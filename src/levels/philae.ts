@@ -35,17 +35,17 @@ g.set(55, GROUND - 1, '#');
 g.set(59, GROUND - 1, '#');
 // The Kiosk. Columns are drawn, not tiled; only the capitals are solid, so the spacing
 // can be what the jump needs: a staircase of four steps two tiles apart (a tap climbs
-// that), then a flat run 40px apart, where any jump lands on the next capital or the one
-// after. The difficulty is the fakes and the water, not the input.
+// that), then a flat run 44px apart: too wide to walk, a tap lands on the next capital,
+// a held jump on the one after. The difficulty is the fakes and the water, not the input.
 const CAPITALS: { x: number; top: number }[] = [
   { x: px(65), top: px(14) },
   { x: px(67), top: px(13) },
   { x: px(69), top: px(12) },
   { x: px(71), top: px(11) },
-  { x: px(71) + 40, top: px(11) },
-  { x: px(71) + 80, top: px(11) },
-  { x: px(71) + 120, top: px(11) },
-  { x: px(71) + 160, top: px(11) },
+  { x: px(71) + 44, top: px(11) },
+  { x: px(71) + 88, top: px(11) },
+  { x: px(71) + 132, top: px(11) },
+  { x: px(71) + 176, top: px(11) },
 ];
 // Fake capitals: the unfinished ones. They look like the others.
 const FAKE = new Set([2, 5, 7]);
@@ -81,7 +81,7 @@ export const PHILAE: LevelData = {
       x1: px(W),
       startY: WATER_Y,
       cause: 'Crocodile',
-      rise: { onEvent: 'cofferdam', fastTo: px(GROUND) + 4, fastSpeed: 60, slowTo: px(11) + 4, slowSpeed: 3 },
+      rise: { onEvent: 'cofferdam', fastTo: px(GROUND) + 8, fastSpeed: 60, slowTo: px(11) + 4, slowSpeed: 1 },
     },
     // The boat in. Honest. It carries you to the landing and stops.
     {

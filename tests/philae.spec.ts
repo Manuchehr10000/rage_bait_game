@@ -125,6 +125,20 @@ test('running the cofferdam corridor on the floor gets you swept', async ({ page
   expect(r.cause).toBe('The cofferdam');
 });
 
+test('a human pace after the wave still reaches the Kiosk', async ({ page }) => {
+  // Wait out the wave on the first stump, then think for three seconds, then walk to the first capital.
+  const r = await play(page, `
+    let rest = 0;
+    const step = () => { if (!waitDock()) return; const x = p.x;
+      if (phase === 'reached') { key('ArrowRight', false); return; }
+      if (phase !== 'corridor') { toQuay(); return; }
+      if (!wave.finished) { key('ArrowRight', true); const stump = stumps[0]; if (wave.triggered) { key('ArrowRight', x < stump - 2); if (x >= stump - 14 && canJump()) jump(); } return; }
+      if (rest < 180) { rest++; key('ArrowRight', false); return; }
+      key('ArrowRight', true); if (canJump() && inWin(firstCap - 36, firstCap - 22)) jump(12); if (x > firstCap + 4 && p.onGround) phase = 'reached'; };`, 60 * 30);
+  expect(r.state).toBe('playing');
+  expect(r.phase).toBe('reached');
+});
+
 test('a run that knows the level finishes with zero deaths', async ({ page }) => {
   const r = await play(page, `
     const step = () => { if (!waitDock()) return; if (!toQuay()) return;
