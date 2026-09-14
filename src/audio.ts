@@ -129,26 +129,29 @@ export class GameAudio {
     }, 0.12);
   }
 
-  /** Lake Nasser coming up. */
+  /** The Nile coming up into the pit: a soft gurgle, not surf. */
   setWater(on: boolean): void {
     this.setLoop('water', on, (ctx, out) => {
       const src = this.noiseSource(ctx);
-      const lp = ctx.createBiquadFilter();
-      lp.type = 'lowpass';
-      lp.frequency.value = 320;
+      const bp = ctx.createBiquadFilter();
+      bp.type = 'bandpass';
+      bp.frequency.value = 640;
+      bp.Q.value = 1.4;
+      const trem = ctx.createGain();
+      trem.gain.value = 0.6;
       const lfo = ctx.createOscillator();
-      lfo.frequency.value = 1.3;
+      lfo.frequency.value = 2.3;
       const lfoGain = ctx.createGain();
-      lfoGain.gain.value = 120;
-      lfo.connect(lfoGain).connect(lp.frequency);
-      src.connect(lp).connect(out);
+      lfoGain.gain.value = 0.35;
+      lfo.connect(lfoGain).connect(trem.gain);
+      src.connect(bp).connect(trem).connect(out);
       src.start();
       lfo.start();
       return () => {
         src.stop();
         lfo.stop();
       };
-    }, 0.16);
+    }, 0.05);
   }
 
   /** The sun in the sanctuary: a swell, not a sting. */
@@ -222,17 +225,18 @@ export class GameAudio {
   private startWind(): void {
     const ctx = this.ctx;
     if (!ctx || !this.master) return;
+    // Desert wind over rock: thin and steady. A slow swell would sound like waves.
     const src = this.noiseSource(ctx);
     const bp = ctx.createBiquadFilter();
     bp.type = 'bandpass';
-    bp.frequency.value = 480;
-    bp.Q.value = 0.6;
+    bp.frequency.value = 1100;
+    bp.Q.value = 1.8;
     const gain = ctx.createGain();
-    gain.gain.value = 0.03;
+    gain.gain.value = 0.012;
     const lfo = ctx.createOscillator();
-    lfo.frequency.value = 0.07;
+    lfo.frequency.value = 0.4;
     const lfoGain = ctx.createGain();
-    lfoGain.gain.value = 0.018;
+    lfoGain.gain.value = 0.004;
     lfo.connect(lfoGain).connect(gain.gain);
     src.connect(bp).connect(gain).connect(this.master);
     src.start();
