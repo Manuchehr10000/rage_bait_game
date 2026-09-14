@@ -43,3 +43,22 @@ Abu Simbel → Philae → Karnak / Luxor → Valley of the Kings → Giza.
 | Exit | none | visitor record: deaths by cause |
 
 Target death budget for a first clean run: 10 to 15.
+
+## Level 2: Philae, Temple of Isis
+
+Level 1 lied about the world. Level 2 lies about what level 1 taught you. Everything is
+over water, and the water is a crocodile. From the cofferdam on, the water rises for the
+rest of the level: standing still anywhere eventually drowns you.
+
+| Beat | Trap | The history behind it |
+|---|---|---|
+| The boat in | none; it docks, you hop the bow | Philae is reachable only by boat |
+| Two rocks | identical; the first is a crocodile that dives when touched | Lake Nasser has crocodiles |
+| The reliefs | four chiselled Isis figures; one steps out and shoves you back into the water | Coptic Christians defaced the reliefs |
+| Numbered blocks | cranes above, 201 to 206. They do not move. The bank after them sinks | moved to Agilkia 1972 to 1980 |
+| The cofferdam | the wall gives way; a wave comes along the floor; stumps are above it | the temple was moved inside a cofferdam |
+| The Kiosk | seven column tops, three tiles apart; a tapped hop lands, a held jump overshoots; three capitals give way a beat after you land | Trajan's Kiosk was never finished |
+| The scaffold | nothing happens | the last hieroglyph was cut here in 394 AD |
+| The boat out | starts leaving when you reach the scaffold; a committed jump makes it, a hesitation does not | by boat only |
+
+Target death budget for a first clean run: 25 to 35.

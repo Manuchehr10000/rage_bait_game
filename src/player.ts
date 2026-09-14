@@ -39,6 +39,8 @@ export class Player implements Rect {
   justJumped = false;
   /** Set on frames where a foot comes down while walking. */
   justStepped = false;
+  /** True from a jump until landing; the variable-height cut applies only then. */
+  private jumping = false;
   lastContacts: Contacts = { left: false, right: false, up: false, down: false, standingOn: null };
 
   spawnAt(x: number, y: number): void {
@@ -52,6 +54,16 @@ export class Player implements Rect {
     this.riding = null;
     this.facing = 1;
     this.walkPhase = 0;
+  }
+
+  /** Knocked by something in the world. Controls stay honest; the world does not. */
+  shove(vx: number, vy: number): void {
+    this.vx = vx;
+    this.vy = vy;
+    this.onGround = false;
+    this.riding = null;
+    this.coyote = 0;
+    this.jumping = false;
   }
 
   animFrame(): 'idle' | 'walk1' | 'walk2' | 'jump' {
@@ -81,13 +93,14 @@ export class Player implements Rect {
     this.justStepped = false;
     if (this.buffer > 0 && this.coyote > 0) {
       this.justJumped = true;
+      this.jumping = true;
       this.vy = -PHYS.jumpVelocity;
       this.buffer = 0;
       this.coyote = 0;
       this.onGround = false;
       this.riding = null;
     }
-    if (!input.jumpHeld && this.vy < -PHYS.jumpCutVelocity) this.vy = -PHYS.jumpCutVelocity;
+    if (this.jumping && !input.jumpHeld && this.vy < -PHYS.jumpCutVelocity) this.vy = -PHYS.jumpCutVelocity;
 
     this.vy = Math.min(PHYS.maxFall, this.vy + PHYS.gravity * DT);
 
@@ -112,6 +125,7 @@ export class Player implements Rect {
 
     const ground = groundBelow(this, level, rects);
     this.onGround = ground !== null;
+    if (this.onGround) this.jumping = false;
     if (this.onGround && Math.abs(this.vx) >= 10) {
       const before = Math.floor(this.walkPhase / 10);
       this.walkPhase += Math.abs(this.vx) * DT;

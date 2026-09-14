@@ -42,9 +42,9 @@ export function moveAndCollide(
 
 function resolveX(body: Rect, s: Rect, dx: number, c: Contacts, oldX: number): void {
   if (!overlaps(body, s)) return;
-  // Already overlapping on X before this move: the overlap comes from the Y axis
-  // (a solid rising from below). Leave it to the Y pass instead of shoving sideways.
-  if (oldX < s.x + s.w && oldX + body.w > s.x) return;
+  // Already overlapping on X before this move (by more than a rounding error): the
+  // overlap comes from the Y axis, a solid rising from below. Leave it to the Y pass.
+  if (oldX < s.x + s.w - 0.5 && oldX + body.w > s.x + 0.5) return;
   if (dx > 0) {
     body.x = s.x - body.w;
     c.right = true;

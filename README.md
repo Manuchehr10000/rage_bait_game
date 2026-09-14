@@ -24,7 +24,7 @@ npm install
 npm run dev
 ```
 
-Arrows or WASD to move, Space to jump, R to give up (it counts), M to mute.
+Arrows or WASD to move, Space to jump, R to give up (it counts), M to mute, Enter for the next level at the exit label. Open `#philae` in the URL to start at level 2.
 
 `npm test` runs scripted playthroughs in headless Chromium (`tests/smoke.spec.ts`). Each one
 checks a design contract: the trap fires for the naive player and can be avoided by the one
@@ -34,8 +34,8 @@ who remembers it.
 
 - `src/player.ts` – physics tuning (`PHYS`). The one part of the game that never lies.
 - `src/physics.ts` – axis-separated AABB collision against tiles and moving solids.
-- `src/entities.ts` – the traps: colossus heads, baboon, relocation, sunbeam.
-- `src/levels/abu-simbel.ts` – chapter 1, level 1 as data.
+- `src/levels/` – each level as data: geometry, decor, and a list of generic traps.
+- `src/entities.ts` – the generic traps: falling object, thrower, moving platform, water, sweep, crumbling platform, pusher.
 - `src/render.ts` – the scene: sky, lake, rock, facade, tiles, entities. 320×180, integer-scaled.
 - `src/sprites.ts` – pixel-map sprites: the tourist, baboons, the colossi, the four gods.
 - `src/audio.ts` – every sound, synthesised with Web Audio. No files.
@@ -43,4 +43,4 @@ who remembers it.
 
 ## Status
 
-Level 1 playable end to end with first-pass pixel art and procedural sound. No menu yet.
+Levels 1 and 2 playable end to end with pixel art and procedural sound. No menu yet.

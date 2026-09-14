@@ -1,70 +1,104 @@
-import type { Level, BaboonDef, RelocationDef, StatueDef, SunbeamDef } from './level';
+import type { Sfx } from './audio';
+import type {
+  CrumbleDef,
+  EntityDef,
+  FallingDef,
+  Level,
+  PlatformDef,
+  PusherDef,
+  SweepDef,
+  ThrowerDef,
+  WaterDef,
+} from './level';
 import type { MovingSolid, Player } from './player';
 import { PHYS } from './player';
-import { centerX, centerY, DT, TILE, type DeathCause, type Rect } from './types';
-import type { Sfx } from './audio';
+import { centerX, centerY, DT, overlaps, type DeathCause, type Rect } from './types';
 
 export interface World {
   level: Level;
   player: Player;
   cameraX: number;
+  /** Names of events fired this attempt. Entities read it; platforms and sweeps write it. */
+  events: Set<string>;
   kill(cause: DeathCause): void;
   sound(name: Sfx): void;
 }
 
 export interface Entity {
+  readonly def: EntityDef;
   update(w: World): void;
   /** Solids the player collides with this frame. */
   solids?(): MovingSolid[];
+  /** True while the player standing on it should count as reaching the exit. */
+  isExit?(p: Player): boolean;
+}
+
+export function createEntity(def: EntityDef, level: Level): Entity {
+  switch (def.kind) {
+    case 'falling':
+      return new Falling(def);
+    case 'thrower':
+      return new Thrower(def);
+    case 'platform':
+      return new Platform(def);
+    case 'water':
+      return new Water(def, level.heightPx);
+    case 'sweep':
+      return new Sweep(def);
+    case 'crumble':
+      return new Crumble(def);
+    case 'pusher':
+      return new Pusher(def);
+  }
+}
+
+function fallOntoTiles(w: World, r: Rect, vy: number): boolean {
+  r.y += vy * DT;
+  const tiles: Rect[] = [];
+  w.level.solidTilesIn(r, tiles);
+  let landed = false;
+  for (const t of tiles) {
+    if (t.y < r.y + r.h) {
+      r.y = t.y - r.h;
+      landed = true;
+    }
+  }
+  return landed;
 }
 
 // ---------------------------------------------------------------------------
-// Colossus head. Intact heads drop. The broken statue has nothing to drop.
-// ---------------------------------------------------------------------------
 
-export class ColossusHead implements Entity {
+export class Falling implements Entity {
   readonly rect: Rect;
   state: 'idle' | 'falling' | 'landed' = 'idle';
   private vy = 0;
-  private solid: MovingSolid;
-  readonly headX: number;
+  private readonly solid: MovingSolid;
 
-  constructor(readonly def: StatueDef) {
-    this.headX = def.tx * TILE + TILE;
-    this.rect = { x: this.headX, y: 6 * TILE, w: 32, h: 32 };
+  constructor(readonly def: FallingDef) {
+    this.rect = { ...def.rect };
     this.solid = { rect: this.rect, dx: 0, dy: 0 };
   }
 
   update(w: World): void {
-    if (this.def.broken || !this.def.drops) return;
+    if (!this.def.active) return;
     const p = w.player;
-
     if (this.state === 'idle') {
-      // Tuned so the head meets a full-speed runner. Stop short and it lands in front of you.
-      if (centerX(p) >= this.headX - 40) {
+      if (centerX(p) >= this.def.triggerX) {
         this.state = 'falling';
         w.sound('headCrack');
       }
       return;
     }
-
-    if (this.state === 'falling') {
-      this.vy = Math.min(PHYS.maxFall, this.vy + PHYS.gravity * DT);
-      const dy = this.vy * DT;
-      const tiles: Rect[] = [];
-      this.rect.y += dy;
-      w.level.solidTilesIn(this.rect, tiles);
-      if (overlapsRect(this.rect, p)) w.kill('Colossus head');
-      for (const t of tiles) {
-        if (t.y < this.rect.y + this.rect.h) {
-          // Thirty tonnes of sandstone do not bounce. The head shatters into a
-          // one-tile-high pile of rubble that the player hops over.
-          this.rect.h = 16;
-          this.rect.y = t.y - this.rect.h;
-          this.state = 'landed';
-          w.sound('headThud');
-        }
-      }
+    if (this.state !== 'falling') return;
+    this.vy = Math.min(PHYS.maxFall, this.vy + PHYS.gravity * DT);
+    if (overlaps(this.rect, p)) w.kill(this.def.cause);
+    if (fallOntoTiles(w, this.rect, this.vy)) {
+      // Thirty tonnes of sandstone do not bounce. It becomes a low pile you hop over.
+      const bottom = this.rect.y + this.rect.h;
+      this.rect.h = this.def.landedH;
+      this.rect.y = bottom - this.rect.h;
+      this.state = 'landed';
+      w.sound('headThud');
     }
   }
 
@@ -74,131 +108,193 @@ export class ColossusHead implements Entity {
 }
 
 // ---------------------------------------------------------------------------
-// Baboon. Twenty-two of them, identical. One throws a date. It does not move.
-// ---------------------------------------------------------------------------
 
-export class Baboon implements Entity {
+export class Thrower implements Entity {
   readonly rect: Rect;
-  /** The thrown date, once it exists. */
-  date: Rect | null = null;
+  projectile: Rect | null = null;
   state: 'idle' | 'thrown' | 'landed' = 'idle';
   private vx = 0;
   private vy = 0;
 
-  constructor(readonly def: BaboonDef) {
+  constructor(readonly def: ThrowerDef) {
     this.rect = { x: def.x, y: def.y, w: 6, h: 8 };
   }
 
   update(w: World): void {
-    if (!this.def.throws || this.state === 'landed') return;
+    if (!this.def.active || this.state === 'landed') return;
     const p = w.player;
     if (this.state === 'idle') {
-      if (centerX(p) >= this.rect.x - 52) {
+      if (centerX(p) >= this.rect.x - this.def.triggerDist) {
         this.state = 'thrown';
-        this.date = { x: this.rect.x - 2, y: this.rect.y - 2, w: 4, h: 4 };
-        this.vx = -12;
-        this.vy = -70;
+        this.projectile = { x: this.rect.x - 2, y: this.rect.y - 2, w: 4, h: 4 };
+        this.vx = this.def.vx;
+        this.vy = this.def.vy;
         w.sound('baboon');
       }
       return;
     }
-    const d = this.date;
+    const d = this.projectile;
     if (!d) return;
     this.vy = Math.min(PHYS.maxFall, this.vy + PHYS.gravity * DT);
     d.x += this.vx * DT;
-    d.y += this.vy * DT;
-    const tiles: Rect[] = [];
-    w.level.solidTilesIn(d, tiles);
-    for (const t of tiles) {
-      if (t.y < d.y + d.h) {
-        d.y = t.y - d.h;
-        this.state = 'landed';
-        w.sound('dateLand');
-      }
+    if (fallOntoTiles(w, d, this.vy)) {
+      this.state = 'landed';
+      w.sound('dateLand');
     }
-    if (this.state === 'thrown' && overlapsRect(d, p)) w.kill('Baboon');
+    if (this.state === 'thrown' && overlaps(d, p)) w.kill(this.def.cause);
   }
 }
 
 // ---------------------------------------------------------------------------
-// Relocation. 1,036 numbered blocks, 65 metres up, 200 metres back. You are on 417.
-// ---------------------------------------------------------------------------
 
-export class Relocation implements Entity {
-  readonly platform: MovingSolid;
-  state: 'idle' | 'rising' | 'sliding' = 'idle';
+export class Platform implements Entity {
+  readonly solid: MovingSolid;
+  readonly rail: MovingSolid | null;
+  state: 'idle' | 'waiting' | 'rising' | 'sliding' | 'done' = 'idle';
   private risen = 0;
-  waterY: number;
-  readonly waterRect: Rect;
-  private readonly startRect: Rect;
+  private slid = 0;
+  private wait = 0;
 
-  constructor(readonly def: RelocationDef, levelH: number) {
-    this.startRect = { ...def.platform };
-    this.platform = { rect: { ...def.platform }, dx: 0, dy: 0 };
-    this.waterY = levelH;
-    this.waterRect = { x: 0, y: levelH, w: def.waterRightEdge, h: 0 };
+  constructor(readonly def: PlatformDef) {
+    this.solid = { rect: { ...def.rect }, dx: 0, dy: 0 };
+    this.rail = def.rail ? { rect: { ...def.rail, x: def.rect.x + def.rail.x, y: def.rect.y + def.rail.y }, dx: 0, dy: 0 } : null;
+  }
+
+  get rect(): Rect {
+    return this.solid.rect;
   }
 
   get triggered(): boolean {
     return this.state !== 'idle';
   }
 
-  blockNumberAt(i: number): number {
-    return this.def.firstBlockNumber + i;
+  numberAt(i: number): number {
+    return (this.def.firstNumber ?? 0) + i;
+  }
+
+  private standingOn(p: Player): boolean {
+    const r = this.rect;
+    return p.x + p.w > r.x && p.x < r.x + r.w && Math.abs(p.y + p.h - r.y) <= 2;
   }
 
   update(w: World): void {
+    this.step(w);
+    if (this.rail && this.def.rail) {
+      this.rail.rect.x = this.rect.x + this.def.rail.x;
+      this.rail.rect.y = this.rect.y + this.def.rail.y;
+      this.rail.dx = this.solid.dx;
+      this.rail.dy = this.solid.dy;
+    }
+  }
+
+  private step(w: World): void {
     const p = w.player;
     const d = this.def;
-    const r = this.platform.rect;
-    this.platform.dx = 0;
-    this.platform.dy = 0;
+    this.solid.dx = 0;
+    this.solid.dy = 0;
 
     if (this.state === 'idle') {
-      const triggerX = r.x + (d.triggerBlock - d.firstBlockNumber) * TILE;
-      const standingOnBlocks = p.x + p.w > r.x && p.x < r.x + r.w && Math.abs(p.y + p.h - r.y) <= 2;
-      if (standingOnBlocks && centerX(p) >= triggerX) this.state = 'rising';
+      const t = d.trigger;
+      let go = false;
+      if (t.type === 'auto') go = true;
+      else if (t.type === 'reach') go = centerX(p) >= t.x;
+      else if (t.type === 'standOn') go = this.standingOn(p) && (t.pastX === undefined || centerX(p) >= t.pastX);
+      if (!go) return;
+      this.wait = t.type === 'standOn' ? (t.delay ?? 0) : 0;
+      this.state = this.wait > 0 ? 'waiting' : 'rising';
+      if (d.emits) w.events.add(d.emits);
+      if (this.state === 'rising') this.begin(w);
       return;
     }
-
-    if (this.state === 'rising') {
-      const step = Math.min(d.riseSpeed * DT, d.riseDistance - this.risen);
-      r.y -= step;
-      this.risen += step;
-      this.platform.dy = -step;
-      if (this.risen >= d.riseDistance) this.state = 'sliding';
-    } else {
-      const step = d.slideSpeed * DT;
-      r.x -= step;
-      this.platform.dx = -step;
+    if (this.state === 'waiting') {
+      this.wait -= DT;
+      if (this.wait <= 0) {
+        this.state = 'rising';
+        this.begin(w);
+      }
+      return;
     }
+    if (this.state === 'rising') {
+      const total = Math.abs(d.rise);
+      const step = Math.min(d.riseSpeed * DT, total - this.risen);
+      const dir = d.rise >= 0 ? -1 : 1;
+      this.rect.y += dir * step;
+      this.solid.dy = dir * step;
+      this.risen += step;
+      if (this.risen >= total) this.state = d.slideX !== 0 ? 'sliding' : 'done';
+      return;
+    }
+    if (this.state === 'sliding') {
+      const total = Math.abs(d.slideX);
+      const step = Math.min(d.slideSpeed * DT, total - this.slid);
+      const dir = d.slideX >= 0 ? 1 : -1;
+      this.rect.x += dir * step;
+      this.solid.dx = dir * step;
+      this.slid += step;
+      if (this.slid >= total) this.state = 'done';
+    }
+  }
 
-    // Lake Nasser fills the pit, then keeps coming.
-    const levelBottom = this.startRect.y + this.startRect.h + TILE;
-    if (this.waterY > d.waterFastTo) this.waterY = Math.max(d.waterFastTo, this.waterY - d.waterFastSpeed * DT);
-    else if (this.waterY > d.waterSlowTo) this.waterY = Math.max(d.waterSlowTo, this.waterY - d.waterSlowSpeed * DT);
-    this.waterRect.y = this.waterY;
-    this.waterRect.h = Math.max(0, levelBottom - this.waterY);
-
-    if (overlapsRect(this.waterRect, p) && centerY(p) > this.waterY) w.kill('Lake Nasser');
+  private begin(w: World): void {
+    if (this.def.skin === 'blocks') w.sound('winchStart');
+    if (this.def.skin === 'boat') w.sound('motorStart');
   }
 
   solids(): MovingSolid[] {
-    return [this.platform];
+    return this.rail ? [this.solid, this.rail] : [this.solid];
+  }
+
+  isExit(p: Player): boolean {
+    return this.def.isExit === true && this.standingOn(p);
   }
 }
 
 // ---------------------------------------------------------------------------
-// Sunbeam. Twice a year the sun reaches the sanctuary. Ptah stays in the dark.
+
+export class Water implements Entity {
+  waterY: number;
+  readonly rect: Rect;
+  rising = false;
+  private readonly levelBottom: number;
+
+  constructor(readonly def: WaterDef, levelH: number) {
+    this.waterY = def.startY;
+    this.levelBottom = levelH + 16;
+    this.rect = { x: def.x0, y: def.startY, w: def.x1 - def.x0, h: this.levelBottom - def.startY };
+  }
+
+  /** True while the water is in its fast phase. */
+  get surging(): boolean {
+    const r = this.def.rise;
+    return this.rising && r !== undefined && this.waterY > r.fastTo;
+  }
+
+  update(w: World): void {
+    const p = w.player;
+    const r = this.def.rise;
+    if (r && !this.rising) {
+      if ((r.onEvent && w.events.has(r.onEvent)) || (r.atX !== undefined && centerX(p) >= r.atX)) this.rising = true;
+    }
+    if (r && this.rising) {
+      if (this.waterY > r.fastTo) this.waterY = Math.max(r.fastTo, this.waterY - r.fastSpeed * DT);
+      else if (this.waterY > r.slowTo) this.waterY = Math.max(r.slowTo, this.waterY - r.slowSpeed * DT);
+    }
+    this.rect.y = this.waterY;
+    this.rect.h = Math.max(0, this.levelBottom - this.waterY);
+    if (overlaps(this.rect, p) && centerY(p) > this.waterY) w.kill(this.def.cause);
+  }
+}
+
 // ---------------------------------------------------------------------------
 
-export class Sunbeam implements Entity {
+export class Sweep implements Entity {
   t = -1;
-  /** Current lit rect, or null when dark. */
-  beam: Rect | null = null;
+  /** Current deadly band, or null. */
+  band: Rect | null = null;
   fade = 0;
+  private emitted = false;
 
-  constructor(readonly def: SunbeamDef) {}
+  constructor(readonly def: SweepDef) {}
 
   get triggered(): boolean {
     return this.t >= 0;
@@ -206,7 +302,12 @@ export class Sunbeam implements Entity {
 
   get finished(): boolean {
     const d = this.def;
-    return this.t > d.darkFor + d.sweepFor + d.holdFor + 0.3;
+    return this.t > d.delay + d.duration + d.hold + 0.3;
+  }
+
+  /** Leading edge of the band, for rendering. */
+  get front(): number {
+    return this.band ? (this.def.endX >= this.def.startX ? this.band.x + this.band.w : this.band.x) : this.def.startX;
   }
 
   update(w: World): void {
@@ -217,28 +318,114 @@ export class Sunbeam implements Entity {
       else return;
     }
     this.t += DT;
+    const sweepStart = d.delay;
+    const holdStart = sweepStart + d.duration;
+    const fadeStart = holdStart + d.hold;
 
-    const sweepStart = d.darkFor;
-    const holdStart = sweepStart + d.sweepFor;
-    const fadeStart = holdStart + d.holdFor;
-
-    this.beam = null;
+    this.band = null;
     this.fade = 0;
     if (this.t >= sweepStart && this.t < fadeStart) {
-      const k = Math.min(1, (this.t - sweepStart) / d.sweepFor);
-      const front = d.beamStartX + (d.beamEndX - d.beamStartX) * k;
-      this.beam = { x: d.beamStartX, y: d.beamTop, w: front - d.beamStartX, h: d.beamBottom - d.beamTop };
+      if (!this.emitted && d.emits) {
+        w.events.add(d.emits);
+        this.emitted = true;
+      }
+      const k = Math.min(1, (this.t - sweepStart) / d.duration);
+      const front = d.startX + (d.endX - d.startX) * k;
+      const x0 = Math.min(d.startX, front);
+      const x1 = Math.max(d.startX, front);
+      // A wave is a short band; a beam fills everything behind its front.
+      const width = d.skin === 'wave' ? 24 : x1 - x0;
+      const bx = d.skin === 'wave' ? (d.endX >= d.startX ? front - width : front) : x0;
+      this.band = { x: bx, y: d.top, w: width, h: d.bottom - d.top };
     } else if (this.t >= fadeStart && this.t < fadeStart + 0.3) {
       this.fade = 1 - (this.t - fadeStart) / 0.3;
     }
 
-    if (this.beam && overlapsRect(this.beam, p)) {
-      const inAlcove = centerX(p) >= d.alcove.x && centerX(p) <= d.alcove.x + d.alcove.w;
-      if (!inAlcove) w.kill('The sun');
+    if (this.band && overlaps(this.band, p)) {
+      const cx = centerX(p);
+      const safe = d.safe.some((s) => cx >= s.x && cx <= s.x + s.w && centerY(p) >= s.y && centerY(p) <= s.y + s.h);
+      if (!safe) w.kill(d.cause);
     }
   }
 }
 
-function overlapsRect(a: Rect, b: Rect): boolean {
-  return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
+// ---------------------------------------------------------------------------
+
+export class Crumble implements Entity {
+  readonly rect: Rect;
+  state: 'idle' | 'armed' | 'falling' | 'gone' = 'idle';
+  private timer = 0;
+  private vy = 0;
+  private readonly solid: MovingSolid;
+
+  constructor(readonly def: CrumbleDef) {
+    this.rect = { ...def.rect };
+    this.solid = { rect: this.rect, dx: 0, dy: 0 };
+  }
+
+  update(w: World): void {
+    if (!this.def.fake || this.state === 'gone') return;
+    const p = w.player;
+    this.solid.dx = 0;
+    this.solid.dy = 0;
+    const r = this.rect;
+    const standing = p.x + p.w > r.x && p.x < r.x + r.w && Math.abs(p.y + p.h - r.y) <= 2;
+    if (this.state === 'idle') {
+      if (standing) {
+        this.state = 'armed';
+        this.timer = this.def.delay;
+      }
+      return;
+    }
+    if (this.state === 'armed') {
+      this.timer -= DT;
+      if (this.timer <= 0) {
+        this.state = 'falling';
+        w.sound(this.def.skin === 'croc' ? 'splash' : 'crumble');
+      }
+      return;
+    }
+    // Falling: a crocodile dives at its own pace, a capital drops. You ride it down either way.
+    if (this.def.skin === 'croc') this.vy = 55;
+    else this.vy = Math.min(PHYS.maxFall, this.vy + PHYS.gravity * DT);
+    const before = r.y;
+    r.y += this.vy * DT;
+    this.solid.dy = r.y - before;
+    if (r.y > w.level.heightPx + 32) this.state = 'gone';
+  }
+
+  solids(): MovingSolid[] {
+    return this.state === 'gone' ? [] : [this.solid];
+  }
+}
+
+// ---------------------------------------------------------------------------
+
+export class Pusher implements Entity {
+  /** How far the figure has stepped out of the wall, in px. */
+  out = 0;
+  state: 'idle' | 'out' | 'done' = 'idle';
+  private timer = 0;
+  readonly figure: Rect;
+
+  constructor(readonly def: PusherDef) {
+    this.figure = { x: def.x, y: def.floorY - 24, w: 12, h: 24 };
+  }
+
+  update(w: World): void {
+    if (!this.def.active || this.state === 'done') return;
+    const p = w.player;
+    if (this.state === 'idle') {
+      if (Math.abs(centerX(p) - centerX(this.figure)) <= this.def.reach && p.y + p.h >= this.def.floorY - 4) {
+        this.state = 'out';
+        this.timer = this.def.outFor;
+        w.sound('grind');
+        p.shove(this.def.impulseX, this.def.impulseY);
+      }
+      return;
+    }
+    this.out = Math.min(6, this.out + 60 * DT);
+    this.timer -= DT;
+    if (this.timer <= 0) this.state = 'done';
+  }
 }

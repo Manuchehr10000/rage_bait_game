@@ -1,17 +1,18 @@
 import { GameAudio } from './audio';
 import { Camera } from './camera';
-import { Baboon, ColossusHead, Relocation, Sunbeam, type Entity, type World } from './entities';
+import { createEntity, type Entity, type Platform, type Sweep, type Water, type World } from './entities';
 import type { Stats } from './hud';
 import { renderHud } from './hud';
 import { Input } from './input';
 import { Level, type LevelData } from './level';
-import { ABU_SIMBEL } from './levels/abu-simbel';
+import { LEVELS, levelIndexFromHash } from './levels/index';
 import { Player, type MovingSolid } from './player';
 import { renderWorld, type Scene, type WorldText } from './render';
 import { DEATH_SOUND, DT, overlaps, TILE, VIEW_H, VIEW_W, type DeathCause } from './types';
 
 /** How long a death plays before the reset. The world keeps moving through it. */
 const DEATH_TIME = 0.75;
+const TITLE_TIME = 2.2;
 const LIFETIME_KEY = 'ragebait.lifetimeDeaths';
 
 type State = 'playing' | 'dead' | 'complete';
@@ -24,21 +25,20 @@ export class Game {
 
   private readonly input: Input;
   private readonly audio = new GameAudio();
-  private readonly level: Level;
+  private levelIndex = 0;
+  private level!: Level;
   private readonly player = new Player();
-  private readonly camera: Camera;
+  private camera!: Camera;
 
-  private heads: ColossusHead[] = [];
-  private baboons: Baboon[] = [];
-  private relocation!: Relocation;
-  private sunbeam!: Sunbeam;
   private entities: Entity[] = [];
+  private events = new Set<string>();
   private coins: { x: number; y: number; t: number }[] = [];
   private texts: WorldText[] = [];
 
   private state: State = 'playing';
   private deathTimer = 0;
   private deathCause: DeathCause = 'Fall';
+  private titleTimer = 0;
 
   private stats: Stats = { total: 0, byCause: new Map(), lifetime: readLifetime() };
 
@@ -46,7 +46,7 @@ export class Game {
   private last = 0;
   private time = 0;
 
-  constructor(private readonly canvas: HTMLCanvasElement, data: LevelData = ABU_SIMBEL) {
+  constructor(private readonly canvas: HTMLCanvasElement) {
     const ctx = canvas.getContext('2d');
     if (!ctx) throw new Error('2d context unavailable');
     this.ctx = ctx;
@@ -62,16 +62,18 @@ export class Game {
       this.audio.unlock();
       if (e.code === 'KeyM' && !e.repeat) this.audio.toggleMute();
     });
-    this.level = new Level(data);
-    this.camera = new Camera(this.level.widthPx, data.cameraBottom);
     this.resize();
     window.addEventListener('resize', () => this.resize());
-    this.resetRun();
+    this.loadLevel(levelIndexFromHash(location.hash));
   }
 
   start(): void {
     this.last = performance.now();
     requestAnimationFrame((t) => this.frame(t));
+  }
+
+  get levelData(): LevelData {
+    return this.level.data;
   }
 
   // ---------------------------------------------------------------------
@@ -84,15 +86,28 @@ export class Game {
     this.ctx.imageSmoothingEnabled = false;
   }
 
+  /** Enter a level fresh: new stats, the title card, first attempt. */
+  loadLevel(index: number): void {
+    const data = LEVELS[index] ?? LEVELS[0];
+    if (!data) throw new Error('no levels');
+    this.levelIndex = LEVELS.indexOf(data);
+    this.level = new Level(data);
+    this.camera = new Camera(this.level.widthPx, data.cameraBottom);
+    this.titleTimer = TITLE_TIME;
+    try {
+      history.replaceState(null, '', `#${data.id}`);
+    } catch {
+      /* fine */
+    }
+    this.resetRun();
+  }
+
   /** Rebuild every trap. Deterministic: the level is identical on every attempt. */
   private resetLevel(): void {
     const d = this.level.data;
     this.level.reset();
-    this.heads = d.statues.map((s) => new ColossusHead(s));
-    this.baboons = d.baboons.map((b) => new Baboon(b));
-    this.relocation = new Relocation(d.relocation, this.level.heightPx);
-    this.sunbeam = new Sunbeam(d.sunbeam);
-    this.entities = [...this.heads, ...this.baboons, this.relocation, this.sunbeam];
+    this.entities = d.entities.map((def) => createEntity(def, this.level));
+    this.events = new Set();
     this.coins = [];
     this.time = 0;
     this.audio.stopLoops();
@@ -135,21 +150,22 @@ export class Game {
 
   private tick(): void {
     this.audio.update();
-    if (this.input.takeRestartPressed()) {
-      if (this.state === 'complete') {
-        this.resetRun();
-      } else if (this.state === 'playing') {
-        this.kill('Gave up');
-      }
+    if (this.titleTimer > 0) this.titleTimer -= DT;
+    const restart = this.input.takeRestartPressed();
+    const next = this.input.takeNextPressed();
+    if (this.state === 'complete') {
+      if (next && this.levelIndex + 1 < LEVELS.length) this.loadLevel(this.levelIndex + 1);
+      else if (restart || next) this.resetRun();
+      return;
     }
+    if (restart && this.state === 'playing') this.kill('Gave up');
 
-    if (this.state === 'complete') return;
     this.time += DT;
-
     const world: World = {
       level: this.level,
       player: this.player,
       cameraX: this.camera.x,
+      events: this.events,
       kill: (c) => this.kill(c),
       sound: (n) => this.audio.play(n),
     };
@@ -191,7 +207,9 @@ export class Game {
       this.kill('Fall');
       return;
     }
-    if (overlaps(this.player, this.level.data.exit)) {
+    const exit = this.level.data.exit;
+    const reached = (exit && overlaps(this.player, exit)) || this.entities.some((e) => e.isExit?.(this.player));
+    if (reached) {
       this.state = 'complete';
       this.audio.stopLoops();
       this.audio.play('turnstile');
@@ -200,11 +218,28 @@ export class Game {
 
   /** Continuous sounds follow entity state; they stop on their own when it changes. */
   private driveLoops(): void {
-    const rel = this.relocation;
-    const onScreen = rel.platform.rect.x + rel.platform.rect.w > this.camera.x;
-    this.audio.setWinch(rel.state !== 'idle' && onScreen);
-    this.audio.setWater(rel.state !== 'idle' && rel.waterY > this.level.data.relocation.waterFastTo);
-    this.audio.setBeam(this.sunbeam.beam !== null);
+    let winch = false;
+    let motor = false;
+    let water = false;
+    let beam = false;
+    for (const e of this.entities) {
+      const d = e.def;
+      if (d.kind === 'platform') {
+        const p = e as Platform;
+        const moving = p.state === 'rising' || p.state === 'sliding';
+        const onScreen = p.rect.x + p.rect.w > this.camera.x && p.rect.x < this.camera.x + VIEW_W + 64;
+        if (d.skin === 'blocks' && moving && onScreen) winch = true;
+        if (d.skin === 'boat' && moving && onScreen) motor = true;
+      } else if (d.kind === 'water') {
+        if ((e as Water).surging) water = true;
+      } else if (d.kind === 'sweep' && d.skin === 'beam') {
+        if ((e as Sweep).band) beam = true;
+      }
+    }
+    this.audio.setWinch(winch);
+    this.audio.setMotor(motor);
+    this.audio.setWater(water);
+    this.audio.setBeam(beam);
   }
 
   private bumpBlocks(): void {
@@ -224,30 +259,26 @@ export class Game {
       level: this.level,
       camera: this.camera,
       player: this.player,
-      heads: this.heads,
-      baboons: this.baboons,
-      relocation: this.relocation,
-      sunbeam: this.sunbeam,
+      entities: this.entities,
       coins: this.coins,
       texts: this.texts,
       time: this.time,
       death: this.state === 'dead' ? { cause: this.deathCause, t: 1 - this.deathTimer / DEATH_TIME } : null,
-      waterY: this.relocation.waterY,
     };
     renderWorld(this.wctx, scene);
 
     this.ctx.imageSmoothingEnabled = false;
     this.ctx.drawImage(this.world, 0, 0, this.canvas.width, this.canvas.height);
-    renderHud(
-      this.ctx,
-      this.scale,
-      this.stats,
-      this.texts,
-      this.camera.ix,
-      this.camera.iy,
-      this.state === 'complete',
-      this.level.data.name,
-    );
+    renderHud(this.ctx, this.scale, {
+      stats: this.stats,
+      texts: this.texts,
+      camX: this.camera.ix,
+      camY: this.camera.iy,
+      complete: this.state === 'complete',
+      hasNext: this.levelIndex + 1 < LEVELS.length,
+      levelName: this.level.data.name,
+      title: this.titleTimer > 0 ? Math.min(1, this.titleTimer / 0.4, (TITLE_TIME - this.titleTimer) / 0.4) : 0,
+    });
   }
 }
 

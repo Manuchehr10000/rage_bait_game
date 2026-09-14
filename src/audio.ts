@@ -20,7 +20,14 @@ export type Sfx =
   | 'drown'
   | 'burn'
   | 'fallAway'
-  | 'sigh';
+  | 'sigh'
+  | 'snap'
+  | 'whoosh'
+  | 'splash'
+  | 'crumble'
+  | 'grind'
+  | 'winchStart'
+  | 'motorStart';
 
 const MUTE_KEY = 'ragebait.muted';
 
@@ -34,7 +41,7 @@ export class GameAudio {
   private master: GainNode | null = null;
   private noise: AudioBuffer | null = null;
   private muted = readMuted();
-  private loops: Partial<Record<'winch' | 'water' | 'beam', Loop>> = {};
+  private loops: Partial<Record<'winch' | 'water' | 'beam' | 'motor', Loop>> = {};
   private nextNote = 0;
   private noteIndex = 0;
 
@@ -142,6 +149,33 @@ export class GameAudio {
       case 'sigh':
         this.burst(t, 900, 'bandpass', 0.4, 0.05);
         break;
+      case 'snap':
+        this.burst(t, 1200, 'bandpass', 0.02, 0.2);
+        this.burst(t + 0.09, 900, 'bandpass', 0.03, 0.25);
+        this.tone(t + 0.12, 'sine', 260, 90, 0.25, 0.12);
+        break;
+      case 'whoosh':
+        this.burst(t, 600, 'lowpass', 0.45, 0.22);
+        this.burst(t + 0.1, 1800, 'bandpass', 0.3, 0.08);
+        break;
+      case 'splash':
+        this.burst(t, 1400, 'bandpass', 0.18, 0.12);
+        this.tone(t, 'sine', 240, 120, 0.15, 0.06);
+        break;
+      case 'crumble':
+        this.burst(t, 900, 'lowpass', 0.14, 0.16);
+        this.burst(t + 0.05, 1800, 'highpass', 0.08, 0.08);
+        break;
+      case 'grind':
+        this.burst(t, 300, 'lowpass', 0.3, 0.2);
+        this.tone(t, 'sawtooth', 48, 40, 0.3, 0.05);
+        break;
+      case 'winchStart':
+        this.burst(t, 200, 'lowpass', 0.1, 0.1);
+        break;
+      case 'motorStart':
+        this.tone(t, 'square', 60, 90, 0.4, 0.05);
+        break;
     }
   }
 
@@ -222,16 +256,32 @@ export class GameAudio {
     }, 0.07, 0.6);
   }
 
+  /** An outboard motor, receding. */
+  setMotor(on: boolean): void {
+    this.setLoop('motor', on, (ctx, out) => {
+      const osc = ctx.createOscillator();
+      osc.type = 'square';
+      osc.frequency.value = 38;
+      const lp = ctx.createBiquadFilter();
+      lp.type = 'lowpass';
+      lp.frequency.value = 180;
+      osc.connect(lp).connect(out);
+      osc.start();
+      return () => osc.stop();
+    }, 0.05);
+  }
+
   stopLoops(): void {
     this.setWinch(false);
     this.setWater(false);
     this.setBeam(false);
+    this.setMotor(false);
   }
 
   // -------------------------------------------------------------------------
 
   private setLoop(
-    key: 'winch' | 'water' | 'beam',
+    key: 'winch' | 'water' | 'beam' | 'motor',
     on: boolean,
     build: (ctx: AudioContext, out: GainNode) => () => void,
     level: number,

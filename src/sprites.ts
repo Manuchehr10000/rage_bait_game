@@ -436,3 +436,202 @@ export const COLOSSUS = {
   pieces: colossusPieces(),
   head: colossusHead(),
 };
+
+// ---------------------------------------------------------------------------
+// Philae.
+// ---------------------------------------------------------------------------
+
+const RIVER: Palette = {
+  O: '#1e2a14',
+  G: '#4f6b2e', // crocodile
+  H: '#6b8a3c',
+  E: '#f2e7a8',
+  W: '#5c3d1e', // boat wood
+  V: '#7a5430',
+  S: '#efe6cf', // sail
+  M: '#3a2915', // mast
+  R: '#8f8a80', // stone
+  L: '#aaa49a',
+  D: '#6a655c',
+};
+
+/** A crocodile's back, just breaking the surface. 32 x 10. Looks like a rock, if you want it to. */
+export const CROC_SPRITE = compile(
+  [
+    '.....OO..OOO..OO..OOO..OO.......',
+    '....OGGOOGGGOOGGOOGGGOOGGO......',
+    '..OOGHGGGGHGGGGHGGGGHGGGGHGOO...',
+    '.OGGGGGGGGGGGGGGGGGGGGGGGGGGGOO.',
+    'OGGHGGGGGGGGGGGGGGGGGGGGGGGGGGEO',
+    'OGGGGGGGGGGGGGGGGGGGGGGGGGGGGOOO',
+    '.OOOGGGGGGGGGGGGGGGGGGGGGGGOO...',
+    '...OOOOOOOOOOOOOOOOOOOOOOOOO....',
+    '................................',
+    '................................',
+  ],
+  RIVER,
+);
+
+/** A rock in the river. 24 x 8. */
+export const ROCK_SPRITE = compile(
+  [
+    '......OOOOOO..OOO.......',
+    '...OORLLRRRROORRROO.....',
+    '.OORRRRRRRRRRRRRRRRROO..',
+    'ORRRRRRRRRRRRRRRRRRRRRRO',
+    'ORRDRRRRRRDRRRRRRRRDRRRO',
+    'ORRRRRRRRRRRRRRRRRRRRRRO',
+    'ODDDDDDDDDDDDDDDDDDDDDDO',
+    'OOOOOOOOOOOOOOOOOOOOOOOO',
+  ],
+  RIVER,
+);
+
+/** An unfinished capital. 32 x 8. Every one looks like this. */
+export const CAPITAL_SPRITE = compile(
+  [
+    'OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO',
+    'OLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLO',
+    'ORRRRRRRRRRRRRRRRRRRRRRRRRRRRRRO',
+    'ORRRDRRRRRRRRDRRRRRRRDRRRRRRDRRO',
+    'ORRRRRRRRRRRRRRRRRRRRRRRRRRRRRRO',
+    '..ODDRRRRRRRRRRRRRRRRRRRRRRDDO..',
+    '....ODDDDDDDDDDDDDDDDDDDDDDO....',
+    '......OOOOOOOOOOOOOOOOOOOO......',
+  ],
+  RIVER,
+);
+
+/** A felucca. 64 x 24 hull; the sail is drawn separately above it. */
+export const BOAT_SPRITE = compile(
+  [
+    '..OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO..',
+    '.OVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVO.',
+    'OWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWO',
+    'OWVWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWVWO',
+    'OWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWO',
+    '.OWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWO.',
+    '.OWVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVWO.',
+    '..OWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWO..',
+    '..OWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWO..',
+    '...OWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWO...',
+    '....OWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWO....',
+    '.....OOWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWOO.....',
+    '.......OOOWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWOOO.......',
+    '..........OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO..........',
+  ],
+  RIVER,
+);
+
+/** The lateen sail and mast, 40 x 44, drawn above the hull. */
+export const SAIL_SPRITE = compile(
+  [
+    '......................................M.',
+    '.....................................MM.',
+    '....................................MOM.',
+    '...................................MOSM.',
+    '..................................MOSSM.',
+    '.................................MOSSSM.',
+    '................................MOSSSSM.',
+    '...............................MOSSSSSM.',
+    '..............................MOSSSSSSM.',
+    '.............................MOSSSSSSSM.',
+    '............................MOSSSSSSSSM.',
+    '...........................MOSSSSSSSSSM.',
+    '..........................MOSSSSSSSSSSM.',
+    '.........................MOSSSSSSSSSSSM.',
+    '........................MOSSSSSSSSSSSSM.',
+    '.......................MOSSSSSSSSSSSSSM.',
+    '......................MOSSSSSSSSSSSSSSM.',
+    '.....................MOSSSSSSSSSSSSSSSM.',
+    '....................MOSSSSSSSSSSSSSSSSM.',
+    '...................MOSSSSSSSSSSSSSSSSSM.',
+    '..................MOSSSSSSSSSSSSSSSSSSM.',
+    '.................MOSSSSSSSSSSSSSSSSSSSM.',
+    '................MOSSSSSSSSSSSSSSSSSSSSM.',
+    '...............MOSSSSSSSSSSSSSSSSSSSSSM.',
+    '..............MOSSSSSSSSSSSSSSSSSSSSSSM.',
+    '.............MOSSSSSSSSSSSSSSSSSSSSSSSM.',
+    '............MOSSSSSSSSSSSSSSSSSSSSSSSSM.',
+    '...........MOSSSSSSSSSSSSSSSSSSSSSSSSSM.',
+    '..........MOSSSSSSSSSSSSSSSSSSSSSSSSSSM.',
+    '.........MOSSSSSSSSSSSSSSSSSSSSSSSSSSSM.',
+    '........MOSSSSSSSSSSSSSSSSSSSSSSSSSSSSM.',
+    '.......MOSSSSSSSSSSSSSSSSSSSSSSSSSSSSSM.',
+    '......MOSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSM.',
+    '.....MOSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSM.',
+    '....MOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOM.',
+    '...MM.................................M.',
+    '......................................M.',
+    '......................................M.',
+    '......................................M.',
+    '......................................M.',
+    '......................................M.',
+    '......................................M.',
+    '......................................M.',
+    '......................................M.',
+  ],
+  RIVER,
+);
+
+/** A relief of Isis in the wall, the face chiselled away. 12 x 24. Lines only. */
+export const RELIEF_SPRITE = compile(
+  [
+    '....OOOO....',
+    '...O....O...',
+    '...O.DD.O...',
+    '...O.DD.O...',
+    '....O..O....',
+    '..OO.OO.OO..',
+    '.O..O..O..O.',
+    '.O..O..O..O.',
+    'O...O..O...O',
+    'O..O....O..O',
+    'O..O....O..O',
+    '...O....O...',
+    '...O....O...',
+    '...O....O...',
+    '...O....O...',
+    '...O....O...',
+    '...O....O...',
+    '..O......O..',
+    '..O......O..',
+    '..O......O..',
+    '..O......O..',
+    '.O........O.',
+    '.O........O.',
+    '.OOOOOOOOOO.',
+  ],
+  { O: '#4d4438', D: '#2b2116' },
+);
+
+/** The same figure, solid, when it steps out. */
+export const RELIEF_OUT_SPRITE = compile(
+  [
+    '....OOOO....',
+    '...ORRRRO...',
+    '...ORDDRO...',
+    '...ORDDRO...',
+    '....ORRO....',
+    '..OORORROO..',
+    '.ORROORROOR.',
+    '.ORROORROOR.',
+    'ORRROORROORO',
+    'ORROORRRROOR',
+    'ORROORRRROOR',
+    '...ORRRRO...',
+    '...ORRRRO...',
+    '...ORRRRO...',
+    '...ORRRRO...',
+    '...ORRRRO...',
+    '...ORRRRO...',
+    '..ORRRRRRO..',
+    '..ORRRRRRO..',
+    '..ORRRRRRO..',
+    '..ORRRRRRO..',
+    '.ORRRRRRRRO.',
+    '.ORRRRRRRRO.',
+    '.OOOOOOOOOO.',
+  ],
+  { O: '#2b2116', R: '#8f8a80', D: '#1a1410' },
+);

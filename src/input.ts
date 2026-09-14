@@ -6,6 +6,7 @@ export class Input {
   private down = new Set<string>();
   private jumpQueued = false;
   private restartQueued = false;
+  private nextQueued = false;
 
   constructor(target: Window) {
     target.addEventListener('keydown', (e) => {
@@ -17,6 +18,7 @@ export class Input {
       this.down.add(e.code);
       if (JUMP_KEYS.has(e.code)) this.jumpQueued = true;
       if (e.code === 'KeyR') this.restartQueued = true;
+      if (e.code === 'Enter') this.nextQueued = true;
     });
     target.addEventListener('keyup', (e) => {
       this.down.delete(e.code);
@@ -44,6 +46,12 @@ export class Input {
     return v;
   }
 
+  takeNextPressed(): boolean {
+    const v = this.nextQueued;
+    this.nextQueued = false;
+    return v;
+  }
+
   takeRestartPressed(): boolean {
     const v = this.restartQueued;
     this.restartQueued = false;
@@ -61,4 +69,5 @@ const GAME_KEYS = new Set([
   'KeyD',
   'KeyS',
   'KeyR',
+  'Enter',
 ]);

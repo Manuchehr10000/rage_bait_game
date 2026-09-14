@@ -10,17 +10,21 @@ export interface Stats {
 
 const LABEL_FONT = 'Georgia, "Times New Roman", serif';
 
+export interface HudState {
+  stats: Stats;
+  texts: WorldText[];
+  camX: number;
+  camY: number;
+  complete: boolean;
+  hasNext: boolean;
+  levelName: string;
+  /** 0 hidden, 1 fully shown. */
+  title: number;
+}
+
 /** Everything textual is drawn on the scaled canvas so it stays legible. */
-export function renderHud(
-  ctx: CanvasRenderingContext2D,
-  scale: number,
-  stats: Stats,
-  worldTexts: WorldText[],
-  camX: number,
-  camY: number,
-  complete: boolean,
-  levelName: string,
-): void {
+export function renderHud(ctx: CanvasRenderingContext2D, scale: number, h: HudState): void {
+  const { stats, texts: worldTexts, camX, camY, complete, hasNext, levelName, title } = h;
   const W = VIEW_W * scale;
   const H = VIEW_H * scale;
 
@@ -48,7 +52,29 @@ export function renderHud(
   ctx.strokeText(String(stats.total), 6 * scale, 11 * scale);
   ctx.fillText(String(stats.total), 6 * scale, 11 * scale);
 
-  if (complete) drawExitLabel(ctx, scale, stats, W, H, levelName);
+  if (title > 0 && !complete) drawTitle(ctx, scale, levelName, W, title);
+  if (complete) drawExitLabel(ctx, scale, stats, W, H, levelName, hasNext);
+}
+
+/** A museum label, briefly, when you arrive. Not on retries. */
+function drawTitle(ctx: CanvasRenderingContext2D, scale: number, name: string, W: number, alpha: number): void {
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.font = `${6.5 * scale}px ${LABEL_FONT}`;
+  const text = name.toUpperCase();
+  const tw = ctx.measureText(text).width;
+  const boxW = tw + 16 * scale;
+  const x = (W - boxW) / 2;
+  const y = 6 * scale;
+  ctx.fillStyle = 'rgba(239, 230, 207, 0.96)';
+  ctx.fillRect(x, y, boxW, 14 * scale);
+  ctx.fillStyle = '#6b5a3e';
+  ctx.fillRect(x, y + 14 * scale - scale * 0.5, boxW, scale * 0.5);
+  ctx.fillStyle = '#2b2116';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(text, W / 2, y + 7 * scale);
+  ctx.restore();
 }
 
 function drawExitLabel(
@@ -58,6 +84,7 @@ function drawExitLabel(
   W: number,
   H: number,
   levelName: string,
+  hasNext: boolean,
 ): void {
   const rows: [string, string][] = [];
   for (const [cause, n] of [...stats.byCause.entries()].sort((a, b) => b[1] - a[1])) {
@@ -112,5 +139,5 @@ function drawExitLabel(
   ty += lineH * 1.4;
   ctx.textAlign = 'center';
   ctx.font = `italic ${5.5 * scale}px ${LABEL_FONT}`;
-  ctx.fillText('Press R to visit again.', x + boxW / 2, ty);
+  ctx.fillText(hasNext ? 'Enter for the next site. R to visit again.' : 'Press R to visit again.', x + boxW / 2, ty);
 }

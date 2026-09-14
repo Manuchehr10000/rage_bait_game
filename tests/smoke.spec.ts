@@ -18,6 +18,7 @@ interface Snap {
 
 const DRIVER = `
   const g = window.__game;
+  g.resetRun();
   const held = new Set();
   const key = (code, down) => {
     if (down === held.has(code)) return;
@@ -27,16 +28,23 @@ const DRIVER = `
   const p = g.player;
   const L = g.level.data;
   const T = 16;
+  const ents = g.entities;
+  const byDef = (pred) => ents.find((e) => pred(e.def));
   const groundRow = L.rows.findIndex((r) => r[0] === '=');
-  const gapX = L.rows[groundRow].indexOf(' ') * T;           // first hole in the ground
-  const head4 = (L.statues.find((s) => s.drops).tx + 1) * T;  // x of the head that drops
-  const bx = L.baboons.find((b) => b.throws).x;              // the thrower
-  const platX = L.relocation.platform.x;
-  const trig417 = platX + (L.relocation.triggerBlock - L.relocation.firstBlockNumber) * T;
-  const cliffTop = L.corridor.y + L.corridor.h;
-  const corridorX = L.corridor.x;
-  const sunTrig = L.sunbeam.triggerX;
-  const alcoveX = L.sunbeam.alcove.x;
+  const gapX = L.rows[groundRow].indexOf(' ') * T;                       // first hole in the ground
+  const headEnt = byDef((d) => d.kind === 'falling' && d.active);        // the head that drops
+  const head4 = headEnt.def.rect.x;
+  const baboon = byDef((d) => d.kind === 'thrower' && d.active);        // the thrower
+  const bx = baboon.rect.x;
+  const rel = byDef((d) => d.kind === 'platform' && d.skin === 'blocks');
+  const platX = rel.def.rect.x;
+  const trig417 = rel.def.trigger.pastX;
+  const sanctuary = L.decor.find((d) => d.kind === 'sanctuary');
+  const cliffTop = sanctuary.corridor.y + sanctuary.corridor.h;
+  const corridorX = sanctuary.corridor.x;
+  const sun = byDef((d) => d.kind === 'sweep' && d.skin === 'beam');
+  const sunTrig = sun.def.triggerX;
+  const alcoveX = sun.def.safe[0].x;
   let hold = 0;
   const jump = () => { key('Space', true); hold = 18; };
   const snap = () => ({ x: Math.round(p.x), y: Math.round(p.y), state: g.state, total: g.stats.total,
@@ -56,7 +64,7 @@ const DRIVER = `
 /** `spawn` is a JS expression pair evaluated inside the driver, e.g. ['bx - 128', 'groundRow * T - 16']. */
 async function play(page: Page, opts: { spawn?: [string, string]; script: string; ticks?: number }): Promise<Snap> {
   const spawn = opts.spawn ? `{ const sx = ${opts.spawn[0]}; p.spawnAt(sx, ${opts.spawn[1]}); g.camera.x = sx - 110; }` : '';
-  return page.evaluate(`(() => { ${DRIVER} g.resetRun(); ${spawn} ${opts.script} return run(step, ${opts.ticks ?? 60 * 30}); })()`);
+  return page.evaluate(`(() => { ${DRIVER} ${spawn} ${opts.script} return run(step, ${opts.ticks ?? 60 * 30}); })()`);
 }
 
 test.beforeEach(async ({ page }) => {
@@ -98,8 +106,6 @@ test('a run that knows the level finishes with zero deaths', async ({ page }) =>
   const r = await play(page, {
     ticks: 60 * 120,
     script: `
-      const heads = g.heads; const baboon = g.baboons.find(b => b.def.throws);
-      const rel = g.relocation; const sun = g.sunbeam;
       let phase = 'start';
       const step = () => {
         const x = p.x;
@@ -110,7 +116,7 @@ test('a run that knows the level finishes with zero deaths', async ({ page }) =>
             if (x >= head4 - 84) phase = 'head4';
             break;
           case 'head4': {
-            const h = heads.find(h => h.def.drops);
+            const h = headEnt;
             if (h.state === 'idle') key('ArrowRight', x < head4 - 34);       // cross the trigger line, stop short of the landing spot
             else if (h.state === 'landed') { key('ArrowRight', true); if (x >= head4 - 24 && x <= head4 - 12 && p.onGround && hold === 0) jump(); }
             else key('ArrowRight', false);
@@ -124,7 +130,7 @@ test('a run that knows the level finishes with zero deaths', async ({ page }) =>
             if (x >= bx + 72) phase = 'relocation';
             break;
           case 'relocation': {
-            const top = rel.platform.rect.y;
+            const top = rel.rect.y;
             if (rel.state === 'idle') key('ArrowRight', x < trig417 + 4);
             else if (top <= cliffTop + 40 && top >= cliffTop - 10) { key('ArrowRight', true); if (x >= platX + 74 && p.onGround && hold === 0) jump(); }
             else key('ArrowRight', false);

@@ -1,78 +1,163 @@
-import { TILE, type Rect } from './types';
+import { TILE, type DeathCause, type Rect } from './types';
 
 /**
  * Tile legend:
  *  ' '  empty
- *  '#'  cliff stone (solid)
- *  '='  sandstone ground (solid)
- *  '?'  coin block (solid, bumps once)
+ *  '#'  stone (solid). Drawn per theme: cliff brick at Abu Simbel, column drum at Philae.
+ *  '='  ground (solid). Sand at Abu Simbel, granite quay at Philae.
+ *  '?'  ankh block (solid, bumps once)
  *  'x'  used block (solid)
  */
 export type TileChar = ' ' | '#' | '=' | '?' | 'x';
 
-export interface StatueDef {
-  /** Tile x of the statue's left edge. Body is 4 tiles wide. */
-  tx: number;
-  /** Historically, the second colossus lost its upper half. No head to drop. */
-  broken: boolean;
-  /** Whether this head drops when the player approaches. Intact heads all look the same. */
-  drops: boolean;
+export type Theme = 'abuSimbel' | 'philae';
+
+// ---------------------------------------------------------------------------
+// Entities. Every trap in the game is one of these, with a skin for the renderer.
+// ---------------------------------------------------------------------------
+
+/** Drops from where it is when the player's centre passes triggerX. */
+export interface FallingDef {
+  kind: 'falling';
+  skin: 'colossusHead';
+  rect: Rect;
+  triggerX: number;
+  /** Height of the pile it becomes on landing. It is solid afterwards. */
+  landedH: number;
+  cause: DeathCause;
+  active: boolean;
 }
 
-export interface BaboonDef {
+/** Sits still. If active, throws a projectile when the player comes within reach. */
+export interface ThrowerDef {
+  kind: 'thrower';
+  skin: 'baboon';
   x: number;
   y: number;
-  /** One of the 22 throws a date at you. It looks exactly like the other 21. */
-  throws: boolean;
+  active: boolean;
+  triggerDist: number;
+  vx: number;
+  vy: number;
+  cause: DeathCause;
 }
 
-export interface RelocationDef {
-  /** Initial platform rect (the numbered blocks). */
-  platform: Rect;
-  firstBlockNumber: number;
-  /** Block number that starts the relocation when stepped onto. */
-  triggerBlock: number;
+export type PlatformTrigger =
+  | { type: 'none' }
+  | { type: 'auto' }
+  | { type: 'standOn'; pastX?: number; delay?: number }
+  | { type: 'reach'; x: number };
+
+/** A solid that moves along a fixed path once triggered: up or down, then sideways. */
+export interface PlatformDef {
+  kind: 'platform';
+  skin: 'blocks' | 'bank' | 'boat';
+  rect: Rect;
+  trigger: PlatformTrigger;
+  /** Positive rises, negative sinks. */
+  rise: number;
   riseSpeed: number;
-  riseDistance: number;
+  /** Signed horizontal travel after the rise; Infinity never stops. */
+  slideX: number;
   slideSpeed: number;
-  /** Water covers x from 0 to this. */
-  waterRightEdge: number;
-  waterFastTo: number;
-  waterSlowTo: number;
-  waterFastSpeed: number;
-  waterSlowSpeed: number;
+  /** First painted number, for the numbered-blocks skin. */
+  firstNumber?: number;
+  /** Fires this event when triggered, for water regions to listen to. */
+  emits?: string;
+  /** Standing on it completes the level. */
+  isExit?: boolean;
+  /** An extra solid that travels with it, relative to its top-left. A boat's bow, say. */
+  rail?: Rect;
 }
 
-export interface SunbeamDef {
-  triggerX: number;
-  beamStartX: number;
-  beamEndX: number;
-  beamTop: number;
-  beamBottom: number;
-  darkFor: number;
-  sweepFor: number;
-  holdFor: number;
-  /** The niche of Ptah. The beam never reaches it. */
-  alcove: Rect;
+/** Deadly water over an x range. Can rise on an event or when the player reaches an x. */
+export interface WaterDef {
+  kind: 'water';
+  x0: number;
+  x1: number;
+  startY: number;
+  cause: DeathCause;
+  rise?: {
+    onEvent?: string;
+    atX?: number;
+    fastTo: number;
+    fastSpeed: number;
+    slowTo: number;
+    slowSpeed: number;
+  };
 }
+
+/** A band of death that moves across a span after a trigger. Safe inside the safe rects, or above its top. */
+export interface SweepDef {
+  kind: 'sweep';
+  skin: 'beam' | 'wave';
+  triggerX: number;
+  delay: number;
+  startX: number;
+  endX: number;
+  top: number;
+  bottom: number;
+  duration: number;
+  hold: number;
+  safe: Rect[];
+  cause: DeathCause;
+  emits?: string;
+}
+
+/** Looks like something to stand on. If fake, it gives way a moment after you do. */
+export interface CrumbleDef {
+  kind: 'crumble';
+  skin: 'croc' | 'capital' | 'rock';
+  rect: Rect;
+  fake: boolean;
+  delay: number;
+}
+
+/** A figure in a wall. If active, it steps out and shoves the player when they pass. */
+export interface PusherDef {
+  kind: 'pusher';
+  skin: 'relief';
+  x: number;
+  floorY: number;
+  active: boolean;
+  reach: number;
+  impulseX: number;
+  impulseY: number;
+  outFor: number;
+}
+
+export type EntityDef = FallingDef | ThrowerDef | PlatformDef | WaterDef | SweepDef | CrumbleDef | PusherDef;
+
+// ---------------------------------------------------------------------------
+// Decor. Drawn, never collided with.
+// ---------------------------------------------------------------------------
+
+export type DecorDef =
+  | { kind: 'colossus'; tx: number; broken: boolean }
+  | { kind: 'facade'; x: number; w: number; doorX: number }
+  | { kind: 'frieze'; rect: Rect }
+  | { kind: 'pit'; rect: Rect }
+  | { kind: 'sanctuary'; corridor: Rect; niche: Rect; gods: { x: number; y: number }[] }
+  | { kind: 'reliefWall'; rect: Rect }
+  | { kind: 'cofferdam'; x: number; top: number; bottom: number }
+  | { kind: 'scaffold'; x: number; floorY: number }
+  | { kind: 'landing'; x: number; floorY: number };
 
 export interface LevelData {
+  id: string;
   name: string;
+  theme: Theme;
   widthTiles: number;
   heightTiles: number;
   rows: string[];
   spawn: { x: number; y: number };
-  statues: StatueDef[];
-  baboons: BaboonDef[];
-  /** Decorative baboon cornice, drawn only. */
-  frieze: Rect;
-  relocation: RelocationDef;
-  sunbeam: SunbeamDef;
-  corridor: Rect;
-  gods: { x: number; y: number }[];
-  exit: Rect;
-  /** Lowest world y the camera will show. Rows below it are the pit under Lake Nasser. */
+  entities: EntityDef[];
+  decor: DecorDef[];
+  /** Fixed exit zone. A platform with isExit is the alternative. */
+  exit: Rect | null;
+  /** Lowest world y the camera will show. */
   cameraBottom: number;
+  /** Where the hill begins for the Abu Simbel backdrop, in px. */
+  rockFromX?: number;
 }
 
 export class Level {
@@ -129,7 +214,7 @@ export class Level {
   }
 }
 
-/** Small builder so level layouts read as geometry, not as 120-column ASCII art. */
+/** Small builder so level layouts read as geometry, not as 100-column ASCII art. */
 export class Grid {
   private cells: TileChar[][];
 

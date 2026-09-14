@@ -23,15 +23,33 @@ export type DeathCause =
   | 'Baboon'
   | 'Lake Nasser'
   | 'The sun'
+  | 'Crocodile'
+  | 'The cofferdam'
   | 'Fall'
   | 'Gave up';
 
+/** How each death is drawn. */
+export type DeathAnim = 'crush' | 'plank' | 'drown' | 'burn' | 'snap' | 'swept' | 'gone' | 'sit';
+
+export const DEATH_ANIM: Record<DeathCause, DeathAnim> = {
+  'Colossus head': 'crush',
+  Baboon: 'plank',
+  'Lake Nasser': 'drown',
+  'The sun': 'burn',
+  Crocodile: 'snap',
+  'The cofferdam': 'swept',
+  Fall: 'gone',
+  'Gave up': 'sit',
+};
+
 /** What each death sounds like. Material, never musical. */
-export const DEATH_SOUND: Record<DeathCause, 'squish' | 'bonk' | 'drown' | 'burn' | 'fallAway' | 'sigh'> = {
+export const DEATH_SOUND: Record<DeathCause, 'squish' | 'bonk' | 'drown' | 'burn' | 'snap' | 'whoosh' | 'fallAway' | 'sigh'> = {
   'Colossus head': 'squish',
   Baboon: 'bonk',
   'Lake Nasser': 'drown',
   'The sun': 'burn',
+  Crocodile: 'snap',
+  'The cofferdam': 'whoosh',
   Fall: 'fallAway',
   'Gave up': 'sigh',
 };
