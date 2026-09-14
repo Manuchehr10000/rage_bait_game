@@ -24,7 +24,6 @@ export class ColossusHead implements Entity {
   readonly rect: Rect;
   state: 'idle' | 'falling' | 'landed' = 'idle';
   private vy = 0;
-  private dwell = 0;
   private solid: MovingSolid;
   readonly headX: number;
 
@@ -35,18 +34,12 @@ export class ColossusHead implements Entity {
   }
 
   update(w: World): void {
-    if (this.def.broken) return;
+    if (this.def.broken || !this.def.drops) return;
     const p = w.player;
-    const px = centerX(p);
 
     if (this.state === 'idle') {
-      if (this.def.trigger === 'dwell') {
-        const under = px >= this.headX - 6 && px <= this.headX + 32 + 6;
-        this.dwell = under ? this.dwell + DT : 0;
-        if (this.dwell >= 0.15) this.state = 'falling';
-      } else if (px >= this.headX - 40) {
-        this.state = 'falling';
-      }
+      // Tuned so the head meets a full-speed runner. Stop short and it lands in front of you.
+      if (centerX(p) >= this.headX - 40) this.state = 'falling';
       return;
     }
 
@@ -75,12 +68,15 @@ export class ColossusHead implements Entity {
 }
 
 // ---------------------------------------------------------------------------
-// Baboon. Twenty-two face the sun. One faces you.
+// Baboon. Twenty-two of them, identical. One throws a date. It does not move.
 // ---------------------------------------------------------------------------
 
 export class Baboon implements Entity {
   readonly rect: Rect;
-  state: 'idle' | 'falling' | 'landed' = 'idle';
+  /** The thrown date, once it exists. */
+  date: Rect | null = null;
+  state: 'idle' | 'thrown' | 'landed' = 'idle';
+  private vx = 0;
   private vy = 0;
 
   constructor(readonly def: BaboonDef) {
@@ -88,23 +84,31 @@ export class Baboon implements Entity {
   }
 
   update(w: World): void {
-    if (!this.def.facesPlayer || this.state === 'landed') return;
+    if (!this.def.throws || this.state === 'landed') return;
     const p = w.player;
     if (this.state === 'idle') {
-      if (centerX(p) >= this.rect.x - 40) this.state = 'falling';
+      if (centerX(p) >= this.rect.x - 52) {
+        this.state = 'thrown';
+        this.date = { x: this.rect.x - 2, y: this.rect.y - 2, w: 4, h: 4 };
+        this.vx = -12;
+        this.vy = -70;
+      }
       return;
     }
+    const d = this.date;
+    if (!d) return;
     this.vy = Math.min(PHYS.maxFall, this.vy + PHYS.gravity * DT);
-    this.rect.y += this.vy * DT;
+    d.x += this.vx * DT;
+    d.y += this.vy * DT;
     const tiles: Rect[] = [];
-    w.level.solidTilesIn(this.rect, tiles);
+    w.level.solidTilesIn(d, tiles);
     for (const t of tiles) {
-      if (t.y < this.rect.y + this.rect.h) {
-        this.rect.y = t.y - this.rect.h;
+      if (t.y < d.y + d.h) {
+        d.y = t.y - d.h;
         this.state = 'landed';
       }
     }
-    if (this.state === 'falling' && overlapsRect(this.rect, p)) w.kill('Baboon');
+    if (this.state === 'thrown' && overlapsRect(d, p)) w.kill('Baboon');
   }
 }
 

@@ -179,11 +179,6 @@ export class Game {
     }
   }
 
-  private currentPlaque(): string | null {
-    for (const p of this.level.data.plaques) if (overlaps(this.player, p.zone)) return p.text;
-    return null;
-  }
-
   private draw(): void {
     this.texts = [];
     const scene: Scene = {
@@ -205,7 +200,6 @@ export class Game {
       this.ctx,
       this.scale,
       this.stats,
-      this.currentPlaque(),
       this.texts,
       this.camera.ix,
       this.camera.iy,

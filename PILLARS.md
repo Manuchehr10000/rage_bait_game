@@ -6,12 +6,13 @@ these bent, the idea is wrong, not the rule.
 1. **The world lies. The controls never do.** Jump height, run speed, acceleration and
    collision are fixed in `src/player.ts` (`PHYS`) and identical in every chapter. Coyote
    time and jump buffering stay on. The player must always be able to blame themselves.
-2. **Text never lies. It only misleads.** Every plaque is historically accurate. The trap
-   is in what the player infers from it. One false plaque and nobody reads the rest.
+2. **No text inside a level.** Reading kills tempo. History lives in the geometry and the
+   set pieces, not in captions. The only words are the death counter and the exit label.
 3. **Deterministic, never random.** Every trap fires from player position or a fixed
    timeline started by player position. Death one is a surprise. Death two is your fault.
-4. **Every trap has a tell.** Something visible on the way in that a second attempt can
-   read: a crack, a baboon facing the wrong way, slack crane cables.
+4. **Memory is the tell.** Traps are not telegraphed. Identical things behave differently
+   and only one of them is lying. The level is always the same, so the second attempt
+   knows exactly where. Never punish a player for something they could not have memorised.
 5. **No waiting before the finale.** A player who knows the level runs it without standing
    still. Only the last trap in a level may run on a cycle, because nothing comes after it.
 6. **The camera never scrolls left.** Tells are absorbed on the way in or not at all.
@@ -30,13 +31,13 @@ Abu Simbel → Philae → Karnak / Luxor → Valley of the Kings → Giza.
 
 ## Level 1: Great Temple of Abu Simbel
 
-| Beat | Trap | Tell | Fact on the plaque |
-|---|---|---|---|
-| Honest opening | none | none | Temple cut by Ramesses II, four 20 m colossi |
-| Colossi | intact heads drop; the broken statue is safe | hairline crack at the neck; the second statue has no head to drop | second colossus lost its upper body in an earthquake |
-| Frieze | one baboon drops | it is the only one facing you | 22 baboons face east to greet the sun |
-| Relocation | numbered blocks rise 65 m and slide back; Lake Nasser fills the pit and keeps rising | slack crane cables above the blocks | 1,036 blocks, 65 m higher, 200 m back |
-| Sanctuary | sun beam sweeps in; only Ptah's niche is dark | the plaque says Ptah is never lit | sun reaches the sanctuary on 22 Feb and 22 Oct |
-| Exit | none | none | visitor record: deaths by cause |
+| Beat | Trap | The history behind it |
+|---|---|---|
+| Honest opening | none | Temple cut by Ramesses II, four 20 m colossi |
+| Colossi | three intact heads look identical; only the fourth drops; the broken statue is safe | the second colossus lost its upper body in an earthquake |
+| Frieze | 22 identical baboons; one throws a date | 22 baboons on the facade face east to greet the sun |
+| Relocation | numbered blocks rise 65 m and slide back; Lake Nasser fills the pit and keeps rising | 1,036 blocks, 65 m higher, 200 m back, 1964 to 1968 |
+| Sanctuary | sun beam sweeps in; only Ptah's niche is dark | sun reaches the sanctuary on 22 Feb and 22 Oct; Ptah is never lit |
+| Exit | none | visitor record: deaths by cause |
 
 Target death budget for a first clean run: 10 to 15.

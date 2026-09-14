@@ -1,7 +1,7 @@
 # Rage Bait Game
 
 A deadpan, mean, browser-based 2D platformer for desktop. Chapters are historical places.
-Every plaque tells the truth. Every level lies anyway.
+No text, no hints. The level is always the same. You learn by dying.
 
 Design rules are in [PILLARS.md](PILLARS.md). Read them before adding a trap.
 
@@ -27,8 +27,8 @@ npm run dev
 Arrows or WASD to move, Space to jump, R to give up (it counts).
 
 `npm test` runs scripted playthroughs in headless Chromium (`tests/smoke.spec.ts`). Each one
-checks a design contract: the trap fires for the naive player and not for the one who read
-the tell.
+checks a design contract: the trap fires for the naive player and can be avoided by the one
+who remembers it.
 
 ## Layout
 
@@ -37,7 +37,7 @@ the tell.
 - `src/entities.ts` – the traps: colossus heads, baboon, relocation, sunbeam.
 - `src/levels/abu-simbel.ts` – chapter 1, level 1 as data.
 - `src/render.ts` – placeholder pixel art at 320×180, integer-scaled.
-- `src/hud.ts` – death counter, plaques, exit label. Drawn in screen space so text stays crisp.
+- `src/hud.ts` – death counter and exit label. Drawn in screen space so text stays crisp.
 
 ## Status
 

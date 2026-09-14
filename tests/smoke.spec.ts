@@ -5,7 +5,7 @@ import { expect, test, type Page } from '@playwright/test';
  * directly, so they are deterministic and independent of frame rate.
  *
  * Each scenario checks one design contract from PILLARS.md: the trap fires
- * for the naive player and does not fire for the player who read the tell.
+ * for the naive player and can be avoided by the player who remembers it.
  */
 
 interface Snap {
@@ -54,27 +54,17 @@ test.beforeEach(async ({ page }) => {
   expect(errors).toEqual([]);
 });
 
-test('a full-speed runner passes statue 1 and dies to statue 3', async ({ page }) => {
+test('a full-speed runner passes three colossi and dies to the fourth', async ({ page }) => {
   const r = await play(page, {
     script: `let jumped = false;
       const step = () => { key('ArrowRight', true);
         if (!jumped && p.x >= 176 && p.onGround) { jump(); jumped = true; } };`,
   });
   expect(r.causes).toEqual({ 'Colossus head': 1 });
-  expect(r.x).toBeGreaterThan(600);
+  expect(r.x).toBeGreaterThan(740);
 });
 
-test('stopping to read the colossi plaque drops the head on you', async ({ page }) => {
-  const r = await play(page, {
-    script: `let jumped = false;
-      const step = () => { if (!jumped && p.x >= 176 && p.onGround) { jump(); jumped = true; }
-        key('ArrowRight', p.x < 455); };`,
-  });
-  expect(r.causes).toEqual({ 'Colossus head': 1 });
-  expect(r.x).toBeLessThan(500);
-});
-
-test('the baboon facing you drops on a runner', async ({ page }) => {
+test('the one baboon that throws hits a runner', async ({ page }) => {
   const r = await play(page, { spawn: [900, 224, 790], script: `const step = () => key('ArrowRight', true);` });
   expect(r.causes).toEqual({ Baboon: 1 });
 });
@@ -91,11 +81,11 @@ test('the sun kills both the runner and the waiter in the sanctuary', async ({ p
   expect(waiter.causes).toEqual({ 'The sun': 1 });
 });
 
-test('a run that respects every tell finishes with zero deaths', async ({ page }) => {
+test('a run that knows the level finishes with zero deaths', async ({ page }) => {
   const r = await play(page, {
     ticks: 60 * 120,
     script: `
-      const heads = g.heads; const baboon = g.baboons.find(b => b.def.facesPlayer);
+      const heads = g.heads; const baboon = g.baboons.find(b => b.def.throws);
       const rel = g.relocation; const sun = g.sunbeam;
       let phase = 'start';
       const step = () => {
@@ -104,16 +94,8 @@ test('a run that respects every tell finishes with zero deaths', async ({ page }
           case 'start':
             key('ArrowRight', true);
             if (x >= 176 && x < 200 && p.onGround && hold === 0) jump();
-            if (x >= 590) phase = 'head3';
+            if (x >= 700) phase = 'head4';
             break;
-          case 'head3': {
-            const h = heads[2];
-            if (h.state === 'idle') key('ArrowRight', x < 640);
-            else if (h.state === 'landed') { key('ArrowRight', true); if (x >= 648 && x <= 660 && p.onGround && hold === 0) jump(); }
-            else key('ArrowRight', false);
-            if (x >= 720) phase = 'head4';
-            break;
-          }
           case 'head4': {
             const h = heads[3];
             if (h.state === 'idle') key('ArrowRight', x < 750);
@@ -123,8 +105,8 @@ test('a run that respects every tell finishes with zero deaths', async ({ page }
             break;
           }
           case 'baboon':
-            if (baboon.state === 'idle') key('ArrowRight', x < 985);
-            else if (baboon.state === 'falling') key('ArrowRight', false);
+            if (baboon.state === 'idle') key('ArrowRight', x < 975);
+            else if (baboon.state === 'thrown') key('ArrowRight', false);
             else key('ArrowRight', true);
             if (x >= 1100) phase = 'relocation';
             break;

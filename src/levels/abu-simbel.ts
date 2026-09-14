@@ -5,7 +5,7 @@ import { TILE } from '../types';
  * Chapter 1, Level 1 — The Great Temple of Abu Simbel.
  *
  * Layout in tiles (16px). Ground on the lower bank is row 15; the relocated
- * plateau is row 10. Every plaque is historically accurate. None of them help.
+ * plateau is row 10. There is no text in the level. You learn by dying.
  */
 const W = 120;
 const H = 18;
@@ -36,46 +36,18 @@ export const ABU_SIMBEL: LevelData = {
   rows: g.rows(),
   spawn: { x: 24, y: px(GROUND) - 16 },
 
-  plaques: [
-    {
-      zone: { x: px(2), y: px(GROUND) - 32, w: 48, h: 32 },
-      text:
-        'The Great Temple of Abu Simbel was cut into a sandstone cliff on the orders of Ramesses II in the 13th century BC. Its facade is guarded by four seated colossi of the king, each about 20 metres tall.',
-    },
-    {
-      zone: { x: px(28) - 8, y: px(GROUND) - 32, w: 48, h: 32 },
-      text:
-        'The upper body of the second colossus collapsed in an earthquake shortly after the temple was completed. It has never been restored, and the pieces still lie at its feet.',
-    },
-    {
-      zone: { x: px(56) + 4, y: px(GROUND) - 32, w: 50, h: 32 },
-      text:
-        'Along the top of the facade runs a frieze of 22 baboons. They face east, arms raised, to greet the rising sun.',
-    },
-    {
-      zone: { x: px(76), y: px(GROUND) - 32, w: 48, h: 32 },
-      text:
-        'Between 1964 and 1968, to save it from the rising waters of Lake Nasser, the temple was cut into 1,036 numbered blocks of up to 30 tonnes and reassembled 65 metres higher and about 200 metres back from the river.',
-    },
-    {
-      zone: { x: px(83) + 8, y: px(PLATEAU) - 32, w: 64, h: 32 },
-      text:
-        'Twice a year, on 22 February and 22 October, the rising sun reaches 60 metres into the mountain and lights the seated figures of Ra-Horakhty, Ramesses II and Amun-Ra. Ptah, a god of the underworld, remains in darkness.',
-    },
-  ],
-
   statues: [
-    { tx: 27, broken: false, trigger: 'dwell' },
-    { tx: 34, broken: true, trigger: 'ahead' },
-    { tx: 41, broken: false, trigger: 'ahead' },
-    { tx: 48, broken: false, trigger: 'ahead' },
+    { tx: 27, broken: false, drops: false },
+    { tx: 34, broken: true, drops: false },
+    { tx: 41, broken: false, drops: false },
+    { tx: 48, broken: false, drops: true },
   ],
 
   frieze: { x: px(56), y: px(8), w: px(14), h: 8 },
   baboons: Array.from({ length: 22 }, (_, i) => ({
     x: px(56) + 2 + i * 10,
     y: px(8) - 8,
-    facesPlayer: i === 13,
+    throws: i === 13,
   })),
 
   relocation: {

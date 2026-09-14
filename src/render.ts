@@ -29,8 +29,7 @@ export const COLORS = {
   waterTop: '#7fb3d5',
   beam: 'rgba(255, 236, 160, 0.55)',
   niche: '#241a10',
-  plaque: '#efe6cf',
-  plaquePost: '#3a2e1f',
+  cream: '#efe6cf',
   baboon: '#4b3a26',
   coin: '#f2d16b',
 };
@@ -69,7 +68,6 @@ export function renderWorld(ctx: CanvasRenderingContext2D, s: Scene): void {
   drawFrieze(ctx, s);
   drawSanctuaryBackdrop(ctx, s);
   drawTiles(ctx, level, cx, cy);
-  drawPlaqueSigns(ctx, s);
   drawRelocation(ctx, s);
   drawBaboons(ctx, s);
   drawHeads(ctx, s);
@@ -185,14 +183,6 @@ function drawHeads(ctx: CanvasRenderingContext2D, s: Scene): void {
     ctx.fillRect(r.x + 10, r.y + 22, 3, 2); // eyes
     ctx.fillRect(r.x + 19, r.y + 22, 3, 2);
     ctx.fillRect(r.x + 14, r.y + 28, 4, 1); // mouth
-    if (h.state === 'idle') {
-      // The tell: a hairline crack across the neck.
-      ctx.fillStyle = COLORS.crack;
-      ctx.fillRect(r.x + 3, r.y + 30, 6, 2);
-      ctx.fillRect(r.x + 9, r.y + 29, 5, 2);
-      ctx.fillRect(r.x + 14, r.y + 30, 8, 2);
-      ctx.fillRect(r.x + 22, r.y + 29, 7, 2);
-    }
   }
 }
 
@@ -221,32 +211,12 @@ function drawBaboons(ctx: CanvasRenderingContext2D, s: Scene): void {
     const r = b.rect;
     ctx.fillStyle = COLORS.baboon;
     ctx.fillRect(r.x, r.y + 2, r.w, r.h - 2); // body
-    if (b.state === 'landed') {
-      ctx.fillRect(r.x - 2, r.y + 5, r.w + 4, 3);
-      continue;
+    ctx.fillRect(r.x + 3, r.y, 4, 3); // head, facing the sun
+    ctx.fillRect(r.x + 5, r.y - 3, 1, 3); // raised arm
+    if (b.date) {
+      ctx.fillStyle = COLORS.crack;
+      ctx.fillRect(b.date.x, b.date.y, b.date.w, b.date.h);
     }
-    if (b.def.facesPlayer) {
-      ctx.fillRect(r.x - 1, r.y, 4, 3); // head, turned toward the player
-      ctx.fillStyle = COLORS.plaque;
-      ctx.fillRect(r.x, r.y + 1, 1, 1); // eye
-    } else {
-      ctx.fillRect(r.x + 3, r.y, 4, 3); // head, facing the sun
-      ctx.fillRect(r.x + 5, r.y - 3, 1, 3); // raised arm
-    }
-  }
-}
-
-function drawPlaqueSigns(ctx: CanvasRenderingContext2D, s: Scene): void {
-  for (const p of s.level.data.plaques) {
-    const x = p.zone.x + 2;
-    const floor = p.zone.y + p.zone.h;
-    ctx.fillStyle = COLORS.plaquePost;
-    ctx.fillRect(x + 4, floor - 12, 1, 12);
-    ctx.fillStyle = COLORS.plaque;
-    ctx.fillRect(x, floor - 18, 10, 7);
-    ctx.fillStyle = COLORS.plaquePost;
-    ctx.fillRect(x + 2, floor - 16, 6, 1);
-    ctx.fillRect(x + 2, floor - 14, 4, 1);
   }
 }
 

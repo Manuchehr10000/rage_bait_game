@@ -17,7 +17,7 @@ export function centerY(r: Rect): number {
   return r.y + r.h / 2;
 }
 
-/** Death causes are museum-label nouns: they end up printed on the exit plaque. */
+/** Death causes are museum-label nouns: they end up printed on the exit label. */
 export type DeathCause =
   | 'Colossus head'
   | 'Baboon'

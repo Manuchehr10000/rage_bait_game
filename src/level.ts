@@ -10,28 +10,20 @@ import { TILE, type Rect } from './types';
  */
 export type TileChar = ' ' | '#' | '=' | '?' | 'x';
 
-export interface PlaqueDef {
-  /** Trigger zone in pixels. The sign is drawn at the zone's left edge. */
-  zone: Rect;
-  text: string;
-}
-
 export interface StatueDef {
   /** Tile x of the statue's left edge. Body is 4 tiles wide. */
   tx: number;
   /** Historically, the second colossus lost its upper half. No head to drop. */
   broken: boolean;
-  /**
-   * 'dwell'  – head drops only if the player lingers underneath (reading a plaque).
-   * 'ahead'  – head drops when the player approaches, landing on a full-speed runner.
-   */
-  trigger: 'dwell' | 'ahead';
+  /** Whether this head drops when the player approaches. Intact heads all look the same. */
+  drops: boolean;
 }
 
 export interface BaboonDef {
   x: number;
   y: number;
-  facesPlayer: boolean;
+  /** One of the 22 throws a date at you. It looks exactly like the other 21. */
+  throws: boolean;
 }
 
 export interface RelocationDef {
@@ -70,7 +62,6 @@ export interface LevelData {
   heightTiles: number;
   rows: string[];
   spawn: { x: number; y: number };
-  plaques: PlaqueDef[];
   statues: StatueDef[];
   baboons: BaboonDef[];
   /** Decorative baboon cornice, drawn only. */
