@@ -33,6 +33,8 @@ export class Player implements Rect {
   private buffer = 0;
   /** Dynamic solid we are riding; its per-frame delta is applied to us. */
   riding: MovingSolid | null = null;
+  /** Distance walked while grounded, drives the two-frame walk cycle. */
+  private walkPhase = 0;
   lastContacts: Contacts = { left: false, right: false, up: false, down: false, standingOn: null };
 
   spawnAt(x: number, y: number): void {
@@ -45,6 +47,13 @@ export class Player implements Rect {
     this.buffer = 0;
     this.riding = null;
     this.facing = 1;
+    this.walkPhase = 0;
+  }
+
+  animFrame(): 'idle' | 'walk1' | 'walk2' | 'jump' {
+    if (!this.onGround) return 'jump';
+    if (Math.abs(this.vx) < 10) return 'idle';
+    return Math.floor(this.walkPhase / 10) % 2 === 0 ? 'walk1' : 'walk2';
   }
 
   update(input: Input, level: Level, solids: readonly MovingSolid[], minX: number): void {
@@ -96,6 +105,7 @@ export class Player implements Rect {
 
     const ground = groundBelow(this, level, rects);
     this.onGround = ground !== null;
+    if (this.onGround) this.walkPhase += Math.abs(this.vx) * DT;
     this.riding = null;
     if (ground) {
       for (const s of solids) if (s.rect === ground) this.riding = s;

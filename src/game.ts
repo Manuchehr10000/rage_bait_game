@@ -40,6 +40,7 @@ export class Game {
 
   private acc = 0;
   private last = 0;
+  private time = 0;
 
   constructor(private readonly canvas: HTMLCanvasElement, data: LevelData = ABU_SIMBEL) {
     const ctx = canvas.getContext('2d');
@@ -85,6 +86,7 @@ export class Game {
     this.sunbeam = new Sunbeam(d.sunbeam);
     this.entities = [...this.heads, ...this.baboons, this.relocation, this.sunbeam];
     this.coins = [];
+    this.time = 0;
     this.player.spawnAt(d.spawn.x, d.spawn.y);
     this.camera.reset();
     this.state = 'playing';
@@ -135,6 +137,7 @@ export class Game {
       return;
     }
     if (this.state === 'complete') return;
+    this.time += DT;
 
     const world: World = {
       level: this.level,
@@ -191,6 +194,7 @@ export class Game {
       sunbeam: this.sunbeam,
       coins: this.coins,
       texts: this.texts,
+      time: this.time,
     };
     renderWorld(this.wctx, scene);
 

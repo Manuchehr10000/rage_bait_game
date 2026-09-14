@@ -36,9 +36,10 @@ who remembers it.
 - `src/physics.ts` – axis-separated AABB collision against tiles and moving solids.
 - `src/entities.ts` – the traps: colossus heads, baboon, relocation, sunbeam.
 - `src/levels/abu-simbel.ts` – chapter 1, level 1 as data.
-- `src/render.ts` – placeholder pixel art at 320×180, integer-scaled.
+- `src/render.ts` – the scene: sky, lake, rock, facade, tiles, entities. 320×180, integer-scaled.
+- `src/sprites.ts` – pixel-map sprites: the tourist, baboons, the four gods.
 - `src/hud.ts` – death counter and exit label. Drawn in screen space so text stays crisp.
 
 ## Status
 
-Grey-box prototype of level 1. Placeholder art, no audio, no menu. Playable end to end.
+Level 1 playable end to end with first-pass pixel art. No audio, no menu yet.
