@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Abu Simbel</title>
+    <link rel="icon" href="data:," />
+    <style>
+      html, body { margin: 0; height: 100%; background: #0b0a08; color: #cfc6b0; font-family: Georgia, serif; }
+      body { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; }
+      canvas { image-rendering: pixelated; image-rendering: crisp-edges; display: block; }
+      .controls { font-size: 12px; letter-spacing: 0.06em; color: #7d7462; text-transform: uppercase; }
+    </style>
+  </head>
+  <body>
+    <canvas id="game" width="320" height="180"></canvas>
+    <div class="controls">Arrows / WASD move &nbsp;·&nbsp; Space jump &nbsp;·&nbsp; R give up</div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
