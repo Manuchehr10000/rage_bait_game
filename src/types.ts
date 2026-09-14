@@ -26,6 +26,16 @@ export type DeathCause =
   | 'Fall'
   | 'Gave up';
 
+/** What each death sounds like. Material, never musical. */
+export const DEATH_SOUND: Record<DeathCause, 'squish' | 'bonk' | 'drown' | 'burn' | 'fallAway' | 'sigh'> = {
+  'Colossus head': 'squish',
+  Baboon: 'bonk',
+  'Lake Nasser': 'drown',
+  'The sun': 'burn',
+  Fall: 'fallAway',
+  'Gave up': 'sigh',
+};
+
 export const VIEW_W = 320;
 export const VIEW_H = 180;
 export const TILE = 16;

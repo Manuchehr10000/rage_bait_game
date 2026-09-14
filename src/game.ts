@@ -8,11 +8,10 @@ import { Level, type LevelData } from './level';
 import { ABU_SIMBEL } from './levels/abu-simbel';
 import { Player, type MovingSolid } from './player';
 import { renderWorld, type Scene, type WorldText } from './render';
-import { DT, overlaps, TILE, VIEW_H, VIEW_W, type DeathCause } from './types';
+import { DEATH_SOUND, DT, overlaps, TILE, VIEW_H, VIEW_W, type DeathCause } from './types';
 
-const DEATH_FREEZE = 0.5;
-/** The tourist stays as they were for a moment, then the pose lands. */
-const DEATH_POSE_AFTER = 0.12;
+/** How long a death plays before the reset. The world keeps moving through it. */
+const DEATH_TIME = 0.75;
 const LIFETIME_KEY = 'ragebait.lifetimeDeaths';
 
 type State = 'playing' | 'dead' | 'complete';
@@ -39,6 +38,7 @@ export class Game {
 
   private state: State = 'playing';
   private deathTimer = 0;
+  private deathCause: DeathCause = 'Fall';
 
   private stats: Stats = { total: 0, byCause: new Map(), lifetime: readLifetime() };
 
@@ -110,7 +110,9 @@ export class Game {
   private kill(cause: DeathCause): void {
     if (this.state !== 'playing') return;
     this.state = 'dead';
-    this.deathTimer = DEATH_FREEZE;
+    this.deathTimer = DEATH_TIME;
+    this.deathCause = cause;
+    this.audio.play(DEATH_SOUND[cause]);
     this.stats.total += 1;
     this.stats.byCause.set(cause, (this.stats.byCause.get(cause) ?? 0) + 1);
     this.stats.lifetime += 1;
@@ -141,11 +143,6 @@ export class Game {
       }
     }
 
-    if (this.state === 'dead') {
-      this.deathTimer -= DT;
-      if (this.deathTimer <= 0) this.resetLevel();
-      return;
-    }
     if (this.state === 'complete') return;
     this.time += DT;
 
@@ -156,6 +153,15 @@ export class Game {
       kill: (c) => this.kill(c),
       sound: (n) => this.audio.play(n),
     };
+
+    if (this.state === 'dead') {
+      // The tourist is done. The head still lands, the water still rises, the sun still sweeps.
+      for (const e of this.entities) e.update(world);
+      this.driveLoops();
+      this.deathTimer -= DT;
+      if (this.deathTimer <= 0) this.resetLevel();
+      return;
+    }
 
     // Traps first, so a platform's displacement is known before the player moves.
     for (const e of this.entities) {
@@ -225,7 +231,8 @@ export class Game {
       coins: this.coins,
       texts: this.texts,
       time: this.time,
-      dead: this.state === 'dead' && this.deathTimer <= DEATH_FREEZE - DEATH_POSE_AFTER,
+      death: this.state === 'dead' ? { cause: this.deathCause, t: 1 - this.deathTimer / DEATH_TIME } : null,
+      waterY: this.relocation.waterY,
     };
     renderWorld(this.wctx, scene);
 

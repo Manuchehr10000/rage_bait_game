@@ -2,7 +2,8 @@ import type { Camera } from './camera';
 import type { Baboon, ColossusHead, Relocation, Sunbeam } from './entities';
 import type { Level } from './level';
 import type { Player } from './player';
-import { BABOON_SPRITE, COLOSSUS, DATE_SPRITE, GOD_SPRITES, TOURIST_FRAMES } from './sprites';
+import { BABOON_SPRITE, COLOSSUS, DATE_SPRITE, GOD_SPRITES, silhouette, TOURIST_FRAMES, TOURIST_SEATED } from './sprites';
+import type { DeathCause } from './types';
 import { TILE, VIEW_H, VIEW_W, type Rect } from './types';
 
 /** Text drawn in screen space after scaling so it stays crisp. World coordinates. */
@@ -67,8 +68,9 @@ export interface Scene {
   texts: WorldText[];
   /** Seconds since level start, for water and dust animation only. */
   time: number;
-  /** True once the death pose should show. */
-  dead: boolean;
+  /** The death in progress, t from 0 to 1, or null. */
+  death: { cause: DeathCause; t: number } | null;
+  waterY: number;
 }
 
 export function renderWorld(ctx: CanvasRenderingContext2D, s: Scene): void {
@@ -92,14 +94,38 @@ export function renderWorld(ctx: CanvasRenderingContext2D, s: Scene): void {
   drawTiles(ctx, level, cx, cy);
   drawRelocation(ctx, s);
   drawBaboons(ctx, s);
+  if (s.death?.cause === 'Colossus head') drawDeath(ctx, s, s.death); // flattened under the head
   drawHeads(ctx, s);
   drawCoins(ctx, s);
   drawExit(ctx, d.exit);
-  drawPlayer(ctx, s.player, s.dead);
+  if (!s.death) drawPlayer(ctx, s.player);
+  else if (s.death.cause !== 'Colossus head') drawDeath(ctx, s, s.death);
   drawWater(ctx, s);
+  if (s.death?.cause === 'Lake Nasser') drawDrownSurface(ctx, s, s.death.t);
   drawSunbeam(ctx, s);
 
   ctx.restore();
+}
+
+/** Bubbles rising to the surface, then the towel floating on it. */
+function drawDrownSurface(ctx: CanvasRenderingContext2D, s: Scene, t: number): void {
+  const p = s.player;
+  const x = Math.round(p.x) - 1;
+  const midX = x + 6;
+  const surface = Math.round(s.waterY);
+  ctx.fillStyle = COLORS.waterTop;
+  for (let i = 0; i < 4; i++) {
+    const bt = (t * 1.8 + i * 0.23) % 1;
+    const by = Math.round(p.y + 8 + t * 22 - bt * 26);
+    if (by > surface + 1) ctx.fillRect(midX - 3 + ((i * 5) % 8), by, 1, 1);
+  }
+  if (t > 0.4) {
+    const drift = Math.round((t - 0.4) * 10);
+    for (let i = 0; i < 4; i++) {
+      ctx.fillStyle = i % 2 === 0 ? '#2f5fb3' : '#f5f1e4';
+      ctx.fillRect(x + drift, surface - 4 + i, 10, 1);
+    }
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -506,18 +532,95 @@ function drawExit(ctx: CanvasRenderingContext2D, e: Rect): void {
 }
 
 /** A lost tourist in a visibly fake pharaoh costume. Nobody will mention it. */
-export function drawPlayer(ctx: CanvasRenderingContext2D, p: Player, dead = false): void {
-  const frame = TOURIST_FRAMES[dead ? 'dead' : p.animFrame()];
+export function drawPlayer(ctx: CanvasRenderingContext2D, p: Player): void {
+  drawFacing(ctx, TOURIST_FRAMES[p.animFrame()], Math.round(p.x) - 1, Math.round(p.y), p.facing);
+}
+
+function drawFacing(ctx: CanvasRenderingContext2D, frame: HTMLCanvasElement, x: number, y: number, facing: 1 | -1): void {
+  if (facing === 1) {
+    ctx.drawImage(frame, x, y);
+    return;
+  }
+  ctx.save();
+  ctx.translate(x + frame.width, y);
+  ctx.scale(-1, 1);
+  ctx.drawImage(frame, 0, 0);
+  ctx.restore();
+}
+
+/**
+ * Six deaths. Each looks like what caused it. Nothing else in the frame reacts.
+ * t runs 0..1 over the death time; the level resets at 1.
+ */
+function drawDeath(ctx: CanvasRenderingContext2D, s: Scene, death: { cause: DeathCause; t: number }): void {
+  const p = s.player;
   const x = Math.round(p.x) - 1;
   const y = Math.round(p.y);
-  if (p.facing === 1) {
-    ctx.drawImage(frame, x, y);
-  } else {
-    ctx.save();
-    ctx.translate(x + frame.width, y);
-    ctx.scale(-1, 1);
-    ctx.drawImage(frame, 0, 0);
-    ctx.restore();
+  const t = death.t;
+  const idle = TOURIST_FRAMES.idle;
+  const dead = TOURIST_FRAMES.dead;
+  const feetY = y + 16;
+  const midX = x + 6;
+
+  switch (death.cause) {
+    case 'Colossus head': {
+      // Squashed flat in the first tenth of a second. Then a pancake with a towel on it.
+      const k = Math.min(1, t / 0.12);
+      const h = Math.max(4, Math.round(16 - 12 * k));
+      const w = Math.round(12 + 16 * k);
+      // Spreads out sideways, mostly toward where you came from, so it shows beside the rubble.
+      ctx.drawImage(dead, midX - w * 0.7, feetY - h, w, h);
+      break;
+    }
+    case 'Baboon': {
+      // Knocked over backwards, stiff as a plank, then lies there.
+      const k = Math.min(1, t / 0.3);
+      const angle = (k * k * Math.PI) / 2;
+      ctx.save();
+      ctx.translate(p.facing === 1 ? x + 2 : x + 10, feetY);
+      ctx.rotate(p.facing === 1 ? -angle : angle);
+      drawFacing(ctx, k >= 1 ? dead : idle, p.facing === 1 ? -2 : -10, -16, p.facing);
+      ctx.restore();
+      break;
+    }
+    case 'Lake Nasser': {
+      // Sinks. The bubbles and the towel are drawn on the surface, after the water.
+      const sink = Math.round(t * 22);
+      drawFacing(ctx, dead, x, y + sink, p.facing);
+      break;
+    }
+    case 'The sun': {
+      // A white flash, then charred black, then crumbles from the top into ash.
+      if (t < 0.18) {
+        drawFacing(ctx, silhouette(idle, 'idle', '#fff8e0'), x, y, p.facing);
+      } else {
+        const char = silhouette(dead, 'dead', '#1a1410');
+        const gone = Math.max(0, Math.min(1, (t - 0.4) / 0.5));
+        const top = Math.round(16 * gone);
+        if (top < 16) {
+          ctx.save();
+          ctx.beginPath();
+          ctx.rect(x - 2, y + top, 16, 16 - top);
+          ctx.clip();
+          drawFacing(ctx, char, x, y, p.facing);
+          ctx.restore();
+        }
+        // The ash pile grows as the figure goes.
+        const pile = Math.round(gone * 4);
+        ctx.fillStyle = '#5a5049';
+        for (let i = 0; i < pile; i++) ctx.fillRect(midX - 4 - i, feetY - 1 - i, 8 + i * 2, 1);
+        ctx.fillStyle = '#8a7f75';
+        if (pile > 0) ctx.fillRect(midX - 2, feetY - pile, 4, 1);
+      }
+      break;
+    }
+    case 'Fall':
+      // Already gone. Nothing to draw. The sound does the work.
+      break;
+    case 'Gave up':
+      // Sits down.
+      drawFacing(ctx, TOURIST_SEATED, x, feetY - TOURIST_SEATED.height, p.facing);
+      break;
   }
 }
 

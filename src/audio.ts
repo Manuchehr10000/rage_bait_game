@@ -1,11 +1,26 @@
 /**
  * All sound is synthesised with the Web Audio API. No files, nothing to load.
  *
- * Rules from PILLARS.md: death makes no sound, and the music and the wind never
- * pause. Everything the world does gets a sound; the player's own death does not.
+ * Rules from PILLARS.md: a death sounds like what caused it, never like a jingle,
+ * and the music and the wind never pause or react.
  */
 
-export type Sfx = 'jump' | 'land' | 'step' | 'coin' | 'headCrack' | 'headThud' | 'baboon' | 'dateLand' | 'turnstile';
+export type Sfx =
+  | 'jump'
+  | 'land'
+  | 'step'
+  | 'coin'
+  | 'headCrack'
+  | 'headThud'
+  | 'baboon'
+  | 'dateLand'
+  | 'turnstile'
+  | 'squish'
+  | 'bonk'
+  | 'drown'
+  | 'burn'
+  | 'fallAway'
+  | 'sigh';
 
 const MUTE_KEY = 'ragebait.muted';
 
@@ -101,6 +116,31 @@ export class GameAudio {
       case 'turnstile':
         this.burst(t, 1500, 'bandpass', 0.02, 0.15);
         this.burst(t + 0.12, 1500, 'bandpass', 0.02, 0.15);
+        break;
+      // Deaths. Material, not musical.
+      case 'squish':
+        this.burst(t, 700, 'lowpass', 0.12, 0.25);
+        this.tone(t, 'sine', 160, 45, 0.16, 0.18);
+        break;
+      case 'bonk':
+        this.tone(t, 'square', 900, 380, 0.03, 0.06);
+        this.burst(t + 0.22, 400, 'lowpass', 0.06, 0.16); // the plank hits the sand
+        break;
+      case 'drown':
+        this.tone(t, 'sine', 320, 110, 0.22, 0.12);
+        for (let i = 0; i < 4; i++) this.tone(t + 0.25 + i * 0.11, 'sine', 500 + i * 90, 700 + i * 90, 0.05, 0.03);
+        break;
+      case 'burn':
+        this.burst(t, 2600, 'highpass', 0.5, 0.14);
+        this.tone(t, 'sine', 90, 40, 0.25, 0.12);
+        for (let i = 0; i < 9; i++) this.burst(t + 0.05 + i * 0.05 + (i % 3) * 0.013, 4000, 'highpass', 0.012, 0.06);
+        break;
+      case 'fallAway':
+        this.tone(t, 'sine', 700, 180, 0.5, 0.05);
+        this.burst(t + 0.55, 200, 'lowpass', 0.08, 0.1);
+        break;
+      case 'sigh':
+        this.burst(t, 900, 'bandpass', 0.4, 0.05);
         break;
     }
   }

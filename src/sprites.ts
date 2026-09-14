@@ -67,6 +67,47 @@ function tourist(legs: string[]): string[] {
   return [...TOURIST_HEAD, ...TOURIST_TORSO, ...legs];
 }
 
+/** Sitting down, towel in the lap. For the one death you choose. */
+export const TOURIST_SEATED = compile(
+  [
+    '..OOOOOOOO..',
+    '.OBBBBBBBBO.',
+    '.OWWWWWWWWO.',
+    '.OBBBBBBBBO.',
+    'OWOSSSSSSOWO',
+    'OBOSKKSKKOBO',
+    'OWOKKKKKKOWO',
+    '.OOSSSSSSOO.',
+    '..OSKKKSO...',
+    '..ORRKKKRRO.',
+    '..ORYRRRRYO.',
+    '.OTTTTTTTTTO',
+    'OTTOWWOOWWOTO',
+    'OOOONNOONNOOO',
+  ],
+  TOURIST,
+);
+
+const tintCache = new Map<string, HTMLCanvasElement>();
+
+/** The sprite's shape filled with one colour. Cached. */
+export function silhouette(sprite: HTMLCanvasElement, key: string, color: string): HTMLCanvasElement {
+  const id = `${key}:${color}`;
+  const hit = tintCache.get(id);
+  if (hit) return hit;
+  const c = document.createElement('canvas');
+  c.width = sprite.width;
+  c.height = sprite.height;
+  const ctx = c.getContext('2d');
+  if (!ctx) throw new Error('2d context unavailable');
+  ctx.drawImage(sprite, 0, 0);
+  ctx.globalCompositeOperation = 'source-in';
+  ctx.fillStyle = color;
+  ctx.fillRect(0, 0, c.width, c.height);
+  tintCache.set(id, c);
+  return c;
+}
+
 export const TOURIST_FRAMES = {
   idle: compile(
     tourist(['...OTTOOTTO.', '...OWWOOWWO.', '...ONNOONNO.']),
