@@ -84,6 +84,28 @@ export const TOURIST_FRAMES = {
     tourist(['..OTTO.OTTO.', '..OWWO..OWWO', '..ONNO...ONN']),
     TOURIST,
   ),
+  // Dead: eyes shut, beard slipped down the elastic. Nothing else moves.
+  dead: compile(
+    [
+      '..OOOOOOOO..',
+      '.OBBBBBBBBO.',
+      '.OWWWWWWWWO.',
+      '.OBBBBBBBBO.',
+      'OWOSSSSSSOWO',
+      'OBOSKKSKKOBO',
+      'OWOKKKKKKOWO',
+      '.OOSSSSSSOO.',
+      '..OSSSSSO...',
+      '..ORRRKKKRO.',
+      '..ORYRKKKYO.',
+      '..ORRRRYRRO.',
+      '..OTTTTTTTO.',
+      '...OTTOOTTO.',
+      '...OWWOOWWO.',
+      '...ONNOONNO.',
+    ],
+    TOURIST,
+  ),
 };
 
 // ---------------------------------------------------------------------------
@@ -165,4 +187,208 @@ export const GOD_SPRITES = {
     seated(['................', '................', '................', '.....OOOOOO.....', '....OKKKKKKO....', '....OKSKSSKO....', '....OKSSSSKO....', '.....OSKKSO.....']),
     GOD,
   ),
+};
+
+// ---------------------------------------------------------------------------
+// A small painter for big sprites: fill shapes into a char grid, then outline.
+// ---------------------------------------------------------------------------
+
+class PixelGrid {
+  private cells: string[][];
+
+  constructor(readonly w: number, readonly h: number) {
+    this.cells = [];
+    for (let y = 0; y < h; y++) this.cells.push(new Array<string>(w).fill('.'));
+  }
+
+  rect(x: number, y: number, w: number, h: number, c: string): this {
+    for (let yy = y; yy < y + h; yy++) for (let xx = x; xx < x + w; xx++) this.px(xx, yy, c);
+    return this;
+  }
+
+  px(x: number, y: number, c: string): this {
+    const row = this.cells[y];
+    if (row && x >= 0 && x < this.w) row[x] = c;
+    return this;
+  }
+
+  /** Cut a corner off a filled shape: clears a diagonal triangle of size n at (x, y) pointing dir. */
+  bevel(x: number, y: number, n: number, dx: 1 | -1, dy: 1 | -1): this {
+    for (let i = 0; i < n; i++) for (let j = 0; j < n - i; j++) this.px(x + dx * j, y + dy * i, '.');
+    return this;
+  }
+
+  /** Any filled pixel touching transparency (or the sprite edge) becomes the outline colour. */
+  outline(c: string): this {
+    const out = this.cells.map((r) => [...r]);
+    for (let y = 0; y < this.h; y++) {
+      for (let x = 0; x < this.w; x++) {
+        if ((this.cells[y]?.[x] ?? '.') === '.') continue;
+        const edge = [
+          [x - 1, y],
+          [x + 1, y],
+          [x, y - 1],
+          [x, y + 1],
+        ].some(([nx, ny]) => (this.cells[ny ?? -1]?.[nx ?? -1] ?? '.') === '.');
+        if (edge) {
+          const row = out[y];
+          if (row) row[x] = c;
+        }
+      }
+    }
+    this.cells = out;
+    return this;
+  }
+
+  rows(): string[] {
+    return this.cells.map((r) => r.join(''));
+  }
+}
+
+// ---------------------------------------------------------------------------
+// The colossi of Ramesses II. Body 64 x 112 (world y 128..240), head 32 x 32.
+// ---------------------------------------------------------------------------
+
+const STONE: Palette = {
+  S: '#c9a76f', // stone
+  L: '#dbbd8b', // lit
+  D: '#96773f', // shade
+  T: '#b08f5c', // throne
+  Q: '#8f6f44', // deep shade
+  O: '#3a2915', // outline
+};
+
+function colossusBody(): HTMLCanvasElement {
+  const g = new PixelGrid(64, 112);
+  // Throne: back slab, side panels, base.
+  g.rect(2, 44, 60, 68, 'T');
+  g.rect(2, 44, 6, 64, 'Q');
+  g.rect(56, 44, 6, 64, 'Q');
+  g.rect(0, 106, 64, 6, 'T');
+  // Torso with sloped shoulders.
+  g.rect(10, 0, 44, 46, 'S');
+  g.bevel(10, 0, 4, 1, 1);
+  g.bevel(53, 0, 4, -1, 1);
+  g.rect(16, 2, 32, 30, 'L'); // chest catches the light
+  // Broad collar.
+  g.rect(20, 2, 24, 8, 'S');
+  g.rect(22, 4, 20, 1, 'D');
+  g.rect(21, 7, 22, 1, 'D');
+  g.rect(31, 2, 2, 8, 'D');
+  // Upper arms hanging at the sides.
+  g.rect(6, 8, 7, 38, 'S');
+  g.rect(51, 8, 7, 38, 'S');
+  g.rect(12, 8, 1, 38, 'D');
+  g.rect(51, 8, 1, 38, 'D');
+  // Lap: thighs coming forward, kilt between the knees.
+  g.rect(8, 46, 48, 20, 'S');
+  g.rect(10, 46, 44, 4, 'L');
+  g.rect(26, 46, 12, 20, 'L');
+  for (let i = 0; i < 5; i++) g.rect(27 + i * 2, 50, 1, 16, 'D'); // pleats
+  // Forearms and hands flat on the thighs.
+  g.rect(6, 44, 18, 8, 'S');
+  g.rect(40, 44, 18, 8, 'S');
+  g.rect(6, 52, 12, 5, 'L');
+  g.rect(46, 52, 12, 5, 'L');
+  g.rect(9, 54, 1, 3, 'D');
+  g.rect(12, 54, 1, 3, 'D');
+  g.rect(51, 54, 1, 3, 'D');
+  g.rect(54, 54, 1, 3, 'D');
+  // Shins, the gap between them shows the throne.
+  g.rect(12, 66, 16, 40, 'S');
+  g.rect(36, 66, 16, 40, 'S');
+  g.rect(14, 66, 6, 36, 'L');
+  g.rect(38, 66, 6, 36, 'L');
+  g.rect(26, 66, 2, 40, 'D');
+  g.rect(50, 66, 2, 40, 'D');
+  // Feet forward on the base.
+  g.rect(8, 100, 22, 8, 'S');
+  g.rect(34, 100, 22, 8, 'S');
+  g.rect(8, 100, 22, 2, 'L');
+  g.rect(34, 100, 22, 2, 'L');
+  // The queen at the king's leg, as on the real facade.
+  g.rect(0, 78, 6, 30, 'D');
+  g.rect(1, 80, 4, 5, 'S');
+  g.rect(1, 87, 4, 12, 'S');
+  return compile(g.outline('O').rows(), STONE);
+}
+
+function colossusBroken(): HTMLCanvasElement {
+  const g = new PixelGrid(64, 112);
+  g.rect(2, 44, 60, 68, 'T');
+  g.rect(2, 44, 6, 64, 'Q');
+  g.rect(56, 44, 6, 64, 'Q');
+  g.rect(0, 106, 64, 6, 'T');
+  // Everything above the lap came away in the earthquake. Jagged break.
+  g.rect(8, 50, 48, 16, 'S');
+  g.rect(10, 48, 8, 2, 'S');
+  g.rect(24, 46, 6, 4, 'S');
+  g.rect(38, 49, 12, 1, 'S');
+  g.rect(26, 50, 12, 16, 'L');
+  for (let i = 0; i < 5; i++) g.rect(27 + i * 2, 52, 1, 14, 'D');
+  g.rect(6, 50, 12, 7, 'L'); // hands still on the knees
+  g.rect(46, 50, 12, 7, 'L');
+  g.rect(12, 66, 16, 40, 'S');
+  g.rect(36, 66, 16, 40, 'S');
+  g.rect(14, 66, 6, 36, 'L');
+  g.rect(38, 66, 6, 36, 'L');
+  g.rect(26, 66, 2, 40, 'D');
+  g.rect(50, 66, 2, 40, 'D');
+  g.rect(8, 100, 22, 8, 'S');
+  g.rect(34, 100, 22, 8, 'S');
+  g.rect(0, 78, 6, 30, 'D');
+  g.rect(1, 80, 4, 5, 'S');
+  g.rect(1, 87, 4, 12, 'S');
+  return compile(g.outline('O').rows(), STONE);
+}
+
+/** The fallen upper half, lying in the sand in front of the broken statue. */
+function colossusPieces(): HTMLCanvasElement {
+  const g = new PixelGrid(72, 14);
+  g.rect(0, 4, 18, 10, 'S');
+  g.rect(2, 6, 12, 2, 'L');
+  g.rect(22, 8, 14, 6, 'S');
+  g.rect(44, 0, 26, 14, 'S'); // the face, on its side
+  g.rect(46, 2, 22, 3, 'D');
+  g.rect(52, 7, 4, 2, 'D');
+  g.rect(60, 7, 4, 2, 'D');
+  g.rect(56, 11, 6, 1, 'D');
+  return compile(g.outline('O').rows(), STONE);
+}
+
+function colossusHead(): HTMLCanvasElement {
+  const g = new PixelGrid(32, 32);
+  // Nemes: the striped headcloth, wide at the sides, lappets down to the shoulders.
+  g.rect(0, 2, 32, 30, 'S');
+  g.bevel(0, 2, 3, 1, 1);
+  g.bevel(31, 2, 3, -1, 1);
+  for (let i = 0; i < 8; i++) g.rect(1 + i * 4, 3, 2, 9, 'D');
+  g.rect(0, 12, 7, 20, 'D'); // lappets
+  g.rect(25, 12, 7, 20, 'D');
+  g.rect(2, 14, 1, 16, 'S');
+  g.rect(29, 14, 1, 16, 'S');
+  // Face.
+  g.rect(8, 11, 16, 17, 'L');
+  g.rect(8, 11, 16, 1, 'S');
+  g.rect(9, 17, 5, 2, 'D'); // eyes
+  g.rect(18, 17, 5, 2, 'D');
+  g.rect(10, 17, 1, 1, 'O');
+  g.rect(21, 17, 1, 1, 'O');
+  g.rect(15, 20, 2, 3, 'D'); // nose
+  g.rect(12, 24, 8, 1, 'D'); // the famous slight smile
+  g.rect(11, 25, 1, 1, 'D');
+  g.rect(20, 25, 1, 1, 'D');
+  // False beard and uraeus.
+  g.rect(13, 28, 6, 4, 'D');
+  g.rect(14, 29, 4, 3, 'S');
+  g.rect(15, 0, 2, 3, 'D');
+  g.rect(14, 2, 4, 1, 'D');
+  return compile(g.outline('O').rows(), STONE);
+}
+
+export const COLOSSUS = {
+  body: colossusBody(),
+  broken: colossusBroken(),
+  pieces: colossusPieces(),
+  head: colossusHead(),
 };

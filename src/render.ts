@@ -2,7 +2,7 @@ import type { Camera } from './camera';
 import type { Baboon, ColossusHead, Relocation, Sunbeam } from './entities';
 import type { Level } from './level';
 import type { Player } from './player';
-import { BABOON_SPRITE, DATE_SPRITE, GOD_SPRITES, TOURIST_FRAMES } from './sprites';
+import { BABOON_SPRITE, COLOSSUS, DATE_SPRITE, GOD_SPRITES, TOURIST_FRAMES } from './sprites';
 import { TILE, VIEW_H, VIEW_W, type Rect } from './types';
 
 /** Text drawn in screen space after scaling so it stays crisp. World coordinates. */
@@ -67,6 +67,8 @@ export interface Scene {
   texts: WorldText[];
   /** Seconds since level start, for water and dust animation only. */
   time: number;
+  /** True once the death pose should show. */
+  dead: boolean;
 }
 
 export function renderWorld(ctx: CanvasRenderingContext2D, s: Scene): void {
@@ -93,7 +95,7 @@ export function renderWorld(ctx: CanvasRenderingContext2D, s: Scene): void {
   drawHeads(ctx, s);
   drawCoins(ctx, s);
   drawExit(ctx, d.exit);
-  drawPlayer(ctx, s.player);
+  drawPlayer(ctx, s.player, s.dead);
   drawWater(ctx, s);
   drawSunbeam(ctx, s);
 
@@ -295,78 +297,12 @@ function drawStatues(ctx: CanvasRenderingContext2D, s: Scene): void {
   for (const h of s.heads) {
     const x = h.def.tx * TILE;
     if (h.def.broken) {
-      drawBrokenStatue(ctx, x, groundY);
-      continue;
+      ctx.drawImage(COLOSSUS.broken, x, groundY - 112);
+      ctx.drawImage(COLOSSUS.pieces, x - 6, groundY - 14);
+    } else {
+      ctx.drawImage(COLOSSUS.body, x, groundY - 112);
     }
-    // Throne block.
-    ctx.fillStyle = COLORS.statueShade;
-    ctx.fillRect(x, groundY - 40, 64, 40);
-    ctx.fillStyle = COLORS.statue;
-    ctx.fillRect(x + 2, groundY - 40, 60, 38);
-    // Legs and kilt.
-    ctx.fillStyle = COLORS.statueLight;
-    ctx.fillRect(x + 10, groundY - 64, 44, 26);
-    ctx.fillStyle = COLORS.statueShade;
-    for (let i = 0; i < 3; i++) ctx.fillRect(x + 14, groundY - 58 + i * 8, 36, 1);
-    ctx.fillRect(x + 31, groundY - 64, 2, 26);
-    // Feet.
-    ctx.fillStyle = COLORS.statueLight;
-    ctx.fillRect(x + 8, groundY - 8, 20, 8);
-    ctx.fillRect(x + 36, groundY - 8, 20, 8);
-    // Torso.
-    ctx.fillStyle = COLORS.statue;
-    ctx.fillRect(x + 14, groundY - 112, 36, 48);
-    ctx.fillStyle = COLORS.statueLight;
-    ctx.fillRect(x + 18, groundY - 110, 28, 20);
-    // Arms resting on the knees.
-    ctx.fillStyle = COLORS.statueShade;
-    ctx.fillRect(x + 8, groundY - 96, 6, 34);
-    ctx.fillRect(x + 50, groundY - 96, 6, 34);
-    ctx.fillStyle = COLORS.statue;
-    ctx.fillRect(x + 8, groundY - 62, 12, 6);
-    ctx.fillRect(x + 44, groundY - 62, 12, 6);
-    // Outline.
-    ctx.fillStyle = COLORS.outline;
-    ctx.fillRect(x, groundY - 40, 1, 40);
-    ctx.fillRect(x + 63, groundY - 40, 1, 40);
-    ctx.fillRect(x + 8, groundY - 96, 1, 34);
-    ctx.fillRect(x + 55, groundY - 96, 1, 34);
-    ctx.fillRect(x + 14, groundY - 112, 36, 1);
-    // A small queen at the king's leg, as on the real facade.
-    ctx.fillStyle = COLORS.statueShade;
-    ctx.fillRect(x + 2, groundY - 24, 5, 24);
-    ctx.fillStyle = COLORS.statue;
-    ctx.fillRect(x + 3, groundY - 22, 3, 6);
   }
-}
-
-function drawBrokenStatue(ctx: CanvasRenderingContext2D, x: number, groundY: number): void {
-  ctx.fillStyle = COLORS.statueShade;
-  ctx.fillRect(x, groundY - 40, 64, 40);
-  ctx.fillStyle = COLORS.statue;
-  ctx.fillRect(x + 2, groundY - 40, 60, 38);
-  ctx.fillStyle = COLORS.statueLight;
-  ctx.fillRect(x + 10, groundY - 58, 44, 20);
-  ctx.fillStyle = COLORS.statueShade;
-  ctx.fillRect(x + 14, groundY - 50, 36, 1);
-  ctx.fillRect(x + 31, groundY - 58, 2, 20);
-  // The break: a jagged top edge where the torso came away.
-  ctx.fillStyle = COLORS.rock;
-  ctx.fillRect(x + 10, groundY - 58, 6, 3);
-  ctx.fillRect(x + 22, groundY - 58, 8, 2);
-  ctx.fillRect(x + 40, groundY - 58, 5, 4);
-  // Pieces in the sand at its feet.
-  ctx.fillStyle = COLORS.statue;
-  ctx.fillRect(x - 6, groundY - 10, 14, 10);
-  ctx.fillRect(x + 20, groundY - 6, 10, 6);
-  ctx.fillRect(x + 44, groundY - 12, 18, 12);
-  ctx.fillStyle = COLORS.statueShade;
-  ctx.fillRect(x - 6, groundY - 10, 14, 1);
-  ctx.fillRect(x + 44, groundY - 12, 18, 1);
-  ctx.fillRect(x + 48, groundY - 8, 6, 1); // half a face
-  ctx.fillStyle = COLORS.outline;
-  ctx.fillRect(x, groundY - 40, 1, 40);
-  ctx.fillRect(x + 63, groundY - 40, 1, 40);
 }
 
 function drawHeads(ctx: CanvasRenderingContext2D, s: Scene): void {
@@ -377,24 +313,7 @@ function drawHeads(ctx: CanvasRenderingContext2D, s: Scene): void {
       drawRubble(ctx, r);
       continue;
     }
-    // Nemes with lappets, false beard, the famous serene face.
-    ctx.fillStyle = COLORS.statue;
-    ctx.fillRect(r.x, r.y, r.w, r.h);
-    ctx.fillStyle = COLORS.statueLight;
-    ctx.fillRect(r.x + 8, r.y + 10, 16, 18);
-    ctx.fillStyle = COLORS.statueShade;
-    for (let i = 0; i < 4; i++) ctx.fillRect(r.x + 1 + i * 8, r.y + 1, 3, 10);
-    ctx.fillRect(r.x + 1, r.y + 12, 6, 20); // lappets
-    ctx.fillRect(r.x + 25, r.y + 12, 6, 20);
-    ctx.fillRect(r.x + 9, r.y + 18, 5, 2); // eyes
-    ctx.fillRect(r.x + 18, r.y + 18, 5, 2);
-    ctx.fillRect(r.x + 14, r.y + 24, 4, 1); // mouth
-    ctx.fillRect(r.x + 14, r.y + 27, 4, 5); // beard
-    ctx.fillStyle = COLORS.outline;
-    ctx.fillRect(r.x, r.y, r.w, 1);
-    ctx.fillRect(r.x, r.y, 1, r.h);
-    ctx.fillRect(r.x + r.w - 1, r.y, 1, r.h);
-    ctx.fillRect(r.x + 14, r.y + 8, 4, 1); // uraeus
+    ctx.drawImage(COLOSSUS.head, r.x, r.y);
   }
 }
 
@@ -587,8 +506,8 @@ function drawExit(ctx: CanvasRenderingContext2D, e: Rect): void {
 }
 
 /** A lost tourist in a visibly fake pharaoh costume. Nobody will mention it. */
-export function drawPlayer(ctx: CanvasRenderingContext2D, p: Player): void {
-  const frame = TOURIST_FRAMES[p.animFrame()];
+export function drawPlayer(ctx: CanvasRenderingContext2D, p: Player, dead = false): void {
+  const frame = TOURIST_FRAMES[dead ? 'dead' : p.animFrame()];
   const x = Math.round(p.x) - 1;
   const y = Math.round(p.y);
   if (p.facing === 1) {

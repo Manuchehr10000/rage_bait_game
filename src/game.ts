@@ -9,7 +9,9 @@ import { Player, type MovingSolid } from './player';
 import { renderWorld, type Scene, type WorldText } from './render';
 import { DT, overlaps, TILE, VIEW_H, VIEW_W, type DeathCause } from './types';
 
-const DEATH_FREEZE = 0.45;
+const DEATH_FREEZE = 0.5;
+/** The tourist stays as they were for a moment, then the pose lands. */
+const DEATH_POSE_AFTER = 0.12;
 const LIFETIME_KEY = 'ragebait.lifetimeDeaths';
 
 type State = 'playing' | 'dead' | 'complete';
@@ -195,6 +197,7 @@ export class Game {
       coins: this.coins,
       texts: this.texts,
       time: this.time,
+      dead: this.state === 'dead' && this.deathTimer <= DEATH_FREEZE - DEATH_POSE_AFTER,
     };
     renderWorld(this.wctx, scene);
 
