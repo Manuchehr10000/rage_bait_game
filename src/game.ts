@@ -1,3 +1,4 @@
+import { GameAudio } from './audio';
 import { Camera } from './camera';
 import { Baboon, ColossusHead, Relocation, Sunbeam, type Entity, type World } from './entities';
 import type { Stats } from './hud';
@@ -23,6 +24,7 @@ export class Game {
   private scale = 1;
 
   private readonly input: Input;
+  private readonly audio = new GameAudio();
   private readonly level: Level;
   private readonly player = new Player();
   private readonly camera: Camera;
@@ -56,6 +58,10 @@ export class Game {
     this.wctx = wctx;
 
     this.input = new Input(window);
+    window.addEventListener('keydown', (e) => {
+      this.audio.unlock();
+      if (e.code === 'KeyM' && !e.repeat) this.audio.toggleMute();
+    });
     this.level = new Level(data);
     this.camera = new Camera(this.level.widthPx, data.cameraBottom);
     this.resize();
@@ -89,6 +95,7 @@ export class Game {
     this.entities = [...this.heads, ...this.baboons, this.relocation, this.sunbeam];
     this.coins = [];
     this.time = 0;
+    this.audio.stopLoops();
     this.player.spawnAt(d.spawn.x, d.spawn.y);
     this.camera.reset();
     this.state = 'playing';
@@ -125,6 +132,7 @@ export class Game {
   }
 
   private tick(): void {
+    this.audio.update();
     if (this.input.takeRestartPressed()) {
       if (this.state === 'complete') {
         this.resetRun();
@@ -146,6 +154,7 @@ export class Game {
       player: this.player,
       cameraX: this.camera.x,
       kill: (c) => this.kill(c),
+      sound: (n) => this.audio.play(n),
     };
 
     // Traps first, so a platform's displacement is known before the player moves.
@@ -157,9 +166,14 @@ export class Game {
     const solids: MovingSolid[] = [];
     for (const e of this.entities) if (e.solids) solids.push(...e.solids());
 
+    const wasOnGround = this.player.onGround;
     this.player.update(this.input, this.level, solids, this.camera.x);
+    if (this.player.justJumped) this.audio.play('jump');
+    else if (!wasOnGround && this.player.onGround) this.audio.play('land');
+    else if (this.player.justStepped) this.audio.play('step');
     this.bumpBlocks();
     this.camera.update(this.player);
+    this.driveLoops();
 
     for (const c of this.coins) {
       c.y -= 60 * DT;
@@ -171,7 +185,20 @@ export class Game {
       this.kill('Fall');
       return;
     }
-    if (overlaps(this.player, this.level.data.exit)) this.state = 'complete';
+    if (overlaps(this.player, this.level.data.exit)) {
+      this.state = 'complete';
+      this.audio.stopLoops();
+      this.audio.play('turnstile');
+    }
+  }
+
+  /** Continuous sounds follow entity state; they stop on their own when it changes. */
+  private driveLoops(): void {
+    const rel = this.relocation;
+    const onScreen = rel.platform.rect.x + rel.platform.rect.w > this.camera.x;
+    this.audio.setWinch(rel.state !== 'idle' && onScreen);
+    this.audio.setWater(rel.state !== 'idle' && rel.waterY > this.level.data.relocation.waterFastTo);
+    this.audio.setBeam(this.sunbeam.beam !== null);
   }
 
   private bumpBlocks(): void {
@@ -180,6 +207,7 @@ export class Game {
     const ty = Math.floor((this.player.y - 1) / TILE);
     if (this.level.tile(tx, ty) === '?') {
       this.level.setTile(tx, ty, 'x');
+      this.audio.play('coin');
       this.coins.push({ x: tx * TILE + 6, y: ty * TILE - 6, t: 0.5 });
     }
   }

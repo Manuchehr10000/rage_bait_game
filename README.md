@@ -24,7 +24,7 @@ npm install
 npm run dev
 ```
 
-Arrows or WASD to move, Space to jump, R to give up (it counts).
+Arrows or WASD to move, Space to jump, R to give up (it counts), M to mute.
 
 `npm test` runs scripted playthroughs in headless Chromium (`tests/smoke.spec.ts`). Each one
 checks a design contract: the trap fires for the naive player and can be avoided by the one
@@ -37,9 +37,10 @@ who remembers it.
 - `src/entities.ts` – the traps: colossus heads, baboon, relocation, sunbeam.
 - `src/levels/abu-simbel.ts` – chapter 1, level 1 as data.
 - `src/render.ts` – the scene: sky, lake, rock, facade, tiles, entities. 320×180, integer-scaled.
-- `src/sprites.ts` – pixel-map sprites: the tourist, baboons, the four gods.
+- `src/sprites.ts` – pixel-map sprites: the tourist, baboons, the colossi, the four gods.
+- `src/audio.ts` – every sound, synthesised with Web Audio. No files.
 - `src/hud.ts` – death counter and exit label. Drawn in screen space so text stays crisp.
 
 ## Status
 
-Level 1 playable end to end with first-pass pixel art. No audio, no menu yet.
+Level 1 playable end to end with first-pass pixel art and procedural sound. No menu yet.

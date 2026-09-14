@@ -19,8 +19,9 @@ these bent, the idea is wrong, not the rule.
 7. **No checkpoints. Infinite lives. Big visible death counter.** Levels stay short
    (about 45 seconds clean) so the retry loop stays fast.
 8. **Deadpan.** No sound effect on death, no shake, no pity message. The tourist freezes,
-   the counter ticks, the level resets in under half a second. The only acknowledgement is
-   the museum label at the exit, with deaths broken down by cause.
+   the counter ticks, the level resets in half a second. The wind and the music never
+   pause. The world makes sounds; your death does not. The only acknowledgement is the
+   museum label at the exit, with deaths broken down by cause.
 9. **The costume is cosmetic.** The tourist wears visibly fake period dress and nobody in
    the game ever mentions it. It never changes the hitbox.
 10. **False completion is spent once per player, ever.** Held in reserve. Not in level 1.

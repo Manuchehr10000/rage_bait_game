@@ -358,15 +358,18 @@ function colossusPieces(): HTMLCanvasElement {
 
 function colossusHead(): HTMLCanvasElement {
   const g = new PixelGrid(32, 32);
-  // Nemes: the striped headcloth, wide at the sides, lappets down to the shoulders.
+  // Nemes: smooth crown under a headband, striped wings falling to the shoulders.
   g.rect(0, 2, 32, 30, 'S');
   g.bevel(0, 2, 3, 1, 1);
   g.bevel(31, 2, 3, -1, 1);
-  for (let i = 0; i < 8; i++) g.rect(1 + i * 4, 3, 2, 9, 'D');
-  g.rect(0, 12, 7, 20, 'D'); // lappets
-  g.rect(25, 12, 7, 20, 'D');
-  g.rect(2, 14, 1, 16, 'S');
-  g.rect(29, 14, 1, 16, 'S');
+  g.rect(8, 5, 16, 6, 'L'); // crown catches the light
+  g.rect(1, 4, 30, 1, 'D'); // headband
+  for (let i = 0; i < 3; i++) {
+    g.rect(1 + i * 2, 7, 1, 25, 'D');
+    g.rect(30 - i * 2, 7, 1, 25, 'D');
+  }
+  g.rect(7, 7, 1, 25, 'D'); // edge of the wing against the face
+  g.rect(24, 7, 1, 25, 'D');
   // Face.
   g.rect(8, 11, 16, 17, 'L');
   g.rect(8, 11, 16, 1, 'S');

@@ -35,6 +35,10 @@ export class Player implements Rect {
   riding: MovingSolid | null = null;
   /** Distance walked while grounded, drives the two-frame walk cycle. */
   private walkPhase = 0;
+  /** Set for the one frame a jump starts. */
+  justJumped = false;
+  /** Set on frames where a foot comes down while walking. */
+  justStepped = false;
   lastContacts: Contacts = { left: false, right: false, up: false, down: false, standingOn: null };
 
   spawnAt(x: number, y: number): void {
@@ -73,7 +77,10 @@ export class Player implements Rect {
     if (this.onGround) this.coyote = PHYS.coyoteTime;
     else this.coyote = Math.max(0, this.coyote - DT);
 
+    this.justJumped = false;
+    this.justStepped = false;
     if (this.buffer > 0 && this.coyote > 0) {
+      this.justJumped = true;
       this.vy = -PHYS.jumpVelocity;
       this.buffer = 0;
       this.coyote = 0;
@@ -105,7 +112,11 @@ export class Player implements Rect {
 
     const ground = groundBelow(this, level, rects);
     this.onGround = ground !== null;
-    if (this.onGround) this.walkPhase += Math.abs(this.vx) * DT;
+    if (this.onGround && Math.abs(this.vx) >= 10) {
+      const before = Math.floor(this.walkPhase / 10);
+      this.walkPhase += Math.abs(this.vx) * DT;
+      if (Math.floor(this.walkPhase / 10) !== before) this.justStepped = true;
+    }
     this.riding = null;
     if (ground) {
       for (const s of solids) if (s.rect === ground) this.riding = s;

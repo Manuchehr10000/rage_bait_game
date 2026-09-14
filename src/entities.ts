@@ -2,12 +2,14 @@ import type { Level, BaboonDef, RelocationDef, StatueDef, SunbeamDef } from './l
 import type { MovingSolid, Player } from './player';
 import { PHYS } from './player';
 import { centerX, centerY, DT, TILE, type DeathCause, type Rect } from './types';
+import type { Sfx } from './audio';
 
 export interface World {
   level: Level;
   player: Player;
   cameraX: number;
   kill(cause: DeathCause): void;
+  sound(name: Sfx): void;
 }
 
 export interface Entity {
@@ -39,7 +41,10 @@ export class ColossusHead implements Entity {
 
     if (this.state === 'idle') {
       // Tuned so the head meets a full-speed runner. Stop short and it lands in front of you.
-      if (centerX(p) >= this.headX - 40) this.state = 'falling';
+      if (centerX(p) >= this.headX - 40) {
+        this.state = 'falling';
+        w.sound('headCrack');
+      }
       return;
     }
 
@@ -57,6 +62,7 @@ export class ColossusHead implements Entity {
           this.rect.h = 16;
           this.rect.y = t.y - this.rect.h;
           this.state = 'landed';
+          w.sound('headThud');
         }
       }
     }
@@ -92,6 +98,7 @@ export class Baboon implements Entity {
         this.date = { x: this.rect.x - 2, y: this.rect.y - 2, w: 4, h: 4 };
         this.vx = -12;
         this.vy = -70;
+        w.sound('baboon');
       }
       return;
     }
@@ -106,6 +113,7 @@ export class Baboon implements Entity {
       if (t.y < d.y + d.h) {
         d.y = t.y - d.h;
         this.state = 'landed';
+        w.sound('dateLand');
       }
     }
     if (this.state === 'thrown' && overlapsRect(d, p)) w.kill('Baboon');
@@ -148,7 +156,8 @@ export class Relocation implements Entity {
 
     if (this.state === 'idle') {
       const triggerX = r.x + (d.triggerBlock - d.firstBlockNumber) * TILE;
-      if (centerX(p) >= triggerX && p.y + p.h <= r.y + 1) this.state = 'rising';
+      const standingOnBlocks = p.x + p.w > r.x && p.x < r.x + r.w && Math.abs(p.y + p.h - r.y) <= 2;
+      if (standingOnBlocks && centerX(p) >= triggerX) this.state = 'rising';
       return;
     }
 
