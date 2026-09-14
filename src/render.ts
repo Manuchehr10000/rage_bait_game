@@ -1,5 +1,5 @@
 import type { Camera } from './camera';
-import type { Crumble, Entity, Falling, Platform, Pusher, Sweep, Thrower, Water } from './entities';
+import type { Chaser, Crumble, Entity, Falling, Platform, Pusher, Sweep, Thrower, Tipper, Water } from './entities';
 import type { DecorDef, Level } from './level';
 import type { Player } from './player';
 import {
@@ -10,11 +10,16 @@ import {
   CROC_SPRITE,
   DATE_SPRITE,
   GOD_SPRITES,
+  OBELISK_SPRITE,
   RELIEF_OUT_SPRITE,
   RELIEF_SPRITE,
   ROCK_SPRITE,
   SAIL_SPRITE,
+  SCARAB_FRAMES,
   silhouette,
+  SPHINX_SPRITE,
+  SPHINX_TURNED_SPRITE,
+  TALATAT_SPRITE,
   TOURIST_FRAMES,
   TOURIST_SEATED,
 } from './sprites';
@@ -78,6 +83,15 @@ export const COLORS = {
   woodDark: '#4d3319',
   palm: '#3f5a2a',
   palmTrunk: '#6b4a2b',
+  paving: '#d9c9a0',
+  pavingLine: '#b39f72',
+  pavingTop: '#eadcb6',
+  sandstone: '#c9a96e',
+  sandstoneJoint: '#8f7444',
+  sandstoneLight: '#ddc08a',
+  mudbrick: '#9a6f45',
+  mudbrickLine: '#6e4c2c',
+  night: '#08060a',
   cream: '#efe6cf',
   cable: '#3a2915',
   crack: '#2a1d10',
@@ -105,26 +119,29 @@ export function renderWorld(ctx: CanvasRenderingContext2D, s: Scene): void {
 
   drawSky(ctx, cy);
   if (theme === 'abuSimbel') drawFarCliffs(ctx, cx, cy);
-  else drawFarIsland(ctx, cx, cy);
+  else if (theme === 'philae') drawFarIsland(ctx, cx, cy);
+  else drawFarKarnak(ctx, cx, cy);
 
   ctx.save();
   ctx.translate(-cx, -cy);
 
   if (theme === 'abuSimbel') drawRock(ctx, s, cx, cy);
-  else drawRiverbed(ctx, s, cx, cy);
+  else if (theme === 'philae') drawRiverbed(ctx, s, cx, cy);
+  else drawKarnakGround(ctx, s, cx, cy);
   for (const d of level.data.decor) drawDecor(ctx, s, d);
   drawTiles(ctx, level, cx, cy);
   for (const e of s.entities) drawEntityBack(ctx, s, e);
   if (s.death && DEATH_ANIM[s.death.cause] === 'crush') drawDeath(ctx, s, s.death); // flattened under the head
   for (const e of s.entities) drawEntityFront(ctx, s, e);
   drawCoins(ctx, s);
-  if (level.data.exit) drawExit(ctx, level.data.exit);
+  if (level.data.exit && !level.data.exitHidden) drawExit(ctx, level.data.exit);
   if (!s.death) drawPlayer(ctx, s.player);
   else if (DEATH_ANIM[s.death.cause] !== 'crush') drawDeath(ctx, s, s.death);
   for (const e of s.entities) drawEntityOverlay(ctx, s, e);
   if (s.death && (DEATH_ANIM[s.death.cause] === 'drown' || DEATH_ANIM[s.death.cause] === 'snap')) drawDrownSurface(ctx, s, s.death.t);
 
   ctx.restore();
+  drawDarkness(ctx, s, cx, cy);
 }
 
 // ---------------------------------------------------------------------------
@@ -200,6 +217,117 @@ function drawFarIsland(ctx: CanvasRenderingContext2D, cx: number, cy: number): v
   ctx.fillRect(0, horizon, VIEW_W, 1);
   const shimmer = Math.round(cx * 0.2) % 24;
   for (let x = -24 - shimmer; x < VIEW_W; x += 24) ctx.fillRect(x, horizon + 5, 10, 1);
+}
+
+/** Karnak: pylons and palms on the skyline, the Theban hills behind. */
+function drawFarKarnak(ctx: CanvasRenderingContext2D, cx: number, cy: number): void {
+  const horizon = 150 - Math.round(cy * 0.55);
+  const off = Math.round(cx * 0.2) % 240;
+  ctx.fillStyle = COLORS.farShade;
+  for (let base = -240; base < VIEW_W + 240; base += 240) {
+    const x = base - off;
+    ctx.fillRect(x, horizon - 40, 90, 40);
+    ctx.fillRect(x + 120, horizon - 30, 70, 30);
+  }
+  for (let base = -240; base < VIEW_W + 240; base += 240) {
+    const x = base - off;
+    // A pylon: two tapered towers with a gate between.
+    ctx.fillStyle = COLORS.far;
+    ctx.fillRect(x + 30, horizon - 26, 22, 26);
+    ctx.fillRect(x + 62, horizon - 26, 22, 26);
+    ctx.fillRect(x + 52, horizon - 14, 10, 14);
+    ctx.fillStyle = COLORS.farShade;
+    ctx.fillRect(x + 30, horizon - 26, 54, 2);
+    for (const p of [x + 140, x + 200]) {
+      ctx.fillStyle = COLORS.palmTrunk;
+      ctx.fillRect(p, horizon - 20, 2, 20);
+      ctx.fillStyle = COLORS.palm;
+      ctx.fillRect(p - 6, horizon - 22, 14, 3);
+      ctx.fillRect(p - 4, horizon - 25, 10, 3);
+    }
+  }
+  ctx.fillStyle = COLORS.sand;
+  ctx.fillRect(0, horizon, VIEW_W, VIEW_H - horizon);
+  ctx.fillStyle = COLORS.sandLine;
+  ctx.fillRect(0, horizon, VIEW_W, 1);
+}
+
+function drawKarnakGround(ctx: CanvasRenderingContext2D, s: Scene, cx: number, cy: number): void {
+  void cy;
+  // Below the paving is earth; the pits show it.
+  ctx.fillStyle = COLORS.pit;
+  ctx.fillRect(cx - 8, 15 * TILE, VIEW_W + 16, s.level.heightPx - 15 * TILE + 16);
+}
+
+const darkLayer = document.createElement('canvas');
+darkLayer.width = VIEW_W;
+darkLayer.height = VIEW_H;
+
+/** The Hypostyle Hall at night. You see a little around you, and what the show lights. */
+function drawDarkness(ctx: CanvasRenderingContext2D, s: Scene, cx: number, cy: number): void {
+  const dark = s.level.data.decor.find((d) => d.kind === 'dark');
+  if (!dark || dark.kind !== 'dark') return;
+  const x0 = dark.x0 - cx;
+  const x1 = dark.x1 - cx;
+  if (x1 < 0 || x0 > VIEW_W) return;
+  const d = darkLayer.getContext('2d');
+  if (!d) return;
+  d.clearRect(0, 0, VIEW_W, VIEW_H);
+  d.fillStyle = COLORS.night;
+  d.globalAlpha = 0.94;
+  // Soft edges: the dark fades in over 24px at each end of the hall.
+  const feather = 24;
+  d.fillRect(x0 + feather, 0, x1 - x0 - feather * 2, VIEW_H);
+  for (let i = 0; i < feather; i += 2) {
+    d.globalAlpha = 0.94 * (i / feather);
+    d.fillRect(x0 + i, 0, 2, VIEW_H);
+    d.fillRect(x1 - i - 2, 0, 2, VIEW_H);
+  }
+  d.globalAlpha = 1;
+  d.globalCompositeOperation = 'destination-out';
+  // Your own small circle of sight.
+  const p = s.player;
+  const pxc = Math.round(p.x) + 5 - cx;
+  const pyc = Math.round(p.y) + 8 - cy;
+  d.beginPath();
+  d.arc(pxc, pyc, 44, 0, Math.PI * 2);
+  d.fill();
+  d.globalAlpha = 0.5;
+  d.beginPath();
+  d.arc(pxc, pyc, 60, 0, Math.PI * 2);
+  d.fill();
+  d.globalAlpha = 1;
+  // The show's spotlights, from the roof down to a capital.
+  for (const sp of s.level.data.decor) {
+    if (sp.kind !== 'spotlight') continue;
+    const sx = sp.x - cx;
+    const sy = sp.floorY - cy;
+    d.beginPath();
+    d.moveTo(sx - 4, -10);
+    d.lineTo(sx + 4, -10);
+    d.lineTo(sx + 26, sy + 12);
+    d.lineTo(sx - 26, sy + 12);
+    d.closePath();
+    d.fill();
+  }
+  d.globalCompositeOperation = 'source-over';
+  ctx.drawImage(darkLayer, 0, 0);
+  // The beams themselves, faintly, so the light reads as light and not as a hole.
+  ctx.save();
+  ctx.fillStyle = 'rgba(255, 240, 190, 0.18)';
+  for (const sp of s.level.data.decor) {
+    if (sp.kind !== 'spotlight') continue;
+    const sx = sp.x - cx;
+    const sy = sp.floorY - cy;
+    ctx.beginPath();
+    ctx.moveTo(sx - 4, -10);
+    ctx.lineTo(sx + 4, -10);
+    ctx.lineTo(sx + 26, sy + 12);
+    ctx.lineTo(sx - 26, sy + 12);
+    ctx.closePath();
+    ctx.fill();
+  }
+  ctx.restore();
 }
 
 function drawRock(ctx: CanvasRenderingContext2D, s: Scene, cx: number, cy: number): void {
@@ -384,6 +512,85 @@ function drawDecor(ctx: CanvasRenderingContext2D, s: Scene, d: DecorDef): void {
       for (let y = d.top; y < d.bottom; y += TILE) drawColumnDrum(ctx, d.x, y, y === d.top);
       break;
     }
+    case 'pylon': {
+      // The first pylon: a tapered sandstone face with a torus edge and a cornice.
+      ctx.fillStyle = COLORS.sandstone;
+      ctx.fillRect(d.x, d.top, d.w, d.bottom - d.top);
+      ctx.fillStyle = COLORS.sandstoneJoint;
+      for (let y = d.top; y < d.bottom; y += 16) {
+        ctx.fillRect(d.x, y, d.w, 1);
+        for (let x = d.x + ((y / 16) % 2) * 16; x < d.x + d.w; x += 32) ctx.fillRect(x, y, 1, 16);
+      }
+      ctx.fillStyle = COLORS.sandstoneLight;
+      ctx.fillRect(d.x, d.top - 6, d.w + 6, 6);
+      ctx.fillStyle = COLORS.outline;
+      ctx.fillRect(d.x, d.top - 6, d.w + 6, 1);
+      ctx.fillRect(d.x, d.top, d.w + 6, 1);
+      ctx.fillRect(d.x + d.w + 4, d.top, 2, d.bottom - d.top);
+      break;
+    }
+    case 'ramp': {
+      // Mud brick, sloping up to the right. Still there after 2,300 years.
+      const h = d.bottom - d.top;
+      for (let y = 0; y < h; y += 4) {
+        const w = Math.round((d.w * (h - y)) / h);
+        ctx.fillStyle = COLORS.mudbrick;
+        ctx.fillRect(d.x + d.w - w, d.top + y, w, 4);
+        ctx.fillStyle = COLORS.mudbrickLine;
+        ctx.fillRect(d.x + d.w - w, d.top + y, w, 1);
+        for (let x = d.x + d.w - w + ((y / 4) % 2) * 6; x < d.x + d.w; x += 12) ctx.fillRect(x, d.top + y, 1, 4);
+      }
+      break;
+    }
+    case 'sphinxRow':
+      break;
+    case 'dark':
+      break;
+    case 'spotlight': {
+      // The lamp on the roof beam.
+      ctx.fillStyle = '#2b2b2b';
+      ctx.fillRect(d.x - 5, 0, 10, 6);
+      ctx.fillStyle = '#fff2c0';
+      ctx.fillRect(d.x - 3, 5, 6, 2);
+      break;
+    }
+    case 'brokenObelisk': {
+      // The one that cracked in the quarry. Lies where it fell.
+      const f = d.floorY;
+      ctx.fillStyle = COLORS.sandstone;
+      ctx.fillRect(d.x, f - 12, 60, 12);
+      ctx.fillRect(d.x + 66, f - 10, 14, 10);
+      ctx.fillStyle = COLORS.sandstoneLight;
+      ctx.fillRect(d.x, f - 12, 60, 2);
+      ctx.fillStyle = COLORS.outline;
+      ctx.fillRect(d.x, f - 12, 60, 1);
+      ctx.fillRect(d.x, f - 1, 60, 1);
+      ctx.fillRect(d.x + 59, f - 12, 1, 12);
+      ctx.fillRect(d.x + 66, f - 10, 14, 1);
+      ctx.fillStyle = COLORS.sandstoneJoint;
+      for (let x = d.x + 8; x < d.x + 56; x += 6) ctx.fillRect(x, f - 7, 3, 2);
+      break;
+    }
+    case 'pedestal': {
+      // An empty base. Whatever stood here is somewhere else.
+      const f = d.floorY;
+      ctx.fillStyle = COLORS.sandstone;
+      ctx.fillRect(d.x, f - 16, 32, 16);
+      ctx.fillStyle = COLORS.sandstoneLight;
+      ctx.fillRect(d.x - 2, f - 18, 36, 3);
+      ctx.fillStyle = COLORS.outline;
+      ctx.fillRect(d.x - 2, f - 18, 36, 1);
+      ctx.fillRect(d.x, f - 15, 32, 1);
+      ctx.fillRect(d.x, f - 16, 1, 16);
+      ctx.fillRect(d.x + 31, f - 16, 1, 16);
+      ctx.fillStyle = COLORS.sandstoneJoint;
+      ctx.fillRect(d.x + 8, f - 9, 16, 1);
+      ctx.fillRect(d.x + 10, f - 6, 12, 1);
+      break;
+    }
+    case 'turnstile':
+      drawExit(ctx, { x: d.x, y: d.floorY - 24, w: 12, h: 24 });
+      break;
     case 'landing': {
       // Mooring posts on the landing stage.
       ctx.fillStyle = COLORS.wood;
@@ -416,10 +623,12 @@ function drawTiles(ctx: CanvasRenderingContext2D, level: Level, cx: number, cy: 
       const open = !level.isSolid(tx, ty - 1);
       if (c === '=') {
         if (theme === 'abuSimbel') drawSand(ctx, level, tx, ty, x, y, open);
-        else drawGranite(ctx, tx, ty, x, y, open);
+        else if (theme === 'philae') drawGranite(ctx, tx, ty, x, y, open);
+        else drawPaving(ctx, tx, ty, x, y, open);
       } else if (c === '#') {
         if (theme === 'abuSimbel') drawBrick(ctx, x, y, ty % 2 === 1);
-        else drawColumnDrum(ctx, x, y, open);
+        else if (theme === 'philae') drawColumnDrum(ctx, x, y, open);
+        else drawSandstone(ctx, x, y, ty % 2 === 1, open);
       } else if (c === '?') {
         ctx.fillStyle = COLORS.statueLight;
         ctx.fillRect(x, y, TILE, TILE);
@@ -469,6 +678,32 @@ function drawGranite(ctx: CanvasRenderingContext2D, tx: number, ty: number, x: n
   ctx.fillRect(x + ((tx + ty) % 2 === 0 ? 12 : 3), y + 8, 1, 8);
   if (open) {
     ctx.fillStyle = COLORS.graniteTop;
+    ctx.fillRect(x, y, TILE, 2);
+  }
+}
+
+function drawPaving(ctx: CanvasRenderingContext2D, tx: number, ty: number, x: number, y: number, open: boolean): void {
+  ctx.fillStyle = COLORS.paving;
+  ctx.fillRect(x, y, TILE, TILE);
+  ctx.fillStyle = COLORS.pavingLine;
+  ctx.fillRect(x, y + ((tx + ty) % 2 === 0 ? 5 : 10), TILE, 1);
+  ctx.fillRect(x + ((tx * 7 + ty * 3) % 12) + 2, y, 1, TILE);
+  if (open) {
+    ctx.fillStyle = COLORS.pavingTop;
+    ctx.fillRect(x, y, TILE, 2);
+  }
+}
+
+function drawSandstone(ctx: CanvasRenderingContext2D, x: number, y: number, offset: boolean, open: boolean): void {
+  ctx.fillStyle = COLORS.sandstone;
+  ctx.fillRect(x, y, TILE, TILE);
+  ctx.fillStyle = COLORS.sandstoneJoint;
+  ctx.fillRect(x, y, TILE, 1);
+  ctx.fillRect(x + (offset ? 8 : 0), y, 1, TILE);
+  ctx.fillStyle = COLORS.sandstoneLight;
+  ctx.fillRect(x + (offset ? 9 : 1), y + 1, 6, 1);
+  if (open) {
+    ctx.fillStyle = COLORS.sandstoneLight;
     ctx.fillRect(x, y, TILE, 2);
   }
 }
@@ -543,15 +778,44 @@ function drawEntityBack(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): voi
       const r = c.rect;
       // A crocodile looks like a rock until it moves. Then you see the back.
       if (d.skin === 'croc') ctx.drawImage(c.state === 'falling' ? CROC_SPRITE : ROCK_SPRITE, r.x - (c.state === 'falling' ? 4 : 0), r.y - (c.state === 'falling' ? 2 : 0));
-      else if (d.skin === 'rock') ctx.drawImage(ROCK_SPRITE, r.x, r.y);
-      else ctx.drawImage(CAPITAL_SPRITE, r.x, r.y);
+      else if (d.skin === 'rock' || d.skin === 'stone') ctx.drawImage(ROCK_SPRITE, r.x, r.y);
+      else if (d.skin === 'talatat') for (let i = 0; i < r.w / TILE; i++) ctx.drawImage(TALATAT_SPRITE, r.x + i * TILE, r.y);
+      else if (d.skin === 'floor') {
+        // Looks exactly like the paving around it, all the way down. That is the point.
+        for (let j = 0; j < r.h / TILE; j++) {
+          for (let i = 0; i < r.w / TILE; i++) {
+            drawPaving(ctx, Math.round(r.x / TILE) + i, Math.round(r.y / TILE) + j, r.x + i * TILE, r.y + j * TILE, j === 0);
+          }
+        }
+      } else ctx.drawImage(CAPITAL_SPRITE, r.x, r.y);
       break;
     }
     case 'pusher': {
       const p = e as Pusher;
       const f = p.figure;
+      if (d.skin === 'sphinx') {
+        // The figure rect is the head; the body lies behind it on the plinth.
+        const turned = p.state === 'out';
+        ctx.drawImage(turned ? SPHINX_TURNED_SPRITE : SPHINX_SPRITE, f.x - 4, f.y + 4);
+        break;
+      }
       if (p.state === 'idle' || p.state === 'done') ctx.drawImage(RELIEF_SPRITE, f.x, f.y);
       else ctx.drawImage(RELIEF_OUT_SPRITE, f.x - Math.round(p.out), f.y);
+      break;
+    }
+    case 'chaser': {
+      const c = e as Chaser;
+      const frame = SCARAB_FRAMES[c.state === 'walking' ? Math.floor(c.walkPhase * 6) % 2 : 0] ?? SCARAB_FRAMES[0];
+      if (frame) ctx.drawImage(frame, c.rect.x, c.rect.y);
+      break;
+    }
+    case 'tipper': {
+      const t = e as Tipper;
+      ctx.save();
+      ctx.translate(d.x + 8, d.floorY);
+      ctx.rotate(-t.angle);
+      ctx.drawImage(OBELISK_SPRITE, -8, -d.height);
+      ctx.restore();
       break;
     }
     case 'thrower': {

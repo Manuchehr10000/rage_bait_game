@@ -62,3 +62,22 @@ rest of the level: standing still anywhere eventually drowns you.
 | The boat out | starts leaving when you reach the scaffold; a committed jump makes it, a hesitation does not | by boat only |
 
 Target death budget for a first clean run: 25 to 35.
+
+## Level 3: Karnak
+
+Level 1 lied about the world. Level 2 lied about level 1. Level 3 lies about the game.
+Everything it has taught you is now the trap.
+
+| Beat | Trap | The history behind it |
+|---|---|---|
+| The ankh | the one reward in the game; hit it and the floor under it opens | the Cachette: 17,000 statues buried under the courtyard |
+| The Avenue | five identical ram sphinxes on plinths over pits; two turn and butt you back | the Avenue of Sphinxes, three kilometres of them |
+| The ramp | stairs that pull you backward; stop and you slide to the bottom | the mud-brick construction ramp still leaning on the first pylon |
+| The blocks | steps up the pylon face that give way a beat after you land | Akhenaten's talatat blocks reused as fill in the pylon |
+| The scarab | steps off its plinth and walks at you; jump it | the scarab statue tourists circle seven times for luck |
+| The Hall | dark; column tops over a pit; the spotlit ones fall | 134 columns; the Sound and Light show |
+| The obelisk | falls to the left, ahead of you, across where you are sprinting to | Hatshepsut's obelisk; the broken one lies by the lake |
+| The lake | the stones sink; the water holds you; you swim | the sacred lake, where the priests bathed |
+| The exit | the turnstile stands on a trapdoor; the real exit is an empty pedestal with nothing on it | Luxor's second obelisk is in Paris |
+
+Target death budget for a first clean run: 40 to 60.

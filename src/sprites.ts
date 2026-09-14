@@ -635,3 +635,165 @@ export const RELIEF_OUT_SPRITE = compile(
   ],
   { O: '#2b2116', R: '#8f8a80', D: '#1a1410' },
 );
+
+// ---------------------------------------------------------------------------
+// Karnak.
+// ---------------------------------------------------------------------------
+
+const KARNAK: Palette = {
+  O: '#3a2915',
+  S: '#d3b57e', // sandstone
+  L: '#e6cd9a',
+  D: '#a68a55',
+  K: '#2a3038', // scarab shell
+  B: '#3f4b58',
+  H: '#5a6a7a',
+  E: '#e8dcc0',
+};
+
+/** A ram-headed sphinx on its plinth, facing the way you came. 32 x 20. */
+export const SPHINX_SPRITE = compile(
+  [
+    '....OOO.........................',
+    '...OSDSO........................',
+    '..OSSOSSO...OOOOOOOOOOOOOOOO....',
+    '..OSDSSSSOOOSSSSSSSSSSSSSSSSOO..',
+    '..OSSSSSSSSSSSSSSSSSSSSSSSSSSSO.',
+    '..OSSKSSSSSSSSSSSSSSSSSSSSSSSSO.',
+    '...OSSSSSSSSSSSSSSSSSSSSSSSSSSO.',
+    '...OSSSSOSSSSSSSSSSSSSSSSSSSSSO.',
+    '....OOOOSSSSSSSSSSSSSSSSSSSSSDO.',
+    '.....OSSSSSSSSSSSSSSSSSSSSSSSDO.',
+    '....OSSSSSSSSSSSSSSSSSSSSSSSSSO.',
+    '...OSSSSSSSSSSSSSSSSSSSSSSSSSSO.',
+    '...OSSDDSSSSSSSSSSSSSSSSSSSSDDO.',
+    '...OSSSSSSSSSSSSSSSSSSSSSSSSSSO.',
+    '..OSSSSSSSSOSSSSSSSSSSSSOSSSSSO.',
+    '..OSSSSSSSSOSSSSSSSSSSSSOSSSSSO.',
+    '..OSSSSSSSOOSSSSSSSSSSSSOOSSSSO.',
+    '.OSSSSSSSSOOSSSSSSSSSSSSOOSSSSSO',
+    '.ODDDDDDDDOODDDDDDDDDDDDOODDDDDO',
+    '.OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO',
+  ],
+  KARNAK,
+);
+
+/** The same sphinx with its head turned toward you. */
+export const SPHINX_TURNED_SPRITE = compile(
+  [
+    '....OOOO........................',
+    '...OSDDSO.......................',
+    '..OSSSSSSO..OOOOOOOOOOOOOOOO....',
+    '.OSSKSSKSSOOSSSSSSSSSSSSSSSSOO..',
+    '.OSSSSSSSSSSSSSSSSSSSSSSSSSSSSO.',
+    '.OSSSOOSSSSSSSSSSSSSSSSSSSSSSSO.',
+    '..OSSSSSSSSSSSSSSSSSSSSSSSSSSSO.',
+    '...OSSSSOSSSSSSSSSSSSSSSSSSSSSO.',
+    '....OOOOSSSSSSSSSSSSSSSSSSSSSDO.',
+    '.....OSSSSSSSSSSSSSSSSSSSSSSSDO.',
+    '....OSSSSSSSSSSSSSSSSSSSSSSSSSO.',
+    '...OSSSSSSSSSSSSSSSSSSSSSSSSSSO.',
+    '...OSSDDSSSSSSSSSSSSSSSSSSSSDDO.',
+    '...OSSSSSSSSSSSSSSSSSSSSSSSSSSO.',
+    '..OSSSSSSSSOSSSSSSSSSSSSOSSSSSO.',
+    '..OSSSSSSSSOSSSSSSSSSSSSOSSSSSO.',
+    '..OSSSSSSSOOSSSSSSSSSSSSOOSSSSO.',
+    '.OSSSSSSSSOOSSSSSSSSSSSSOOSSSSSO',
+    '.ODDDDDDDDOODDDDDDDDDDDDOODDDDDO',
+    '.OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO',
+  ],
+  KARNAK,
+);
+
+/** The great scarab, off its plinth. 40 x 24, two frames. */
+function scarab(legs: string[]): string[] {
+  return [
+    '..........OOOOOOOOOOOOOOOOOOOO..........',
+    '.......OOOKKKKKKKKKKKKKKKKKKKKOOO.......',
+    '.....OOKKKKBBBBBBBBBBBBBBBBBBKKKKOO.....',
+    '....OKKKBBBBBBBBBBBBBBBBBBBBBBBBKKKO....',
+    '...OKKBBBBBBBBBBHBBBBBBBBBBBBBBBBKKO....',
+    '..OKKBBBBBBBBBBBHHBBBBBBBBBBBBBBBBKKO...',
+    '..OKBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBKO...',
+    '.OKKBBBBBBBBBBBKBBBBBBBBKBBBBBBBBBBKKO..',
+    '.OKBBBBBBBBBBBBKBBBBBBBBKBBBBBBBBBBBKO..',
+    '.OKBBBBBBBBBBBBKBBBBBBBBKBBBBBBBBBBBKO..',
+    '.OKBBBBBBBBBBBBKBBBBBBBBKBBBBBBBBBBBKO..',
+    '.OKKBBBBBBBBBBBKBBBBBBBBKBBBBBBBBBBKKO..',
+    '..OKBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBKO...',
+    '..OKKBBBBBBBBBBBBBBBBBBBBBBBBBBBBBKKO...',
+    '...OKKKBBBBBBBBBBBBBBBBBBBBBBBBBKKKO....',
+    '....OOKKKKKKKKKKKKKKKKKKKKKKKKKKKOO.....',
+    '......OOOOOOOOOOOOOOOOOOOOOOOOOOO.......',
+    ...legs,
+  ];
+}
+
+export const SCARAB_FRAMES = [
+  compile(
+    scarab([
+      '....OO....OO..........OO....OO..........',
+      '...OKO....OKO........OKO....OKO.........',
+      '..OKO.....OKO........OKO.....OKO........',
+      '.OKO......OKO........OKO......OKO.......',
+      'OKO.......OKO........OKO.......OKO......',
+      'OO........OO..........OO........OO......',
+      '........................................',
+    ]),
+    KARNAK,
+  ),
+  compile(
+    scarab([
+      '......OO....OO......OO....OO............',
+      '.....OKO....OKO....OKO....OKO...........',
+      '.....OKO....OKO....OKO....OKO...........',
+      '.....OKO....OKO....OKO....OKO...........',
+      '.....OKO....OKO....OKO....OKO...........',
+      '.....OO.....OO.....OO.....OO............',
+      '........................................',
+    ]),
+    KARNAK,
+  ),
+];
+
+/** Hatshepsut's obelisk, standing. 16 x 96, drawn from its base. */
+function obelisk(): HTMLCanvasElement {
+  const g = new PixelGrid(16, 96);
+  for (let y = 8; y < 96; y++) {
+    const w = 8 + Math.round(((y - 8) / 88) * 4); // tapers from 12 at the base to 8 at the top
+    const x0 = Math.floor((16 - w) / 2);
+    g.rect(x0, y, w, 1, 'S');
+    g.rect(x0 + 1, y, 2, 1, 'L');
+  }
+  for (let y = 0; y < 8; y++) {
+    const w = 2 + y;
+    g.rect(Math.floor((16 - w) / 2), y, w, 1, 'L');
+  }
+  // A line of carved marks down the face. Not readable.
+  for (let y = 16; y < 88; y += 6) g.rect(7, y, 2, 3, 'D');
+  return compile(g.outline('O').rows(), KARNAK);
+}
+export const OBELISK_SPRITE = obelisk();
+
+/** A reused block from Akhenaten's temple, built into the pylon. 16 x 16. */
+export const TALATAT_SPRITE = compile(
+  [
+    'OOOOOOOOOOOOOOOO',
+    'OLLLLLLLLLLLLLLO',
+    'OSSSSSSSSSSSSSSO',
+    'OSSDSSSSSSSDSSSO',
+    'OSSSDSSSSSDSSSSO',
+    'OSSSSDDDDDSSSSSO',
+    'OSSSSSDSDSSSSSSO',
+    'OSSSSSDSDSSSSSSO',
+    'OSSSSDDDDDSSSSSO',
+    'OSSSDSSSSSDSSSSO',
+    'OSSDSSSSSSSDSSSO',
+    'OSSSSSSSSSSSSSSO',
+    'OSSSSSSSSSSSSSSO',
+    'ODDDDDDDDDDDDDDO',
+    'ODDDDDDDDDDDDDDO',
+    'OOOOOOOOOOOOOOOO',
+  ],
+  KARNAK,
+);

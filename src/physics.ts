@@ -12,6 +12,12 @@ export interface Contacts {
 
 const tiles: Rect[] = [];
 
+export interface DynamicSolid {
+  rect: Rect;
+  /** Solid from above only: you land on it, but pass through it sideways or from below. */
+  oneWay?: boolean;
+}
+
 /**
  * Axis-separated AABB sweep. Move on X, resolve; move on Y, resolve.
  * Per-frame displacement never exceeds a tile, so there is no tunnelling.
@@ -21,22 +27,26 @@ export function moveAndCollide(
   dx: number,
   dy: number,
   level: Level,
-  dynamicSolids: readonly Rect[],
+  dynamicSolids: readonly DynamicSolid[],
 ): Contacts {
   const c: Contacts = { left: false, right: false, up: false, down: false, standingOn: null };
 
   const oldX = body.x;
+  const oldBottom = body.y + body.h;
   body.x += dx;
   tiles.length = 0;
   level.solidTilesIn(body, tiles);
   for (const s of tiles) resolveX(body, s, dx, c, oldX);
-  for (const s of dynamicSolids) resolveX(body, s, dx, c, oldX);
+  for (const s of dynamicSolids) if (!s.oneWay) resolveX(body, s.rect, dx, c, oldX);
 
   body.y += dy;
   tiles.length = 0;
   level.solidTilesIn(body, tiles);
   for (const s of tiles) resolveY(body, s, dy, c, false);
-  for (const s of dynamicSolids) resolveY(body, s, dy, c, true);
+  for (const s of dynamicSolids) {
+    if (s.oneWay && (dy < 0 || oldBottom > s.rect.y + 0.5)) continue;
+    resolveY(body, s.rect, dy, c, true);
+  }
   return c;
 }
 
@@ -68,11 +78,14 @@ function resolveY(body: Rect, s: Rect, dy: number, c: Contacts, dynamic: boolean
 }
 
 /** The solid directly beneath the body's feet, if any. */
-export function groundBelow(body: Rect, level: Level, dynamicSolids: readonly Rect[]): Rect | null {
+export function groundBelow(body: Rect, level: Level, dynamicSolids: readonly DynamicSolid[]): Rect | null {
   const probe: Rect = { x: body.x, y: body.y + body.h, w: body.w, h: 1 };
   tiles.length = 0;
   level.solidTilesIn(probe, tiles);
   for (const s of tiles) if (overlaps(probe, s)) return s;
-  for (const s of dynamicSolids) if (overlaps(probe, s)) return s;
+  for (const s of dynamicSolids) {
+    if (s.oneWay && body.y + body.h > s.rect.y + 0.5) continue;
+    if (overlaps(probe, s.rect)) return s.rect;
+  }
   return null;
 }

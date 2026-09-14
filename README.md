@@ -24,7 +24,7 @@ npm install
 npm run dev
 ```
 
-Arrows or WASD to move, Space to jump, R to give up (it counts), M to mute, Enter for the next level at the exit label. Open `#philae` in the URL to start at level 2.
+Arrows or WASD to move, Space to jump, R to give up (it counts), M to mute, Enter for the next level at the exit label. Open `#philae` or `#karnak` in the URL to start at that level.
 
 `npm test` runs scripted playthroughs in headless Chromium (`tests/smoke.spec.ts`). Each one
 checks a design contract: the trap fires for the naive player and can be avoided by the one
@@ -43,4 +43,4 @@ who remembers it.
 
 ## Status
 
-Levels 1 and 2 playable end to end with pixel art and procedural sound. No menu yet.
+Levels 1 to 3 playable end to end with pixel art and procedural sound. No menu yet.

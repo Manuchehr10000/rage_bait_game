@@ -10,7 +10,7 @@ import { TILE, type DeathCause, type Rect } from './types';
  */
 export type TileChar = ' ' | '#' | '=' | '?' | 'x';
 
-export type Theme = 'abuSimbel' | 'philae';
+export type Theme = 'abuSimbel' | 'philae' | 'karnak';
 
 // ---------------------------------------------------------------------------
 // Entities. Every trap in the game is one of these, with a skin for the renderer.
@@ -19,7 +19,7 @@ export type Theme = 'abuSimbel' | 'philae';
 /** Drops from where it is when the player's centre passes triggerX. */
 export interface FallingDef {
   kind: 'falling';
-  skin: 'colossusHead';
+  skin: 'colossusHead' | 'block';
   rect: Rect;
   triggerX: number;
   /** Height of the pile it becomes on landing. It is solid afterwards. */
@@ -50,7 +50,7 @@ export type PlatformTrigger =
 /** A solid that moves along a fixed path once triggered: up or down, then sideways. */
 export interface PlatformDef {
   kind: 'platform';
-  skin: 'blocks' | 'bank' | 'boat';
+  skin: 'blocks' | 'bank' | 'boat' | 'scarabBase';
   rect: Rect;
   trigger: PlatformTrigger;
   /** Positive rises, negative sinks. */
@@ -69,13 +69,15 @@ export interface PlatformDef {
   rail?: Rect;
 }
 
-/** Deadly water over an x range. Can rise on an event or when the player reaches an x. */
+/** Water over an x range. Deadly unless swimmable. Can rise on an event or when the player reaches an x. */
 export interface WaterDef {
   kind: 'water';
   x0: number;
   x1: number;
   startY: number;
   cause: DeathCause;
+  /** The sacred lake. You can be in it. */
+  swimmable?: boolean;
   rise?: {
     onEvent?: string;
     atX?: number;
@@ -103,19 +105,21 @@ export interface SweepDef {
   emits?: string;
 }
 
-/** Looks like something to stand on. If fake, it gives way a moment after you do. */
+/** Looks like something to stand on. If fake, it gives way a moment after you do, or on an event. */
 export interface CrumbleDef {
   kind: 'crumble';
-  skin: 'croc' | 'capital' | 'rock';
+  skin: 'croc' | 'capital' | 'rock' | 'floor' | 'talatat' | 'column' | 'stone';
   rect: Rect;
   fake: boolean;
   delay: number;
+  /** Gives way when this event fires, instead of when stood on. */
+  onEvent?: string;
 }
 
 /** A figure in a wall. If active, it steps out and shoves the player when they pass. */
 export interface PusherDef {
   kind: 'pusher';
-  skin: 'relief';
+  skin: 'relief' | 'sphinx';
   x: number;
   floorY: number;
   active: boolean;
@@ -125,7 +129,49 @@ export interface PusherDef {
   outFor: number;
 }
 
-export type EntityDef = FallingDef | ThrowerDef | PlatformDef | WaterDef | SweepDef | CrumbleDef | PusherDef;
+/** A region that drags whatever stands in it. The mud-brick ramp. */
+export interface ConveyorDef {
+  kind: 'conveyor';
+  rect: Rect;
+  vx: number;
+}
+
+/** Steps off its base when you come near and walks at you. Deadly to touch. Jump it. */
+export interface ChaserDef {
+  kind: 'chaser';
+  skin: 'scarab';
+  rect: Rect;
+  triggerX: number;
+  speed: number;
+  /** Stops here. */
+  minX: number;
+  cause: DeathCause;
+}
+
+/** Stands tall, then tips over to the left across the path when you approach. */
+export interface TipperDef {
+  kind: 'tipper';
+  skin: 'obelisk';
+  /** Base of the shaft. */
+  x: number;
+  floorY: number;
+  height: number;
+  triggerX: number;
+  duration: number;
+  cause: DeathCause;
+}
+
+export type EntityDef =
+  | FallingDef
+  | ThrowerDef
+  | PlatformDef
+  | WaterDef
+  | SweepDef
+  | CrumbleDef
+  | PusherDef
+  | ConveyorDef
+  | ChaserDef
+  | TipperDef;
 
 // ---------------------------------------------------------------------------
 // Decor. Drawn, never collided with.
@@ -135,12 +181,20 @@ export type DecorDef =
   | { kind: 'colossus'; tx: number; broken: boolean }
   | { kind: 'facade'; x: number; w: number; doorX: number }
   | { kind: 'frieze'; rect: Rect }
-  | { kind: 'pit'; rect: Rect }
   | { kind: 'sanctuary'; corridor: Rect; niche: Rect; gods: { x: number; y: number }[] }
   | { kind: 'reliefWall'; rect: Rect }
   | { kind: 'cofferdam'; x: number; top: number; bottom: number }
   | { kind: 'scaffold'; x: number; floorY: number }
   | { kind: 'column'; x: number; top: number; bottom: number }
+  | { kind: 'pylon'; x: number; w: number; top: number; bottom: number }
+  | { kind: 'ramp'; x: number; w: number; top: number; bottom: number }
+  | { kind: 'pit'; rect: Rect }
+  | { kind: 'sphinxRow'; x: number; w: number; floorY: number }
+  | { kind: 'dark'; x0: number; x1: number }
+  | { kind: 'spotlight'; x: number; floorY: number }
+  | { kind: 'brokenObelisk'; x: number; floorY: number }
+  | { kind: 'pedestal'; x: number; floorY: number }
+  | { kind: 'turnstile'; x: number; floorY: number }
   | { kind: 'landing'; x: number; floorY: number };
 
 export interface LevelData {
@@ -159,6 +213,10 @@ export interface LevelData {
   cameraBottom: number;
   /** Where the hill begins for the Abu Simbel backdrop, in px. */
   rockFromX?: number;
+  /** What falling off the bottom is called here. */
+  fallCause?: DeathCause;
+  /** The exit has no marker. You find it. */
+  exitHidden?: boolean;
 }
 
 export class Level {

@@ -18,6 +18,12 @@ export const PHYS = {
   maxFall: 320,
   coyoteTime: 0.1,
   jumpBuffer: 0.1,
+  // In water: soft gravity, slow, a stroke instead of a jump.
+  swimGravity: 260,
+  swimMaxFall: 45,
+  swimSpeed: 60,
+  strokeVelocity: 190,
+  strokeCooldown: 0.28,
 } as const;
 
 export class Player implements Rect {
@@ -41,6 +47,11 @@ export class Player implements Rect {
   justStepped = false;
   /** True from a jump until landing; the variable-height cut applies only then. */
   private jumping = false;
+  /** Set by the world each frame when the player is in swimmable water. */
+  inWater = false;
+  private strokeTimer = 0;
+  /** Horizontal drag applied this frame by a conveyor. */
+  private driftX = 0;
   lastContacts: Contacts = { left: false, right: false, up: false, down: false, standingOn: null };
 
   spawnAt(x: number, y: number): void {
@@ -56,6 +67,11 @@ export class Player implements Rect {
     this.walkPhase = 0;
   }
 
+  /** A conveyor pulls the ground out from under you. Applied on top of your own movement. */
+  drift(vx: number): void {
+    this.driftX += vx;
+  }
+
   /** Knocked by something in the world. Controls stay honest; the world does not. */
   shove(vx: number, vy: number): void {
     this.vx = vx;
@@ -66,13 +82,52 @@ export class Player implements Rect {
     this.jumping = false;
   }
 
+  /** The sacred lake. The same keys, a different medium. */
+  private updateSwimming(input: Input, level: Level, solids: readonly MovingSolid[], minX: number): void {
+    const want = (input.right ? 1 : 0) - (input.left ? 1 : 0);
+    if (want !== 0) {
+      this.facing = want as 1 | -1;
+      this.vx = approach(this.vx, want * PHYS.swimSpeed, 500 * DT);
+    } else {
+      this.vx = approach(this.vx, 0, 300 * DT);
+    }
+    this.justJumped = false;
+    this.justStepped = false;
+    this.strokeTimer = Math.max(0, this.strokeTimer - DT);
+    if (input.takeJumpPressed() && this.strokeTimer <= 0) {
+      this.vy = -PHYS.strokeVelocity;
+      this.strokeTimer = PHYS.strokeCooldown;
+      this.justJumped = true;
+    }
+    this.vy = Math.min(PHYS.swimMaxFall, this.vy + PHYS.swimGravity * DT);
+    const c = moveAndCollide(this, this.vx * DT, this.vy * DT, level, solids);
+    this.driftX = 0;
+    this.lastContacts = c;
+    if (c.down) this.vy = Math.max(0, this.vy);
+    if (c.up) this.vy = Math.max(0, this.vy);
+    if (c.left || c.right) this.vx = 0;
+    if (this.x < minX) {
+      this.x = minX;
+      if (this.vx < 0) this.vx = 0;
+    }
+    this.onGround = false;
+    this.riding = null;
+    this.jumping = false;
+    this.coyote = 0;
+  }
+
   animFrame(): 'idle' | 'walk1' | 'walk2' | 'jump' {
+    if (this.inWater) return 'jump';
     if (!this.onGround) return 'jump';
     if (Math.abs(this.vx) < 10) return 'idle';
     return Math.floor(this.walkPhase / 10) % 2 === 0 ? 'walk1' : 'walk2';
   }
 
   update(input: Input, level: Level, solids: readonly MovingSolid[], minX: number): void {
+    if (this.inWater) {
+      this.updateSwimming(input, level, solids, minX);
+      return;
+    }
     // Horizontal intent.
     const want = (input.right ? 1 : 0) - (input.left ? 1 : 0);
     if (want !== 0) {
@@ -110,8 +165,8 @@ export class Player implements Rect {
       this.y += this.riding.dy;
     }
 
-    const rects = solids.map((s) => s.rect);
-    const c = moveAndCollide(this, this.vx * DT, this.vy * DT, level, rects);
+    const c = moveAndCollide(this, this.vx * DT + this.driftX * DT, this.vy * DT, level, solids);
+    this.driftX = 0;
     this.lastContacts = c;
     if (c.down) this.vy = Math.max(0, this.vy);
     if (c.up) this.vy = Math.max(0, this.vy);
@@ -123,7 +178,7 @@ export class Player implements Rect {
       if (this.vx < 0) this.vx = 0;
     }
 
-    const ground = groundBelow(this, level, rects);
+    const ground = groundBelow(this, level, solids);
     this.onGround = ground !== null;
     if (this.onGround) this.jumping = false;
     if (this.onGround && Math.abs(this.vx) >= 10) {
@@ -143,6 +198,8 @@ export interface MovingSolid {
   /** Displacement applied this frame, so riders can be carried. */
   dx: number;
   dy: number;
+  /** Solid from above only. */
+  oneWay?: boolean;
 }
 
 function approach(v: number, target: number, step: number): number {

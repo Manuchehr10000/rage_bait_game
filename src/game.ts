@@ -189,8 +189,9 @@ export class Game {
     for (const e of this.entities) if (e.solids) solids.push(...e.solids());
 
     const wasOnGround = this.player.onGround;
+    this.player.inWater = this.entities.some((e) => e.def.kind === 'water' && (e as Water).holds(this.player));
     this.player.update(this.input, this.level, solids, this.camera.x);
-    if (this.player.justJumped) this.audio.play('jump');
+    if (this.player.justJumped) this.audio.play(this.player.inWater ? 'splash' : 'jump');
     else if (!wasOnGround && this.player.onGround) this.audio.play('land');
     else if (this.player.justStepped) this.audio.play('step');
     this.bumpBlocks();
@@ -204,7 +205,7 @@ export class Game {
     this.coins = this.coins.filter((c) => c.t > 0);
 
     if (this.player.y > this.level.heightPx + 16) {
-      this.kill('Fall');
+      this.kill(this.level.data.fallCause ?? 'Fall');
       return;
     }
     const exit = this.level.data.exit;
@@ -248,6 +249,7 @@ export class Game {
     const ty = Math.floor((this.player.y - 1) / TILE);
     if (this.level.tile(tx, ty) === '?') {
       this.level.setTile(tx, ty, 'x');
+      this.events.add('ankh');
       this.audio.play('coin');
       this.coins.push({ x: tx * TILE + 6, y: ty * TILE - 6, t: 0.5 });
     }

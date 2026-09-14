@@ -25,6 +25,9 @@ export type DeathCause =
   | 'The sun'
   | 'Crocodile'
   | 'The cofferdam'
+  | 'The Cachette'
+  | 'Scarab'
+  | 'Obelisk'
   | 'Fall'
   | 'Gave up';
 
@@ -38,6 +41,9 @@ export const DEATH_ANIM: Record<DeathCause, DeathAnim> = {
   'The sun': 'burn',
   Crocodile: 'snap',
   'The cofferdam': 'swept',
+  'The Cachette': 'gone',
+  Scarab: 'crush',
+  Obelisk: 'crush',
   Fall: 'gone',
   'Gave up': 'sit',
 };
@@ -50,6 +56,9 @@ export const DEATH_SOUND: Record<DeathCause, 'squish' | 'bonk' | 'drown' | 'burn
   'The sun': 'burn',
   Crocodile: 'snap',
   'The cofferdam': 'whoosh',
+  'The Cachette': 'fallAway',
+  Scarab: 'squish',
+  Obelisk: 'squish',
   Fall: 'fallAway',
   'Gave up': 'sigh',
 };

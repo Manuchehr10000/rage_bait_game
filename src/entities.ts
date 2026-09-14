@@ -1,5 +1,7 @@
 import type { Sfx } from './audio';
 import type {
+  ChaserDef,
+  ConveyorDef,
   CrumbleDef,
   EntityDef,
   FallingDef,
@@ -8,6 +10,7 @@ import type {
   PusherDef,
   SweepDef,
   ThrowerDef,
+  TipperDef,
   WaterDef,
 } from './level';
 import type { MovingSolid, Player } from './player';
@@ -49,6 +52,12 @@ export function createEntity(def: EntityDef, level: Level): Entity {
       return new Crumble(def);
     case 'pusher':
       return new Pusher(def);
+    case 'conveyor':
+      return new Conveyor(def);
+    case 'chaser':
+      return new Chaser(def);
+    case 'tipper':
+      return new Tipper(def);
   }
 }
 
@@ -281,7 +290,13 @@ export class Water implements Entity {
     }
     this.rect.y = this.waterY;
     this.rect.h = Math.max(0, this.levelBottom - this.waterY);
+    if (this.def.swimmable) return;
     if (overlaps(this.rect, p) && centerY(p) > this.waterY) w.kill(this.def.cause);
+  }
+
+  /** True while the player's feet are in this water and it can be swum. Feet, so a stroke can carry you up onto a bank. */
+  holds(p: Player): boolean {
+    return this.def.swimmable === true && centerX(p) >= this.def.x0 && centerX(p) <= this.def.x1 && p.y + p.h > this.waterY + 2;
   }
 }
 
@@ -360,7 +375,8 @@ export class Crumble implements Entity {
 
   constructor(readonly def: CrumbleDef) {
     this.rect = { ...def.rect };
-    this.solid = { rect: this.rect, dx: 0, dy: 0 };
+    // Stepping stones can be swum under and past; everything else is solid all round.
+    this.solid = { rect: this.rect, dx: 0, dy: 0, oneWay: def.skin === 'stone' };
   }
 
   update(w: World): void {
@@ -371,7 +387,8 @@ export class Crumble implements Entity {
     const r = this.rect;
     const standing = p.x + p.w > r.x && p.x < r.x + r.w && Math.abs(p.y + p.h - r.y) <= 2;
     if (this.state === 'idle') {
-      if (standing) {
+      const go = this.def.onEvent ? w.events.has(this.def.onEvent) : standing;
+      if (go) {
         this.state = 'armed';
         this.timer = this.def.delay;
       }
@@ -427,5 +444,112 @@ export class Pusher implements Entity {
     this.out = Math.min(6, this.out + 60 * DT);
     this.timer -= DT;
     if (this.timer <= 0) this.state = 'done';
+  }
+}
+
+// ---------------------------------------------------------------------------
+
+export class Conveyor implements Entity {
+  constructor(readonly def: ConveyorDef) {}
+
+  update(w: World): void {
+    const p = w.player;
+    const r = this.def.rect;
+    if (p.onGround && centerX(p) >= r.x && centerX(p) <= r.x + r.w && p.y + p.h >= r.y && p.y + p.h <= r.y + r.h) {
+      p.drift(this.def.vx);
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+
+export class Chaser implements Entity {
+  readonly rect: Rect;
+  state: 'idle' | 'walking' | 'stopped' = 'idle';
+  private readonly dir = -1;
+  walkPhase = 0;
+
+  constructor(readonly def: ChaserDef) {
+    this.rect = { ...def.rect };
+  }
+
+  update(w: World): void {
+    const p = w.player;
+    if (this.state === 'idle') {
+      if (centerX(p) >= this.def.triggerX) {
+        this.state = 'walking';
+        w.sound('grind');
+      }
+      return;
+    }
+    if (this.state === 'walking') {
+      // Walks at you, and keeps walking that way once you are past it. It does not turn.
+      this.rect.x += this.dir * this.def.speed * DT;
+      this.walkPhase += DT;
+      if (this.rect.x <= this.def.minX) {
+        this.rect.x = this.def.minX;
+        this.state = 'stopped';
+      }
+    }
+    if (overlaps(this.rect, p)) w.kill(this.def.cause);
+  }
+}
+
+// ---------------------------------------------------------------------------
+
+export class Tipper implements Entity {
+  /** 0 standing, 1 lying flat to the left. */
+  k = 0;
+  state: 'idle' | 'tipping' | 'landed' = 'idle';
+  private readonly solid: MovingSolid;
+
+  constructor(readonly def: TipperDef) {
+    this.solid = { rect: { x: def.x - def.height, y: def.floorY - 16, w: def.height, h: 16 }, dx: 0, dy: 0 };
+  }
+
+  /** Angle from vertical, radians, for the renderer. */
+  get angle(): number {
+    return (Math.PI / 2) * this.k;
+  }
+
+  update(w: World): void {
+    const p = w.player;
+    const d = this.def;
+    if (this.state === 'idle') {
+      if (centerX(p) >= d.triggerX) {
+        this.state = 'tipping';
+        w.sound('headCrack');
+      }
+      return;
+    }
+    if (this.state === 'tipping') {
+      this.k = Math.min(1, this.k + DT / d.duration);
+      // The shaft: a segment from the base, leaning left by the current angle. Falls faster near the end.
+      const a = this.angle;
+      const px = d.x + 8;
+      const py = d.floorY;
+      const inflated: Rect = { x: p.x - 3, y: p.y - 3, w: p.w + 6, h: p.h + 6 };
+      for (let t = 0; t <= d.height; t += 6) {
+        const sx = px - Math.sin(a) * t;
+        const sy = py - Math.cos(a) * t;
+        if (sx >= inflated.x && sx <= inflated.x + inflated.w && sy >= inflated.y && sy <= inflated.y + inflated.h) {
+          w.kill(d.cause);
+          break;
+        }
+      }
+      if (this.k >= 1) {
+        this.state = 'landed';
+        w.sound('headThud');
+      }
+      return;
+    }
+    if (overlaps(this.solid.rect, p) && p.y + p.h > this.solid.rect.y + 4) {
+      // Landed on you.
+      w.kill(d.cause);
+    }
+  }
+
+  solids(): MovingSolid[] {
+    return this.state === 'landed' ? [this.solid] : [];
   }
 }

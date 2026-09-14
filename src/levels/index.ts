@@ -1,9 +1,10 @@
 import type { LevelData } from '../level';
 import { ABU_SIMBEL } from './abu-simbel';
+import { KARNAK } from './karnak';
 import { PHILAE } from './philae';
 
 /** Chapter 1, south to north along the Nile. */
-export const LEVELS: LevelData[] = [ABU_SIMBEL, PHILAE];
+export const LEVELS: LevelData[] = [ABU_SIMBEL, PHILAE, KARNAK];
 
 export function levelIndexFromHash(hash: string): number {
   const key = hash.replace(/^#/, '').trim();
