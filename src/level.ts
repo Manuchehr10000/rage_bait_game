@@ -140,6 +140,7 @@ export type DecorDef =
   | { kind: 'reliefWall'; rect: Rect }
   | { kind: 'cofferdam'; x: number; top: number; bottom: number }
   | { kind: 'scaffold'; x: number; floorY: number }
+  | { kind: 'column'; x: number; top: number; bottom: number }
   | { kind: 'landing'; x: number; floorY: number };
 
 export interface LevelData {

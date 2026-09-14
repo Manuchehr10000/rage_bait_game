@@ -33,13 +33,22 @@ g.fill(42, GROUND, 22, H - GROUND, '='); // bank and cofferdam floor 42..63
 g.set(51, GROUND - 1, '#'); // column stumps in the corridor
 g.set(55, GROUND - 1, '#');
 g.set(59, GROUND - 1, '#');
-// The Kiosk: columns rise from the water three tiles apart, the first two shorter, a
-// staircase up to the row. Three tiles is a tapped hop; a held jump overshoots.
-const COLUMNS = [65, 68, 71, 74, 77, 80, 83];
-const COLUMN_TOP = [13, 12, 11, 11, 11, 11, 11]; // row the column's top drum sits in
-COLUMNS.forEach((tx, i) => g.fill(tx, COLUMN_TOP[i] ?? 11, 1, H - (COLUMN_TOP[i] ?? 11), '#'));
+// The Kiosk. Columns are drawn, not tiled; only the capitals are solid, so the spacing
+// can be what the jump needs: a staircase of four steps two tiles apart (a tap climbs
+// that), then a flat run 40px apart, where any jump lands on the next capital or the one
+// after. The difficulty is the fakes and the water, not the input.
+const CAPITALS: { x: number; top: number }[] = [
+  { x: px(65), top: px(14) },
+  { x: px(67), top: px(13) },
+  { x: px(69), top: px(12) },
+  { x: px(71), top: px(11) },
+  { x: px(71) + 40, top: px(11) },
+  { x: px(71) + 80, top: px(11) },
+  { x: px(71) + 120, top: px(11) },
+  { x: px(71) + 160, top: px(11) },
+];
 // Fake capitals: the unfinished ones. They look like the others.
-const FAKE = new Set([1, 4, 6]);
+const FAKE = new Set([2, 5, 7]);
 g.fill(84, 12, 6, H - 12, '='); // the quay 84..89, higher than the old ground
 
 // Figure x positions. The second one is live; a shove from there lands you in the water between the rock and the bank.
@@ -60,6 +69,7 @@ export const PHILAE: LevelData = {
     { kind: 'reliefWall', rect: { x: px(25), y: px(GROUND) - 64, w: px(8), h: 64 } },
     { kind: 'cofferdam', x: px(64), top: px(GROUND) - 64, bottom: px(GROUND) },
     { kind: 'scaffold', x: px(86), floorY: px(12) },
+    ...CAPITALS.map((c) => ({ kind: 'column' as const, x: c.x, top: c.top, bottom: px(H) })),
     { kind: 'landing', x: px(10), floorY: px(GROUND) },
   ],
 
@@ -140,10 +150,10 @@ export const PHILAE: LevelData = {
       emits: 'cofferdam',
     },
     // The capitals of the Kiosk. Unfinished ones give way a beat after you land.
-    ...COLUMNS.map((tx, i) => ({
+    ...CAPITALS.map((c, i) => ({
       kind: 'crumble' as const,
       skin: 'capital' as const,
-      rect: { x: px(tx) - 8, y: px(COLUMN_TOP[i] ?? 11) - 8, w: 32, h: 8 },
+      rect: { x: c.x - 8, y: c.top - 8, w: 32, h: 8 },
       fake: FAKE.has(i),
       delay: 0.3,
     })),

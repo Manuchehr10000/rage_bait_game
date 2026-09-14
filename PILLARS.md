@@ -57,7 +57,7 @@ rest of the level: standing still anywhere eventually drowns you.
 | The reliefs | four chiselled Isis figures; one steps out and shoves you back into the water | Coptic Christians defaced the reliefs |
 | Numbered blocks | cranes above, 201 to 206. They do not move. The bank after them sinks | moved to Agilkia 1972 to 1980 |
 | The cofferdam | the wall gives way; a wave comes along the floor; stumps are above it | the temple was moved inside a cofferdam |
-| The Kiosk | seven column tops, three tiles apart; a tapped hop lands, a held jump overshoots; three capitals give way a beat after you land | Trajan's Kiosk was never finished |
+| The Kiosk | eight capitals: a short staircase, then a flat run spaced so any jump lands on the next capital or the one after; three give way a beat after you land; the water is rising | Trajan's Kiosk was never finished |
 | The scaffold | nothing happens | the last hieroglyph was cut here in 394 AD |
 | The boat out | starts leaving when you reach the scaffold; a committed jump makes it, a hesitation does not | by boat only |
 

@@ -380,6 +380,10 @@ function drawDecor(ctx: CanvasRenderingContext2D, s: Scene, d: DecorDef): void {
       ctx.fillRect(d.x + 8, f - 36, 12, 1);
       break;
     }
+    case 'column': {
+      for (let y = d.top; y < d.bottom; y += TILE) drawColumnDrum(ctx, d.x, y, y === d.top);
+      break;
+    }
     case 'landing': {
       // Mooring posts on the landing stage.
       ctx.fillStyle = COLORS.wood;
