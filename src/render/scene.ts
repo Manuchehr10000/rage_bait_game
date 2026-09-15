@@ -1,12 +1,11 @@
 import type { Camera } from '../engine/camera';
-import type { Chaser, Crumble, Entity, Falling, Horse, Pick, Platform, Pusher, Roof, Sweep, Thrower, Tipper, Water } from '../engine/entities';
+import type { Chaser, Crumble, Entity, Falling, Horse, Platform, Pusher, Roof, Sweep, Thrower, Tipper, Water } from '../engine/entities';
 import type { DecorDef, Level } from '../engine/level';
 import type { Player } from '../engine/player';
 import {
   BABOON_SPRITE,
   BISON_SPRITE,
   BOAT_SPRITE,
-  DIGGER_FRAMES,
   HIKER_FRAMES,
   HIKER_SEATED,
   HORSE_SPRITE,
@@ -180,6 +179,7 @@ export function renderWorld(ctx: CanvasRenderingContext2D, s: Scene): void {
 
   ctx.restore();
   drawDarkness(ctx, s, cx, cy);
+  drawBeams(ctx, s, cx, cy);
 }
 
 // ---------------------------------------------------------------------------
@@ -433,15 +433,38 @@ function drawDarkness(ctx: CanvasRenderingContext2D, s: Scene, cx: number, cy: n
   for (const sp of s.level.data.decor) if (sp.kind === 'spotlight') beam(d, sp);
   d.globalCompositeOperation = 'source-over';
   ctx.drawImage(darkLayer, 0, 0);
-  // The beams themselves, faintly, so the light reads as light and not as a hole.
+}
+
+/**
+ * The beams themselves, faintly, so the light reads as light and not as a hole.
+ * Drawn whether or not there is any darkness to cut, so a lamp does not stop
+ * being a lamp when the dark end of the room leaves the screen.
+ */
+function drawBeams(ctx: CanvasRenderingContext2D, s: Scene, cx: number, cy: number): void {
+  const dark = s.level.data.decor.find((d) => d.kind === 'dark');
+  if (!dark) return;
   ctx.save();
   ctx.fillStyle = 'rgba(255, 240, 190, 0.18)';
-  for (const sp of s.level.data.decor) if (sp.kind === 'spotlight') beam(ctx, sp);
-  if (dark.lamp === 'headlamp' && s.lampOn) {
-    // The headlamp's beam, the same faint warmth, so it reads as the lamp and not as a hole.
+  for (const sp of s.level.data.decor) {
+    if (sp.kind !== 'spotlight') continue;
+    const sx = sp.x - cx;
+    if (sx < -40 || sx > VIEW_W + 40) continue;
+    const sy = sp.floorY - cy;
+    const ty = sp.top === undefined ? -10 : sp.top + 6 - cy;
+    ctx.beginPath();
+    ctx.moveTo(sx - 4, ty);
+    ctx.lineTo(sx + 4, ty);
+    ctx.lineTo(sx + 26, sy + 12);
+    ctx.lineTo(sx - 26, sy + 12);
+    ctx.closePath();
+    ctx.fill();
+  }
+  if (dark.kind === 'dark' && dark.lamp === 'headlamp' && s.lampOn) {
+    // The headlamp's beam, the same faint warmth.
+    const p = s.player;
     const f = p.facing;
-    const hx = pxc + f * 2;
-    const hy = pyc - 4;
+    const hx = Math.round(p.x) + 5 - cx + f * 2;
+    const hy = Math.round(p.y) + 8 - cy - 4;
     ctx.beginPath();
     ctx.moveTo(hx, hy - 2);
     ctx.lineTo(hx + f * 76, hy - 30);
@@ -1165,14 +1188,6 @@ function drawEntityBack(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): voi
     }
     case 'horse': {
       drawHorse(ctx, e as Horse);
-      break;
-    }
-    case 'pick': {
-      // The digger. Busy. Does not look up.
-      const k = e as Pick;
-      const fi = k.down ? 1 : 0;
-      const frame = DIGGER_FRAMES[fi] ?? DIGGER_FRAMES[0];
-      if (frame && !paint(ctx, 'digger', d.x, d.floorY - 28, fi)) ctx.drawImage(frame, d.x, d.floorY - 28);
       break;
     }
     default:

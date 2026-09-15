@@ -35,11 +35,11 @@ const DRIVER = `
   const splitter = horses[8];
   const last = horses[9];
   const roof = E.find((e) => e.def.kind === 'roof');
-  const pick = E.find((e) => e.def.kind === 'pick');
   const stream = E.find((e) => e.def.kind === 'water');
   const streamX = stream.def.x0;
-  const floorEdge = g.level.data.decor.find((d) => d.kind === 'trench').rect.x;
-  const farFloor = pick.def.triggerX;
+  const trench = g.level.data.decor.find((d) => d.kind === 'trench').rect;
+  const floorEdge = trench.x;
+  const farFloor = trench.x + trench.w;
   const ledgeY = horses[0].rect.y;
   /** Feet on a horse's back. */
   const standY = ledgeY - 16;
@@ -267,13 +267,6 @@ test('the four that hold do so however long you stand on them', async ({ page })
   expect(r.y).toBe(208);
 });
 
-test('running at the pick from the far floor gets you picked', async ({ page }) => {
-  const r = await play(page, `
-    p.spawnAt(farFloor + 6, 224); g.camera.x = farFloor - 100;
-    const step = () => { key('ArrowRight', true); if (canJump() && p.lastContacts.right) jump(); };`, 60 * 10);
-  expect(r.cause).toBe('The pick');
-});
-
 test('a run that knows the level finishes with zero deaths', async ({ page }) => {
   const r = await play(page, `
     const step = () => {
@@ -299,10 +292,9 @@ test('a run that knows the level finishes with zero deaths', async ({ page }) =>
           key('ArrowRight', true);
           if (p.onGround && p.x >= farFloor - 6) phase = 'roof';
           break;
-        // Let the overhang have its block, then let the pick have its swing.
-        case 'roof': key('ArrowRight', false); if (roof.state === 'landed') phase = 'wait'; break;
-        case 'wait': key('ArrowRight', false); if (pick.t >= 1.1) phase = 'dig'; break;
-        case 'dig': key('ArrowRight', true); if (canJump() && p.lastContacts.right) jump(); break;
+        // Let the overhang have its block, then climb it and walk out.
+        case 'roof': key('ArrowRight', false); if (roof.state === 'landed') phase = 'out'; break;
+        case 'out': key('ArrowRight', true); if (canJump() && p.lastContacts.right) jump(); break;
       }
     };`, 60 * 60);
   expect(r.state).toBe('complete');

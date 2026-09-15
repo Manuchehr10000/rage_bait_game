@@ -8,7 +8,6 @@ import type {
   HazardDef,
   HorseDef,
   Level,
-  PickDef,
   PlatformDef,
   PusherDef,
   RoofDef,
@@ -68,8 +67,6 @@ export function createEntity(def: EntityDef, level: Level): Entity {
       return new Horse(def);
     case 'roof':
       return new Roof(def);
-    case 'pick':
-      return new Pick(def);
   }
 }
 
@@ -675,52 +672,6 @@ export class Hazard implements Entity {
 
   update(w: World): void {
     if (overlaps(this.def.rect, w.player)) w.kill(this.def.cause);
-  }
-}
-
-// ---------------------------------------------------------------------------
-
-export class Pick implements Entity {
-  /** Seconds since the cycle started, or -1 before the trigger. */
-  t = -1;
-  private strikes = 0;
-
-  constructor(readonly def: PickDef) {}
-
-  get triggered(): boolean {
-    return this.t >= 0;
-  }
-
-  /** Where in the cycle the swing is, 0..period. */
-  get phase(): number {
-    return this.t < 0 ? 0 : this.t % this.def.period;
-  }
-
-  /** True while the pick is down in the deposit: from the strike until the next lift. */
-  get down(): boolean {
-    return this.t >= 0 && this.phase >= this.def.strikeAt;
-  }
-
-  /** True during the strike itself. */
-  get striking(): boolean {
-    const d = this.def;
-    return this.t >= 0 && this.phase >= d.strikeAt && this.phase < d.strikeAt + d.strikeFor;
-  }
-
-  update(w: World): void {
-    const p = w.player;
-    const d = this.def;
-    if (this.t < 0) {
-      if (centerX(p) >= d.triggerX) this.t = 0;
-      else return;
-    }
-    this.t += DT;
-    const n = Math.floor((this.t - d.strikeAt) / d.period) + 1;
-    if (this.t >= d.strikeAt && n > this.strikes) {
-      this.strikes = n;
-      w.sound('pick');
-    }
-    if (this.striking && overlaps(d.hazard, p)) w.kill(d.cause);
   }
 }
 

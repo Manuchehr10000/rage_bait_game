@@ -184,24 +184,6 @@ export interface HazardDef {
   cause: DeathCause;
 }
 
-/**
- * Someone busy with a pick. Once the player reaches triggerX the swing runs on a
- * fixed cycle: raised, then a strike that is deadly inside `hazard` for `strikeFor`.
- * The only trap in the game allowed to cycle is the last one in a level (pillar 5).
- */
-export interface PickDef {
-  kind: 'pick';
-  /** Where the digger stands (left edge of the figure) and the floor under them. */
-  x: number;
-  floorY: number;
-  triggerX: number;
-  period: number;
-  strikeAt: number;
-  strikeFor: number;
-  hazard: Rect;
-  cause: DeathCause;
-}
-
 /** A figure in a wall. If active, it steps out and shoves the player when they pass. */
 export interface PusherDef {
   kind: 'pusher';
@@ -260,8 +242,7 @@ export type EntityDef =
   | TipperDef
   | HazardDef
   | HorseDef
-  | RoofDef
-  | PickDef;
+  | RoofDef;
 
 // ---------------------------------------------------------------------------
 // Decor. Drawn, never collided with.

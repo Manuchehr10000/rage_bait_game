@@ -1,10 +1,13 @@
-# Beat e · the far floor and the dig
+# Beat e · the far floor
 
-Two things happen here. A block of the overhang comes down, two steps in from the edge of
-the far floor, and stays where it lands as something to climb: `roof-block.png`, with its
-own note. Then the workman of 1909 works the deposit with his pick: `digger.png`, and the
-deposit tiles.
+The platform at the end of the crossing, lit end to end. The dark stops where this floor
+starts, which is why you can see it from halfway along the frieze and why you jump for it
+too hard.
 
-The crossing ends with a jump off the tenth horse, and a full jump puts you exactly where
-the block lands. The way through is to hop short, land at the very edge, and let the roof
-have its moment.
+One thing happens here. A block of the overhang comes down, two steps in from the edge,
+and stays where it lands as something to climb: `roof-block.png`, with its own note. A
+full jump off the tenth horse puts you exactly where it lands; the way through is to hop
+short, land at the very edge, and let the roof have its moment.
+
+Beyond it is the deposit the excavation left in place (`tile-sediment`), and the way out
+over the top of it. The lamps are drawn by the game.

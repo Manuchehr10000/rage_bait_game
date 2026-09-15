@@ -24,8 +24,8 @@ import { TILE, type DeathCause } from '../../engine/types';
  *             throws you back; the ninth breaks in the middle; the tenth holds.
  *  69..73   the far floor. Land at its very edge: two steps in, the overhang lets
  *             go of a block, and it comes down where a full jump would have put you.
-
- *  74..     the deposit the excavation left; the pick works its edge
+ *             The whole platform is lit, so you can watch it happen.
+ *  74..     the deposit the excavation left in place
  *  81       exit
  */
 const W = 84;
@@ -37,7 +37,6 @@ const WALL_X = px(21);
 const CEILING = px(7);
 const TRENCH_X0 = px(26);
 const TRENCH_X1 = px(69);
-const DEPOSIT_X = px(74);
 const LEDGE_Y = px(14);
 /** The trench floor. Falling this far is the death called 'The trench'. */
 const TRENCH_FLOOR = px(GROUND) + 12;
@@ -77,7 +76,6 @@ const ledge = (i: number) => ({ x: (HORSES[i]?.x ?? 0) + 4, y: LEDGE_Y, w: 28, h
 const LIT = 5;
 
 const FAR_FLOOR = TRENCH_X1;
-const DIGGER_X = DEPOSIT_X - 2;
 const EXIT_X = px(81);
 
 export const CAP_BLANC: LevelData = {
@@ -101,10 +99,13 @@ export const CAP_BLANC: LevelData = {
     { kind: 'skeletonCast', x: 576, floorY: TRENCH_FLOOR },
     { kind: 'bisonRelief', x: 470, y: 150 },
     { kind: 'bisonRelief', x: 606, y: 160 },
-    { kind: 'dark', x0: WALL_X + 36, x1: px(W), lamp: 'headlamp' },
-    // The museum's lamps over the first five horses; the digger's work lamp; the light at the way out.
+    // The dark ends where the far floor begins. You can see the lit platform from
+    // halfway down the frieze, which is exactly why you jump for it too hard.
+    { kind: 'dark', x0: WALL_X + 36, x1: FAR_FLOOR, lamp: 'headlamp' },
+    // The museum's lamps over the first five horses, and the lamps over the far floor.
     ...HORSES.slice(0, LIT).map((h) => ({ kind: 'spotlight' as const, x: h.x + 20, floorY: px(GROUND), top: CEILING })),
-    { kind: 'spotlight', x: DIGGER_X + 28, floorY: LEDGE_Y, top: CEILING },
+    { kind: 'spotlight', x: FAR_FLOOR + 16, floorY: px(GROUND), top: CEILING },
+    { kind: 'spotlight', x: FAR_FLOOR + 56, floorY: px(GROUND), top: CEILING },
     { kind: 'spotlight', x: EXIT_X + 6, floorY: LEDGE_Y, top: CEILING },
   ],
 
@@ -136,17 +137,5 @@ export const CAP_BLANC: LevelData = {
     },
     // The floor of the trench.
     { kind: 'hazard', rect: { x: TRENCH_X0, y: TRENCH_FLOOR - 2, w: TRENCH_X1 - TRENCH_X0, h: 8 }, cause: 'The trench' },
-    // The pick. It found the frieze in 1909, the hard way. It is still at it.
-    {
-      kind: 'pick',
-      x: DIGGER_X,
-      floorY: LEDGE_Y,
-      triggerX: TRENCH_X1,
-      period: 1.5,
-      strikeAt: 0.75,
-      strikeFor: 0.3,
-      hazard: { x: DEPOSIT_X - 14, y: LEDGE_Y - 28, w: 26, h: 32 },
-      cause: 'The pick',
-    },
   ],
 };

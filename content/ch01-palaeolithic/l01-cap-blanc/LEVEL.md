@@ -30,7 +30,7 @@ the ruined castle of **Commarque**.
 | b | `b-shelter` | The wall with its door; through it, he switches the headlamp on; the lit floor | The protective wall and door, the modern lighting |
 | c | `c-frieze` | Five horses under museum lamps; their backs are the floor. The third is plaster and goes if you stand about on it; the fifth walks out from under you | Ten is the count of horses on the frieze; the backs are relief deep enough to stand on in the game's scale; none is plaster, and none has ever moved |
 | d | `d-dark` | The lamps end, and not one of the last five is honest. The sixth holds for six seconds and is the only place to stand. The seventh jumps when you jump at it from the sixth, once, then comes back down to stay. The eighth comes up and throws you back. The ninth breaks in the middle. The tenth holds, which by then nobody believes | The far end of the frieze is less well lit for a visitor; the darkness is the level's. Roof fall is the one true thing here: shelters are made and unmade by the overhang letting go, and the Magdalenian layers at Cap Blanc were sealed under it |
-| e | `e-dig` | The far floor. Land at its very edge: two steps in, the overhang lets go of a block, and it comes down where a full jump would have put you. Then a workman with a pick, working the deposit on a cycle | Roof fall is what seals the archaeology of a shelter, and the Cap Blanc frieze lay under it until 1909. The discovery itself was by pick, into the deposit. He is not still there |
+| e | `e-dig` | The far floor, lit end to end. Land at its very edge: two steps in, the overhang lets go of a block, and it comes down where a full jump would have put you. It stays as a step | Roof fall is what seals the archaeology of a shelter, and the Cap Blanc frieze lay under it until 1909. The deposit at the far end is what the excavation left in place |
 | f | `f-exit` | The far floor and the way out | The visitor leaves by the same door; the game lets you leave at the far end |
 
 ## What the level teaches
@@ -58,7 +58,9 @@ let it settle. Six seconds is enough to do that twice and not much more.
 - The **wall** is rubble limestone with a plain door. The shelter is not a cave; the
   overhang is open to the valley behind the wall.
 - The **trench** section shows layered sediment. The excavators left the deposit at
-  the far end in place.
+  the far end in place, and the level ends by climbing it.
+- The far floor is **lit end to end**. The dark is the frieze's; the platform is the
+  part of the shelter a visitor is allowed to stand on.
 - **Roof fall**: blocks off the overhang are in the deposit of every shelter, and at Cap
   Blanc the sculpted frieze was buried under such a deposit until 1909. One block comes
   down on the far floor, two steps in, and stays there as a step.
@@ -75,8 +77,6 @@ let it settle. Six seconds is enough to do that twice and not much more.
 - The overhang lets a block go on cue, on the far floor. Roof fall is real and is what
   seals the archaeology of every shelter; it does not wait for a visitor to arrive.
 - The floor of the trench kills. It is a metre and a half down.
-- The digger is still there, on a cycle, and his pick is deadly. The 1909 workman was
-  paid by the day and went home.
 - The far half of the frieze is dark. The visitor's tour lights the whole thing.
 - The stream drowns you.
 

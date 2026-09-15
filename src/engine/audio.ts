@@ -29,7 +29,6 @@ export type Sfx =
   | 'winchStart'
   | 'motorStart'
   | 'thud'
-  | 'pick'
   | 'click';
 
 const MUTE_KEY = 'lostTourist.muted';
@@ -188,12 +187,6 @@ export class GameAudio {
         // A switch on the side of a lamp.
         this.burst(t, 4000, 'highpass', 0.012, 0.12);
         this.burst(t + 0.03, 3000, 'highpass', 0.01, 0.08);
-        break;
-      case 'pick':
-        // Steel into packed sediment: a click, then the dull bite.
-        this.burst(t, 2400, 'highpass', 0.02, 0.1);
-        this.burst(t + 0.02, 500, 'lowpass', 0.07, 0.18);
-        this.tone(t + 0.02, 'sine', 120, 60, 0.12, 0.08);
         break;
     }
   }

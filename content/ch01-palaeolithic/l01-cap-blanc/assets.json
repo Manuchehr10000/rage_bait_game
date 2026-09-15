@@ -59,14 +59,6 @@
       "what": "The cast of the 1911 burial, lying at the foot of the frieze."
     },
     {
-      "id": "digger",
-      "w": 32,
-      "h": 28,
-      "beat": "e-dig",
-      "what": "The workman of 1909 with his pick. Two frames: raised, down.",
-      "frames": 2
-    },
-    {
       "id": "tile-sediment",
       "w": 16,
       "h": 16,

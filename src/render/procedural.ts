@@ -1145,48 +1145,6 @@ export const SKELETON_CAST_SPRITE = compile(
   { ...LIMESTONE, O: '#8a8272' },
 );
 
-// ---------------------------------------------------------------------------
-// The digger. 1909. Two frames, 32 x 28: pick raised, pick down. Stands at
-// the right of the frame, faces left, works the deposit on the left.
-// ---------------------------------------------------------------------------
-
-const DIGGER: Palette = {
-  O: '#2b1d10',
-  C: '#5a4a3a', // flat cap
-  F: '#e6b48c', // skin
-  S: '#c9c0a8', // shirt, sleeves rolled
-  P: '#4e5364', // trousers
-  B: '#3a2a1a', // boots
-  H: '#8b6a3e', // handle
-  M: '#9a9ea3', // steel
-};
-
-function digger(down: boolean): HTMLCanvasElement {
-  const g = new PixelGrid(32, 28);
-  const x = 19;
-  g.rect(x + 1, 3, 6, 6, 'F'); // head
-  g.rect(x, 2, 8, 2, 'C'); // cap
-  g.rect(x - 1, 3, 2, 1, 'C'); // its peak, forward
-  g.px(x + 2, 5, 'O'); // eye, on the work
-  g.rect(x, 9, 8, 10, 'S'); // body
-  g.rect(x, 19, 3, 7, 'P'); // legs
-  g.rect(x + 5, 19, 3, 7, 'P');
-  g.rect(x - 1, 26, 4, 2, 'B'); // boots
-  g.rect(x + 5, 26, 4, 2, 'B');
-  if (!down) {
-    g.rect(x - 3, 4, 4, 3, 'F'); // arms up
-    g.line(x - 2, 6, 5, 2, 'H'); // handle
-    g.rect(2, 1, 7, 2, 'M'); // the head of the pick
-    g.px(1, 2, 'M');
-  } else {
-    g.rect(x - 4, 12, 5, 3, 'F'); // arms down and forward
-    g.line(x - 3, 14, 4, 24, 'H');
-    g.rect(1, 23, 7, 2, 'M');
-    g.px(0, 24, 'M');
-  }
-  return compile(g.outline('O').rows(), DIGGER);
-}
-export const DIGGER_FRAMES = [digger(false), digger(true)];
 
 /**
  * A block of the overhang, 24 x 18. Shelters are made by the roof falling in and
