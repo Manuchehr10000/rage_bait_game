@@ -1,0 +1,28 @@
+{
+  "$comment": "Sizes are world pixels (320 x 180 view). Painted files are 4x. See content/README.md.",
+  "level": "shared",
+  "assets": [
+    {
+      "id": "hiker",
+      "w": 12,
+      "h": 16,
+      "beat": "shared",
+      "what": "The lost tourist in chapter 1: bucket hat, headlamp, fleece, boots. Four frames: idle, walk1, walk2, jump.",
+      "frames": 4
+    },
+    {
+      "id": "hiker-dead",
+      "w": 12,
+      "h": 16,
+      "beat": "shared",
+      "what": "The hiker flat on their back, headlamp still on. Used, rotated, by every death in the chapter."
+    },
+    {
+      "id": "hiker-seated",
+      "w": 13,
+      "h": 14,
+      "beat": "shared",
+      "what": "The hiker sitting down. The 'Gave up' pose."
+    }
+  ]
+}

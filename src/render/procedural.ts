@@ -217,6 +217,31 @@ class PixelGrid {
     return this;
   }
 
+  /** A one-pixel line, Bresenham. For pick handles. */
+  line(x0: number, y0: number, x1: number, y1: number, c: string): this {
+    const dx = Math.abs(x1 - x0);
+    const dy = -Math.abs(y1 - y0);
+    const sx = x0 < x1 ? 1 : -1;
+    const sy = y0 < y1 ? 1 : -1;
+    let err = dx + dy;
+    let x = x0;
+    let y = y0;
+    for (;;) {
+      this.px(x, y, c);
+      if (x === x1 && y === y1) break;
+      const e2 = 2 * err;
+      if (e2 >= dy) {
+        err += dy;
+        x += sx;
+      }
+      if (e2 <= dx) {
+        err += dx;
+        y += sy;
+      }
+    }
+    return this;
+  }
+
   /** Cut a corner off a filled shape: clears a diagonal triangle of size n at (x, y) pointing dir. */
   bevel(x: number, y: number, n: number, dx: 1 | -1, dy: 1 | -1): this {
     for (let i = 0; i < n; i++) for (let j = 0; j < n - i; j++) this.px(x + dx * j, y + dy * i, '.');
@@ -945,3 +970,220 @@ export const TALATAT_SPRITE = compile(
   ],
   KARNAK,
 );
+
+// ---------------------------------------------------------------------------
+// Chapter 1. The hiker: bucket hat, headlamp, fleece, boots. He came for the
+// guided tour. 12 x 16, same box and footprint as the pharaoh. Faces right.
+// ---------------------------------------------------------------------------
+
+const HIKER: Palette = {
+  O: '#2b1d10', // outline
+  H: '#b5a06a', // bucket hat, khaki
+  K: '#1c1c1c', // headlamp body, eye
+  L: '#fff8c0', // headlamp lens, lit
+  S: '#e6b48c', // skin
+  J: '#e0632c', // fleece
+  Z: '#3c4a5a', // rucksack strap
+  P: '#5f6650', // walking trousers
+  B: '#5a3a1e', // boots
+};
+
+const HIKER_HEAD = [
+  '...OOOOOO...',
+  '..OHHHHHHO..',
+  '..OHHHHHHO..',
+  '.OHHHHHHHHO.',
+  'OHHHHHHHHKLO',
+  '.OSSSSSSSOO.',
+  '.OSSSSKSSO..',
+  '.OSSSSSSSO..',
+  '..OSSSSSO...',
+];
+
+const HIKER_TORSO = [
+  '..OJJZJJJJO.',
+  '..OJJZJJJJO.',
+  '..OJJJJJJJO.',
+  '..OPPPPPPPO.',
+];
+
+function hiker(legs: string[]): string[] {
+  return [...HIKER_HEAD, ...HIKER_TORSO, ...legs];
+}
+
+export const HIKER_FRAMES = {
+  idle: compile(hiker(['...OPPOOPPO.', '...OPPOOPPO.', '...OBBOOBBO.']), HIKER),
+  walk1: compile(hiker(['..OPPO..OPPO', '..OPPO..OPPO', '..OBBO..OBBO']), HIKER),
+  walk2: compile(hiker(['....OPPPPO..', '....OPPPPO..', '....OBBBBO..']), HIKER),
+  jump: compile(hiker(['..OPPO.OPPO.', '..OPPO..OPPO', '..OBBO...OBB']), HIKER),
+  // Dead: eyes shut. The headlamp stays on. Nothing else changes.
+  dead: compile(
+    [
+      '...OOOOOO...',
+      '..OHHHHHHO..',
+      '..OHHHHHHO..',
+      '.OHHHHHHHHO.',
+      'OHHHHHHHHKLO',
+      '.OSSSSSSSOO.',
+      '.OSSSKKSSO..',
+      '.OSSSSSSSO..',
+      '..OSSSSSO...',
+      '..OJJZJJJJO.',
+      '..OJJZJJJJO.',
+      '..OJJJJJJJO.',
+      '..OPPPPPPPO.',
+      '...OPPOOPPO.',
+      '...OPPOOPPO.',
+      '...OBBOOBBO.',
+    ],
+    HIKER,
+  ),
+};
+
+/** Sitting down, hat on, lamp on. For the one death you choose. */
+export const HIKER_SEATED = compile(
+  [
+    '...OOOOOO...',
+    '..OHHHHHHO..',
+    '..OHHHHHHO..',
+    '.OHHHHHHHHO.',
+    'OHHHHHHHHKLO',
+    '.OSSSSSSSOO.',
+    '.OSSSKKSSO..',
+    '.OSSSSSSSO..',
+    '..OSSSSSO...',
+    '..OJJZJJJJO.',
+    '..OJJJJJJJO.',
+    '.OPPPPPPPPPO',
+    'OPPOBBOOBBOPO',
+    'OOOOOOOOOOOOO',
+  ],
+  HIKER,
+);
+
+// ---------------------------------------------------------------------------
+// Cap Blanc. Limestone, carved.
+// ---------------------------------------------------------------------------
+
+const LIMESTONE: Palette = {
+  S: '#d9cdb0', // limestone
+  L: '#efe6cf', // lit edge of the relief
+  D: '#b3a483', // undercut shade
+  R: '#b5573a', // red ochre, what is left of it
+  O: '#6e634c', // the edge of the relief: soft, it is stone against stone
+  W: '#f4f1ea', // plaster
+  G: '#b8b0a0', // plaster shade
+  K: '#2b1d10',
+};
+
+/**
+ * A horse of the frieze in high relief, 40 x 20, facing right, head lowered.
+ * The back is the ledge: a 28 px run from x 4 at y 3. All ten are this sprite.
+ * The cast is this sprite too. That is the point.
+ */
+function horseRelief(): HTMLCanvasElement {
+  const g = new PixelGrid(40, 20);
+  g.rect(0, 5, 4, 9, 'S'); // tail
+  g.rect(1, 6, 1, 7, 'D');
+  g.rect(3, 3, 29, 11, 'S'); // body
+  g.rect(4, 3, 28, 1, 'L'); // the back catches the light: this is the floor
+  g.rect(5, 12, 26, 2, 'D'); // belly, undercut
+  g.rect(29, 5, 6, 7, 'S'); // neck, going forward and down
+  g.rect(28, 4, 7, 2, 'D'); // mane
+  g.rect(33, 8, 7, 6, 'S'); // head
+  g.rect(37, 11, 3, 3, 'D'); // muzzle
+  g.px(34, 7, 'S'); // ear
+  g.px(35, 9, 'K'); // eye
+  for (const x of [7, 12, 23, 28]) {
+    g.rect(x, 14, 3, 6, 'S');
+    g.rect(x, 19, 3, 1, 'D');
+  }
+  g.rect(9, 7, 4, 2, 'R'); // ochre, the same three patches on every horse
+  g.rect(18, 9, 3, 1, 'R');
+  g.rect(20, 5, 2, 2, 'R');
+  return compile(g.outline('O').rows(), LIMESTONE);
+}
+export const HORSE_SPRITE = horseRelief();
+
+/** A bison of the frieze, 32 x 18, facing right, in low relief: lines, not a ledge. */
+export const BISON_SPRITE = compile(
+  [
+    '....................OOOOO.......',
+    '..................OO.....OO.....',
+    '.................O.........O....',
+    '...OOOOOOOOOOOOOO..........OO...',
+    '..O..........................O..',
+    '.O...........................OO.',
+    '.O............................O.',
+    '.O...........................OO.',
+    '.O..........................O...',
+    '..O........................O....',
+    '..O.......................OOO...',
+    '..O....OOOO.........OOO.....OO..',
+    '..O...O....O.......O...O......O.',
+    '..O..O......O.....O.....O.......',
+    '..OOO.......O.....O.....O.......',
+    '............O.....O.....O.......',
+    '............O.....O.....O.......',
+    '...........OO....OO....OO.......',
+  ],
+  LIMESTONE,
+);
+
+/** The copy of the burial at the foot of the frieze, 24 x 8. Plaster, lying on its side, knees drawn up. */
+export const SKELETON_CAST_SPRITE = compile(
+  [
+    '.OOO....................',
+    'OWWWO.OWOWOWOWOWO.......',
+    'OWGWWOWWWWWWWWWWWOO.....',
+    'OWWWO.OWOWOWOWOWWWWOO...',
+    '.OOO......OO......OWWWO.',
+    '...........OWWO...OWWWWO',
+    '............OWWO.OWWWO..',
+    '.............OOOOOOO....',
+  ],
+  { ...LIMESTONE, O: '#8a8272' },
+);
+
+// ---------------------------------------------------------------------------
+// The digger. 1909. Two frames, 32 x 28: pick raised, pick down. Stands at
+// the right of the frame, faces left, works the deposit on the left.
+// ---------------------------------------------------------------------------
+
+const DIGGER: Palette = {
+  O: '#2b1d10',
+  C: '#5a4a3a', // flat cap
+  F: '#e6b48c', // skin
+  S: '#c9c0a8', // shirt, sleeves rolled
+  P: '#4e5364', // trousers
+  B: '#3a2a1a', // boots
+  H: '#8b6a3e', // handle
+  M: '#9a9ea3', // steel
+};
+
+function digger(down: boolean): HTMLCanvasElement {
+  const g = new PixelGrid(32, 28);
+  const x = 19;
+  g.rect(x + 1, 3, 6, 6, 'F'); // head
+  g.rect(x, 2, 8, 2, 'C'); // cap
+  g.rect(x - 1, 3, 2, 1, 'C'); // its peak, forward
+  g.px(x + 2, 5, 'O'); // eye, on the work
+  g.rect(x, 9, 8, 10, 'S'); // body
+  g.rect(x, 19, 3, 7, 'P'); // legs
+  g.rect(x + 5, 19, 3, 7, 'P');
+  g.rect(x - 1, 26, 4, 2, 'B'); // boots
+  g.rect(x + 5, 26, 4, 2, 'B');
+  if (!down) {
+    g.rect(x - 3, 4, 4, 3, 'F'); // arms up
+    g.line(x - 2, 6, 5, 2, 'H'); // handle
+    g.rect(2, 1, 7, 2, 'M'); // the head of the pick
+    g.px(1, 2, 'M');
+  } else {
+    g.rect(x - 4, 12, 5, 3, 'F'); // arms down and forward
+    g.line(x - 3, 14, 4, 24, 'H');
+    g.rect(1, 23, 7, 2, 'M');
+    g.px(0, 24, 'M');
+  }
+  return compile(g.outline('O').rows(), DIGGER);
+}
+export const DIGGER_FRAMES = [digger(false), digger(true)];

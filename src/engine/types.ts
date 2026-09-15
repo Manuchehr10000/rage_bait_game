@@ -19,6 +19,10 @@ export function centerY(r: Rect): number {
 
 /** Death causes are museum-label nouns: they end up printed on the exit label. */
 export type DeathCause =
+  | 'The Beune'
+  | 'The cast'
+  | 'The trench'
+  | 'The pick'
   | 'Colossus head'
   | 'Baboon'
   | 'Lake Nasser'
@@ -32,9 +36,13 @@ export type DeathCause =
   | 'Gave up';
 
 /** How each death is drawn. */
-export type DeathAnim = 'crush' | 'plank' | 'drown' | 'burn' | 'snap' | 'swept' | 'gone' | 'sit';
+export type DeathAnim = 'crush' | 'plank' | 'drown' | 'burn' | 'snap' | 'swept' | 'gone' | 'sit' | 'flat';
 
 export const DEATH_ANIM: Record<DeathCause, DeathAnim> = {
+  'The Beune': 'drown',
+  'The cast': 'flat',
+  'The trench': 'flat',
+  'The pick': 'plank',
   'Colossus head': 'crush',
   Baboon: 'plank',
   'Lake Nasser': 'drown',
@@ -49,7 +57,11 @@ export const DEATH_ANIM: Record<DeathCause, DeathAnim> = {
 };
 
 /** What each death sounds like. Material, never musical. */
-export const DEATH_SOUND: Record<DeathCause, 'squish' | 'bonk' | 'drown' | 'burn' | 'snap' | 'whoosh' | 'fallAway' | 'sigh'> = {
+export const DEATH_SOUND: Record<DeathCause, 'squish' | 'bonk' | 'drown' | 'burn' | 'snap' | 'whoosh' | 'fallAway' | 'sigh' | 'thud'> = {
+  'The Beune': 'drown',
+  'The cast': 'thud',
+  'The trench': 'thud',
+  'The pick': 'bonk',
   'Colossus head': 'squish',
   Baboon: 'bonk',
   'Lake Nasser': 'drown',
@@ -62,6 +74,12 @@ export const DEATH_SOUND: Record<DeathCause, 'squish' | 'bonk' | 'drown' | 'burn
   Fall: 'fallAway',
   'Gave up': 'sigh',
 };
+
+/**
+ * What the tourist wears. One per chapter, fixed by content/research/arc.md.
+ * Cosmetic (pillar 9): it picks the sprites and nothing else.
+ */
+export type Costume = 'hiker' | 'pharaoh';
 
 export const VIEW_W = 320;
 export const VIEW_H = 180;

@@ -47,6 +47,7 @@ export const ABU_SIMBEL: LevelData = {
   id: 'abu-simbel',
   name: 'Great Temple of Abu Simbel',
   theme: 'abuSimbel',
+  costume: 'pharaoh',
   widthTiles: W,
   heightTiles: H,
   rows: g.rows(),

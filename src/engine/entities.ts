@@ -5,7 +5,9 @@ import type {
   CrumbleDef,
   EntityDef,
   FallingDef,
+  HazardDef,
   Level,
+  PickDef,
   PlatformDef,
   PusherDef,
   SweepDef,
@@ -58,6 +60,10 @@ export function createEntity(def: EntityDef, level: Level): Entity {
       return new Chaser(def);
     case 'tipper':
       return new Tipper(def);
+    case 'hazard':
+      return new Hazard(def);
+    case 'pick':
+      return new Pick(def);
   }
 }
 
@@ -368,15 +374,20 @@ export class Sweep implements Entity {
 
 export class Crumble implements Entity {
   readonly rect: Rect;
-  state: 'idle' | 'armed' | 'falling' | 'gone' = 'idle';
+  state: 'idle' | 'armed' | 'falling' | 'landed' | 'gone' = 'idle';
   private timer = 0;
   private vy = 0;
   private readonly solid: MovingSolid;
 
   constructor(readonly def: CrumbleDef) {
     this.rect = { ...def.rect };
-    // Stepping stones can be swum under and past; everything else is solid all round.
-    this.solid = { rect: this.rect, dx: 0, dy: 0, oneWay: def.skin === 'stone' };
+    // Stepping stones can be swum under and past, a horse's back is landed on from above; everything else is solid all round.
+    this.solid = { rect: this.rect, dx: 0, dy: 0, oneWay: def.skin === 'stone' || def.skin === 'horse' };
+  }
+
+  /** How far it has dropped from where it started. */
+  get fallen(): number {
+    return this.rect.y - this.def.rect.y;
   }
 
   update(w: World): void {
@@ -403,16 +414,81 @@ export class Crumble implements Entity {
       return;
     }
     // Falling: a crocodile dives at its own pace, a capital drops. You ride it down either way.
+    if (this.state === 'landed') return;
     if (this.def.skin === 'croc') this.vy = 55;
     else this.vy = Math.min(PHYS.maxFall, this.vy + PHYS.gravity * DT);
     const before = r.y;
     r.y += this.vy * DT;
+    const floorY = this.def.floorY;
+    if (floorY !== undefined && r.y + r.h >= floorY) {
+      // Plaster hits the bottom of the trench and stays there, in pieces.
+      r.y = floorY - r.h;
+      this.state = 'landed';
+      w.sound('thud');
+      if (this.def.cause && standing) w.kill(this.def.cause);
+    }
     this.solid.dy = r.y - before;
     if (r.y > w.level.heightPx + 32) this.state = 'gone';
   }
 
   solids(): MovingSolid[] {
     return this.state === 'gone' ? [] : [this.solid];
+  }
+}
+
+// ---------------------------------------------------------------------------
+
+export class Hazard implements Entity {
+  constructor(readonly def: HazardDef) {}
+
+  update(w: World): void {
+    if (overlaps(this.def.rect, w.player)) w.kill(this.def.cause);
+  }
+}
+
+// ---------------------------------------------------------------------------
+
+export class Pick implements Entity {
+  /** Seconds since the cycle started, or -1 before the trigger. */
+  t = -1;
+  private strikes = 0;
+
+  constructor(readonly def: PickDef) {}
+
+  get triggered(): boolean {
+    return this.t >= 0;
+  }
+
+  /** Where in the cycle the swing is, 0..period. */
+  get phase(): number {
+    return this.t < 0 ? 0 : this.t % this.def.period;
+  }
+
+  /** True while the pick is down in the deposit: from the strike until the next lift. */
+  get down(): boolean {
+    return this.t >= 0 && this.phase >= this.def.strikeAt;
+  }
+
+  /** True during the strike itself. */
+  get striking(): boolean {
+    const d = this.def;
+    return this.t >= 0 && this.phase >= d.strikeAt && this.phase < d.strikeAt + d.strikeFor;
+  }
+
+  update(w: World): void {
+    const p = w.player;
+    const d = this.def;
+    if (this.t < 0) {
+      if (centerX(p) >= d.triggerX) this.t = 0;
+      else return;
+    }
+    this.t += DT;
+    const n = Math.floor((this.t - d.strikeAt) / d.period) + 1;
+    if (this.t >= d.strikeAt && n > this.strikes) {
+      this.strikes = n;
+      w.sound('pick');
+    }
+    if (this.striking && overlaps(d.hazard, p)) w.kill(d.cause);
   }
 }
 

@@ -5,6 +5,8 @@
  * drawn on the map as closed.
  */
 
+import type { Costume } from '../engine/types';
+
 export interface Site {
   name: string;
   lat: number;
@@ -27,6 +29,8 @@ export interface Chapter {
   anchor: number;
   /** Nudge for the number badge on the world map, so clustered chapters do not overlap. */
   badge?: { dx: number; dy: number };
+  /** What the tourist wears here, from the research. Unset until the chapter is designed. */
+  costume?: Costume;
   sites: Site[];
 }
 
@@ -38,12 +42,13 @@ export const CHAPTERS: Chapter[] = [
     dates: '27,000–13,000 BP',
     anchor: 3,
     badge: { dx: -10, dy: 6 },
+    costume: 'hiker',
     sites: [
-      { name: 'Cap Blanc', lat: 44.95, lon: 1.1 },
-      { name: 'Roc-aux-Sorciers', lat: 46.69, lon: 0.87 },
-      { name: 'Pech Merle', lat: 44.51, lon: 1.64 },
-      { name: 'Rouffignac', lat: 45.01, lon: 0.99 },
-      { name: 'Gargas', lat: 43.05, lon: 0.52 },
+      { name: 'Cap Blanc', lat: 44.95, lon: 1.1, level: 'cap-blanc', pin: { dx: 14, dy: 8 }, label: 'right' },
+      { name: 'Roc-aux-Sorciers', lat: 46.69, lon: 0.87, label: 'right' },
+      { name: 'Pech Merle', lat: 44.51, lon: 1.64, pin: { dx: 10, dy: 10 }, label: 'right' },
+      { name: 'Rouffignac', lat: 45.01, lon: 0.99, pin: { dx: -14, dy: -6 }, label: 'left' },
+      { name: 'Gargas', lat: 43.05, lon: 0.52, label: 'left' },
     ],
   },
   {
@@ -52,6 +57,7 @@ export const CHAPTERS: Chapter[] = [
     name: 'Egypt',
     dates: '2667 BC – AD 30',
     anchor: 2,
+    costume: 'pharaoh',
     sites: [
       { name: 'Abu Simbel', lat: 22.34, lon: 31.63, level: 'abu-simbel' },
       { name: 'Philae', lat: 24.02, lon: 32.88, level: 'philae', pin: { dx: 12, dy: 2 }, label: 'right' },

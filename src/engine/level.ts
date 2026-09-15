@@ -1,16 +1,17 @@
-import { TILE, type DeathCause, type Rect } from './types';
+import { TILE, type Costume, type DeathCause, type Rect } from './types';
 
 /**
  * Tile legend:
  *  ' '  empty
- *  '#'  stone (solid). Drawn per theme: cliff brick at Abu Simbel, column drum at Philae.
- *  '='  ground (solid). Sand at Abu Simbel, granite quay at Philae.
+ *  '#'  stone (solid). Drawn per theme: cliff brick at Abu Simbel, column drum at Philae, bedrock at Cap Blanc.
+ *  '='  ground (solid). Sand at Abu Simbel, granite quay at Philae, the valley path at Cap Blanc.
+ *  '%'  deposit (solid). The excavation's unremoved sediment at Cap Blanc; stone elsewhere.
  *  '?'  ankh block (solid, bumps once)
  *  'x'  used block (solid)
  */
-export type TileChar = ' ' | '#' | '=' | '?' | 'x';
+export type TileChar = ' ' | '#' | '=' | '%' | '?' | 'x';
 
-export type Theme = 'abuSimbel' | 'philae' | 'karnak';
+export type Theme = 'capBlanc' | 'abuSimbel' | 'philae' | 'karnak';
 
 // ---------------------------------------------------------------------------
 // Entities. Every trap in the game is one of these, with a skin for the renderer.
@@ -108,12 +109,41 @@ export interface SweepDef {
 /** Looks like something to stand on. If fake, it gives way a moment after you do, or on an event. */
 export interface CrumbleDef {
   kind: 'crumble';
-  skin: 'croc' | 'capital' | 'rock' | 'floor' | 'talatat' | 'column' | 'stone';
+  skin: 'croc' | 'capital' | 'rock' | 'floor' | 'talatat' | 'column' | 'stone' | 'horse';
   rect: Rect;
   fake: boolean;
   delay: number;
   /** Gives way when this event fires, instead of when stood on. */
   onEvent?: string;
+  /** Stops falling with its bottom here, instead of leaving the level. */
+  floorY?: number;
+  /** Whoever is still riding it when it lands dies of this. */
+  cause?: DeathCause;
+}
+
+/** A still, invisible band of death. The floor of a trench, say. Drawn by decor. */
+export interface HazardDef {
+  kind: 'hazard';
+  rect: Rect;
+  cause: DeathCause;
+}
+
+/**
+ * Someone busy with a pick. Once the player reaches triggerX the swing runs on a
+ * fixed cycle: raised, then a strike that is deadly inside `hazard` for `strikeFor`.
+ * The only trap in the game allowed to cycle is the last one in a level (pillar 5).
+ */
+export interface PickDef {
+  kind: 'pick';
+  /** Where the digger stands (left edge of the figure) and the floor under them. */
+  x: number;
+  floorY: number;
+  triggerX: number;
+  period: number;
+  strikeAt: number;
+  strikeFor: number;
+  hazard: Rect;
+  cause: DeathCause;
 }
 
 /** A figure in a wall. If active, it steps out and shoves the player when they pass. */
@@ -171,7 +201,9 @@ export type EntityDef =
   | PusherDef
   | ConveyorDef
   | ChaserDef
-  | TipperDef;
+  | TipperDef
+  | HazardDef
+  | PickDef;
 
 // ---------------------------------------------------------------------------
 // Decor. Drawn, never collided with.
@@ -190,8 +222,13 @@ export type DecorDef =
   | { kind: 'ramp'; x: number; w: number; top: number; bottom: number }
   | { kind: 'pit'; rect: Rect }
   | { kind: 'sphinxRow'; x: number; w: number; floorY: number }
-  | { kind: 'dark'; x0: number; x1: number }
-  | { kind: 'spotlight'; x: number; floorY: number }
+  | { kind: 'dark'; x0: number; x1: number; lamp?: 'glow' | 'headlamp' }
+  | { kind: 'spotlight'; x: number; floorY: number; top?: number }
+  | { kind: 'museumWall'; x: number; w: number; doorX: number; top: number; floorY: number }
+  | { kind: 'shelter'; x0: number; x1: number; ceilingY: number; floorY: number }
+  | { kind: 'trench'; rect: Rect }
+  | { kind: 'skeletonCast'; x: number; floorY: number }
+  | { kind: 'bisonRelief'; x: number; y: number }
   | { kind: 'brokenObelisk'; x: number; floorY: number }
   | { kind: 'pedestal'; x: number; floorY: number }
   | { kind: 'turnstile'; x: number; floorY: number }
@@ -201,6 +238,8 @@ export interface LevelData {
   id: string;
   name: string;
   theme: Theme;
+  /** The chapter's costume. Picks the tourist's sprites and nothing else. */
+  costume: Costume;
   widthTiles: number;
   heightTiles: number;
   rows: string[];
@@ -256,7 +295,7 @@ export class Level {
 
   isSolid(tx: number, ty: number): boolean {
     const c = this.tile(tx, ty);
-    return c === '#' || c === '=' || c === '?' || c === 'x';
+    return c === '#' || c === '=' || c === '%' || c === '?' || c === 'x';
   }
 
   /** Solid tile rects overlapping the given rect's tile span. */

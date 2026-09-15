@@ -27,7 +27,7 @@ npm run dev
 ```
 
 Arrows or WASD to move, Space to jump, R to give up (it counts), M to mute, Enter for the
-next level at the exit label. Open `#philae` or `#karnak` in the URL to start at that level.
+next level at the exit label. Esc returns to the map. Open `#cap-blanc`, `#philae` or `#karnak` in the URL to start at that level.
 
 `npm test` runs scripted playthroughs in headless Chromium. Each one checks a design
 contract: the trap fires for the naive player and can be avoided by the one who remembers.
@@ -58,11 +58,13 @@ src/
     hud.ts                death counter and exit label, drawn in screen space
   levels/
     index.ts              level order and URL hash lookup
-    ch02-egypt/           one file per level: geometry, decor, entity list
+    ch01-palaeolithic/    one file per level: geometry, decor, entity list
+    ch02-egypt/
 content/
   README.md               the designer's guide
-  ch02-egypt/             CHAPTER.md, shared art, one folder per level with LEVEL.md,
-                          assets.json, easter-eggs.md, and beat folders holding notes and paintings
+  research/               the historical arc; outranks everything else on history
+  ch01-palaeolithic/      CHAPTER.md, shared art, one folder per level with LEVEL.md,
+  ch02-egypt/             assets.json, easter-eggs.md, and beat folders holding notes and paintings
 tools/
   check-assets.mjs        the manifest checker CI runs
 tests/                    Playwright playthroughs, one file per level
@@ -73,5 +75,5 @@ Rendering: the world is 320 × 180 units, rendered onto a canvas four times that
 
 ## Status
 
-Levels 1 to 3 playable end to end with code-drawn art and procedural sound. Painted art
+Four levels playable end to end (Cap Blanc; Abu Simbel, Philae, Karnak) with code-drawn art and procedural sound, from a tour map start screen. Painted art
 arrives per asset through `content/`. No menu yet.

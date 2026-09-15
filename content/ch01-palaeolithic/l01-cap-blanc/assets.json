@@ -1,0 +1,84 @@
+{
+  "$comment": "Sizes are world pixels (320 x 180 view). Painted files are 4x. See content/README.md.",
+  "level": "l01-cap-blanc",
+  "assets": [
+    {
+      "id": "tile-limestone",
+      "w": 16,
+      "h": 16,
+      "beat": "a-valley",
+      "what": "The valley floor: pale limestone rubble under turf, no surface."
+    },
+    {
+      "id": "tile-limestone-top",
+      "w": 16,
+      "h": 16,
+      "beat": "a-valley",
+      "what": "The valley floor with the turf on top: the path the hiker walks."
+    },
+    {
+      "id": "cap-blanc-wall",
+      "w": 32,
+      "h": 128,
+      "beat": "b-shelter",
+      "what": "The wall built across the mouth of the shelter, with its door. The way in."
+    },
+    {
+      "id": "tile-rock",
+      "w": 16,
+      "h": 16,
+      "beat": "b-shelter",
+      "what": "Bedrock of the shelter, bedded limestone, no surface."
+    },
+    {
+      "id": "tile-rock-top",
+      "w": 16,
+      "h": 16,
+      "beat": "b-shelter",
+      "what": "Bedrock with the floor surface on top."
+    },
+    {
+      "id": "horse-relief",
+      "w": 40,
+      "h": 20,
+      "beat": "c-frieze",
+      "what": "One horse of the frieze in high relief. Its back is the ledge. All ten are this sprite, and so is the cast."
+    },
+    {
+      "id": "bison-relief",
+      "w": 32,
+      "h": 18,
+      "beat": "c-frieze",
+      "what": "A bison of the frieze in low relief: lines in the wall, not a ledge."
+    },
+    {
+      "id": "skeleton-cast",
+      "w": 24,
+      "h": 8,
+      "beat": "c-frieze",
+      "what": "The cast of the 1911 burial, lying at the foot of the frieze."
+    },
+    {
+      "id": "digger",
+      "w": 32,
+      "h": 28,
+      "beat": "e-dig",
+      "what": "The workman of 1909 with his pick. Two frames: raised, down.",
+      "frames": 2
+    },
+    {
+      "id": "tile-sediment",
+      "w": 16,
+      "h": 16,
+      "beat": "e-dig",
+      "what": "The deposit the excavation left in place: layered sediment, no surface."
+    },
+    {
+      "id": "tile-sediment-top",
+      "w": 16,
+      "h": 16,
+      "beat": "e-dig",
+      "what": "The deposit with its cut top."
+    }
+  ]
+}

@@ -58,6 +58,7 @@ export const PHILAE: LevelData = {
   id: 'philae',
   name: 'Philae, Temple of Isis',
   theme: 'philae',
+  costume: 'pharaoh',
   widthTiles: W,
   heightTiles: H,
   rows: g.rows(),

@@ -27,7 +27,9 @@ export type Sfx =
   | 'crumble'
   | 'grind'
   | 'winchStart'
-  | 'motorStart';
+  | 'motorStart'
+  | 'thud'
+  | 'pick';
 
 const MUTE_KEY = 'lostTourist.muted';
 
@@ -175,6 +177,17 @@ export class GameAudio {
         break;
       case 'motorStart':
         this.tone(t, 'square', 60, 90, 0.4, 0.05);
+        break;
+      case 'thud':
+        // Something soft landing on the floor of a trench.
+        this.burst(t, 350, 'lowpass', 0.09, 0.22);
+        this.tone(t, 'sine', 90, 40, 0.2, 0.14);
+        break;
+      case 'pick':
+        // Steel into packed sediment: a click, then the dull bite.
+        this.burst(t, 2400, 'highpass', 0.02, 0.1);
+        this.burst(t + 0.02, 500, 'lowpass', 0.07, 0.18);
+        this.tone(t + 0.02, 'sine', 120, 60, 0.12, 0.08);
         break;
     }
   }

@@ -1,10 +1,16 @@
 import type { Camera } from '../engine/camera';
-import type { Chaser, Crumble, Entity, Falling, Platform, Pusher, Sweep, Thrower, Tipper, Water } from '../engine/entities';
+import type { Chaser, Crumble, Entity, Falling, Pick, Platform, Pusher, Sweep, Thrower, Tipper, Water } from '../engine/entities';
 import type { DecorDef, Level } from '../engine/level';
 import type { Player } from '../engine/player';
 import {
   BABOON_SPRITE,
+  BISON_SPRITE,
   BOAT_SPRITE,
+  DIGGER_FRAMES,
+  HIKER_FRAMES,
+  HIKER_SEATED,
+  HORSE_SPRITE,
+  SKELETON_CAST_SPRITE,
   CAPITAL_SPRITE,
   COLOSSUS,
   HEAD_CROWN,
@@ -25,7 +31,7 @@ import {
   TOURIST_FRAMES,
   TOURIST_SEATED,
 } from './procedural';
-import { DEATH_ANIM, TILE, VIEW_H, VIEW_W, type DeathCause, type Rect } from '../engine/types';
+import { DEATH_ANIM, TILE, VIEW_H, VIEW_W, type Costume, type DeathCause, type Rect } from '../engine/types';
 import { paint } from '../engine/assets';
 import { blit, blitFacing, frameOf, silhouette, type Frame } from './frame';
 
@@ -101,6 +107,29 @@ export const COLORS = {
   cable: '#3a2915',
   crack: '#2a1d10',
   coin: '#f2d16b',
+  // Cap Blanc: a Dordogne sky, a wooded valley, pale limestone.
+  skyTopCool: '#9db4c6',
+  skyBottomCool: '#dfe0cc',
+  sunPale: '#fbf7e4',
+  treeFar: '#5f7a4e',
+  treeFarShade: '#4a6140',
+  meadow: '#a9b877',
+  meadowLine: '#7f9256',
+  limestone: '#d9cdb0',
+  limestoneLine: '#b3a483',
+  limestoneLight: '#efe6cf',
+  bedrock: '#c4b697',
+  bedrockLine: '#9c8f70',
+  bedrockDark: '#a3946f',
+  sediment: '#a58a62',
+  sedimentLine: '#7d6647',
+  sedimentLight: '#c3a97e',
+  masonry: '#cfc3a5',
+  masonryJoint: '#9d9174',
+  trenchWall: '#5a4a34',
+  trenchFloor: '#3f3324',
+  plaster: '#f4f1ea',
+  plasterShade: '#b8b0a0',
 };
 
 export interface Scene {
@@ -122,8 +151,9 @@ export function renderWorld(ctx: CanvasRenderingContext2D, s: Scene): void {
   const cy = camera.iy;
   const theme = level.data.theme;
 
-  drawSky(ctx, cy);
-  if (theme === 'abuSimbel') drawFarCliffs(ctx, cx, cy);
+  drawSky(ctx, cy, theme);
+  if (theme === 'capBlanc') drawFarBeune(ctx, cx, cy);
+  else if (theme === 'abuSimbel') drawFarCliffs(ctx, cx, cy);
   else if (theme === 'philae') drawFarIsland(ctx, cx, cy);
   else drawFarKarnak(ctx, cx, cy);
 
@@ -140,7 +170,7 @@ export function renderWorld(ctx: CanvasRenderingContext2D, s: Scene): void {
   for (const e of s.entities) drawEntityFront(ctx, s, e);
   drawCoins(ctx, s);
   if (level.data.exit && !level.data.exitHidden) drawExit(ctx, level.data.exit);
-  if (!s.death) drawPlayer(ctx, s.player);
+  if (!s.death) drawPlayer(ctx, s.player, level.data.costume);
   else if (DEATH_ANIM[s.death.cause] !== 'crush') drawDeath(ctx, s, s.death);
   for (const e of s.entities) drawEntityOverlay(ctx, s, e);
   if (s.death && (DEATH_ANIM[s.death.cause] === 'drown' || DEATH_ANIM[s.death.cause] === 'snap')) drawDrownSurface(ctx, s, s.death.t);
@@ -153,15 +183,16 @@ export function renderWorld(ctx: CanvasRenderingContext2D, s: Scene): void {
 // Backdrops.
 // ---------------------------------------------------------------------------
 
-function drawSky(ctx: CanvasRenderingContext2D, cy: number): void {
+function drawSky(ctx: CanvasRenderingContext2D, cy: number, theme: Level['data']['theme']): void {
+  const cool = theme === 'capBlanc';
   const bands = 6;
   for (let i = 0; i < bands; i++) {
-    ctx.fillStyle = mix(COLORS.skyTop, COLORS.skyBottom, i / (bands - 1));
+    ctx.fillStyle = cool ? mix(COLORS.skyTopCool, COLORS.skyBottomCool, i / (bands - 1)) : mix(COLORS.skyTop, COLORS.skyBottom, i / (bands - 1));
     ctx.fillRect(0, (i * VIEW_H) / bands, VIEW_W, VIEW_H / bands + 1);
   }
   const sx = 272;
   const sy = 30 - Math.round(cy * 0.2);
-  ctx.fillStyle = COLORS.sun;
+  ctx.fillStyle = cool ? COLORS.sunPale : COLORS.sun;
   ctx.fillRect(sx - 6, sy - 2, 12, 5);
   ctx.fillRect(sx - 4, sy - 4, 8, 9);
   ctx.fillRect(sx - 2, sy - 6, 4, 13);
@@ -190,6 +221,57 @@ function drawFarCliffs(ctx: CanvasRenderingContext2D, cx: number, cy: number): v
   ctx.fillRect(0, horizon, VIEW_W, 1);
   const shimmer = Math.round(cx * 0.25) % 24;
   for (let x = -24 - shimmer; x < VIEW_W; x += 24) ctx.fillRect(x, horizon + 4, 10, 1);
+}
+
+/**
+ * Cap Blanc: the far side of the Beune valley. Wooded slope, and once, not
+ * repeated, the ruined keep of Commarque on its spur across the valley.
+ */
+function drawFarBeune(ctx: CanvasRenderingContext2D, cx: number, cy: number): void {
+  const horizon = 150 - Math.round(cy * 0.55);
+  const off = Math.round(cx * 0.2) % 180;
+  // The wooded slope: two ranks of tree masses.
+  ctx.fillStyle = COLORS.treeFarShade;
+  for (let base = -180; base < VIEW_W + 180; base += 180) {
+    const x = base - off;
+    for (let i = 0; i < 9; i++) {
+      const tx = x + i * 20 + ((i * 7) % 5);
+      const h = 18 + ((i * 11) % 9);
+      ctx.fillRect(tx, horizon - h, 14, h);
+      ctx.fillRect(tx + 3, horizon - h - 3, 8, 3);
+    }
+  }
+  ctx.fillStyle = COLORS.treeFar;
+  for (let base = -180; base < VIEW_W + 180; base += 180) {
+    const x = base - off;
+    for (let i = 0; i < 9; i++) {
+      const tx = x + 8 + i * 20 + ((i * 3) % 5);
+      const h = 12 + ((i * 5) % 7);
+      ctx.fillRect(tx, horizon - h, 12, h);
+      ctx.fillRect(tx + 2, horizon - h - 2, 8, 2);
+    }
+  }
+  // Commarque: a tall square keep on the cliff opposite, the curtain wall and the chapel ruin below it. Once.
+  const kx = 236 - Math.round(cx * 0.2);
+  if (kx > -80 && kx < VIEW_W + 10) {
+    ctx.fillStyle = COLORS.farShade;
+    ctx.fillRect(kx - 30, horizon - 26, 76, 26); // the spur
+    ctx.fillStyle = COLORS.far;
+    ctx.fillRect(kx, horizon - 62, 14, 40); // the keep
+    ctx.fillRect(kx - 2, horizon - 64, 4, 4);
+    ctx.fillRect(kx + 6, horizon - 64, 3, 3);
+    ctx.fillRect(kx + 12, horizon - 64, 4, 4);
+    ctx.fillRect(kx - 24, horizon - 40, 24, 18); // the curtain and the ruined chapel, roofless
+    ctx.fillRect(kx + 14, horizon - 36, 22, 14);
+    ctx.fillStyle = COLORS.farShade;
+    ctx.fillRect(kx + 4, horizon - 52, 2, 4); // slit windows
+    ctx.fillRect(kx + 8, horizon - 44, 2, 4);
+    ctx.fillRect(kx - 18, horizon - 34, 3, 6); // the chapel's empty window
+  }
+  ctx.fillStyle = COLORS.meadow;
+  ctx.fillRect(0, horizon, VIEW_W, VIEW_H - horizon);
+  ctx.fillStyle = COLORS.meadowLine;
+  ctx.fillRect(0, horizon, VIEW_W, 1);
 }
 
 /** Philae: low islands, palms, and the Kiosk on the skyline across the water. */
@@ -290,45 +372,76 @@ function drawDarkness(ctx: CanvasRenderingContext2D, s: Scene, cx: number, cy: n
   }
   d.globalAlpha = 1;
   d.globalCompositeOperation = 'destination-out';
-  // Your own small circle of sight.
   const p = s.player;
   const pxc = Math.round(p.x) + 5 - cx;
   const pyc = Math.round(p.y) + 8 - cy;
-  d.beginPath();
-  d.arc(pxc, pyc, 44, 0, Math.PI * 2);
-  d.fill();
-  d.globalAlpha = 0.5;
-  d.beginPath();
-  d.arc(pxc, pyc, 60, 0, Math.PI * 2);
-  d.fill();
-  d.globalAlpha = 1;
-  // The show's spotlights, from the roof down to a capital.
-  for (const sp of s.level.data.decor) {
-    if (sp.kind !== 'spotlight') continue;
+  if (dark.lamp === 'headlamp') {
+    // The lamp on the hat: a cone the way you are facing, and a little spill around you.
+    const f = p.facing;
+    const hx = pxc + f * 2;
+    const hy = pyc - 4;
+    const cone = (len: number, half: number, alpha: number) => {
+      d.globalAlpha = alpha;
+      d.beginPath();
+      d.moveTo(hx, hy - 2);
+      d.lineTo(hx + f * len, hy - half);
+      d.lineTo(hx + f * len, hy + half);
+      d.lineTo(hx, hy + 2);
+      d.closePath();
+      d.fill();
+    };
+    cone(76, 30, 1);
+    cone(96, 44, 0.45);
+    d.globalAlpha = 1;
+    d.beginPath();
+    d.arc(pxc, pyc, 12, 0, Math.PI * 2);
+    d.fill();
+    d.globalAlpha = 0.5;
+    d.beginPath();
+    d.arc(pxc, pyc, 18, 0, Math.PI * 2);
+    d.fill();
+    d.globalAlpha = 1;
+  } else {
+    // Your own small circle of sight.
+    d.beginPath();
+    d.arc(pxc, pyc, 44, 0, Math.PI * 2);
+    d.fill();
+    d.globalAlpha = 0.5;
+    d.beginPath();
+    d.arc(pxc, pyc, 60, 0, Math.PI * 2);
+    d.fill();
+    d.globalAlpha = 1;
+  }
+  // The spotlights, from the roof (or the overhang) down to the floor.
+  const beam = (g: CanvasRenderingContext2D, sp: { x: number; floorY: number; top?: number }) => {
     const sx = sp.x - cx;
     const sy = sp.floorY - cy;
-    d.beginPath();
-    d.moveTo(sx - 4, -10);
-    d.lineTo(sx + 4, -10);
-    d.lineTo(sx + 26, sy + 12);
-    d.lineTo(sx - 26, sy + 12);
-    d.closePath();
-    d.fill();
-  }
+    const ty = sp.top === undefined ? -10 : sp.top + 6 - cy;
+    g.beginPath();
+    g.moveTo(sx - 4, ty);
+    g.lineTo(sx + 4, ty);
+    g.lineTo(sx + 26, sy + 12);
+    g.lineTo(sx - 26, sy + 12);
+    g.closePath();
+    g.fill();
+  };
+  for (const sp of s.level.data.decor) if (sp.kind === 'spotlight') beam(d, sp);
   d.globalCompositeOperation = 'source-over';
   ctx.drawImage(darkLayer, 0, 0);
   // The beams themselves, faintly, so the light reads as light and not as a hole.
   ctx.save();
   ctx.fillStyle = 'rgba(255, 240, 190, 0.18)';
-  for (const sp of s.level.data.decor) {
-    if (sp.kind !== 'spotlight') continue;
-    const sx = sp.x - cx;
-    const sy = sp.floorY - cy;
+  for (const sp of s.level.data.decor) if (sp.kind === 'spotlight') beam(ctx, sp);
+  if (dark.lamp === 'headlamp') {
+    // The headlamp's beam, the same faint warmth, so it reads as the lamp and not as a hole.
+    const f = p.facing;
+    const hx = pxc + f * 2;
+    const hy = pyc - 4;
     ctx.beginPath();
-    ctx.moveTo(sx - 4, -10);
-    ctx.lineTo(sx + 4, -10);
-    ctx.lineTo(sx + 26, sy + 12);
-    ctx.lineTo(sx - 26, sy + 12);
+    ctx.moveTo(hx, hy - 2);
+    ctx.lineTo(hx + f * 76, hy - 30);
+    ctx.lineTo(hx + f * 76, hy + 30);
+    ctx.lineTo(hx, hy + 2);
     ctx.closePath();
     ctx.fill();
   }
@@ -539,11 +652,12 @@ function drawDecor(ctx: CanvasRenderingContext2D, s: Scene, d: DecorDef): void {
     case 'dark':
       break;
     case 'spotlight': {
-      // The lamp on the roof beam.
+      // The lamp on the roof beam, or on the overhang.
+      const top = d.top ?? 0;
       ctx.fillStyle = '#2b2b2b';
-      ctx.fillRect(d.x - 5, 0, 10, 6);
+      ctx.fillRect(d.x - 5, top, 10, 6);
       ctx.fillStyle = '#fff2c0';
-      ctx.fillRect(d.x - 3, 5, 6, 2);
+      ctx.fillRect(d.x - 3, top + 5, 6, 2);
       break;
     }
     case 'brokenObelisk': {
@@ -582,6 +696,71 @@ function drawDecor(ctx: CanvasRenderingContext2D, s: Scene, d: DecorDef): void {
     }
     case 'turnstile':
       drawExit(ctx, { x: d.x, y: d.floorY - 24, w: 12, h: 24 });
+      break;
+    case 'museumWall': {
+      // The wall built against the rock in 1911 to close the shelter. Rubble limestone, mortared, a plain door.
+      const h = d.floorY - d.top;
+      if (paint(ctx, 'cap-blanc-wall', d.x, d.top)) break;
+      ctx.fillStyle = COLORS.masonry;
+      ctx.fillRect(d.x, d.top, d.w, h);
+      ctx.fillStyle = COLORS.masonryJoint;
+      for (let y = d.top; y < d.floorY; y += 8) {
+        ctx.fillRect(d.x, y, d.w, 1);
+        for (let x = d.x + (((y - d.top) / 8) % 2) * 9; x < d.x + d.w; x += 18) ctx.fillRect(x, y, 1, 8);
+      }
+      ctx.fillStyle = COLORS.doorway;
+      ctx.fillRect(d.doorX, d.floorY - 40, 16, 40);
+      ctx.fillStyle = COLORS.woodDark;
+      ctx.fillRect(d.doorX - 2, d.floorY - 43, 20, 3); // lintel
+      ctx.fillRect(d.doorX - 2, d.floorY - 40, 2, 40);
+      ctx.fillRect(d.doorX + 16, d.floorY - 40, 2, 40);
+      ctx.fillStyle = COLORS.outline;
+      ctx.fillRect(d.x, d.top, 1, h);
+      ctx.fillRect(d.x + d.w - 1, d.top, 1, h);
+      break;
+    }
+    case 'shelter': {
+      // Inside: the back wall of the shelter, bedded limestone, with the band the frieze was cut in.
+      const w = d.x1 - d.x0;
+      ctx.fillStyle = COLORS.bedrock;
+      ctx.fillRect(d.x0, d.ceilingY, w, d.floorY - d.ceilingY);
+      ctx.fillStyle = COLORS.bedrockLine;
+      for (let y = d.ceilingY + 9; y < d.floorY; y += 14) {
+        const jog = hash(2, y) % 3;
+        for (let sx = d.x0; sx < d.x1; sx += 36) {
+          const len = 10 + (hash(sx, y) % 22);
+          ctx.fillRect(sx, y + jog, Math.min(len, d.x1 - sx), 1);
+        }
+      }
+      // The overhang throws a shadow down the top of the wall.
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.18)';
+      ctx.fillRect(d.x0, d.ceilingY, w, 14);
+      ctx.fillStyle = COLORS.bedrockDark;
+      ctx.fillRect(d.x0, d.ceilingY, w, 2);
+      break;
+    }
+    case 'trench': {
+      // The excavation: the floor was dug down to below the frieze. The section shows its layers.
+      const r = d.rect;
+      ctx.fillStyle = COLORS.trenchWall;
+      ctx.fillRect(r.x, r.y, r.w, r.h);
+      ctx.fillStyle = COLORS.sedimentLine;
+      for (let y = r.y + 5; y < r.y + r.h - 4; y += 7) {
+        ctx.fillRect(r.x, y, r.w, 1);
+      }
+      ctx.fillStyle = COLORS.trenchFloor;
+      ctx.fillRect(r.x, r.y + r.h - 4, r.w, 4);
+      ctx.fillStyle = COLORS.outline;
+      ctx.fillRect(r.x, r.y + r.h - 4, r.w, 1);
+      ctx.fillRect(r.x, r.y, 1, r.h);
+      ctx.fillRect(r.x + r.w - 1, r.y, 1, r.h);
+      break;
+    }
+    case 'skeletonCast':
+      if (!paint(ctx, 'skeleton-cast', d.x, d.floorY - 8)) ctx.drawImage(SKELETON_CAST_SPRITE, d.x, d.floorY - 8);
+      break;
+    case 'bisonRelief':
+      if (!paint(ctx, 'bison-relief', d.x, d.y)) ctx.drawImage(BISON_SPRITE, d.x, d.y);
       break;
     case 'landing': {
       // Mooring posts on the landing stage.
@@ -694,11 +873,15 @@ function drawTiles(ctx: CanvasRenderingContext2D, level: Level, cx: number, cy: 
       const open = !level.isSolid(tx, ty - 1);
       if (paint(ctx, tileArtId(theme, c, open), x, y)) continue;
       if (c === '=') {
-        if (theme === 'abuSimbel') drawSand(ctx, level, tx, ty, x, y, open);
+        if (theme === 'capBlanc') drawMeadowPath(ctx, tx, ty, x, y, open);
+        else if (theme === 'abuSimbel') drawSand(ctx, level, tx, ty, x, y, open);
         else if (theme === 'philae') drawGranite(ctx, tx, ty, x, y, open);
         else drawPaving(ctx, tx, ty, x, y, open);
-      } else if (c === '#') {
-        if (theme === 'abuSimbel') drawCliff(ctx, tx, ty, x, y, open);
+      } else if (c === '%' && theme === 'capBlanc') {
+        drawSediment(ctx, tx, ty, x, y, open);
+      } else if (c === '#' || c === '%') {
+        if (theme === 'capBlanc') drawBedrock(ctx, tx, ty, x, y, open);
+        else if (theme === 'abuSimbel') drawCliff(ctx, tx, ty, x, y, open);
         else if (theme === 'philae') drawColumnDrum(ctx, x, y, open);
         else drawSandstone(ctx, x, y, ty % 2 === 1, open);
       } else if (c === '?') {
@@ -730,8 +913,9 @@ function tileArtId(theme: Level['data']['theme'], c: string, open: boolean): str
   const name =
     c === '?' ? 'ankh-block'
     : c === 'x' ? 'ankh-block-used'
-    : c === '=' ? (theme === 'abuSimbel' ? 'sand' : theme === 'philae' ? 'granite' : 'paving')
-    : theme === 'abuSimbel' ? 'cliff' : theme === 'philae' ? 'column-drum' : 'sandstone';
+    : c === '=' ? (theme === 'capBlanc' ? 'limestone' : theme === 'abuSimbel' ? 'sand' : theme === 'philae' ? 'granite' : 'paving')
+    : c === '%' && theme === 'capBlanc' ? 'sediment'
+    : theme === 'capBlanc' ? 'rock' : theme === 'abuSimbel' ? 'cliff' : theme === 'philae' ? 'column-drum' : 'sandstone';
   if (c === '?' || c === 'x') return name;
   return open ? `tile-${name}-top` : `tile-${name}`;
 }
@@ -749,6 +933,59 @@ function drawSand(ctx: CanvasRenderingContext2D, level: Level, tx: number, ty: n
     ctx.fillRect(x, y, TILE, 2);
     ctx.fillStyle = COLORS.sandLine;
     ctx.fillRect(x, y + 2, TILE, 1);
+  }
+}
+
+/** The valley floor: pale limestone rubble under a skin of turf. */
+function drawMeadowPath(ctx: CanvasRenderingContext2D, tx: number, ty: number, x: number, y: number, open: boolean): void {
+  ctx.fillStyle = COLORS.limestone;
+  ctx.fillRect(x, y, TILE, TILE);
+  const h = hash(tx, ty);
+  ctx.fillStyle = COLORS.limestoneLine;
+  ctx.fillRect(x + (h % 6), y + 5 + (h % 4), 4 + (h % 4), 1);
+  ctx.fillRect(x + 7 + ((h >> 2) % 5), y + 11 + ((h >> 3) % 3), 3 + (h % 3), 1);
+  if (h % 5 === 0) ctx.fillRect(x + ((h >> 4) % 10), y + 3, 2, 2);
+  if (open) {
+    ctx.fillStyle = COLORS.meadow;
+    ctx.fillRect(x, y, TILE, 3);
+    ctx.fillStyle = COLORS.meadowLine;
+    ctx.fillRect(x, y + 3, TILE, 1);
+    ctx.fillRect(x + (h % 7), y - 1, 1, 1);
+    ctx.fillRect(x + 9 + (h % 5), y - 1, 1, 1);
+  }
+}
+
+/** Bedrock of the shelter: the same limestone, bedded, no turf. */
+function drawBedrock(ctx: CanvasRenderingContext2D, tx: number, ty: number, x: number, y: number, open: boolean): void {
+  ctx.fillStyle = COLORS.bedrock;
+  ctx.fillRect(x, y, TILE, TILE);
+  const h = hash(tx * 3, ty * 5);
+  ctx.fillStyle = h % 4 === 0 ? COLORS.limestoneLight : COLORS.bedrockLine;
+  ctx.fillRect(x, y + 4 + (h % 4), 5 + (h % 10), 1);
+  ctx.fillStyle = COLORS.bedrockLine;
+  ctx.fillRect(x + 3 + ((h >> 3) % 7), y + 11 + ((h >> 2) % 4), 4 + (h % 8), 1);
+  if (open) {
+    ctx.fillStyle = COLORS.limestoneLight;
+    ctx.fillRect(x, y, TILE, 2);
+    ctx.fillStyle = COLORS.bedrockLine;
+    ctx.fillRect(x, y + 2, TILE, 1);
+  }
+}
+
+/** The deposit the excavators left: layered sediment, darker at the bottom. */
+function drawSediment(ctx: CanvasRenderingContext2D, tx: number, ty: number, x: number, y: number, open: boolean): void {
+  ctx.fillStyle = COLORS.sediment;
+  ctx.fillRect(x, y, TILE, TILE);
+  const h = hash(tx * 7, ty);
+  ctx.fillStyle = COLORS.sedimentLine;
+  ctx.fillRect(x, y + 6, TILE, 1);
+  ctx.fillRect(x, y + 12, TILE, 1);
+  ctx.fillStyle = COLORS.sedimentLight;
+  ctx.fillRect(x + (h % 9), y + 2 + (h % 3), 2, 1);
+  ctx.fillRect(x + 4 + ((h >> 2) % 9), y + 8 + ((h >> 3) % 3), 3, 1);
+  if (open) {
+    ctx.fillStyle = COLORS.sedimentLight;
+    ctx.fillRect(x, y, TILE, 2);
   }
 }
 
@@ -876,6 +1113,18 @@ function drawEntityBack(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): voi
         if (!paint(ctx, 'lake-stone', r.x, r.y)) ctx.drawImage(ROCK_SPRITE, r.x, r.y);
       } else if (d.skin === 'talatat') {
         for (let i = 0; i < r.w / TILE; i++) if (!paint(ctx, 'talatat', r.x + i * TILE, r.y)) ctx.drawImage(TALATAT_SPRITE, r.x + i * TILE, r.y);
+      } else if (d.skin === 'horse') {
+        // A horse of the frieze. Once it gives way you see what it was made of.
+        const sx = r.x - 4;
+        const sy = r.y - 3;
+        if (c.state === 'falling' || c.state === 'landed') {
+          const f = frameOf('horse-relief', 0, HORSE_SPRITE);
+          blit(ctx, silhouette(f, COLORS.plaster), sx, sy);
+          ctx.fillStyle = COLORS.plasterShade;
+          ctx.fillRect(sx + 8, sy + 12, 20, 1);
+          ctx.fillRect(sx + 14, sy + 7, 1, 4);
+          ctx.fillRect(sx + 26, sy + 9, 1, 3);
+        } else if (!paint(ctx, 'horse-relief', sx, sy)) ctx.drawImage(HORSE_SPRITE, sx, sy);
       } else if (d.skin === 'floor') {
         // Looks exactly like the paving around it, all the way down. That is the point.
         for (let j = 0; j < r.h / TILE; j++) {
@@ -919,6 +1168,14 @@ function drawEntityBack(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): voi
     case 'thrower': {
       const t = e as Thrower;
       if (!paint(ctx, 'baboon', t.rect.x - 1, t.rect.y - 3)) ctx.drawImage(BABOON_SPRITE, t.rect.x - 1, t.rect.y - 3);
+      break;
+    }
+    case 'pick': {
+      // The digger. Busy. Does not look up.
+      const k = e as Pick;
+      const fi = k.down ? 1 : 0;
+      const frame = DIGGER_FRAMES[fi] ?? DIGGER_FRAMES[0];
+      if (frame && !paint(ctx, 'digger', d.x, d.floorY - 28, fi)) ctx.drawImage(frame, d.x, d.floorY - 28);
       break;
     }
     default:
@@ -1060,16 +1317,23 @@ function drawExit(ctx: CanvasRenderingContext2D, e: Rect): void {
   ctx.fillRect(e.x, e.y, e.w, 2);
 }
 
-/** A lost tourist in a visibly fake pharaoh costume. Nobody will mention it. */
-export function drawPlayer(ctx: CanvasRenderingContext2D, p: Player): void {
-  blitFacing(ctx, tourist(p.animFrame()), Math.round(p.x) - 1, Math.round(p.y), p.facing);
+/** A lost tourist in a visibly wrong costume. Nobody will mention it. */
+export function drawPlayer(ctx: CanvasRenderingContext2D, p: Player, costume: Costume): void {
+  blitFacing(ctx, tourist(costume, p.animFrame()), Math.round(p.x) - 1, Math.round(p.y), p.facing);
 }
 
 const TOURIST_FRAME_INDEX = { idle: 0, walk1: 1, walk2: 2, jump: 3 } as const;
 
-/** The tourist: the painted strip `tourist` (idle, walk1, walk2, jump), or the code-drawn frames. */
-function tourist(name: keyof typeof TOURIST_FRAME_INDEX): Frame {
-  return frameOf('tourist', TOURIST_FRAME_INDEX[name], TOURIST_FRAMES[name]);
+/** Art ids and code-drawn frames per costume. The hiker is chapter 1; the pharaoh is chapter 2. */
+const COSTUMES: Record<Costume, { id: string; frames: typeof TOURIST_FRAMES; seated: HTMLCanvasElement }> = {
+  hiker: { id: 'hiker', frames: HIKER_FRAMES, seated: HIKER_SEATED },
+  pharaoh: { id: 'tourist', frames: TOURIST_FRAMES, seated: TOURIST_SEATED },
+};
+
+/** The tourist: the painted strip (idle, walk1, walk2, jump) for the costume, or the code-drawn frames. */
+export function tourist(costume: Costume, name: keyof typeof TOURIST_FRAME_INDEX): Frame {
+  const c = COSTUMES[costume];
+  return frameOf(c.id, TOURIST_FRAME_INDEX[name], c.frames[name]);
 }
 
 function waterSurfaceAt(s: Scene, x: number): number | null {
@@ -1090,8 +1354,10 @@ function drawDeath(ctx: CanvasRenderingContext2D, s: Scene, death: { cause: Deat
   const x = Math.round(p.x) - 1;
   const y = Math.round(p.y);
   const t = death.t;
-  const idle = tourist('idle');
-  const dead = frameOf('tourist-dead', 0, TOURIST_FRAMES.dead);
+  const costume = s.level.data.costume;
+  const c = COSTUMES[costume];
+  const idle = tourist(costume, 'idle');
+  const dead = frameOf(`${c.id}-dead`, 0, c.frames.dead);
   const feetY = y + 16;
   const midX = x + 6;
 
@@ -1156,10 +1422,20 @@ function drawDeath(ctx: CanvasRenderingContext2D, s: Scene, death: { cause: Deat
     }
     case 'gone':
       break;
-    case 'sit':
-      const seated = frameOf('tourist-seated', 0, TOURIST_SEATED);
+    case 'flat': {
+      // Already down. Lies where it landed, the way the plank ends, with no fall to draw.
+      ctx.save();
+      ctx.translate(p.facing === 1 ? x + 2 : x + 10, feetY);
+      ctx.rotate(p.facing === 1 ? -Math.PI / 2 : Math.PI / 2);
+      blitFacing(ctx, dead, p.facing === 1 ? -2 : -10, -16, p.facing);
+      ctx.restore();
+      break;
+    }
+    case 'sit': {
+      const seated = frameOf(`${c.id}-seated`, 0, c.seated);
       blitFacing(ctx, seated, x, feetY - seated.h, p.facing);
       break;
+    }
   }
 }
 

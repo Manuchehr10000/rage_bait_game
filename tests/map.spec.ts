@@ -48,15 +48,30 @@ test.beforeEach(async ({ page }) => {
   expect(errors).toEqual([]);
 });
 
-test('the map opens on chapter 1, which is closed', async ({ page }) => {
+test('the map opens on chapter 1; Enter opens it on Cap Blanc', async ({ page }) => {
   let s = await snap(page);
   expect(s.screen).toBe('map');
   expect(s.view).toBe('world');
   expect(s.chapter).toBe(0);
   await press(page, 'Enter');
   s = await snap(page);
-  expect(s.view).toBe('world');
+  expect(s.view).toBe('chapter');
   expect(s.chapter).toBe(0);
+  expect(s.site).toBe(0);
+  await press(page, 'Enter');
+  s = await snap(page);
+  expect(s.screen).toBe('level');
+  expect(s.level).toBe('cap-blanc');
+});
+
+test('a closed chapter stays closed', async ({ page }) => {
+  await press(page, 'ArrowLeft');
+  let s = await snap(page);
+  expect(s.chapter).toBe(11);
+  await press(page, 'Enter');
+  s = await snap(page);
+  expect(s.view).toBe('world');
+  expect(s.chapter).toBe(11);
 });
 
 test('arrow keys walk the chapters; Enter falls into Egypt; Escape comes back', async ({ page }) => {

@@ -88,6 +88,7 @@ export const KARNAK: LevelData = {
   id: 'karnak',
   name: 'Karnak',
   theme: 'karnak',
+  costume: 'pharaoh',
   widthTiles: W,
   heightTiles: H,
   rows: g.rows(),

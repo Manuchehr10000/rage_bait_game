@@ -11,8 +11,8 @@ import { paint } from '../engine/assets';
 import type { Input } from '../engine/input';
 import type { Progress } from '../engine/progress';
 import { VIEW_H, VIEW_W } from '../engine/types';
-import { blitFacing, frameOf } from '../render/frame';
-import { TOURIST_FRAMES } from '../render/procedural';
+import { blitFacing } from '../render/frame';
+import { tourist } from '../render/scene';
 import { CHAPTERS, chapterOpen, type Chapter } from './atlas';
 import { LAND, RIVERS } from './geo';
 
@@ -322,8 +322,9 @@ export class MapScreen {
     this.drawTourist(ctx, this.sitePin(this.site));
   }
 
+  /** The tourist, dressed for the chapter under the cursor. Chapters not yet designed get the hiker. */
   private drawTourist(ctx: CanvasRenderingContext2D, at: { x: number; y: number }): void {
-    const f = frameOf('tourist', 0, TOURIST_FRAMES.idle);
+    const f = tourist(this.current.costume ?? 'hiker', 'idle');
     const bob = Math.round(Math.sin(this.t * 3) * 1);
     blitFacing(ctx, f, at.x - 6, at.y - 22 + bob, 1);
   }
