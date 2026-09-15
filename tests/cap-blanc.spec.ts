@@ -32,8 +32,8 @@ const DRIVER = `
   const cracker = horses[5];
   const shy = horses[6];
   const rearer = horses[7];
-  const stoner = horses[8];
-  const splitter = horses[9];
+  const splitter = horses[8];
+  const stoner = horses[9];
   const pick = E.find((e) => e.def.kind === 'pick');
   const stream = E.find((e) => e.def.kind === 'water');
   const streamX = stream.def.x0;
@@ -213,7 +213,7 @@ test('the eighth horse comes up and throws you back into the trench', async ({ p
   expect(r.cause).toBe('The trench');
 });
 
-test('the ninth horse brings the overhang down on anyone who waits', async ({ page }) => {
+test('the tenth horse brings the overhang down on anyone who waits', async ({ page }) => {
   const r = await play(page, `
     standOn(stoner);
     const step = () => { key('ArrowRight', false); if (stoner.stoneShown) phase = 'falling'; };`, 60 * 6);
@@ -221,7 +221,7 @@ test('the ninth horse brings the overhang down on anyone who waits', async ({ pa
   expect(r.cause).toBe('The roof');
 });
 
-test('the tenth horse breaks in the middle and drops you', async ({ page }) => {
+test('the ninth horse breaks in the middle and drops you', async ({ page }) => {
   const r = await play(page, `
     standOn(splitter);
     const step = () => { key('ArrowRight', false); if (splitter.broken > 0) phase = 'broken'; };`, 60 * 8);

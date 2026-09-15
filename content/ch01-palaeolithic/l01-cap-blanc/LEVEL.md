@@ -29,7 +29,7 @@ the ruined castle of **Commarque**.
 | a | `a-valley` | A meadow, the Beune, the wooded slope and Commarque opposite | The valley as it is; the stream is a metre deep and cold |
 | b | `b-shelter` | The wall with its door; through it, he switches the headlamp on; the lit floor | The protective wall and door, the modern lighting |
 | c | `c-frieze` | Five horses under museum lamps; their backs are the floor. The third is plaster and goes if you stand about on it; the fifth walks out from under you | Ten is the count of horses on the frieze; the backs are relief deep enough to stand on in the game's scale; none is plaster, and none has ever moved |
-| d | `d-dark` | The lamps end, and not one of the last five is honest. The sixth holds for six seconds and is the only place to stand. The seventh jumps when you jump at it from the sixth, once, then comes back down to stay. The eighth comes up and throws you back. The ninth brings a block of the overhang down on anyone who waits a second. The tenth breaks in the middle | The far end of the frieze is less well lit for a visitor; the darkness is the level's. Roof fall is the one true thing here: shelters are made and unmade by the overhang letting go, and the Magdalenian layers at Cap Blanc were sealed under it |
+| d | `d-dark` | The lamps end, and not one of the last five is honest. The sixth holds for six seconds and is the only place to stand. The seventh jumps when you jump at it from the sixth, once, then comes back down to stay. The eighth comes up and throws you back. The ninth breaks in the middle. The tenth brings a block of the overhang down on anyone who waits a second on the last step | The far end of the frieze is less well lit for a visitor; the darkness is the level's. Roof fall is the one true thing here: shelters are made and unmade by the overhang letting go, and the Magdalenian layers at Cap Blanc were sealed under it |
 | e | `e-dig` | A workman with a pick, working the deposit on a cycle; the swing is the last trap | The 1909 discovery, by pick, into the deposit. He is not still there |
 | f | `f-exit` | The far floor and the way out | The visitor leaves by the same door; the game lets you leave at the far end |
 
@@ -61,7 +61,7 @@ let it settle. Six seconds is enough to do that twice and not much more.
   the far end in place.
 - **Roof fall**: blocks off the overhang are in the deposit of every shelter, and at Cap
   Blanc the sculpted frieze was buried under such a deposit until 1909. A block of it is
-  the ninth horse's answer to anyone who waits.
+  the tenth horse's answer to anyone who waits on the last step of the crossing.
 - **Commarque** across the valley: a tall square keep on a spur, the curtain wall and
   the roofless chapel below it. It is 12th to 14th century and has nothing to do with
   the frieze, which is the point of drawing it.
@@ -69,10 +69,10 @@ let it settle. Six seconds is enough to do that twice and not much more.
 ## Deliberate lies
 
 - The third horse is plaster. No horse of the frieze is a cast.
-- The fifth walks, the sixth collapses, the seventh jumps, the eighth rears and the tenth
+- The fifth walks, the sixth collapses, the seventh jumps, the eighth rears and the ninth
   breaks in two. They are carved in high relief into a limestone wall and have not moved
   since the Magdalenian.
-- The ninth brings a block of the overhang down on cue. Roof fall is real and is what
+- The tenth brings a block of the overhang down on cue. Roof fall is real and is what
   seals the archaeology of every shelter; it does not wait for a visitor to stand still.
 - The floor of the trench kills. It is a metre and a half down.
 - The digger is still there, on a cycle, and his pick is deadly. The 1909 workman was

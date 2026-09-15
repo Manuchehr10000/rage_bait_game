@@ -21,9 +21,9 @@ import { TILE, type DeathCause } from '../../engine/types';
  *             the last five is honest. The sixth holds for six seconds and is the
  *             only place to stand; the seventh jumps when you jump at it from the
  *             sixth, once, and comes back down to stay; the eighth comes up and
- *             throws you back; the ninth brings a block of the overhang down on
- *             anyone who waits a second; the tenth breaks in the middle, one step
- *             from the far floor.
+ *             throws you back; the ninth breaks in the middle; the tenth brings a
+ *             block of the overhang down on anyone who waits a second on the last
+ *             step before the far floor.
  *  69..73   the far floor, and the digger's lamp
  *  74..     the deposit the excavation left; the pick works its edge
  *  81       exit
@@ -65,8 +65,8 @@ const HORSES: { x: number; trick: HorseTrick }[] = [
   { x: 788, trick: 'crack' }, // holds for six seconds. The only place to stand in the dark
   { x: 848, trick: 'shy' }, // jumps when you jump at it from the sixth, once, then stays
   { x: 920, trick: 'rear' }, // comes up on its front legs and throws you back
-  { x: 988, trick: 'stone' }, // stand on it for one second and the overhang lets go
-  { x: 1052, trick: 'split' }, // breaks in the middle, at the last step of the crossing
+  { x: 988, trick: 'split' }, // breaks in the middle
+  { x: 1052, trick: 'stone' }, // the last step: stand on it for a second and the overhang lets go
 ];
 /** How long you may stand on one before it decides. Crossing at a run takes 0.31 s. */
 const DELAY: Record<HorseTrick, number> = { none: 0, cast: 0.45, crack: 6, walk: 0.12, shy: 0, rear: 0.5, stone: 1, split: 0.5 };
