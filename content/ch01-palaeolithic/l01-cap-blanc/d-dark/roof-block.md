@@ -16,7 +16,7 @@ one **weathered** face that used to be the ceiling. 24 × 18.
 ## Where it stands in the game
 
 Beat d, over the ninth horse. It starts just under the overhang and comes down on anyone
-who has stood on that horse for two seconds. It lands on the horse's back and stays there.
+who has stood on that horse for a second. It lands on the horse's back and stays there.
 
 ## Must be right
 

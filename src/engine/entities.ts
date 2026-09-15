@@ -446,8 +446,6 @@ const HORSE = {
   /** Forward, in px per second, and how far it goes. Far enough to leave nobody standing. */
   walkSpeed: 80,
   walkDistance: 32,
-  /** How near, and how far up, a jump has to be for the shy one to take it personally. */
-  shyRange: 72,
   /** Its own hop: slow gravity and a lazy push, so it is away longer than you are. */
   shyPush: 160,
   shyGravity: 260,
@@ -519,11 +517,15 @@ export class Horse implements Entity {
     return this.def.trick === 'stone' && this.state !== 'idle' && this.state !== 'armed';
   }
 
-  /** A jump aimed at this one, from the ledge behind it. */
+  /**
+   * A jump made from the ledge behind it, which is the only thing it minds.
+   * Entities update before the player, so this is last frame's jump; nobody will notice.
+   */
   private jumpedAt(p: Player): boolean {
-    if (p.onGround || p.vy >= 0) return false;
-    const cx = centerX(p);
-    return cx < this.rect.x && this.rect.x - cx <= HORSE.shyRange;
+    const from = this.def.wakeFrom;
+    if (!from || !p.justJumped) return false;
+    const feet = p.y + p.h;
+    return p.x + p.w > from.x && p.x < from.x + from.w && feet <= from.y + 6 && feet >= from.y - 28;
   }
 
   /** How far it has dropped from where it was carved. */

@@ -135,7 +135,7 @@ export type HorseTrick =
   | 'crack'
   /** It walks forward out from under you. It carries nobody: smooth stone. */
   | 'walk'
-  /** Jump towards it and it jumps too, once, and comes back down to stay. */
+  /** Jump at it from the horse before it and it jumps too, once, then comes back to stay. */
   | 'shy'
   /** The front comes up and the back throws you back the way you came. */
   | 'rear'
@@ -155,6 +155,8 @@ export interface HorseDef {
   floorY: number;
   /** Where the block of the roof starts, for `stone`. */
   stoneFrom?: number;
+  /** The ledge a jump must start from to wake it, for `shy`. */
+  wakeFrom?: Rect;
   /** What this one kills you with, if it kills you. */
   cause: DeathCause;
 }

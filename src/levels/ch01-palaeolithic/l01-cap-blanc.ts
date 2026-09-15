@@ -18,11 +18,12 @@ import { TILE, type DeathCause } from '../../engine/types';
  *             All ten are the same sprite. Three hold, and all three are in the
  *             light: the third is a cast that gives way if you stand about on it,
  *             the fifth walks out from under you. Then the lamps stop, and none of
- *             the last five is honest. The sixth holds for a slow ten seconds and
- *             is the only place to stand; the seventh jumps when you jump at it,
- *             once, and comes back down to stay; the eighth comes up and throws
- *             you back; the ninth brings a block of the overhang down on anyone
- *             who waits; the tenth breaks in the middle, one step from the floor.
+ *             the last five is honest. The sixth holds for six seconds and is the
+ *             only place to stand; the seventh jumps when you jump at it from the
+ *             sixth, once, and comes back down to stay; the eighth comes up and
+ *             throws you back; the ninth brings a block of the overhang down on
+ *             anyone who waits a second; the tenth breaks in the middle, one step
+ *             from the far floor.
  *  69..73   the far floor, and the digger's lamp
  *  74..     the deposit the excavation left; the pick works its edge
  *  81       exit
@@ -61,16 +62,18 @@ const HORSES: { x: number; trick: HorseTrick }[] = [
   { x: 576, trick: 'cast' }, // plaster, and lit: stand about on it and it goes
   { x: 644, trick: 'none' },
   { x: 712, trick: 'walk' }, // walks forward out from under you, still in the light
-  { x: 788, trick: 'crack' }, // holds for ten seconds. The only place to stand in the dark
-  { x: 848, trick: 'shy' }, // jumps when you jump at it, once, then comes back and stays
+  { x: 788, trick: 'crack' }, // holds for six seconds. The only place to stand in the dark
+  { x: 848, trick: 'shy' }, // jumps when you jump at it from the sixth, once, then stays
   { x: 920, trick: 'rear' }, // comes up on its front legs and throws you back
-  { x: 988, trick: 'stone' }, // stand on it for two seconds and the overhang lets go
+  { x: 988, trick: 'stone' }, // stand on it for one second and the overhang lets go
   { x: 1052, trick: 'split' }, // breaks in the middle, at the last step of the crossing
 ];
 /** How long you may stand on one before it decides. Crossing at a run takes 0.31 s. */
-const DELAY: Record<HorseTrick, number> = { none: 0, cast: 0.45, crack: 10, walk: 0.12, shy: 0, rear: 0.5, stone: 2, split: 0.5 };
+const DELAY: Record<HorseTrick, number> = { none: 0, cast: 0.45, crack: 6, walk: 0.12, shy: 0, rear: 0.5, stone: 1, split: 0.5 };
 /** What each one kills you with, when it does. */
 const CAUSE: Partial<Record<HorseTrick, DeathCause>> = { cast: 'The cast', stone: 'The roof' };
+/** The back of one horse: the 28 px of ledge you stand on. */
+const ledge = (i: number) => ({ x: (HORSES[i]?.x ?? 0) + 4, y: LEDGE_Y, w: 28, h: 6 });
 const LIT = 5;
 
 const DIGGER_X = DEPOSIT_X - 2;
@@ -108,13 +111,15 @@ export const CAP_BLANC: LevelData = {
     // The stream in the valley. A metre deep.
     { kind: 'water', x0: px(9), x1: px(11), startY: px(GROUND) + 6, cause: 'The Beune' },
     // Ten horses. Three hold, all of them in the light. The other seven look the same.
-    ...HORSES.map((h) => ({
+    ...HORSES.map((h, i) => ({
       kind: 'horse' as const,
-      rect: { x: h.x + 4, y: LEDGE_Y, w: 28, h: 6 },
+      rect: ledge(i),
       trick: h.trick,
       delay: DELAY[h.trick],
       floorY: TRENCH_FLOOR,
       stoneFrom: CEILING + 4,
+      // The shy one takes offence at one thing only: a jump made from the horse before it.
+      wakeFrom: h.trick === 'shy' ? ledge(i - 1) : undefined,
       cause: CAUSE[h.trick] ?? ('The trench' as const),
     })),
     // The floor of the trench.

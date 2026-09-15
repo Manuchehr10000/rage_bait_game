@@ -142,19 +142,33 @@ test('the fifth horse walks out from under anyone who stands still', async ({ pa
   expect(r.cause).toBe('The trench');
 });
 
-test('the sixth horse holds for ten seconds, and then does not', async ({ page }) => {
+test('the sixth horse holds for six seconds, and then does not', async ({ page }) => {
   const patient = await play(page, `
     standOn(cracker);
-    const step = () => key('ArrowRight', false);`, 60 * 9);
+    const step = () => key('ArrowRight', false);`, 60 * 5);
   expect(patient.state).toBe('playing');
   expect(patient.y).toBe(208);
   const late = await play(page, `
     standOn(cracker);
-    const step = () => key('ArrowRight', false);`, 60 * 13);
+    const step = () => key('ArrowRight', false);`, 60 * 9);
   expect(late.cause).toBe('The trench');
 });
 
-test('the seventh horse jumps when you jump at it, and only once', async ({ page }) => {
+test('the seventh horse ignores a jump made from anywhere but the sixth', async ({ page }) => {
+  // Standing on the seventh itself and jumping about: it is not interested.
+  const onIt = await play(page, `
+    standOn(shy);
+    const step = () => { key('ArrowRight', false); if (canJump()) jump(10); if (shy.state !== 'idle') phase = 'woke'; };`, 60 * 5);
+  expect(onIt.phase).toBe('valley');
+  expect(onIt.state).toBe('playing');
+  // And a jump from the horse before the sixth is too far back to count.
+  const early = await play(page, `
+    standOn(walker);
+    const step = () => { key('ArrowRight', false); if (canJump()) jump(10); if (shy.state !== 'idle') phase = 'woke'; };`, 60 * 4);
+  expect(early.phase).toBe('valley');
+});
+
+test('the seventh horse jumps when you jump at it from the sixth, and only once', async ({ page }) => {
   const chased = await play(page, `
     standOn(cracker);
     const step = () => {
