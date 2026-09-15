@@ -1,10 +1,11 @@
+import { loadArt } from './engine/assets';
 import { Game } from './game';
 
 const canvas = document.getElementById('game');
 if (!(canvas instanceof HTMLCanvasElement)) throw new Error('canvas#game missing');
 
 const game = new Game(canvas);
-game.start();
+loadArt().then(() => game.start());
 
 const stamp = document.getElementById('stamp');
 if (stamp) stamp.textContent = __COMMIT__ ? `${__BUILD_ENV__} · ${__COMMIT__}` : __BUILD_ENV__;

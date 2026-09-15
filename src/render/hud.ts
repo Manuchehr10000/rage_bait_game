@@ -1,6 +1,6 @@
-import type { DeathCause } from './types';
-import { VIEW_H, VIEW_W } from './types';
-import type { WorldText } from './render';
+import type { DeathCause } from '../engine/types';
+import { VIEW_H, VIEW_W } from '../engine/types';
+import type { WorldText } from './scene';
 
 export interface Stats {
   total: number;

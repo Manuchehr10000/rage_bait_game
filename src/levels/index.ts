@@ -1,7 +1,7 @@
-import type { LevelData } from '../level';
-import { ABU_SIMBEL } from './abu-simbel';
-import { KARNAK } from './karnak';
-import { PHILAE } from './philae';
+import type { LevelData } from '../engine/level';
+import { ABU_SIMBEL } from './ch01-egypt/l01-abu-simbel';
+import { KARNAK } from './ch01-egypt/l03-karnak';
+import { PHILAE } from './ch01-egypt/l02-philae';
 
 /** Chapter 1, south to north along the Nile. */
 export const LEVELS: LevelData[] = [ABU_SIMBEL, PHILAE, KARNAK];

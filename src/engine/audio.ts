@@ -29,7 +29,7 @@ export type Sfx =
   | 'winchStart'
   | 'motorStart';
 
-const MUTE_KEY = 'ragebait.muted';
+const MUTE_KEY = 'lostTourist.muted';
 
 interface Loop {
   gain: GainNode;

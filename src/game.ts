@@ -1,19 +1,19 @@
-import { GameAudio } from './audio';
-import { Camera } from './camera';
-import { createEntity, type Entity, type Platform, type Sweep, type Water, type World } from './entities';
-import type { Stats } from './hud';
-import { renderHud } from './hud';
-import { Input } from './input';
-import { Level, type LevelData } from './level';
+import { GameAudio } from './engine/audio';
+import { Camera } from './engine/camera';
+import { createEntity, type Entity, type Platform, type Sweep, type Water, type World } from './engine/entities';
+import type { Stats } from './render/hud';
+import { renderHud } from './render/hud';
+import { Input } from './engine/input';
+import { Level, type LevelData } from './engine/level';
 import { LEVELS, levelIndexFromHash } from './levels/index';
-import { Player, type MovingSolid } from './player';
-import { renderWorld, type Scene, type WorldText } from './render';
-import { DEATH_SOUND, DT, overlaps, TILE, VIEW_H, VIEW_W, type DeathCause } from './types';
+import { Player, type MovingSolid } from './engine/player';
+import { renderWorld, type Scene, type WorldText } from './render/scene';
+import { ART_SCALE, DEATH_SOUND, DT, overlaps, TILE, VIEW_H, VIEW_W, type DeathCause } from './engine/types';
 
 /** How long a death plays before the reset. The world keeps moving through it. */
 const DEATH_TIME = 0.75;
 const TITLE_TIME = 2.2;
-const LIFETIME_KEY = 'ragebait.lifetimeDeaths';
+const LIFETIME_KEY = 'lostTourist.lifetimeDeaths';
 
 type State = 'playing' | 'dead' | 'complete';
 
@@ -51,10 +51,13 @@ export class Game {
     if (!ctx) throw new Error('2d context unavailable');
     this.ctx = ctx;
     this.world = document.createElement('canvas');
-    this.world.width = VIEW_W;
-    this.world.height = VIEW_H;
+    this.world.width = VIEW_W * ART_SCALE;
+    this.world.height = VIEW_H * ART_SCALE;
     const wctx = this.world.getContext('2d');
     if (!wctx) throw new Error('2d context unavailable');
+    // Everything draws in world units; painted art at ART_SCALE lands pixel for pixel.
+    wctx.scale(ART_SCALE, ART_SCALE);
+    wctx.imageSmoothingEnabled = false;
     this.wctx = wctx;
 
     this.input = new Input(window);
@@ -83,7 +86,8 @@ export class Game {
     this.scale = s;
     this.canvas.width = VIEW_W * s;
     this.canvas.height = VIEW_H * s;
-    this.ctx.imageSmoothingEnabled = false;
+    // The world canvas is ART_SCALE times the view; at any other window scale it is resampled.
+    this.ctx.imageSmoothingEnabled = s !== ART_SCALE;
   }
 
   /** Enter a level fresh: new stats, the title card, first attempt. */
@@ -269,7 +273,6 @@ export class Game {
     };
     renderWorld(this.wctx, scene);
 
-    this.ctx.imageSmoothingEnabled = false;
     this.ctx.drawImage(this.world, 0, 0, this.canvas.width, this.canvas.height);
     renderHud(this.ctx, this.scale, {
       stats: this.stats,

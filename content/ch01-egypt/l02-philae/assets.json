@@ -1,0 +1,83 @@
+{
+  "$comment": "Sizes are world pixels (320 x 180 view). Painted files are 4x. See content/README.md.",
+  "level": "l02-philae",
+  "assets": [
+    {
+      "id": "tile-granite",
+      "w": 16,
+      "h": 16,
+      "beat": "a-arrival",
+      "what": "Grey Aswan granite bedrock, no surface."
+    },
+    {
+      "id": "tile-granite-top",
+      "w": 16,
+      "h": 16,
+      "beat": "a-arrival",
+      "what": "Granite with the surface on top."
+    },
+    {
+      "id": "felucca-hull",
+      "w": 65,
+      "h": 14,
+      "beat": "a-arrival",
+      "what": "The hull of a Nile felucca, side on, moving right."
+    },
+    {
+      "id": "felucca-sail",
+      "w": 40,
+      "h": 44,
+      "beat": "a-arrival",
+      "what": "The lateen sail and mast of the same boat."
+    },
+    {
+      "id": "river-rock",
+      "w": 24,
+      "h": 8,
+      "beat": "b-crocodile",
+      "what": "A rock just breaking the surface of the river."
+    },
+    {
+      "id": "crocodile",
+      "w": 32,
+      "h": 10,
+      "beat": "b-crocodile",
+      "what": "A Nile crocodile's back, the moment it moves."
+    },
+    {
+      "id": "isis-relief",
+      "w": 12,
+      "h": 24,
+      "beat": "c-reliefs",
+      "what": "A figure in sunk relief on the bank wall, in the stone."
+    },
+    {
+      "id": "isis-relief-out",
+      "w": 12,
+      "h": 24,
+      "beat": "c-reliefs",
+      "what": "The same figure stepped out of the wall."
+    },
+    {
+      "id": "kiosk-capital",
+      "w": 32,
+      "h": 8,
+      "beat": "e-kiosk",
+      "what": "The top of one column of Trajan's Kiosk: composite capital under its abacus block."
+    },
+    {
+      "id": "tile-column-drum",
+      "w": 16,
+      "h": 16,
+      "beat": "e-kiosk",
+      "what": "A column drum, no top."
+    },
+    {
+      "id": "tile-column-drum-top",
+      "w": 16,
+      "h": 16,
+      "beat": "e-kiosk",
+      "what": "A column drum with the top of the shaft."
+    }
+  ]
+}

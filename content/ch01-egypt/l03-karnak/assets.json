@@ -1,0 +1,84 @@
+{
+  "$comment": "Sizes are world pixels (320 x 180 view). Painted files are 4x. See content/README.md.",
+  "level": "l03-karnak",
+  "assets": [
+    {
+      "id": "tile-paving",
+      "w": 16,
+      "h": 16,
+      "beat": "a-cachette",
+      "what": "Sandstone paving of the courts, no surface."
+    },
+    {
+      "id": "tile-paving-top",
+      "w": 16,
+      "h": 16,
+      "beat": "a-cachette",
+      "what": "Paving slabs with the walking surface."
+    },
+    {
+      "id": "criosphinx",
+      "w": 32,
+      "h": 20,
+      "beat": "b-sphinxes",
+      "what": "A ram-headed sphinx on its plinth, facing the avenue."
+    },
+    {
+      "id": "criosphinx-turned",
+      "w": 32,
+      "h": 20,
+      "beat": "b-sphinxes",
+      "what": "The same sphinx with its head turned to butt you."
+    },
+    {
+      "id": "talatat",
+      "w": 16,
+      "h": 16,
+      "beat": "c-pylon",
+      "what": "One talatat block from Akhenaten's temples, reused as fill."
+    },
+    {
+      "id": "tile-sandstone",
+      "w": 16,
+      "h": 16,
+      "beat": "c-pylon",
+      "what": "Coursed sandstone of the pylon, no surface."
+    },
+    {
+      "id": "tile-sandstone-top",
+      "w": 16,
+      "h": 16,
+      "beat": "c-pylon",
+      "what": "Sandstone with a top course."
+    },
+    {
+      "id": "scarab",
+      "w": 40,
+      "h": 14,
+      "beat": "d-court",
+      "what": "The great scarab of Amenhotep III, walking. Two frames.",
+      "frames": 2
+    },
+    {
+      "id": "papyrus-capital",
+      "w": 32,
+      "h": 8,
+      "beat": "e-hypostyle",
+      "what": "The top of a Hypostyle Hall column: papyrus capital under its abacus."
+    },
+    {
+      "id": "obelisk",
+      "w": 16,
+      "h": 96,
+      "beat": "f-obelisk",
+      "what": "Hatshepsut's obelisk, pink granite, standing."
+    },
+    {
+      "id": "lake-stone",
+      "w": 24,
+      "h": 8,
+      "beat": "g-lake",
+      "what": "A stepping stone in the sacred lake."
+    }
+  ]
+}

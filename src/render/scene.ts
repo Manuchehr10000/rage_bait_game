@@ -1,7 +1,7 @@
-import type { Camera } from './camera';
-import type { Chaser, Crumble, Entity, Falling, Platform, Pusher, Sweep, Thrower, Tipper, Water } from './entities';
-import type { DecorDef, Level } from './level';
-import type { Player } from './player';
+import type { Camera } from '../engine/camera';
+import type { Chaser, Crumble, Entity, Falling, Platform, Pusher, Sweep, Thrower, Tipper, Water } from '../engine/entities';
+import type { DecorDef, Level } from '../engine/level';
+import type { Player } from '../engine/player';
 import {
   BABOON_SPRITE,
   BOAT_SPRITE,
@@ -19,14 +19,15 @@ import {
   ROCK_SPRITE,
   SAIL_SPRITE,
   SCARAB_FRAMES,
-  silhouette,
   SPHINX_SPRITE,
   SPHINX_TURNED_SPRITE,
   TALATAT_SPRITE,
   TOURIST_FRAMES,
   TOURIST_SEATED,
-} from './sprites';
-import { DEATH_ANIM, TILE, VIEW_H, VIEW_W, type DeathCause, type Rect } from './types';
+} from './procedural';
+import { DEATH_ANIM, TILE, VIEW_H, VIEW_W, type DeathCause, type Rect } from '../engine/types';
+import { paint } from '../engine/assets';
+import { blit, blitFacing, frameOf, silhouette, type Frame } from './frame';
 
 /** Text drawn in screen space after scaling so it stays crisp. World coordinates. */
 export interface WorldText {
@@ -377,6 +378,7 @@ function drawDecor(ctx: CanvasRenderingContext2D, s: Scene, d: DecorDef): void {
       // sit in a recess below it. Over the door, Ra-Horakhty in his niche.
       const top = 4 * TILE;
       const batter = 16;
+      if (paint(ctx, 'abu-simbel-facade', d.x - 6, top - 8)) break;
       drawFacadeWall(ctx, d.x, top, d.w, groundY, batter);
       drawCornice(ctx, d.x + batter - 4, top, d.w - batter + 8);
       // Door: tall, narrow, with its own small cornice.
@@ -393,15 +395,15 @@ function drawDecor(ctx: CanvasRenderingContext2D, s: Scene, d: DecorDef): void {
       ctx.fillRect(d.doorX - 1, groundY - 102, 18, 2);
       ctx.fillRect(d.doorX - 1, groundY - 100, 2, 26);
       ctx.fillRect(d.doorX + 15, groundY - 100, 2, 26);
-      ctx.drawImage(RA_NICHE_SPRITE, d.doorX + 3, groundY - 98);
+      if (!paint(ctx, 'ra-horakhty-niche', d.doorX + 3, groundY - 98)) ctx.drawImage(RA_NICHE_SPRITE, d.doorX + 3, groundY - 98);
       break;
     }
     case 'colossus': {
       const x = d.tx * TILE;
       if (d.broken) {
-        ctx.drawImage(COLOSSUS.broken, x, groundY - 112);
-        ctx.drawImage(COLOSSUS.pieces, x - 6, groundY - 14);
-      } else {
+        if (!paint(ctx, 'colossus-broken', x, groundY - 112)) ctx.drawImage(COLOSSUS.broken, x, groundY - 112);
+        if (!paint(ctx, 'colossus-fallen', x - 6, groundY - 14)) ctx.drawImage(COLOSSUS.pieces, x - 6, groundY - 14);
+      } else if (!paint(ctx, 'colossus-seated', x, groundY - 112)) {
         ctx.drawImage(COLOSSUS.body, x, groundY - 112);
       }
       break;
@@ -409,6 +411,7 @@ function drawDecor(ctx: CanvasRenderingContext2D, s: Scene, d: DecorDef): void {
     case 'frieze': {
       // The terrace wall under the baboons, with its own cornice.
       const f = d.rect;
+      if (paint(ctx, 'abu-simbel-terrace-wall', f.x - 14, f.y + f.h - 8)) break;
       drawFacadeWall(ctx, f.x - 8, f.y + f.h, f.w + 16, groundY, 0);
       drawCornice(ctx, f.x - 8, f.y + f.h, f.w + 16);
       break;
@@ -419,36 +422,18 @@ function drawDecor(ctx: CanvasRenderingContext2D, s: Scene, d: DecorDef): void {
       break;
     case 'sanctuary': {
       const c = d.corridor;
-      ctx.fillStyle = COLORS.wall;
-      ctx.fillRect(c.x, c.y, c.w, c.h);
-      // The Battle of Kadesh, in two registers of sunk relief: chariots above, the
-      // king's army below. At this size, marks. That is what most of it is now.
-      ctx.fillStyle = COLORS.pilaster;
-      ctx.fillRect(c.x, c.y + 20, c.w, 1);
-      ctx.fillRect(c.x, c.y + 42, c.w, 1);
-      for (let x = c.x + 4; x < c.x + c.w - 4; x += 5) {
-        const h = hash(x, 7);
-        ctx.fillStyle = h % 3 === 0 ? COLORS.pilaster : COLORS.wallLine;
-        ctx.fillRect(x + (h % 2), c.y + 8 + (h % 4), 2, 6 + (h % 3)); // a figure
-        ctx.fillRect(x, c.y + 7 + (h % 4), 3, 1); // its head
-        ctx.fillRect(x + ((h >> 2) % 2), c.y + 28 + ((h >> 3) % 5), 2, 5);
-      }
-      // Osiride pillars: the king as Osiris, eight of them down the hall.
-      for (let x = c.x + 14; x < c.x + c.w - 12; x += 48) ctx.drawImage(OSIRIDE_SPRITE, x, c.y + c.h - 60);
-      ctx.fillStyle = COLORS.wallLine;
-      ctx.fillRect(c.x, c.y + c.h - 1, c.w, 1);
       const a = d.niche;
-      ctx.fillStyle = COLORS.niche;
-      ctx.fillRect(a.x, a.y, a.w, a.h);
-      ctx.fillStyle = COLORS.wallLine;
-      ctx.fillRect(a.x - 2, a.y, 2, a.h);
-      ctx.fillRect(a.x + a.w, a.y, 2, a.h);
-      ctx.drawImage(GOD_SPRITES.ptah, a.x + 8, a.y + a.h - 40);
+      if (!paint(ctx, 'abu-simbel-hall', c.x, c.y)) drawHallWall(ctx, c, a);
+      if (!paint(ctx, 'god-ptah', a.x + 8, a.y + a.h - 40)) ctx.drawImage(GOD_SPRITES.ptah, a.x + 8, a.y + a.h - 40);
       // Left to right as in the real sanctuary: Ptah, Amun-Ra, Ramesses, Ra-Horakhty.
-      const gods = [GOD_SPRITES.amun, GOD_SPRITES.ramesses, GOD_SPRITES.raHorakhty];
+      const gods: [string, HTMLCanvasElement][] = [
+        ['god-amun', GOD_SPRITES.amun],
+        ['god-ramesses', GOD_SPRITES.ramesses],
+        ['god-ra-horakhty', GOD_SPRITES.raHorakhty],
+      ];
       d.gods.forEach((g, i) => {
-        const sprite = gods[i];
-        if (sprite) ctx.drawImage(sprite, g.x, g.y - 40);
+        const god = gods[i];
+        if (god && !paint(ctx, god[0], g.x, g.y - 40)) ctx.drawImage(god[1], g.x, g.y - 40);
       });
       break;
     }
@@ -611,6 +596,34 @@ function drawDecor(ctx: CanvasRenderingContext2D, s: Scene, d: DecorDef): void {
   }
 }
 
+/** The hypostyle hall: Kadesh in two registers of sunk relief, the Osiride pillars, the dark niche. */
+function drawHallWall(ctx: CanvasRenderingContext2D, c: Rect, a: Rect): void {
+  ctx.fillStyle = COLORS.wall;
+  ctx.fillRect(c.x, c.y, c.w, c.h);
+  // Chariots above, the king's army below. At this size, marks. That is what most of it is now.
+  ctx.fillStyle = COLORS.pilaster;
+  ctx.fillRect(c.x, c.y + 20, c.w, 1);
+  ctx.fillRect(c.x, c.y + 42, c.w, 1);
+  for (let x = c.x + 4; x < c.x + c.w - 4; x += 5) {
+    const h = hash(x, 7);
+    ctx.fillStyle = h % 3 === 0 ? COLORS.pilaster : COLORS.wallLine;
+    ctx.fillRect(x + (h % 2), c.y + 8 + (h % 4), 2, 6 + (h % 3)); // a figure
+    ctx.fillRect(x, c.y + 7 + (h % 4), 3, 1); // its head
+    ctx.fillRect(x + ((h >> 2) % 2), c.y + 28 + ((h >> 3) % 5), 2, 5);
+  }
+  // Osiride pillars: the king as Osiris, eight of them down the hall.
+  for (let x = c.x + 14; x < c.x + c.w - 12; x += 48) {
+    if (!paint(ctx, 'osiride-pillar', x, c.y + c.h - 60)) ctx.drawImage(OSIRIDE_SPRITE, x, c.y + c.h - 60);
+  }
+  ctx.fillStyle = COLORS.wallLine;
+  ctx.fillRect(c.x, c.y + c.h - 1, c.w, 1);
+  ctx.fillStyle = COLORS.niche;
+  ctx.fillRect(a.x, a.y, a.w, a.h);
+  ctx.fillStyle = COLORS.wallLine;
+  ctx.fillRect(a.x - 2, a.y, 2, a.h);
+  ctx.fillRect(a.x + a.w, a.y, 2, a.h);
+}
+
 /**
  * A wall of Nubian sandstone with its bedding showing. The left edge leans in
  * by `batter` px from bottom to top, with a torus moulding along it.
@@ -679,6 +692,7 @@ function drawTiles(ctx: CanvasRenderingContext2D, level: Level, cx: number, cy: 
       const x = tx * TILE;
       const y = ty * TILE;
       const open = !level.isSolid(tx, ty - 1);
+      if (paint(ctx, tileArtId(theme, c, open), x, y)) continue;
       if (c === '=') {
         if (theme === 'abuSimbel') drawSand(ctx, level, tx, ty, x, y, open);
         else if (theme === 'philae') drawGranite(ctx, tx, ty, x, y, open);
@@ -709,6 +723,17 @@ function drawTiles(ctx: CanvasRenderingContext2D, level: Level, cx: number, cy: 
       }
     }
   }
+}
+
+/** Painted tile ids: `tile-<name>` for a buried tile, `tile-<name>-top` for one with sky above it. */
+function tileArtId(theme: Level['data']['theme'], c: string, open: boolean): string {
+  const name =
+    c === '?' ? 'ankh-block'
+    : c === 'x' ? 'ankh-block-used'
+    : c === '=' ? (theme === 'abuSimbel' ? 'sand' : theme === 'philae' ? 'granite' : 'paving')
+    : theme === 'abuSimbel' ? 'cliff' : theme === 'philae' ? 'column-drum' : 'sandstone';
+  if (c === '?' || c === 'x') return name;
+  return open ? `tile-${name}-top` : `tile-${name}`;
 }
 
 function drawSand(ctx: CanvasRenderingContext2D, level: Level, tx: number, ty: number, x: number, y: number, open: boolean): void {
@@ -815,22 +840,24 @@ function drawEntityBack(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): voi
         ctx.fillRect(r.x + r.w - 9, r.y - 4, 5, 4);
         for (let i = 0; i < r.w / TILE; i++) {
           const bx = r.x + i * TILE;
-          ctx.fillStyle = COLORS.statue;
-          ctx.fillRect(bx, r.y, TILE, r.h);
-          ctx.fillStyle = COLORS.statueLight;
-          ctx.fillRect(bx + 1, r.y + 1, TILE - 2, 1);
-          ctx.fillStyle = COLORS.outline;
-          ctx.fillRect(bx, r.y, TILE, 1);
-          ctx.fillRect(bx, r.y, 1, r.h);
-          ctx.fillRect(bx, r.y + TILE, TILE, 1);
-          ctx.fillRect(bx, r.y + r.h - 1, TILE, 1);
+          if (!paint(ctx, 'relocation-block', bx, r.y)) {
+            ctx.fillStyle = COLORS.statue;
+            ctx.fillRect(bx, r.y, TILE, r.h);
+            ctx.fillStyle = COLORS.statueLight;
+            ctx.fillRect(bx + 1, r.y + 1, TILE - 2, 1);
+            ctx.fillStyle = COLORS.outline;
+            ctx.fillRect(bx, r.y, TILE, 1);
+            ctx.fillRect(bx, r.y, 1, r.h);
+            ctx.fillRect(bx, r.y + TILE, TILE, 1);
+            ctx.fillRect(bx, r.y + r.h - 1, TILE, 1);
+          }
           s.texts.push({ x: bx + TILE / 2, y: r.y + 12, text: String(p.numberAt(i)), size: 6, color: COLORS.crack, align: 'center' });
         }
       } else if (d.skin === 'bank') {
         for (let i = 0; i < r.w / TILE; i++) for (let j = 0; j < r.h / TILE; j++) drawGranite(ctx, i, j, r.x + i * TILE, r.y + j * TILE, j === 0);
       } else if (d.skin === 'boat') {
-        ctx.drawImage(SAIL_SPRITE, r.x + 10, r.y - 42);
-        ctx.drawImage(BOAT_SPRITE, r.x, r.y);
+        if (!paint(ctx, 'felucca-sail', r.x + 10, r.y - 42)) ctx.drawImage(SAIL_SPRITE, r.x + 10, r.y - 42);
+        if (!paint(ctx, 'felucca-hull', r.x, r.y)) ctx.drawImage(BOAT_SPRITE, r.x, r.y);
       }
       break;
     }
@@ -839,17 +866,24 @@ function drawEntityBack(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): voi
       if (c.state === 'gone') break;
       const r = c.rect;
       // A crocodile looks like a rock until it moves. Then you see the back.
-      if (d.skin === 'croc') ctx.drawImage(c.state === 'falling' ? CROC_SPRITE : ROCK_SPRITE, r.x - (c.state === 'falling' ? 4 : 0), r.y - (c.state === 'falling' ? 2 : 0));
-      else if (d.skin === 'rock' || d.skin === 'stone') ctx.drawImage(ROCK_SPRITE, r.x, r.y);
-      else if (d.skin === 'talatat') for (let i = 0; i < r.w / TILE; i++) ctx.drawImage(TALATAT_SPRITE, r.x + i * TILE, r.y);
-      else if (d.skin === 'floor') {
+      if (d.skin === 'croc') {
+        if (c.state === 'falling') {
+          if (!paint(ctx, 'crocodile', r.x - 4, r.y - 2)) ctx.drawImage(CROC_SPRITE, r.x - 4, r.y - 2);
+        } else if (!paint(ctx, 'river-rock', r.x, r.y)) ctx.drawImage(ROCK_SPRITE, r.x, r.y);
+      } else if (d.skin === 'rock') {
+        if (!paint(ctx, 'river-rock', r.x, r.y)) ctx.drawImage(ROCK_SPRITE, r.x, r.y);
+      } else if (d.skin === 'stone') {
+        if (!paint(ctx, 'lake-stone', r.x, r.y)) ctx.drawImage(ROCK_SPRITE, r.x, r.y);
+      } else if (d.skin === 'talatat') {
+        for (let i = 0; i < r.w / TILE; i++) if (!paint(ctx, 'talatat', r.x + i * TILE, r.y)) ctx.drawImage(TALATAT_SPRITE, r.x + i * TILE, r.y);
+      } else if (d.skin === 'floor') {
         // Looks exactly like the paving around it, all the way down. That is the point.
         for (let j = 0; j < r.h / TILE; j++) {
           for (let i = 0; i < r.w / TILE; i++) {
             drawPaving(ctx, Math.round(r.x / TILE) + i, Math.round(r.y / TILE) + j, r.x + i * TILE, r.y + j * TILE, j === 0);
           }
         }
-      } else ctx.drawImage(CAPITAL_SPRITE, r.x, r.y);
+      } else if (!paint(ctx, s.level.data.theme === 'karnak' ? 'papyrus-capital' : 'kiosk-capital', r.x, r.y)) ctx.drawImage(CAPITAL_SPRITE, r.x, r.y);
       break;
     }
     case 'pusher': {
@@ -858,17 +892,19 @@ function drawEntityBack(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): voi
       if (d.skin === 'sphinx') {
         // The figure rect is the head; the body lies behind it on the plinth.
         const turned = p.state === 'out';
-        ctx.drawImage(turned ? SPHINX_TURNED_SPRITE : SPHINX_SPRITE, f.x - 4, f.y + 4);
+        if (!paint(ctx, turned ? 'criosphinx-turned' : 'criosphinx', f.x - 4, f.y + 4)) ctx.drawImage(turned ? SPHINX_TURNED_SPRITE : SPHINX_SPRITE, f.x - 4, f.y + 4);
         break;
       }
-      if (p.state === 'idle' || p.state === 'done') ctx.drawImage(RELIEF_SPRITE, f.x, f.y);
-      else ctx.drawImage(RELIEF_OUT_SPRITE, f.x - Math.round(p.out), f.y);
+      if (p.state === 'idle' || p.state === 'done') {
+        if (!paint(ctx, 'isis-relief', f.x, f.y)) ctx.drawImage(RELIEF_SPRITE, f.x, f.y);
+      } else if (!paint(ctx, 'isis-relief-out', f.x - Math.round(p.out), f.y)) ctx.drawImage(RELIEF_OUT_SPRITE, f.x - Math.round(p.out), f.y);
       break;
     }
     case 'chaser': {
       const c = e as Chaser;
-      const frame = SCARAB_FRAMES[c.state === 'walking' ? Math.floor(c.walkPhase * 6) % 2 : 0] ?? SCARAB_FRAMES[0];
-      if (frame) ctx.drawImage(frame, c.rect.x, c.rect.y);
+      const fi = c.state === 'walking' ? Math.floor(c.walkPhase * 6) % 2 : 0;
+      const frame = SCARAB_FRAMES[fi] ?? SCARAB_FRAMES[0];
+      if (frame && !paint(ctx, 'scarab', c.rect.x, c.rect.y, fi)) ctx.drawImage(frame, c.rect.x, c.rect.y);
       break;
     }
     case 'tipper': {
@@ -876,13 +912,13 @@ function drawEntityBack(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): voi
       ctx.save();
       ctx.translate(d.x + 8, d.floorY);
       ctx.rotate(-t.angle);
-      ctx.drawImage(OBELISK_SPRITE, -8, -d.height);
+      if (!paint(ctx, 'obelisk', -8, -d.height)) ctx.drawImage(OBELISK_SPRITE, -8, -d.height);
       ctx.restore();
       break;
     }
     case 'thrower': {
       const t = e as Thrower;
-      ctx.drawImage(BABOON_SPRITE, t.rect.x - 1, t.rect.y - 3);
+      if (!paint(ctx, 'baboon', t.rect.x - 1, t.rect.y - 3)) ctx.drawImage(BABOON_SPRITE, t.rect.x - 1, t.rect.y - 3);
       break;
     }
     default:
@@ -897,12 +933,12 @@ function drawEntityFront(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): vo
     case 'falling': {
       const f = e as Falling;
       if (f.state === 'landed') drawRubble(ctx, f.rect);
-      else ctx.drawImage(COLOSSUS.head, f.rect.x, f.rect.y - HEAD_CROWN);
+      else if (!paint(ctx, 'colossus-head', f.rect.x, f.rect.y - HEAD_CROWN)) ctx.drawImage(COLOSSUS.head, f.rect.x, f.rect.y - HEAD_CROWN);
       break;
     }
     case 'thrower': {
       const t = e as Thrower;
-      if (t.projectile) ctx.drawImage(DATE_SPRITE, t.projectile.x, t.projectile.y);
+      if (t.projectile && !paint(ctx, 'date', t.projectile.x, t.projectile.y)) ctx.drawImage(DATE_SPRITE, t.projectile.x, t.projectile.y);
       break;
     }
     default:
@@ -1026,19 +1062,14 @@ function drawExit(ctx: CanvasRenderingContext2D, e: Rect): void {
 
 /** A lost tourist in a visibly fake pharaoh costume. Nobody will mention it. */
 export function drawPlayer(ctx: CanvasRenderingContext2D, p: Player): void {
-  drawFacing(ctx, TOURIST_FRAMES[p.animFrame()], Math.round(p.x) - 1, Math.round(p.y), p.facing);
+  blitFacing(ctx, tourist(p.animFrame()), Math.round(p.x) - 1, Math.round(p.y), p.facing);
 }
 
-function drawFacing(ctx: CanvasRenderingContext2D, frame: HTMLCanvasElement, x: number, y: number, facing: 1 | -1): void {
-  if (facing === 1) {
-    ctx.drawImage(frame, x, y);
-    return;
-  }
-  ctx.save();
-  ctx.translate(x + frame.width, y);
-  ctx.scale(-1, 1);
-  ctx.drawImage(frame, 0, 0);
-  ctx.restore();
+const TOURIST_FRAME_INDEX = { idle: 0, walk1: 1, walk2: 2, jump: 3 } as const;
+
+/** The tourist: the painted strip `tourist` (idle, walk1, walk2, jump), or the code-drawn frames. */
+function tourist(name: keyof typeof TOURIST_FRAME_INDEX): Frame {
+  return frameOf('tourist', TOURIST_FRAME_INDEX[name], TOURIST_FRAMES[name]);
 }
 
 function waterSurfaceAt(s: Scene, x: number): number | null {
@@ -1059,8 +1090,8 @@ function drawDeath(ctx: CanvasRenderingContext2D, s: Scene, death: { cause: Deat
   const x = Math.round(p.x) - 1;
   const y = Math.round(p.y);
   const t = death.t;
-  const idle = TOURIST_FRAMES.idle;
-  const dead = TOURIST_FRAMES.dead;
+  const idle = tourist('idle');
+  const dead = frameOf('tourist-dead', 0, TOURIST_FRAMES.dead);
   const feetY = y + 16;
   const midX = x + 6;
 
@@ -1069,7 +1100,7 @@ function drawDeath(ctx: CanvasRenderingContext2D, s: Scene, death: { cause: Deat
       const k = Math.min(1, t / 0.12);
       const h = Math.max(4, Math.round(16 - 12 * k));
       const w = Math.round(12 + 16 * k);
-      ctx.drawImage(dead, midX - w * 0.7, feetY - h, w, h);
+      blit(ctx, dead, midX - w * 0.7, feetY - h, w, h);
       break;
     }
     case 'plank': {
@@ -1078,21 +1109,21 @@ function drawDeath(ctx: CanvasRenderingContext2D, s: Scene, death: { cause: Deat
       ctx.save();
       ctx.translate(p.facing === 1 ? x + 2 : x + 10, feetY);
       ctx.rotate(p.facing === 1 ? -angle : angle);
-      drawFacing(ctx, k >= 1 ? dead : idle, p.facing === 1 ? -2 : -10, -16, p.facing);
+      blitFacing(ctx, k >= 1 ? dead : idle, p.facing === 1 ? -2 : -10, -16, p.facing);
       ctx.restore();
       break;
     }
     case 'drown':
     case 'snap': {
       const sink = Math.round(t * 22);
-      drawFacing(ctx, dead, x, y + sink, p.facing);
+      blitFacing(ctx, dead, x, y + sink, p.facing);
       break;
     }
     case 'burn': {
       if (t < 0.18) {
-        drawFacing(ctx, silhouette(idle, 'idle', '#fff8e0'), x, y, p.facing);
+        blitFacing(ctx, silhouette(idle, '#fff8e0'), x, y, p.facing);
       } else {
-        const char = silhouette(dead, 'dead', '#1a1410');
+        const char = silhouette(dead, '#1a1410');
         const gone = Math.max(0, Math.min(1, (t - 0.4) / 0.5));
         const top = Math.round(16 * gone);
         if (top < 16) {
@@ -1100,7 +1131,7 @@ function drawDeath(ctx: CanvasRenderingContext2D, s: Scene, death: { cause: Deat
           ctx.beginPath();
           ctx.rect(x - 2, y + top, 16, 16 - top);
           ctx.clip();
-          drawFacing(ctx, char, x, y, p.facing);
+          blitFacing(ctx, char, x, y, p.facing);
           ctx.restore();
         }
         const pile = Math.round(gone * 4);
@@ -1119,14 +1150,15 @@ function drawDeath(ctx: CanvasRenderingContext2D, s: Scene, death: { cause: Deat
       ctx.save();
       ctx.translate(midX + dx, y + 8 + dy);
       ctx.rotate(-angle);
-      ctx.drawImage(dead, -6, -8);
+      blit(ctx, dead, -6, -8);
       ctx.restore();
       break;
     }
     case 'gone':
       break;
     case 'sit':
-      drawFacing(ctx, TOURIST_SEATED, x, feetY - TOURIST_SEATED.height, p.facing);
+      const seated = frameOf('tourist-seated', 0, TOURIST_SEATED);
+      blitFacing(ctx, seated, x, feetY - seated.h, p.facing);
       break;
   }
 }

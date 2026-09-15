@@ -1,5 +1,5 @@
-import { Grid, type LevelData } from '../level';
-import { TILE } from '../types';
+import { Grid, type LevelData } from '../../engine/level';
+import { TILE } from '../../engine/types';
 
 /**
  * Chapter 1, Level 3 — Karnak, and the walk down to Luxor.

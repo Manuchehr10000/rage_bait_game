@@ -1,0 +1,49 @@
+{
+  "$comment": "Sizes are world pixels (320 x 180 view). Painted files are 4x. See content/README.md.",
+  "level": "shared",
+  "assets": [
+    {
+      "id": "tourist",
+      "w": 12,
+      "h": 16,
+      "beat": "shared",
+      "what": "The lost tourist. Four frames: idle, walk1, walk2, jump.",
+      "frames": 4
+    },
+    {
+      "id": "tourist-dead",
+      "w": 12,
+      "h": 16,
+      "beat": "shared",
+      "what": "The tourist flat on their back. Used, stretched and rotated, by every death."
+    },
+    {
+      "id": "tourist-seated",
+      "w": 13,
+      "h": 14,
+      "beat": "shared",
+      "what": "The tourist sitting down. The 'Gave up' pose."
+    },
+    {
+      "id": "ankh-block",
+      "w": 16,
+      "h": 16,
+      "beat": "shared",
+      "what": "The floating block with an ankh on it. The one joke that is not Egyptian."
+    },
+    {
+      "id": "ankh-block-used",
+      "w": 16,
+      "h": 16,
+      "beat": "shared",
+      "what": "The same block after it has been hit from below. Blank."
+    },
+    {
+      "id": "relocation-block",
+      "w": 16,
+      "h": 32,
+      "beat": "shared",
+      "what": "One numbered block of a dismantled temple. The number is drawn by the game; paint the block blank."
+    }
+  ]
+}

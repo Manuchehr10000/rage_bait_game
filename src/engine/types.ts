@@ -65,5 +65,7 @@ export const DEATH_SOUND: Record<DeathCause, 'squish' | 'bonk' | 'drown' | 'burn
 
 export const VIEW_W = 320;
 export const VIEW_H = 180;
+/** Painted art is authored at this many pixels per world pixel. The world canvas renders at the same scale. */
+export const ART_SCALE = 4;
 export const TILE = 16;
 export const DT = 1 / 60;

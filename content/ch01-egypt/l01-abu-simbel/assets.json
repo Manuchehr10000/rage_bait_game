@@ -1,0 +1,139 @@
+{
+  "$comment": "Sizes are world pixels (320 x 180 view). Painted files are 4x. See content/README.md.",
+  "level": "l01-abu-simbel",
+  "assets": [
+    {
+      "id": "tile-sand",
+      "w": 16,
+      "h": 16,
+      "beat": "a-approach",
+      "what": "Sand fill, no sky above."
+    },
+    {
+      "id": "tile-sand-top",
+      "w": 16,
+      "h": 16,
+      "beat": "a-approach",
+      "what": "Sand with the surface on top: the ground the tourist walks on."
+    },
+    {
+      "id": "abu-simbel-facade",
+      "w": 348,
+      "h": 184,
+      "beat": "b-colossi",
+      "what": "The temple front, without the colossi. Door, niche, cornice, batter."
+    },
+    {
+      "id": "colossus-seated",
+      "w": 64,
+      "h": 112,
+      "beat": "b-colossi",
+      "what": "A seated Ramesses II from the shoulders down, with the family at his legs."
+    },
+    {
+      "id": "colossus-broken",
+      "w": 64,
+      "h": 112,
+      "beat": "b-colossi",
+      "what": "The same statue with everything above the lap gone."
+    },
+    {
+      "id": "colossus-fallen",
+      "w": 72,
+      "h": 14,
+      "beat": "b-colossi",
+      "what": "The fallen head and torso lying in the sand in front of the broken statue."
+    },
+    {
+      "id": "colossus-head",
+      "w": 32,
+      "h": 48,
+      "beat": "b-colossi",
+      "what": "The head with the double crown. The lower 32 x 32 is the hitbox; the crown is above it."
+    },
+    {
+      "id": "ra-horakhty-niche",
+      "w": 10,
+      "h": 22,
+      "beat": "b-colossi",
+      "what": "Ra-Horakhty standing in the niche over the door."
+    },
+    {
+      "id": "abu-simbel-terrace-wall",
+      "w": 204,
+      "h": 120,
+      "beat": "c-frieze",
+      "what": "The wall under the baboon frieze, with its cornice."
+    },
+    {
+      "id": "baboon",
+      "w": 8,
+      "h": 11,
+      "beat": "c-frieze",
+      "what": "One of the twenty-two baboons, seated, arms up."
+    },
+    {
+      "id": "date",
+      "w": 4,
+      "h": 4,
+      "beat": "c-frieze",
+      "what": "The date one baboon throws."
+    },
+    {
+      "id": "tile-cliff",
+      "w": 16,
+      "h": 16,
+      "beat": "d-relocation",
+      "what": "Cut sandstone of the hill, no sky above."
+    },
+    {
+      "id": "tile-cliff-top",
+      "w": 16,
+      "h": 16,
+      "beat": "d-relocation",
+      "what": "Cut sandstone with the plateau surface on top."
+    },
+    {
+      "id": "abu-simbel-hall",
+      "w": 384,
+      "h": 64,
+      "beat": "e-sanctuary",
+      "what": "The hall wall and the dark niche, without the four gods."
+    },
+    {
+      "id": "osiride-pillar",
+      "w": 12,
+      "h": 60,
+      "beat": "e-sanctuary",
+      "what": "Ramesses as Osiris on a pillar. The game repeats it down the hall."
+    },
+    {
+      "id": "god-ptah",
+      "w": 16,
+      "h": 40,
+      "beat": "e-sanctuary",
+      "what": "Ptah, seated, leftmost, the one the sun never reaches."
+    },
+    {
+      "id": "god-amun",
+      "w": 16,
+      "h": 40,
+      "beat": "e-sanctuary",
+      "what": "Amun-Ra, seated, with the tall plumes."
+    },
+    {
+      "id": "god-ramesses",
+      "w": 16,
+      "h": 40,
+      "beat": "e-sanctuary",
+      "what": "Ramesses II seated among the gods."
+    },
+    {
+      "id": "god-ra-horakhty",
+      "w": 16,
+      "h": 40,
+      "beat": "e-sanctuary",
+      "what": "Ra-Horakhty, seated, falcon head, sun disc."
+    }
+  ]
+}
