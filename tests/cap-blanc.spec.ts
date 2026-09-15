@@ -29,8 +29,8 @@ const DRIVER = `
   /** The four that do something, by their number on the frieze. */
   const cast = horses[3];
   const walker = horses[5];
-  const rearer = horses[6];
-  const splitter = horses[8];
+  const rearer = horses[7];
+  const splitter = horses[9];
   const pick = E.find((e) => e.def.kind === 'pick');
   const stream = E.find((e) => e.def.kind === 'water');
   const streamX = stream.def.x0;
@@ -139,7 +139,7 @@ test('the sixth horse walks out from under anyone who stands still', async ({ pa
   expect(r.cause).toBe('The trench');
 });
 
-test('the seventh horse comes up and throws you back into the trench', async ({ page }) => {
+test('the eighth horse comes up and throws you back into the trench', async ({ page }) => {
   const r = await play(page, `
     standOn(rearer);
     const startX = p.x;
@@ -148,7 +148,7 @@ test('the seventh horse comes up and throws you back into the trench', async ({ 
   expect(r.cause).toBe('The trench');
 });
 
-test('the ninth horse breaks in the middle and drops you', async ({ page }) => {
+test('the tenth horse breaks in the middle and drops you', async ({ page }) => {
   const r = await play(page, `
     standOn(splitter);
     const step = () => { key('ArrowRight', false); if (splitter.broken > 0) phase = 'broken'; };`, 60 * 8);

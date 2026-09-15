@@ -29,7 +29,7 @@ the ruined castle of **Commarque**.
 | a | `a-valley` | A meadow, the Beune, the wooded slope and Commarque opposite | The valley as it is; the stream is a metre deep and cold |
 | b | `b-shelter` | The wall with its door; through it, he switches the headlamp on; the lit floor | The protective wall and door, the modern lighting |
 | c | `c-frieze` | Five horses under museum lamps; their backs are the floor; the fourth is plaster and goes if you stand about on it | Ten is the count of horses on the frieze; the backs are relief deep enough to stand on in the game's scale; none is plaster |
-| d | `d-dark` | The lamps end; five more horses, seen only by the headlamp. The sixth walks out from under you, the seventh comes up and throws you back, the ninth breaks in the middle; the eighth and tenth hold | The far end of the frieze is less well lit for a visitor; the darkness is the level's, and no relief has ever moved |
+| d | `d-dark` | The lamps end; five more horses, seen only by the headlamp. The sixth walks out from under you, the eighth comes up and throws you back, the tenth breaks in the middle at the last step of the crossing; the seventh and ninth hold | The far end of the frieze is less well lit for a visitor; the darkness is the level's, and no relief has ever moved |
 | e | `e-dig` | A workman with a pick, working the deposit on a cycle; the swing is the last trap | The 1909 discovery, by pick, into the deposit. He is not still there |
 | f | `f-exit` | The far floor and the way out | The visitor leaves by the same door; the game lets you leave at the far end |
 
@@ -64,7 +64,7 @@ learning that four of them were waiting.
 ## Deliberate lies
 
 - The fourth horse is plaster. No horse of the frieze is a cast.
-- The sixth walks, the seventh rears, the ninth breaks in two. They are carved in high
+- The sixth walks, the eighth rears, the tenth breaks in two. They are carved in high
   relief into a limestone wall and have not moved since the Magdalenian.
 - The floor of the trench kills. It is a metre and a half down.
 - The digger is still there, on a cycle, and his pick is deadly. The 1909 workman was

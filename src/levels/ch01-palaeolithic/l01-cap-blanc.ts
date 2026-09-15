@@ -18,8 +18,8 @@ import { TILE } from '../../engine/types';
  *             The first five are under the museum's lamps; the fourth is a cast
  *             and gives way if you stand about on it. The last five are in the
  *             dark, and three of them do something a relief cannot: the sixth
- *             walks out from under you, the seventh comes up and throws you back,
- *             the ninth breaks in the middle. All ten are the same sprite.
+ *             walks out from under you, the eighth comes up and throws you back,
+ *             the tenth breaks in the middle. All ten are the same sprite.
  *  69..73   the far floor, and the digger's lamp
  *  74..     the deposit the excavation left; the pick works its edge
  *  81       exit
@@ -59,10 +59,10 @@ const HORSES: { x: number; trick: HorseTrick }[] = [
   { x: 644, trick: 'cast' }, // plaster, and lit: stand about on it and it goes
   { x: 712, trick: 'none' },
   { x: 788, trick: 'walk' }, // walks forward out from under you
-  { x: 848, trick: 'rear' }, // comes up on its front legs and throws you back
-  { x: 920, trick: 'none' },
-  { x: 988, trick: 'split' }, // breaks in the middle
-  { x: 1052, trick: 'none' },
+  { x: 848, trick: 'none' },
+  { x: 920, trick: 'rear' }, // comes up on its front legs and throws you back
+  { x: 988, trick: 'none' },
+  { x: 1052, trick: 'split' }, // breaks in the middle, at the last step of the crossing
 ];
 /** How long you may stand on one before it decides. Crossing at a run takes 0.31 s. */
 const DELAY: Record<HorseTrick, number> = { none: 0, cast: 0.45, walk: 0.12, rear: 0.5, split: 0.5 };
