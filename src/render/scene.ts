@@ -1,5 +1,5 @@
 import type { Camera } from '../engine/camera';
-import type { Chaser, Crumble, Entity, Falling, Pick, Platform, Pusher, Sweep, Thrower, Tipper, Water } from '../engine/entities';
+import type { Chaser, Crumble, Entity, Falling, Horse, Pick, Platform, Pusher, Sweep, Thrower, Tipper, Water } from '../engine/entities';
 import type { DecorDef, Level } from '../engine/level';
 import type { Player } from '../engine/player';
 import {
@@ -33,7 +33,7 @@ import {
 } from './procedural';
 import { DEATH_ANIM, TILE, VIEW_H, VIEW_W, type Costume, type DeathCause, type Rect } from '../engine/types';
 import { paint } from '../engine/assets';
-import { blit, blitFacing, frameOf, silhouette, type Frame } from './frame';
+import { blit, blitFacing, frameOf, silhouette, withLamp, type Frame } from './frame';
 
 /** Text drawn in screen space after scaling so it stays crisp. World coordinates. */
 export interface WorldText {
@@ -143,6 +143,8 @@ export interface Scene {
   time: number;
   /** The death in progress, t from 0 to 1, or null. */
   death: { cause: DeathCause; t: number } | null;
+  /** True once the tourist has switched the headlamp on. */
+  lampOn: boolean;
 }
 
 export function renderWorld(ctx: CanvasRenderingContext2D, s: Scene): void {
@@ -170,7 +172,7 @@ export function renderWorld(ctx: CanvasRenderingContext2D, s: Scene): void {
   for (const e of s.entities) drawEntityFront(ctx, s, e);
   drawCoins(ctx, s);
   if (level.data.exit && !level.data.exitHidden) drawExit(ctx, level.data.exit);
-  if (!s.death) drawPlayer(ctx, s.player, level.data.costume);
+  if (!s.death) drawPlayer(ctx, s.player, level.data.costume, s.lampOn);
   else if (DEATH_ANIM[s.death.cause] !== 'crush') drawDeath(ctx, s, s.death);
   for (const e of s.entities) drawEntityOverlay(ctx, s, e);
   if (s.death && (DEATH_ANIM[s.death.cause] === 'drown' || DEATH_ANIM[s.death.cause] === 'snap')) drawDrownSurface(ctx, s, s.death.t);
@@ -380,18 +382,20 @@ function drawDarkness(ctx: CanvasRenderingContext2D, s: Scene, cx: number, cy: n
     const f = p.facing;
     const hx = pxc + f * 2;
     const hy = pyc - 4;
-    const cone = (len: number, half: number, alpha: number) => {
-      d.globalAlpha = alpha;
-      d.beginPath();
-      d.moveTo(hx, hy - 2);
-      d.lineTo(hx + f * len, hy - half);
-      d.lineTo(hx + f * len, hy + half);
-      d.lineTo(hx, hy + 2);
-      d.closePath();
-      d.fill();
-    };
-    cone(76, 30, 1);
-    cone(96, 44, 0.45);
+    if (s.lampOn) {
+      const cone = (len: number, half: number, alpha: number) => {
+        d.globalAlpha = alpha;
+        d.beginPath();
+        d.moveTo(hx, hy - 2);
+        d.lineTo(hx + f * len, hy - half);
+        d.lineTo(hx + f * len, hy + half);
+        d.lineTo(hx, hy + 2);
+        d.closePath();
+        d.fill();
+      };
+      cone(76, 30, 1);
+      cone(96, 44, 0.45);
+    }
     d.globalAlpha = 1;
     d.beginPath();
     d.arc(pxc, pyc, 12, 0, Math.PI * 2);
@@ -432,7 +436,7 @@ function drawDarkness(ctx: CanvasRenderingContext2D, s: Scene, cx: number, cy: n
   ctx.save();
   ctx.fillStyle = 'rgba(255, 240, 190, 0.18)';
   for (const sp of s.level.data.decor) if (sp.kind === 'spotlight') beam(ctx, sp);
-  if (dark.lamp === 'headlamp') {
+  if (dark.lamp === 'headlamp' && s.lampOn) {
     // The headlamp's beam, the same faint warmth, so it reads as the lamp and not as a hole.
     const f = p.facing;
     const hx = pxc + f * 2;
@@ -1113,18 +1117,6 @@ function drawEntityBack(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): voi
         if (!paint(ctx, 'lake-stone', r.x, r.y)) ctx.drawImage(ROCK_SPRITE, r.x, r.y);
       } else if (d.skin === 'talatat') {
         for (let i = 0; i < r.w / TILE; i++) if (!paint(ctx, 'talatat', r.x + i * TILE, r.y)) ctx.drawImage(TALATAT_SPRITE, r.x + i * TILE, r.y);
-      } else if (d.skin === 'horse') {
-        // A horse of the frieze. Once it gives way you see what it was made of.
-        const sx = r.x - 4;
-        const sy = r.y - 3;
-        if (c.state === 'falling' || c.state === 'landed') {
-          const f = frameOf('horse-relief', 0, HORSE_SPRITE);
-          blit(ctx, silhouette(f, COLORS.plaster), sx, sy);
-          ctx.fillStyle = COLORS.plasterShade;
-          ctx.fillRect(sx + 8, sy + 12, 20, 1);
-          ctx.fillRect(sx + 14, sy + 7, 1, 4);
-          ctx.fillRect(sx + 26, sy + 9, 1, 3);
-        } else if (!paint(ctx, 'horse-relief', sx, sy)) ctx.drawImage(HORSE_SPRITE, sx, sy);
       } else if (d.skin === 'floor') {
         // Looks exactly like the paving around it, all the way down. That is the point.
         for (let j = 0; j < r.h / TILE; j++) {
@@ -1170,6 +1162,10 @@ function drawEntityBack(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): voi
       if (!paint(ctx, 'baboon', t.rect.x - 1, t.rect.y - 3)) ctx.drawImage(BABOON_SPRITE, t.rect.x - 1, t.rect.y - 3);
       break;
     }
+    case 'horse': {
+      drawHorse(ctx, e as Horse);
+      break;
+    }
     case 'pick': {
       // The digger. Busy. Does not look up.
       const k = e as Pick;
@@ -1181,6 +1177,59 @@ function drawEntityBack(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): voi
     default:
       break;
   }
+}
+
+/**
+ * One horse of the frieze, and whatever it is in the middle of doing. All ten
+ * are the same sprite: what differs is the transform.
+ */
+function drawHorse(ctx: CanvasRenderingContext2D, h: Horse): void {
+  const r = h.rect;
+  const sx = r.x - 4;
+  const sy = r.y - 3;
+  const f = frameOf('horse-relief', 0, HORSE_SPRITE);
+  const acting = h.state === 'acting' || h.state === 'done';
+  if (h.def.trick === 'cast' && acting) {
+    // Plaster, and once it has gone you can see what it was made of.
+    blit(ctx, silhouette(f, COLORS.plaster), sx, sy);
+    ctx.fillStyle = COLORS.plasterShade;
+    ctx.fillRect(sx + 8, sy + 12, 20, 1);
+    ctx.fillRect(sx + 14, sy + 7, 1, 4);
+    ctx.fillRect(sx + 26, sy + 9, 1, 3);
+    return;
+  }
+  if (h.def.trick === 'rear' && h.angle > 0) {
+    // Up on the front legs, pivoting on the hind feet. The back goes out from under you.
+    ctx.save();
+    ctx.translate(sx + 9, sy + 20);
+    ctx.rotate(-h.angle);
+    blit(ctx, f, -9, -20);
+    ctx.restore();
+    return;
+  }
+  if (h.def.trick === 'split' && h.broken > 0) {
+    // Broken in the middle. The ends stay in the rock; the middle goes down, and so do you.
+    const k = h.broken;
+    drawHalf(ctx, f, sx, sy, 0, 20, 0, 0.55 * k);
+    drawHalf(ctx, f, sx, sy, 20, 20, 40, -0.55 * k);
+    return;
+  }
+  blit(ctx, f, sx, sy);
+}
+
+/**
+ * One clipped half of the horse sprite, hinged about its outer end: the two
+ * halves of a broken one go down in the middle and stay in the rock at the ends.
+ */
+function drawHalf(ctx: CanvasRenderingContext2D, f: Frame, sx: number, sy: number, x0: number, w: number, pivotX: number, rot: number): void {
+  ctx.save();
+  ctx.translate(sx + pivotX, sy + 20);
+  ctx.rotate(rot);
+  ctx.beginPath();
+  ctx.rect(x0 - pivotX, -20, w, 20);
+  ctx.clip();
+  blit(ctx, f, -pivotX, -20);
+  ctx.restore();
 }
 
 function drawEntityFront(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): void {
@@ -1318,22 +1367,32 @@ function drawExit(ctx: CanvasRenderingContext2D, e: Rect): void {
 }
 
 /** A lost tourist in a visibly wrong costume. Nobody will mention it. */
-export function drawPlayer(ctx: CanvasRenderingContext2D, p: Player, costume: Costume): void {
-  blitFacing(ctx, tourist(costume, p.animFrame()), Math.round(p.x) - 1, Math.round(p.y), p.facing);
+export function drawPlayer(ctx: CanvasRenderingContext2D, p: Player, costume: Costume, lampOn: boolean): void {
+  blitFacing(ctx, tourist(costume, p.animFrame(), lampOn), Math.round(p.x) - 1, Math.round(p.y), p.facing);
 }
 
 const TOURIST_FRAME_INDEX = { idle: 0, walk1: 1, walk2: 2, jump: 3 } as const;
 
 /** Art ids and code-drawn frames per costume. The hiker is chapter 1; the pharaoh is chapter 2. */
-const COSTUMES: Record<Costume, { id: string; frames: typeof TOURIST_FRAMES; seated: HTMLCanvasElement }> = {
-  hiker: { id: 'hiker', frames: HIKER_FRAMES, seated: HIKER_SEATED },
+const COSTUMES: Record<
+  Costume,
+  { id: string; frames: typeof TOURIST_FRAMES; seated: HTMLCanvasElement; lamp?: { x: number; y: number } }
+> = {
+  // The lens sits at sprite column 10, row 4, of the right-facing hiker.
+  hiker: { id: 'hiker', frames: HIKER_FRAMES, seated: HIKER_SEATED, lamp: { x: 10, y: 4 } },
   pharaoh: { id: 'tourist', frames: TOURIST_FRAMES, seated: TOURIST_SEATED },
 };
 
+/** Light the lamp on a frame, if this costume has one and it is switched on. */
+function lit(costume: Costume, f: Frame, lampOn: boolean): Frame {
+  const lamp = COSTUMES[costume].lamp;
+  return lampOn && lamp ? withLamp(f, lamp.x, lamp.y) : f;
+}
+
 /** The tourist: the painted strip (idle, walk1, walk2, jump) for the costume, or the code-drawn frames. */
-export function tourist(costume: Costume, name: keyof typeof TOURIST_FRAME_INDEX): Frame {
+export function tourist(costume: Costume, name: keyof typeof TOURIST_FRAME_INDEX, lampOn = false): Frame {
   const c = COSTUMES[costume];
-  return frameOf(c.id, TOURIST_FRAME_INDEX[name], c.frames[name]);
+  return lit(costume, frameOf(c.id, TOURIST_FRAME_INDEX[name], c.frames[name]), lampOn);
 }
 
 function waterSurfaceAt(s: Scene, x: number): number | null {
@@ -1356,8 +1415,8 @@ function drawDeath(ctx: CanvasRenderingContext2D, s: Scene, death: { cause: Deat
   const t = death.t;
   const costume = s.level.data.costume;
   const c = COSTUMES[costume];
-  const idle = tourist(costume, 'idle');
-  const dead = frameOf(`${c.id}-dead`, 0, c.frames.dead);
+  const idle = tourist(costume, 'idle', s.lampOn);
+  const dead = lit(costume, frameOf(`${c.id}-dead`, 0, c.frames.dead), s.lampOn);
   const feetY = y + 16;
   const midX = x + 6;
 
@@ -1432,7 +1491,7 @@ function drawDeath(ctx: CanvasRenderingContext2D, s: Scene, death: { cause: Deat
       break;
     }
     case 'sit': {
-      const seated = frameOf(`${c.id}-seated`, 0, c.seated);
+      const seated = lit(costume, frameOf(`${c.id}-seated`, 0, c.seated), s.lampOn);
       blitFacing(ctx, seated, x, feetY - seated.h, p.facing);
       break;
     }

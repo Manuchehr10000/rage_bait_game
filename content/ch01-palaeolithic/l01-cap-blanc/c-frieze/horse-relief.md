@@ -11,7 +11,7 @@
 
 One horse of the Cap Blanc frieze in **high relief**: facing right, head lowered, the back a long level line, the belly undercut so the body stands out from the wall, the legs in shallower relief. Patches of **red ochre** remain on the body. 40 × 20. The back, from x 4 to x 32 at y 3, is the ledge the hiker stands on; the game's collision box is that 28 px run and nothing else.
 
-All ten horses are this one sprite. The fifth is plaster and gives way, and until it does it is this sprite too. When it falls the game silhouettes the same sprite white. Nothing about the painting may differ between copies.
+All ten horses are this one sprite, and four of them do something with it. The **fourth** is plaster: it gives way and takes you down to the floor of the trench, and the game silhouettes this sprite in white for the broken cast. The **sixth** walks forward, so the sprite slides right. The **seventh** comes up on its front legs, so the sprite turns about its hind feet. The **ninth** breaks in the middle, so the sprite is drawn in two halves that hinge down from their outer ends. Nothing about the painting may differ between copies, and nothing in it may hint at which four are lying.
 
 ## Where it stands in the game
 
@@ -23,10 +23,12 @@ Beat c and beat d, ten times along the back wall, at the heights in the level fi
 - High relief: the light edge along the back, the shadow under the belly.
 - Ochre in the same patches on every copy.
 - The ledge line: the back must be a clean level edge 28 px long, because the player stands on it.
+- The middle of the sprite, at column 20, is where the ninth one breaks. Nothing that must survive whole should straddle it.
+- The hind feet, around column 9, are what the seventh one rises on.
 
 ## Deliberately wrong
 
-The real horses are not all the same horse; they differ in size and preservation. The game repeats one because pillar 4 needs the cast indistinguishable from the stone.
+The real horses are not all the same horse; they differ in size and preservation. The game repeats one because pillar 4 needs the four that move indistinguishable from the six that do not. And no relief walks, rears or breaks in half while anyone stands on it.
 
 ## Easter eggs
 

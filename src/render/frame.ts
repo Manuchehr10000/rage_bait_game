@@ -64,3 +64,30 @@ export function silhouette(f: Frame, color: string): Frame {
   tintCache.set(id, out);
   return out;
 }
+
+const lampCache = new Map<string, Frame>();
+
+/**
+ * The same frame with the headlamp's lens lit, at sprite coordinates of the
+ * right-facing sprite. Baked into a canvas and cached, so the flip, the
+ * rotations and the stretches of the death animations all carry the light.
+ */
+export function withLamp(f: Frame, lensX: number, lensY: number): Frame {
+  const id = `${f.key}:lamp`;
+  const hit = lampCache.get(id);
+  if (hit) return hit;
+  const k = Math.max(1, Math.round(f.sw / f.w));
+  const c = document.createElement('canvas');
+  c.width = f.sw;
+  c.height = f.sh;
+  const ctx = c.getContext('2d');
+  if (!ctx) throw new Error('2d context unavailable');
+  ctx.drawImage(f.src, f.sx, f.sy, f.sw, f.sh, 0, 0, f.sw, f.sh);
+  ctx.fillStyle = 'rgba(255, 244, 190, 0.45)';
+  ctx.fillRect((lensX - 1) * k, (lensY - 1) * k, 3 * k, 3 * k);
+  ctx.fillStyle = '#fff8c0';
+  ctx.fillRect(lensX * k, lensY * k, k, k);
+  const out: Frame = { src: c, sx: 0, sy: 0, sw: f.sw, sh: f.sh, w: f.w, h: f.h, key: id };
+  lampCache.set(id, out);
+  return out;
+}

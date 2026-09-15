@@ -6,6 +6,7 @@ import type {
   EntityDef,
   FallingDef,
   HazardDef,
+  HorseDef,
   Level,
   PickDef,
   PlatformDef,
@@ -62,6 +63,8 @@ export function createEntity(def: EntityDef, level: Level): Entity {
       return new Tipper(def);
     case 'hazard':
       return new Hazard(def);
+    case 'horse':
+      return new Horse(def);
     case 'pick':
       return new Pick(def);
   }
@@ -381,8 +384,8 @@ export class Crumble implements Entity {
 
   constructor(readonly def: CrumbleDef) {
     this.rect = { ...def.rect };
-    // Stepping stones can be swum under and past, a horse's back is landed on from above; everything else is solid all round.
-    this.solid = { rect: this.rect, dx: 0, dy: 0, oneWay: def.skin === 'stone' || def.skin === 'horse' };
+    // Stepping stones can be swum under and past; everything else is solid all round.
+    this.solid = { rect: this.rect, dx: 0, dy: 0, oneWay: def.skin === 'stone' };
   }
 
   /** How far it has dropped from where it started. */
@@ -433,6 +436,130 @@ export class Crumble implements Entity {
 
   solids(): MovingSolid[] {
     return this.state === 'gone' ? [] : [this.solid];
+  }
+}
+
+// ---------------------------------------------------------------------------
+
+/** How a horse of the frieze behaves once it has decided to. */
+const HORSE = {
+  /** Forward, in px per second, and how far it goes. Far enough to leave nobody standing. */
+  walkSpeed: 80,
+  walkDistance: 32,
+  /** How far the front comes up, in radians, and how fast. */
+  rearAngle: 0.62,
+  rearSpeed: 3.2,
+  /** Back the way you came, and up. */
+  rearPushX: -250,
+  rearPushY: -190,
+  /** How fast the two halves part, in fractions of the break per second. */
+  splitSpeed: 2.2,
+} as const;
+
+/**
+ * A horse of the frieze. Its back is a one-way ledge: you land on it from above
+ * and it never blocks you from the side. Nine of the ten hold. The others hold
+ * exactly as long as you keep moving.
+ */
+export class Horse implements Entity {
+  readonly rect: Rect;
+  state: 'idle' | 'armed' | 'acting' | 'done' = 'idle';
+  /** How far it has walked forward, in px. */
+  walked = 0;
+  /** How far the front has come up, in radians. */
+  angle = 0;
+  /** How far apart the two halves are, 0 to 1. */
+  broken = 0;
+  private timer = 0;
+  private vy = 0;
+  private readonly solid: MovingSolid;
+
+  constructor(readonly def: HorseDef) {
+    this.rect = { ...def.rect };
+    this.solid = { rect: this.rect, dx: 0, dy: 0, oneWay: true };
+  }
+
+  /** True while the back is still something to stand on. */
+  get standable(): boolean {
+    const t = this.def.trick;
+    if (t !== 'rear' && t !== 'split') return true;
+    return this.state === 'idle' || this.state === 'armed';
+  }
+
+  /** How far it has dropped from where it was carved. */
+  get fallen(): number {
+    return this.rect.y - this.def.rect.y;
+  }
+
+  update(w: World): void {
+    const d = this.def;
+    const p = w.player;
+    const r = this.rect;
+    this.solid.dx = 0;
+    this.solid.dy = 0;
+    if (d.trick === 'none' || this.state === 'done') return;
+    const standing = p.x + p.w > r.x && p.x < r.x + r.w && Math.abs(p.y + p.h - r.y) <= 2;
+
+    if (this.state === 'idle') {
+      if (standing) {
+        this.state = 'armed';
+        this.timer = d.delay;
+      }
+      return;
+    }
+
+    if (this.state === 'armed') {
+      // It has decided. Leaving now does not stop it; it only stops it mattering.
+      this.timer -= DT;
+      if (this.timer > 0) return;
+      this.state = 'acting';
+      if (d.trick === 'cast') w.sound('crumble');
+      else if (d.trick === 'split') w.sound('snap');
+      else w.sound('grind');
+      if (d.trick === 'rear' && standing) p.shove(HORSE.rearPushX, HORSE.rearPushY);
+      return;
+    }
+
+    switch (d.trick) {
+      case 'cast': {
+        // Plaster. It takes whoever is still on it down to the floor of the trench.
+        this.vy = Math.min(PHYS.maxFall, this.vy + PHYS.gravity * DT);
+        const before = r.y;
+        r.y += this.vy * DT;
+        if (r.y + r.h >= d.floorY) {
+          r.y = d.floorY - r.h;
+          this.state = 'done';
+          w.sound('thud');
+          if (standing) w.kill(d.cause);
+        }
+        this.solid.dy = r.y - before;
+        break;
+      }
+      case 'walk': {
+        // It walks out from under you. Stone is smooth: it carries nobody.
+        const step = Math.min(HORSE.walkSpeed * DT, HORSE.walkDistance - this.walked);
+        this.walked += step;
+        r.x += step;
+        if (this.walked >= HORSE.walkDistance) this.state = 'done';
+        break;
+      }
+      case 'rear': {
+        this.angle = Math.min(HORSE.rearAngle, this.angle + HORSE.rearSpeed * DT);
+        if (this.angle >= HORSE.rearAngle) this.state = 'done';
+        break;
+      }
+      case 'split': {
+        this.broken = Math.min(1, this.broken + HORSE.splitSpeed * DT);
+        if (this.broken >= 1) this.state = 'done';
+        break;
+      }
+      default:
+        break;
+    }
+  }
+
+  solids(): MovingSolid[] {
+    return this.standable ? [this.solid] : [];
   }
 }
 

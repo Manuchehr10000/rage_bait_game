@@ -47,6 +47,9 @@ export class Game {
   private coins: { x: number; y: number; t: number }[] = [];
   private texts: WorldText[] = [];
 
+  /** The headlamp. Off outside; switched on once past the door, and it stays on. */
+  private lampOn = false;
+
   private state: State = 'playing';
   private deathTimer = 0;
   private deathCause: DeathCause = 'Fall';
@@ -96,6 +99,11 @@ export class Game {
 
   get levelData(): LevelData {
     return this.level.data;
+  }
+
+  /** True once the headlamp is on. For tests. */
+  get lamp(): boolean {
+    return this.lampOn;
   }
 
   /** Which screen is showing. For tests. */
@@ -204,6 +212,7 @@ export class Game {
     this.audio.stopLoops();
     this.player.spawnAt(d.spawn.x, d.spawn.y);
     this.camera.reset();
+    this.lampOn = false;
     this.state = 'playing';
   }
 
@@ -303,6 +312,12 @@ export class Game {
     else if (!wasOnGround && this.player.onGround) this.audio.play('land');
     else if (this.player.justStepped) this.audio.play('step');
     this.bumpBlocks();
+    // Through the door, and he remembers what the lamp is for.
+    const lampFrom = this.level.data.lampFromX;
+    if (lampFrom !== undefined && !this.lampOn && this.player.x + this.player.w / 2 >= lampFrom) {
+      this.lampOn = true;
+      this.audio.play('click');
+    }
     this.camera.update(this.player);
     this.driveLoops();
 
@@ -381,6 +396,7 @@ export class Game {
       texts: this.texts,
       time: this.time,
       death: this.state === 'dead' ? { cause: this.deathCause, t: 1 - this.deathTimer / DEATH_TIME } : null,
+      lampOn: this.lampOn,
     };
     renderWorld(this.wctx, scene);
 

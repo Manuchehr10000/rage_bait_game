@@ -13,7 +13,7 @@ The same lost adult as every chapter, in this chapter's costume: modern hiking c
 bought for the trip. Frames in order: **idle** (feet together), **walk1**, **walk2** (the
 two halves of a step), **jump** (knees up). Faces right; the game flips it to face left.
 
-A khaki **bucket hat** with a **headlamp** strapped round it, lit. An orange **fleece**
+A khaki **bucket hat** with a **headlamp** strapped round it, **unlit**. An orange **fleece**
 with rucksack straps, walking trousers, boots. Everything is new. He came for the guided
 tour and has lost it.
 
@@ -26,18 +26,20 @@ pixel on each side. The feet are at the bottom row.
 
 ## Must be right
 
-- The headlamp must read as a headlamp at 12 px: a dark body on the brim, a bright
-  lens, at the front (the right edge when facing right). In the dark levels the game
-  cuts the beam out of the darkness from that lens, so it has to be where the beam
-  starts.
+- The headlamp must read as a headlamp at 12 px: a dark body on the brim and a dull
+  glass lens in front of it, at the front of the hat (the right edge when facing
+  right). Paint the lens **off**: the game lights it, as a bright pixel and a small
+  glow, from the moment he switches it on inside the shelter, and it cuts the beam out
+  of the darkness from that same place. The lens must be at sprite column 10, row 4,
+  of the right-facing frames, or the light will come out of his ear.
 - The hat is a bucket hat, not a cap and not a helmet. He is not a caver.
 - No furs, no skins, no club. The research is explicit.
 - Skin, hair and face are the designer's call. The tourist is nobody in particular.
 
 ## Deliberately wrong
 
-The whole outfit, in the sense that it is right for a cave and he is at a shelter, and
-the lamp is on in daylight. Pillar 9: cosmetic; nobody mentions it; it never changes the
+The whole outfit, in the sense that it is right for a cave and he is at a shelter: an
+overhang open to a French valley, where the only dark is the dark the game put there. Pillar 9: cosmetic; nobody mentions it; it never changes the
 hitbox.
 
 ## Easter eggs

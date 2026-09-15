@@ -1,4 +1,4 @@
-import { Grid, type LevelData } from '../../engine/level';
+import { Grid, type HorseTrick, type LevelData } from '../../engine/level';
 import { TILE } from '../../engine/types';
 
 /**
@@ -15,8 +15,11 @@ import { TILE } from '../../engine/types';
  *  21       the wall of 1911, and its door
  *  21..25   the shelter floor, lit
  *  26..68   the trench. Ten horses in high relief; their backs are the floor.
- *             The first five are under the museum's lamps. The fifth is a cast.
- *             The last five are in the dark; you have a headlamp.
+ *             The first five are under the museum's lamps; the fourth is a cast
+ *             and gives way if you stand about on it. The last five are in the
+ *             dark, and three of them do something a relief cannot: the sixth
+ *             walks out from under you, the seventh comes up and throws you back,
+ *             the ninth breaks in the middle. All ten are the same sprite.
  *  69..73   the far floor, and the digger's lamp
  *  74..     the deposit the excavation left; the pick works its edge
  *  81       exit
@@ -45,11 +48,24 @@ g.fill(74, GROUND - 1, W - 74, H - GROUND + 1, '%'); // the deposit
 
 /**
  * The frieze. Sprite x of each horse; the ledge is the back, 28 px from x + 4.
- * Five under the lamps at an even 68 px, the fifth a cast; five in the dark at
- * gaps of 48, 32, 52, 40 and 36. Every one of the ten is drawn from the same sprite.
+ * Five under the lamps at an even 68 px, five in the dark at uneven gaps.
+ * Every one of the ten is drawn from the same sprite (pillar 4), and what any
+ * one of them does is learned the way everything here is learned.
  */
-const HORSES = [440, 508, 576, 644, 712, 788, 848, 928, 996, 1060];
-const CAST = 4;
+const HORSES: { x: number; trick: HorseTrick }[] = [
+  { x: 440, trick: 'none' },
+  { x: 508, trick: 'none' },
+  { x: 576, trick: 'none' },
+  { x: 644, trick: 'cast' }, // plaster, and lit: stand about on it and it goes
+  { x: 712, trick: 'none' },
+  { x: 788, trick: 'walk' }, // walks forward out from under you
+  { x: 848, trick: 'rear' }, // comes up on its front legs and throws you back
+  { x: 920, trick: 'none' },
+  { x: 988, trick: 'split' }, // breaks in the middle
+  { x: 1052, trick: 'none' },
+];
+/** How long you may stand on one before it decides. Crossing at a run takes 0.31 s. */
+const DELAY: Record<HorseTrick, number> = { none: 0, cast: 0.45, walk: 0.12, rear: 0.5, split: 0.5 };
 const LIT = 5;
 
 const DIGGER_X = DEPOSIT_X - 2;
@@ -65,6 +81,7 @@ export const CAP_BLANC: LevelData = {
   rows: g.rows(),
   spawn: { x: 24, y: px(GROUND) - 16 },
   cameraBottom: px(16),
+  lampFromX: WALL_X + 26,
   fallCause: 'The trench',
   exit: { x: EXIT_X, y: LEDGE_Y - 24, w: 12, h: 24 },
 
@@ -77,7 +94,7 @@ export const CAP_BLANC: LevelData = {
     { kind: 'bisonRelief', x: 606, y: 160 },
     { kind: 'dark', x0: WALL_X + 36, x1: px(W), lamp: 'headlamp' },
     // The museum's lamps over the first five horses; the digger's work lamp; the light at the way out.
-    ...HORSES.slice(0, LIT).map((x) => ({ kind: 'spotlight' as const, x: x + 20, floorY: px(GROUND), top: CEILING })),
+    ...HORSES.slice(0, LIT).map((h) => ({ kind: 'spotlight' as const, x: h.x + 20, floorY: px(GROUND), top: CEILING })),
     { kind: 'spotlight', x: DIGGER_X + 28, floorY: LEDGE_Y, top: CEILING },
     { kind: 'spotlight', x: EXIT_X + 6, floorY: LEDGE_Y, top: CEILING },
   ],
@@ -85,13 +102,12 @@ export const CAP_BLANC: LevelData = {
   entities: [
     // The stream in the valley. A metre deep.
     { kind: 'water', x0: px(9), x1: px(11), startY: px(GROUND) + 6, cause: 'The Beune' },
-    // Ten horses. Nine are limestone. One is plaster, and it looks exactly like the others.
-    ...HORSES.map((x, i) => ({
-      kind: 'crumble' as const,
-      skin: 'horse' as const,
-      rect: { x: x + 4, y: LEDGE_Y, w: 28, h: 6 },
-      fake: i === CAST,
-      delay: 0.35,
+    // Ten horses. Six hold. The other four look exactly like them.
+    ...HORSES.map((h) => ({
+      kind: 'horse' as const,
+      rect: { x: h.x + 4, y: LEDGE_Y, w: 28, h: 6 },
+      trick: h.trick,
+      delay: DELAY[h.trick],
       floorY: TRENCH_FLOOR,
       cause: 'The cast' as const,
     })),

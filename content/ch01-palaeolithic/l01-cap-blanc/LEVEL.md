@@ -27,17 +27,22 @@ the ruined castle of **Commarque**.
 | Beat | Folder | What you see | What is true |
 |---|---|---|---|
 | a | `a-valley` | A meadow, the Beune, the wooded slope and Commarque opposite | The valley as it is; the stream is a metre deep and cold |
-| b | `b-shelter` | The wall with its door; the overhang; the lit floor | The protective wall and door, the modern lighting |
-| c | `c-frieze` | Ten horses under museum lamps; their backs are the floor; the fifth gives way | Ten is the count of horses on the frieze; the backs are relief deep enough to stand on in the game's scale; none is plaster |
-| d | `d-dark` | The lamps end; the rest of the frieze is in the dark; only the headlamp shows it | The far end of the frieze is less well lit for a visitor; the darkness is the level's |
+| b | `b-shelter` | The wall with its door; through it, he switches the headlamp on; the lit floor | The protective wall and door, the modern lighting |
+| c | `c-frieze` | Five horses under museum lamps; their backs are the floor; the fourth is plaster and goes if you stand about on it | Ten is the count of horses on the frieze; the backs are relief deep enough to stand on in the game's scale; none is plaster |
+| d | `d-dark` | The lamps end; five more horses, seen only by the headlamp. The sixth walks out from under you, the seventh comes up and throws you back, the ninth breaks in the middle; the eighth and tenth hold | The far end of the frieze is less well lit for a visitor; the darkness is the level's, and no relief has ever moved |
 | e | `e-dig` | A workman with a pick, working the deposit on a cycle; the swing is the last trap | The 1909 discovery, by pick, into the deposit. He is not still there |
 | f | `f-exit` | The far floor and the way out | The visitor leaves by the same door; the game lets you leave at the far end |
 
 ## What the level teaches
 
 The chapter's three words, in order: **a relief ledge is a floor** (the horses), **light
-is a resource** (the lamps stop, the headlamp is all you have), **what you see may be a
-cast** (the fifth horse; the burial at your feet).
+is a resource** (the lamp goes on at the door, the museum's lamps stop half way, the
+headlamp is all you have), **what you see may be a cast** (the fourth horse; the burial
+at your feet).
+
+And the rule the whole game runs on: ten identical horses, six of which hold. Standing
+still is what kills you here. A player who keeps moving crosses the frieze without ever
+learning that four of them were waiting.
 
 ## Details a teacher will look for
 
@@ -58,7 +63,9 @@ cast** (the fifth horse; the burial at your feet).
 
 ## Deliberate lies
 
-- The fifth horse is plaster. No horse of the frieze is a cast.
+- The fourth horse is plaster. No horse of the frieze is a cast.
+- The sixth walks, the seventh rears, the ninth breaks in two. They are carved in high
+  relief into a limestone wall and have not moved since the Magdalenian.
 - The floor of the trench kills. It is a metre and a half down.
 - The digger is still there, on a cycle, and his pick is deadly. The 1909 workman was
   paid by the day and went home.

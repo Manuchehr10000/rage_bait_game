@@ -980,7 +980,7 @@ const HIKER: Palette = {
   O: '#2b1d10', // outline
   H: '#b5a06a', // bucket hat, khaki
   K: '#1c1c1c', // headlamp body, eye
-  L: '#fff8c0', // headlamp lens, lit
+  L: '#8a8f94', // headlamp lens, unlit: the game lights it
   S: '#e6b48c', // skin
   J: '#e0632c', // fleece
   Z: '#3c4a5a', // rucksack strap

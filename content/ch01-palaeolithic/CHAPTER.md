@@ -35,7 +35,8 @@ caused it and nothing reacts. There is no text inside a level. The full rules ar
 ## The tourist
 
 Research: modern hiking clothes, bucket hat, headlamp. As drawn: a khaki bucket hat with
-a headlamp strapped round it and switched on in daylight, an orange fleece, rucksack
+a headlamp strapped round it, unlit outside and switched on the moment he is through the
+door, an orange fleece, rucksack
 straps, walking trousers, boots. He is dressed for a cave and has come to a shelter.
 Nobody in the game ever mentions it. It never changes the hitbox. The headlamp is the one
 part of the costume that does anything: in the dark it is the only light there is.

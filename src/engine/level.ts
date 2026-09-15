@@ -109,7 +109,7 @@ export interface SweepDef {
 /** Looks like something to stand on. If fake, it gives way a moment after you do, or on an event. */
 export interface CrumbleDef {
   kind: 'crumble';
-  skin: 'croc' | 'capital' | 'rock' | 'floor' | 'talatat' | 'column' | 'stone' | 'horse';
+  skin: 'croc' | 'capital' | 'rock' | 'floor' | 'talatat' | 'column' | 'stone';
   rect: Rect;
   fake: boolean;
   delay: number;
@@ -119,6 +119,36 @@ export interface CrumbleDef {
   floorY?: number;
   /** Whoever is still riding it when it lands dies of this. */
   cause?: DeathCause;
+}
+
+/**
+ * What a horse of the frieze does when you stand on its back. Nine of the ten at
+ * Cap Blanc are limestone and one is plaster; in the game four of them move,
+ * which no relief can do. All ten are the same sprite (pillar 4).
+ */
+export type HorseTrick =
+  /** Limestone. It holds. */
+  | 'none'
+  /** Plaster. It gives way and takes you down to the floor of the trench. */
+  | 'cast'
+  /** It walks forward out from under you. It carries nobody: smooth stone. */
+  | 'walk'
+  /** The front comes up and the back throws you back the way you came. */
+  | 'rear'
+  /** It breaks in the middle and the two halves fall apart. */
+  | 'split';
+
+/** One horse of the frieze. The rect is the back: the ledge you stand on. */
+export interface HorseDef {
+  kind: 'horse';
+  rect: Rect;
+  trick: HorseTrick;
+  /** Seconds of standing on it before the trick fires. */
+  delay: number;
+  /** Where the plaster lands, for `cast`. */
+  floorY: number;
+  /** What the plaster kills you with, for `cast`. */
+  cause: DeathCause;
 }
 
 /** A still, invisible band of death. The floor of a trench, say. Drawn by decor. */
@@ -203,6 +233,7 @@ export type EntityDef =
   | ChaserDef
   | TipperDef
   | HazardDef
+  | HorseDef
   | PickDef;
 
 // ---------------------------------------------------------------------------
@@ -240,6 +271,8 @@ export interface LevelData {
   theme: Theme;
   /** The chapter's costume. Picks the tourist's sprites and nothing else. */
   costume: Costume;
+  /** Past this x the tourist switches the headlamp on, and it stays on. */
+  lampFromX?: number;
   widthTiles: number;
   heightTiles: number;
   rows: string[];

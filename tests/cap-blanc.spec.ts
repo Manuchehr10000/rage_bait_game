@@ -13,6 +13,7 @@ interface Snap {
   y: number;
   total: number;
   phase: string;
+  lamp: boolean;
 }
 
 const DRIVER = `
@@ -24,19 +25,25 @@ const DRIVER = `
   const jump = (frames = 18) => { key('Space', true); hold = frames; };
   const canJump = () => p.onGround && hold === 0;
   const E = g.entities;
-  const horses = E.filter((e) => e.def.kind === 'crumble' && e.def.skin === 'horse');
-  const cast = horses.find((h) => h.def.fake);
+  const horses = E.filter((e) => e.def.kind === 'horse');
+  /** The four that do something, by their number on the frieze. */
+  const cast = horses[3];
+  const walker = horses[5];
+  const rearer = horses[6];
+  const splitter = horses[8];
   const pick = E.find((e) => e.def.kind === 'pick');
   const stream = E.find((e) => e.def.kind === 'water');
   const streamX = stream.def.x0;
   const floorEdge = g.level.data.decor.find((d) => d.kind === 'trench').rect.x;
   const farFloor = pick.def.triggerX;
-  const stepX = pick.def.hazard.x;
-  const firstDark = horses[5].rect.x;
-  const lastLit = horses[4].rect.x;
+  const ledgeY = horses[0].rect.y;
+  /** Feet on a horse's back. */
+  const standY = ledgeY - 16;
   const under = () => horses.find((h) => p.x + 5 >= h.rect.x && p.x + 5 <= h.rect.x + h.rect.w);
   /** Right edge of the player, for jumping off ledges. */
   const right = () => p.x + p.w;
+  /** Stand on one horse, with the camera already past it. */
+  const standOn = (h) => { p.spawnAt(h.rect.x + 9, standY); g.camera.x = h.rect.x - 120; };
   let phase = 'valley';
   const run = (step, maxTicks) => {
     for (let i = 0; i < maxTicks; i++) {
@@ -46,11 +53,11 @@ const DRIVER = `
       if (g.state !== 'playing') break;
     }
     key('ArrowRight', false); key('Space', false);
-    return { state: g.state, cause: g.deathCause, x: Math.round(p.x), y: Math.round(p.y), total: g.stats.total, phase };
+    return { state: g.state, cause: g.deathCause, x: Math.round(p.x), y: Math.round(p.y), total: g.stats.total, phase, lamp: g.lamp };
   };
   // The valley: one stream to jump.
   const valley = () => { key('ArrowRight', true); if (canJump() && right() >= streamX - 8 && right() < streamX + 10) jump(); };
-  // The frieze: jump from within \`early\` px of a horse's far edge. The one who knows uses 4; the one who guesses in the dark uses more.
+  // The frieze: jump from within \`early\` px of a horse's far edge. Keep moving and nothing has time to decide.
   const hop = (early) => {
     key('ArrowRight', true);
     if (!canJump()) return;
@@ -89,7 +96,21 @@ test('walking into the Beune drowns you', async ({ page }) => {
   expect(r.x).toBeLessThan(200);
 });
 
-test('the fifth horse is plaster: stop on it and it goes; keep moving and it holds', async ({ page }) => {
+test('the headlamp is off in the valley and comes on through the door', async ({ page }) => {
+  const before = await page.evaluate(`(() => window.__game.lamp)()`);
+  expect(before).toBe(false);
+  const r = await play(page, `
+    const step = () => {
+      if (g.lamp) { key('ArrowRight', false); phase = 'lit'; return; }
+      valley();
+    };`, 60 * 12);
+  expect(r.phase).toBe('lit');
+  expect(r.lamp).toBe(true);
+  expect(r.x).toBeGreaterThan(352);
+  expect(r.x).toBeLessThan(420);
+});
+
+test('the fourth horse is plaster: stop on it and it goes; keep moving and it holds', async ({ page }) => {
   const looker = await play(page, `
     const step = () => {
       if (phase === 'valley') { valley(); if (p.x > streamX + 40) phase = 'frieze'; return; }
@@ -102,7 +123,7 @@ test('the fifth horse is plaster: stop on it and it goes; keep moving and it hol
   const runner = await play(page, `
     const step = () => {
       if (phase === 'valley') { valley(); if (p.x > streamX + 40) phase = 'frieze'; return; }
-      if (p.x > firstDark + 8 && p.onGround) { key('ArrowRight', false); phase = 'past'; return; }
+      if (under() === horses[4] && p.onGround) { key('ArrowRight', false); phase = 'past'; return; }
       hop(4);
     };`, 60 * 15);
   expect(runner.state).toBe('playing');
@@ -110,14 +131,38 @@ test('the fifth horse is plaster: stop on it and it goes; keep moving and it hol
   expect(runner.total).toBe(0);
 });
 
-test('a rhythm that clears the lit horses falls in the dark', async ({ page }) => {
+test('the sixth horse walks out from under anyone who stands still', async ({ page }) => {
   const r = await play(page, `
-    const step = () => {
-      if (phase === 'valley') { valley(); if (p.x > streamX + 40) phase = 'frieze'; return; }
-      hop(18);
-    };`);
+    standOn(walker);
+    const step = () => { key('ArrowRight', false); if (walker.walked >= 16) phase = 'walked'; };`, 60 * 8);
+  expect(r.phase).toBe('walked');
   expect(r.cause).toBe('The trench');
-  expect(r.x).toBeGreaterThan(744);
+});
+
+test('the seventh horse comes up and throws you back into the trench', async ({ page }) => {
+  const r = await play(page, `
+    standOn(rearer);
+    const startX = p.x;
+    const step = () => { key('ArrowRight', false); if (p.x < startX - 8) phase = 'thrown'; };`, 60 * 8);
+  expect(r.phase).toBe('thrown');
+  expect(r.cause).toBe('The trench');
+});
+
+test('the ninth horse breaks in the middle and drops you', async ({ page }) => {
+  const r = await play(page, `
+    standOn(splitter);
+    const step = () => { key('ArrowRight', false); if (splitter.broken > 0) phase = 'broken'; };`, 60 * 8);
+  expect(r.phase).toBe('broken');
+  expect(r.cause).toBe('The trench');
+});
+
+test('the other six hold however long you stand on them', async ({ page }) => {
+  const r = await play(page, `
+    const stable = horses.filter((h) => h.def.trick === 'none');
+    standOn(stable[5]);
+    const step = () => key('ArrowRight', false);`, 60 * 6);
+  expect(r.state).toBe('playing');
+  expect(r.y).toBe(208);
 });
 
 test('running at the pick from the far floor gets you picked', async ({ page }) => {
