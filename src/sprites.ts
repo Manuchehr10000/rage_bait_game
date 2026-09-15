@@ -186,49 +186,13 @@ export const DATE_SPRITE = compile(['.OO.', 'ONNO', 'ONNO', '.OO.'], { O: '#2b1d
 const GOD: Palette = {
   O: '#2b1d10',
   S: '#c19b66',
+  L: '#d6b57f',
   D: '#8f6f44',
   G: '#d9b34a', // gold disc / plumes
   K: '#1c1c1c',
 };
 
-const seated = (head: string[]): string[] => [
-  ...head,
-  '.....OSSSSO.....',
-  '.....OSSSSO.....',
-  '....OSSSSSSO....',
-  '...OSSDSSDSSO...',
-  '...OSSSSSSSSO...',
-  '...OSSSSSSSSO...',
-  '...OSSSSSSSSO...',
-  '...OSSSSSSSSOOOO',
-  '...OSSSSSSSSSSSO',
-  '...OSSSSSSSSSSSO',
-  '...ODSSSSSSSSSSO',
-  '...ODSSSSSSSSSSO',
-  '...OSSSSSSSSSSSO',
-  '...OSSSSSSSSDSSO',
-  '...OSSSSSSSSDSSO',
-  '...OOOOOOOOOOOOO',
-];
-
-export const GOD_SPRITES = {
-  raHorakhty: compile(
-    seated(['......OGGO......', '.....OGGGGO.....', '.....OGGGGO.....', '......OOOO......', '.....OSSSSO.....', '....OSSKSSSO....', '....OSSSSSKO....', '.....OSSSSO.....']),
-    GOD,
-  ),
-  ramesses: compile(
-    seated(['.....OOOOOO.....', '....ODSDSDSO....', '....OSDSDSDO....', '...OOSSSSSSOO...', '...ODOSKSSOSO...', '...ODOSSSSOSO...', '....OOSKKSOO....', '.....OSSSSO.....']),
-    GOD,
-  ),
-  amun: compile(
-    seated(['.....OG.GO......', '.....OG.GO......', '.....OG.GO......', '.....OGOGO......', '.....OSSSSO.....', '....OSSKSSSO....', '....OSSSSSSO....', '.....OSSSSO.....']),
-    GOD,
-  ),
-  ptah: compile(
-    seated(['................', '................', '................', '.....OOOOOO.....', '....OKKKKKKO....', '....OKSKSSKO....', '....OKSSSSKO....', '.....OSKKSO.....']),
-    GOD,
-  ),
-};
+/** The four in the sanctuary are built with the painter below; see `godSprites()`. */
 
 // ---------------------------------------------------------------------------
 // A small painter for big sprites: fill shapes into a char grid, then outline.
@@ -347,11 +311,46 @@ function colossusBody(): HTMLCanvasElement {
   g.rect(34, 100, 22, 8, 'S');
   g.rect(8, 100, 22, 2, 'L');
   g.rect(34, 100, 22, 2, 'L');
-  // The queen at the king's leg, as on the real facade.
-  g.rect(0, 78, 6, 30, 'D');
-  g.rect(1, 80, 4, 5, 'S');
-  g.rect(1, 87, 4, 12, 'S');
+  // Cartouches on the chest and the shoulders, sunk into the stone.
+  cartouche(g, 29, 12, 6, 12);
+  cartouche(g, 14, 10, 4, 8);
+  cartouche(g, 46, 10, 4, 8);
+  family(g);
   return compile(g.outline('O').rows(), STONE);
+}
+
+/** A cartouche: a rounded frame with a name inside that nobody at this scale can read. */
+function cartouche(g: PixelGrid, x: number, y: number, w: number, h: number): void {
+  g.rect(x, y, w, h, 'D');
+  g.rect(x + 1, y + 1, w - 2, h - 2, 'L');
+  g.rect(x, y, 1, 1, 'L');
+  g.rect(x + w - 1, y, 1, 1, 'L');
+  g.rect(x, y + h - 1, 1, 1, 'L');
+  g.rect(x + w - 1, y + h - 1, 1, 1, 'L');
+  for (let i = 2; i < h - 2; i += 3) g.rect(x + 2, y + i, w - 4, 1, 'D');
+  g.rect(x + 1, y + h, w - 2, 1, 'D'); // the tie at the bottom
+}
+
+/**
+ * The family at the king's legs, as on the real facade: the queen and the
+ * queen mother beside the shins, a prince or princess between them. They come
+ * up to his knee. That is the point of them.
+ */
+function family(g: PixelGrid): void {
+  const figure = (x: number, y: number, h: number, crown: boolean): void => {
+    g.rect(x, y, 6, h, 'S');
+    g.rect(x + 1, y, 4, 5, 'L'); // face
+    g.rect(x + 1, y + 5, 4, 1, 'D'); // collar
+    g.rect(x + 2, y + 5, 2, h - 5, 'L'); // the sheath dress catches the light
+    g.rect(x + 1, y + h - 1, 4, 1, 'D');
+    if (crown) {
+      g.rect(x + 1, y - 4, 4, 4, 'D'); // plumes and disc of a queen
+      g.rect(x + 2, y - 3, 2, 3, 'S');
+    }
+  };
+  figure(0, 80, 28, true);
+  figure(58, 80, 28, true);
+  figure(29, 84, 24, false);
 }
 
 function colossusBroken(): HTMLCanvasElement {
@@ -377,9 +376,7 @@ function colossusBroken(): HTMLCanvasElement {
   g.rect(50, 66, 2, 40, 'D');
   g.rect(8, 100, 22, 8, 'S');
   g.rect(34, 100, 22, 8, 'S');
-  g.rect(0, 78, 6, 30, 'D');
-  g.rect(1, 80, 4, 5, 'S');
-  g.rect(1, 87, 4, 12, 'S');
+  family(g);
   return compile(g.outline('O').rows(), STONE);
 }
 
@@ -394,41 +391,119 @@ function colossusPieces(): HTMLCanvasElement {
   g.rect(52, 7, 4, 2, 'D');
   g.rect(60, 7, 4, 2, 'D');
   g.rect(56, 11, 6, 1, 'D');
+  g.rect(36, 4, 8, 10, 'S'); // a piece of the crown, on end
+  g.rect(38, 6, 4, 6, 'L');
   return compile(g.outline('O').rows(), STONE);
 }
 
+/** Pixels of crown above the 32 x 32 head hitbox. The sprite is drawn that much higher. */
+export const HEAD_CROWN = 16;
+
 function colossusHead(): HTMLCanvasElement {
-  const g = new PixelGrid(32, 32);
+  const g = new PixelGrid(32, 32 + HEAD_CROWN);
+  const c = HEAD_CROWN;
+  // The double crown, seen from the front: the red crown as a low band, the
+  // white crown rising out of it as a tall bulb, the curl of the red crown at the front.
+  g.rect(6, c - 7, 20, 7, 'S');
+  g.bevel(6, c - 7, 2, 1, 1);
+  g.bevel(25, c - 7, 2, -1, 1);
+  g.rect(7, c - 5, 18, 1, 'D'); // rim of the red crown
+  g.rect(11, 2, 10, c - 2, 'S');
+  g.rect(12, 0, 8, 3, 'S');
+  g.bevel(12, 0, 2, 1, 1);
+  g.bevel(19, 0, 2, -1, 1);
+  g.rect(13, 1, 4, c - 5, 'L'); // the bulb catches the light
+  g.rect(15, c - 4, 2, 2, 'D'); // the curl
+  g.rect(17, c - 3, 1, 1, 'D');
   // Nemes: smooth crown under a headband, striped wings falling to the shoulders.
-  g.rect(0, 2, 32, 30, 'S');
-  g.bevel(0, 2, 3, 1, 1);
-  g.bevel(31, 2, 3, -1, 1);
-  g.rect(8, 5, 16, 6, 'L'); // crown catches the light
-  g.rect(1, 4, 30, 1, 'D'); // headband
+  g.rect(0, c + 2, 32, 30, 'S');
+  g.bevel(0, c + 2, 3, 1, 1);
+  g.bevel(31, c + 2, 3, -1, 1);
+  g.rect(8, c + 5, 16, 6, 'L');
+  g.rect(1, c + 4, 30, 1, 'D'); // headband
   for (let i = 0; i < 3; i++) {
-    g.rect(1 + i * 2, 7, 1, 25, 'D');
-    g.rect(30 - i * 2, 7, 1, 25, 'D');
+    g.rect(1 + i * 2, c + 7, 1, 25, 'D');
+    g.rect(30 - i * 2, c + 7, 1, 25, 'D');
   }
-  g.rect(7, 7, 1, 25, 'D'); // edge of the wing against the face
-  g.rect(24, 7, 1, 25, 'D');
+  g.rect(7, c + 7, 1, 25, 'D'); // edge of the wing against the face
+  g.rect(24, c + 7, 1, 25, 'D');
   // Face.
-  g.rect(8, 11, 16, 17, 'L');
-  g.rect(8, 11, 16, 1, 'S');
-  g.rect(9, 17, 5, 2, 'D'); // eyes
-  g.rect(18, 17, 5, 2, 'D');
-  g.rect(10, 17, 1, 1, 'O');
-  g.rect(21, 17, 1, 1, 'O');
-  g.rect(15, 20, 2, 3, 'D'); // nose
-  g.rect(12, 24, 8, 1, 'D'); // the famous slight smile
-  g.rect(11, 25, 1, 1, 'D');
-  g.rect(20, 25, 1, 1, 'D');
-  // False beard and uraeus.
-  g.rect(13, 28, 6, 4, 'D');
-  g.rect(14, 29, 4, 3, 'S');
-  g.rect(15, 0, 2, 3, 'D');
-  g.rect(14, 2, 4, 1, 'D');
+  g.rect(8, c + 11, 16, 17, 'L');
+  g.rect(8, c + 11, 16, 1, 'S');
+  g.rect(9, c + 16, 5, 1, 'D'); // brows
+  g.rect(18, c + 16, 5, 1, 'D');
+  g.rect(9, c + 17, 5, 2, 'D'); // eyes, with the cosmetic line drawn out to the side
+  g.rect(18, c + 17, 5, 2, 'D');
+  g.rect(10, c + 17, 1, 1, 'O');
+  g.rect(21, c + 17, 1, 1, 'O');
+  g.rect(8, c + 18, 1, 1, 'D');
+  g.rect(23, c + 18, 1, 1, 'D');
+  g.rect(15, c + 20, 2, 3, 'D'); // nose
+  g.rect(14, c + 22, 4, 1, 'D');
+  g.rect(12, c + 24, 8, 1, 'D'); // the famous slight smile
+  g.rect(11, c + 25, 1, 1, 'D');
+  g.rect(20, c + 25, 1, 1, 'D');
+  // False beard, plaited, and the uraeus on the brow.
+  g.rect(13, c + 28, 6, 4, 'D');
+  g.rect(14, c + 29, 4, 3, 'S');
+  g.rect(15, c + 30, 2, 1, 'D');
+  g.rect(15, c + 1, 2, 4, 'D');
+  g.rect(14, c + 2, 1, 2, 'D');
+  g.rect(17, c + 2, 1, 2, 'D');
+  g.rect(15, c + 2, 2, 1, 'L'); // the cobra's hood
   return compile(g.outline('O').rows(), STONE);
 }
+
+/** Ra-Horakhty in the niche over the door: falcon head, sun disc, 10 x 22. */
+export const RA_NICHE_SPRITE = compile(
+  [
+    '...OOOO...',
+    '..OLLLLO..',
+    '..OLLLLO..',
+    '...OOOO...',
+    '..OSSSSO..',
+    '..OSKSSO..',
+    '...OSSOO..',
+    '...OOO....',
+    '..OSSSSO..',
+    '.OSSSSSSO.',
+    '.OSDSSDSO.',
+    '.OSSSSSSO.',
+    '.OSSSSSSO.',
+    '..OSSSSO..',
+    '..OSDDSO..',
+    '..OSDDSO..',
+    '..OSDDSO..',
+    '..OSSSSO..',
+    '..OSSSSO..',
+    '..OSSSSO..',
+    '.OSSOOSSO.',
+    '.OOOO.OOO.',
+  ],
+  { O: '#2b1d10', S: '#b3925c', L: '#d9b34a', D: '#8f6f44', K: '#1c1c1c' },
+);
+
+/** Ramesses as Osiris, arms crossed, on a pillar of the hall. 12 x 60. */
+function osiride(): HTMLCanvasElement {
+  const g = new PixelGrid(12, 60);
+  g.rect(2, 0, 8, 60, 'Q'); // the pillar behind him
+  g.rect(3, 4, 6, 3, 'S'); // white crown
+  g.rect(4, 2, 4, 2, 'S');
+  g.rect(3, 7, 6, 6, 'L'); // face
+  g.rect(4, 9, 1, 1, 'D');
+  g.rect(7, 9, 1, 1, 'D');
+  g.rect(5, 13, 2, 2, 'D'); // beard
+  g.rect(2, 15, 8, 40, 'S'); // mummiform body
+  g.rect(3, 16, 6, 1, 'D'); // collar
+  g.rect(3, 19, 3, 2, 'D'); // crossed arms: crook and flail
+  g.rect(6, 19, 3, 2, 'D');
+  g.rect(4, 21, 1, 3, 'D');
+  g.rect(7, 21, 1, 3, 'D');
+  g.rect(5, 26, 2, 28, 'L');
+  g.rect(3, 55, 6, 2, 'D'); // feet
+  return compile(g.outline('O').rows(), STONE);
+}
+export const OSIRIDE_SPRITE = osiride();
 
 export const COLOSSUS = {
   body: colossusBody(),
@@ -436,6 +511,79 @@ export const COLOSSUS = {
   pieces: colossusPieces(),
   head: colossusHead(),
 };
+
+/** A seated god on a block throne, without a head. Head goes in rows 0..11. */
+function seatedGod(): PixelGrid {
+  const g = new PixelGrid(16, 40);
+  g.rect(2, 22, 13, 18, 'D'); // throne
+  g.rect(3, 12, 10, 12, 'S'); // torso
+  g.rect(4, 13, 8, 1, 'D'); // collar
+  g.rect(5, 15, 6, 8, 'L');
+  g.rect(1, 14, 3, 10, 'S'); // upper arms
+  g.rect(12, 14, 3, 10, 'S');
+  g.rect(0, 22, 14, 6, 'S'); // lap, coming forward
+  g.rect(1, 23, 12, 2, 'L');
+  g.rect(1, 24, 4, 3, 'L'); // hands flat on the knees
+  g.rect(9, 24, 4, 3, 'L');
+  g.rect(1, 28, 5, 10, 'S'); // shins
+  g.rect(8, 28, 5, 10, 'S');
+  g.rect(2, 29, 2, 8, 'L');
+  g.rect(9, 29, 2, 8, 'L');
+  g.rect(0, 37, 6, 3, 'S'); // feet
+  g.rect(8, 37, 6, 3, 'S');
+  return g;
+}
+
+function godSprites(): Record<'ptah' | 'amun' | 'ramesses' | 'raHorakhty', HTMLCanvasElement> {
+  const face = (g: PixelGrid): void => {
+    g.rect(5, 6, 6, 6, 'L');
+    g.rect(6, 8, 1, 1, 'K');
+    g.rect(9, 8, 1, 1, 'K');
+    g.rect(7, 10, 2, 1, 'D');
+  };
+  // Ptah: skullcap, straight beard, wrapped like a mummy, the sceptre held in front.
+  const ptah = seatedGod();
+  ptah.rect(4, 3, 8, 4, 'K');
+  face(ptah);
+  ptah.rect(7, 12, 2, 3, 'K');
+  ptah.rect(1, 14, 12, 10, 'S'); // wrapped: the arms are inside
+  ptah.rect(7, 14, 2, 14, 'D'); // was sceptre
+  ptah.rect(6, 13, 4, 2, 'D');
+  // Amun: the flat crown with two tall plumes.
+  const amun = seatedGod();
+  amun.rect(5, 4, 6, 3, 'G');
+  amun.rect(6, 0, 1, 5, 'G');
+  amun.rect(9, 0, 1, 5, 'G');
+  amun.rect(6, 1, 1, 1, 'D');
+  amun.rect(9, 1, 1, 1, 'D');
+  face(amun);
+  amun.rect(7, 12, 2, 2, 'K');
+  // Ramesses, among the gods: nemes with the uraeus, and the false beard.
+  const ram = seatedGod();
+  ram.rect(3, 4, 10, 4, 'S');
+  ram.rect(3, 8, 2, 6, 'S');
+  ram.rect(11, 8, 2, 6, 'S');
+  ram.rect(4, 6, 1, 8, 'D');
+  ram.rect(11, 6, 1, 8, 'D');
+  ram.rect(7, 3, 2, 2, 'D');
+  face(ram);
+  ram.rect(7, 12, 2, 2, 'D');
+  // Ra-Horakhty: the falcon's head under the sun disc.
+  const ra = seatedGod();
+  ra.rect(5, 0, 6, 4, 'G');
+  ra.rect(6, 1, 4, 2, 'S');
+  ra.rect(5, 4, 6, 3, 'S');
+  ra.rect(4, 7, 8, 4, 'S');
+  ra.rect(6, 8, 1, 1, 'K');
+  ra.rect(9, 8, 1, 1, 'K');
+  ra.rect(7, 10, 2, 2, 'K'); // the hooked beak
+  ra.rect(3, 9, 1, 2, 'K'); // the cheek marking
+  ra.rect(12, 9, 1, 2, 'K');
+  const done = (g: PixelGrid): HTMLCanvasElement => compile(g.outline('O').rows(), GOD);
+  return { ptah: done(ptah), amun: done(amun), ramesses: done(ram), raHorakhty: done(ra) };
+}
+
+export const GOD_SPRITES = godSprites();
 
 // ---------------------------------------------------------------------------
 // Philae.

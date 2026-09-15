@@ -7,6 +7,9 @@ import {
   BOAT_SPRITE,
   CAPITAL_SPRITE,
   COLOSSUS,
+  HEAD_CROWN,
+  OSIRIDE_SPRITE,
+  RA_NICHE_SPRITE,
   CROC_SPRITE,
   DATE_SPRITE,
   GOD_SPRITES,
@@ -46,9 +49,10 @@ export const COLORS = {
   rock: '#98773f',
   rockLine: '#7c5f33',
   rockLight: '#a98650',
-  facade: '#8a6a3c',
-  facadeDark: '#6d5230',
-  cornice: '#b28d55',
+  facade: '#a5845a',
+  facadeDark: '#7a5f3a',
+  facadeLine: '#8c6c44',
+  cornice: '#c3a06a',
   doorway: '#2a1c10',
   sand: '#dcc08a',
   sandLine: '#b89a62',
@@ -368,23 +372,28 @@ function drawDecor(ctx: CanvasRenderingContext2D, s: Scene, d: DecorDef): void {
   const groundY = 15 * TILE;
   switch (d.kind) {
     case 'facade': {
-      const top = 5 * TILE + 8;
-      ctx.fillStyle = COLORS.facade;
-      ctx.fillRect(d.x, top, d.w, groundY - top);
-      ctx.fillStyle = COLORS.facadeDark;
-      ctx.fillRect(d.x, top, 3, groundY - top);
-      ctx.fillRect(d.x + d.w - 3, top, 3, groundY - top);
-      ctx.fillStyle = COLORS.cornice;
-      ctx.fillRect(d.x - 4, top - 6, d.w + 8, 6);
-      ctx.fillStyle = COLORS.outline;
-      ctx.fillRect(d.x - 4, top, d.w + 8, 1);
-      ctx.fillRect(d.x - 4, top - 6, d.w + 8, 1);
+      // The Great Temple's face: a pylon shape cut into the cliff, battered on
+      // its free edge, with a torus moulding and a cavetto cornice. The colossi
+      // sit in a recess below it. Over the door, Ra-Horakhty in his niche.
+      const top = 4 * TILE;
+      const batter = 16;
+      drawFacadeWall(ctx, d.x, top, d.w, groundY, batter);
+      drawCornice(ctx, d.x + batter - 4, top, d.w - batter + 8);
+      // Door: tall, narrow, with its own small cornice.
       ctx.fillStyle = COLORS.doorway;
       ctx.fillRect(d.doorX, groundY - 64, 16, 64);
-      ctx.fillStyle = COLORS.cornice;
-      ctx.fillRect(d.doorX - 2, groundY - 68, 20, 4);
-      ctx.fillStyle = COLORS.doorway;
-      ctx.fillRect(d.doorX + 4, groundY - 84, 8, 12);
+      ctx.fillStyle = COLORS.facadeDark;
+      ctx.fillRect(d.doorX - 3, groundY - 64, 3, 64);
+      ctx.fillRect(d.doorX + 16, groundY - 64, 3, 64);
+      drawCornice(ctx, d.doorX - 4, groundY - 66, 24);
+      // The niche over the door, and the king offering to it on either side.
+      ctx.fillStyle = COLORS.niche;
+      ctx.fillRect(d.doorX + 1, groundY - 100, 14, 26);
+      ctx.fillStyle = COLORS.facadeDark;
+      ctx.fillRect(d.doorX - 1, groundY - 102, 18, 2);
+      ctx.fillRect(d.doorX - 1, groundY - 100, 2, 26);
+      ctx.fillRect(d.doorX + 15, groundY - 100, 2, 26);
+      ctx.drawImage(RA_NICHE_SPRITE, d.doorX + 3, groundY - 98);
       break;
     }
     case 'colossus': {
@@ -398,16 +407,10 @@ function drawDecor(ctx: CanvasRenderingContext2D, s: Scene, d: DecorDef): void {
       break;
     }
     case 'frieze': {
+      // The terrace wall under the baboons, with its own cornice.
       const f = d.rect;
-      ctx.fillStyle = COLORS.facade;
-      ctx.fillRect(f.x - 8, f.y + f.h, f.w + 16, groundY - f.y - f.h);
-      ctx.fillStyle = COLORS.facadeDark;
-      ctx.fillRect(f.x + f.w + 5, f.y + f.h, 3, groundY - f.y - f.h);
-      ctx.fillStyle = COLORS.cornice;
-      ctx.fillRect(f.x - 8, f.y, f.w + 16, f.h);
-      ctx.fillStyle = COLORS.outline;
-      ctx.fillRect(f.x - 8, f.y, f.w + 16, 1);
-      ctx.fillRect(f.x - 8, f.y + f.h - 1, f.w + 16, 1);
+      drawFacadeWall(ctx, f.x - 8, f.y + f.h, f.w + 16, groundY, 0);
+      drawCornice(ctx, f.x - 8, f.y + f.h, f.w + 16);
       break;
     }
     case 'pit':
@@ -418,18 +421,21 @@ function drawDecor(ctx: CanvasRenderingContext2D, s: Scene, d: DecorDef): void {
       const c = d.corridor;
       ctx.fillStyle = COLORS.wall;
       ctx.fillRect(c.x, c.y, c.w, c.h);
-      for (let x = c.x + 16; x < c.x + c.w; x += 48) {
-        ctx.fillStyle = COLORS.pilaster;
-        ctx.fillRect(x, c.y, 6, c.h);
-        ctx.fillStyle = COLORS.wallLine;
-        ctx.fillRect(x, c.y, 1, c.h);
-      }
-      ctx.fillStyle = COLORS.wallLine;
-      for (let x = c.x + 4; x < c.x + c.w - 4; x += 6) {
+      // The Battle of Kadesh, in two registers of sunk relief: chariots above, the
+      // king's army below. At this size, marks. That is what most of it is now.
+      ctx.fillStyle = COLORS.pilaster;
+      ctx.fillRect(c.x, c.y + 20, c.w, 1);
+      ctx.fillRect(c.x, c.y + 42, c.w, 1);
+      for (let x = c.x + 4; x < c.x + c.w - 4; x += 5) {
         const h = hash(x, 7);
-        ctx.fillRect(x, c.y + 6 + (h % 4), 3, 2 + (h % 3));
-        ctx.fillRect(x + 1, c.y + 22 + ((h >> 2) % 4), 2, 3);
+        ctx.fillStyle = h % 3 === 0 ? COLORS.pilaster : COLORS.wallLine;
+        ctx.fillRect(x + (h % 2), c.y + 8 + (h % 4), 2, 6 + (h % 3)); // a figure
+        ctx.fillRect(x, c.y + 7 + (h % 4), 3, 1); // its head
+        ctx.fillRect(x + ((h >> 2) % 2), c.y + 28 + ((h >> 3) % 5), 2, 5);
       }
+      // Osiride pillars: the king as Osiris, eight of them down the hall.
+      for (let x = c.x + 14; x < c.x + c.w - 12; x += 48) ctx.drawImage(OSIRIDE_SPRITE, x, c.y + c.h - 60);
+      ctx.fillStyle = COLORS.wallLine;
       ctx.fillRect(c.x, c.y + c.h - 1, c.w, 1);
       const a = d.niche;
       ctx.fillStyle = COLORS.niche;
@@ -438,7 +444,8 @@ function drawDecor(ctx: CanvasRenderingContext2D, s: Scene, d: DecorDef): void {
       ctx.fillRect(a.x - 2, a.y, 2, a.h);
       ctx.fillRect(a.x + a.w, a.y, 2, a.h);
       ctx.drawImage(GOD_SPRITES.ptah, a.x + 8, a.y + a.h - 40);
-      const gods = [GOD_SPRITES.raHorakhty, GOD_SPRITES.ramesses, GOD_SPRITES.amun];
+      // Left to right as in the real sanctuary: Ptah, Amun-Ra, Ramesses, Ra-Horakhty.
+      const gods = [GOD_SPRITES.amun, GOD_SPRITES.ramesses, GOD_SPRITES.raHorakhty];
       d.gods.forEach((g, i) => {
         const sprite = gods[i];
         if (sprite) ctx.drawImage(sprite, g.x, g.y - 40);
@@ -604,6 +611,57 @@ function drawDecor(ctx: CanvasRenderingContext2D, s: Scene, d: DecorDef): void {
   }
 }
 
+/**
+ * A wall of Nubian sandstone with its bedding showing. The left edge leans in
+ * by `batter` px from bottom to top, with a torus moulding along it.
+ */
+function drawFacadeWall(ctx: CanvasRenderingContext2D, x: number, top: number, w: number, bottom: number, batter: number): void {
+  const h = bottom - top;
+  for (let y = top; y < bottom; y += 4) {
+    const lean = Math.round((batter * (bottom - y)) / h);
+    const left = x + batter - lean;
+    ctx.fillStyle = COLORS.facade;
+    ctx.fillRect(left, y, x + w - left, 4);
+    if (batter > 0) {
+      ctx.fillStyle = COLORS.facadeDark;
+      ctx.fillRect(left, y, 3, 4);
+      ctx.fillStyle = COLORS.cornice;
+      ctx.fillRect(left + 1, y, 1, 4);
+    }
+  }
+  // Bedding planes in the rock, running through the whole face.
+  for (let y = top + 6; y < bottom; y += 12) {
+    const lean = Math.round((batter * (bottom - y)) / h);
+    const left = x + batter - lean + 3;
+    const jog = hash(1, y) % 3;
+    ctx.fillStyle = COLORS.facadeLine;
+    for (let sx = left; sx < x + w; sx += 40) {
+      const len = 12 + (hash(sx, y) % 20);
+      ctx.fillRect(sx, y + jog, Math.min(len, x + w - sx), 1);
+    }
+  }
+  ctx.fillStyle = COLORS.outline;
+  ctx.fillRect(x + w - 1, top, 1, h);
+}
+
+/** A cavetto cornice: a flared top with vertical leaves, over a torus roll. */
+function drawCornice(ctx: CanvasRenderingContext2D, x: number, y: number, w: number): void {
+  for (let i = 0; i < 6; i++) {
+    const flare = 6 - i;
+    ctx.fillStyle = i < 2 ? COLORS.cornice : COLORS.facade;
+    ctx.fillRect(x - flare, y - 8 + i, w + flare * 2, 1);
+  }
+  ctx.fillStyle = COLORS.facadeDark;
+  for (let sx = x - 4; sx < x + w + 4; sx += 4) ctx.fillRect(sx, y - 6, 1, 4);
+  ctx.fillStyle = COLORS.facadeDark;
+  ctx.fillRect(x - 2, y - 2, w + 4, 2);
+  ctx.fillStyle = COLORS.cornice;
+  ctx.fillRect(x - 2, y - 2, w + 4, 1);
+  ctx.fillStyle = COLORS.outline;
+  ctx.fillRect(x - 6, y - 8, w + 12, 1);
+  ctx.fillRect(x - 2, y, w + 4, 1);
+}
+
 // ---------------------------------------------------------------------------
 // Tiles.
 // ---------------------------------------------------------------------------
@@ -626,7 +684,7 @@ function drawTiles(ctx: CanvasRenderingContext2D, level: Level, cx: number, cy: 
         else if (theme === 'philae') drawGranite(ctx, tx, ty, x, y, open);
         else drawPaving(ctx, tx, ty, x, y, open);
       } else if (c === '#') {
-        if (theme === 'abuSimbel') drawBrick(ctx, x, y, ty % 2 === 1);
+        if (theme === 'abuSimbel') drawCliff(ctx, tx, ty, x, y, open);
         else if (theme === 'philae') drawColumnDrum(ctx, x, y, open);
         else drawSandstone(ctx, x, y, ty % 2 === 1, open);
       } else if (c === '?') {
@@ -721,18 +779,22 @@ function drawColumnDrum(ctx: CanvasRenderingContext2D, x: number, y: number, ope
   if (open) ctx.fillRect(x, y, TILE, 1);
 }
 
-function drawBrick(ctx: CanvasRenderingContext2D, x: number, y: number, offset: boolean): void {
-  ctx.fillStyle = COLORS.brick;
+/** The hill the temple was moved into: cut sandstone, bedded like the cliff it came from. */
+function drawCliff(ctx: CanvasRenderingContext2D, tx: number, ty: number, x: number, y: number, open: boolean): void {
+  ctx.fillStyle = COLORS.rock;
   ctx.fillRect(x, y, TILE, TILE);
-  ctx.fillStyle = COLORS.brickJoint;
-  ctx.fillRect(x, y, TILE, 1);
-  ctx.fillRect(x, y + 8, TILE, 1);
-  const j = offset ? 8 : 0;
-  ctx.fillRect(x + j, y, 1, 8);
-  ctx.fillRect(x + ((j + 8) % 16), y + 8, 1, 8);
-  ctx.fillStyle = COLORS.brickLight;
-  ctx.fillRect(x + j + 1, y + 1, 7, 1);
-  ctx.fillRect(x + ((j + 8) % 16) + 1, y + 9, 7, 1);
+  const h = hash(tx, ty);
+  ctx.fillStyle = h % 4 === 0 ? COLORS.rockLight : COLORS.rockLine;
+  ctx.fillRect(x, y + 5 + (h % 3), 6 + (h % 9), 1);
+  ctx.fillStyle = COLORS.rockLine;
+  ctx.fillRect(x + 4 + ((h >> 3) % 6), y + 12 + ((h >> 2) % 3), 5 + (h % 7), 1);
+  if (h % 7 === 0) ctx.fillRect(x + (h % 12), y + 1 + (h % 4), 1, 3);
+  if (open) {
+    ctx.fillStyle = COLORS.sandTop;
+    ctx.fillRect(x, y, TILE, 2);
+    ctx.fillStyle = COLORS.rockLine;
+    ctx.fillRect(x, y + 2, TILE, 1);
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -835,7 +897,7 @@ function drawEntityFront(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): vo
     case 'falling': {
       const f = e as Falling;
       if (f.state === 'landed') drawRubble(ctx, f.rect);
-      else ctx.drawImage(COLOSSUS.head, f.rect.x, f.rect.y);
+      else ctx.drawImage(COLOSSUS.head, f.rect.x, f.rect.y - HEAD_CROWN);
       break;
     }
     case 'thrower': {
