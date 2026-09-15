@@ -26,10 +26,13 @@ const DRIVER = `
   const canJump = () => p.onGround && hold === 0;
   const E = g.entities;
   const horses = E.filter((e) => e.def.kind === 'horse');
-  /** The four that do something, by their number on the frieze. */
-  const cast = horses[3];
-  const walker = horses[5];
+  /** The seven that do something, by their number on the frieze. */
+  const cast = horses[2];
+  const walker = horses[4];
+  const cracker = horses[5];
+  const shy = horses[6];
   const rearer = horses[7];
+  const stoner = horses[8];
   const splitter = horses[9];
   const pick = E.find((e) => e.def.kind === 'pick');
   const stream = E.find((e) => e.def.kind === 'water');
@@ -110,7 +113,7 @@ test('the headlamp is off in the valley and comes on through the door', async ({
   expect(r.x).toBeLessThan(420);
 });
 
-test('the fourth horse is plaster: stop on it and it goes; keep moving and it holds', async ({ page }) => {
+test('the third horse is plaster: stop on it and it goes; keep moving and it holds', async ({ page }) => {
   const looker = await play(page, `
     const step = () => {
       if (phase === 'valley') { valley(); if (p.x > streamX + 40) phase = 'frieze'; return; }
@@ -123,7 +126,7 @@ test('the fourth horse is plaster: stop on it and it goes; keep moving and it ho
   const runner = await play(page, `
     const step = () => {
       if (phase === 'valley') { valley(); if (p.x > streamX + 40) phase = 'frieze'; return; }
-      if (under() === horses[4] && p.onGround) { key('ArrowRight', false); phase = 'past'; return; }
+      if (under() === horses[3] && p.onGround) { key('ArrowRight', false); phase = 'past'; return; }
       hop(4);
     };`, 60 * 15);
   expect(runner.state).toBe('playing');
@@ -131,12 +134,60 @@ test('the fourth horse is plaster: stop on it and it goes; keep moving and it ho
   expect(runner.total).toBe(0);
 });
 
-test('the sixth horse walks out from under anyone who stands still', async ({ page }) => {
+test('the fifth horse walks out from under anyone who stands still', async ({ page }) => {
   const r = await play(page, `
     standOn(walker);
     const step = () => { key('ArrowRight', false); if (walker.walked >= 16) phase = 'walked'; };`, 60 * 8);
   expect(r.phase).toBe('walked');
   expect(r.cause).toBe('The trench');
+});
+
+test('the sixth horse holds for ten seconds, and then does not', async ({ page }) => {
+  const patient = await play(page, `
+    standOn(cracker);
+    const step = () => key('ArrowRight', false);`, 60 * 9);
+  expect(patient.state).toBe('playing');
+  expect(patient.y).toBe(208);
+  const late = await play(page, `
+    standOn(cracker);
+    const step = () => key('ArrowRight', false);`, 60 * 13);
+  expect(late.cause).toBe('The trench');
+});
+
+test('the seventh horse jumps when you jump at it, and only once', async ({ page }) => {
+  const chased = await play(page, `
+    standOn(cracker);
+    const step = () => {
+      key('ArrowRight', true);
+      if (canJump() && right() >= cracker.rect.x + cracker.rect.w - 4) jump();
+      if (shy.rect.y < shy.def.rect.y - 4) phase = 'itJumped';
+    };`, 60 * 6);
+  expect(chased.phase).toBe('itJumped');
+  expect(chased.cause).toBe('The trench');
+  // The answer is to jump where you stand: it goes, you come back down where you were.
+  const patient = await play(page, `
+    standOn(cracker);
+    const step = () => {
+      switch (phase) {
+        case 'valley':
+          key('ArrowRight', false);
+          if (canJump()) jump(10);
+          if (shy.state === 'acting') phase = 'settle';
+          break;
+        case 'settle':
+          if (p.onGround && under() !== cracker) phase = 'lost';
+          if (shy.state === 'done') phase = 'cross';
+          break;
+        case 'cross':
+          key('ArrowRight', true);
+          if (canJump() && right() >= cracker.rect.x + cracker.rect.w - 4) jump();
+          if (under() === shy && p.onGround) { key('ArrowRight', false); phase = 'across'; }
+          break;
+      }
+    };`, 60 * 12);
+  expect(patient.phase).toBe('across');
+  expect(patient.state).toBe('playing');
+  expect(patient.total).toBe(0);
 });
 
 test('the eighth horse comes up and throws you back into the trench', async ({ page }) => {
@@ -148,6 +199,14 @@ test('the eighth horse comes up and throws you back into the trench', async ({ p
   expect(r.cause).toBe('The trench');
 });
 
+test('the ninth horse brings the overhang down on anyone who waits', async ({ page }) => {
+  const r = await play(page, `
+    standOn(stoner);
+    const step = () => { key('ArrowRight', false); if (stoner.stoneShown) phase = 'falling'; };`, 60 * 6);
+  expect(r.phase).toBe('falling');
+  expect(r.cause).toBe('The roof');
+});
+
 test('the tenth horse breaks in the middle and drops you', async ({ page }) => {
   const r = await play(page, `
     standOn(splitter);
@@ -156,11 +215,11 @@ test('the tenth horse breaks in the middle and drops you', async ({ page }) => {
   expect(r.cause).toBe('The trench');
 });
 
-test('the other six hold however long you stand on them', async ({ page }) => {
+test('the three that hold do so however long you stand on them', async ({ page }) => {
   const r = await play(page, `
     const stable = horses.filter((h) => h.def.trick === 'none');
-    standOn(stable[5]);
-    const step = () => key('ArrowRight', false);`, 60 * 6);
+    standOn(stable[stable.length - 1]);
+    const step = () => key('ArrowRight', false);`, 60 * 12);
   expect(r.state).toBe('playing');
   expect(r.y).toBe(208);
 });
@@ -177,7 +236,15 @@ test('a run that knows the level finishes with zero deaths', async ({ page }) =>
     const step = () => {
       switch (phase) {
         case 'valley': valley(); if (p.x > streamX + 40) phase = 'frieze'; break;
-        case 'frieze': hop(4); if (p.x >= farFloor + 2 && p.onGround) phase = 'wait'; break;
+        case 'frieze': hop(4); if (under() === cracker && p.onGround) phase = 'bait'; break;
+        // The seventh jumps when you jump at it. Wake it, come back, and let it settle.
+        case 'bait':
+          key('ArrowRight', false);
+          if (canJump()) jump(10);
+          if (shy.state === 'acting') phase = 'settle';
+          break;
+        case 'settle': if (shy.state === 'done') phase = 'cross'; break;
+        case 'cross': hop(4); if (p.x >= farFloor + 2 && p.onGround) phase = 'wait'; break;
         case 'wait': key('ArrowRight', false); if (pick.t >= 1.1) phase = 'dig'; break;
         case 'dig': key('ArrowRight', true); if (canJump() && p.lastContacts.right) jump(); break;
       }

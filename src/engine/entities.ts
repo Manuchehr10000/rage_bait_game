@@ -446,6 +446,14 @@ const HORSE = {
   /** Forward, in px per second, and how far it goes. Far enough to leave nobody standing. */
   walkSpeed: 80,
   walkDistance: 32,
+  /** How near, and how far up, a jump has to be for the shy one to take it personally. */
+  shyRange: 72,
+  /** Its own hop: slow gravity and a lazy push, so it is away longer than you are. */
+  shyPush: 160,
+  shyGravity: 260,
+  /** The block of the overhang: how big, and how hard it comes down. */
+  stoneW: 24,
+  stoneH: 18,
   /** How far the front comes up, in radians, and how fast. */
   rearAngle: 0.62,
   rearSpeed: 3.2,
@@ -470,6 +478,9 @@ export class Horse implements Entity {
   angle = 0;
   /** How far apart the two halves are, 0 to 1. */
   broken = 0;
+  /** The block of the overhang, for `stone`. Only ever moves downward. */
+  readonly stone: Rect;
+  private stoneVy = 0;
   private timer = 0;
   private vy = 0;
   private readonly solid: MovingSolid;
@@ -477,13 +488,42 @@ export class Horse implements Entity {
   constructor(readonly def: HorseDef) {
     this.rect = { ...def.rect };
     this.solid = { rect: this.rect, dx: 0, dy: 0, oneWay: true };
+    this.stone = {
+      x: def.rect.x + (def.rect.w - HORSE.stoneW) / 2,
+      y: def.stoneFrom ?? def.rect.y - 96,
+      w: HORSE.stoneW,
+      h: HORSE.stoneH,
+    };
   }
 
   /** True while the back is still something to stand on. */
   get standable(): boolean {
-    const t = this.def.trick;
-    if (t !== 'rear' && t !== 'split') return true;
-    return this.state === 'idle' || this.state === 'armed';
+    switch (this.def.trick) {
+      case 'rear':
+      case 'split':
+        return this.state === 'idle' || this.state === 'armed';
+      // The shy one is only gone while it is in the air. It comes back to stay.
+      case 'shy':
+        return this.state !== 'acting';
+      // While it falls you ride it. Where it lands is the floor of a trench, not a floor.
+      case 'cast':
+      case 'crack':
+        return this.state !== 'done';
+      default:
+        return true;
+    }
+  }
+
+  /** True once the block of the overhang is on its way, or down. */
+  get stoneShown(): boolean {
+    return this.def.trick === 'stone' && this.state !== 'idle' && this.state !== 'armed';
+  }
+
+  /** A jump aimed at this one, from the ledge behind it. */
+  private jumpedAt(p: Player): boolean {
+    if (p.onGround || p.vy >= 0) return false;
+    const cx = centerX(p);
+    return cx < this.rect.x && this.rect.x - cx <= HORSE.shyRange;
   }
 
   /** How far it has dropped from where it was carved. */
@@ -501,7 +541,8 @@ export class Horse implements Entity {
     const standing = p.x + p.w > r.x && p.x < r.x + r.w && Math.abs(p.y + p.h - r.y) <= 2;
 
     if (this.state === 'idle') {
-      if (standing) {
+      // The shy one watches the air in front of it. Everything else waits to be stood on.
+      if (d.trick === 'shy' ? this.jumpedAt(p) : standing) {
         this.state = 'armed';
         this.timer = d.delay;
       }
@@ -513,16 +554,19 @@ export class Horse implements Entity {
       this.timer -= DT;
       if (this.timer > 0) return;
       this.state = 'acting';
-      if (d.trick === 'cast') w.sound('crumble');
+      if (d.trick === 'cast' || d.trick === 'crack') w.sound('crumble');
       else if (d.trick === 'split') w.sound('snap');
+      else if (d.trick === 'stone') w.sound('crumble');
       else w.sound('grind');
       if (d.trick === 'rear' && standing) p.shove(HORSE.rearPushX, HORSE.rearPushY);
+      if (d.trick === 'shy') this.vy = -HORSE.shyPush;
       return;
     }
 
     switch (d.trick) {
+      case 'crack':
       case 'cast': {
-        // Plaster. It takes whoever is still on it down to the floor of the trench.
+        // One is plaster and one is patient. Either takes whoever is still on it down.
         this.vy = Math.min(PHYS.maxFall, this.vy + PHYS.gravity * DT);
         const before = r.y;
         r.y += this.vy * DT;
@@ -541,6 +585,32 @@ export class Horse implements Entity {
         this.walked += step;
         r.x += step;
         if (this.walked >= HORSE.walkDistance) this.state = 'done';
+        break;
+      }
+      case 'shy': {
+        // Its own slow hop. Nothing to land on until it is back where it was carved.
+        this.vy += HORSE.shyGravity * DT;
+        const before = r.y;
+        r.y += this.vy * DT;
+        if (this.vy > 0 && r.y >= d.rect.y) {
+          r.y = d.rect.y;
+          this.vy = 0;
+          this.state = 'done';
+          w.sound('thud');
+        }
+        this.solid.dy = r.y - before;
+        break;
+      }
+      case 'stone': {
+        // A block of the overhang, on whoever stood still long enough to deserve it.
+        this.stoneVy = Math.min(PHYS.maxFall, this.stoneVy + PHYS.gravity * DT);
+        this.stone.y += this.stoneVy * DT;
+        if (overlaps(this.stone, p)) w.kill(d.cause);
+        if (this.stone.y + this.stone.h >= r.y) {
+          this.stone.y = r.y - this.stone.h;
+          this.state = 'done';
+          w.sound('thud');
+        }
         break;
       }
       case 'rear': {

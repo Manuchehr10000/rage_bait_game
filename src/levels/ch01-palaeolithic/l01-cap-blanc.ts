@@ -1,5 +1,5 @@
 import { Grid, type HorseTrick, type LevelData } from '../../engine/level';
-import { TILE } from '../../engine/types';
+import { TILE, type DeathCause } from '../../engine/types';
 
 /**
  * Chapter 1, Level 1 — The Abri de Cap Blanc, Marquay, Dordogne.
@@ -15,11 +15,14 @@ import { TILE } from '../../engine/types';
  *  21       the wall of 1911, and its door
  *  21..25   the shelter floor, lit
  *  26..68   the trench. Ten horses in high relief; their backs are the floor.
- *             The first five are under the museum's lamps; the fourth is a cast
- *             and gives way if you stand about on it. The last five are in the
- *             dark, and three of them do something a relief cannot: the sixth
- *             walks out from under you, the eighth comes up and throws you back,
- *             the tenth breaks in the middle. All ten are the same sprite.
+ *             All ten are the same sprite. Three hold, and all three are in the
+ *             light: the third is a cast that gives way if you stand about on it,
+ *             the fifth walks out from under you. Then the lamps stop, and none of
+ *             the last five is honest. The sixth holds for a slow ten seconds and
+ *             is the only place to stand; the seventh jumps when you jump at it,
+ *             once, and comes back down to stay; the eighth comes up and throws
+ *             you back; the ninth brings a block of the overhang down on anyone
+ *             who waits; the tenth breaks in the middle, one step from the floor.
  *  69..73   the far floor, and the digger's lamp
  *  74..     the deposit the excavation left; the pick works its edge
  *  81       exit
@@ -55,17 +58,19 @@ g.fill(74, GROUND - 1, W - 74, H - GROUND + 1, '%'); // the deposit
 const HORSES: { x: number; trick: HorseTrick }[] = [
   { x: 440, trick: 'none' },
   { x: 508, trick: 'none' },
-  { x: 576, trick: 'none' },
-  { x: 644, trick: 'cast' }, // plaster, and lit: stand about on it and it goes
-  { x: 712, trick: 'none' },
-  { x: 788, trick: 'walk' }, // walks forward out from under you
-  { x: 848, trick: 'none' },
+  { x: 576, trick: 'cast' }, // plaster, and lit: stand about on it and it goes
+  { x: 644, trick: 'none' },
+  { x: 712, trick: 'walk' }, // walks forward out from under you, still in the light
+  { x: 788, trick: 'crack' }, // holds for ten seconds. The only place to stand in the dark
+  { x: 848, trick: 'shy' }, // jumps when you jump at it, once, then comes back and stays
   { x: 920, trick: 'rear' }, // comes up on its front legs and throws you back
-  { x: 988, trick: 'none' },
+  { x: 988, trick: 'stone' }, // stand on it for two seconds and the overhang lets go
   { x: 1052, trick: 'split' }, // breaks in the middle, at the last step of the crossing
 ];
 /** How long you may stand on one before it decides. Crossing at a run takes 0.31 s. */
-const DELAY: Record<HorseTrick, number> = { none: 0, cast: 0.45, walk: 0.12, rear: 0.5, split: 0.5 };
+const DELAY: Record<HorseTrick, number> = { none: 0, cast: 0.45, crack: 10, walk: 0.12, shy: 0, rear: 0.5, stone: 2, split: 0.5 };
+/** What each one kills you with, when it does. */
+const CAUSE: Partial<Record<HorseTrick, DeathCause>> = { cast: 'The cast', stone: 'The roof' };
 const LIT = 5;
 
 const DIGGER_X = DEPOSIT_X - 2;
@@ -102,14 +107,15 @@ export const CAP_BLANC: LevelData = {
   entities: [
     // The stream in the valley. A metre deep.
     { kind: 'water', x0: px(9), x1: px(11), startY: px(GROUND) + 6, cause: 'The Beune' },
-    // Ten horses. Six hold. The other four look exactly like them.
+    // Ten horses. Three hold, all of them in the light. The other seven look the same.
     ...HORSES.map((h) => ({
       kind: 'horse' as const,
       rect: { x: h.x + 4, y: LEDGE_Y, w: 28, h: 6 },
       trick: h.trick,
       delay: DELAY[h.trick],
       floorY: TRENCH_FLOOR,
-      cause: 'The cast' as const,
+      stoneFrom: CEILING + 4,
+      cause: CAUSE[h.trick] ?? ('The trench' as const),
     })),
     // The floor of the trench.
     { kind: 'hazard', rect: { x: TRENCH_X0, y: TRENCH_FLOOR - 2, w: TRENCH_X1 - TRENCH_X0, h: 8 }, cause: 'The trench' },

@@ -1187,3 +1187,24 @@ function digger(down: boolean): HTMLCanvasElement {
   return compile(g.outline('O').rows(), DIGGER);
 }
 export const DIGGER_FRAMES = [digger(false), digger(true)];
+
+/**
+ * A block of the overhang, 24 x 18. Shelters are made by the roof falling in and
+ * unmade the same way; the archaeology of every one of them is sealed under this.
+ */
+function roofBlock(): HTMLCanvasElement {
+  const g = new PixelGrid(24, 18);
+  g.rect(0, 3, 24, 15, 'S');
+  g.rect(2, 0, 19, 4, 'S');
+  g.bevel(0, 3, 2, 1, 1);
+  g.bevel(23, 3, 2, -1, 1);
+  g.bevel(2, 0, 2, 1, 1);
+  g.rect(3, 1, 13, 2, 'L'); // the clean face where it parted from the roof
+  g.rect(1, 13, 22, 5, 'D'); // the weathered underside that was the ceiling
+  g.rect(4, 7, 14, 1, 'D'); // bedding
+  g.rect(2, 10, 9, 1, 'D');
+  g.rect(14, 10, 8, 1, 'D');
+  g.rect(6, 5, 5, 1, 'L');
+  return compile(g.outline('O').rows(), LIMESTONE);
+}
+export const ROOF_BLOCK_SPRITE = roofBlock();

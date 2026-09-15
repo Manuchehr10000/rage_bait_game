@@ -10,6 +10,7 @@ import {
   HIKER_FRAMES,
   HIKER_SEATED,
   HORSE_SPRITE,
+  ROOF_BLOCK_SPRITE,
   SKELETON_CAST_SPRITE,
   CAPITAL_SPRITE,
   COLOSSUS,
@@ -1245,6 +1246,12 @@ function drawEntityFront(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): vo
     case 'thrower': {
       const t = e as Thrower;
       if (t.projectile && !paint(ctx, 'date', t.projectile.x, t.projectile.y)) ctx.drawImage(DATE_SPRITE, t.projectile.x, t.projectile.y);
+      break;
+    }
+    case 'horse': {
+      // The block of the overhang comes down in front of whoever it lands on.
+      const h = e as Horse;
+      if (h.stoneShown) blit(ctx, frameOf('roof-block', 0, ROOF_BLOCK_SPRITE), h.stone.x, h.stone.y);
       break;
     }
     default:

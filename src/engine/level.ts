@@ -131,10 +131,16 @@ export type HorseTrick =
   | 'none'
   /** Plaster. It gives way and takes you down to the floor of the trench. */
   | 'cast'
+  /** Limestone, and patient. It holds for a long count and then goes. */
+  | 'crack'
   /** It walks forward out from under you. It carries nobody: smooth stone. */
   | 'walk'
+  /** Jump towards it and it jumps too, once, and comes back down to stay. */
+  | 'shy'
   /** The front comes up and the back throws you back the way you came. */
   | 'rear'
+  /** It holds. A block of the overhang comes down on whoever waited. */
+  | 'stone'
   /** It breaks in the middle and the two halves fall apart. */
   | 'split';
 
@@ -145,9 +151,11 @@ export interface HorseDef {
   trick: HorseTrick;
   /** Seconds of standing on it before the trick fires. */
   delay: number;
-  /** Where the plaster lands, for `cast`. */
+  /** Where a falling one lands, for `cast` and `crack`. */
   floorY: number;
-  /** What the plaster kills you with, for `cast`. */
+  /** Where the block of the roof starts, for `stone`. */
+  stoneFrom?: number;
+  /** What this one kills you with, if it kills you. */
   cause: DeathCause;
 }
 

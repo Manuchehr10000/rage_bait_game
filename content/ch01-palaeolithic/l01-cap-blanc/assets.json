@@ -79,6 +79,13 @@
       "h": 16,
       "beat": "e-dig",
       "what": "The deposit with its cut top."
+    },
+    {
+      "id": "roof-block",
+      "w": 24,
+      "h": 18,
+      "beat": "d-dark",
+      "what": "A block of the overhang, on its way down. Limestone, one fresh face where it parted."
     }
   ]
 }
