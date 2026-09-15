@@ -2,7 +2,7 @@ import { Grid, type LevelData } from '../../engine/level';
 import { TILE } from '../../engine/types';
 
 /**
- * Chapter 1, Level 2 — Philae, the Temple of Isis.
+ * Chapter 2, Level 2 — Philae, the Temple of Isis.
  *
  * Everything is over water. The water is the crocodile. Level 1 taught you
  * things; this level is built out of those lessons, turned around.

@@ -2,7 +2,7 @@ import { Grid, type LevelData } from '../../engine/level';
 import { TILE } from '../../engine/types';
 
 /**
- * Chapter 1, Level 3 — Karnak, and the walk down to Luxor.
+ * Chapter 2, Level 3 — Karnak, and the walk down to Luxor.
  *
  * Everything the game has taught you is now the trap. The reward kills. The
  * light kills. The water is fine. The exit is a lie and the real one is unmarked.

@@ -7,7 +7,7 @@ The code never has to be opened to add or replace a picture.
 ```
 content/
   README.md                  this file
-  ch01-egypt/
+  ch02-egypt/
     CHAPTER.md               the period, the costume, the tone of the chapter
     shared/                  art used by every level of the chapter (the tourist, the ankh block)
     l01-abu-simbel/

@@ -26,10 +26,19 @@ these bent, the idea is wrong, not the rule.
 9. **The costume is cosmetic.** The tourist wears visibly fake period dress and nobody in
    the game ever mentions it. It never changes the hitbox.
 10. **False completion is spent once per player, ever.** Held in reserve. Not in level 1.
+11. **The tourist is always the idiot.** The locals are always competent and busy. No level
+    may make the culture the joke. The costume mocks the tourist, never the place.
+12. **Respect gate.** Places of active worship, graves of the recently dead, and sites of
+    atrocity are never levels. Ruins, temples of dead religions, palaces, fortifications
+    and engineering are. Ambiguous sites are flagged in `content/research/arc.md` and
+    need a designer ruling before any production; a level designer never decides alone.
 
-## Chapter 1: Egypt, south to north along the Nile
+The chapters, their sites, periods and costumes are fixed by `content/research/arc.md`.
+Read it before touching any of them.
 
-Abu Simbel → Philae → Karnak / Luxor → Valley of the Kings → Giza.
+## Chapter 2: Egypt, south to north along the Nile
+
+Abu Simbel → Philae → Karnak → Dendera → Saqqara. Giza is rejected by the research (three triangles and a plain).
 
 ## Level 1: Great Temple of Abu Simbel
 

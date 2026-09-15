@@ -19,9 +19,13 @@ Suggested layout, one file per topic, but any Markdown is fine:
 content/research/
   README.md          this file
   arc.md             the chapters in order, why, and the sites in each
-  ch01-egypt.md      per-chapter detail: sites, relics, costume, sources
+  ch02-egypt.md      per-chapter detail: sites, relics, costume, sources
   ch02-....md
 ```
+
+Slugs in the research (`ch02_egypt`, `abu_simbel`) name sites. Paths and ids in the
+repository use the same words with hyphens (`ch02-egypt`, `abu-simbel`), because URL
+hashes and asset ids are hyphenated. The research stays authoritative on the words.
 
 The per-level history the designer reads (`LEVEL.md`, the asset notes, `easter-eggs.md`)
 is derived from this research and must cite it where it can.

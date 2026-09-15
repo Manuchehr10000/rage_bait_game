@@ -2,7 +2,7 @@ import { Grid, type LevelData } from '../../engine/level';
 import { TILE } from '../../engine/types';
 
 /**
- * Chapter 1, Level 1 — The Great Temple of Abu Simbel.
+ * Chapter 2, Level 1 — The Great Temple of Abu Simbel.
  *
  * Ground on the lower bank is row 15; the relocated plateau is row 10.
  * There is no text in the level. You learn by dying.

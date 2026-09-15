@@ -5,7 +5,7 @@ single source of truth for site identity, period, costume and status. It does no
 contain level design; beats are decided one at a time in design conversation and
 live in each level's own asset notes.
 
-Last revised: 2026-09-15
+Last revised: 2026-09-15. Curator mode dropped by designer ruling the same day; facts that cannot be shown without text live in the asset notes and nowhere in the game.
 
 ---
 
@@ -21,17 +21,10 @@ what must be right and what is deliberately wrong. There is no third category.
 colour, breakage and detail are documented. Spacing, sequence and jump distances
 are level design. The pithoi are real; their positions are not.
 
-**No text inside a level.** Facts are tagged for one of two homes:
-
-| Tag | Home | Definition |
-|---|---|---|
-| `IN_LEVEL` | the level | legible as painted art, silhouette or behaviour, with no text |
-| `CURATOR` | curator mode | true but only expressible in writing: inscriptions, ledgers, names, dates, disputes |
-
-A site with no `IN_LEVEL` facts is not a level, however good its curator material.
-
-**Curator mode.** Unlocked per level on first clear. Renders that level's asset
-notes as prose. Never accessible before the level is cleared.
+**No text inside a level.** A fact is either legible as painted art, silhouette or
+behaviour, with no text, or it stays in the asset notes for the designer and never
+reaches the player. A site with no facts of the first kind is not a level, however good
+its written material.
 
 **Level shape.** One real site. Walked left to right. About 45 seconds of clean
 play. Five to eight beats. A beat is one real feature of the site turned into one
@@ -147,7 +140,7 @@ castles, Oceania and Polynesia, the steppe and nomadic cultures.
 - **Signature mechanic, to keep distinct from Egypt:** the light well and the multi-storey collapse, not the staircase. Stairs are incidental here.
 - **Chapter error dossier:** Evans's reinforced-concrete reconstitution at Knossos (wood to c. 1905, iron to c. 1913, ferro-concrete 1922–1930; architects Fyfe, Doll, de Jong). Gilliéron père and fils fresco restorations — the Priest-King assembled from three non-contiguous fragments with no face preserved; the Saffron Gatherer restored as a boy and later re-restored as a blue monkey; the Ladies in Blue largely modern paint. Lapatin's forgery case against the Boston "Snake Goddess". Evans's Early/Middle/Late Minoan scheme versus Platon's palace periods. Schliemann's naming of the Mask of Agamemnon (genuine but misnamed and misdated by three centuries; the forgery claim is fringe; the "gazed upon the face" quotation is apocryphal).
 - **Imagery:** Schliemann 1878 and 1886 are public domain worldwide. Evans's *Palace of Minos* is EU public domain from 2012 and US public domain for the pre-1930 volumes. Akrotiri has no public-domain imagery at all; base on Marinatos 1968–76 and Doumas 1992.
-- **Reserves, curator cameos only:** Pylos (`pylos`), Gournia, Malia, Zakros, Ayia Triada. All fail gate 1 on profile — standing fabric is knee to waist height.
+- **Reserves, notes only:** Pylos (`pylos`), Gournia, Malia, Zakros, Ayia Triada. All fail gate 1 on profile — standing fabric is knee to waist height.
 - **Gate 6:** clear.
 
 ### Chapter 4 — Iron Age Near East & Persia · `ch04_persia`
@@ -181,7 +174,7 @@ castles, Oceania and Polynesia, the steppe and nomadic cultures.
 | — | Ostia Antica | `ostia_antica` | Rome, IT | Republican–Imperial | Multi-storey insulae, theatre, silted harbour |
 | — | Pompeii | `pompeii` | Naples, IT | Buried AD 79 | **GATE 6 FLAG** — body casts are graves. Architecture only; casts out of frame. Niccolini 1854–96, PD |
 | — | Segesta / Taormina | `segesta` | Sicily, IT | Greek | Temple or theatre on a height. Grand Tour engravings, PD |
-| — | Leptis Magna | `leptis_magna` | LY | esp. AD 193–211 | Theatre, basilica, harbour mole. **Flag:** conflict-zone heritage, curator note |
+| — | Leptis Magna | `leptis_magna` | LY | esp. AD 193–211 | Theatre, basilica, harbour mole. **Flag:** conflict-zone heritage, note it |
 
 ### Chapter 6 — The Americas · `ch06_americas`
 
@@ -355,7 +348,7 @@ must not be cut first on imagery grounds alone.
 
 ## 7. Contested facts
 
-Present these as live disputes in curator mode, never as settled.
+Keep these as live disputes in the asset notes, never as settled, and never in a level.
 
 - Mask of Agamemnon: genuine Mycenaean but misnamed and misdated by three-plus centuries. The forgery claim is fringe. The "gazed upon the face of Agamemnon" quotation is apocryphal.
 - Knossos: keep straight what is original (throne stone, column form, plan) and what is reconstituted (walls, ceilings, most colour).

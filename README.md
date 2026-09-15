@@ -58,10 +58,10 @@ src/
     hud.ts                death counter and exit label, drawn in screen space
   levels/
     index.ts              level order and URL hash lookup
-    ch01-egypt/           one file per level: geometry, decor, entity list
+    ch02-egypt/           one file per level: geometry, decor, entity list
 content/
   README.md               the designer's guide
-  ch01-egypt/             CHAPTER.md, shared art, one folder per level with LEVEL.md,
+  ch02-egypt/             CHAPTER.md, shared art, one folder per level with LEVEL.md,
                           assets.json, easter-eggs.md, and beat folders holding notes and paintings
 tools/
   check-assets.mjs        the manifest checker CI runs
