@@ -1,5 +1,5 @@
 import type { Camera } from '../engine/camera';
-import type { Chaser, Crumble, Entity, Falling, Horse, Pick, Platform, Pusher, Sweep, Thrower, Tipper, Water } from '../engine/entities';
+import type { Chaser, Crumble, Entity, Falling, Horse, Pick, Platform, Pusher, Roof, Sweep, Thrower, Tipper, Water } from '../engine/entities';
 import type { DecorDef, Level } from '../engine/level';
 import type { Player } from '../engine/player';
 import {
@@ -1248,10 +1248,10 @@ function drawEntityFront(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): vo
       if (t.projectile && !paint(ctx, 'date', t.projectile.x, t.projectile.y)) ctx.drawImage(DATE_SPRITE, t.projectile.x, t.projectile.y);
       break;
     }
-    case 'horse': {
+    case 'roof': {
       // The block of the overhang comes down in front of whoever it lands on.
-      const h = e as Horse;
-      if (h.stoneShown) blit(ctx, frameOf('roof-block', 0, ROOF_BLOCK_SPRITE), h.stone.x, h.stone.y);
+      const r = e as Roof;
+      if (r.shown) blit(ctx, frameOf('roof-block', 0, ROOF_BLOCK_SPRITE), r.rect.x, r.rect.y);
       break;
     }
     default:

@@ -139,8 +139,6 @@ export type HorseTrick =
   | 'shy'
   /** The front comes up and the back throws you back the way you came. */
   | 'rear'
-  /** It holds. A block of the overhang comes down on whoever waited. */
-  | 'stone'
   /** It breaks in the middle and the two halves fall apart. */
   | 'split';
 
@@ -153,11 +151,29 @@ export interface HorseDef {
   delay: number;
   /** Where a falling one lands, for `cast` and `crack`. */
   floorY: number;
-  /** Where the block of the roof starts, for `stone`. */
-  stoneFrom?: number;
   /** The ledge a jump must start from to wake it, for `shy`. */
   wakeFrom?: Rect;
   /** What this one kills you with, if it kills you. */
+  cause: DeathCause;
+}
+
+/**
+ * A block of the overhang. It lets go a moment after the player crosses
+ * `triggerX`, comes down fast, and is something to climb on once it is down.
+ */
+export interface RoofDef {
+  kind: 'roof';
+  /** Where it lands, and how big it is. */
+  x: number;
+  w: number;
+  h: number;
+  /** Where it starts, and the floor it lands on. */
+  fromY: number;
+  floorY: number;
+  /** Crossing this sets it off. */
+  triggerX: number;
+  /** Seconds between the crossing and the roof letting go. */
+  delay: number;
   cause: DeathCause;
 }
 
@@ -244,6 +260,7 @@ export type EntityDef =
   | TipperDef
   | HazardDef
   | HorseDef
+  | RoofDef
   | PickDef;
 
 // ---------------------------------------------------------------------------

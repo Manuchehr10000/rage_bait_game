@@ -33,7 +33,8 @@ const DRIVER = `
   const shy = horses[6];
   const rearer = horses[7];
   const splitter = horses[8];
-  const stoner = horses[9];
+  const last = horses[9];
+  const roof = E.find((e) => e.def.kind === 'roof');
   const pick = E.find((e) => e.def.kind === 'pick');
   const stream = E.find((e) => e.def.kind === 'water');
   const streamX = stream.def.x0;
@@ -213,12 +214,40 @@ test('the eighth horse comes up and throws you back into the trench', async ({ p
   expect(r.cause).toBe('The trench');
 });
 
-test('the tenth horse brings the overhang down on anyone who waits', async ({ page }) => {
-  const r = await play(page, `
-    standOn(stoner);
-    const step = () => { key('ArrowRight', false); if (stoner.stoneShown) phase = 'falling'; };`, 60 * 6);
-  expect(r.phase).toBe('falling');
-  expect(r.cause).toBe('The roof');
+test('a full jump off the tenth lands where the overhang lets go', async ({ page }) => {
+  const long = await play(page, `
+    standOn(last);
+    const step = () => {
+      key('ArrowRight', true);
+      if (canJump() && right() >= last.rect.x + last.rect.w - 4) jump();
+      if (roof.state === 'falling') phase = 'falling';
+    };`, 60 * 6);
+  expect(long.phase).toBe('falling');
+  expect(long.cause).toBe('The roof');
+});
+
+test('hop short to the very edge of the far floor and the block comes down in front of you', async ({ page }) => {
+  const short = await play(page, `
+    standOn(last);
+    const step = () => {
+      switch (phase) {
+        case 'valley':
+          key('ArrowRight', true);
+          if (canJump() && right() >= last.rect.x + last.rect.w - 4) { jump(6); phase = 'hopping'; }
+          break;
+        case 'hopping':
+          key('ArrowRight', true);
+          if (p.onGround && p.x >= farFloor - 6) { key('ArrowRight', false); phase = 'waiting'; }
+          break;
+        case 'waiting':
+          key('ArrowRight', false);
+          if (roof.state === 'landed') phase = 'safe';
+          break;
+      }
+    };`, 60 * 6);
+  expect(short.phase).toBe('safe');
+  expect(short.state).toBe('playing');
+  expect(short.x).toBeLessThan(1130);
 });
 
 test('the ninth horse breaks in the middle and drops you', async ({ page }) => {
@@ -229,7 +258,7 @@ test('the ninth horse breaks in the middle and drops you', async ({ page }) => {
   expect(r.cause).toBe('The trench');
 });
 
-test('the three that hold do so however long you stand on them', async ({ page }) => {
+test('the four that hold do so however long you stand on them', async ({ page }) => {
   const r = await play(page, `
     const stable = horses.filter((h) => h.def.trick === 'none');
     standOn(stable[stable.length - 1]);
@@ -258,7 +287,20 @@ test('a run that knows the level finishes with zero deaths', async ({ page }) =>
           if (shy.state === 'acting') phase = 'settle';
           break;
         case 'settle': if (shy.state === 'done') phase = 'cross'; break;
-        case 'cross': hop(4); if (p.x >= farFloor + 2 && p.onGround) phase = 'wait'; break;
+        // Every horse but the last takes a full hop. Off the last one, a short one.
+        case 'cross':
+          key('ArrowRight', true);
+          if (canJump()) {
+            if (under() === last) { if (right() >= last.rect.x + last.rect.w - 4) { jump(6); phase = 'landing'; } }
+            else hop(4);
+          }
+          break;
+        case 'landing':
+          key('ArrowRight', true);
+          if (p.onGround && p.x >= farFloor - 6) phase = 'roof';
+          break;
+        // Let the overhang have its block, then let the pick have its swing.
+        case 'roof': key('ArrowRight', false); if (roof.state === 'landed') phase = 'wait'; break;
         case 'wait': key('ArrowRight', false); if (pick.t >= 1.1) phase = 'dig'; break;
         case 'dig': key('ArrowRight', true); if (canJump() && p.lastContacts.right) jump(); break;
       }

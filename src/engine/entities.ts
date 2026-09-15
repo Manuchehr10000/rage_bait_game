@@ -11,6 +11,7 @@ import type {
   PickDef,
   PlatformDef,
   PusherDef,
+  RoofDef,
   SweepDef,
   ThrowerDef,
   TipperDef,
@@ -65,6 +66,8 @@ export function createEntity(def: EntityDef, level: Level): Entity {
       return new Hazard(def);
     case 'horse':
       return new Horse(def);
+    case 'roof':
+      return new Roof(def);
     case 'pick':
       return new Pick(def);
   }
@@ -449,9 +452,6 @@ const HORSE = {
   /** Its own hop: slow gravity and a lazy push, so it is away longer than you are. */
   shyPush: 160,
   shyGravity: 260,
-  /** The block of the overhang: how big, and how hard it comes down. */
-  stoneW: 24,
-  stoneH: 18,
   /** How far the front comes up, in radians, and how fast. */
   rearAngle: 0.62,
   rearSpeed: 3.2,
@@ -476,9 +476,6 @@ export class Horse implements Entity {
   angle = 0;
   /** How far apart the two halves are, 0 to 1. */
   broken = 0;
-  /** The block of the overhang, for `stone`. Only ever moves downward. */
-  readonly stone: Rect;
-  private stoneVy = 0;
   private timer = 0;
   private vy = 0;
   private readonly solid: MovingSolid;
@@ -486,12 +483,6 @@ export class Horse implements Entity {
   constructor(readonly def: HorseDef) {
     this.rect = { ...def.rect };
     this.solid = { rect: this.rect, dx: 0, dy: 0, oneWay: true };
-    this.stone = {
-      x: def.rect.x + (def.rect.w - HORSE.stoneW) / 2,
-      y: def.stoneFrom ?? def.rect.y - 96,
-      w: HORSE.stoneW,
-      h: HORSE.stoneH,
-    };
   }
 
   /** True while the back is still something to stand on. */
@@ -510,11 +501,6 @@ export class Horse implements Entity {
       default:
         return true;
     }
-  }
-
-  /** True once the block of the overhang is on its way, or down. */
-  get stoneShown(): boolean {
-    return this.def.trick === 'stone' && this.state !== 'idle' && this.state !== 'armed';
   }
 
   /**
@@ -558,7 +544,6 @@ export class Horse implements Entity {
       this.state = 'acting';
       if (d.trick === 'cast' || d.trick === 'crack') w.sound('crumble');
       else if (d.trick === 'split') w.sound('snap');
-      else if (d.trick === 'stone') w.sound('crumble');
       else w.sound('grind');
       if (d.trick === 'rear' && standing) p.shove(HORSE.rearPushX, HORSE.rearPushY);
       if (d.trick === 'shy') this.vy = -HORSE.shyPush;
@@ -603,18 +588,6 @@ export class Horse implements Entity {
         this.solid.dy = r.y - before;
         break;
       }
-      case 'stone': {
-        // A block of the overhang, on whoever stood still long enough to deserve it.
-        this.stoneVy = Math.min(PHYS.maxFall, this.stoneVy + PHYS.gravity * DT);
-        this.stone.y += this.stoneVy * DT;
-        if (overlaps(this.stone, p)) w.kill(d.cause);
-        if (this.stone.y + this.stone.h >= r.y) {
-          this.stone.y = r.y - this.stone.h;
-          this.state = 'done';
-          w.sound('thud');
-        }
-        break;
-      }
       case 'rear': {
         this.angle = Math.min(HORSE.rearAngle, this.angle + HORSE.rearSpeed * DT);
         if (this.angle >= HORSE.rearAngle) this.state = 'done';
@@ -632,6 +605,66 @@ export class Horse implements Entity {
 
   solids(): MovingSolid[] {
     return this.standable ? [this.solid] : [];
+  }
+}
+
+// ---------------------------------------------------------------------------
+
+/** A block of the overhang comes down harder than anything the player does. */
+const ROOF = { push: 240, gravity: 3000 } as const;
+
+/**
+ * The roof lets go. Shelters are made by this and unmade by it, and the layers
+ * of every one of them are sealed under it. Once it is down it is a step.
+ */
+export class Roof implements Entity {
+  readonly rect: Rect;
+  state: 'idle' | 'armed' | 'falling' | 'landed' = 'idle';
+  private timer = 0;
+  private vy = 0;
+  private readonly solid: MovingSolid;
+
+  constructor(readonly def: RoofDef) {
+    this.rect = { x: def.x, y: def.fromY, w: def.w, h: def.h };
+    this.solid = { rect: this.rect, dx: 0, dy: 0 };
+  }
+
+  /** True once it is on its way, or down. */
+  get shown(): boolean {
+    return this.state !== 'idle';
+  }
+
+  update(w: World): void {
+    const d = this.def;
+    const p = w.player;
+    if (this.state === 'idle') {
+      if (centerX(p) >= d.triggerX) {
+        this.state = 'armed';
+        this.timer = d.delay;
+      }
+      return;
+    }
+    if (this.state === 'armed') {
+      this.timer -= DT;
+      if (this.timer > 0) return;
+      this.state = 'falling';
+      this.vy = ROOF.push;
+      w.sound('crumble');
+      return;
+    }
+    if (this.state === 'landed') return;
+    this.vy += ROOF.gravity * DT;
+    this.rect.y += this.vy * DT;
+    if (this.rect.y + this.rect.h >= d.floorY) {
+      this.rect.y = d.floorY - this.rect.h;
+      this.state = 'landed';
+      w.sound('thud');
+    }
+    if (overlaps(this.rect, p)) w.kill(d.cause);
+  }
+
+  solids(): MovingSolid[] {
+    return this.state === 'landed' ? [this.solid] : [];
   }
 }
 
