@@ -1,0 +1,20 @@
+{
+  "$comment": "The tour map. Sizes are world pixels (320 x 180 view). Painted files are 4x. Beat '.' means the note sits in this folder.",
+  "level": "map",
+  "assets": [
+    {
+      "id": "map-world",
+      "w": 320,
+      "h": 180,
+      "beat": ".",
+      "what": "The world as a tour brochure draws it. Land, sea, paper. No badges, no route, no words: the game draws those."
+    },
+    {
+      "id": "map-ch02-egypt",
+      "w": 320,
+      "h": 180,
+      "beat": ".",
+      "what": "The Nile from Abu Simbel to Saqqara, zoomed, as the chapter's own map. No pins, no route, no words."
+    }
+  ]
+}

@@ -60,7 +60,7 @@ for (const manifestPath of walk(root)) {
     if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(e.id)) errors.push(`${where}: id must be lower-case words joined by hyphens`);
     if (seen.has(e.id)) errors.push(`${where}: id also used in ${seen.get(e.id)}`);
     seen.set(e.id, rel);
-    const notePath = join(dir, e.beat === 'shared' ? '' : e.beat, `${e.id}.md`);
+    const notePath = join(dir, e.beat === 'shared' || e.beat === '.' ? '' : e.beat, `${e.id}.md`);
     if (!existsSync(notePath)) errors.push(`${where}: no note at ${relative(process.cwd(), notePath)}`);
     if (!e.file) continue;
     painted++;

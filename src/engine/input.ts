@@ -7,6 +7,7 @@ export class Input {
   private jumpQueued = false;
   private restartQueued = false;
   private nextQueued = false;
+  private pressed = new Set<string>();
 
   constructor(target: Window) {
     target.addEventListener('keydown', (e) => {
@@ -16,6 +17,7 @@ export class Input {
       }
       if (GAME_KEYS.has(e.code)) e.preventDefault();
       this.down.add(e.code);
+      this.pressed.add(e.code);
       if (JUMP_KEYS.has(e.code)) this.jumpQueued = true;
       if (e.code === 'KeyR') this.restartQueued = true;
       if (e.code === 'Enter') this.nextQueued = true;
@@ -52,6 +54,16 @@ export class Input {
     return v;
   }
 
+  /** True once per physical press of any key, by code. Cleared each tick by `flush`. */
+  takePressed(code: string): boolean {
+    return this.pressed.delete(code);
+  }
+
+  /** Forget presses nobody consumed this tick, so they do not fire later. */
+  flush(): void {
+    this.pressed.clear();
+  }
+
   takeRestartPressed(): boolean {
     const v = this.restartQueued;
     this.restartQueued = false;
@@ -70,4 +82,5 @@ const GAME_KEYS = new Set([
   'KeyS',
   'KeyR',
   'Enter',
+  'Escape',
 ]);

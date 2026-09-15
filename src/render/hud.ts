@@ -139,5 +139,5 @@ function drawExitLabel(
   ty += lineH * 1.4;
   ctx.textAlign = 'center';
   ctx.font = `italic ${5.5 * scale}px ${LABEL_FONT}`;
-  ctx.fillText(hasNext ? 'Enter for the next site. R to visit again.' : 'Press R to visit again.', x + boxW / 2, ty);
+  ctx.fillText(hasNext ? 'Enter for the next site. R to visit again. Esc for the map.' : 'Enter for the map. R to visit again.', x + boxW / 2, ty);
 }

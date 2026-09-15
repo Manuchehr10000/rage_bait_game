@@ -70,7 +70,7 @@ async function play(page: Page, opts: { spawn?: [string, string]; script: string
 test.beforeEach(async ({ page }) => {
   const errors: string[] = [];
   page.on('pageerror', (e) => errors.push(String(e)));
-  await page.goto('/');
+  await page.goto('/#abu-simbel');
   await page.waitForFunction(() => (window as unknown as { __game?: unknown }).__game);
   expect(errors).toEqual([]);
 });

@@ -7,6 +7,9 @@ import { Input } from './engine/input';
 import { Level, type LevelData } from './engine/level';
 import { LEVELS, levelIndexFromHash } from './levels/index';
 import { Player, type MovingSolid } from './engine/player';
+import { Progress } from './engine/progress';
+import { locate } from './map/atlas';
+import { MapScreen } from './map/screen';
 import { renderWorld, type Scene, type WorldText } from './render/scene';
 import { ART_SCALE, DEATH_SOUND, DT, overlaps, TILE, VIEW_H, VIEW_W, type DeathCause } from './engine/types';
 
@@ -16,6 +19,10 @@ const TITLE_TIME = 2.2;
 const LIFETIME_KEY = 'lostTourist.lifetimeDeaths';
 
 type State = 'playing' | 'dead' | 'complete';
+type Screen = 'map' | 'level';
+
+/** How far above the spawn the tourist appears when dropping in from the map. */
+const FALL_IN_HEIGHT = 200;
 
 export class Game {
   private readonly ctx: CanvasRenderingContext2D;
@@ -25,6 +32,11 @@ export class Game {
 
   private readonly input: Input;
   private readonly audio = new GameAudio();
+  private readonly progress = new Progress();
+  private readonly map = new MapScreen(this.progress);
+  private screen: Screen = 'map';
+  /** Escape was pressed mid-level: after the death plays, go back to the map. */
+  private leaveAfterDeath = false;
   private levelIndex = 0;
   private level!: Level;
   private readonly player = new Player();
@@ -67,7 +79,14 @@ export class Game {
     });
     this.resize();
     window.addEventListener('resize', () => this.resize());
-    this.loadLevel(levelIndexFromHash(location.hash));
+    canvas.addEventListener('mousemove', (e) => this.pointer(e, false));
+    canvas.addEventListener('click', (e) => {
+      this.audio.unlock();
+      this.pointer(e, true);
+    });
+    const hash = location.hash.replace(/^#/, '').trim();
+    if (hash && hash !== 'map') this.enterLevel(levelIndexFromHash(location.hash), false);
+    else this.goToMap();
   }
 
   start(): void {
@@ -77,6 +96,74 @@ export class Game {
 
   get levelData(): LevelData {
     return this.level.data;
+  }
+
+  /** Which screen is showing. For tests. */
+  get currentScreen(): Screen {
+    return this.screen;
+  }
+
+  /** The map screen, for tests. */
+  get mapScreen(): MapScreen {
+    return this.map;
+  }
+
+  private pointer(e: MouseEvent, click: boolean): void {
+    if (this.screen !== 'map') return;
+    const r = this.canvas.getBoundingClientRect();
+    const x = ((e.clientX - r.left) / r.width) * VIEW_W;
+    const y = ((e.clientY - r.top) / r.height) * VIEW_H;
+    this.act(this.map.pointer(x, y, click));
+  }
+
+  private act(action: ReturnType<MapScreen['pointer']>): void {
+    if (!action) return;
+    if (action.kind === 'move') this.audio.play('step');
+    else if (action.kind === 'closed') this.audio.play('bonk');
+    else {
+      const i = LEVELS.findIndex((l) => l.id === action.level);
+      if (i >= 0) this.enterLevel(i, true);
+    }
+  }
+
+  /** Back to the tour map, on the chapter of the level just left. */
+  private goToMap(): void {
+    this.screen = 'map';
+    this.leaveAfterDeath = false;
+    this.audio.stopLoops();
+    if (this.level) this.map.showLevel(this.level.data.id);
+    else this.map.openWorld();
+    try {
+      history.replaceState(null, '', location.pathname + location.search);
+    } catch {
+      /* fine */
+    }
+  }
+
+  /** Enter a level from the map. `fallIn` drops the tourist from the sky onto the spawn. */
+  private enterLevel(index: number, fallIn: boolean): void {
+    this.screen = 'level';
+    this.leaveAfterDeath = false;
+    this.loadLevel(index);
+    if (fallIn) {
+      this.player.y -= FALL_IN_HEIGHT;
+      this.player.vy = 0;
+      this.camera.y = 0;
+      this.audio.play('whoosh');
+    }
+  }
+
+  /** The next site of this chapter that has a level, or null at the end of the chapter. */
+  private nextLevelIndex(): number | null {
+    const here = locate(this.level.data.id);
+    if (!here) return this.levelIndex + 1 < LEVELS.length ? this.levelIndex + 1 : null;
+    for (let i = here.site + 1; i < here.chapter.sites.length; i++) {
+      const id = here.chapter.sites[i]?.level;
+      if (!id) continue;
+      const idx = LEVELS.findIndex((l) => l.id === id);
+      if (idx >= 0) return idx;
+    }
+    return null;
   }
 
   // ---------------------------------------------------------------------
@@ -154,13 +241,27 @@ export class Game {
 
   private tick(): void {
     this.audio.update();
+    if (this.screen === 'map') {
+      this.act(this.map.update(this.input, DT));
+      this.input.flush();
+      return;
+    }
     if (this.titleTimer > 0) this.titleTimer -= DT;
     const restart = this.input.takeRestartPressed();
     const next = this.input.takeNextPressed();
+    const escape = this.input.takePressed('Escape');
+    this.input.flush();
     if (this.state === 'complete') {
-      if (next && this.levelIndex + 1 < LEVELS.length) this.loadLevel(this.levelIndex + 1);
-      else if (restart || next) this.resetRun();
+      const nextIndex = this.nextLevelIndex();
+      if (escape) this.goToMap();
+      else if (next && nextIndex !== null) this.enterLevel(nextIndex, true);
+      else if (next) this.goToMap();
+      else if (restart) this.resetRun();
       return;
+    }
+    if (escape && this.state === 'playing') {
+      this.kill('Gave up');
+      this.leaveAfterDeath = true;
     }
     if (restart && this.state === 'playing') this.kill('Gave up');
 
@@ -179,7 +280,10 @@ export class Game {
       for (const e of this.entities) e.update(world);
       this.driveLoops();
       this.deathTimer -= DT;
-      if (this.deathTimer <= 0) this.resetLevel();
+      if (this.deathTimer <= 0) {
+        if (this.leaveAfterDeath) this.goToMap();
+        else this.resetLevel();
+      }
       return;
     }
 
@@ -216,6 +320,7 @@ export class Game {
     const reached = (exit && overlaps(this.player, exit)) || this.entities.some((e) => e.isExit?.(this.player));
     if (reached) {
       this.state = 'complete';
+      this.progress.markCleared(this.level.data.id);
       this.audio.stopLoops();
       this.audio.play('turnstile');
     }
@@ -260,6 +365,12 @@ export class Game {
   }
 
   private draw(): void {
+    if (this.screen === 'map') {
+      this.map.draw(this.wctx);
+      this.ctx.drawImage(this.world, 0, 0, this.canvas.width, this.canvas.height);
+      this.map.drawText(this.ctx, this.scale, this.stats.lifetime);
+      return;
+    }
     this.texts = [];
     const scene: Scene = {
       level: this.level,
@@ -280,7 +391,7 @@ export class Game {
       camX: this.camera.ix,
       camY: this.camera.iy,
       complete: this.state === 'complete',
-      hasNext: this.levelIndex + 1 < LEVELS.length,
+      hasNext: this.nextLevelIndex() !== null,
       levelName: this.level.data.name,
       title: this.titleTimer > 0 ? Math.min(1, this.titleTimer / 0.4, (TITLE_TIME - this.titleTimer) / 0.4) : 0,
     });
