@@ -24,6 +24,12 @@ content/
     l03-karnak/
 ```
 
+## Where the history comes from
+
+`content/research/` holds the historical research that decides the chapters, the sites,
+the relics and the costumes. Everything in `LEVEL.md` and the asset notes is derived from
+it. Read it before painting a chapter.
+
 ## The one rule
 
 **Nothing in the game is accidentally wrong.** Every asset note has a "Must be right"
