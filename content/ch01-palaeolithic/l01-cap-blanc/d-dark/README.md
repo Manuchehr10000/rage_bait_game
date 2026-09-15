@@ -22,4 +22,5 @@ What must be right when the chapter is painted: the beam starts at the lens on t
 brim, so the lens must sit at sprite column 10, row 4, of the right-facing hiker (see
 `../../shared/hiker.md`). The lamp is off until he is through the door in beat b. The
 block of the overhang belongs to the next beat, on the far floor: see
-`../e-dig/roof-block.md`.
+`../e-dig/roof-block.md`. No lamp hangs past the fifth horse. The far floor is lit because
+the dark ends at its edge, not because anything is over it.

@@ -22,9 +22,9 @@ import { TILE, type DeathCause } from '../../engine/types';
  *             only place to stand; the seventh jumps when you jump at it from the
  *             sixth, once, and comes back down to stay; the eighth comes up and
  *             throws you back; the ninth breaks in the middle; the tenth holds.
- *  69..73   the far floor. Land at its very edge: two steps in, the overhang lets
- *             go of a block, and it comes down where a full jump would have put you.
- *             The whole platform is lit, so you can watch it happen.
+ *  69..73   the far floor, lit end to end with no lamp over it. Land at its very
+ *             edge and stay there: a stride in, the overhang lets go of a block,
+ *             and it comes down where a full jump would have put you.
  *  74..     the deposit the excavation left in place
  *  81       exit
  */
@@ -102,11 +102,10 @@ export const CAP_BLANC: LevelData = {
     // The dark ends where the far floor begins. You can see the lit platform from
     // halfway down the frieze, which is exactly why you jump for it too hard.
     { kind: 'dark', x0: WALL_X + 36, x1: FAR_FLOOR, lamp: 'headlamp' },
-    // The museum's lamps over the first five horses, and the lamps over the far floor.
+    // The museum's lamps, over the first five horses and nowhere else. The far
+    // floor is lit because the dark ends at its edge, not because anything hangs
+    // over it: daylight from the mouth of the shelter, and no fixture to read by.
     ...HORSES.slice(0, LIT).map((h) => ({ kind: 'spotlight' as const, x: h.x + 20, floorY: px(GROUND), top: CEILING })),
-    { kind: 'spotlight', x: FAR_FLOOR + 16, floorY: px(GROUND), top: CEILING },
-    { kind: 'spotlight', x: FAR_FLOOR + 56, floorY: px(GROUND), top: CEILING },
-    { kind: 'spotlight', x: EXIT_X + 6, floorY: LEDGE_Y, top: CEILING },
   ],
 
   entities: [
@@ -123,16 +122,19 @@ export const CAP_BLANC: LevelData = {
       wakeFrom: h.trick === 'shy' ? ledge(i - 1) : undefined,
       cause: CAUSE[h.trick] ?? ('The trench' as const),
     })),
-    // The roof. Land long, or walk straight on, and it has you.
+    // The roof. It lets go over the near end of the platform, and it lets go the
+    // moment you are over the edge: a full jump lands under it, and two strides
+    // off a short hop walk into it. Standing still at the very edge is the only
+    // thing that works.
     {
       kind: 'roof',
-      x: FAR_FLOOR + 32,
+      x: FAR_FLOOR + 24,
       w: 24,
       h: 18,
       fromY: CEILING + 4,
       floorY: px(GROUND),
       triggerX: FAR_FLOOR,
-      delay: 0.4,
+      delay: 0.2,
       cause: 'The roof',
     },
     // The floor of the trench.

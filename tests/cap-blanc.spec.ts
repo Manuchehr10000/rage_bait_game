@@ -14,6 +14,8 @@ interface Snap {
   total: number;
   phase: string;
   lamp: boolean;
+  /** Left edge of the block the overhang drops, so the far-floor tests can measure against it. */
+  roofX: number;
 }
 
 const DRIVER = `
@@ -35,6 +37,7 @@ const DRIVER = `
   const splitter = horses[8];
   const last = horses[9];
   const roof = E.find((e) => e.def.kind === 'roof');
+  const roofX = roof.def.x;
   const stream = E.find((e) => e.def.kind === 'water');
   const streamX = stream.def.x0;
   const trench = g.level.data.decor.find((d) => d.kind === 'trench').rect;
@@ -57,7 +60,7 @@ const DRIVER = `
       if (g.state !== 'playing') break;
     }
     key('ArrowRight', false); key('Space', false);
-    return { state: g.state, cause: g.deathCause, x: Math.round(p.x), y: Math.round(p.y), total: g.stats.total, phase, lamp: g.lamp };
+    return { state: g.state, cause: g.deathCause, x: Math.round(p.x), y: Math.round(p.y), total: g.stats.total, phase, lamp: g.lamp, roofX };
   };
   // The valley: one stream to jump.
   const valley = () => { key('ArrowRight', true); if (canJump() && right() >= streamX - 8 && right() < streamX + 10) jump(); };
@@ -233,7 +236,7 @@ test('hop short to the very edge of the far floor and the block comes down in fr
       switch (phase) {
         case 'valley':
           key('ArrowRight', true);
-          if (canJump() && right() >= last.rect.x + last.rect.w - 4) { jump(6); phase = 'hopping'; }
+          if (canJump() && right() >= last.rect.x + last.rect.w - 4) { jump(4); phase = 'hopping'; }
           break;
         case 'hopping':
           key('ArrowRight', true);
@@ -247,7 +250,44 @@ test('hop short to the very edge of the far floor and the block comes down in fr
     };`, 60 * 6);
   expect(short.phase).toBe('safe');
   expect(short.state).toBe('playing');
-  expect(short.x).toBeLessThan(1130);
+  // Standing clear of the block, with the whole platform beyond it still to walk.
+  expect(short.x + 10).toBeLessThanOrEqual(short.roofX);
+});
+
+test('two strides off the short hop and the block has you', async ({ page }) => {
+  const walked = await play(page, `
+    standOn(last);
+    const step = () => {
+      key('ArrowRight', true);
+      if (canJump() && right() >= last.rect.x + last.rect.w - 4) jump(4);
+    };`, 60 * 6);
+  expect(walked.cause).toBe('The roof');
+  // Crushed within a couple of strides of where the short hop put you.
+  expect(walked.x).toBeLessThan(walked.roofX + 24);
+});
+
+test('over-jump it and you can still back up to the edge, if you go at once', async ({ page }) => {
+  const back = await play(page, `
+    standOn(last);
+    const step = () => {
+      switch (phase) {
+        case 'valley':
+          key('ArrowRight', true);
+          if (canJump() && right() >= last.rect.x + last.rect.w - 4) { jump(7); phase = 'hopping'; }
+          break;
+        case 'hopping':
+          key('ArrowRight', true);
+          if (p.onGround && p.x >= farFloor - 6) { key('ArrowRight', false); key('ArrowLeft', true); phase = 'backing'; }
+          break;
+        case 'backing':
+          if (p.x <= farFloor + 2) key('ArrowLeft', false);
+          if (roof.state === 'landed') { key('ArrowLeft', false); phase = 'safe'; }
+          break;
+        case 'safe': key('ArrowLeft', false); break;
+      }
+    };`, 60 * 6);
+  expect(back.phase).toBe('safe');
+  expect(back.state).toBe('playing');
 });
 
 test('the ninth horse breaks in the middle and drops you', async ({ page }) => {
@@ -284,7 +324,7 @@ test('a run that knows the level finishes with zero deaths', async ({ page }) =>
         case 'cross':
           key('ArrowRight', true);
           if (canJump()) {
-            if (under() === last) { if (right() >= last.rect.x + last.rect.w - 4) { jump(6); phase = 'landing'; } }
+            if (under() === last) { if (right() >= last.rect.x + last.rect.w - 4) { jump(4); phase = 'landing'; } }
             else hop(4);
           }
           break;

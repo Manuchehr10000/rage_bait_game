@@ -5,7 +5,7 @@
 | Id | `roof-block` |
 | File | `roof-block.png` (not painted yet: the game draws its own until this file exists) |
 | Size | 24 × 18 world px, painted 96 × 72 |
-| Beat | `d-dark` |
+| Beat | `e-dig` |
 
 ## What it is
 
@@ -15,8 +15,10 @@ one **weathered** face that used to be the ceiling. 24 × 18.
 
 ## Where it stands in the game
 
-Beat d, over the tenth horse, the last of the crossing. It starts just under the overhang and comes down on anyone
-who has stood on that horse for a second. It lands on the horse's back and stays there.
+Beat e, over the near end of the far floor, a stride in from its edge. It starts just
+under the overhang and lets go the moment the tourist is over the edge of the platform. It
+lands on the floor and stays there, as the one thing in the level you climb rather than
+cross.
 
 ## Must be right
 
