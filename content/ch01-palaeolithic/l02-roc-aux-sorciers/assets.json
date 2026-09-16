@@ -1,0 +1,55 @@
+{
+  "$comment": "Sizes are world pixels (320 x 180 view). Painted files are 4x. See content/README.md. The limestone, rock and sediment tiles are shared with Cap Blanc: same stone, same art, declared once in that level's manifest.",
+  "level": "l02-roc-aux-sorciers",
+  "assets": [
+    {
+      "id": "site-grille",
+      "w": 14,
+      "h": 40,
+      "beat": "a-bank",
+      "what": "The gate across the path to the shelter. Shut since the site was classified in 1955, and the tourist walks straight past it."
+    },
+    {
+      "id": "frieze-ibex",
+      "w": 40,
+      "h": 20,
+      "beat": "b-raked",
+      "what": "An ibex of the frieze, facing right, back level. Eight of them on the real wall: the commonest animal here."
+    },
+    {
+      "id": "frieze-horse",
+      "w": 40,
+      "h": 20,
+      "beat": "b-raked",
+      "what": "A horse of the frieze, facing right, mane up, head carried low. Seven of them on the real wall."
+    },
+    {
+      "id": "frieze-bison",
+      "w": 40,
+      "h": 20,
+      "beat": "b-raked",
+      "what": "A bison of the frieze, facing right, the hump standing above the line of the back. Six of them on the real wall."
+    },
+    {
+      "id": "ibex-horn",
+      "w": 44,
+      "h": 20,
+      "beat": "d-horns",
+      "what": "One horn of the confronting pair, reaching in from the left with the tip at the right-hand end. Ridged the whole way."
+    },
+    {
+      "id": "fallen-block",
+      "w": 40,
+      "h": 12,
+      "beat": "e-collapse",
+      "what": "A block of the roof fall lying in the river margin with its carved face turned under. The bedding plane is what you see."
+    },
+    {
+      "id": "venus",
+      "w": 14,
+      "h": 20,
+      "beat": "e-collapse",
+      "what": "One of the women of the frieze, carved from the waist to the knees. No head, no feet, no arms."
+    }
+  ]
+}

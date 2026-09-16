@@ -4,8 +4,18 @@ import type { DecorDef, Level } from '../engine/level';
 import type { Player } from '../engine/player';
 import {
   BABOON_SPRITE,
+  BISON_FIGURE_SPRITE,
   BISON_SPRITE,
   BOAT_SPRITE,
+  FALLEN_BLOCK_SPRITE,
+  GRILLE_SPRITE,
+  BISON_FIGURE_SHADOW,
+  HORSE_FIGURE_SHADOW,
+  HORSE_FIGURE_SPRITE,
+  IBEX_HORN_SPRITE,
+  IBEX_SHADOW,
+  IBEX_SPRITE,
+  VENUS_SPRITE,
   HIKER_FRAMES,
   HIKER_SEATED,
   HORSE_SPRITE,
@@ -130,6 +140,18 @@ export const COLORS = {
   trenchFloor: '#3f3324',
   plaster: '#f4f1ea',
   plasterShade: '#b8b0a0',
+  // Roc-aux-Sorciers: the same limestone, in the sun, over the Anglin.
+  anglin: '#4d7f7a',
+  anglinDeep: '#2f5a58',
+  anglinTop: '#9ecac2',
+  willow: '#6c8a4e',
+  willowShade: '#53703d',
+  shelterWall: '#cfc2a2',
+  shelterWallShade: '#ab9d7e',
+  shelterWallLit: '#ece0c0',
+  reliefShadow: '#8d7f61',
+  engraved: '#a89878',
+  grille: '#4a4640',
 };
 
 export interface Scene {
@@ -155,6 +177,7 @@ export function renderWorld(ctx: CanvasRenderingContext2D, s: Scene): void {
 
   drawSky(ctx, cy, theme);
   if (theme === 'capBlanc') drawFarBeune(ctx, cx, cy);
+  else if (theme === 'rocAuxSorciers') drawFarAnglin(ctx, cx, cy);
   else if (theme === 'abuSimbel') drawFarCliffs(ctx, cx, cy);
   else if (theme === 'philae') drawFarIsland(ctx, cx, cy);
   else drawFarKarnak(ctx, cx, cy);
@@ -271,6 +294,60 @@ function drawFarBeune(ctx: CanvasRenderingContext2D, cx: number, cy: number): vo
     ctx.fillRect(kx + 8, horizon - 44, 2, 4);
     ctx.fillRect(kx - 18, horizon - 34, 3, 6); // the chapel's empty window
   }
+  ctx.fillStyle = COLORS.meadow;
+  ctx.fillRect(0, horizon, VIEW_W, VIEW_H - horizon);
+  ctx.fillStyle = COLORS.meadowLine;
+  ctx.fillRect(0, horizon, VIEW_W, 1);
+}
+
+/**
+ * Roc-aux-Sorciers: the far bank of the Anglin, willows, and upstream on the
+ * skyline the village of Angles-sur-l'Anglin with the ruin of its fortress. The
+ * castle is 12th to 15th century and has nothing to do with the frieze; it is
+ * drawn because it is what you actually see from the valley floor.
+ */
+function drawFarAnglin(ctx: CanvasRenderingContext2D, cx: number, cy: number): void {
+  const horizon = 146 - Math.round(cy * 0.55);
+  const off = Math.round(cx * 0.18) % 160;
+  // The far bank: two ranks of willow and poplar, lighter than the Dordogne oaks.
+  ctx.fillStyle = COLORS.willowShade;
+  for (let base = -160; base < VIEW_W + 160; base += 160) {
+    const x = base - off;
+    for (let i = 0; i < 8; i++) {
+      const tx = x + i * 20 + ((i * 5) % 6);
+      const h = 14 + ((i * 13) % 8);
+      ctx.fillRect(tx, horizon - h, 13, h);
+      ctx.fillRect(tx + 4, horizon - h - 3, 6, 3);
+    }
+  }
+  ctx.fillStyle = COLORS.willow;
+  for (let base = -160; base < VIEW_W + 160; base += 160) {
+    const x = base - off;
+    for (let i = 0; i < 8; i++) {
+      const tx = x + 9 + i * 20 + ((i * 3) % 5);
+      const h = 9 + ((i * 7) % 6);
+      ctx.fillRect(tx, horizon - h, 11, h);
+      ctx.fillRect(tx + 3, horizon - h - 2, 6, 2);
+    }
+  }
+  // Angles-sur-l'Anglin upstream: the ruined keep on the cliff and the village under it. Once.
+  const vx = 190 - Math.round(cx * 0.18);
+  if (vx > -90 && vx < VIEW_W + 10) {
+    ctx.fillStyle = COLORS.farShade;
+    ctx.fillRect(vx - 34, horizon - 30, 84, 30); // the limestone spur the village stands on
+    ctx.fillStyle = COLORS.far;
+    ctx.fillRect(vx, horizon - 58, 11, 34); // the keep, broken off at the top
+    ctx.fillRect(vx + 1, horizon - 60, 4, 3);
+    ctx.fillRect(vx + 7, horizon - 59, 4, 2);
+    ctx.fillRect(vx - 20, horizon - 40, 18, 16); // curtain wall
+    ctx.fillRect(vx + 13, horizon - 36, 15, 12);
+    ctx.fillRect(vx + 30, horizon - 30, 8, 6); // roofs of the village below it
+    ctx.fillRect(vx - 30, horizon - 26, 9, 5);
+    ctx.fillStyle = COLORS.farShade;
+    ctx.fillRect(vx + 3, horizon - 50, 2, 5); // slits
+    ctx.fillRect(vx - 14, horizon - 34, 2, 5);
+  }
+  // The valley floor and the far bank of the river, then the meadow above it.
   ctx.fillStyle = COLORS.meadow;
   ctx.fillRect(0, horizon, VIEW_W, VIEW_H - horizon);
   ctx.fillStyle = COLORS.meadowLine;
@@ -767,6 +844,97 @@ function drawDecor(ctx: CanvasRenderingContext2D, s: Scene, d: DecorDef): void {
       ctx.fillRect(d.x0, d.ceilingY, w, 2);
       break;
     }
+    case 'cliff': {
+      // The back wall of a shallow, south-facing shelter, in the sun. Bedded limestone,
+      // paler than Cap Blanc because this one has daylight on it all day.
+      const w = d.x1 - d.x0;
+      const floorY = 18 * TILE;
+      ctx.fillStyle = COLORS.shelterWall;
+      // The cliff comes up out of the valley floor rather than starting as a wall:
+      // the first 48 px of it is the slope of the spur the shelter is cut into.
+      ctx.beginPath();
+      ctx.moveTo(d.x0 - 48, floorY);
+      ctx.lineTo(d.x0, d.ceilingY);
+      ctx.lineTo(d.x1, d.ceilingY);
+      ctx.lineTo(d.x1, floorY);
+      ctx.closePath();
+      ctx.fill();
+      ctx.fillStyle = COLORS.shelterWallShade;
+      for (let y = d.ceilingY + 11; y < floorY; y += 15) {
+        const jog = hash(3, y) % 3;
+        for (let sx = d.x0 - 48 + Math.round((48 * (y - d.ceilingY)) / (floorY - d.ceilingY)); sx < d.x1; sx += 40) {
+          const len = 12 + (hash(sx, y) % 24);
+          ctx.fillRect(sx, y + jog, Math.min(len, d.x1 - sx), 1);
+        }
+      }
+      // The overhang above, and the shadow it throws on the top of the wall.
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.16)';
+      ctx.fillRect(d.x0, d.ceilingY, w, 12);
+      ctx.fillStyle = COLORS.bedrockDark;
+      ctx.fillRect(d.x0, d.ceilingY, w, 2);
+      ctx.fillRect(d.x0 - 48, floorY - 2, 50, 2);
+      break;
+    }
+    case 'raking': {
+      // Low sun coming in under the overhang. Bas-relief is only legible in light
+      // like this, which is how the frieze was found in 1950 and how it is photographed.
+      const w = d.x1 - d.x0;
+      const top = 7 * TILE;
+      const floorY = 15 * TILE;
+      const g = ctx.createLinearGradient(d.x0, 0, d.x1, 0);
+      g.addColorStop(0, 'rgba(255, 244, 214, 0.34)');
+      g.addColorStop(1, 'rgba(255, 244, 214, 0.06)');
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.moveTo(d.x0, top);
+      ctx.lineTo(d.x1, top + 26);
+      ctx.lineTo(d.x1, floorY);
+      ctx.lineTo(d.x0, floorY);
+      ctx.closePath();
+      ctx.fill();
+      ctx.fillStyle = COLORS.shelterWallLit;
+      ctx.fillRect(d.x0, top, Math.min(w, 3), floorY - top);
+      break;
+    }
+    case 'engraving': {
+      // A figure of the frieze that was only ever engraved. Same animals, same wall,
+      // nothing to stand on. Drawn exactly like the carved ones: that is the level.
+      drawFigure(ctx, d.figure, d.x, d.y, false, d.face ?? 1);
+      break;
+    }
+    case 'venus': {
+      // One of the women. Hip to knee, no head, no feet, at the tourist's own height.
+      if (!paint(ctx, 'venus', d.x, d.y)) ctx.drawImage(VENUS_SPRITE, d.x, d.y);
+      break;
+    }
+    case 'engravedWall': {
+      // Cave Taillebourg: the art here is line, not relief. Nothing on it is a ledge.
+      const r = d.rect;
+      ctx.strokeStyle = COLORS.engraved;
+      ctx.lineWidth = 1;
+      for (let i = 0; i < 9; i++) {
+        const x = r.x + 10 + ((i * 47) % Math.max(1, r.w - 30));
+        const y = r.y + 8 + ((i * 29) % Math.max(1, r.h - 22));
+        ctx.beginPath();
+        ctx.moveTo(x, y + 10);
+        ctx.lineTo(x + 4, y);
+        ctx.lineTo(x + 16, y + 1);
+        ctx.lineTo(x + 22, y + 9);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(x + 6, y + 9);
+        ctx.lineTo(x + 6, y + 15);
+        ctx.moveTo(x + 18, y + 9);
+        ctx.lineTo(x + 18, y + 15);
+        ctx.stroke();
+      }
+      break;
+    }
+    case 'grille': {
+      // Classified in 1955 and shut ever since. The tourist walks straight past it.
+      if (!paint(ctx, 'site-grille', d.x, d.floorY - 40)) ctx.drawImage(GRILLE_SPRITE, d.x, d.floorY - 40);
+      break;
+    }
     case 'trench': {
       // The excavation: the floor was dug down to below the frieze. The section shows its layers.
       const r = d.rect;
@@ -905,10 +1073,10 @@ function drawTiles(ctx: CanvasRenderingContext2D, level: Level, cx: number, cy: 
         else if (theme === 'abuSimbel') drawSand(ctx, level, tx, ty, x, y, open);
         else if (theme === 'philae') drawGranite(ctx, tx, ty, x, y, open);
         else drawPaving(ctx, tx, ty, x, y, open);
-      } else if (c === '%' && theme === 'capBlanc') {
+      } else if (c === '%' && (theme === 'capBlanc' || theme === 'rocAuxSorciers')) {
         drawSediment(ctx, tx, ty, x, y, open);
       } else if (c === '#' || c === '%') {
-        if (theme === 'capBlanc') drawBedrock(ctx, tx, ty, x, y, open);
+        if (theme === 'capBlanc' || theme === 'rocAuxSorciers') drawBedrock(ctx, tx, ty, x, y, open);
         else if (theme === 'abuSimbel') drawCliff(ctx, tx, ty, x, y, open);
         else if (theme === 'philae') drawColumnDrum(ctx, x, y, open);
         else drawSandstone(ctx, x, y, ty % 2 === 1, open);
@@ -941,9 +1109,9 @@ function tileArtId(theme: Level['data']['theme'], c: string, open: boolean): str
   const name =
     c === '?' ? 'ankh-block'
     : c === 'x' ? 'ankh-block-used'
-    : c === '=' ? (theme === 'capBlanc' ? 'limestone' : theme === 'abuSimbel' ? 'sand' : theme === 'philae' ? 'granite' : 'paving')
-    : c === '%' && theme === 'capBlanc' ? 'sediment'
-    : theme === 'capBlanc' ? 'rock' : theme === 'abuSimbel' ? 'cliff' : theme === 'philae' ? 'column-drum' : 'sandstone';
+    : c === '=' ? (theme === 'capBlanc' || theme === 'rocAuxSorciers' ? 'limestone' : theme === 'abuSimbel' ? 'sand' : theme === 'philae' ? 'granite' : 'paving')
+    : c === '%' && (theme === 'capBlanc' || theme === 'rocAuxSorciers') ? 'sediment'
+    : theme === 'capBlanc' || theme === 'rocAuxSorciers' ? 'rock' : theme === 'abuSimbel' ? 'cliff' : theme === 'philae' ? 'column-drum' : 'sandstone';
   if (c === '?' || c === 'x') return name;
   return open ? `tile-${name}-top` : `tile-${name}`;
 }
@@ -1139,6 +1307,24 @@ function drawEntityBack(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): voi
         if (!paint(ctx, 'river-rock', r.x, r.y)) ctx.drawImage(ROCK_SPRITE, r.x, r.y);
       } else if (d.skin === 'stone') {
         if (!paint(ctx, 'lake-stone', r.x, r.y)) ctx.drawImage(ROCK_SPRITE, r.x, r.y);
+      } else if (d.skin === 'relief') {
+        // A figure carved deep enough to be a floor. The rect is its back; the sprite
+        // hangs 2 px left of it and starts 2 px above it.
+        const raked = s.level.data.decor.some((z) => z.kind === 'raking' && r.x >= z.x0 && r.x < z.x1);
+        drawFigure(ctx, d.figure ?? 'ibex', r.x - 4, r.y - 3, raked, d.face ?? 1);
+      } else if (d.skin === 'horns') {
+        // Two horns reaching out from the animals on either side, meeting over the gap.
+        const horn = frameOf('ibex-horn', 0, IBEX_HORN_SPRITE);
+        // The horn's own line is the floor: the top of the sprite's taper sits on it.
+        const y = r.y - 4;
+        blit(ctx, horn, r.x + r.w / 2 - horn.w, y);
+        ctx.save();
+        ctx.translate(r.x + r.w / 2 + horn.w, y);
+        ctx.scale(-1, 1);
+        blit(ctx, horn, 0, 0);
+        ctx.restore();
+      } else if (d.skin === 'fallenBlock') {
+        if (!paint(ctx, 'fallen-block', r.x, r.y)) ctx.drawImage(FALLEN_BLOCK_SPRITE, r.x, r.y);
       } else if (d.skin === 'talatat') {
         for (let i = 0; i < r.w / TILE; i++) if (!paint(ctx, 'talatat', r.x + i * TILE, r.y)) ctx.drawImage(TALATAT_SPRITE, r.x + i * TILE, r.y);
       } else if (d.skin === 'floor') {
@@ -1199,6 +1385,31 @@ function drawEntityBack(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): voi
  * One horse of the frieze, and whatever it is in the middle of doing. All ten
  * are the same sprite: what differs is the transform.
  */
+/**
+ * One figure of the Roc-aux-Sorciers frieze. `raked` decides whether it throws a
+ * shadow, and that is the only difference between a figure you can stand on and a
+ * figure that is a line on a wall. The sprite is the same either way.
+ */
+function drawFigure(ctx: CanvasRenderingContext2D, figure: 'bison' | 'horse' | 'ibex', x: number, y: number, raked: boolean, face: 1 | -1 = 1): void {
+  const id = figure === 'bison' ? 'frieze-bison' : figure === 'horse' ? 'frieze-horse' : 'frieze-ibex';
+  const sprite = figure === 'bison' ? BISON_FIGURE_SPRITE : figure === 'horse' ? HORSE_FIGURE_SPRITE : IBEX_SPRITE;
+  const shadow = figure === 'bison' ? BISON_FIGURE_SHADOW : figure === 'horse' ? HORSE_FIGURE_SHADOW : IBEX_SHADOW;
+  ctx.save();
+  if (face === -1) {
+    ctx.translate(x + sprite.width, y);
+    ctx.scale(-1, 1);
+    ctx.translate(-x, -y);
+  }
+  if (raked) {
+    // Low sun from the mouth of the shelter: the carving throws its own shape.
+    ctx.globalAlpha = 0.45;
+    ctx.drawImage(shadow, x + 3, y + 3);
+    ctx.globalAlpha = 1;
+  }
+  if (!paint(ctx, id, x, y)) ctx.drawImage(sprite, x, y);
+  ctx.restore();
+}
+
 function drawHorse(ctx: CanvasRenderingContext2D, h: Horse): void {
   const r = h.rect;
   const sx = r.x - 4;

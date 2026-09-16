@@ -1166,3 +1166,201 @@ function roofBlock(): HTMLCanvasElement {
   return compile(g.outline('O').rows(), LIMESTONE);
 }
 export const ROOF_BLOCK_SPRITE = roofBlock();
+
+// ---------------------------------------------------------------------------
+// Roc-aux-Sorciers. The same limestone, carved on a vertical wall above a river.
+// Every figure of the frieze is 32 x 20 with a flat back at y 2, from x 2 to x 30:
+// that 28 px run is the ledge, when the figure is carved deep enough to be one.
+// Sculpture and engraving are drawn from the same sprites on purpose. In flat
+// light you cannot tell them apart, which is the whole of this level.
+// ---------------------------------------------------------------------------
+
+/**
+ * Every animal of the frieze is 40 x 20 with its back flat from x 4 to x 32 at
+ * y 3. That 28 px run is the ledge; the head hangs off the front of it and the
+ * tail off the back, so the silhouette says which animal it is without changing
+ * the shape of the floor. Each one compiles twice: once in stone, once as a flat
+ * silhouette for the shadow it throws when the light rakes.
+ */
+function friezeAnimal(kind: 'bison' | 'horse' | 'ibex'): string[] {
+  const g = new PixelGrid(40, 20);
+  g.rect(4, 3, 28, 9, 'S'); // the body: the same block under all three
+  g.rect(4, 3, 28, 1, 'L'); // the back, catching the light. This is the floor
+  g.rect(4, 10, 28, 3, 'D'); // belly, deeply undercut, so the body stands off the wall
+  const legs = (pairs: number[]) => {
+    for (const x of pairs) {
+      g.rect(x, 13, 2, 5, 'S');
+      g.rect(x + 3, 13, 2, 4, 'S');
+      g.rect(x, 17, 2, 1, 'D');
+      g.rect(x + 3, 16, 2, 1, 'D');
+    }
+  };
+  if (kind === 'ibex') {
+    g.rect(2, 3, 3, 4, 'S'); // short tail, carried up
+    g.rect(29, 2, 7, 6, 'S'); // neck, thick and short
+    g.rect(33, 5, 7, 6, 'S'); // head
+    g.rect(37, 8, 3, 3, 'D'); // muzzle
+    g.px(35, 7, 'K'); // eye
+    g.rect(34, 11, 2, 4, 'D'); // the beard: how you know it is an ibex and not a goat-shaped nothing
+    // The horns. Two of them, back over the whole length of the body, ridged.
+    for (let i = 0; i < 22; i++) {
+      const x = 35 - i;
+      const y = 2 - Math.floor(i / 4);
+      g.px(x, y, 'D');
+      g.px(x, y + 1, i % 3 === 0 ? 'K' : 'S');
+      if (i > 3) g.px(x + 2, y + 3, 'D');
+    }
+    legs([7, 23]);
+    g.rect(11, 6, 3, 1, 'R');
+    g.rect(20, 8, 2, 1, 'R');
+  } else if (kind === 'horse') {
+    g.rect(0, 2, 5, 12, 'S'); // the tail, full and hanging past the rump
+    g.rect(1, 3, 3, 10, 'D');
+    g.rect(28, 3, 8, 7, 'S'); // neck, thick, running forward and down
+    g.rect(27, 0, 11, 3, 'D'); // the crest of the mane, standing up off the back line
+    g.rect(28, 0, 9, 1, 'S');
+    g.rect(34, 8, 6, 6, 'S'); // head, carried low
+    g.rect(37, 11, 3, 3, 'D'); // muzzle
+    g.px(35, 6, 'S'); // ear
+    g.px(36, 9, 'K');
+    legs([7, 24]);
+    g.rect(10, 6, 4, 1, 'R');
+    g.rect(19, 8, 3, 1, 'R');
+  } else {
+    // The hump. It is the whole silhouette of a bison and it stands well above the back.
+    g.rect(22, 0, 12, 4, 'S');
+    g.rect(23, 0, 10, 1, 'L');
+    g.rect(20, 2, 3, 2, 'S');
+    g.rect(2, 4, 3, 6, 'S'); // short tail
+    g.rect(31, 4, 7, 9, 'S'); // the head, hung low under the hump
+    g.rect(33, 9, 6, 5, 'D'); // muzzle and beard
+    g.px(33, 6, 'K');
+    g.rect(35, 2, 2, 2, 'S'); // horn, short and forward
+    g.px(37, 1, 'D');
+    g.rect(24, 5, 8, 7, 'D'); // shaggy forequarters, in shadow
+    legs([7, 22]);
+    g.rect(12, 7, 4, 1, 'R');
+  }
+  return g.outline('O').rows();
+}
+
+const IBEX_ROWS = friezeAnimal('ibex');
+const HORSE_FIGURE_ROWS = friezeAnimal('horse');
+const BISON_FIGURE_ROWS = friezeAnimal('bison');
+/** Every pixel of the figure in one shade: the shadow a relief throws in raking light. */
+const SHADOW: Palette = Object.fromEntries('SLDROWGK'.split('').map((k) => [k, '#8d7f61']));
+
+export const IBEX_SPRITE = compile(IBEX_ROWS, LIMESTONE);
+export const HORSE_FIGURE_SPRITE = compile(HORSE_FIGURE_ROWS, LIMESTONE);
+export const BISON_FIGURE_SPRITE = compile(BISON_FIGURE_ROWS, LIMESTONE);
+export const IBEX_SHADOW = compile(IBEX_ROWS, SHADOW);
+export const HORSE_FIGURE_SHADOW = compile(HORSE_FIGURE_ROWS, SHADOW);
+export const BISON_FIGURE_SHADOW = compile(BISON_FIGURE_ROWS, SHADOW);
+
+/**
+ * One of the women of the frieze, 14 x 20. The carving starts at the waist and
+ * stops at the knees: no head, no feet, no arms. Life size on the real wall,
+ * which is why she is the only thing in the level at the tourist's own height.
+ */
+function venusRelief(): HTMLCanvasElement {
+  const g = new PixelGrid(14, 20);
+  g.rect(5, 0, 5, 3, 'S'); // the waist, cut flat where the carving begins
+  g.rect(3, 2, 9, 3, 'S'); // it broadens fast
+  g.rect(1, 4, 12, 6, 'S'); // the hips, which are the whole point of the figure
+  g.rect(2, 10, 10, 5, 'S'); // thighs, turning in
+  g.rect(3, 15, 8, 5, 'S'); // and the knees, cut flat where it stops
+  g.rect(6, 11, 2, 9, 'D'); // the gap between the legs, carried right down
+  g.rect(1, 4, 2, 6, 'D'); // the far hip, in shadow: she is turned slightly
+  g.rect(11, 5, 2, 5, 'D');
+  g.rect(5, 6, 4, 2, 'D'); // the pubic triangle: the detail the frieze is known for
+  g.px(6, 8, 'D');
+  g.px(7, 8, 'D');
+  g.rect(4, 0, 7, 1, 'L'); // the top edge of the carving takes the light
+  g.rect(3, 19, 8, 1, 'D'); // and the bottom edge is a shadow line
+  return compile(g.outline('O').rows(), LIMESTONE);
+}
+export const VENUS_SPRITE = venusRelief();
+
+/** A block of the collapse, 40 x 12, lying in the river margin with its carved face down. */
+function fallenBlock(): HTMLCanvasElement {
+  const g = new PixelGrid(40, 12);
+  g.rect(0, 2, 40, 10, 'S');
+  g.rect(3, 0, 34, 3, 'S');
+  g.bevel(0, 2, 2, 1, 1);
+  g.bevel(39, 2, 2, -1, 1);
+  g.rect(4, 1, 20, 1, 'L'); // the bedding plane, upward: this is the back of the stone
+  g.rect(0, 9, 40, 3, 'D');
+  g.rect(6, 5, 16, 1, 'D');
+  g.rect(24, 6, 12, 1, 'D');
+  // One edge of the carved face, turned under where it landed.
+  g.rect(2, 10, 6, 2, 'L');
+  g.rect(30, 10, 5, 2, 'L');
+  return compile(g.outline('O').rows(), LIMESTONE);
+}
+export const FALLEN_BLOCK_SPRITE = fallenBlock();
+
+/**
+ * One horn of the confronting ibex, 44 x 20, reaching in from the left with its
+ * tip at the right-hand end. Ridged along its whole length: the ridges are the
+ * one thing about an ibex horn that a teacher will check.
+ */
+function ibexHorn(): HTMLCanvasElement {
+  const g = new PixelGrid(44, 20);
+  for (let x = 0; x < 44; x++) {
+    const thick = Math.max(3, 10 - Math.floor(x / 5));
+    const y = 4 + Math.floor(((43 - x) * (43 - x)) / 260);
+    g.rect(x, y, 1, thick, 'S');
+    g.px(x, y, 'L');
+    g.px(x, y + thick - 1, 'D');
+    if (x % 3 === 0) g.rect(x, y, 1, thick, 'D');
+  }
+  return compile(g.outline('O').rows(), LIMESTONE);
+}
+export const IBEX_HORN_SPRITE = ibexHorn();
+
+/** The gate of 1955, 14 x 40. Closed since the site was classified; the tourist walks past it. */
+export const GRILLE_SPRITE = compile(
+  [
+    'MMMMMMMMMMMMMM',
+    'M............M',
+    'M.M.M.M.M.M..M',
+    'M.M.M.M.M.M..M',
+    'M.M.M.M.M.M..M',
+    'M.M.M.M.M.M..M',
+    'M.M.M.M.M.M..M',
+    'M.M.M.M.M.M..M',
+    'MMMMMMMMMMMMMM',
+    'M.M.M.M.M.M..M',
+    'M.M.M.M.M.M..M',
+    'M.M.M.M.M.M..M',
+    'M.M.M.M.M.M..M',
+    'M.M.M.M.MRM..M',
+    'M.M.M.M.M.M..M',
+    'M.M.M.M.M.M..M',
+    'MMMMMMMMMMMMMM',
+    'M.M.M.M.M.M..M',
+    'M.M.M.M.M.M..M',
+    'M.M.M.M.M.M..M',
+    'M.M.M.M.M.M..M',
+    'M.M.M.M.M.M..M',
+    'M.M.M.M.M.M..M',
+    'M.M.M.M.M.M..M',
+    'M.M.M.M.M.M..M',
+    'M.M.M.M.M.M..M',
+    'M.M.M.M.M.M..M',
+    'M.M.M.M.M.M..M',
+    'M.M.M.M.M.M..M',
+    'M.M.M.M.M.M..M',
+    'M.M.M.M.M.M..M',
+    'M.M.M.M.M.M..M',
+    'MMMMMMMMMMMMMM',
+    'M.M.M.M.M.M..M',
+    'M.M.M.M.M.M..M',
+    'M.M.M.M.M.M..M',
+    'M.M.M.M.M.M..M',
+    'M.M.M.M.M.M..M',
+    'M.M.M.M.M.M..M',
+    'MMMMMMMMMMMMMM',
+  ],
+  { M: '#4a4640', R: '#8a5a3a' },
+);

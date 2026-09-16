@@ -341,10 +341,10 @@ test('a run that knows the level finishes with zero deaths', async ({ page }) =>
   expect(r.total).toBe(0);
 });
 
-test('Enter at the exit label goes back to the map: the chapter has no second level yet', async ({ page }) => {
-  const screen = await page.evaluate(`(() => { const g = window.__game;
+test('Enter at the exit label leads on to Roc-aux-Sorciers', async ({ page }) => {
+  const after = await page.evaluate(`(() => { const g = window.__game;
     g.state = 'complete';
     window.dispatchEvent(new KeyboardEvent('keydown', { code: 'Enter' })); window.dispatchEvent(new KeyboardEvent('keyup', { code: 'Enter' }));
-    g.tick(); return { screen: g.currentScreen, chapter: g.mapScreen.chapter, view: g.mapScreen.view }; })()`);
-  expect(screen).toEqual({ screen: 'map', chapter: 0, view: 'chapter' });
+    g.tick(); return { screen: g.currentScreen, level: g.levelData.id }; })()`);
+  expect(after).toEqual({ screen: 'level', level: 'roc-aux-sorciers' });
 });

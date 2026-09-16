@@ -11,7 +11,7 @@ import { TILE, type Costume, type DeathCause, type Rect } from './types';
  */
 export type TileChar = ' ' | '#' | '=' | '%' | '?' | 'x';
 
-export type Theme = 'capBlanc' | 'abuSimbel' | 'philae' | 'karnak';
+export type Theme = 'capBlanc' | 'rocAuxSorciers' | 'abuSimbel' | 'philae' | 'karnak';
 
 // ---------------------------------------------------------------------------
 // Entities. Every trap in the game is one of these, with a skin for the renderer.
@@ -109,10 +109,16 @@ export interface SweepDef {
 /** Looks like something to stand on. If fake, it gives way a moment after you do, or on an event. */
 export interface CrumbleDef {
   kind: 'crumble';
-  skin: 'croc' | 'capital' | 'rock' | 'floor' | 'talatat' | 'column' | 'stone';
+  skin: 'croc' | 'capital' | 'rock' | 'floor' | 'talatat' | 'column' | 'stone' | 'relief' | 'fallenBlock' | 'horns';
   rect: Rect;
   fake: boolean;
   delay: number;
+  /** Which animal of the frieze this one is carved as. Says nothing about whether it holds. */
+  figure?: 'bison' | 'horse' | 'ibex';
+  /** Which way it faces. A frieze faces both ways; the confronting pair face each other. */
+  face?: 1 | -1;
+  /** Constant px/s instead of gravity: a block settling into the river, not a capital dropping. */
+  sinkSpeed?: number;
   /** Gives way when this event fires, instead of when stood on. */
   onEvent?: string;
   /** Stops falling with its bottom here, instead of leaving the level. */
@@ -268,6 +274,12 @@ export type DecorDef =
   | { kind: 'trench'; rect: Rect }
   | { kind: 'skeletonCast'; x: number; floorY: number }
   | { kind: 'bisonRelief'; x: number; y: number }
+  | { kind: 'cliff'; x0: number; x1: number; ceilingY: number }
+  | { kind: 'raking'; x0: number; x1: number }
+  | { kind: 'engraving'; x: number; y: number; figure: 'bison' | 'horse' | 'ibex'; face?: 1 | -1 }
+  | { kind: 'venus'; x: number; y: number }
+  | { kind: 'grille'; x: number; floorY: number }
+  | { kind: 'engravedWall'; rect: Rect }
   | { kind: 'brokenObelisk'; x: number; floorY: number }
   | { kind: 'pedestal'; x: number; floorY: number }
   | { kind: 'turnstile'; x: number; floorY: number }

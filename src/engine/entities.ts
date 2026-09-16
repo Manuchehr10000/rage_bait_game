@@ -419,6 +419,7 @@ export class Crumble implements Entity {
     // Falling: a crocodile dives at its own pace, a capital drops. You ride it down either way.
     if (this.state === 'landed') return;
     if (this.def.skin === 'croc') this.vy = 55;
+    else if (this.def.sinkSpeed !== undefined) this.vy = this.def.sinkSpeed;
     else this.vy = Math.min(PHYS.maxFall, this.vy + PHYS.gravity * DT);
     const before = r.y;
     r.y += this.vy * DT;

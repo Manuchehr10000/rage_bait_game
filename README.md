@@ -27,7 +27,8 @@ npm run dev
 ```
 
 Arrows or WASD to move, Space to jump, R to give up (it counts), M to mute, Enter for the
-next level at the exit label. Esc returns to the map. Open `#cap-blanc`, `#philae` or `#karnak` in the URL to start at that level.
+next level at the exit label. Esc returns to the map. Open `#cap-blanc`,
+`#roc-aux-sorciers`, `#philae` or `#karnak` in the URL to start at that level.
 
 `npm test` runs scripted playthroughs in headless Chromium. Each one checks a design
 contract: the trap fires for the naive player and can be avoided by the one who remembers.
@@ -75,5 +76,6 @@ Rendering: the world is 320 × 180 units, rendered onto a canvas four times that
 
 ## Status
 
-Four levels playable end to end (Cap Blanc; Abu Simbel, Philae, Karnak) with code-drawn art and procedural sound, from a tour map start screen. Painted art
+Five levels playable end to end (Cap Blanc, Roc-aux-Sorciers; Abu Simbel, Philae, Karnak)
+with code-drawn art and procedural sound, from a tour map start screen. Painted art
 arrives per asset through `content/`. No menu yet.

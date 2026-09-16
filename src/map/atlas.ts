@@ -45,7 +45,7 @@ export const CHAPTERS: Chapter[] = [
     costume: 'hiker',
     sites: [
       { name: 'Cap Blanc', lat: 44.95, lon: 1.1, level: 'cap-blanc', pin: { dx: 14, dy: 8 }, label: 'right' },
-      { name: 'Roc-aux-Sorciers', lat: 46.69, lon: 0.87, label: 'right' },
+      { name: 'Roc-aux-Sorciers', lat: 46.69, lon: 0.87, level: 'roc-aux-sorciers', label: 'right' },
       { name: 'Pech Merle', lat: 44.51, lon: 1.64, pin: { dx: 10, dy: 10 }, label: 'right' },
       { name: 'Rouffignac', lat: 45.01, lon: 0.99, pin: { dx: -14, dy: -6 }, label: 'left' },
       { name: 'Gargas', lat: 43.05, lon: 0.52, label: 'left' },
