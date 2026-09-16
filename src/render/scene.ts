@@ -1034,7 +1034,9 @@ function drawDecor(ctx: CanvasRenderingContext2D, s: Scene, d: DecorDef): void {
       // Low sun coming in under the overhang. Bas-relief is only legible in light
       // like this, which is how the frieze was found in 1950 and how it is photographed.
       const w = d.x1 - d.x0;
-      const top = 7 * TILE;
+      // From the underside of the overhang, wherever the level's cliff puts it.
+      const cliff = s.level.data.decor.find((z) => z.kind === 'cliff');
+      const top = cliff?.kind === 'cliff' ? cliff.ceilingY : 7 * TILE;
       const floorY = 15 * TILE;
       const g = ctx.createLinearGradient(d.x0, 0, d.x1, 0);
       g.addColorStop(0, 'rgba(255, 244, 214, 0.34)');

@@ -24,30 +24,46 @@ acknowledgement that the tourist has no business being here at all.
 | Beat | Folder | What the player meets | The history it comes from |
 |---|---|---|---|
 | a | `a-bank` | The bank of the Anglin at the cliff foot. Daylight. The headlamp is on from habit and does nothing. A locked gate he walks straight past | South-facing shelter on a river bank; classified and shut since 1955 |
-| b | `b-raked` | Seven figures of the frieze in low sun. Every one throws a shadow; every one holds. The wall is the road | Bas-relief is only legible in raking light. It is how the frieze was found in 1950 and how it is still photographed |
-| c | `c-flat` | Eight more, out of the light. Identical marks on the same wall — and three of them were only ever engraved, so there is nothing there to stand on | The site carries monumental sculpture and discreet engraving side by side. In flat light the two are the same lines |
+| b | `b-raked` | Seven figures of the frieze in low sun, carved at different heights up the wall. Every one throws a shadow; every one holds. The wall is the road, and it climbs | Bas-relief is only legible in raking light. It is how the frieze was found in 1950 and how it is still photographed. The frieze is 2.6 m high and the figures sit at every height on it |
+| c | `c-flat` | Eight more, out of the light, identical marks on the same wall. The first and the last hold. Three were only ever engraved, so there is nothing there to stand on. One lets go a second after he lands on it. One is carved higher than the rest and settles into the river under him. One is polished and slides him back off it | The site carries monumental sculpture and discreet engraving side by side. In flat light the two are the same lines. Carved blocks did come off this wall in the fall that sealed it |
 | d | `d-horns` | Two ibex nose to nose across a gap wider than a running jump. Their horns meet over it, and their horns hold | Eight ibex, the commonest animal of the frieze, including a confronting pair |
 | e | `e-collapse` | The blocks of the roof fall, lying face down in the river margin. Every one settles under a man who stands on it. Above them the five women, at his own height, doing nothing whatever | The rockfall of c. 17,000 BP that ended the occupation and sealed the frieze; the five female figures, life size, waist to knees |
 | f | `f-taillebourg` | The deeper cave. Dark, so the lamp finally earns its place — and the one ledge it finds is a sculpted block that came off the roof and is attached to nothing | Cave Taillebourg is engraved rather than carved, and its own rockfalls are what closed it |
 
 ## What the level teaches
 
-Level 1 was dark, and everything the tourist could see was lying. This one is the other
-way round. **Nothing on this wall changes its mind**: every figure cut deep enough to be
-a ledge holds his weight, every time, however long he stands on it. What varies is
-whether the light lets him tell which those are. The one dishonest thing in the level is
-in the dark half, and it is not the wall — it is a piece of the wall that came off
-seventeen thousand years ago and is leaning where it landed.
+Level 1 was dark, and everything the tourist could see was lying. This one is lit, and
+the light is the whole story. **In the sun, nothing on this wall changes its mind**: every
+figure that throws a shadow is a ledge, every ledge holds his weight however long he
+stands on it, and the only thing the light adds is how high up the wall each one is
+carved. The climb is honest too: a step up is a hop, a step down is a walk, and every
+edge is visible.
+
+Out of the sun the same wall goes flat, and the eight figures in it are eight identical
+drawings. Three are not there. One drops a second after he lands. One stands higher than
+the others and goes down into the river under him. One is polished, and slides him back
+off it the way he came. Two are what they look like. Nothing tells them apart, so the
+first attempt is a list of deaths and the second attempt is the list, by heart (pillar 4).
 
 So: at Cap Blanc the committed jump was the death and the short hop was the way out. Here
-the short hop is what puts you in the river.
+the short hop is what puts you in the river, and the polished figure is the one place in
+the chapter where the way on is to leave the ground the moment you touch it. The one
+dishonest thing in the dark half is not the wall either: it is a piece of the wall that
+came off seventeen thousand years ago and is leaning where it landed.
 
 ## Deliberate lies
 
 - **The Anglin runs under the whole frieze.** It does not. The shelter floor is dry and
   was dug out by hand between 1947 and 1964. The river is put where the trench was.
-- **Three figures of the flat run are engraving and five are sculpture, in that order.**
-  The mix is real; this arrangement of it is level design.
+- **The figures of the frieze in the light step up and down the wall by a body height
+  or more.** The frieze is 2.6 m high and its figures do sit at different heights on it;
+  this particular climb, and a figure carved a full body height above its neighbours in
+  the flat run, are level design.
+- **Three figures of the flat run are engraving and five are sculpture, in that order,
+  and of the five, one drops, one sinks and one is polished.** The mix of carving and
+  engraving is real; the arrangement, the movement and the polish are level design. No
+  figure of the Bourdois frieze has moved since the Magdalenian, and none of it is
+  polished: the limestone is matt, and the surfaces were ochred, never burnished.
 - **The horns of the confronting ibex bridge a gap and carry a man.** They meet on the
   real wall. They are a few centimetres of limestone and they carry nothing.
 - **The blocks of the collapse sink under a standing man.** They came to rest in the

@@ -2,8 +2,11 @@ import { expect, test, type Page } from '@playwright/test';
 
 /**
  * Scripted playthroughs of Roc-aux-Sorciers, the second level of the game. The
- * contract here is the opposite of Cap Blanc's: nothing on this wall changes its
- * mind, so every death has to be the light or the player, never the rock.
+ * contract here: in the raking light the wall is honest, every figure holds and
+ * the only thing that changes is how high up it is carved. Out of the light the
+ * figures are drawn the same and are not: three are engraving, one lets go, one
+ * settles into the river, one is polished. Every death is the light or the
+ * player, and the second attempt knows exactly where.
  */
 
 interface Snap {
@@ -14,6 +17,7 @@ interface Snap {
   total: number;
   phase: string;
   lamp: boolean;
+  tick: number;
 }
 
 const DRIVER = `
@@ -25,18 +29,26 @@ const DRIVER = `
   const jump = (frames = 18) => { key('Space', true); hold = frames; };
   const canJump = () => p.onGround && hold === 0;
   const E = g.entities;
-  /** Every figure carved deep enough to be a floor, left to right. */
-  const carved = E.filter((e) => e.def.kind === 'crumble' && e.def.skin === 'relief' && !e.def.fake);
+  const water = E.find((e) => e.def.kind === 'water');
+  const bankX1 = water.def.x0;
+  const caveX0 = water.def.x1;
+  const raking = g.level.data.decor.find((d) => d.kind === 'raking');
+  /** Every figure of the frieze carved deep enough to be a floor, left to right, whatever it does next. */
+  const carved = E.filter((e) => e.def.kind === 'crumble' && e.def.skin === 'relief' && e.def.rect.x < caveX0);
+  /** The polished one: the region that slides whoever stands in it. */
+  const polished = E.find((e) => e.def.kind === 'conveyor');
+  const onPolished = (r) => r.x >= polished.def.rect.x && r.x < polished.def.rect.x + polished.def.rect.w;
+  /** The figures that stay where they are carved and let you stay on them. */
+  const stable = carved.filter((c) => !c.def.fake && !onPolished(c.rect));
+  /** The one that drops a second after you land, and the one that settles into the river as you do. */
+  const letsGo = carved.find((c) => c.def.fake && c.def.sinkSpeed === undefined);
+  const settles = carved.find((c) => c.def.fake && c.def.sinkSpeed !== undefined);
   /** The three that were only ever engraved: decor, and nothing to stand on. */
   const engraved = g.level.data.decor.filter((d) => d.kind === 'engraving');
   const blocks = E.filter((e) => e.def.kind === 'crumble' && e.def.skin === 'fallenBlock');
   const horns = E.find((e) => e.def.kind === 'crumble' && e.def.skin === 'horns');
   /** The block in Cave Taillebourg that is leaning, not attached. */
-  const leaning = E.find((e) => e.def.kind === 'crumble' && e.def.skin === 'relief' && e.def.fake);
-  const water = E.find((e) => e.def.kind === 'water');
-  const bankX1 = water.def.x0;
-  const caveX0 = water.def.x1;
-  const raking = g.level.data.decor.find((d) => d.kind === 'raking');
+  const leaning = E.find((e) => e.def.kind === 'crumble' && e.def.skin === 'relief' && e.def.rect.x >= caveX0);
   const pitX0 = leaning.def.rect.x - 6;
   const right = () => p.x + p.w;
   /** Feet on a figure's back. */
@@ -44,19 +56,23 @@ const DRIVER = `
   /** The carved figure the tourist is over, if any. */
   const under = () => carved.map((c) => c.rect).find((r) => p.x + 5 >= r.x - 1 && p.x + 5 <= r.x + r.w);
   let phase = 'bank';
+  let tick = 0;
   const run = (step, maxTicks) => {
     for (let i = 0; i < maxTicks; i++) {
+      tick = i;
       if (hold > 0) { hold--; if (hold === 0) key('Space', false); }
       step(i);
       g.tick();
       if (g.state !== 'playing') break;
     }
     key('ArrowRight', false); key('ArrowLeft', false); key('Space', false);
-    return { state: g.state, cause: g.deathCause, x: Math.round(p.x), y: Math.round(p.y), total: g.stats.total, phase, lamp: g.lamp };
+    return { state: g.state, cause: g.deathCause, x: Math.round(p.x), y: Math.round(p.y), total: g.stats.total, phase, lamp: g.lamp, tick };
   };
   /**
-   * Cross the frieze the way it has to be crossed: walk the steps, jump the gaps.
-   * A figure's back is 28 px; anything more than a stride to the next one is a jump.
+   * Cross the frieze the way it has to be crossed: walk the steps, hop the ones
+   * carved higher, jump the gaps, and never stand on the polished one. A
+   * figure's back is 28 px; anything more than a stride to the next one, or
+   * any step up, is a jump.
    */
   const cross = () => {
     key('ArrowRight', true);
@@ -67,10 +83,16 @@ const DRIVER = `
       if (right() >= bankX1 - 10 && p.x < bankX1) jump();
       return;
     }
+    // The polished one is not a floor. Bounce.
+    if (onPolished(u)) { jump(); return; }
     const next = carved.map((c) => c.rect).find((r) => r.x > u.x);
     if (!next) return;
     const gap = next.x - (u.x + u.w);
-    if (gap > 16 && gap < 50 && right() >= u.x + u.w - 6) jump();
+    const up = next.y < u.y;
+    if (right() < u.x + u.w - 6) return;
+    // A step up across a stride is a hop, not a jump: a full jump carries 60 px and overshoots the next back.
+    if (up && gap <= 16) jump(6);
+    else if (gap > 16 && gap < 50) jump();
   };
 `;
 
@@ -108,7 +130,7 @@ test('the headlamp stays off through the whole sunlit half and comes on at the c
   expect(before).toBe(false);
   // Out on the frieze, in the sun, with the whole wall lit: still off.
   const middle = await play(page, `
-    standOn(carved[8].rect);
+    standOn(carved[carved.length - 1].rect);
     const step = () => { key('ArrowRight', false); if (!g.lamp) phase = 'dark hat'; };`, 60 * 3);
   expect(middle.phase).toBe('dark hat');
   expect(middle.lamp).toBe(false);
@@ -120,23 +142,44 @@ test('the headlamp stays off through the whole sunlit half and comes on at the c
   expect(cave.lamp).toBe(true);
 });
 
-test('every figure in the raking light throws a shadow, and every one of them holds', async ({ page }) => {
+test('every figure in the raking light throws a shadow, every one of them holds, and they climb the wall', async ({ page }) => {
   const r = await page.evaluate(`(() => { ${DRIVER}
     const inRaking = carved.filter((c) => c.rect.x >= raking.x0 && c.rect.x < raking.x1);
     const shaded = g.level.data.decor.filter((d) => d.kind === 'engraving' && d.x >= raking.x0 && d.x < raking.x1);
-    return { lit: inRaking.length, engravedInTheLight: shaded.length, anyFake: inRaking.some((c) => c.def.fake) };
+    const heights = inRaking.map((c) => c.rect.y);
+    return {
+      lit: inRaking.length,
+      engravedInTheLight: shaded.length,
+      anyFake: inRaking.some((c) => c.def.fake),
+      anyPolished: inRaking.some((c) => onPolished(c.rect)),
+      levels: new Set(heights).size,
+      span: Math.max(...heights) - Math.min(...heights),
+    };
   })()`);
-  expect(r).toEqual({ lit: 7, engravedInTheLight: 0, anyFake: false });
+  expect(r).toEqual({ lit: 7, engravedInTheLight: 0, anyFake: false, anyPolished: false, levels: 6, span: 40 });
 });
 
-test('standing still on a carved figure does nothing at all, however long you wait', async ({ page }) => {
+test('the climb through the light is walked and hopped, never fallen from', async ({ page }) => {
   const r = await play(page, `
-    standOn(carved[9].rect);
-    const startY = p.y;
-    const step = () => { key('ArrowRight', false); if (p.y === startY) phase = 'held'; };`, 60 * 15);
-  expect(r.phase).toBe('held');
+    standOn(carved[0].rect);
+    const end = carved.find((c) => c.rect.x >= raking.x1).rect;
+    const step = () => { cross(); if (p.onGround && p.x >= end.x) phase = 'through'; };`, 60 * 10);
+  expect(r.phase).toBe('through');
   expect(r.state).toBe('playing');
   expect(r.total).toBe(0);
+});
+
+test('standing still on a figure that holds does nothing at all, however long you wait', async ({ page }) => {
+  // The highest one in the light, and the last of the flat run.
+  for (const pick of ['stable.slice().sort((a, b) => a.rect.y - b.rect.y)[0]', 'stable.filter((c) => c.rect.x > raking.x1)[1]']) {
+    const r = await play(page, `
+      standOn(${pick}.rect);
+      const startY = p.y;
+      const step = () => { key('ArrowRight', false); if (p.y === startY) phase = 'held'; };`, 60 * 15);
+    expect(r.phase).toBe('held');
+    expect(r.state).toBe('playing');
+    expect(r.total).toBe(0);
+  }
 });
 
 test('an engraved figure is a drawing: jump for it and you go in the river', async ({ page }) => {
@@ -151,6 +194,68 @@ test('an engraved figure is a drawing: jump for it and you go in the river', asy
       if (canJump() && right() >= from.x + from.w - 4) jump(9);
     };`, 60 * 8);
   expect(r.cause).toBe('The Anglin');
+});
+
+test('the flat run is, in order: holds, gone, lets go, higher and settles, gone, polished, gone, holds', async ({ page }) => {
+  const r = (await page.evaluate(`(() => { ${DRIVER}
+    const flat = [...carved.filter((c) => c.rect.x > raking.x1 && c.rect.x < horns.def.rect.x - 40).map((c) => ({ x: c.rect.x, what: c.def.fake ? (c.def.sinkSpeed === undefined ? 'lets go' : 'settles') : onPolished(c.rect) ? 'polished' : 'holds', y: c.rect.y })),
+      ...engraved.map((d) => ({ x: d.x + 4, what: 'gone', y: d.y + 3 }))].sort((a, b) => a.x - b.x);
+    return { order: flat.map((f) => f.what), pitch: [...new Set(flat.slice(1).map((f, i) => f.x - flat[i].x))], higher: flat.map((f) => f.y).map((y, i, a) => y < a[0]) };
+  })()`)) as { order: string[]; pitch: number[]; higher: boolean[] };
+  expect(r.order).toEqual(['holds', 'gone', 'lets go', 'settles', 'gone', 'polished', 'gone', 'holds']);
+  expect(r.pitch).toEqual([36]);
+  expect(r.higher).toEqual([false, false, false, true, false, false, false, false]);
+});
+
+test('the third of the flat run lets go one second after you land on it', async ({ page }) => {
+  const r = await play(page, `
+    standOn(letsGo.rect);
+    let went = -1;
+    const step = (i) => { key('ArrowRight', false); if (went < 0 && letsGo.state === 'falling') { went = i; phase = 'went at ' + i; } };`, 60 * 8);
+  expect(r.cause).toBe('The Anglin');
+  // Sixty ticks to the second, give or take the frame it takes to notice him.
+  const went = Number(r.phase.replace('went at ', ''));
+  expect(went).toBeGreaterThanOrEqual(58);
+  expect(went).toBeLessThanOrEqual(63);
+});
+
+test('the fourth is carved higher than the rest and settles into the river under whoever stands on it', async ({ page }) => {
+  const r = await play(page, `
+    const startY = settles.rect.y;
+    standOn(settles.rect);
+    const step = () => { key('ArrowRight', false); if (settles.state === 'falling' && settles.rect.y > startY + 8) phase = 'going under'; };`, 60 * 8);
+  expect(r.phase).toBe('going under');
+  expect(r.cause).toBe('The Anglin');
+  expect(r.tick).toBeGreaterThan(60 * 2);
+
+  const shape = await page.evaluate(`(() => { ${DRIVER}
+    const others = carved.filter((c) => c !== settles && c.rect.x > raking.x1).map((c) => c.rect.y);
+    return { above: Math.min(...others) - settles.def.rect.y, sameAsOthers: new Set(others).size, delay: settles.def.delay };
+  })()`);
+  expect(shape).toEqual({ above: 32, sameAsOthers: 1, delay: 0 });
+});
+
+test('the sixth is polished: stand on it and it slides you back into the river where the fifth is', async ({ page }) => {
+  // Hold right the whole way. It still takes you back.
+  const r = await play(page, `
+    const it = carved.find((c) => onPolished(c.rect)).rect;
+    standOn(it);
+    const step = () => { key('ArrowRight', true); if (p.onGround && p.x < it.x + 9 - 4) phase = 'sliding'; };`, 60 * 8);
+  expect(r.phase).toBe('sliding');
+  expect(r.cause).toBe('The Anglin');
+  const fifth = (await page.evaluate(`(() => { ${DRIVER} return engraved[1].x + 4; })()`)) as number;
+  expect(r.x).toBeGreaterThanOrEqual(fifth - 12);
+  expect(r.x).toBeLessThan(fifth + 36);
+});
+
+test('bounce off the polished one the moment you land and the eighth holds', async ({ page }) => {
+  const r = await play(page, `
+    const eighth = stable.filter((c) => c.rect.x > raking.x1)[1].rect;
+    standOn(settles.rect);
+    const step = () => { cross(); if (p.onGround && p.x >= eighth.x) phase = 'eighth'; };`, 60 * 8);
+  expect(r.phase).toBe('eighth');
+  expect(r.state).toBe('playing');
+  expect(r.total).toBe(0);
 });
 
 test('the gap between the confronting ibex is past a running jump', async ({ page }) => {
@@ -250,7 +355,8 @@ test('a run that knows the level finishes with zero deaths', async ({ page }) =>
           key('ArrowRight', true);
           if (p.x > bankX1 - 24) phase = 'frieze';
           break;
-        // Walk the steps, jump the gaps, and never stop on the confronting pair.
+        // Walk the steps, hop the climbs, jump the gaps, bounce off the polished
+        // one, and never stop on the confronting pair.
         case 'frieze':
           cross();
           if (p.x >= last.x) phase = 'collapse';
