@@ -1,14 +1,14 @@
 # Chapter 1 · Palaeolithic Europe
 
 Source: `content/research/arc.md`, chapter 1. Dates 27,000 to 13,000 BP. Status: locked
-in the research. Levels 1 and 2 are built; the rest are not yet designed. The game
+in the research. Levels 1 to 3 are built; the rest are not yet designed. The game
 starts here.
 
 | Level | Site | Place | Period | Built |
 |---|---|---|---|---|
 | 1 | Cap Blanc | Marquay, Dordogne, France | Magdalenian, c. 15,000 BP | yes |
 | 2 | Roc-aux-Sorciers | Angles-sur-l'Anglin, Vienne, France | Mid Magdalenian, c. 15,000 BP | yes |
-| 3 | Pech Merle | Cabrerets, Lot, France | Gravettian, c. 25,000 BP | not yet |
+| 3 | Pech Merle | Cabrerets, Lot, France | Gravettian, c. 25,000 BP | yes |
 | 4 | Rouffignac | Rouffignac-St-Cernin, Dordogne, France | Magdalenian, c. 13,000–15,000 BP | not yet |
 | 5 | Gargas | Aventignan, Hautes-Pyrénées, France | Gravettian, c. 27,000 BP | not yet |
 
@@ -21,6 +21,10 @@ starts here.
 - **Level 2 turns those round:** the wall never lies, and the light will not let you see
   which parts of it are a floor. The one dishonest thing in it came off the wall
   seventeen thousand years ago.
+- **Level 3 makes everything untrustworthy:** two things tell you where to go — the
+  concrete of the guided tour and the footprints of a boy — and they disagree twice. The
+  concrete is wrong both times. It is also three times as long as the first two and has
+  no checkpoints, which is where the rest of its cruelty comes from.
 - **Level 5 ends on:** walls of hand stencils with missing finger segments.
 - **Imagery:** thin. Most decorated caves are sealed or their photography is in
   copyright. Base on excavation reports plus Cartailhac & Breuil 1906 from US-hosted
@@ -68,5 +72,5 @@ nationale's plates. Modern photographs are for reference on your own screen only
 `shared/` holds the hiker (living, dead, sitting). He appears in every level and is
 painted once.
 
-Design of levels 3 to 5 happens in conversation, one beat at a time, before any folder
+Design of levels 4 and 5 happens in conversation, one beat at a time, before any folder
 for a level is created.

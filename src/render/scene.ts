@@ -7,7 +7,10 @@ import {
   BISON_FIGURE_SPRITE,
   BISON_SPRITE,
   BOAT_SPRITE,
+  DISC_SPRITE,
   FALLEN_BLOCK_SPRITE,
+  FOOTPRINT_BACK_SPRITE,
+  FOOTPRINT_SPRITE,
   GRILLE_SPRITE,
   BISON_FIGURE_SHADOW,
   HORSE_FIGURE_SHADOW,
@@ -152,6 +155,22 @@ export const COLORS = {
   reliefShadow: '#8d7f61',
   engraved: '#a89878',
   grille: '#4a4640',
+  // Pech Merle: a deep cave, wet calcite, clay, and the concrete of the tour.
+  cave: '#5c5449',
+  caveLine: '#463f37',
+  caveLit: '#6e655a',
+  calcite: '#b9b2a4',
+  calciteLit: '#ded8cb',
+  clay: '#7a6a52',
+  clayLine: '#5e5140',
+  clayTop: '#9c8a6d',
+  concrete: '#9a968e',
+  concreteLine: '#6f6c66',
+  concreteTop: '#b4b0a7',
+  rail: '#5a5e60',
+  railLit: '#8c9195',
+  manganese: '#241d16',
+  ochreRed: '#a0402c',
 };
 
 export interface Scene {
@@ -178,6 +197,7 @@ export function renderWorld(ctx: CanvasRenderingContext2D, s: Scene): void {
   drawSky(ctx, cy, theme);
   if (theme === 'capBlanc') drawFarBeune(ctx, cx, cy);
   else if (theme === 'rocAuxSorciers') drawFarAnglin(ctx, cx, cy);
+  else if (theme === 'pechMerle') drawCaveDepth(ctx, cx, cy);
   else if (theme === 'abuSimbel') drawFarCliffs(ctx, cx, cy);
   else if (theme === 'philae') drawFarIsland(ctx, cx, cy);
   else drawFarKarnak(ctx, cx, cy);
@@ -354,6 +374,31 @@ function drawFarAnglin(ctx: CanvasRenderingContext2D, cx: number, cy: number): v
   ctx.fillRect(0, horizon, VIEW_W, 1);
 }
 
+/**
+ * Pech Merle: there is no sky. What is behind everything is more cave — the
+ * chamber going back into the dark, and the drips that have been coming down it
+ * for as long as there has been a hill above it.
+ */
+function drawCaveDepth(ctx: CanvasRenderingContext2D, cx: number, cy: number): void {
+  ctx.fillStyle = COLORS.night;
+  ctx.fillRect(0, 0, VIEW_W, VIEW_H);
+  const off = Math.round(cx * 0.3) % 120;
+  ctx.fillStyle = COLORS.caveLine;
+  for (let base = -120; base < VIEW_W + 120; base += 120) {
+    const x = base - off;
+    // Stalactites hanging in the chamber behind, and the stumps coming up to meet them.
+    for (let i = 0; i < 6; i++) {
+      const sx = x + i * 21 + ((i * 7) % 9);
+      const h = 10 + ((i * 13) % 22);
+      const top = 26 - Math.round(cy * 0.35);
+      for (let j = 0; j < h; j++) ctx.fillRect(sx - Math.floor((h - j) / 8), top + j, 1 + Math.floor((h - j) / 4), 1);
+      const bh = 6 + ((i * 5) % 11);
+      const by = 150 - Math.round(cy * 0.35);
+      for (let j = 0; j < bh; j++) ctx.fillRect(sx + 6 - Math.floor(j / 6), by - j, 1 + Math.floor(j / 4), 1);
+    }
+  }
+}
+
 /** Philae: low islands, palms, and the Kiosk on the skyline across the water. */
 function drawFarIsland(ctx: CanvasRenderingContext2D, cx: number, cy: number): void {
   const horizon = 140 - Math.round(cy * 0.55);
@@ -440,13 +485,14 @@ function drawDarkness(ctx: CanvasRenderingContext2D, s: Scene, cx: number, cy: n
   const d = darkLayer.getContext('2d');
   if (!d) return;
   d.clearRect(0, 0, VIEW_W, VIEW_H);
+  const ambient = dark.ambient ?? 0.94;
   d.fillStyle = COLORS.night;
-  d.globalAlpha = 0.94;
+  d.globalAlpha = ambient;
   // Soft edges: the dark fades in over 24px at each end of the hall.
   const feather = 24;
   d.fillRect(x0 + feather, 0, x1 - x0 - feather * 2, VIEW_H);
   for (let i = 0; i < feather; i += 2) {
-    d.globalAlpha = 0.94 * (i / feather);
+    d.globalAlpha = ambient * (i / feather);
     d.fillRect(x0 + i, 0, 2, VIEW_H);
     d.fillRect(x1 - i - 2, 0, 2, VIEW_H);
   }
@@ -935,6 +981,48 @@ function drawDecor(ctx: CanvasRenderingContext2D, s: Scene, d: DecorDef): void {
       if (!paint(ctx, 'site-grille', d.x, d.floorY - 40)) ctx.drawImage(GRILLE_SPRITE, d.x, d.floorY - 40);
       break;
     }
+    case 'walkway': {
+      // The guided tour: poured slabs and a steel handrail on stanchions. It is the
+      // one continuous thing in the cave, it is well made, and it is lying.
+      const w = d.x1 - d.x0;
+      ctx.fillStyle = COLORS.concreteTop;
+      ctx.fillRect(d.x0, d.y - 2, w, 2);
+      ctx.fillStyle = COLORS.rail;
+      for (let x = d.x0 + 6; x < d.x1; x += 40) {
+        ctx.fillRect(x, d.y - 26, 2, 26); // stanchion
+        ctx.fillRect(x - 2, d.y - 27, 6, 1);
+      }
+      ctx.fillRect(d.x0, d.y - 28, w, 2); // the rail itself
+      ctx.fillRect(d.x0, d.y - 18, w, 1); // and the knee rail under it
+      ctx.fillStyle = COLORS.railLit;
+      ctx.fillRect(d.x0, d.y - 28, w, 1);
+      break;
+    }
+    case 'footprints': {
+      // A dozen prints of one adolescent, sealed under a skin of calcite. Some of
+      // them are him going the other way, which is the level's one honest warning.
+      for (const f of d.prints) {
+        const sprite = f.back ? FOOTPRINT_BACK_SPRITE : FOOTPRINT_SPRITE;
+        if (!paint(ctx, f.back ? 'footprint-back' : 'footprint', f.x, f.y)) ctx.drawImage(sprite, f.x, f.y);
+      }
+      break;
+    }
+    case 'bearNest': {
+      // A hollow scraped in the clay by a bear settling down for a winter. The rim
+      // is the only part of it the lamp finds before you are in it.
+      ctx.fillStyle = COLORS.clayTop;
+      ctx.fillRect(d.x - 3, d.floorY - 2, 4, 3);
+      ctx.fillRect(d.x + d.w - 1, d.floorY - 2, 4, 3);
+      ctx.fillStyle = COLORS.night;
+      ctx.fillRect(d.x, d.floorY, d.w, 18);
+      ctx.fillStyle = COLORS.clayLine;
+      ctx.fillRect(d.x, d.floorY, d.w, 1);
+      break;
+    }
+    case 'cavePanel': {
+      drawCavePanel(ctx, d.panel, d.rect);
+      break;
+    }
     case 'trench': {
       // The excavation: the floor was dug down to below the frieze. The section shows its layers.
       const r = d.rect;
@@ -1069,14 +1157,18 @@ function drawTiles(ctx: CanvasRenderingContext2D, level: Level, cx: number, cy: 
       const open = !level.isSolid(tx, ty - 1);
       if (paint(ctx, tileArtId(theme, c, open), x, y)) continue;
       if (c === '=') {
-        if (theme === 'capBlanc') drawMeadowPath(ctx, tx, ty, x, y, open);
+        if (theme === 'pechMerle') drawConcrete(ctx, x, y, open);
+        else if (theme === 'capBlanc' || theme === 'rocAuxSorciers') drawMeadowPath(ctx, tx, ty, x, y, open);
         else if (theme === 'abuSimbel') drawSand(ctx, level, tx, ty, x, y, open);
         else if (theme === 'philae') drawGranite(ctx, tx, ty, x, y, open);
         else drawPaving(ctx, tx, ty, x, y, open);
+      } else if (c === '%' && theme === 'pechMerle') {
+        drawClay(ctx, tx, ty, x, y, open);
       } else if (c === '%' && (theme === 'capBlanc' || theme === 'rocAuxSorciers')) {
         drawSediment(ctx, tx, ty, x, y, open);
       } else if (c === '#' || c === '%') {
-        if (theme === 'capBlanc' || theme === 'rocAuxSorciers') drawBedrock(ctx, tx, ty, x, y, open);
+        if (theme === 'pechMerle') drawCaveRock(ctx, tx, ty, x, y, open);
+        else if (theme === 'capBlanc' || theme === 'rocAuxSorciers') drawBedrock(ctx, tx, ty, x, y, open);
         else if (theme === 'abuSimbel') drawCliff(ctx, tx, ty, x, y, open);
         else if (theme === 'philae') drawColumnDrum(ctx, x, y, open);
         else drawSandstone(ctx, x, y, ty % 2 === 1, open);
@@ -1109,8 +1201,10 @@ function tileArtId(theme: Level['data']['theme'], c: string, open: boolean): str
   const name =
     c === '?' ? 'ankh-block'
     : c === 'x' ? 'ankh-block-used'
-    : c === '=' ? (theme === 'capBlanc' || theme === 'rocAuxSorciers' ? 'limestone' : theme === 'abuSimbel' ? 'sand' : theme === 'philae' ? 'granite' : 'paving')
+    : c === '=' ? (theme === 'pechMerle' ? 'concrete' : theme === 'capBlanc' || theme === 'rocAuxSorciers' ? 'limestone' : theme === 'abuSimbel' ? 'sand' : theme === 'philae' ? 'granite' : 'paving')
+    : c === '%' && theme === 'pechMerle' ? 'clay'
     : c === '%' && (theme === 'capBlanc' || theme === 'rocAuxSorciers') ? 'sediment'
+    : theme === 'pechMerle' ? 'cave-rock'
     : theme === 'capBlanc' || theme === 'rocAuxSorciers' ? 'rock' : theme === 'abuSimbel' ? 'cliff' : theme === 'philae' ? 'column-drum' : 'sandstone';
   if (c === '?' || c === 'x') return name;
   return open ? `tile-${name}-top` : `tile-${name}`;
@@ -1152,6 +1246,47 @@ function drawMeadowPath(ctx: CanvasRenderingContext2D, tx: number, ty: number, x
 }
 
 /** Bedrock of the shelter: the same limestone, bedded, no turf. */
+/** The rock of the cave: wet limestone, bedded, and darker than anything above ground. */
+function drawCaveRock(ctx: CanvasRenderingContext2D, tx: number, ty: number, x: number, y: number, open: boolean): void {
+  ctx.fillStyle = COLORS.cave;
+  ctx.fillRect(x, y, TILE, TILE);
+  ctx.fillStyle = COLORS.caveLine;
+  const h = hash(tx, ty);
+  ctx.fillRect(x + (h % 5), y + 4 + (h % 3), 6 + (h % 6), 1);
+  ctx.fillRect(x + 2 + ((h >> 3) % 7), y + 11, 5 + ((h >> 2) % 5), 1);
+  if (open) {
+    ctx.fillStyle = COLORS.caveLit;
+    ctx.fillRect(x, y, TILE, 2);
+  }
+}
+
+/** The clay floor of the galleries. Soft enough to take a footprint and keep it. */
+function drawClay(ctx: CanvasRenderingContext2D, tx: number, ty: number, x: number, y: number, open: boolean): void {
+  ctx.fillStyle = COLORS.clay;
+  ctx.fillRect(x, y, TILE, TILE);
+  ctx.fillStyle = COLORS.clayLine;
+  const h = hash(tx, ty);
+  ctx.fillRect(x + (h % 6), y + 6 + (h % 4), 7 + (h % 5), 1);
+  if (open) {
+    ctx.fillStyle = COLORS.clayTop;
+    ctx.fillRect(x, y, TILE, 3);
+  }
+}
+
+/** The concrete of the walkway. Poured in slabs, with the joints showing. */
+function drawConcrete(ctx: CanvasRenderingContext2D, x: number, y: number, open: boolean): void {
+  ctx.fillStyle = COLORS.concrete;
+  ctx.fillRect(x, y, TILE, TILE);
+  ctx.fillStyle = COLORS.concreteLine;
+  ctx.fillRect(x, y, 1, TILE);
+  if (open) {
+    ctx.fillStyle = COLORS.concreteTop;
+    ctx.fillRect(x, y, TILE, 3);
+    ctx.fillStyle = COLORS.concreteLine;
+    ctx.fillRect(x, y + 3, TILE, 1);
+  }
+}
+
 function drawBedrock(ctx: CanvasRenderingContext2D, tx: number, ty: number, x: number, y: number, open: boolean): void {
   ctx.fillStyle = COLORS.bedrock;
   ctx.fillRect(x, y, TILE, TILE);
@@ -1323,6 +1458,13 @@ function drawEntityBack(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): voi
         ctx.scale(-1, 1);
         blit(ctx, horn, 0, 0);
         ctx.restore();
+      } else if (d.skin === 'walkway') {
+        // The last run of concrete, laid across the hole on two steel bearers.
+        for (let i = 0; i < r.w / TILE; i++) drawConcrete(ctx, r.x + i * TILE, r.y, true);
+        ctx.fillStyle = COLORS.rail;
+        ctx.fillRect(r.x, r.y + r.h - 3, r.w, 2);
+      } else if (d.skin === 'disc') {
+        if (!paint(ctx, 'calcite-disc', r.x, r.y)) ctx.drawImage(DISC_SPRITE, r.x, r.y);
       } else if (d.skin === 'fallenBlock') {
         if (!paint(ctx, 'fallen-block', r.x, r.y)) ctx.drawImage(FALLEN_BLOCK_SPRITE, r.x, r.y);
       } else if (d.skin === 'talatat') {
@@ -1390,6 +1532,100 @@ function drawEntityBack(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): voi
  * shadow, and that is the only difference between a figure you can stand on and a
  * figure that is a line on a wall. The sprite is the same either way.
  */
+/**
+ * The painted panels of Pech Merle, drawn on the rock. Manganese black for the
+ * animals of the friezes, blown pigment for the dots and the hands. None of them
+ * is ever collided with: this cave's art is on the wall, not under your feet, and
+ * that is the one thing the level never lies about.
+ */
+function drawCavePanel(ctx: CanvasRenderingContext2D, panel: 'blackFrieze' | 'mammoths' | 'fingerCeiling' | 'spottedHorses', r: Rect): void {
+  ctx.save();
+  // The rock the panel is on. A painted wall in a cave is a patch of lit stone in
+  // the dark and nothing else; without this the animals hang in mid air.
+  ctx.fillStyle = COLORS.cave;
+  ctx.fillRect(r.x - 8, r.y - 8, r.w + 16, r.h + 16);
+  ctx.fillStyle = COLORS.caveLit;
+  ctx.fillRect(r.x - 8, r.y - 8, r.w + 16, 2);
+  ctx.fillStyle = COLORS.caveLine;
+  for (let y = r.y + 4; y < r.y + r.h + 8; y += 17) {
+    for (let x = r.x - 6; x < r.x + r.w + 8; x += 34) ctx.fillRect(x, y + (hash(x, y) % 3), 10 + (hash(y, x) % 14), 1);
+  }
+  ctx.strokeStyle = COLORS.manganese;
+  ctx.lineWidth = 1;
+  const beast = (x: number, y: number, w: number, h: number, hump: number) => {
+    ctx.beginPath();
+    ctx.moveTo(x, y + h);
+    ctx.lineTo(x + 2, y + hump);
+    ctx.lineTo(x + w * 0.35, y);
+    ctx.lineTo(x + w * 0.7, y + 1);
+    ctx.lineTo(x + w, y + h * 0.4);
+    ctx.lineTo(x + w - 3, y + h);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(x + 4, y + h);
+    ctx.lineTo(x + 4, y + h + 5);
+    ctx.moveTo(x + w - 6, y + h);
+    ctx.lineTo(x + w - 6, y + h + 5);
+    ctx.stroke();
+  };
+  if (panel === 'blackFrieze') {
+    // Twenty-five animals in one black line: bison, horse, mammoth, aurochs.
+    for (let i = 0; i < 9; i++) beast(r.x + i * 40, r.y + 6 + ((i * 11) % 14), 30, 14, 4);
+  } else if (panel === 'mammoths') {
+    // The Chapel of the Mammoths: seven metres of them, with the trunks down.
+    for (let i = 0; i < 6; i++) {
+      const x = r.x + i * 46;
+      const y = r.y + 8 + ((i * 7) % 10);
+      beast(x, y, 38, 18, 2);
+      ctx.beginPath();
+      ctx.moveTo(x + 36, y + 8); // the trunk
+      ctx.lineTo(x + 41, y + 18);
+      ctx.lineTo(x + 37, y + 24);
+      ctx.moveTo(x + 38, y + 12); // and a tusk under it
+      ctx.lineTo(x + 45, y + 17);
+      ctx.stroke();
+    }
+  } else if (panel === 'fingerCeiling') {
+    // Lines drawn with the fingers in soft clay, with animals somewhere in the tangle.
+    ctx.strokeStyle = COLORS.clayLine;
+    for (let i = 0; i < 14; i++) {
+      const x = r.x + ((i * 53) % Math.max(1, r.w - 40));
+      const y = r.y + ((i * 31) % Math.max(1, r.h - 10));
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.bezierCurveTo(x + 14, y + 9, x + 26, y - 7, x + 40, y + 4);
+      ctx.stroke();
+    }
+  } else {
+    // The spotted horses: two of them, back to back, under blown black dots, with
+    // the hands sprayed around them. The dots go on past the outlines.
+    const mid = r.x + r.w / 2;
+    ctx.strokeStyle = COLORS.manganese;
+    beast(mid - 58, r.y + 12, 56, 22, 5);
+    ctx.save();
+    ctx.translate(mid + 58, 0);
+    ctx.scale(-1, 1);
+    beast(0, r.y + 10, 56, 22, 5);
+    ctx.restore();
+    ctx.fillStyle = COLORS.manganese;
+    for (let i = 0; i < 46; i++) {
+      const x = r.x + 6 + ((i * 37) % (r.w - 12));
+      const y = r.y + 6 + ((i * 23) % (r.h - 10));
+      ctx.fillRect(x, y, 2, 2);
+    }
+    // Negative hands: the wall sprayed around a hand, so the hand is the bare rock.
+    for (const hx of [r.x + 10, r.x + r.w - 26]) {
+      ctx.fillStyle = COLORS.ochreRed;
+      ctx.fillRect(hx - 4, r.y + 24, 20, 22);
+      ctx.fillStyle = COLORS.calcite;
+      ctx.fillRect(hx + 2, r.y + 34, 7, 10);
+      for (let f = 0; f < 4; f++) ctx.fillRect(hx + 1 + f * 2, r.y + 28, 1, 7);
+      ctx.fillRect(hx + 9, r.y + 33, 3, 2);
+    }
+  }
+  ctx.restore();
+}
+
 function drawFigure(ctx: CanvasRenderingContext2D, figure: 'bison' | 'horse' | 'ibex', x: number, y: number, raked: boolean, face: 1 | -1 = 1): void {
   const id = figure === 'bison' ? 'frieze-bison' : figure === 'horse' ? 'frieze-horse' : 'frieze-ibex';
   const sprite = figure === 'bison' ? BISON_FIGURE_SPRITE : figure === 'horse' ? HORSE_FIGURE_SPRITE : IBEX_SPRITE;

@@ -11,7 +11,7 @@ import { TILE, type Costume, type DeathCause, type Rect } from './types';
  */
 export type TileChar = ' ' | '#' | '=' | '%' | '?' | 'x';
 
-export type Theme = 'capBlanc' | 'rocAuxSorciers' | 'abuSimbel' | 'philae' | 'karnak';
+export type Theme = 'capBlanc' | 'rocAuxSorciers' | 'pechMerle' | 'abuSimbel' | 'philae' | 'karnak';
 
 // ---------------------------------------------------------------------------
 // Entities. Every trap in the game is one of these, with a skin for the renderer.
@@ -109,7 +109,7 @@ export interface SweepDef {
 /** Looks like something to stand on. If fake, it gives way a moment after you do, or on an event. */
 export interface CrumbleDef {
   kind: 'crumble';
-  skin: 'croc' | 'capital' | 'rock' | 'floor' | 'talatat' | 'column' | 'stone' | 'relief' | 'fallenBlock' | 'horns';
+  skin: 'croc' | 'capital' | 'rock' | 'floor' | 'talatat' | 'column' | 'stone' | 'relief' | 'fallenBlock' | 'horns' | 'disc' | 'walkway';
   rect: Rect;
   fake: boolean;
   delay: number;
@@ -267,7 +267,18 @@ export type DecorDef =
   | { kind: 'ramp'; x: number; w: number; top: number; bottom: number }
   | { kind: 'pit'; rect: Rect }
   | { kind: 'sphinxRow'; x: number; w: number; floorY: number }
-  | { kind: 'dark'; x0: number; x1: number; lamp?: 'glow' | 'headlamp' }
+  | {
+      kind: 'dark';
+      x0: number;
+      x1: number;
+      lamp?: 'glow' | 'headlamp';
+      /**
+       * How black the dark is, 0 to 1. The default is a hall with the lights off.
+       * A cave that is the whole level needs to be lighter than that, or the player
+       * is not being asked to remember, only to guess.
+       */
+      ambient?: number;
+    }
   | { kind: 'spotlight'; x: number; floorY: number; top?: number }
   | { kind: 'museumWall'; x: number; w: number; doorX: number; top: number; floorY: number }
   | { kind: 'shelter'; x0: number; x1: number; ceilingY: number; floorY: number }
@@ -280,6 +291,14 @@ export type DecorDef =
   | { kind: 'venus'; x: number; y: number }
   | { kind: 'grille'; x: number; floorY: number }
   | { kind: 'engravedWall'; rect: Rect }
+  /** The concrete of the guided tour, with its handrail. The one continuous thing in the cave, and a liar. */
+  | { kind: 'walkway'; x0: number; x1: number; y: number }
+  /** The prints of one adolescent in the clay, sealed under calcite. They are never wrong. */
+  | { kind: 'footprints'; prints: { x: number; y: number; back?: boolean }[] }
+  /** A hollow a bear dug to sleep in. The rim is what the lamp finds first. */
+  | { kind: 'bearNest'; x: number; w: number; floorY: number }
+  /** One painted panel of the cave, drawn on the rock at the given rect. */
+  | { kind: 'cavePanel'; panel: 'blackFrieze' | 'mammoths' | 'fingerCeiling' | 'spottedHorses'; rect: Rect }
   | { kind: 'brokenObelisk'; x: number; floorY: number }
   | { kind: 'pedestal'; x: number; floorY: number }
   | { kind: 'turnstile'; x: number; floorY: number }

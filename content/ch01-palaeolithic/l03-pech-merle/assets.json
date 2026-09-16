@@ -1,0 +1,69 @@
+{
+  "$comment": "Sizes are world pixels (320 x 180 view). Painted files are 4x. See content/README.md. The panels of the cave (the Black Frieze, the mammoths, the finger tracings, the spotted horses) are drawn by the game from the level data and are not listed here; they are wall art, never collided with, and their notes live in their beat folders.",
+  "level": "l03-pech-merle",
+  "assets": [
+    {
+      "id": "tile-cave-rock",
+      "w": 16,
+      "h": 16,
+      "beat": "a-entrance",
+      "what": "The rock of the cave: wet bedded limestone, darker than anything above ground, no surface."
+    },
+    {
+      "id": "tile-cave-rock-top",
+      "w": 16,
+      "h": 16,
+      "beat": "a-entrance",
+      "what": "The same, with a lit top edge where a lamp catches it."
+    },
+    {
+      "id": "tile-clay",
+      "w": 16,
+      "h": 16,
+      "beat": "a-entrance",
+      "what": "The clay floor of the galleries, below the surface. Soft enough to take a footprint and keep it."
+    },
+    {
+      "id": "tile-clay-top",
+      "w": 16,
+      "h": 16,
+      "beat": "a-entrance",
+      "what": "The clay floor with its walked surface on top."
+    },
+    {
+      "id": "tile-concrete",
+      "w": 16,
+      "h": 16,
+      "beat": "a-entrance",
+      "what": "The underside of a walkway slab, where the tour path is cut through."
+    },
+    {
+      "id": "tile-concrete-top",
+      "w": 16,
+      "h": 16,
+      "beat": "a-entrance",
+      "what": "A poured slab of the visitor walkway, seen from above: the surface everybody walks on."
+    },
+    {
+      "id": "footprint",
+      "w": 6,
+      "h": 5,
+      "beat": "a-entrance",
+      "what": "One print of the boy, left in soft clay and sealed under a skin of calcite. Facing the way in."
+    },
+    {
+      "id": "footprint-back",
+      "w": 6,
+      "h": 5,
+      "beat": "c-mammoths",
+      "what": "The same print the other way about. A dozen of them survive and they run in two directions."
+    },
+    {
+      "id": "calcite-disc",
+      "w": 24,
+      "h": 14,
+      "beat": "e-discs",
+      "what": "A calcite disc seen edge on: a plate forced out of a crack in the rock and set hard. Its top edge is a ledge."
+    }
+  ]
+}

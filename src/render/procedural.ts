@@ -1364,3 +1364,42 @@ export const GRILLE_SPRITE = compile(
   ],
   { M: '#4a4640', R: '#8a5a3a' },
 );
+
+// ---------------------------------------------------------------------------
+// Pech Merle. A deep cave, dark the whole way, with a concrete walkway through it.
+// ---------------------------------------------------------------------------
+
+const CAVE: Palette = {
+  C: '#b9b2a4', // calcite, wet
+  H: '#ded8cb', // its lit edge
+  D: '#8b8375', // its shadow
+  Y: '#7a6a52', // clay
+  L: '#9c8a6d', // clay, lit
+  K: '#2a2119', // the black of manganese
+  O: '#4a4239',
+  W: '#cfc6b2', // the pale of a print under calcite
+};
+
+/**
+ * One calcite disc, 24 x 14, seen edge on. Water under pressure comes out of a
+ * crack in the rock and spreads into a plate; what you stand on is the top edge
+ * of the plate, and it is about as thick as a hand.
+ */
+function calciteDisc(): HTMLCanvasElement {
+  const g = new PixelGrid(24, 14);
+  g.rect(2, 0, 20, 3, 'C'); // the top edge: the ledge
+  g.rect(3, 0, 18, 1, 'H');
+  g.rect(0, 3, 24, 5, 'C'); // the face of the plate, widest in the middle
+  g.rect(1, 8, 22, 3, 'D');
+  g.rect(4, 11, 16, 3, 'D'); // and back in to the crack it grew out of
+  g.rect(9, 4, 6, 1, 'D'); // growth rings
+  g.rect(6, 6, 12, 1, 'D');
+  return compile(g.outline('O').rows(), CAVE);
+}
+export const DISC_SPRITE = calciteDisc();
+
+/** One print of the boy, 7 x 5, left behind in soft clay and sealed under calcite. */
+export const FOOTPRINT_SPRITE = compile(['.WWW..', 'WWWWW.', 'WWWWW.', '.WWW..', '.W.W..'], CAVE);
+
+/** The same print, the other way about: a dozen of them run in two directions. */
+export const FOOTPRINT_BACK_SPRITE = compile(['..WWW.', '.WWWWW', '.WWWWW', '..WWW.', '..W.W.'], CAVE);
