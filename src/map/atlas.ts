@@ -6,6 +6,7 @@
  */
 
 import type { Costume } from '../engine/types';
+import type { MonumentId } from './monuments';
 
 export interface Site {
   name: string;
@@ -31,6 +32,13 @@ export interface Chapter {
   badge?: { dx: number; dy: number };
   /** What the tourist wears here, from the research. Unset until the chapter is designed. */
   costume?: Costume;
+  /**
+   * The vignette that stands for the chapter on the tour map: which of the
+   * chapter's own five sites it shows, and how the game draws it. Never a
+   * monument borrowed from another chapter. `content/map/README.md` says what
+   * must be right about each outline.
+   */
+  monument: { site: number; art: MonumentId };
   sites: Site[];
 }
 
@@ -43,6 +51,7 @@ export const CHAPTERS: Chapter[] = [
     anchor: 3,
     badge: { dx: -10, dy: 6 },
     costume: 'hiker',
+    monument: { site: 4, art: 'hand-stencil' },
     sites: [
       { name: 'Cap Blanc', lat: 44.95, lon: 1.1, level: 'cap-blanc', pin: { dx: 14, dy: 8 }, label: 'right' },
       { name: 'Roc-aux-Sorciers', lat: 46.69, lon: 0.87, level: 'roc-aux-sorciers', label: 'right' },
@@ -58,6 +67,7 @@ export const CHAPTERS: Chapter[] = [
     dates: '2667 BC – AD 30',
     anchor: 2,
     costume: 'pharaoh',
+    monument: { site: 0, art: 'abu-simbel' },
     sites: [
       { name: 'Abu Simbel', lat: 22.34, lon: 31.63, level: 'abu-simbel' },
       { name: 'Philae', lat: 24.02, lon: 32.88, level: 'philae', pin: { dx: 12, dy: 2 }, label: 'right' },
@@ -73,6 +83,7 @@ export const CHAPTERS: Chapter[] = [
     dates: '1900–1200 BC',
     anchor: 0,
     badge: { dx: 4, dy: 8 },
+    monument: { site: 3, art: 'lion-gate' },
     sites: [
       { name: 'Knossos', lat: 35.3, lon: 25.16 },
       { name: 'Phaistos', lat: 35.05, lon: 24.81 },
@@ -87,6 +98,7 @@ export const CHAPTERS: Chapter[] = [
     name: 'Iron Age Near East & Persia',
     dates: '900–330 BC',
     anchor: 0,
+    monument: { site: 0, art: 'apadana' },
     sites: [
       { name: 'Persepolis', lat: 29.93, lon: 52.89 },
       { name: 'Behistun', lat: 34.39, lon: 47.44 },
@@ -102,6 +114,7 @@ export const CHAPTERS: Chapter[] = [
     dates: '450 BC – AD 200',
     anchor: 2,
     badge: { dx: -8, dy: -6 },
+    monument: { site: 3, art: 'doric-temple' },
     sites: [
       { name: 'Ephesus', lat: 37.94, lon: 27.34 },
       { name: 'Ostia Antica', lat: 41.76, lon: 12.29 },
@@ -116,6 +129,7 @@ export const CHAPTERS: Chapter[] = [
     name: 'The Americas',
     dates: 'AD 200–1500',
     anchor: 1,
+    monument: { site: 2, art: 'roof-comb' },
     sites: [
       { name: 'Teotihuacan', lat: 19.69, lon: -98.84 },
       { name: 'Chichén Itzá', lat: 20.68, lon: -88.57 },
@@ -130,6 +144,7 @@ export const CHAPTERS: Chapter[] = [
     name: 'Monsoon Asia',
     dates: 'AD 400–1300',
     anchor: 4,
+    monument: { site: 4, art: 'lotus-towers' },
     sites: [
       { name: 'Sigiriya', lat: 7.96, lon: 80.76 },
       { name: 'Ajanta', lat: 20.55, lon: 75.7 },
@@ -144,6 +159,7 @@ export const CHAPTERS: Chapter[] = [
     name: 'East Asia',
     dates: 'AD 600–1600',
     anchor: 1,
+    monument: { site: 0, art: 'tiered-roofs' },
     sites: [
       { name: 'Himeji', lat: 34.84, lon: 134.69 },
       { name: 'Great Wall', lat: 40.36, lon: 116.02 },
@@ -158,6 +174,7 @@ export const CHAPTERS: Chapter[] = [
     name: 'Africa & the Indian Ocean',
     dates: 'AD 1000–1600',
     anchor: 0,
+    monument: { site: 0, art: 'conical-tower' },
     sites: [
       { name: 'Great Zimbabwe', lat: -20.27, lon: 30.93 },
       { name: 'Gede', lat: -3.31, lon: 40.02 },
@@ -172,6 +189,7 @@ export const CHAPTERS: Chapter[] = [
     name: 'Islamic Central Asia & al-Andalus',
     dates: 'AD 1200–1600',
     anchor: 0,
+    monument: { site: 0, art: 'iwan' },
     sites: [
       { name: 'Registan', lat: 39.65, lon: 66.98 },
       { name: 'Alhambra', lat: 37.18, lon: -3.59 },
@@ -187,6 +205,7 @@ export const CHAPTERS: Chapter[] = [
     dates: '1700–1800',
     anchor: 0,
     badge: { dx: -6, dy: -8 },
+    monument: { site: 0, art: 'iron-bridge' },
     sites: [
       { name: 'The Iron Bridge', lat: 52.63, lon: -2.49 },
       { name: 'Cromford Mill', lat: 53.11, lon: -1.56 },
@@ -202,6 +221,7 @@ export const CHAPTERS: Chapter[] = [
     dates: '1796–1815',
     anchor: 2,
     badge: { dx: 10, dy: -4 },
+    monument: { site: 4, art: 'three-masts' },
     sites: [
       { name: 'Martello Towers', lat: 51.02, lon: 1.0 },
       { name: 'Simplon Pass', lat: 46.25, lon: 8.03 },
@@ -215,6 +235,16 @@ export const CHAPTERS: Chapter[] = [
 /** True if any level of the chapter exists in the game. */
 export function chapterOpen(c: Chapter): boolean {
   return c.sites.some((s) => s.level);
+}
+
+/** The site whose monument stands for the chapter on the tour map. */
+export function chapterMonumentSite(c: Chapter): Site {
+  return c.sites[c.monument.site] ?? c.sites[0]!;
+}
+
+/** The painted-art id for a chapter's vignette, if anybody ever paints one. */
+export function monumentArtId(c: Chapter): string {
+  return `map-monument-ch${String(c.number).padStart(2, '0')}-${c.slug}`;
 }
 
 /** The chapter and site index a level belongs to. */

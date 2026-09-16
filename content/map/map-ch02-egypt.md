@@ -4,19 +4,21 @@
 |---|---|
 | Id | `map-ch02-egypt` |
 | File | `map-ch02-egypt.png` (not painted yet: the game draws its own until this file exists) |
-| Size | 320 × 180 world px, painted 1280 × 720 |
+| Size | 208 × 152 world px, painted 832 × 608 |
 | Beat | `.` |
 
 ## What it is
 
 The Nile from Abu Simbel in the south to Saqqara in the north, as the chapter's own
 brochure page: the river, the desert either side, the Red Sea coast at the right edge,
-Lake Nasser behind the High Dam. No pins, no route, no words. The game draws the five
-site pins in level order and the dotted route between them.
+Lake Nasser behind the High Dam. No pins, no route, no words. The game draws the site
+markers where the sites really are; their order is the ribbon's business, not the map's,
+so no route is drawn between them.
 
 ## Where it stands in the game
 
-Shown after the player picks Egypt on the world map, behind the pins.
+Shown after the player picks Egypt on the world map, behind the pins, in the 208 × 152
+map box on the left of the screen.
 
 ## Must be right
 

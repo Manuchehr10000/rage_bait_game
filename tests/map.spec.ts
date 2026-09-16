@@ -149,3 +149,84 @@ test('a deep link still opens a level directly, and the exit leads to the next s
   expect(s.level).toBe('karnak');
   expect(s.onGround).toBe(true);
 });
+
+test('the itinerary ribbon is one straight rule, left to right, with every stop on it', async ({ page }) => {
+  const stops = await page.evaluate(() => {
+    const m = (window as unknown as { __game: { mapScreen: { ribbonStop(i: number): { x: number; y: number } } } }).__game.mapScreen;
+    return Array.from({ length: 12 }, (_, i) => m.ribbonStop(i));
+  });
+  expect(stops).toHaveLength(12);
+  for (let i = 1; i < stops.length; i++) {
+    expect(stops[i]!.x).toBeGreaterThan(stops[i - 1]!.x);
+    expect(stops[i]!.y).toBe(stops[0]!.y);
+  }
+  // Below the map, and inside the sheet.
+  expect(stops[0]!.y).toBeGreaterThan(152);
+  expect(stops[11]!.x).toBeLessThan(320);
+});
+
+test('the ribbon picks a chapter and then a site, the same as the map does', async ({ page }) => {
+  const box = await page.locator('#game').boundingBox();
+  if (!box) throw new Error('no canvas');
+  const at = async (p: { x: number; y: number }) => ({ x: box.x + (p.x / 320) * box.width, y: box.y + (p.y / 180) * box.height });
+  const bead = (i: number) =>
+    page.evaluate((i) => (window as unknown as { __game: { mapScreen: { ribbonStop(i: number): { x: number; y: number } } } }).__game.mapScreen.ribbonStop(i), i);
+  const egypt = await at(await bead(1));
+  await page.mouse.click(egypt.x, egypt.y);
+  await ticks(page, 1);
+  let s = await snap(page);
+  expect(s.view).toBe('chapter');
+  expect(s.chapter).toBe(1);
+  // In a chapter the ribbon lists the five sites, so bead 3 is Karnak.
+  const karnak = await at(await bead(2));
+  await page.mouse.click(karnak.x, karnak.y);
+  await ticks(page, 1);
+  s = await snap(page);
+  expect(s.screen).toBe('level');
+  expect(s.level).toBe('karnak');
+});
+
+test('the ribbon measures progress, not where the cursor is', async ({ page }) => {
+  const walked = () =>
+    page.evaluate(() => (window as unknown as { __game: { mapScreen: { walked(): number } } }).__game.mapScreen.walked());
+  // Nothing cleared: no rule, wherever the cursor wanders.
+  expect(await walked()).toBe(0);
+  await press(page, 'ArrowRight');
+  await press(page, 'ArrowRight');
+  await press(page, 'ArrowRight');
+  expect(await walked()).toBe(0);
+
+  // Chapter 1's four built levels cleared, chapter 2's three not.
+  await page.evaluate(() =>
+    localStorage.setItem('lostTourist.cleared', JSON.stringify(['cap-blanc', 'roc-aux-sorciers', 'pech-merle', 'rouffignac'])),
+  );
+  await page.reload();
+  await page.waitForFunction(() => (window as unknown as { __game?: { currentScreen: string } }).__game?.currentScreen === 'map');
+  expect(await walked()).toBe(1);
+
+  // Clearing a site out of order stamps its bead but never lengthens the rule.
+  await page.evaluate(() => {
+    const cleared = JSON.parse(localStorage.getItem('lostTourist.cleared') ?? '[]') as string[];
+    localStorage.setItem('lostTourist.cleared', JSON.stringify([...cleared, 'karnak']));
+  });
+  await page.reload();
+  await page.waitForFunction(() => (window as unknown as { __game?: { currentScreen: string } }).__game?.currentScreen === 'map');
+  expect(await walked()).toBe(1);
+  // Inside Egypt: Abu Simbel unplayed, Karnak cleared, so the rule is still nothing.
+  await press(page, 'ArrowRight');
+  await press(page, 'Enter');
+  expect(await walked()).toBe(0);
+});
+
+test('a chapter whose every built level is cleared opens on its first site', async ({ page }) => {
+  await page.evaluate(() =>
+    localStorage.setItem('lostTourist.cleared', JSON.stringify(['cap-blanc', 'roc-aux-sorciers', 'pech-merle', 'rouffignac'])),
+  );
+  await page.reload();
+  await page.waitForFunction(() => (window as unknown as { __game?: { currentScreen: string } }).__game?.currentScreen === 'map');
+  await press(page, 'Enter');
+  const s = await snap(page);
+  expect(s.view).toBe('chapter');
+  expect(s.chapter).toBe(0);
+  expect(s.site).toBe(0);
+});

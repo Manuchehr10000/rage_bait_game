@@ -1,10 +1,23 @@
 /**
- * The tour map. Two views: the world, with one numbered badge per chapter and
- * a dotted route through them in order; and a chapter, zoomed on its five sites
- * with the route between them. Painted art replaces the drawn map when it
- * exists (`map-world`, `map-chNN-slug`); the badges, route, pins and the
- * tourist are always drawn on top, and every word is drawn in screen space so
- * it stays crisp.
+ * The tour map. One screen, three instruments, one job each:
+ *
+ *   - the map, left, says *where on Earth*, and nothing else. It draws the
+ *     paper, the land and a marker per stop, plus at most one dotted leg: the
+ *     one from the previous stop to the selected one. There is no route
+ *     polyline, because the tour's order is chronological and the map's order
+ *     is geographical, and drawing a line through twelve chapters in
+ *     chronological order over real coordinates can only ever be a web.
+ *   - the panel, right, says *what is there*: the chapter, its dates, and a
+ *     vignette of one of its own monuments, the way a brochure prints one.
+ *   - the ribbon, along the bottom, says *where in the tour you are*: every
+ *     stop on one straight rule, left to right, departure marked at the left
+ *     end. Cleared stops are stamped solid, so progress fills from the left.
+ *
+ * Both views share that grammar: the world has twelve chapters on the ribbon,
+ * a chapter has its five sites in play order. Painted art replaces the drawn
+ * map when it exists (`map-world`, `map-chNN-slug`, `map-monument-chNN-slug`);
+ * the markers, the ribbon, the vignette and the tourist are always drawn on
+ * top, and every word is drawn in screen space so it stays crisp.
  */
 
 import { paint } from '../engine/assets';
@@ -13,8 +26,9 @@ import type { Progress } from '../engine/progress';
 import { VIEW_H, VIEW_W } from '../engine/types';
 import { blitFacing } from '../render/frame';
 import { tourist } from '../render/scene';
-import { CHAPTERS, chapterOpen, type Chapter } from './atlas';
+import { CHAPTERS, chapterMonumentSite, chapterOpen, monumentArtId, type Chapter } from './atlas';
 import { LAND, RIVERS } from './geo';
+import { ART_H, ART_W, drawMonument } from './monuments';
 
 export type MapView = 'world' | 'chapter';
 export type MapAction = { kind: 'enter'; level: string } | { kind: 'closed' } | { kind: 'move' } | null;
@@ -24,9 +38,15 @@ const INK = '#2b2116';
 const INK_SOFT = '#6b5a3e';
 const ROUTE = '#8e2f2a';
 const PAPER = '#e6d8b4';
-const PAPER_LINE = '#d3c299';
+const CARD = '#f3ead4';
+const BAND = '#dccda4';
 const LAND_FILL = '#cbb98d';
 const LAND_LINE = '#8a7250';
+
+/** The three instruments, in world units. */
+const MAP = { x: 0, y: 0, w: 208, h: 152 };
+const PANEL = { x: 208, y: 0, w: VIEW_W - 208, h: 152 };
+const RIBBON = { y: 152, h: VIEW_H - 152, rule: 166 };
 
 /** The world map's frame in degrees. Equirectangular, which is what brochures use. */
 const WORLD = { lon0: -115, lon1: 150, lat0: 65, lat1: -40 };
@@ -36,11 +56,11 @@ interface Projection {
 }
 
 const worldProject: Projection = (lon, lat) => ({
-  x: ((lon - WORLD.lon0) / (WORLD.lon1 - WORLD.lon0)) * VIEW_W,
-  y: ((WORLD.lat0 - lat) / (WORLD.lat0 - WORLD.lat1)) * VIEW_H,
+  x: MAP.x + ((lon - WORLD.lon0) / (WORLD.lon1 - WORLD.lon0)) * MAP.w,
+  y: MAP.y + ((WORLD.lat0 - lat) / (WORLD.lat0 - WORLD.lat1)) * MAP.h,
 });
 
-/** Fit a chapter's sites into the view with room for the header. */
+/** Fit a chapter's sites into the map box with a margin. */
 function chapterProjection(c: Chapter): Projection {
   let lon0 = Infinity;
   let lon1 = -Infinity;
@@ -53,15 +73,21 @@ function chapterProjection(c: Chapter): Projection {
     lat1 = Math.max(lat1, s.lat);
   }
   const span = Math.max(lon1 - lon0, lat1 - lat0, 2);
-  const pad = span * 0.2 + 0.4;
-  const s = Math.min((VIEW_W - 60) / (lon1 - lon0 + pad * 2), (VIEW_H - 56) / (lat1 - lat0 + pad * 2));
+  const pad = span * 0.25 + 0.4;
+  const s = Math.min((MAP.w - 48) / (lon1 - lon0 + pad * 2), (MAP.h - 40) / (lat1 - lat0 + pad * 2));
   const cx = (lon0 + lon1) / 2;
   const cy = (lat0 + lat1) / 2;
-  return (lon, lat) => ({ x: VIEW_W / 2 + (lon - cx) * s, y: VIEW_H / 2 + 10 + (cy - lat) * s });
+  return (lon, lat) => ({ x: MAP.x + MAP.w / 2 + (lon - cx) * s, y: MAP.y + MAP.h / 2 + 6 + (cy - lat) * s });
 }
 
 function chapterArtId(c: Chapter): string {
   return `map-ch${String(c.number).padStart(2, '0')}-${c.slug}`;
+}
+
+/** A chapter is stamped once every level it actually has is cleared. */
+function chapterStamped(c: Chapter, progress: Progress): boolean {
+  const built = c.sites.filter((s) => s.level);
+  return built.length > 0 && built.every((s) => progress.isCleared(s.level!));
 }
 
 export class MapScreen {
@@ -104,6 +130,24 @@ export class MapScreen {
 
   get current(): Chapter {
     return CHAPTERS[this.chapter] ?? CHAPTERS[0]!;
+  }
+
+  /** How many stops the ribbon is showing. */
+  private get stops(): number {
+    return this.view === 'world' ? CHAPTERS.length : this.current.sites.length;
+  }
+
+  /** The selected stop's index in whichever view is up. */
+  private get selected(): number {
+    return this.view === 'world' ? this.chapter : this.site;
+  }
+
+  /** Position of a stop's bead on the itinerary ribbon. */
+  ribbonStop(i: number): { x: number; y: number } {
+    const n = this.stops;
+    const margin = n > 8 ? 20 : 40;
+    const span = VIEW_W - margin * 2;
+    return { x: Math.round(n <= 1 ? VIEW_W / 2 : margin + (span * i) / (n - 1)), y: RIBBON.rule };
   }
 
   /** Position of a chapter's badge on the world map. For tests and the mouse. */
@@ -157,7 +201,7 @@ export class MapScreen {
     return null;
   }
 
-  /** Mouse in world units. Hover selects; a click enters. */
+  /** Mouse in world units. Hover selects; a click enters. The ribbon picks too. */
   pointer(x: number, y: number, click: boolean): MapAction {
     const hit = this.hitTest(x, y);
     if (hit === null) return null;
@@ -174,13 +218,15 @@ export class MapScreen {
   private hitTest(x: number, y: number): number | null {
     let best: number | null = null;
     let bestD = 12;
-    const n = this.view === 'world' ? CHAPTERS.length : this.current.sites.length;
+    const n = this.stops;
     for (let i = 0; i < n; i++) {
-      const p = this.view === 'world' ? this.worldBadge(i) : this.sitePin(i);
-      const d = Math.hypot(p.x - x, p.y - y);
-      if (d < bestD) {
-        bestD = d;
-        best = i;
+      const spots = [this.ribbonStop(i), this.view === 'world' ? this.worldBadge(i) : this.sitePin(i)];
+      for (const p of spots) {
+        const d = Math.hypot(p.x - x, p.y - y);
+        if (d < bestD) {
+          bestD = d;
+          best = i;
+        }
       }
     }
     return best;
@@ -215,40 +261,26 @@ export class MapScreen {
   draw(ctx: CanvasRenderingContext2D): void {
     if (this.view === 'world') this.drawWorld(ctx);
     else this.drawChapter(ctx);
+    this.drawPanel(ctx);
+    this.drawRibbon(ctx);
   }
 
   private drawWorld(ctx: CanvasRenderingContext2D): void {
-    if (!paint(ctx, 'map-world', 0, 0)) {
+    if (!paint(ctx, 'map-world', MAP.x, MAP.y)) {
       drawPaper(ctx);
-      ctx.strokeStyle = PAPER_LINE;
-      ctx.lineWidth = 0.5;
-      for (let lon = -90; lon <= 150; lon += 30) {
-        const p = worldProject(lon, 0);
-        line(ctx, p.x, 0, p.x, VIEW_H);
-      }
-      for (let lat = -30; lat <= 60; lat += 30) {
-        const p = worldProject(0, lat);
-        line(ctx, 0, p.y, VIEW_W, p.y);
-      }
       drawLand(ctx, worldProject);
-      drawCompass(ctx, 24, 150);
+      drawCompass(ctx, 26, 122);
     }
-    // The route, chapter to chapter.
-    ctx.save();
-    ctx.setLineDash([1.5, 2.5]);
-    ctx.strokeStyle = ROUTE;
-    ctx.lineWidth = 0.8;
-    ctx.beginPath();
-    CHAPTERS.forEach((_, i) => {
-      const p = this.worldBadge(i);
-      if (i === 0) ctx.moveTo(p.x, p.y);
-      else ctx.lineTo(p.x, p.y);
-    });
-    ctx.stroke();
-    ctx.restore();
-    // Badges.
+    // At most one leg: where you came from, to where you are standing.
+    this.drawLeg(ctx, this.chapter > 0 ? this.worldBadge(this.chapter - 1) : null, this.worldBadge(this.chapter));
     CHAPTERS.forEach((c, i) => {
       const p = this.worldBadge(i);
+      const selected = i === this.chapter;
+      if (!chapterOpen(c) && !selected) {
+        // A chapter you cannot enter is a dot. The ribbon still lists it.
+        dot(ctx, p.x, p.y, 1.4, LAND_LINE);
+        return;
+      }
       const a = c.sites[c.anchor] ?? c.sites[0]!;
       const ap = worldProject(a.lon, a.lat);
       if (c.badge) {
@@ -258,15 +290,9 @@ export class MapScreen {
         dot(ctx, ap.x, ap.y, 1, INK_SOFT);
       }
       const open = chapterOpen(c);
-      const selected = i === this.chapter;
-      badge(ctx, p.x, p.y, 5.5, selected ? ROUTE : open ? '#f3ead4' : '#d9cdb0', selected ? '#f3ead4' : open ? ROUTE : LAND_LINE);
-      if (selected) {
-        ctx.strokeStyle = ROUTE;
-        ctx.lineWidth = 0.6;
-        ctx.globalAlpha = 0.5 + 0.5 * Math.sin(this.t * 4);
-        ring(ctx, p.x, p.y, 8);
-        ctx.globalAlpha = 1;
-      }
+      const stamped = chapterStamped(c, this.progress);
+      badge(ctx, p.x, p.y, 5.5, stamped ? INK : selected ? ROUTE : CARD, stamped || selected ? CARD : open ? ROUTE : LAND_LINE);
+      if (selected) this.pulse(ctx, p.x, p.y, 8);
     });
     this.drawTourist(ctx, this.worldBadge(this.chapter));
   }
@@ -274,25 +300,20 @@ export class MapScreen {
   private drawChapter(ctx: CanvasRenderingContext2D): void {
     const c = this.current;
     const proj = chapterProjection(c);
-    if (!paint(ctx, chapterArtId(c), 0, 0)) {
+    if (!paint(ctx, chapterArtId(c), MAP.x, MAP.y)) {
       drawPaper(ctx);
       drawLand(ctx, proj);
-      drawCompass(ctx, VIEW_W - 24, 34);
+      drawCompass(ctx, MAP.w - 24, 30);
     }
-    ctx.save();
-    ctx.setLineDash([1.5, 2.5]);
-    ctx.strokeStyle = ROUTE;
-    ctx.lineWidth = 0.8;
-    ctx.beginPath();
-    c.sites.forEach((_, i) => {
-      const p = this.siteSpot(i);
-      if (i === 0) ctx.moveTo(p.x, p.y);
-      else ctx.lineTo(p.x, p.y);
-    });
-    ctx.stroke();
-    ctx.restore();
+    // The sites in play order are the ribbon's business. The map shows one leg.
+    this.drawLeg(ctx, this.site > 0 ? this.sitePin(this.site - 1) : null, this.sitePin(this.site));
     c.sites.forEach((s, i) => {
       const p = this.sitePin(i);
+      const selected = i === this.site;
+      if (!s.level && !selected) {
+        dot(ctx, p.x, p.y, 1.4, LAND_LINE);
+        return;
+      }
       if (s.pin) {
         const t = this.siteSpot(i);
         ctx.strokeStyle = INK_SOFT;
@@ -301,25 +322,29 @@ export class MapScreen {
         dot(ctx, t.x, t.y, 1, INK_SOFT);
       }
       const cleared = !!s.level && this.progress.isCleared(s.level);
-      const open = !!s.level;
-      const selected = i === this.site;
-      const fill = cleared ? INK : open ? '#f3ead4' : '#d9cdb0';
-      const stroke = open ? ROUTE : LAND_LINE;
-      badge(ctx, p.x, p.y, 4, fill, stroke);
-      if (!open) {
-        ctx.strokeStyle = LAND_LINE;
-        ctx.lineWidth = 0.8;
-        line(ctx, p.x - 3, p.y + 3, p.x + 3, p.y - 3);
-      }
-      if (selected) {
-        ctx.strokeStyle = ROUTE;
-        ctx.lineWidth = 0.6;
-        ctx.globalAlpha = 0.5 + 0.5 * Math.sin(this.t * 4);
-        ring(ctx, p.x, p.y, 6.5);
-        ctx.globalAlpha = 1;
-      }
+      badge(ctx, p.x, p.y, 4.5, cleared ? INK : selected ? ROUTE : CARD, selected || cleared ? CARD : s.level ? ROUTE : LAND_LINE);
+      if (selected) this.pulse(ctx, p.x, p.y, 7);
     });
     this.drawTourist(ctx, this.sitePin(this.site));
+  }
+
+  /** The one dotted line allowed on screen: the leg you just travelled. */
+  private drawLeg(ctx: CanvasRenderingContext2D, from: { x: number; y: number } | null, to: { x: number; y: number }): void {
+    if (!from) return;
+    ctx.save();
+    ctx.setLineDash([1.5, 2.5]);
+    ctx.strokeStyle = ROUTE;
+    ctx.lineWidth = 0.8;
+    line(ctx, from.x, from.y, to.x, to.y);
+    ctx.restore();
+  }
+
+  private pulse(ctx: CanvasRenderingContext2D, x: number, y: number, r: number): void {
+    ctx.strokeStyle = ROUTE;
+    ctx.lineWidth = 0.6;
+    ctx.globalAlpha = 0.45 + 0.55 * Math.sin(this.t * 4);
+    ring(ctx, x, y, r);
+    ctx.globalAlpha = 1;
   }
 
   /** The tourist, dressed for the chapter under the cursor. Chapters not yet designed get the hiker. */
@@ -330,90 +355,225 @@ export class MapScreen {
   }
 
   // -------------------------------------------------------------------
+  // The panel: the chapter's own monument, printed the way a brochure prints one.
+
+  /** The vignette's frame, so the words can be laid out around it. */
+  private get vignette(): { x: number; y: number; w: number; h: number } {
+    const w = PANEL.w - 20;
+    const h = Math.round((w * ART_H) / ART_W);
+    return { x: Math.round(PANEL.x + (PANEL.w - w) / 2), y: this.view === 'world' ? 40 : 18, w, h };
+  }
+
+  private drawPanel(ctx: CanvasRenderingContext2D): void {
+    ctx.fillStyle = CARD;
+    ctx.fillRect(PANEL.x, PANEL.y, PANEL.w, PANEL.h);
+    ctx.fillStyle = LAND_LINE;
+    ctx.fillRect(PANEL.x, PANEL.y, 0.6, PANEL.h);
+    const c = this.current;
+    const v = this.vignette;
+    ctx.fillStyle = PAPER;
+    ctx.fillRect(v.x, v.y, v.w, v.h);
+    if (!paint(ctx, monumentArtId(c), v.x, v.y)) {
+      drawMonument(ctx, c.monument.art, v.x, v.y, v.w, v.h, INK, PAPER);
+    }
+    ctx.strokeStyle = INK_SOFT;
+    ctx.lineWidth = 0.6;
+    ctx.strokeRect(v.x + 0.3, v.y + 0.3, v.w - 0.6, v.h - 0.6);
+  }
+
+  // -------------------------------------------------------------------
+  // The ribbon: every stop of the tour on one rule, departure at the left.
+
+  private drawRibbon(ctx: CanvasRenderingContext2D): void {
+    ctx.fillStyle = BAND;
+    ctx.fillRect(0, RIBBON.y, VIEW_W, RIBBON.h);
+    ctx.fillStyle = LAND_LINE;
+    ctx.fillRect(0, RIBBON.y, VIEW_W, 0.6);
+    const n = this.stops;
+    const first = this.ribbonStop(0);
+    const last = this.ribbonStop(n - 1);
+    // The whole itinerary, then the part of it you have actually walked, over
+    // the top. The heavy rule measures progress, never where the cursor is.
+    ctx.fillStyle = INK_SOFT;
+    ctx.fillRect(first.x - 10, RIBBON.rule - 0.4, last.x - first.x + 20, 0.8);
+    const done = this.walked();
+    if (done > 0) {
+      const here = this.ribbonStop(done - 1);
+      ctx.fillStyle = ROUTE;
+      ctx.fillRect(first.x - 10, RIBBON.rule - 0.7, here.x - first.x + 10, 1.4);
+    }
+    // Departure, at the left end, and the last stop, at the right.
+    poly(ctx, ROUTE, [
+      [first.x - 14, RIBBON.rule - 3.5],
+      [first.x - 8, RIBBON.rule],
+      [first.x - 14, RIBBON.rule + 3.5],
+    ]);
+    ctx.fillStyle = INK_SOFT;
+    ctx.fillRect(last.x + 8, RIBBON.rule - 3, 3, 6);
+    for (let i = 0; i < n; i++) {
+      const p = this.ribbonStop(i);
+      const selected = i === this.selected;
+      const stamped = this.stampedAt(i);
+      const open = this.view === 'world' ? chapterOpen(CHAPTERS[i]!) : !!this.current.sites[i]?.level;
+      if (stamped) badge(ctx, p.x, p.y, 5.5, INK, INK);
+      else if (open) badge(ctx, p.x, p.y, 5.5, CARD, ROUTE);
+      else badge(ctx, p.x, p.y, 4.5, BAND, LAND_LINE);
+      if (selected) this.pulse(ctx, p.x, p.y, 8);
+    }
+  }
+
+  /**
+   * How far down the itinerary you have got without leaving a gap: the length of
+   * the heavy rule on the ribbon, in stops. Clearing a stop out of order still
+   * stamps its bead; it does not move the rule.
+   */
+  walked(): number {
+    let i = 0;
+    while (i < this.stops && this.stampedAt(i)) i++;
+    return i;
+  }
+
+  private stampedAt(i: number): boolean {
+    if (this.view === 'chapter') return this.siteCleared(i);
+    const c = CHAPTERS[i];
+    return !!c && chapterStamped(c, this.progress);
+  }
+
+  private siteCleared(i: number): boolean {
+    const s = this.current.sites[i];
+    return !!s?.level && this.progress.isCleared(s.level);
+  }
+
+  // -------------------------------------------------------------------
   // Words, in screen space.
 
   drawText(ctx: CanvasRenderingContext2D, scale: number, lifetimeDeaths: number): void {
     const s = scale;
+    const c = this.current;
+    const v = this.vignette;
+    const px = (PANEL.x + 6) * s;
+    const pw = (PANEL.w - 12) * s;
     ctx.save();
     ctx.textBaseline = 'middle';
+    ctx.textAlign = 'left';
+
     if (this.view === 'world') {
-      // Badge numbers.
-      CHAPTERS.forEach((c, i) => {
-        const p = this.worldBadge(i);
-        ctx.font = `bold ${5 * s}px ${FONT}`;
-        ctx.textAlign = 'center';
-        ctx.fillStyle = i === this.chapter ? '#f3ead4' : chapterOpen(c) ? ROUTE : INK_SOFT;
-        ctx.fillText(String(c.number), p.x * s, (p.y + 0.3) * s);
-      });
-      // Title.
       labelBox(ctx, s, 6, 6, [
         { text: 'LOST TOURIST', font: `bold ${7 * s}px ${FONT}`, color: INK },
         { text: 'A guided tour in twelve chapters', font: `italic ${5 * s}px ${FONT}`, color: INK_SOFT },
       ]);
-      // The selected chapter.
-      const c = this.current;
-      const open = chapterOpen(c);
-      labelBox(ctx, s, 6, VIEW_H - 30, [
-        { text: `${c.number}. ${c.name.toUpperCase()}`, font: `bold ${5.5 * s}px ${FONT}`, color: INK },
-        { text: c.dates, font: `${5 * s}px ${FONT}`, color: INK_SOFT },
-        { text: open ? 'Enter to visit' : 'Closed', font: `italic ${5 * s}px ${FONT}`, color: open ? ROUTE : INK_SOFT },
-      ]);
+      // The panel names the chapter; the map and the ribbon do not.
+      ctx.font = `${4.5 * s}px ${FONT}`;
+      ctx.fillStyle = INK_SOFT;
+      ctx.fillText(`CHAPTER ${c.number}`, px, 9 * s);
+      let y = 18;
+      ctx.font = `bold ${6 * s}px ${FONT}`;
+      for (const l of wrap(ctx, c.name.toUpperCase(), pw)) {
+        ctx.fillStyle = INK;
+        ctx.fillText(l, px, y * s);
+        y += 8;
+      }
+      ctx.font = `italic ${5 * s}px ${FONT}`;
+      ctx.fillStyle = INK_SOFT;
+      ctx.fillText(c.dates, px, 34 * s);
     } else {
-      const c = this.current;
       labelBox(ctx, s, 6, 6, [
         { text: `CHAPTER ${c.number} · ${c.name.toUpperCase()}`, font: `bold ${6 * s}px ${FONT}`, color: INK },
         { text: c.dates, font: `italic ${5 * s}px ${FONT}`, color: INK_SOFT },
       ]);
-      c.sites.forEach((site, i) => {
-        const p = this.sitePin(i);
-        const right = site.label ? site.label === 'right' : i % 2 === 0;
-        ctx.textAlign = right ? 'left' : 'right';
-        ctx.font = `${i === this.site ? 'bold ' : ''}${5 * s}px ${FONT}`;
-        ctx.fillStyle = site.level ? INK : INK_SOFT;
-        const text = site.level ? site.name : `${site.name} (closed)`;
-        ctx.strokeStyle = 'rgba(230, 216, 180, 0.9)';
-        ctx.lineWidth = s * 1.5;
-        ctx.lineJoin = 'round';
-        const tx = (p.x + (right ? 7 : -7)) * s;
-        ctx.strokeText(text, tx, p.y * s);
-        ctx.fillText(text, tx, p.y * s);
-      });
+    }
+
+    // The vignette's caption: which of the chapter's own sites this is.
+    const monument = chapterMonumentSite(c);
+    ctx.font = `italic ${4.5 * s}px ${FONT}`;
+    ctx.fillStyle = INK_SOFT;
+    ctx.fillText(monument.name, px, (v.y + v.h + 6) * s);
+
+    // What pressing Enter does, and the lifetime counter.
+    if (this.view === 'world') {
+      const open = chapterOpen(c);
+      ctx.font = `${5 * s}px ${FONT}`;
+      ctx.fillStyle = open ? ROUTE : INK_SOFT;
+      ctx.fillText(open ? 'Enter to visit' : 'Closed', px, 127 * s);
+    } else {
       const sel = c.sites[this.site];
       const hint = sel?.level ? (this.progress.isCleared(sel.level) ? 'Enter to visit again' : 'Enter to fall in') : 'Closed';
-      labelBox(ctx, s, 6, VIEW_H - 22, [
-        { text: `${this.site + 1}. ${sel?.name ?? ''}`, font: `bold ${5.5 * s}px ${FONT}`, color: INK },
-        { text: `${hint}   ·   Esc for the map`, font: `italic ${5 * s}px ${FONT}`, color: sel?.level ? ROUTE : INK_SOFT },
-      ]);
+      ctx.fillStyle = LAND_LINE;
+      ctx.fillRect(px, 100 * s, pw, 0.6 * s);
+      ctx.font = `bold ${5.5 * s}px ${FONT}`;
+      ctx.fillStyle = INK;
+      ctx.fillText(`${this.site + 1}. ${sel?.name ?? ''}`, px, 108 * s);
+      ctx.font = `${5 * s}px ${FONT}`;
+      ctx.fillStyle = sel?.level ? ROUTE : INK_SOFT;
+      ctx.fillText(hint, px, 118 * s);
+      ctx.font = `italic ${4.5 * s}px ${FONT}`;
+      ctx.fillStyle = INK_SOFT;
+      ctx.fillText('Esc for the world', px, 127 * s);
     }
-    // The passport stamp.
-    ctx.textAlign = 'right';
-    ctx.font = `${5 * s}px ${FONT}`;
+    ctx.font = `${4.5 * s}px ${FONT}`;
     ctx.fillStyle = INK_SOFT;
-    ctx.fillText('ALL VISITS', (VIEW_W - 6) * s, (VIEW_H - 16) * s);
+    ctx.fillText('ALL VISITS', px, 138 * s);
     ctx.font = `bold ${8 * s}px ${FONT}`;
     ctx.fillStyle = INK;
-    ctx.fillText(`${lifetimeDeaths} deaths`, (VIEW_W - 6) * s, (VIEW_H - 8) * s);
+    ctx.fillText(`${lifetimeDeaths} deaths`, px, 147 * s);
+
+    // The ribbon: a number in every bead, and in a chapter, a name under it.
+    ctx.textAlign = 'center';
+    const n = this.stops;
+    for (let i = 0; i < n; i++) {
+      const p = this.ribbonStop(i);
+      const stamped = this.stampedAt(i);
+      const open = this.view === 'world' ? chapterOpen(CHAPTERS[i]!) : !!this.current.sites[i]?.level;
+      ctx.font = `bold ${5 * s}px ${FONT}`;
+      ctx.fillStyle = stamped ? CARD : open ? ROUTE : INK_SOFT;
+      ctx.fillText(String(i + 1), p.x * s, (p.y + 0.3) * s);
+      if (this.view === 'chapter') {
+        const site = this.current.sites[i];
+        if (!site) continue;
+        ctx.font = `${i === this.site ? 'bold ' : ''}${4.5 * s}px ${FONT}`;
+        ctx.fillStyle = site.level ? INK : INK_SOFT;
+        ctx.fillText(site.name, p.x * s, 176 * s);
+      }
+    }
     ctx.restore();
   }
 }
 
 // ---------------------------------------------------------------------------
 
+/** Break a line to fit a width, at most two lines, the second one clipped. */
+function wrap(ctx: CanvasRenderingContext2D, text: string, maxW: number): string[] {
+  if (ctx.measureText(text).width <= maxW) return [text];
+  const words = text.split(' ');
+  const lines: string[] = [];
+  let line = '';
+  for (const w of words) {
+    const next = line ? `${line} ${w}` : w;
+    if (line && ctx.measureText(next).width > maxW) {
+      lines.push(line);
+      line = w;
+    } else {
+      line = next;
+    }
+  }
+  if (line) lines.push(line);
+  return lines.slice(0, 2);
+}
+
 function drawPaper(ctx: CanvasRenderingContext2D): void {
   ctx.fillStyle = PAPER;
-  ctx.fillRect(0, 0, VIEW_W, VIEW_H);
-  // A brochure fold, and a little wear at the edges.
-  ctx.fillStyle = 'rgba(0,0,0,0.05)';
-  ctx.fillRect(VIEW_W / 2 - 1, 0, 2, VIEW_H);
+  ctx.fillRect(MAP.x, MAP.y, MAP.w, MAP.h);
+  // No brochure fold any more: the sheet is two thirds of the screen, and a
+  // crease down the middle of it was one more line pretending to mean something.
   ctx.strokeStyle = LAND_LINE;
   ctx.lineWidth = 0.6;
-  ctx.strokeRect(2.5, 2.5, VIEW_W - 5, VIEW_H - 5);
+  ctx.strokeRect(MAP.x + 2.5, MAP.y + 2.5, MAP.w - 5, MAP.h - 5);
 }
 
 function drawLand(ctx: CanvasRenderingContext2D, proj: Projection): void {
   ctx.save();
   ctx.beginPath();
-  ctx.rect(3, 3, VIEW_W - 6, VIEW_H - 6);
+  ctx.rect(MAP.x + 3, MAP.y + 3, MAP.w - 6, MAP.h - 6);
   ctx.clip();
   ctx.fillStyle = LAND_FILL;
   ctx.strokeStyle = LAND_LINE;
@@ -450,26 +610,26 @@ function drawCompass(ctx: CanvasRenderingContext2D, x: number, y: number): void 
   ctx.fillStyle = INK_SOFT;
   ctx.strokeStyle = INK_SOFT;
   ctx.lineWidth = 0.5;
-  ring(ctx, 0, 0, 9);
+  ring(ctx, 0, 0, 8);
   ctx.beginPath();
-  ctx.moveTo(0, -10);
-  ctx.lineTo(2, 0);
-  ctx.lineTo(0, 10);
-  ctx.lineTo(-2, 0);
+  ctx.moveTo(0, -9);
+  ctx.lineTo(1.8, 0);
+  ctx.lineTo(0, 9);
+  ctx.lineTo(-1.8, 0);
   ctx.closePath();
   ctx.fill();
   ctx.beginPath();
-  ctx.moveTo(-10, 0);
-  ctx.lineTo(0, 1.5);
-  ctx.lineTo(10, 0);
-  ctx.lineTo(0, -1.5);
+  ctx.moveTo(-9, 0);
+  ctx.lineTo(0, 1.4);
+  ctx.lineTo(9, 0);
+  ctx.lineTo(0, -1.4);
   ctx.closePath();
   ctx.fill();
   ctx.fillStyle = ROUTE;
   ctx.beginPath();
-  ctx.moveTo(0, -10);
-  ctx.lineTo(2, 0);
-  ctx.lineTo(-2, 0);
+  ctx.moveTo(0, -9);
+  ctx.lineTo(1.8, 0);
+  ctx.lineTo(-1.8, 0);
   ctx.closePath();
   ctx.fill();
   ctx.restore();
@@ -480,6 +640,14 @@ function line(ctx: CanvasRenderingContext2D, x0: number, y0: number, x1: number,
   ctx.moveTo(x0, y0);
   ctx.lineTo(x1, y1);
   ctx.stroke();
+}
+
+function poly(ctx: CanvasRenderingContext2D, color: string, pts: [number, number][]): void {
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  pts.forEach(([x, y], i) => (i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y)));
+  ctx.closePath();
+  ctx.fill();
 }
 
 function dot(ctx: CanvasRenderingContext2D, x: number, y: number, r: number, color: string): void {

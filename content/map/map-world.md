@@ -4,20 +4,27 @@
 |---|---|
 | Id | `map-world` |
 | File | `map-world.png` (not painted yet: the game draws its own until this file exists) |
-| Size | 320 × 180 world px, painted 1280 × 720 |
+| Size | 208 × 152 world px, painted 832 × 608 |
 | Beat | `.` |
 
 ## What it is
 
-The whole tour on one sheet, the way a brochure draws the world: parchment paper, a
-fold down the middle, coastlines in a warm line, land a shade darker than the sea, a
-compass rose in an empty ocean. Longitude −115 to 150 across the width, latitude 65
-down to −40 across the height, equirectangular. No badges, no route, no words; the game
-draws those on top.
+The whole tour on one sheet, the way a brochure draws the world: parchment paper,
+coastlines in a warm line, land a shade darker than the sea, a compass rose in an empty
+ocean. Longitude −115 to 150 across the width, latitude 65 down to −40 across the
+height, equirectangular. No badges, no route, no words; the game draws those on top.
+
+It occupies the left two thirds of the screen: the right third is the chapter panel and
+the bottom band is the itinerary ribbon, both drawn by the game. There is no fold down
+the middle any more — the sheet is no longer the whole screen, and a crease was one more
+line pretending to mean something.
 
 ## Where it stands in the game
 
-The first thing every player sees. Behind the twelve chapter badges and the dotted route.
+The first thing every player sees. Behind the chapter markers: a numbered badge for a
+chapter that can be entered, a faint dot for one that cannot, and a single dotted leg
+from the previous chapter to the selected one. There is no route through all twelve;
+`content/map/README.md` says why.
 
 ## Must be right
 
@@ -25,6 +32,7 @@ The first thing every player sees. Behind the twelve chapter badges and the dott
   Japan, the Yucatán, Sri Lanka, Java, Madagascar. Every site in `src/map/atlas.ts`
   must fall on land.
 - The frame. If the projection is changed, the badges will land in the sea.
+- The size. It fills the map box only, 208 × 152, not the whole screen.
 
 ## Deliberately wrong
 
