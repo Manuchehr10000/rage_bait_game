@@ -1,7 +1,7 @@
 # Chapter 1 · Palaeolithic Europe
 
 Source: `content/research/arc.md`, chapter 1. Dates 27,000 to 13,000 BP. Status: locked
-in the research. Levels 1 to 3 are built; the rest are not yet designed. The game
+in the research. Levels 1 to 4 are built; level 5 is not yet designed. The game
 starts here.
 
 | Level | Site | Place | Period | Built |
@@ -9,7 +9,7 @@ starts here.
 | 1 | Cap Blanc | Marquay, Dordogne, France | Magdalenian, c. 15,000 BP | yes |
 | 2 | Roc-aux-Sorciers | Angles-sur-l'Anglin, Vienne, France | Mid Magdalenian, c. 15,000 BP | yes |
 | 3 | Pech Merle | Cabrerets, Lot, France | Gravettian, c. 25,000 BP | yes |
-| 4 | Rouffignac | Rouffignac-St-Cernin, Dordogne, France | Magdalenian, c. 13,000–15,000 BP | not yet |
+| 4 | Rouffignac | Rouffignac-St-Cernin, Dordogne, France | Magdalenian, c. 13,000–15,000 BP | yes |
 | 5 | Gargas | Aventignan, Hautes-Pyrénées, France | Gravettian, c. 27,000 BP | not yet |
 
 - **Costume:** modern hiking clothes, bucket hat, headlamp. He came for the guided tour.
@@ -25,6 +25,12 @@ starts here.
   concrete of the guided tour and the footprints of a boy — and they disagree twice. The
   concrete is wrong both times. It is also three times as long as the first two and has
   no checkpoints, which is where the rest of its cruelty comes from.
+- **Level 4 escalates by changing what he is doing:** he is walking up the track of the
+  visitors' train, and the train is behind him, on time, at exactly his speed. Flint in the
+  roof hangs four pixels above a walking head, so the level is where he may jump and where
+  he may not; and the visit ends where the real one does, at the edge of the floor that
+  was dug down under the Great Ceiling, with the train stopping exactly where a visitor
+  stands to look up. The one made floor in the cave is the one place it cannot reach.
 - **Level 5 ends on:** walls of hand stencils with missing finger segments.
 - **Imagery:** thin. Most decorated caves are sealed or their photography is in
   copyright. Base on excavation reports plus Cartailhac & Breuil 1906 from US-hosted
@@ -33,6 +39,11 @@ starts here.
   modern intrusions only.
 - **Contested, never stated as fact:** the Gargas missing fingers (frostbite, amputation
   and folded-finger hypotheses all live); the Pech Merle spotted-horse allele finding.
+- **Chapter error dossier, additions from level 4:** the Rouffignac affair of 1956 — the
+  art published by Nougier and Robert, authenticated by Breuil on 17 July 1956, called
+  fake by Sévérin Blanc, settled by an international commission; *la guerre des mammouths*
+  (Nougier & Robert, 1957). Four centuries of visitors, Belleforest's description of 1575
+  among them, and nobody recognised the drawings. In the notes; never in the level.
 
 ## The tone
 
@@ -72,5 +83,5 @@ nationale's plates. Modern photographs are for reference on your own screen only
 `shared/` holds the hiker (living, dead, sitting). He appears in every level and is
 painted once.
 
-Design of levels 4 and 5 happens in conversation, one beat at a time, before any folder
-for a level is created.
+Design of level 5 happens in conversation, one beat at a time, before any folder for it
+is created.

@@ -11,7 +11,7 @@ import { TILE, type Costume, type DeathCause, type Rect } from './types';
  */
 export type TileChar = ' ' | '#' | '=' | '%' | '?' | 'x';
 
-export type Theme = 'capBlanc' | 'rocAuxSorciers' | 'pechMerle' | 'abuSimbel' | 'philae' | 'karnak';
+export type Theme = 'capBlanc' | 'rocAuxSorciers' | 'pechMerle' | 'rouffignac' | 'abuSimbel' | 'philae' | 'karnak';
 
 // ---------------------------------------------------------------------------
 // Entities. Every trap in the game is one of these, with a skin for the renderer.
@@ -109,7 +109,7 @@ export interface SweepDef {
 /** Looks like something to stand on. If fake, it gives way a moment after you do, or on an event. */
 export interface CrumbleDef {
   kind: 'crumble';
-  skin: 'croc' | 'capital' | 'rock' | 'floor' | 'talatat' | 'column' | 'stone' | 'relief' | 'fallenBlock' | 'horns' | 'disc' | 'walkway';
+  skin: 'croc' | 'capital' | 'rock' | 'floor' | 'talatat' | 'column' | 'stone' | 'relief' | 'fallenBlock' | 'horns' | 'disc' | 'walkway' | 'nodule';
   rect: Rect;
   fake: boolean;
   delay: number;
@@ -222,6 +222,31 @@ export interface ChaserDef {
   cause: DeathCause;
 }
 
+/**
+ * The visitors' train. It waits at the platform, sets off on a fixed delay once
+ * the tourist has walked past it up the track, and runs at exactly run speed
+ * until its nose reaches `stopX`. Solid while it waits; deadly once it moves,
+ * and still deadly where it stops, because that is where it stops.
+ */
+export interface TrainDef {
+  kind: 'train';
+  /** Where the nose is at rest. The cars trail to the left. */
+  x: number;
+  /** The rail it rides on: the top of the floor it sits on. */
+  floorY: number;
+  /** Engine plus this many cars. */
+  cars: number;
+  /** The tourist's centre crossing this starts the clock. */
+  triggerX: number;
+  /** Seconds between the crossing and the train moving. The whole margin of the level. */
+  delay: number;
+  /** px/s. PHYS.runSpeed, or the train is not the mechanic it says it is. */
+  speed: number;
+  /** The nose stops here. */
+  stopX: number;
+  cause: DeathCause;
+}
+
 /** Stands tall, then tips over to the left across the path when you approach. */
 export interface TipperDef {
   kind: 'tipper';
@@ -248,7 +273,8 @@ export type EntityDef =
   | TipperDef
   | HazardDef
   | HorseDef
-  | RoofDef;
+  | RoofDef
+  | TrainDef;
 
 // ---------------------------------------------------------------------------
 // Decor. Drawn, never collided with.
@@ -300,11 +326,39 @@ export type DecorDef =
   /** A hollow a bear dug to sleep in. The rim is what the lamp finds first. */
   | { kind: 'bearNest'; x: number; w: number; floorY: number }
   /** One painted panel of the cave, drawn on the rock at the given rect. */
-  | { kind: 'cavePanel'; panel: 'blackFrieze' | 'mammoths' | 'fingerCeiling' | 'spottedHorses'; rect: Rect }
+  | { kind: 'cavePanel'; panel: CavePanel; rect: Rect }
+  /** The far wall of a train gallery: the rock the claw marks and the names are on. */
+  | { kind: 'galleryWall'; x0: number; x1: number; top: number; bottom: number }
+  /** The track, laid on the floor: two rails on sleepers. Purely a drawing; the floor is the floor. */
+  | { kind: 'rails'; x0: number; x1: number; y: number }
+  /** The platform the visit begins from: a concrete edge and a post with a chain. */
+  | { kind: 'trainPlatform'; x0: number; x1: number; floorY: number }
+  /**
+   * A band of flint nodules in the roof, hanging down to `bottom`. The lip is
+   * drawn here; the death is a `hazard` entity placed to match. Four pixels over
+   * a walking head, so walking is fine and any jump is not.
+   */
+  | { kind: 'flintBand'; x: number; w: number; top: number; bottom: number }
+  /** Where a cave bear sharpened its claws: four gouges, curved, deep, dark with age. */
+  | { kind: 'clawMarks'; x: number; y: number }
+  /** A visitor's name, scratched in. Straight, shallow, pale where the surface is broken. Never legible. */
+  | { kind: 'nameScratch'; x: number; y: number; w: number }
+  /** The near rim of a hollow a bear slept in, in the clay beyond the track. */
+  | { kind: 'bearHollow'; x: number; w: number; floorY: number }
   | { kind: 'brokenObelisk'; x: number; floorY: number }
   | { kind: 'pedestal'; x: number; floorY: number }
   | { kind: 'turnstile'; x: number; floorY: number }
   | { kind: 'landing'; x: number; floorY: number };
+
+/** The painted panels the game draws on cave rock, by site. */
+export type CavePanel =
+  | 'blackFrieze'
+  | 'mammoths'
+  | 'fingerCeiling'
+  | 'spottedHorses'
+  | 'rhinos'
+  | 'tenMammoths'
+  | 'greatCeiling';
 
 export interface LevelData {
   id: string;

@@ -1,0 +1,55 @@
+{
+  "$comment": "Sizes are world pixels (320 x 180 view). Painted files are 4x. See content/README.md. The clay floor is tile-clay from l03-pech-merle: the same clay, painted once. The panels (the rhinos, the ten mammoths, the Great Ceiling), the claw marks, the names, the rails, the platform and the flint lips in the roof are drawn by the game from the level data and are not listed here; their notes live in their beat folders.",
+  "level": "l04-rouffignac",
+  "assets": [
+    {
+      "id": "tile-flint-rock",
+      "w": 16,
+      "h": 16,
+      "beat": "a-platform",
+      "what": "The rock of Rouffignac: dry bedded limestone with a band of flint nodules through every third course, pale cortex round a dark heart."
+    },
+    {
+      "id": "tile-flint-rock-top",
+      "w": 16,
+      "h": 16,
+      "beat": "a-platform",
+      "what": "The same, with a lit top edge where a lamp catches it."
+    },
+    {
+      "id": "tile-ballast",
+      "w": 16,
+      "h": 16,
+      "beat": "a-platform",
+      "what": "The bed the rails lie on: crushed stone, grey against the clay either side of it."
+    },
+    {
+      "id": "tile-ballast-top",
+      "w": 16,
+      "h": 16,
+      "beat": "a-platform",
+      "what": "The ballast seen from above: the surface between the sleepers that the tourist is walking on."
+    },
+    {
+      "id": "train-engine",
+      "w": 28,
+      "h": 14,
+      "beat": "a-platform",
+      "what": "The engine of the visitors' train, facing right: a cab with three windows, the headlight on the front, four small wheels."
+    },
+    {
+      "id": "train-car",
+      "w": 28,
+      "h": 14,
+      "beat": "a-platform",
+      "what": "One open car of the train: a roof, a bench, no sides. The game puts a red lamp on the back of the last one."
+    },
+    {
+      "id": "flint-nodule",
+      "w": 10,
+      "h": 8,
+      "beat": "c-rhinos",
+      "what": "A nodule of flint weathered out of the wall and lying on the track bed. A hop. Walking into it stops you."
+    }
+  ]
+}

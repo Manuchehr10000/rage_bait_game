@@ -30,6 +30,8 @@ export type DeathCause =
   | 'The bear nests'
   | 'The discs'
   | 'The drop'
+  | 'The flint'
+  | 'The train'
   | 'Colossus head'
   | 'Baboon'
   | 'Lake Nasser'
@@ -57,6 +59,8 @@ export const DEATH_ANIM: Record<DeathCause, DeathAnim> = {
   'The bear nests': 'flat',
   'The discs': 'flat',
   'The drop': 'flat',
+  'The flint': 'plank',
+  'The train': 'crush',
   'Colossus head': 'crush',
   Baboon: 'plank',
   'Lake Nasser': 'drown',
@@ -83,6 +87,8 @@ export const DEATH_SOUND: Record<DeathCause, 'squish' | 'bonk' | 'drown' | 'burn
   'The bear nests': 'thud',
   'The discs': 'thud',
   'The drop': 'thud',
+  'The flint': 'bonk',
+  'The train': 'squish',
   'Colossus head': 'squish',
   Baboon: 'bonk',
   'Lake Nasser': 'drown',

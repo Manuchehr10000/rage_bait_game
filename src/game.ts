@@ -1,6 +1,6 @@
 import { GameAudio } from './engine/audio';
 import { Camera } from './engine/camera';
-import { createEntity, type Entity, type Platform, type Sweep, type Water, type World } from './engine/entities';
+import { createEntity, type Entity, type Platform, type Sweep, type Train, type Water, type World } from './engine/entities';
 import type { Stats } from './render/hud';
 import { renderHud } from './render/hud';
 import { Input } from './engine/input';
@@ -353,8 +353,13 @@ export class Game {
     let motor = false;
     let water = false;
     let beam = false;
+    let hum = false;
     for (const e of this.entities) {
       const d = e.def;
+      if (d.kind === 'train') {
+        if ((e as Train).running) hum = true;
+        continue;
+      }
       if (d.kind === 'platform') {
         const p = e as Platform;
         const moving = p.state === 'rising' || p.state === 'sliding';
@@ -371,6 +376,7 @@ export class Game {
     this.audio.setMotor(motor);
     this.audio.setWater(water);
     this.audio.setBeam(beam);
+    this.audio.setHum(hum);
   }
 
   private bumpBlocks(): void {

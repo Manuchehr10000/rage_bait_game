@@ -14,6 +14,7 @@ import type {
   SweepDef,
   ThrowerDef,
   TipperDef,
+  TrainDef,
   WaterDef,
 } from './level';
 import type { MovingSolid, Player } from './player';
@@ -67,6 +68,8 @@ export function createEntity(def: EntityDef, level: Level): Entity {
       return new Horse(def);
     case 'roof':
       return new Roof(def);
+    case 'train':
+      return new Train(def);
   }
 }
 
@@ -811,5 +814,72 @@ export class Tipper implements Entity {
 
   solids(): MovingSolid[] {
     return this.state === 'landed' ? [this.solid] : [];
+  }
+}
+
+// ---------------------------------------------------------------------------
+
+/** The engine and each car of the visitors' train, in px. */
+export const TRAIN = { carW: 28, carH: 14, gap: 4 } as const;
+
+/**
+ * The electric train of the guided tour. It has run since 1959, it carries the
+ * lighting, it keeps to its timetable, and the tourist is walking up its track.
+ * It does not chase anybody: it runs at run speed on a clock the tourist started,
+ * so ahead of it and moving you are safe for ever, and every step you lose is
+ * lost for good. It stops where the visit stops.
+ */
+export class Train implements Entity {
+  readonly rect: Rect;
+  state: 'idle' | 'armed' | 'moving' | 'stopped' = 'idle';
+  private timer = 0;
+  private readonly solid: MovingSolid;
+
+  constructor(readonly def: TrainDef) {
+    const len = (def.cars + 1) * TRAIN.carW + def.cars * TRAIN.gap;
+    this.rect = { x: def.x - len, y: def.floorY - TRAIN.carH, w: len, h: TRAIN.carH };
+    this.solid = { rect: this.rect, dx: 0, dy: 0 };
+  }
+
+  /** The front of the engine. */
+  get nose(): number {
+    return this.rect.x + this.rect.w;
+  }
+
+  /** True while it is going. The headlight and the hum follow this. */
+  get running(): boolean {
+    return this.state === 'moving';
+  }
+
+  update(w: World): void {
+    const p = w.player;
+    const d = this.def;
+    this.solid.dx = 0;
+    if (this.state === 'idle') {
+      if (centerX(p) >= d.triggerX) {
+        this.state = 'armed';
+        this.timer = d.delay;
+      }
+      return;
+    }
+    if (this.state === 'armed') {
+      this.timer -= DT;
+      if (this.timer > 0) return;
+      this.state = 'moving';
+      w.sound('motorStart');
+      return;
+    }
+    if (this.state === 'moving') {
+      const step = Math.min(d.speed * DT, d.stopX - this.nose);
+      this.rect.x += step;
+      this.solid.dx = step;
+      if (this.nose >= d.stopX) this.state = 'stopped';
+    }
+    if (overlaps(this.rect, p)) w.kill(d.cause);
+  }
+
+  /** Parked, it is a thing you cannot walk through. Moving, it is not a thing you touch. */
+  solids(): MovingSolid[] {
+    return this.state === 'idle' || this.state === 'armed' ? [this.solid] : [];
   }
 }

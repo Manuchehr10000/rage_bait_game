@@ -47,6 +47,9 @@ import {
 import { DEATH_ANIM, TILE, VIEW_H, VIEW_W, type Costume, type DeathCause, type Rect } from '../engine/types';
 import { paint } from '../engine/assets';
 import { blit, blitFacing, frameOf, silhouette, withLamp, type Frame } from './frame';
+import { TRAIN, type Train } from '../engine/entities';
+import type { CavePanel } from '../engine/level';
+import { NODULE_SPRITE, TRAIN_CAR_SPRITE, TRAIN_ENGINE_SPRITE, TRAIN_LAST_CAR_SPRITE } from './procedural';
 
 /** Text drawn in screen space after scaling so it stays crisp. World coordinates. */
 export interface WorldText {
@@ -171,6 +174,17 @@ export const COLORS = {
   railLit: '#8c9195',
   manganese: '#241d16',
   ochreRed: '#a0402c',
+  // Rouffignac: dry limestone full of flint, a clay floor, ballast under the rails.
+  flint: '#3a3532',
+  flintCortex: '#a89e8c',
+  ballast: '#6b665e',
+  ballastLine: '#4e4a44',
+  ballastTop: '#847e74',
+  sleeper: '#4a3a2a',
+  clawMark: '#2f2822',
+  scratch: '#cfc6b2',
+  scratchDeep: '#e7e0cf',
+  trainLight: 'rgba(255, 244, 190, 0.22)',
 };
 
 export interface Scene {
@@ -197,7 +211,7 @@ export function renderWorld(ctx: CanvasRenderingContext2D, s: Scene): void {
   drawSky(ctx, cy, theme);
   if (theme === 'capBlanc') drawFarBeune(ctx, cx, cy);
   else if (theme === 'rocAuxSorciers') drawFarAnglin(ctx, cx, cy);
-  else if (theme === 'pechMerle') drawCaveDepth(ctx, cx, cy);
+  else if (theme === 'pechMerle' || theme === 'rouffignac') drawCaveDepth(ctx, cx, cy);
   else if (theme === 'abuSimbel') drawFarCliffs(ctx, cx, cy);
   else if (theme === 'philae') drawFarIsland(ctx, cx, cy);
   else drawFarKarnak(ctx, cx, cy);
@@ -471,6 +485,9 @@ function drawKarnakGround(ctx: CanvasRenderingContext2D, s: Scene, cx: number, c
   ctx.fillRect(cx - 8, 15 * TILE, VIEW_W + 16, s.level.heightPx - 15 * TILE + 16);
 }
 
+/** How far up the track the train's headlight reaches, in px. Further than the tourist's lamp. */
+const TRAIN_LIGHT = 200;
+
 const darkLayer = document.createElement('canvas');
 darkLayer.width = VIEW_W;
 darkLayer.height = VIEW_H;
@@ -540,6 +557,35 @@ function drawDarkness(ctx: CanvasRenderingContext2D, s: Scene, cx: number, cy: n
     d.fill();
     d.globalAlpha = 1;
   }
+  // The train carries the lighting. Its headlight reaches a long way up the
+  // track, so it is on the screen before the train is: the closer it is, the
+  // more of the gallery ahead of you it lights.
+  for (const e of s.entities) {
+    if (e.def.kind !== 'train') continue;
+    const t = e as Train;
+    if (t.state === 'idle') continue;
+    const nx = t.nose - cx;
+    const ny = t.rect.y + 5 - cy;
+    if (nx > VIEW_W + 8 || nx + TRAIN_LIGHT < 0) continue;
+    const cone = (len: number, half: number, alpha: number) => {
+      d.globalAlpha = alpha;
+      d.beginPath();
+      d.moveTo(nx, ny - 3);
+      d.lineTo(nx + len, ny - half);
+      d.lineTo(nx + len, ny + half);
+      d.lineTo(nx, ny + 3);
+      d.closePath();
+      d.fill();
+    };
+    cone(TRAIN_LIGHT * 0.75, 34, 1);
+    cone(TRAIN_LIGHT, 48, 0.4);
+    // And the cars themselves, lit from inside: a soft patch round the train, not a bubble.
+    d.globalAlpha = 0.55;
+    d.beginPath();
+    d.ellipse(nx - t.rect.w / 2, ny + 2, t.rect.w / 2 + 4, 14, 0, 0, Math.PI * 2);
+    d.fill();
+    d.globalAlpha = 1;
+  }
   // The spotlights, from the roof (or the overhang) down to the floor.
   const beam = (g: CanvasRenderingContext2D, sp: { x: number; floorY: number; top?: number }) => {
     const sx = sp.x - cx;
@@ -581,6 +627,23 @@ function drawBeams(ctx: CanvasRenderingContext2D, s: Scene, cx: number, cy: numb
     ctx.lineTo(sx - 26, sy + 12);
     ctx.closePath();
     ctx.fill();
+  }
+  for (const e of s.entities) {
+    if (e.def.kind !== 'train') continue;
+    const t = e as Train;
+    if (t.state === 'idle') continue;
+    const nx = t.nose - cx;
+    const ny = t.rect.y + 5 - cy;
+    if (nx > VIEW_W + 8 || nx + TRAIN_LIGHT < 0) continue;
+    ctx.fillStyle = COLORS.trainLight;
+    ctx.beginPath();
+    ctx.moveTo(nx, ny - 3);
+    ctx.lineTo(nx + TRAIN_LIGHT * 0.75, ny - 34);
+    ctx.lineTo(nx + TRAIN_LIGHT * 0.75, ny + 34);
+    ctx.lineTo(nx, ny + 3);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = 'rgba(255, 240, 190, 0.18)';
   }
   if (dark.kind === 'dark' && dark.lamp === 'headlamp' && s.lampOn) {
     // The headlamp's beam, the same faint warmth.
@@ -1042,6 +1105,131 @@ function drawDecor(ctx: CanvasRenderingContext2D, s: Scene, d: DecorDef): void {
       drawCavePanel(ctx, d.panel, d.rect);
       break;
     }
+    case 'galleryWall': {
+      // The far wall of the gallery: bedded rock with the flint bands running through
+      // it. Everything scratched into this cave is scratched into this.
+      ctx.fillStyle = COLORS.cave;
+      ctx.fillRect(d.x0, d.top, d.x1 - d.x0, d.bottom - d.top);
+      ctx.fillStyle = COLORS.caveLine;
+      for (let y = d.top + 6; y < d.bottom - 2; y += 13) {
+        for (let x = d.x0; x < d.x1; x += 30) ctx.fillRect(x + (hash(x, y) % 5), y + (hash(y, x) % 3), 8 + (hash(x + y, y) % 16), 1);
+      }
+      // The nodules, in their layers.
+      for (let y = d.top + 10; y < d.bottom - 6; y += 22) {
+        for (let x = d.x0 + 4; x < d.x1 - 8; x += 26) {
+          const h = hash(x, y);
+          if (h % 3 === 0) continue;
+          const nw = 3 + (h % 4);
+          ctx.fillStyle = COLORS.flintCortex;
+          ctx.fillRect(x + (h % 9), y + ((h >> 4) % 5), nw + 2, 3);
+          ctx.fillStyle = COLORS.flint;
+          ctx.fillRect(x + (h % 9) + 1, y + ((h >> 4) % 5) + 1, nw, 1);
+        }
+      }
+      // And the darker band at the foot of it, where the wall meets the clay.
+      ctx.fillStyle = COLORS.caveLine;
+      ctx.fillRect(d.x0, d.bottom - 3, d.x1 - d.x0, 3);
+      break;
+    }
+    case 'rails': {
+      // The track of the visitors' train. Two rails on sleepers, laid straight
+      // along the gallery floor. A drawing: the floor under it is the floor.
+      ctx.fillStyle = COLORS.sleeper;
+      for (let x = d.x0; x < d.x1; x += 12) ctx.fillRect(x, d.y - 3, 7, 3);
+      ctx.fillStyle = COLORS.rail;
+      ctx.fillRect(d.x0, d.y - 4, d.x1 - d.x0, 1);
+      ctx.fillRect(d.x0, d.y - 2, d.x1 - d.x0, 1);
+      ctx.fillStyle = COLORS.railLit;
+      ctx.fillRect(d.x0, d.y - 5, d.x1 - d.x0, 1);
+      break;
+    }
+    case 'trainPlatform': {
+      // Where the visit begins: a concrete edge along the track, a post at each
+      // end, and a chain between them that the tourist has already stepped over.
+      const w = d.x1 - d.x0;
+      ctx.fillStyle = COLORS.concrete;
+      ctx.fillRect(d.x0, d.floorY - 6, w, 6);
+      ctx.fillStyle = COLORS.concreteTop;
+      ctx.fillRect(d.x0, d.floorY - 6, w, 2);
+      ctx.fillStyle = COLORS.concreteLine;
+      ctx.fillRect(d.x0, d.floorY - 1, w, 1);
+      ctx.fillStyle = COLORS.rail;
+      ctx.fillRect(d.x0 + 4, d.floorY - 26, 2, 20);
+      ctx.fillRect(d.x1 - 6, d.floorY - 26, 2, 20);
+      for (let x = d.x0 + 6; x < d.x1 - 6; x += 3) ctx.fillRect(x, d.floorY - 18 + ((x >> 1) % 2), 2, 1);
+      break;
+    }
+    case 'flintBand': {
+      // A layer of flint in the roof, hanging lower than the roof around it. The
+      // nodules are the pale things at the bottom edge, and the bottom edge is four
+      // pixels above a walking head.
+      ctx.fillStyle = COLORS.caveLine;
+      ctx.fillRect(d.x, d.top, d.w, d.bottom - d.top);
+      ctx.fillStyle = COLORS.night;
+      ctx.fillRect(d.x, d.top, 1, d.bottom - d.top);
+      ctx.fillRect(d.x + d.w - 1, d.top, 1, d.bottom - d.top);
+      ctx.fillStyle = COLORS.cave;
+      for (let y = d.top + 5; y < d.bottom - 10; y += 9) ctx.fillRect(d.x + 2 + (hash(d.x, y) % 4), y, d.w - 6, 1);
+      // The nodules: a row of them along the bottom edge and two more up the sides,
+      // pale cortex round a dark heart, the way flint weathers out of chalk.
+      const nodule = (x: number, y: number, w: number, h: number) => {
+        ctx.fillStyle = COLORS.flintCortex;
+        ctx.fillRect(x, y, w, h);
+        ctx.fillStyle = COLORS.flint;
+        ctx.fillRect(x + 1, y + 1, w - 2, h - 2);
+      };
+      for (let x = d.x + 1; x < d.x + d.w - 5; x += 7) nodule(x, d.bottom - 6 + (hash(x, d.bottom) % 2), 6, 6 - (hash(x, d.bottom) % 2));
+      nodule(d.x - 2, d.top + 12, 5, 4);
+      nodule(d.x + d.w - 3, d.top + 22, 5, 4);
+      ctx.fillStyle = COLORS.caveLit;
+      ctx.fillRect(d.x + 1, d.bottom - 1, d.w - 2, 1);
+      break;
+    }
+    case 'clawMarks': {
+      // Four gouges where a bear reached up and dragged its claws down the wall.
+      // They curve, they are deep, and they are the colour of a very old surface.
+      ctx.strokeStyle = COLORS.clawMark;
+      ctx.lineWidth = 1;
+      for (let i = 0; i < 4; i++) {
+        const x = d.x + i * 3;
+        ctx.beginPath();
+        ctx.moveTo(x, d.y);
+        ctx.quadraticCurveTo(x + 2, d.y + 6, x + 1, d.y + 12 + (i % 2));
+        ctx.stroke();
+      }
+      break;
+    }
+    case 'nameScratch': {
+      // Somebody's name and a date, scratched in with a knife or a nail: straight
+      // strokes in a row, pale where the surface came off, and an underline. It
+      // is not legible and it must never be.
+      const h0 = hash(d.x, d.y);
+      ctx.fillStyle = COLORS.scratch;
+      let x = d.x;
+      let i = 0;
+      while (x < d.x + d.w) {
+        const h = hash(x, d.y + i);
+        const tall = h % 3 === 0 ? 5 : 3;
+        ctx.fillRect(x, d.y + (4 - tall) + (h % 2), 1, tall);
+        if (h % 4 === 1) ctx.fillRect(x + 1, d.y + 2, 2, 1);
+        x += 2 + (h % 3);
+        i++;
+      }
+      ctx.fillStyle = COLORS.scratchDeep;
+      ctx.fillRect(d.x, d.y + 6, d.w - (h0 % 5), 1);
+      break;
+    }
+    case 'bearHollow': {
+      // The near rim of a hollow in the clay beyond the track, where a bear slept
+      // out a winter. Harmless. It is drawn because it is there.
+      ctx.fillStyle = COLORS.clayTop;
+      ctx.fillRect(d.x - 3, d.floorY - 6, d.w + 6, 3);
+      ctx.fillStyle = COLORS.clayLine;
+      ctx.fillRect(d.x, d.floorY - 5, d.w, 5);
+      ctx.fillStyle = COLORS.night;
+      ctx.fillRect(d.x + 2, d.floorY - 4, d.w - 4, 4);
+      break;
+    }
     case 'trench': {
       // The excavation: the floor was dug down to below the frieze. The section shows its layers.
       const r = d.rect;
@@ -1177,16 +1365,18 @@ function drawTiles(ctx: CanvasRenderingContext2D, level: Level, cx: number, cy: 
       if (paint(ctx, tileArtId(theme, c, open), x, y)) continue;
       if (c === '=') {
         if (theme === 'pechMerle') drawConcrete(ctx, x, y, open);
+        else if (theme === 'rouffignac') drawBallast(ctx, tx, ty, x, y, open);
         else if (theme === 'capBlanc' || theme === 'rocAuxSorciers') drawMeadowPath(ctx, tx, ty, x, y, open);
         else if (theme === 'abuSimbel') drawSand(ctx, level, tx, ty, x, y, open);
         else if (theme === 'philae') drawGranite(ctx, tx, ty, x, y, open);
         else drawPaving(ctx, tx, ty, x, y, open);
-      } else if (c === '%' && theme === 'pechMerle') {
+      } else if (c === '%' && (theme === 'pechMerle' || theme === 'rouffignac')) {
         drawClay(ctx, tx, ty, x, y, open);
       } else if (c === '%' && (theme === 'capBlanc' || theme === 'rocAuxSorciers')) {
         drawSediment(ctx, tx, ty, x, y, open);
       } else if (c === '#' || c === '%') {
         if (theme === 'pechMerle') drawCaveRock(ctx, tx, ty, x, y, open);
+        else if (theme === 'rouffignac') drawFlintRock(ctx, tx, ty, x, y, open);
         else if (theme === 'capBlanc' || theme === 'rocAuxSorciers') drawBedrock(ctx, tx, ty, x, y, open);
         else if (theme === 'abuSimbel') drawCliff(ctx, tx, ty, x, y, open);
         else if (theme === 'philae') drawColumnDrum(ctx, x, y, open);
@@ -1220,10 +1410,11 @@ function tileArtId(theme: Level['data']['theme'], c: string, open: boolean): str
   const name =
     c === '?' ? 'ankh-block'
     : c === 'x' ? 'ankh-block-used'
-    : c === '=' ? (theme === 'pechMerle' ? 'concrete' : theme === 'capBlanc' || theme === 'rocAuxSorciers' ? 'limestone' : theme === 'abuSimbel' ? 'sand' : theme === 'philae' ? 'granite' : 'paving')
-    : c === '%' && theme === 'pechMerle' ? 'clay'
+    : c === '=' ? (theme === 'pechMerle' ? 'concrete' : theme === 'rouffignac' ? 'ballast' : theme === 'capBlanc' || theme === 'rocAuxSorciers' ? 'limestone' : theme === 'abuSimbel' ? 'sand' : theme === 'philae' ? 'granite' : 'paving')
+    : c === '%' && (theme === 'pechMerle' || theme === 'rouffignac') ? 'clay'
     : c === '%' && (theme === 'capBlanc' || theme === 'rocAuxSorciers') ? 'sediment'
     : theme === 'pechMerle' ? 'cave-rock'
+    : theme === 'rouffignac' ? 'flint-rock'
     : theme === 'capBlanc' || theme === 'rocAuxSorciers' ? 'rock' : theme === 'abuSimbel' ? 'cliff' : theme === 'philae' ? 'column-drum' : 'sandstone';
   if (c === '?' || c === 'x') return name;
   return open ? `tile-${name}-top` : `tile-${name}`;
@@ -1293,6 +1484,39 @@ function drawClay(ctx: CanvasRenderingContext2D, tx: number, ty: number, x: numb
 }
 
 /** The concrete of the walkway. Poured in slabs, with the joints showing. */
+/**
+ * Rouffignac's rock: the same bedded limestone, with flint in it. The nodules run
+ * in near-horizontal bands, so every third row of tiles carries them, and a lamp
+ * finds the pale cortex of each one before it finds the rock.
+ */
+function drawFlintRock(ctx: CanvasRenderingContext2D, tx: number, ty: number, x: number, y: number, open: boolean): void {
+  drawCaveRock(ctx, tx, ty, x, y, open);
+  if (ty % 3 !== 1) return;
+  const h = hash(tx * 7, ty * 3);
+  const nx = x + 2 + (h % 8);
+  const ny = y + 5 + ((h >> 4) % 6);
+  const nw = 4 + ((h >> 8) % 4);
+  ctx.fillStyle = COLORS.flintCortex;
+  ctx.fillRect(nx - 1, ny, nw + 2, 3);
+  ctx.fillStyle = COLORS.flint;
+  ctx.fillRect(nx, ny + 1, nw, 1);
+}
+
+/** The bed the rails lie on: crushed stone, grey against the clay either side of it. */
+function drawBallast(ctx: CanvasRenderingContext2D, tx: number, ty: number, x: number, y: number, open: boolean): void {
+  ctx.fillStyle = COLORS.ballast;
+  ctx.fillRect(x, y, TILE, TILE);
+  ctx.fillStyle = COLORS.ballastLine;
+  const h = hash(tx, ty);
+  ctx.fillRect(x + (h % 7), y + 5 + (h % 3), 3, 1);
+  ctx.fillRect(x + 4 + ((h >> 3) % 8), y + 10 + ((h >> 5) % 4), 2, 1);
+  ctx.fillRect(x + 1 + ((h >> 6) % 9), y + 13, 3, 1);
+  if (open) {
+    ctx.fillStyle = COLORS.ballastTop;
+    ctx.fillRect(x, y, TILE, 2);
+  }
+}
+
 function drawConcrete(ctx: CanvasRenderingContext2D, x: number, y: number, open: boolean): void {
   ctx.fillStyle = COLORS.concrete;
   ctx.fillRect(x, y, TILE, TILE);
@@ -1477,6 +1701,9 @@ function drawEntityBack(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): voi
         ctx.scale(-1, 1);
         blit(ctx, horn, 0, 0);
         ctx.restore();
+      } else if (d.skin === 'nodule') {
+        // A nodule of flint that has weathered out of the wall and lies on the track bed.
+        if (!paint(ctx, 'flint-nodule', r.x, r.y)) ctx.drawImage(NODULE_SPRITE, r.x, r.y);
       } else if (d.skin === 'walkway') {
         // The last run of concrete, laid across the hole on two steel bearers.
         for (let i = 0; i < r.w / TILE; i++) drawConcrete(ctx, r.x + i * TILE, r.y, true);
@@ -1519,6 +1746,20 @@ function drawEntityBack(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): voi
       if (frame && !paint(ctx, 'scarab', c.rect.x, c.rect.y, fi)) ctx.drawImage(frame, c.rect.x, c.rect.y);
       break;
     }
+    case 'train': {
+      // Engine first, on the right; the cars trail behind it. The last one has
+      // the red lamp. It is drawn the same standing, running and stopped.
+      const t = e as Train;
+      const pitch = TRAIN.carW + TRAIN.gap;
+      const y = t.rect.y;
+      for (let i = 0; i <= d.cars; i++) {
+        const x = t.nose - TRAIN.carW - i * pitch;
+        if (i === 0) {
+          if (!paint(ctx, 'train-engine', x, y)) ctx.drawImage(TRAIN_ENGINE_SPRITE, x, y);
+        } else if (!paint(ctx, 'train-car', x, y)) ctx.drawImage(i === d.cars ? TRAIN_LAST_CAR_SPRITE : TRAIN_CAR_SPRITE, x, y);
+      }
+      break;
+    }
     case 'tipper': {
       const t = e as Tipper;
       ctx.save();
@@ -1557,7 +1798,7 @@ function drawEntityBack(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): voi
  * is ever collided with: this cave's art is on the wall, not under your feet, and
  * that is the one thing the level never lies about.
  */
-function drawCavePanel(ctx: CanvasRenderingContext2D, panel: 'blackFrieze' | 'mammoths' | 'fingerCeiling' | 'spottedHorses', r: Rect): void {
+function drawCavePanel(ctx: CanvasRenderingContext2D, panel: CavePanel, r: Rect): void {
   ctx.save();
   // The rock the panel is on. A painted wall in a cave is a patch of lit stone in
   // the dark and nothing else; without this the animals hang in mid air.
@@ -1614,6 +1855,58 @@ function drawCavePanel(ctx: CanvasRenderingContext2D, panel: 'blackFrieze' | 'ma
       ctx.moveTo(x, y);
       ctx.bezierCurveTo(x + 14, y + 9, x + 26, y - 7, x + 40, y + 4);
       ctx.stroke();
+    }
+  } else if (panel === 'rhinos') {
+    // Rouffignac, the Frieze of Three Rhinos: three woolly rhinoceros in a line, in
+    // black, each one drawn round a nodule of flint that stands for the shoulder.
+    for (let i = 0; i < 3; i++) {
+      const x = r.x + 6 + i * 46;
+      const y = r.y + 4 + (i % 2) * 2;
+      ctx.fillStyle = COLORS.flintCortex;
+      ctx.fillRect(x + 10, y + 3, 5, 3);
+      beast(x, y, 36, 14, 3);
+      ctx.beginPath();
+      ctx.moveTo(x + 34, y + 6); // the horn, forward and up
+      ctx.lineTo(x + 41, y - 1);
+      ctx.moveTo(x + 31, y + 8); // and the second, smaller
+      ctx.lineTo(x + 35, y + 4);
+      ctx.stroke();
+    }
+  } else if (panel === 'tenMammoths') {
+    // The Frieze of Ten Mammoths: ten of them nose to tail along one wall, drawn
+    // small, the trunks down. Visitors have scratched their names across them.
+    for (let i = 0; i < 10; i++) {
+      const x = r.x + 4 + i * 31;
+      const y = r.y + 4 + ((i * 5) % 6);
+      beast(x, y, 24, 12, 2);
+      ctx.beginPath();
+      ctx.moveTo(x + 22, y + 5);
+      ctx.lineTo(x + 26, y + 12);
+      ctx.lineTo(x + 23, y + 16);
+      ctx.stroke();
+    }
+  } else if (panel === 'greatCeiling') {
+    // The Great Ceiling: sixty-five animals overlapping on one roof, drawn by
+    // someone lying on his back a metre under it. Mammoths, horses, bison, ibex,
+    // rhinoceros, in every direction, because on a ceiling there is no up.
+    for (let i = 0; i < 26; i++) {
+      const x = r.x + 8 + ((i * 71) % Math.max(1, r.w - 44));
+      const y = r.y + 3 + ((i * 29) % Math.max(1, r.h - 18));
+      const w = 22 + (i % 4) * 5;
+      const h = 9 + (i % 3) * 2;
+      ctx.save();
+      if (i % 3 === 1) {
+        ctx.translate(x * 2 + w, 0);
+        ctx.scale(-1, 1);
+      }
+      beast(x, y, w, h, 2 + (i % 2));
+      if (i % 4 === 0) {
+        ctx.beginPath();
+        ctx.moveTo(x + w - 2, y + 4);
+        ctx.lineTo(x + w + 2, y + h + 3);
+        ctx.stroke();
+      }
+      ctx.restore();
     }
   } else {
     // The spotted horses: two of them, back to back, under blown black dots, with

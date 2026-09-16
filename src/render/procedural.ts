@@ -1403,3 +1403,77 @@ export const FOOTPRINT_SPRITE = compile(['.WWW..', 'WWWWW.', 'WWWWW.', '.WWW..',
 
 /** The same print, the other way about: a dozen of them run in two directions. */
 export const FOOTPRINT_BACK_SPRITE = compile(['..WWW.', '.WWWWW', '.WWWWW', '..WWW.', '..W.W.'], CAVE);
+
+// ---------------------------------------------------------------------------
+// Rouffignac. A dry cave with flint in the walls, and a train through it.
+// ---------------------------------------------------------------------------
+
+const ROUFFIGNAC: Palette = {
+  O: '#1e1a17', // outline
+  F: '#3a3532', // flint, the dark glassy inside of a nodule
+  G: '#5a544f', // flint, catching the lamp
+  C: '#a89e8c', // the pale cortex a nodule weathers to
+  B: '#4f6a5a', // the train: painted steel, a green that has been repainted
+  H: '#6c8a78', // its lit edge
+  W: '#c9d6d2', // window glass
+  L: '#fff4be', // the headlight
+  K: '#262626', // chassis and wheels
+  R: '#b0342a', // the one red light on the last car
+};
+
+/**
+ * A nodule of flint, 10 x 8, out of the wall and on the floor. The walls of the
+ * cave are full of them in near-horizontal bands, and the ones that have weathered
+ * out lie where they fell. A hop clears it; walking into it stops you.
+ */
+function flintNodule(): HTMLCanvasElement {
+  const g = new PixelGrid(10, 8);
+  g.rect(1, 1, 8, 6, 'F');
+  g.rect(2, 0, 6, 1, 'C');
+  g.rect(0, 2, 1, 3, 'C');
+  g.rect(9, 3, 1, 3, 'C');
+  g.rect(2, 7, 6, 1, 'C');
+  g.rect(3, 2, 2, 1, 'G');
+  g.px(2, 3, 'G');
+  return compile(g.outline('O').rows(), ROUFFIGNAC);
+}
+export const NODULE_SPRITE = flintNodule();
+
+/** The body every car of the train shares: a low box on four small wheels. */
+function trainBody(g: PixelGrid): void {
+  g.rect(1, 2, 26, 8, 'B');
+  g.rect(2, 1, 24, 1, 'B');
+  g.rect(3, 1, 22, 1, 'H');
+  g.rect(1, 10, 26, 2, 'K');
+  g.rect(3, 12, 4, 2, 'K');
+  g.rect(12, 12, 4, 2, 'K');
+  g.rect(21, 12, 4, 2, 'K');
+}
+
+/**
+ * The engine, 28 x 14, facing right: a cab with three windows and the headlight
+ * on the front. It has been running since 1959 and it carries the lighting.
+ */
+function trainEngine(): HTMLCanvasElement {
+  const g = new PixelGrid(28, 14);
+  trainBody(g);
+  g.rect(4, 3, 5, 3, 'W');
+  g.rect(11, 3, 5, 3, 'W');
+  g.rect(18, 3, 5, 3, 'W');
+  g.rect(25, 4, 2, 3, 'L');
+  return compile(g.outline('O').rows(), ROUFFIGNAC);
+}
+export const TRAIN_ENGINE_SPRITE = trainEngine();
+
+/** A car, 28 x 14: open sides, a bench under a roof, and a red lamp on the back of the last one. */
+function trainCar(last: boolean): HTMLCanvasElement {
+  const g = new PixelGrid(28, 14);
+  trainBody(g);
+  g.rect(3, 3, 22, 4, 'W');
+  g.rect(9, 3, 1, 4, 'B');
+  g.rect(16, 3, 1, 4, 'B');
+  if (last) g.rect(1, 5, 2, 2, 'R');
+  return compile(g.outline('O').rows(), ROUFFIGNAC);
+}
+export const TRAIN_CAR_SPRITE = trainCar(false);
+export const TRAIN_LAST_CAR_SPRITE = trainCar(true);

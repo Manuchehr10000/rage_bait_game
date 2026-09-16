@@ -43,7 +43,7 @@ export class GameAudio {
   private master: GainNode | null = null;
   private noise: AudioBuffer | null = null;
   private muted = readMuted();
-  private loops: Partial<Record<'winch' | 'water' | 'beam' | 'motor', Loop>> = {};
+  private loops: Partial<Record<'winch' | 'water' | 'beam' | 'motor' | 'hum', Loop>> = {};
   private nextNote = 0;
   private noteIndex = 0;
 
@@ -283,17 +283,44 @@ export class GameAudio {
     }, 0.05);
   }
 
+  /** An electric train in a cave: a steady low hum and the rails under it. */
+  setHum(on: boolean): void {
+    this.setLoop('hum', on, (ctx, out) => {
+      const osc = ctx.createOscillator();
+      osc.type = 'sawtooth';
+      osc.frequency.value = 55;
+      const lp = ctx.createBiquadFilter();
+      lp.type = 'lowpass';
+      lp.frequency.value = 240;
+      // The rail joints: a slow tick riding on the hum.
+      const tick = ctx.createOscillator();
+      tick.type = 'square';
+      tick.frequency.value = 3.2;
+      const tickGain = ctx.createGain();
+      tickGain.gain.value = 0.35;
+      tick.connect(tickGain).connect(lp.frequency);
+      osc.connect(lp).connect(out);
+      osc.start();
+      tick.start();
+      return () => {
+        osc.stop();
+        tick.stop();
+      };
+    }, 0.045);
+  }
+
   stopLoops(): void {
     this.setWinch(false);
     this.setWater(false);
     this.setBeam(false);
     this.setMotor(false);
+    this.setHum(false);
   }
 
   // -------------------------------------------------------------------------
 
   private setLoop(
-    key: 'winch' | 'water' | 'beam' | 'motor',
+    key: 'winch' | 'water' | 'beam' | 'motor' | 'hum',
     on: boolean,
     build: (ctx: AudioContext, out: GainNode) => () => void,
     level: number,
