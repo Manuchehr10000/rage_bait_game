@@ -1,9 +1,12 @@
 name: Deploy
 
-# One GitHub Pages site serves both environments:
-#   prod  https://manuchehr10000.github.io/rage_bait_game/       from main
-#   dev   https://manuchehr10000.github.io/rage_bait_game/dev/   from dev
-# Pages holds a single artifact, so every deploy rebuilds both branches.
+# One Cloudflare Pages project, two branches, two hostnames:
+#   prod  https://losttourist.online       from main
+#   dev   https://dev.losttourist.online   from dev
+#
+# Each branch deploys on its own and keeps its own history, so a push to dev
+# never touches prod and either one can be rolled back alone. Both are served
+# from the site root, so there is no base path to juggle.
 
 on:
   push:
@@ -12,68 +15,44 @@ on:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
+# Queue per branch: a second push to dev supersedes the first, and never
+# cancels a prod deploy that happens to be in flight.
 concurrency:
-  group: pages
+  group: deploy-${{ github.ref_name }}
   cancel-in-progress: true
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: main
-          path: prod
-      - uses: actions/checkout@v4
-        with:
-          ref: dev
-          path: dev
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: npm
 
-      - name: Build prod (main)
-        working-directory: prod
+      - run: npm ci
+
+      # `npm run build` is typecheck, then the asset manifest check, then vite.
+      # BUILD_ENV decides the footer stamp and which build is allowed to be
+      # indexed; GITHUB_SHA is already in the environment and stamps the commit.
+      - name: Build
         env:
-          BUILD_ENV: prod
-          GITHUB_SHA: ${{ github.sha }}
-        run: |
-          npm ci
-          npx tsc --noEmit
-          GITHUB_SHA="$(git rev-parse HEAD)" npx vite build --base=/rage_bait_game/
+          BUILD_ENV: ${{ github.ref_name == 'main' && 'prod' || 'dev' }}
+        run: npm run build
 
-      - name: Build dev (dev)
-        working-directory: dev
-        env:
-          BUILD_ENV: dev
-        run: |
-          npm ci
-          npx tsc --noEmit
-          GITHUB_SHA="$(git rev-parse HEAD)" npx vite build --base=/rage_bait_game/dev/
-
-      - name: Assemble site
-        run: |
-          mkdir -p site/dev
-          cp -r prod/dist/. site/
-          cp -r dev/dist/. site/dev/
-          touch site/.nojekyll
-
-      - uses: actions/configure-pages@v5
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
         with:
-          enablement: true
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: site
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy dist --project-name=lost-tourist --branch=${{ github.ref_name }}
 
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Say where it went
+        run: |
+          if [ "${{ github.ref_name }}" = "main" ]; then
+            echo "prod → https://losttourist.online" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "dev → https://dev.losttourist.online" >> "$GITHUB_STEP_SUMMARY"
+          fi

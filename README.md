@@ -11,12 +11,17 @@ Art and history live in [content/](content/README.md). Read that before drawing 
 
 | | Branch | Link |
 |---|---|---|
-| prod | `main` | https://manuchehr10000.github.io/rage_bait_game/ |
-| dev | `dev` | https://manuchehr10000.github.io/rage_bait_game/dev/ |
+| prod | `main` | https://losttourist.online |
+| dev | `dev` | https://dev.losttourist.online |
+
+Both are one Cloudflare Pages project, deployed per branch, so a push to `dev` leaves
+prod alone and either side rolls back on its own. Only prod is indexable: the dev build
+ships a `noindex` meta tag and an `X-Robots-Tag` header, and prod claims the canonical
+URL.
 
 Flow: work on a feature branch, open a pull request into `dev`, then promote `dev` to
 `main` when it has been played and survived. Every push runs CI (typecheck, asset check,
-build, headless playthroughs). Every push to `main` or `dev` redeploys both links. The
+build, headless playthroughs). Every push to `main` or `dev` redeploys that one link. The
 footer of each page shows which environment and commit it is.
 
 ## Run
