@@ -3,6 +3,12 @@
  *
  * Rules from PILLARS.md: a death sounds like what caused it, never like a jingle,
  * and the music and the wind never pause or react.
+ *
+ * There are two pieces of music. `tour` is what plays inside a level. `map` is the
+ * brochure's own waltz, and it is the only cheerful thing in the game. Neither
+ * knows how many times you have died. Switching screens cross-fades between them
+ * and neither one restarts: whichever track you were not listening to kept
+ * playing, and comes back exactly where it would have got to.
  */
 
 export type Sfx =
@@ -31,6 +37,9 @@ export type Sfx =
   | 'thud'
   | 'click';
 
+/** `tour` plays in a level, `map` on the tour map. */
+export type MusicId = 'map' | 'tour';
+
 const MUTE_KEY = 'lostTourist.muted';
 
 interface Loop {
@@ -44,8 +53,12 @@ export class GameAudio {
   private noise: AudioBuffer | null = null;
   private muted = readMuted();
   private loops: Partial<Record<'winch' | 'water' | 'beam' | 'motor' | 'hum', Loop>> = {};
-  private nextNote = 0;
-  private noteIndex = 0;
+  /** One gain per track, so one can fade out under the other without stopping. */
+  private music: Partial<Record<MusicId, GainNode>> = {};
+  /** How far each track has got: when its next step falls, and which step it is. */
+  private nextNote: Record<MusicId, number> = { map: 0, tour: 0 };
+  private noteIndex: Record<MusicId, number> = { map: 0, tour: 0 };
+  private track: MusicId = 'tour';
 
   get isMuted(): boolean {
     return this.muted;
@@ -65,7 +78,7 @@ export class GameAudio {
       this.master.connect(ctx.destination);
       this.noise = makeNoise(ctx);
       this.startWind();
-      this.nextNote = ctx.currentTime + 0.5;
+      this.startMusic();
     } catch {
       this.ctx = null;
     }
@@ -78,14 +91,34 @@ export class GameAudio {
     return this.muted;
   }
 
-  /** Call once per frame; keeps the music scheduled a little ahead of real time. */
+  /**
+   * Call once per frame; keeps the music scheduled a little ahead of real time.
+   * Both tracks are always scheduled, whichever one you can hear. That is what
+   * makes the switch sound like a door opening rather than a tape starting: the
+   * waltz you come back to is where it would have been if you had stayed.
+   */
   update(): void {
     const ctx = this.ctx;
     if (!ctx) return;
-    while (this.nextNote < ctx.currentTime + 0.3) {
-      this.scheduleNote(this.nextNote, this.noteIndex);
-      this.noteIndex = (this.noteIndex + 1) % MELODY.length;
-      this.nextNote += EIGHTH;
+    for (const id of MUSIC_IDS) {
+      const { step, length } = TRACKS[id];
+      while (this.nextNote[id] < ctx.currentTime + 0.3) {
+        if (id === 'map') this.scheduleMapStep(this.nextNote[id], this.noteIndex[id]);
+        else this.scheduleTourNote(this.nextNote[id], this.noteIndex[id]);
+        this.noteIndex[id] = (this.noteIndex[id] + 1) % length;
+        this.nextNote[id] += step;
+      }
+    }
+  }
+
+  /** Cross-fade to the other track. Neither one stops; only the gains move. */
+  setMusic(id: MusicId): void {
+    if (this.track === id) return;
+    this.track = id;
+    const ctx = this.ctx;
+    if (!ctx) return;
+    for (const key of MUSIC_IDS) {
+      this.music[key]?.gain.setTargetAtTime(key === id ? 1 : 0, ctx.currentTime, CROSSFADE);
     }
   }
 
@@ -370,7 +403,24 @@ export class GameAudio {
     src.connect(bp).connect(gain).connect(this.master);
     src.start();
     lfo.start();
-    // A drone under the melody. E2 and E3, barely there.
+  }
+
+  /** One gain per track, and the tour's drone, which runs for the whole session. */
+  private startMusic(): void {
+    const ctx = this.ctx;
+    if (!ctx || !this.master) return;
+    for (const id of MUSIC_IDS) {
+      const g = ctx.createGain();
+      g.gain.value = id === this.track ? 1 : 0;
+      g.connect(this.master);
+      this.music[id] = g;
+      this.nextNote[id] = ctx.currentTime + 0.5;
+      this.noteIndex[id] = 0;
+    }
+    // A drone under the tour's melody. E2 and E3, barely there. The map has none:
+    // a brochure is printed on paper, and paper does not hum.
+    const out = this.music.tour;
+    if (!out) return;
     for (const [f, g] of [
       [82.4, 0.035],
       [164.8, 0.015],
@@ -380,15 +430,16 @@ export class GameAudio {
       osc.frequency.value = f;
       const og = ctx.createGain();
       og.gain.value = g;
-      osc.connect(og).connect(this.master);
+      osc.connect(og).connect(out);
       osc.start();
     }
   }
 
-  private scheduleNote(t: number, i: number): void {
+  private scheduleTourNote(t: number, i: number): void {
     const ctx = this.ctx;
-    const f = MELODY[i];
-    if (!ctx || !this.master || !f) return;
+    const out = this.music.tour;
+    const f = TOUR_MELODY[i];
+    if (!ctx || !out || !f) return;
     const osc = ctx.createOscillator();
     osc.type = 'triangle';
     osc.frequency.value = f;
@@ -399,9 +450,90 @@ export class GameAudio {
     g.gain.setValueAtTime(0, t);
     g.gain.linearRampToValueAtTime(0.05, t + 0.03);
     g.gain.setTargetAtTime(0, t + 0.25, 0.18);
-    osc.connect(lp).connect(g).connect(this.master);
+    osc.connect(lp).connect(g).connect(out);
     osc.start(t);
     osc.stop(t + 1.2);
+  }
+
+  /**
+   * One eighth of the map waltz. A bar is six steps: the bass alone on beat one,
+   * the two plucked chord notes on beats two and three, and the tune over the top
+   * whenever it has something to say, which is not often.
+   */
+  private scheduleMapStep(t: number, i: number): void {
+    const bar = MAP_BARS[Math.floor(i / MAP_STEPS_PER_BAR) % MAP_BARS.length];
+    if (bar) {
+      const beat = i % MAP_STEPS_PER_BAR;
+      if (beat === 0) this.mapBass(t, bar.bass);
+      else if (beat === 2 || beat === 4) for (const f of bar.pah) this.mapChord(t, f);
+    }
+    const f = MAP_MELODY[i];
+    if (f) this.mapMelody(t, f);
+  }
+
+  /** The tune: a music box in a travel agent's window, triangle with an octave ting. */
+  private mapMelody(t: number, f: number): void {
+    const ctx = this.ctx;
+    const out = this.music.map;
+    if (!ctx || !out) return;
+    const lp = ctx.createBiquadFilter();
+    lp.type = 'lowpass';
+    lp.frequency.value = 2600;
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.linearRampToValueAtTime(0.05, t + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.0008, t + 1.3);
+    lp.connect(g).connect(out);
+    for (const [mult, level, type] of [
+      [1, 1, 'triangle'],
+      [2, 0.3, 'sine'],
+    ] as const) {
+      const osc = ctx.createOscillator();
+      osc.type = type;
+      osc.frequency.value = f * mult;
+      const og = ctx.createGain();
+      og.gain.value = level;
+      osc.connect(og).connect(lp);
+      osc.start(t);
+      osc.stop(t + 1.4);
+    }
+  }
+
+  /** Beat one: the root, short, the thing that makes it a waltz and not a drift. */
+  private mapBass(t: number, f: number): void {
+    const ctx = this.ctx;
+    const out = this.music.map;
+    if (!ctx || !out) return;
+    const osc = ctx.createOscillator();
+    osc.type = 'sine';
+    osc.frequency.value = f;
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.linearRampToValueAtTime(0.05, t + 0.012);
+    g.gain.exponentialRampToValueAtTime(0.0008, t + 0.85);
+    osc.connect(g).connect(out);
+    osc.start(t);
+    osc.stop(t + 0.9);
+  }
+
+  /** Beats two and three: the oom-pah-pah, felt rather than heard. */
+  private mapChord(t: number, f: number): void {
+    const ctx = this.ctx;
+    const out = this.music.map;
+    if (!ctx || !out) return;
+    const osc = ctx.createOscillator();
+    osc.type = 'triangle';
+    osc.frequency.value = f;
+    const lp = ctx.createBiquadFilter();
+    lp.type = 'lowpass';
+    lp.frequency.value = 1200;
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.linearRampToValueAtTime(0.016, t + 0.012);
+    g.gain.exponentialRampToValueAtTime(0.0006, t + 0.5);
+    osc.connect(lp).connect(g).connect(out);
+    osc.start(t);
+    osc.stop(t + 0.55);
   }
 
   private tone(t: number, type: OscillatorType, f0: number, f1: number, dur: number, level: number): void {
@@ -442,23 +574,117 @@ export class GameAudio {
   }
 }
 
-// E double harmonic, the scale everyone hears as Egypt. Sparse and slow, like a museum.
+// ---------------------------------------------------------------------------
+// The music.
+
+/** Equal temperament. The only place in this file that names a pitch. */
+const E2 = 82.41;
+const G2 = 98.0;
+const A2 = 110.0;
+const C3 = 130.81;
+const D3 = 146.83;
+const E3 = 164.81;
+const Fs3 = 185.0;
+const G3 = 196.0;
+const A3 = 220.0;
+const B3 = 246.94;
+const C4 = 261.63;
+const D4 = 293.66;
+const Ds4 = 311.13;
 const E4 = 329.63;
 const F4 = 349.23;
+const Fs4 = 369.99;
+const G4 = 392.0;
 const Gs4 = 415.3;
-const A4 = 440;
+const A4 = 440.0;
 const B4 = 493.88;
 const C5 = 523.25;
-const Ds4 = 311.13;
+const D5 = 587.33;
 const E5 = 659.25;
-const BPM = 64;
-const EIGHTH = 60 / BPM / 2;
-const MELODY: (number | 0)[] = [
+
+const MUSIC_IDS = ['map', 'tour'] as const;
+/** Time constant of the fade between tracks: about six tenths of a second. */
+const CROSSFADE = 0.2;
+
+// --- The tour --------------------------------------------------------------
+// E double harmonic, the scale everyone hears as Egypt. Sparse and slow, like a museum.
+
+const TOUR_BPM = 64;
+const TOUR_STEP = 60 / TOUR_BPM / 2;
+const TOUR_MELODY: (number | 0)[] = [
   E4, 0, Gs4, 0, A4, 0, 0, 0, B4, 0, A4, Gs4, 0, F4, 0, 0,
   E4, 0, 0, 0, Ds4, 0, E4, 0, F4, 0, E4, 0, 0, 0, 0, 0,
   B4, 0, C5, 0, B4, 0, 0, 0, A4, 0, Gs4, 0, A4, 0, 0, 0,
   E5, 0, 0, 0, B4, 0, A4, 0, Gs4, 0, 0, 0, E4, 0, 0, 0,
 ];
+
+// --- The map ---------------------------------------------------------------
+// "The Brochure": a waltz for a travel agency that has never heard of the death
+// counter printed six inches to its right.
+//
+// C major with an F# that turns up in bar 3 and again in bar 11, in exactly the
+// same place, like a misprint the press never caught: the brochure's forced
+// smile. The scale is deliberately Western and bland. The map covers twelve
+// chapters on four continents and the tourist is the joke in all of them
+// (pillar 11), so the music is the tour operator's, not any of the places'.
+//
+// Sixteen bars, forty seconds, and it never arrives. The last bar sits on B over
+// G — the one note that wants to rise to C — and the loop answers it by dropping
+// to E instead. The tune has no downbeat on its own root anywhere in the piece,
+// so the map is always a departure and never a destination.
+
+const MAP_BPM = 72;
+/** Three beats to the bar, two steps to the beat. */
+const MAP_STEPS_PER_BAR = 6;
+const MAP_STEP = 60 / MAP_BPM / 2;
+
+/** The left hand: one chord a bar, its root on beat one and two notes to answer. */
+const MAP_BARS: { bass: number; pah: readonly [number, number] }[] = [
+  { bass: C3, pah: [E3, G3] }, //  1  C
+  { bass: C3, pah: [E3, G3] }, //  2  C
+  { bass: C3, pah: [Fs3, A3] }, //  3  D over C — the misprint
+  { bass: C3, pah: [Fs3, A3] }, //  4  D over C
+  { bass: A2, pah: [E3, A3] }, //  5  Am
+  { bass: A2, pah: [E3, A3] }, //  6  Am
+  { bass: G2, pah: [D3, B3] }, //  7  G
+  { bass: G2, pah: [D3, B3] }, //  8  G — the first hang
+  { bass: C3, pah: [E3, G3] }, //  9  C
+  { bass: C3, pah: [E3, G3] }, // 10  C
+  { bass: C3, pah: [Fs3, A3] }, // 11  D over C — the same misprint on the same page
+  { bass: C3, pah: [Fs3, A3] }, // 12  D over C
+  { bass: E2, pah: [G3, B3] }, // 13  Em — the bass at its lowest under the highest note
+  { bass: A2, pah: [E3, A3] }, // 14  Am
+  { bass: G2, pah: [D3, G3] }, // 15  G
+  { bass: G2, pah: [D3, B3] }, // 16  G — hangs, and the loop refuses to answer it
+];
+
+/** The right hand, one line per bar, six eighths each. */
+const MAP_MELODY: (number | 0)[] = [
+  E4, 0, 0, 0, G4, A4,
+  B4, 0, 0, 0, A4, 0,
+  Fs4, 0, 0, 0, A4, 0,
+  G4, 0, Fs4, 0, E4, 0,
+  A4, 0, 0, 0, 0, 0,
+  G4, 0, E4, 0, C4, 0,
+  D4, 0, 0, 0, E4, Fs4,
+  A4, 0, 0, 0, 0, 0,
+  // The second half opens with the first four bars again, note for note, and
+  // only then finds somewhere else to go. Identical things are identical.
+  E4, 0, 0, 0, G4, A4,
+  B4, 0, 0, 0, A4, 0,
+  Fs4, 0, 0, 0, A4, 0,
+  B4, 0, A4, 0, Fs4, 0,
+  E5, 0, 0, 0, D5, 0,
+  C5, 0, B4, 0, A4, 0,
+  G4, 0, 0, 0, A4, 0,
+  B4, 0, 0, 0, 0, 0,
+];
+
+/** How long a step is, and how many there are before each track comes round again. */
+const TRACKS: Record<MusicId, { step: number; length: number }> = {
+  map: { step: MAP_STEP, length: MAP_MELODY.length },
+  tour: { step: TOUR_STEP, length: TOUR_MELODY.length },
+};
 
 function makeNoise(ctx: AudioContext): AudioBuffer {
   const buf = ctx.createBuffer(1, ctx.sampleRate, ctx.sampleRate);

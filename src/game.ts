@@ -149,6 +149,7 @@ export class Game {
     this.screen = 'map';
     this.leaveAfterDeath = false;
     this.audio.stopLoops();
+    this.audio.setMusic('map');
     if (this.level) this.map.showLevel(this.level.data.id);
     else this.map.openWorld();
     try {
@@ -162,6 +163,7 @@ export class Game {
   private enterLevel(index: number, fallIn: boolean): void {
     this.screen = 'level';
     this.leaveAfterDeath = false;
+    this.audio.setMusic('tour');
     this.loadLevel(index);
     if (fallIn) {
       this.player.y -= FALL_IN_HEIGHT;
