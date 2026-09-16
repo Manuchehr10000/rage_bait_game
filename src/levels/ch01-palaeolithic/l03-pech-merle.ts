@@ -15,7 +15,8 @@ import { TILE } from '../../engine/types';
  * checkpoints, which is the whole of the design. A death at the last trap costs
  * forty seconds.
  *
- *   0..19    down into the cave. The walkway starts, the prints start, they agree
+ *   0..5     the mouth, open to the sky. He comes in through it
+ *   6..19    down into the cave. The walkway starts, the prints start, they agree
  *  20..45    the Black Frieze. Still agreeing. The clay below catches anyone who
  *              falls off the concrete, which is a lesson with a short life
  *  46..71    the Chapel of the Mammoths. The clay under the walkway runs out and
@@ -54,6 +55,10 @@ const EXIT_X = px(175);
 
 const g = new Grid(W, H);
 g.fill(0, 0, W, 4, '#'); // the roof of the cave
+// The mouth. It has to be open: the tour arrives from above, and so does the
+// tourist, who is dropped in from two hundred pixels up when you pick the site
+// off the map. A roof over the spawn is a roof he lands on top of.
+g.fill(0, 0, 6, 4, ' ');
 g.fill(0, GROUND, W, H - GROUND, '%'); // clay, all the way along, until it is not
 
 // a, b: concrete slabs on the clay, with one hole in the floor to hop.
@@ -130,6 +135,8 @@ export const PECH_MERLE: LevelData = {
   exit: { x: EXIT_X, y: CLAY_Y - 24, w: 12, h: 24 },
 
   decor: [
+    // The way in, and the last daylight there is.
+    { kind: 'caveMouth', x0: 0, x1: px(6), floorY: CLAY_Y },
     // Dark from the moment the daylight is behind him, which is the rest of the level.
     // Not the blackness of Cap Blanc's back wall: a cave with one lamp in it still
     // shows you the shape of the next thing. You are being asked to remember, not

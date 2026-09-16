@@ -981,6 +981,25 @@ function drawDecor(ctx: CanvasRenderingContext2D, s: Scene, d: DecorDef): void {
       if (!paint(ctx, 'site-grille', d.x, d.floorY - 40)) ctx.drawImage(GRILLE_SPRITE, d.x, d.floorY - 40);
       break;
     }
+    case 'caveMouth': {
+      // Daylight down the shaft, and the sky through it. The only light in the level
+      // that is not on the tourist's hat, and it is behind him within two seconds.
+      const w = d.x1 - d.x0;
+      ctx.fillStyle = COLORS.skyBottomCool;
+      ctx.fillRect(d.x0 - 16, -64, w + 16, 68);
+      const grad = ctx.createLinearGradient(0, 0, 0, d.floorY);
+      grad.addColorStop(0, 'rgba(223, 224, 204, 0.55)');
+      grad.addColorStop(1, 'rgba(223, 224, 204, 0)');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.moveTo(d.x0 - 16, 0);
+      ctx.lineTo(d.x1, 0);
+      ctx.lineTo(d.x1 + 26, d.floorY);
+      ctx.lineTo(d.x0 - 16, d.floorY);
+      ctx.closePath();
+      ctx.fill();
+      break;
+    }
     case 'walkway': {
       // The guided tour: poured slabs and a steel handrail on stanchions. It is the
       // one continuous thing in the cave, it is well made, and it is lying.

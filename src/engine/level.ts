@@ -291,6 +291,8 @@ export type DecorDef =
   | { kind: 'venus'; x: number; y: number }
   | { kind: 'grille'; x: number; floorY: number }
   | { kind: 'engravedWall'; rect: Rect }
+  /** The hole in the hill the cave is entered by, and the last daylight in the level. */
+  | { kind: 'caveMouth'; x0: number; x1: number; floorY: number }
   /** The concrete of the guided tour, with its handrail. The one continuous thing in the cave, and a liar. */
   | { kind: 'walkway'; x0: number; x1: number; y: number }
   /** The prints of one adolescent in the clay, sealed under calcite. They are never wrong. */
