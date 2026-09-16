@@ -16,6 +16,15 @@ export const PHYS = {
   jumpVelocity: 360, // 360^2 / (2*1000) = 64.8px = 4 tiles of jump height
   jumpCutVelocity: 110,
   maxFall: 320,
+  /**
+   * How far you may fall and walk away from it, measured from the top of the arc.
+   * The line is drawn from what the built levels already ask for: the worst fall
+   * on a clean run is 62 px at Cap Blanc and Roc-aux-Sorciers, 78 at Philae, and
+   * 171 at Karnak, coming down off the first pylon into the court. So 200 leaves
+   * every one of them free and still makes a shaft something you go down in
+   * stages. Identical in every chapter, like the rest of PHYS.
+   */
+  fatalFall: 200,
   coyoteTime: 0.1,
   jumpBuffer: 0.1,
   // In water: soft gravity, slow, a stroke instead of a jump.
@@ -47,6 +56,10 @@ export class Player implements Rect {
   justStepped = false;
   /** True from a jump until landing; the variable-height cut applies only then. */
   private jumping = false;
+  /** The highest point of the fall in progress, or null while on the ground. */
+  private fellFrom: number | null = null;
+  /** How far the landing this frame fell. The world reads it and decides. */
+  fellBy = 0;
   /** Set by the world each frame when the player is in swimmable water. */
   inWater = false;
   private strokeTimer = 0;
@@ -65,6 +78,8 @@ export class Player implements Rect {
     this.riding = null;
     this.facing = 1;
     this.walkPhase = 0;
+    this.fellFrom = null;
+    this.fellBy = 0;
   }
 
   /** A conveyor pulls the ground out from under you. Applied on top of your own movement. */
@@ -114,6 +129,9 @@ export class Player implements Rect {
     this.riding = null;
     this.jumping = false;
     this.coyote = 0;
+    // Swimming is not falling. Whatever the water decides, it is the water's call.
+    this.fellFrom = null;
+    this.fellBy = 0;
   }
 
   animFrame(): 'idle' | 'walk1' | 'walk2' | 'jump' {
@@ -180,6 +198,15 @@ export class Player implements Rect {
 
     const ground = groundBelow(this, level, solids);
     this.onGround = ground !== null;
+    // How far this fall has come. Measured from the top of the arc, so a jump
+    // costs you its own height on the way back down and nothing is free twice.
+    this.fellBy = 0;
+    if (!this.onGround) {
+      this.fellFrom = this.fellFrom === null ? this.y : Math.min(this.fellFrom, this.y);
+    } else if (this.fellFrom !== null) {
+      this.fellBy = this.y - this.fellFrom;
+      this.fellFrom = null;
+    }
     if (this.onGround) this.jumping = false;
     if (this.onGround && Math.abs(this.vx) >= 10) {
       const before = Math.floor(this.walkPhase / 10);

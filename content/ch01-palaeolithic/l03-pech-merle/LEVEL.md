@@ -25,7 +25,14 @@ calcite, running in two different directions.**
 It is the third of the chapter, and the research gives level 3 one job: make everything
 untrustworthy. Two things in this cave tell the tourist where to go — the concrete of the
 guided tour, and the prints of a boy who was here twenty-five thousand years before the
-concrete — and they disagree twice. **The walkway is wrong both times.**
+concrete — and they disagree. **The walkway is wrong every time.**
+
+It is also the first level in the game that goes anywhere but sideways. Pech Merle is a
+vertical system: an upper gallery you walk in at, a lower one under it, and shafts
+between. The route drops about four hundred pixels and climbs a hundred and thirty back,
+and **the only way down is in stages**, because a fall of more than 200 px is fatal
+anywhere in the game (`PILLARS.md`, pillar 1). The cave is 576 px deep against a 180 px
+window, so the camera is moving for most of the level.
 
 > Cap Blanc: you see everything, and half of it lies.
 > Roc-aux-Sorciers: nothing lies, and you cannot see it.
@@ -43,18 +50,21 @@ between attempts, and there is no trap that a player who remembers cannot beat.
 |---|---|---|---|
 | a | `a-entrance` | Down into the dark. The lamp comes on. Concrete underfoot and prints in the clay, going the same way | The cave is visited on a made path; the prints are where they have always been |
 | b | `b-frieze` | The Black Frieze on the wall, one hole in the floor to hop. Walkway and prints still agree | Twenty-five animals in black manganese outline |
-| c | `c-mammoths` | The floor runs out and the concrete does not: it carries on over the hole and stops in mid air. The prints turn back at the edge and go up onto the bank | The Chapel of the Mammoths, seven metres of them in the upper gallery |
-| d | `d-bears` | No tour comes down here. Seven hollows in the clay floor, a lamp that shows one at a time, and the prints threading between them | Cave bears wintered in these galleries and dug themselves hollows to do it in |
-| e | `e-discs` | Plates of calcite edge on over the drop, two of them done holding — and no prints at all, because nobody walked this | The Hall of the Discs: water under pressure out of a crack, set into fans |
+| c | `c-mammoths` | The floor runs out and the concrete does not: it carries on over the first shaft and stops in mid air, with three hundred and fifty pixels of nothing under the end of it. The prints turn back at the edge and go down the far side, four short steps | The Chapel of the Mammoths, seven metres of them in the upper gallery |
+| d | `d-bears` | No tour comes down here. A long descent: eight ledges stepping down over the lower gallery, hollows scooped in them where bears slept, and shafts between them that go all the way to the floor | Cave bears wintered in these galleries and scraped themselves hollows to do it in |
+| e | `e-discs` | And this one climbs: plates of calcite growing out of the wall at rising heights, two of them done holding — and no prints at all, because nobody came up this way | The Hall of the Discs: water under pressure out of a crack, set into fans |
 | f | `f-tracings` | A passage low enough to take half the jump away, with two holes in its floor | The ceiling of finger tracings, drawn in soft clay by someone who could reach it |
 | g | `g-horses` | The walkway comes back, runs to the best view in the cave, and holds for half a second more | The Spotted Horses, and the viewing point every visitor is taken to |
 
 ## Deliberate lies
 
-- **The bear hollows go through the floor.** They do not. A bear's nest is a shallow bowl
-  scraped in the clay, thirty centimetres deep, and falling into one would cost a visitor
-  their dignity and nothing else. The game opens them into the gallery below because it
-  wants a floor you have to read.
+- **The galleries are stacked this neatly.** Pech Merle really is a vertical system with
+  shafts between its levels, and the visit really does begin at the upper gallery. The
+  arrangement here — four hundred pixels of descent in tidy stages — is level design.
+  *(An earlier version of this level made the bear hollows lethal holes in the floor.
+  They are not: a bear's nest is a bowl scraped in the clay about thirty centimetres
+  deep, and falling in would cost a visitor their dignity and nothing else. They are
+  drawn as what they are now, and the danger is the shafts, which are real.)*
 - **Two of the calcite discs give way.** Discs are fragile and are never walked on, but
   they have been growing where they are for a very long time and they are not about to
   drop.

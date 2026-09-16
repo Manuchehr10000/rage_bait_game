@@ -6,7 +6,7 @@ import { renderHud } from './render/hud';
 import { Input } from './engine/input';
 import { Level, type LevelData } from './engine/level';
 import { LEVELS, levelIndexFromHash } from './levels/index';
-import { Player, type MovingSolid } from './engine/player';
+import { PHYS, Player, type MovingSolid } from './engine/player';
 import { Progress } from './engine/progress';
 import { locate } from './map/atlas';
 import { MapScreen } from './map/screen';
@@ -311,6 +311,12 @@ export class Game {
     if (this.player.justJumped) this.audio.play(this.player.inWater ? 'splash' : 'jump');
     else if (!wasOnGround && this.player.onGround) this.audio.play('land');
     else if (this.player.justStepped) this.audio.play('step');
+    // A long way down is a long way down in every chapter. The rule is the same
+    // everywhere; only the noun on the museum label changes.
+    if (this.player.fellBy > PHYS.fatalFall) {
+      this.kill(this.level.data.dropCause ?? 'The drop');
+      return;
+    }
     this.bumpBlocks();
     // Through the door, and he remembers what the lamp is for.
     const lampFrom = this.level.data.lampFromX;

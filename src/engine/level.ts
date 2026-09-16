@@ -328,6 +328,11 @@ export interface LevelData {
   rockFromX?: number;
   /** What falling off the bottom is called here. */
   fallCause?: DeathCause;
+  /**
+   * What a fall of more than PHYS.fatalFall is called here. The rule is the same
+   * in every level; this is only the noun that ends up on the exit label.
+   */
+  dropCause?: DeathCause;
   /** The exit has no marker. You find it. */
   exitHidden?: boolean;
 }

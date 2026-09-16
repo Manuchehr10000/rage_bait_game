@@ -1381,19 +1381,19 @@ const CAVE: Palette = {
 };
 
 /**
- * One calcite disc, 24 x 14, seen edge on. Water under pressure comes out of a
+ * One calcite disc, 32 x 14, seen edge on. Water under pressure comes out of a
  * crack in the rock and spreads into a plate; what you stand on is the top edge
  * of the plate, and it is about as thick as a hand.
  */
 function calciteDisc(): HTMLCanvasElement {
-  const g = new PixelGrid(24, 14);
-  g.rect(2, 0, 20, 3, 'C'); // the top edge: the ledge
-  g.rect(3, 0, 18, 1, 'H');
-  g.rect(0, 3, 24, 5, 'C'); // the face of the plate, widest in the middle
-  g.rect(1, 8, 22, 3, 'D');
-  g.rect(4, 11, 16, 3, 'D'); // and back in to the crack it grew out of
-  g.rect(9, 4, 6, 1, 'D'); // growth rings
-  g.rect(6, 6, 12, 1, 'D');
+  const g = new PixelGrid(32, 14);
+  g.rect(2, 0, 28, 3, 'C'); // the top edge: the ledge
+  g.rect(3, 0, 26, 1, 'H');
+  g.rect(0, 3, 32, 5, 'C'); // the face of the plate, widest in the middle
+  g.rect(1, 8, 30, 3, 'D');
+  g.rect(6, 11, 20, 3, 'D'); // and back in to the crack it grew out of
+  g.rect(13, 4, 6, 1, 'D'); // growth rings
+  g.rect(9, 6, 14, 1, 'D');
   return compile(g.outline('O').rows(), CAVE);
 }
 export const DISC_SPRITE = calciteDisc();

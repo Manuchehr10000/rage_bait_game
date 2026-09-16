@@ -4,7 +4,7 @@
 |---|---|
 | Id | `calcite-disc` |
 | File | `calcite-disc.png` (not painted yet: the game draws its own until this file exists) |
-| Size | 24 × 14 world px, painted 96 × 56 |
+| Size | 32 × 14 world px, painted 128 × 56 |
 | Beat | `e-discs` |
 
 ## What it is

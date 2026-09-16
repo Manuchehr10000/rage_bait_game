@@ -3,9 +3,15 @@
 Rules the game never breaks. Every level, every chapter. If a trap idea needs one of
 these bent, the idea is wrong, not the rule.
 
-1. **The world lies. The controls never do.** Jump height, run speed, acceleration and
-   collision are fixed in `src/player.ts` (`PHYS`) and identical in every chapter. Coyote
-   time and jump buffering stay on. The player must always be able to blame themselves.
+1. **The world lies. The controls never do.** Jump height, run speed, acceleration,
+   collision and the fall you can walk away from are fixed in `src/engine/player.ts`
+   (`PHYS`) and identical in every chapter. Coyote time and jump buffering stay on. The
+   player must always be able to blame themselves.
+   **A fall of more than `PHYS.fatalFall` (200 px, measured from the top of the arc)
+   kills you, everywhere.** Only the noun on the museum label changes per level. The
+   number is set from what the built levels already ask for — the worst fall on a clean
+   run is 62 px at Cap Blanc, 78 at Philae and 171 at Karnak, coming off the first
+   pylon — so nothing that was survivable ever stops being survivable.
 2. **No text inside a level.** Reading kills tempo. History lives in the geometry and the
    set pieces, not in captions. The only words are the death counter and the exit label.
 3. **Deterministic, never random.** Every trap fires from player position or a fixed
@@ -16,6 +22,9 @@ these bent, the idea is wrong, not the rule.
 5. **No waiting before the finale.** A player who knows the level runs it without standing
    still. Only the last trap in a level may run on a cycle, because nothing comes after it.
 6. **The camera never scrolls left.** Tells are absorbed on the way in or not at all.
+   It does follow you up and down, so a level is allowed to be taller than the window
+   and should be: the first three were 288 px tall and kept the tourist inside a 45 px
+   band, which made them read as corridors. Use the other axis.
 7. **No checkpoints. Infinite lives. Big visible death counter.** Levels stay short
    (about 45 seconds clean) so the retry loop stays fast.
 8. **Deadpan.** A death looks and sounds like what caused it, and nothing else reacts: no

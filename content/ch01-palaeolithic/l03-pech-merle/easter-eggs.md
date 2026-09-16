@@ -10,8 +10,11 @@ For the designer. None of it is stated anywhere in the game.
 - **Two prints face backwards**, at the edge in beat c, and they are the entire warning
   before the first betrayal. A player who dies there twice will go back and look at them.
 
-- **No prints at the discs.** He did not go that way. After twenty seconds of a trail, its
-  absence is information, and it is the only beat in the level with none.
+- **No prints at the discs.** He did not come up that way. After half a minute of a
+  trail, its absence is information, and it is the only beat in the level with none.
+
+- **The hollows do nothing.** Four bear nests, drawn exactly as a bear leaves them, in the
+  one stretch of the level where every other dark shape in the floor will kill you.
 
 - **The walkway is beautifully made.** It should be: it is real, it is inspected, and
   seven hundred people a day walk it safely. Everything wrong with it in this level is
