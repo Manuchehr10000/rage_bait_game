@@ -42,6 +42,41 @@ jobs:
           BUILD_ENV: ${{ github.ref_name == 'main' && 'prod' || 'dev' }}
         run: npm run build
 
+      # wrangler reports every failure on the upload-token endpoint as
+      # "Authentication error [code: 10000]", whether the token is missing the
+      # Pages permission or the project simply is not there. Ask Cloudflare both
+      # questions first, so a failed deploy says which one it was. Nothing here
+      # prints the token or the account id.
+      - name: Check the Cloudflare token can see the project
+        env:
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          api() { curl -sS -w '\n%{http_code}' -H "Authorization: Bearer $CF_TOKEN" "https://api.cloudflare.com/client/v4$1"; }
+
+          verify=$(api /user/tokens/verify)
+          echo "token verify: HTTP $(echo "$verify" | tail -1)"
+
+          projects=$(api "/accounts/$CF_ACCOUNT/pages/projects")
+          code=$(echo "$projects" | tail -1)
+          echo "list Pages projects: HTTP $code"
+
+          if [ "$code" != "200" ]; then
+            echo "::error::The token cannot list Pages projects on this account. Give it Account → Cloudflare Pages → Edit at https://dash.cloudflare.com/profile/api-tokens"
+            echo "$projects" | head -n -1 | head -c 600
+            exit 1
+          fi
+
+          names=$(echo "$projects" | head -n -1 | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>console.log(JSON.parse(s).result.map(p=>p.name).join(" ")))')
+          echo "projects on this account: ${names:-(none)}"
+          case " $names " in
+            *" lost-tourist "*) ;;
+            *)
+              echo "::error::No Pages project called lost-tourist. Create one (Workers & Pages → Create → Pages → Direct Upload) and attach losttourist.online and dev.losttourist.online to it."
+              exit 1
+              ;;
+          esac
+
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
         with:
