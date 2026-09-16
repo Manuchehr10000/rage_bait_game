@@ -1477,3 +1477,27 @@ function trainCar(last: boolean): HTMLCanvasElement {
 }
 export const TRAIN_CAR_SPRITE = trainCar(false);
 export const TRAIN_LAST_CAR_SPRITE = trainCar(true);
+
+// ---------------------------------------------------------------------------
+// Gargas. The Salle de l'Ours: a stalagmite that looks like a bear, and is not one.
+// ---------------------------------------------------------------------------
+
+/**
+ * The bear of the Salle de l'Ours, 24 x 20: a calcite boss with a hump, a low
+ * head and a rump, which is what a stalagmite looks like when you have spent
+ * four caves looking for bears. Solid, harmless, a hop.
+ */
+function bearStalagmite(): HTMLCanvasElement {
+  const g = new PixelGrid(24, 20);
+  g.rect(2, 8, 20, 12, 'C'); // the body
+  g.rect(5, 4, 12, 5, 'C'); // the hump
+  g.rect(15, 6, 8, 6, 'C'); // the head, low and forward
+  g.rect(20, 10, 3, 3, 'C'); // the muzzle
+  g.rect(0, 12, 3, 8, 'C'); // the rump, spreading at the floor
+  g.rect(6, 5, 9, 1, 'H'); // wet, catching the lamp along the top
+  g.rect(16, 7, 5, 1, 'H');
+  g.rect(3, 15, 18, 1, 'D'); // and the drip-lines of its growth
+  g.rect(8, 11, 10, 1, 'D');
+  return compile(g.outline('O').rows(), CAVE);
+}
+export const BEAR_STALAGMITE_SPRITE = bearStalagmite();

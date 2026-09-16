@@ -49,6 +49,8 @@ export class Game {
 
   /** The headlamp. Off outside; switched on once past the door, and it stays on. */
   private lampOn = false;
+  /** Seconds it has been on. Only a level with a lampLife on its dark cares. */
+  private lampT = 0;
 
   private state: State = 'playing';
   private deathTimer = 0;
@@ -104,6 +106,14 @@ export class Game {
   /** True once the headlamp is on. For tests. */
   get lamp(): boolean {
     return this.lampOn;
+  }
+
+  /** How much of the headlamp is left, 1 to 0. Always 1 where the lamp does not run down. */
+  get lampLeft(): number {
+    const dark = this.level.data.decor.find((d) => d.kind === 'dark');
+    const life = dark && dark.kind === 'dark' ? dark.lampLife : undefined;
+    if (!this.lampOn || life === undefined) return 1;
+    return Math.max(0, 1 - this.lampT / life);
   }
 
   /** Which screen is showing. For tests. */
@@ -213,6 +223,7 @@ export class Game {
     this.player.spawnAt(d.spawn.x, d.spawn.y);
     this.camera.reset();
     this.lampOn = false;
+    this.lampT = 0;
     this.state = 'playing';
   }
 
@@ -324,6 +335,8 @@ export class Game {
       this.lampOn = true;
       this.audio.play('click');
     }
+    // The battery. It has been on since the first door of the chapter.
+    if (this.lampOn) this.lampT += DT;
     this.camera.update(this.player);
     this.driveLoops();
 
@@ -409,6 +422,7 @@ export class Game {
       time: this.time,
       death: this.state === 'dead' ? { cause: this.deathCause, t: 1 - this.deathTimer / DEATH_TIME } : null,
       lampOn: this.lampOn,
+      lampLeft: this.lampLeft,
     };
     renderWorld(this.wctx, scene);
 

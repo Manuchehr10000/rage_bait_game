@@ -1,0 +1,13 @@
+{
+  "$comment": "Sizes are world pixels (320 x 180 view). Painted files are 4x. See content/README.md. The rock, the clay and the concrete are the tiles of l03-pech-merle, painted once; the block at the foot of the tunnel is roof-block from l01-cap-blanc. The panels (the finger tracings, the painted animals of the upper cave, the Camarin's engravings, the wall of hands), the claw marks, the stair rail, the steel door and the slabs across the well are drawn by the game from the level data and are not listed here; their notes live in their beat folders.",
+  "level": "l05-gargas",
+  "assets": [
+    {
+      "id": "bear-stalagmite",
+      "w": 24,
+      "h": 20,
+      "beat": "d-hall",
+      "what": "The stalagmite of the Salle de l'Ours: a lump of calcite that a visitor reads as a bear sitting up, because the guide has just said so. A hop."
+    }
+  ]
+}

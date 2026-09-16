@@ -11,7 +11,7 @@ import { TILE, type Costume, type DeathCause, type Rect } from './types';
  */
 export type TileChar = ' ' | '#' | '=' | '%' | '?' | 'x';
 
-export type Theme = 'capBlanc' | 'rocAuxSorciers' | 'pechMerle' | 'rouffignac' | 'abuSimbel' | 'philae' | 'karnak';
+export type Theme = 'capBlanc' | 'rocAuxSorciers' | 'pechMerle' | 'rouffignac' | 'gargas' | 'abuSimbel' | 'philae' | 'karnak';
 
 // ---------------------------------------------------------------------------
 // Entities. Every trap in the game is one of these, with a skin for the renderer.
@@ -109,7 +109,7 @@ export interface SweepDef {
 /** Looks like something to stand on. If fake, it gives way a moment after you do, or on an event. */
 export interface CrumbleDef {
   kind: 'crumble';
-  skin: 'croc' | 'capital' | 'rock' | 'floor' | 'talatat' | 'column' | 'stone' | 'relief' | 'fallenBlock' | 'horns' | 'disc' | 'walkway' | 'nodule';
+  skin: 'croc' | 'capital' | 'rock' | 'floor' | 'talatat' | 'column' | 'stone' | 'relief' | 'fallenBlock' | 'horns' | 'disc' | 'walkway' | 'nodule' | 'stalagmite' | 'fallenRoof';
   rect: Rect;
   fake: boolean;
   delay: number;
@@ -304,6 +304,13 @@ export type DecorDef =
        * is not being asked to remember, only to guess.
        */
       ambient?: number;
+      /**
+       * Seconds the headlamp lasts from the moment it is switched on. Unset, it
+       * lasts for ever. Set, the beam shortens on a fixed clock from the door,
+       * flickers for the last tenth, and goes out; what is left is a dark-adapted
+       * pair of eyes. A player who does not dawdle arrives with more light.
+       */
+      lampLife?: number;
     }
   | { kind: 'spotlight'; x: number; floorY: number; top?: number }
   | { kind: 'museumWall'; x: number; w: number; doorX: number; top: number; floorY: number }
@@ -317,8 +324,12 @@ export type DecorDef =
   | { kind: 'venus'; x: number; y: number }
   | { kind: 'grille'; x: number; floorY: number }
   | { kind: 'engravedWall'; rect: Rect }
-  /** The hole in the hill the cave is entered by, and the last daylight in the level. */
-  | { kind: 'caveMouth'; x0: number; x1: number; floorY: number }
+  /**
+   * The hole in the hill the cave is entered by, and the last daylight in the
+   * level. With `reach`, its daylight falls `reach` px into the dark, toward
+   * `into`: the way you see a wall by the light of the door you are leaving by.
+   */
+  | { kind: 'caveMouth'; x0: number; x1: number; floorY: number; reach?: number; into?: 'left' | 'right' }
   /** The concrete of the guided tour, with its handrail. The one continuous thing in the cave, and a liar. */
   | { kind: 'walkway'; x0: number; x1: number; y: number }
   /** The prints of one adolescent in the clay, sealed under calcite. They are never wrong. */
@@ -345,6 +356,10 @@ export type DecorDef =
   | { kind: 'nameScratch'; x: number; y: number; w: number }
   /** The near rim of a hollow a bear slept in, in the clay beyond the track. */
   | { kind: 'bearHollow'; x: number; w: number; floorY: number }
+  /** The steel door of a classified cave, standing open for the visit. */
+  | { kind: 'steelDoor'; x: number; floorY: number }
+  /** The handrail down a flight of fitted steps, from the top of the first to the foot of the last. */
+  | { kind: 'stairRail'; x0: number; y0: number; x1: number; y1: number }
   | { kind: 'brokenObelisk'; x: number; floorY: number }
   | { kind: 'pedestal'; x: number; floorY: number }
   | { kind: 'turnstile'; x: number; floorY: number }
@@ -358,7 +373,10 @@ export type CavePanel =
   | 'spottedHorses'
   | 'rhinos'
   | 'tenMammoths'
-  | 'greatCeiling';
+  | 'greatCeiling'
+  | 'gargasBeasts'
+  | 'camarin'
+  | 'hands';
 
 export interface LevelData {
   id: string;

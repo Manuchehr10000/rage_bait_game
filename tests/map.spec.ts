@@ -196,9 +196,9 @@ test('the ribbon measures progress, not where the cursor is', async ({ page }) =
   await press(page, 'ArrowRight');
   expect(await walked()).toBe(0);
 
-  // Chapter 1's four built levels cleared, chapter 2's three not.
+  // Chapter 1's five levels cleared, chapter 2's three not.
   await page.evaluate(() =>
-    localStorage.setItem('lostTourist.cleared', JSON.stringify(['cap-blanc', 'roc-aux-sorciers', 'pech-merle', 'rouffignac'])),
+    localStorage.setItem('lostTourist.cleared', JSON.stringify(['cap-blanc', 'roc-aux-sorciers', 'pech-merle', 'rouffignac', 'gargas'])),
   );
   await page.reload();
   await page.waitForFunction(() => (window as unknown as { __game?: { currentScreen: string } }).__game?.currentScreen === 'map');
@@ -220,7 +220,7 @@ test('the ribbon measures progress, not where the cursor is', async ({ page }) =
 
 test('a chapter whose every built level is cleared opens on its first site', async ({ page }) => {
   await page.evaluate(() =>
-    localStorage.setItem('lostTourist.cleared', JSON.stringify(['cap-blanc', 'roc-aux-sorciers', 'pech-merle', 'rouffignac'])),
+    localStorage.setItem('lostTourist.cleared', JSON.stringify(['cap-blanc', 'roc-aux-sorciers', 'pech-merle', 'rouffignac', 'gargas'])),
   );
   await page.reload();
   await page.waitForFunction(() => (window as unknown as { __game?: { currentScreen: string } }).__game?.currentScreen === 'map');

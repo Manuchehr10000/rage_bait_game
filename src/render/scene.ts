@@ -49,7 +49,7 @@ import { paint } from '../engine/assets';
 import { blit, blitFacing, frameOf, silhouette, withLamp, type Frame } from './frame';
 import { TRAIN, type Train } from '../engine/entities';
 import type { CavePanel } from '../engine/level';
-import { NODULE_SPRITE, TRAIN_CAR_SPRITE, TRAIN_ENGINE_SPRITE, TRAIN_LAST_CAR_SPRITE } from './procedural';
+import { BEAR_STALAGMITE_SPRITE, NODULE_SPRITE, TRAIN_CAR_SPRITE, TRAIN_ENGINE_SPRITE, TRAIN_LAST_CAR_SPRITE } from './procedural';
 
 /** Text drawn in screen space after scaling so it stays crisp. World coordinates. */
 export interface WorldText {
@@ -200,6 +200,28 @@ export interface Scene {
   death: { cause: DeathCause; t: number } | null;
   /** True once the tourist has switched the headlamp on. */
   lampOn: boolean;
+  /** How much of the battery is left, 1 to 0. Always 1 where the lamp does not run down. */
+  lampLeft: number;
+}
+
+/**
+ * Whether the headlamp is giving any light this frame: on, not run down, and
+ * not in the off half of a flicker. The last tenth of the battery flickers on a
+ * quarter-second clock, so nothing about it is random and everything about it
+ * is a warning.
+ */
+function lampLit(s: Scene): boolean {
+  if (!s.lampOn || s.lampLeft <= 0) return false;
+  if (s.lampLeft < 0.1 && Math.floor(s.time * 4) % 2 === 1) return false;
+  return true;
+}
+
+/**
+ * How far the lamp reaches, as a fraction of a fresh one. A battery does not fade
+ * evenly: the light holds up for most of its life and collapses at the end.
+ */
+function lampReach(s: Scene): number {
+  return Math.sqrt(Math.max(0, Math.min(1, s.lampLeft)));
 }
 
 export function renderWorld(ctx: CanvasRenderingContext2D, s: Scene): void {
@@ -211,7 +233,7 @@ export function renderWorld(ctx: CanvasRenderingContext2D, s: Scene): void {
   drawSky(ctx, cy, theme);
   if (theme === 'capBlanc') drawFarBeune(ctx, cx, cy);
   else if (theme === 'rocAuxSorciers') drawFarAnglin(ctx, cx, cy);
-  else if (theme === 'pechMerle' || theme === 'rouffignac') drawCaveDepth(ctx, cx, cy);
+  else if (theme === 'pechMerle' || theme === 'rouffignac' || theme === 'gargas') drawCaveDepth(ctx, cx, cy);
   else if (theme === 'abuSimbel') drawFarCliffs(ctx, cx, cy);
   else if (theme === 'philae') drawFarIsland(ctx, cx, cy);
   else drawFarKarnak(ctx, cx, cy);
@@ -229,7 +251,7 @@ export function renderWorld(ctx: CanvasRenderingContext2D, s: Scene): void {
   for (const e of s.entities) drawEntityFront(ctx, s, e);
   drawCoins(ctx, s);
   if (level.data.exit && !level.data.exitHidden) drawExit(ctx, level.data.exit);
-  if (!s.death) drawPlayer(ctx, s.player, level.data.costume, s.lampOn);
+  if (!s.death) drawPlayer(ctx, s.player, level.data.costume, lampLit(s));
   else if (DEATH_ANIM[s.death.cause] !== 'crush') drawDeath(ctx, s, s.death);
   for (const e of s.entities) drawEntityOverlay(ctx, s, e);
   if (s.death && (DEATH_ANIM[s.death.cause] === 'drown' || DEATH_ANIM[s.death.cause] === 'snap')) drawDrownSurface(ctx, s, s.death.t);
@@ -519,11 +541,14 @@ function drawDarkness(ctx: CanvasRenderingContext2D, s: Scene, cx: number, cy: n
   const pxc = Math.round(p.x) + 5 - cx;
   const pyc = Math.round(p.y) + 8 - cy;
   if (dark.lamp === 'headlamp') {
-    // The lamp on the hat: a cone the way you are facing, and a little spill around you.
+    // The lamp on the hat: a cone the way you are facing, and a little spill around
+    // you. Where the battery runs down, the cone shortens with it and the spill
+    // shrinks to what a pair of eyes can do in the dark.
     const f = p.facing;
     const hx = pxc + f * 2;
     const hy = pyc - 4;
-    if (s.lampOn) {
+    const k = lampReach(s);
+    if (lampLit(s)) {
       const cone = (len: number, half: number, alpha: number) => {
         d.globalAlpha = alpha;
         d.beginPath();
@@ -534,16 +559,17 @@ function drawDarkness(ctx: CanvasRenderingContext2D, s: Scene, cx: number, cy: n
         d.closePath();
         d.fill();
       };
-      cone(76, 30, 1);
-      cone(96, 44, 0.45);
+      cone(76 * k, 30 * k, 1);
+      cone(96 * k, 44 * k, 0.45);
     }
+    const eyes = s.lampOn && k <= 0 ? 1 : 0;
     d.globalAlpha = 1;
     d.beginPath();
-    d.arc(pxc, pyc, 12, 0, Math.PI * 2);
+    d.arc(pxc, pyc, eyes ? 22 : 12, 0, Math.PI * 2);
     d.fill();
     d.globalAlpha = 0.5;
     d.beginPath();
-    d.arc(pxc, pyc, 18, 0, Math.PI * 2);
+    d.arc(pxc, pyc, eyes ? 32 : 18, 0, Math.PI * 2);
     d.fill();
     d.globalAlpha = 1;
   } else {
@@ -556,6 +582,25 @@ function drawDarkness(ctx: CanvasRenderingContext2D, s: Scene, cx: number, cy: n
     d.arc(pxc, pyc, 60, 0, Math.PI * 2);
     d.fill();
     d.globalAlpha = 1;
+  }
+  // Daylight. A mouth with a reach lets the day fall into the cave, strongest at
+  // the door and gone at the far end of its reach; it is how the last wall of a
+  // cave is seen by the light of the way out.
+  for (const m of s.level.data.decor) {
+    if (m.kind !== 'caveMouth' || m.reach === undefined) continue;
+    const into = m.into ?? 'right';
+    const edge = (into === 'left' ? m.x0 : m.x1) - cx;
+    const far = into === 'left' ? edge - m.reach : edge + m.reach;
+    const grad = d.createLinearGradient(edge, 0, far, 0);
+    grad.addColorStop(0, 'rgba(0, 0, 0, 1)');
+    grad.addColorStop(0.35, 'rgba(0, 0, 0, 0.75)');
+    grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    d.globalAlpha = 1;
+    d.fillStyle = grad;
+    d.fillRect(Math.min(edge, far), 0, Math.abs(far - edge), VIEW_H);
+    // And the mouth itself is simply day.
+    d.fillStyle = '#000';
+    d.fillRect(m.x0 - cx, 0, m.x1 - m.x0, VIEW_H);
   }
   // The train carries the lighting. Its headlight reaches a long way up the
   // track, so it is on the screen before the train is: the closer it is, the
@@ -645,16 +690,17 @@ function drawBeams(ctx: CanvasRenderingContext2D, s: Scene, cx: number, cy: numb
     ctx.fill();
     ctx.fillStyle = 'rgba(255, 240, 190, 0.18)';
   }
-  if (dark.kind === 'dark' && dark.lamp === 'headlamp' && s.lampOn) {
-    // The headlamp's beam, the same faint warmth.
+  if (dark.kind === 'dark' && dark.lamp === 'headlamp' && lampLit(s)) {
+    // The headlamp's beam, the same faint warmth, as long as the battery allows.
     const p = s.player;
     const f = p.facing;
+    const k = lampReach(s);
     const hx = Math.round(p.x) + 5 - cx + f * 2;
     const hy = Math.round(p.y) + 8 - cy - 4;
     ctx.beginPath();
     ctx.moveTo(hx, hy - 2);
-    ctx.lineTo(hx + f * 76, hy - 30);
-    ctx.lineTo(hx + f * 76, hy + 30);
+    ctx.lineTo(hx + f * 76 * k, hy - 30 * k);
+    ctx.lineTo(hx + f * 76 * k, hy + 30 * k);
     ctx.lineTo(hx, hy + 2);
     ctx.closePath();
     ctx.fill();
@@ -1053,13 +1099,16 @@ function drawDecor(ctx: CanvasRenderingContext2D, s: Scene, d: DecorDef): void {
       const grad = ctx.createLinearGradient(0, 0, 0, d.floorY);
       grad.addColorStop(0, 'rgba(223, 224, 204, 0.55)');
       grad.addColorStop(1, 'rgba(223, 224, 204, 0)');
-      ctx.fillStyle = grad;
       ctx.beginPath();
       ctx.moveTo(d.x0 - 16, 0);
       ctx.lineTo(d.x1, 0);
       ctx.lineTo(d.x1 + 26, d.floorY);
       ctx.lineTo(d.x0 - 16, d.floorY);
       ctx.closePath();
+      // The mouth is cut through the cave, whatever lies under the ground here.
+      ctx.fillStyle = COLORS.night;
+      ctx.fill();
+      ctx.fillStyle = grad;
       ctx.fill();
       break;
     }
@@ -1219,6 +1268,53 @@ function drawDecor(ctx: CanvasRenderingContext2D, s: Scene, d: DecorDef): void {
       ctx.fillRect(d.x, d.y + 6, d.w - (h0 % 5), 1);
       break;
     }
+    case 'steelDoor': {
+      // The door of a classified cave, steel, standing open on its hinge for the
+      // visit. He walks through it the way everybody does; it is the last thing
+      // outside that is not rock.
+      ctx.fillStyle = COLORS.steelDark;
+      ctx.fillRect(d.x, d.floorY - 44, 3, 44); // the frame
+      ctx.fillRect(d.x, d.floorY - 46, 22, 2);
+      ctx.fillStyle = COLORS.steel;
+      ctx.fillRect(d.x + 4, d.floorY - 42, 12, 42); // the leaf, swung in
+      ctx.fillStyle = COLORS.steelLight;
+      ctx.fillRect(d.x + 4, d.floorY - 42, 12, 1);
+      ctx.fillRect(d.x + 4, d.floorY - 42, 1, 42);
+      ctx.fillStyle = COLORS.steelDark;
+      ctx.fillRect(d.x + 6, d.floorY - 30, 8, 1); // the bars across it
+      ctx.fillRect(d.x + 6, d.floorY - 16, 8, 1);
+      ctx.fillRect(d.x + 13, d.floorY - 24, 2, 3); // the handle
+      break;
+    }
+    case 'stairRail': {
+      // The handrail down the tunnel's steps: a rail at hand height following
+      // the slope, on stanchions, with the knee rail the safety rules ask for.
+      const dx = d.x1 - d.x0;
+      const dy = d.y1 - d.y0;
+      ctx.strokeStyle = COLORS.rail;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(d.x0, d.y0 - 26);
+      ctx.lineTo(d.x1, d.y1 - 26);
+      ctx.stroke();
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(d.x0, d.y0 - 16);
+      ctx.lineTo(d.x1, d.y1 - 16);
+      ctx.stroke();
+      ctx.fillStyle = COLORS.rail;
+      for (let t = 0; t <= 1; t += 1 / 12) {
+        const x = Math.round(d.x0 + dx * t);
+        const y = Math.round(d.y0 + dy * t);
+        ctx.fillRect(x, y - 26, 2, 26);
+      }
+      ctx.fillStyle = COLORS.railLit;
+      ctx.beginPath();
+      ctx.moveTo(d.x0, d.y0 - 27);
+      ctx.lineTo(d.x1, d.y1 - 27);
+      ctx.stroke();
+      break;
+    }
     case 'bearHollow': {
       // The near rim of a hollow in the clay beyond the track, where a bear slept
       // out a winter. Harmless. It is drawn because it is there.
@@ -1364,18 +1460,18 @@ function drawTiles(ctx: CanvasRenderingContext2D, level: Level, cx: number, cy: 
       const open = !level.isSolid(tx, ty - 1);
       if (paint(ctx, tileArtId(theme, c, open), x, y)) continue;
       if (c === '=') {
-        if (theme === 'pechMerle') drawConcrete(ctx, x, y, open);
+        if (theme === 'pechMerle' || theme === 'gargas') drawConcrete(ctx, x, y, open);
         else if (theme === 'rouffignac') drawBallast(ctx, tx, ty, x, y, open);
         else if (theme === 'capBlanc' || theme === 'rocAuxSorciers') drawMeadowPath(ctx, tx, ty, x, y, open);
         else if (theme === 'abuSimbel') drawSand(ctx, level, tx, ty, x, y, open);
         else if (theme === 'philae') drawGranite(ctx, tx, ty, x, y, open);
         else drawPaving(ctx, tx, ty, x, y, open);
-      } else if (c === '%' && (theme === 'pechMerle' || theme === 'rouffignac')) {
+      } else if (c === '%' && (theme === 'pechMerle' || theme === 'rouffignac' || theme === 'gargas')) {
         drawClay(ctx, tx, ty, x, y, open);
       } else if (c === '%' && (theme === 'capBlanc' || theme === 'rocAuxSorciers')) {
         drawSediment(ctx, tx, ty, x, y, open);
       } else if (c === '#' || c === '%') {
-        if (theme === 'pechMerle') drawCaveRock(ctx, tx, ty, x, y, open);
+        if (theme === 'pechMerle' || theme === 'gargas') drawCaveRock(ctx, tx, ty, x, y, open);
         else if (theme === 'rouffignac') drawFlintRock(ctx, tx, ty, x, y, open);
         else if (theme === 'capBlanc' || theme === 'rocAuxSorciers') drawBedrock(ctx, tx, ty, x, y, open);
         else if (theme === 'abuSimbel') drawCliff(ctx, tx, ty, x, y, open);
@@ -1410,10 +1506,10 @@ function tileArtId(theme: Level['data']['theme'], c: string, open: boolean): str
   const name =
     c === '?' ? 'ankh-block'
     : c === 'x' ? 'ankh-block-used'
-    : c === '=' ? (theme === 'pechMerle' ? 'concrete' : theme === 'rouffignac' ? 'ballast' : theme === 'capBlanc' || theme === 'rocAuxSorciers' ? 'limestone' : theme === 'abuSimbel' ? 'sand' : theme === 'philae' ? 'granite' : 'paving')
-    : c === '%' && (theme === 'pechMerle' || theme === 'rouffignac') ? 'clay'
+    : c === '=' ? (theme === 'pechMerle' || theme === 'gargas' ? 'concrete' : theme === 'rouffignac' ? 'ballast' : theme === 'capBlanc' || theme === 'rocAuxSorciers' ? 'limestone' : theme === 'abuSimbel' ? 'sand' : theme === 'philae' ? 'granite' : 'paving')
+    : c === '%' && (theme === 'pechMerle' || theme === 'rouffignac' || theme === 'gargas') ? 'clay'
     : c === '%' && (theme === 'capBlanc' || theme === 'rocAuxSorciers') ? 'sediment'
-    : theme === 'pechMerle' ? 'cave-rock'
+    : theme === 'pechMerle' || theme === 'gargas' ? 'cave-rock'
     : theme === 'rouffignac' ? 'flint-rock'
     : theme === 'capBlanc' || theme === 'rocAuxSorciers' ? 'rock' : theme === 'abuSimbel' ? 'cliff' : theme === 'philae' ? 'column-drum' : 'sandstone';
   if (c === '?' || c === 'x') return name;
@@ -1701,6 +1797,12 @@ function drawEntityBack(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): voi
         ctx.scale(-1, 1);
         blit(ctx, horn, 0, 0);
         ctx.restore();
+      } else if (d.skin === 'stalagmite') {
+        // The bear of the Salle de l'Ours. After four caves of bears, this one is calcite.
+        if (!paint(ctx, 'bear-stalagmite', r.x, r.y)) ctx.drawImage(BEAR_STALAGMITE_SPRITE, r.x, r.y);
+      } else if (d.skin === 'fallenRoof') {
+        // The block that first joined the two caves, lying where it fell in the Middle Ages.
+        blit(ctx, frameOf('roof-block', 0, ROOF_BLOCK_SPRITE), r.x, r.y);
       } else if (d.skin === 'nodule') {
         // A nodule of flint that has weathered out of the wall and lies on the track bed.
         if (!paint(ctx, 'flint-nodule', r.x, r.y)) ctx.drawImage(NODULE_SPRITE, r.x, r.y);
@@ -1908,6 +2010,35 @@ function drawCavePanel(ctx: CanvasRenderingContext2D, panel: CavePanel, r: Rect)
       }
       ctx.restore();
     }
+  } else if (panel === 'gargasBeasts') {
+    // The upper cave at Gargas: a few painted animals, ibex and bison, in black.
+    beast(r.x + 4, r.y + 6, 34, 14, 3);
+    ctx.beginPath();
+    ctx.moveTo(r.x + 36, r.y + 7); // the ibex's horns, back over the neck
+    ctx.quadraticCurveTo(r.x + 30, r.y - 4, r.x + 24, r.y + 2);
+    ctx.stroke();
+    beast(r.x + 56, r.y + 8, 40, 16, 6);
+    ctx.fillStyle = COLORS.manganese;
+    ctx.fillRect(r.x + 58, r.y + 6, 12, 3); // the bison's hump, filled
+  } else if (panel === 'camarin') {
+    // The Camarin: a small smooth-walled side chamber holding most of the cave's
+    // engravings, two of them — the Great Bull and the Great Horse — over a metre
+    // and a half long. Engraved, so the line is pale where the surface came off.
+    ctx.strokeStyle = COLORS.scratch;
+    beast(r.x + 2, r.y + 5, 20, 11, 3);
+    ctx.beginPath();
+    ctx.moveTo(r.x + 20, r.y + 5); // the bull's horn
+    ctx.lineTo(r.x + 25, r.y);
+    ctx.stroke();
+    beast(r.x + 23, r.y + 15, 19, 10, 2);
+    ctx.beginPath();
+    for (let i = 0; i < 4; i++) {
+      ctx.moveTo(r.x + 26 + i * 4, r.y + 16); // the horse's mane, a row of short strokes
+      ctx.lineTo(r.x + 24 + i * 4, r.y + 12);
+    }
+    ctx.stroke();
+  } else if (panel === 'hands') {
+    drawHands(ctx, r);
   } else {
     // The spotted horses: two of them, back to back, under blown black dots, with
     // the hands sprayed around them. The dots go on past the outlines.
@@ -1936,6 +2067,56 @@ function drawCavePanel(ctx: CanvasRenderingContext2D, panel: CavePanel, r: Rect)
     }
   }
   ctx.restore();
+}
+
+/**
+ * The wall of hands at Gargas: negative stencils, the pigment blown round a hand
+ * held to the rock, so the hand is the one part of the wall that is bare. Red
+ * ochre and manganese black, one yellow; adults' hands and children's, the small
+ * ones low down; and about half of them with fingers that stop short. Why they
+ * stop short is not the game's business, and the wall says nothing about it.
+ */
+function drawHands(ctx: CanvasRenderingContext2D, r: Rect): void {
+  ctx.fillStyle = COLORS.cave;
+  ctx.fillRect(r.x - 8, r.y - 8, r.w + 16, r.h + 16);
+  ctx.fillStyle = COLORS.caveLit;
+  ctx.fillRect(r.x - 8, r.y - 8, r.w + 16, 2);
+  ctx.fillStyle = COLORS.caveLine;
+  for (let y = r.y + 6; y < r.y + r.h + 6; y += 15) {
+    for (let x = r.x - 6; x < r.x + r.w + 8; x += 31) ctx.fillRect(x + (hash(x, y) % 3), y + (hash(y, x) % 3), 8 + (hash(x + y, y) % 12), 1);
+  }
+  // The cracks, and a splinter of bone pushed into one of them.
+  ctx.fillStyle = COLORS.caveLine;
+  for (let i = 0; i < 4; i++) {
+    const cx0 = r.x + 20 + i * 74;
+    for (let j = 0; j < 14; j++) ctx.fillRect(cx0 + ((hash(i, j) % 3) - 1) + Math.floor(j / 3), r.y + 2 + j * 3, 1, 3);
+  }
+  ctx.fillStyle = COLORS.calciteLit;
+  ctx.fillRect(r.x + 21, r.y + 17, 1, 4);
+  // The hands. Adults above, children below; roughly half with fingers short.
+  const count = Math.floor(r.w / 9) * 3;
+  for (let i = 0; i < count; i++) {
+    const h = hash(i * 13, r.x);
+    const child = i % 3 === 2;
+    const w = child ? 6 : 8;
+    const tall = child ? 5 : 7;
+    const x = r.x + 4 + ((i * 37 + (h % 5)) % (r.w - 12));
+    const y = child ? r.y + r.h - 12 - (h % 5) : r.y + 4 + ((i * 17 + (h >> 3)) % Math.max(1, r.h - 22));
+    // The halo of blown pigment. Red for most, black for many, yellow for one.
+    ctx.fillStyle = i === 7 ? '#c9a23a' : h % 9 < 5 ? COLORS.ochreRed : COLORS.manganese;
+    ctx.fillRect(x - 3, y - 2, w + 6, tall + 8);
+    ctx.fillRect(x - 4, y, w + 8, tall + 4);
+    // The hand, which is the rock: a palm and five fingers, some of them short.
+    ctx.fillStyle = COLORS.cave;
+    ctx.fillRect(x, y + 3, w, tall - 1); // palm
+    ctx.fillRect(x - 2, y + 4, 2, 2); // thumb
+    const short = h % 2 === 0;
+    for (let f = 0; f < 4; f++) {
+      const full = child ? 3 : 4;
+      const len = short && ((h >> (4 + f)) & 1) === 1 ? Math.max(1, full - 2 - (f % 2)) : full;
+      ctx.fillRect(x + f * 2, y + 3 - len, 1, len);
+    }
+  }
 }
 
 function drawFigure(ctx: CanvasRenderingContext2D, figure: 'bison' | 'horse' | 'ibex', x: number, y: number, raked: boolean, face: 1 | -1 = 1): void {
@@ -2196,8 +2377,8 @@ function drawDeath(ctx: CanvasRenderingContext2D, s: Scene, death: { cause: Deat
   const t = death.t;
   const costume = s.level.data.costume;
   const c = COSTUMES[costume];
-  const idle = tourist(costume, 'idle', s.lampOn);
-  const dead = lit(costume, frameOf(`${c.id}-dead`, 0, c.frames.dead), s.lampOn);
+  const idle = tourist(costume, 'idle', lampLit(s));
+  const dead = lit(costume, frameOf(`${c.id}-dead`, 0, c.frames.dead), lampLit(s));
   const feetY = y + 16;
   const midX = x + 6;
 
@@ -2272,7 +2453,7 @@ function drawDeath(ctx: CanvasRenderingContext2D, s: Scene, death: { cause: Deat
       break;
     }
     case 'sit': {
-      const seated = lit(costume, frameOf(`${c.id}-seated`, 0, c.seated), s.lampOn);
+      const seated = lit(costume, frameOf(`${c.id}-seated`, 0, c.seated), lampLit(s));
       blitFacing(ctx, seated, x, feetY - seated.h, p.facing);
       break;
     }

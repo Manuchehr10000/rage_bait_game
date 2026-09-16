@@ -1,8 +1,7 @@
 # Chapter 1 · Palaeolithic Europe
 
 Source: `content/research/arc.md`, chapter 1. Dates 27,000 to 13,000 BP. Status: locked
-in the research. Levels 1 to 4 are built; level 5 is not yet designed. The game
-starts here.
+in the research. All five levels are built. The game starts here.
 
 | Level | Site | Place | Period | Built |
 |---|---|---|---|---|
@@ -10,7 +9,7 @@ starts here.
 | 2 | Roc-aux-Sorciers | Angles-sur-l'Anglin, Vienne, France | Mid Magdalenian, c. 15,000 BP | yes |
 | 3 | Pech Merle | Cabrerets, Lot, France | Gravettian, c. 25,000 BP | yes |
 | 4 | Rouffignac | Rouffignac-St-Cernin, Dordogne, France | Magdalenian, c. 13,000–15,000 BP | yes |
-| 5 | Gargas | Aventignan, Hautes-Pyrénées, France | Gravettian, c. 27,000 BP | not yet |
+| 5 | Gargas | Aventignan, Hautes-Pyrénées, France | Gravettian, c. 27,000 BP | yes |
 
 - **Costume:** modern hiking clothes, bucket hat, headlamp. He came for the guided tour.
   No furs, ever.
@@ -31,6 +30,12 @@ starts here.
   he may not; and the visit ends where the real one does, at the edge of the floor that
   was dug down under the Great Ceiling, with the train stopping exactly where a visitor
   stands to look up. The one made floor in the cave is the one place it cannot reach.
+- **Level 5 takes the light away:** the headlamp that has been on since the first door of
+  the chapter runs down on a clock from the door of Gargas, and dies before the end. The
+  thing worth seeing, the engravings of the Camarin under the hall floor, costs the light
+  the well needs. The chapter ends on the wall of 137 hands near the lower portal, seen by
+  the daylight from the way out, the only art in the chapter ever lit by a light the tourist
+  did not bring. Half the hands are short of a finger, and the level says nothing about why.
 - **Level 5 ends on:** walls of hand stencils with missing finger segments.
 - **Imagery:** thin. Most decorated caves are sealed or their photography is in
   copyright. Base on excavation reports plus Cartailhac & Breuil 1906 from US-hosted
@@ -44,6 +49,12 @@ starts here.
   fake by Sévérin Blanc, settled by an international commission; *la guerre des mammouths*
   (Nougier & Robert, 1957). Four centuries of visitors, Belleforest's description of 1575
   among them, and nobody recognised the drawings. In the notes; never in the level.
+- **Chapter error dossier, additions from level 5:** the counts of the hands of Gargas,
+  eighty at the first study of 1906, then a hundred and fifty, two hundred and seventeen in
+  Sahly's survey of 1963, two hundred and thirty-one in Barrière's; the four explanations of
+  the short fingers, Sahly's mutilation (1966), disease and frostbite, Leroi-Gourhan's folded
+  fingers (1967), Etxepare and Irurtzun's hand signs (2021), none of them settled; and the
+  legend of the outlaw Blaise Ferrage hiding in the cave. In the notes; never in the level.
 
 ## The tone
 
@@ -83,5 +94,5 @@ nationale's plates. Modern photographs are for reference on your own screen only
 `shared/` holds the hiker (living, dead, sitting). He appears in every level and is
 painted once.
 
-Design of level 5 happens in conversation, one beat at a time, before any folder for it
-is created.
+Every level of the chapter was designed in conversation, one beat at a time, before its
+folder was created. Chapter 2 follows the same rule.
