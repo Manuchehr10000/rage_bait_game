@@ -1,4 +1,6 @@
 import { defineConfig, type Plugin } from 'vite';
+// @ts-expect-error -- plain JS, and the config is the only thing that loads it.
+import { png, svg, check } from './tools/favicon.mjs';
 
 // Stamped into the page footer so the dev and prod links are telling the truth
 // about what they are. Set by the deploy workflow; harmless when unset.
@@ -49,8 +51,48 @@ function indexingRules(): Plugin {
   };
 }
 
+/**
+ * The tab icon, drawn from the same grid and the same palette as the tourist
+ * himself — see tools/favicon.mjs. Three files, because browsers do not agree:
+ * an SVG, which everything modern prefers and which stays sharp at any size;
+ * a 32 px PNG for Safari and anything older; and a big one for a phone that
+ * has been told to keep the page on its home screen.
+ *
+ * They are generated rather than committed so there is one source for the art,
+ * and the dev server serves the same bytes the build emits.
+ */
+function favicon(): Plugin {
+  const bad: string[] = check();
+  if (bad.length) throw new Error(`favicon art is malformed:\n  ${bad.join('\n  ')}`);
+
+  const files: Record<string, { body: Buffer | string; type: string }> = {
+    'favicon.svg': { body: svg(), type: 'image/svg+xml' },
+    'favicon.png': { body: png(2), type: 'image/png' },
+    'apple-touch-icon.png': { body: png(12), type: 'image/png' },
+  };
+
+  return {
+    name: 'lost-tourist-favicon',
+
+    configureServer(server) {
+      server.middlewares.use((req, res, next) => {
+        const hit = files[(req.url ?? '').replace(/^\/|\?.*$/g, '')];
+        if (!hit) return next();
+        res.setHeader('Content-Type', hit.type);
+        res.end(hit.body);
+      });
+    },
+
+    generateBundle() {
+      for (const [fileName, f] of Object.entries(files)) {
+        this.emitFile({ type: 'asset', fileName, source: f.body });
+      }
+    },
+  };
+}
+
 export default defineConfig({
-  plugins: [indexingRules()],
+  plugins: [favicon(), indexingRules()],
   define: {
     __BUILD_ENV__: JSON.stringify(buildEnv),
     __COMMIT__: JSON.stringify(commit),
