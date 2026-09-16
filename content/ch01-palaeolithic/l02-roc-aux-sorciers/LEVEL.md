@@ -24,7 +24,7 @@ acknowledgement that the tourist has no business being here at all.
 | Beat | Folder | What the player meets | The history it comes from |
 |---|---|---|---|
 | a | `a-bank` | The bank of the Anglin at the cliff foot. Daylight. The headlamp is on from habit and does nothing. A locked gate he walks straight past | South-facing shelter on a river bank; classified and shut since 1955 |
-| b | `b-raked` | Seven figures of the frieze in low sun, carved at different heights up the wall. Every one throws a shadow; every one holds. The wall is the road, and it climbs | Bas-relief is only legible in raking light. It is how the frieze was found in 1950 and how it is still photographed. The frieze is 2.6 m high and the figures sit at every height on it |
+| b | `b-raked` | Seven figures of the frieze in low sun at seven heights up the wall. Six throw a shadow and are floors; the third throws none and is a drawing. The fourth turns round and walks back to the second with him on it, and lets go of him there. The fifth rises into the overhang, and does not stop | Bas-relief is only legible in raking light. It is how the frieze was found in 1950 and how it is still photographed. The frieze is 2.6 m high and the figures sit at every height on it; the roof of the shelter came down once |
 | c | `c-flat` | Eight more, out of the light, identical marks on the same wall. The first and the last hold. Three were only ever engraved, so there is nothing there to stand on. One lets go a second after he lands on it. One is carved higher than the rest and settles into the river under him. One is polished and slides him back off it | The site carries monumental sculpture and discreet engraving side by side. In flat light the two are the same lines. Carved blocks did come off this wall in the fall that sealed it |
 | d | `d-horns` | Two ibex nose to nose across a gap wider than a running jump. Their horns meet over it, and their horns hold | Eight ibex, the commonest animal of the frieze, including a confronting pair |
 | e | `e-collapse` | The blocks of the roof fall, lying face down in the river margin. Every one settles under a man who stands on it. Above them the five women, at his own height, doing nothing whatever | The rockfall of c. 17,000 BP that ended the occupation and sealed the frieze; the five female figures, life size, waist to knees |
@@ -33,11 +33,13 @@ acknowledgement that the tourist has no business being here at all.
 ## What the level teaches
 
 Level 1 was dark, and everything the tourist could see was lying. This one is lit, and
-the light is the whole story. **In the sun, nothing on this wall changes its mind**: every
-figure that throws a shadow is a ledge, every ledge holds his weight however long he
-stands on it, and the only thing the light adds is how high up the wall each one is
-carved. The climb is honest too: a step up is a hop, a step down is a walk, and every
-edge is visible.
+the light is the whole story. **In the sun, the light says which figures are floors, and
+it is never wrong**: every figure that throws a shadow is a ledge, and the one that
+throws none is a drawing. What the light cannot say is what a ledge does next. One turns
+round and walks him back the way he came, and lets go of him when it gets there. One
+rises under him and keeps rising, into the overhang. Both are floors; neither stays. The
+climb is honest: a step up is a hop, a step down is a walk, every edge is visible, and
+the way past a figure that moves is to leave it the moment you land on it.
 
 Out of the sun the same wall goes flat, and the eight figures in it are eight identical
 drawings. Three are not there. One drops a second after he lands. One stands higher than
@@ -59,6 +61,10 @@ came off seventeen thousand years ago and is leaning where it landed.
   or more.** The frieze is 2.6 m high and its figures do sit at different heights on it;
   this particular climb, and a figure carved a full body height above its neighbours in
   the flat run, are level design.
+- **Two figures in the light move: one walks back along the wall, one rises into the
+  overhang and crushes whoever is still on it.** No figure of the Bourdois frieze has
+  moved since the Magdalenian, and the overhang has come down once, seventeen thousand
+  years ago. Both are level design.
 - **Three figures of the flat run are engraving and five are sculpture, in that order,
   and of the five, one drops, one sinks and one is polished.** The mix of carving and
   engraving is real; the arrangement, the movement and the polish are level design. No

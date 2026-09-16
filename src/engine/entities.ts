@@ -19,7 +19,7 @@ import type {
 } from './level';
 import type { MovingSolid, Player } from './player';
 import { PHYS } from './player';
-import { centerX, centerY, DT, overlaps, type DeathCause, type Rect } from './types';
+import { centerX, centerY, DT, overlaps, TILE, type DeathCause, type Rect } from './types';
 
 export interface World {
   level: Level;
@@ -53,7 +53,7 @@ export function createEntity(def: EntityDef, level: Level): Entity {
     case 'sweep':
       return new Sweep(def);
     case 'crumble':
-      return new Crumble(def);
+      return new Crumble(def, level);
     case 'pusher':
       return new Pusher(def);
     case 'conveyor':
@@ -380,15 +380,21 @@ export class Sweep implements Entity {
 
 export class Crumble implements Entity {
   readonly rect: Rect;
-  state: 'idle' | 'armed' | 'falling' | 'landed' | 'gone' = 'idle';
+  state: 'idle' | 'armed' | 'walking' | 'rising' | 'falling' | 'landed' | 'gone' = 'idle';
+  /** Which way a figure faces. One that walks turns round first. */
+  face: 1 | -1;
   private timer = 0;
   private vy = 0;
   private readonly solid: MovingSolid;
+  /** Where the top of a rising one meets the rock above it. */
+  private readonly roofY: number;
 
-  constructor(readonly def: CrumbleDef) {
+  constructor(readonly def: CrumbleDef, level?: Level) {
     this.rect = { ...def.rect };
+    this.face = def.face ?? 1;
     // Stepping stones can be swum under and past; everything else is solid all round.
     this.solid = { rect: this.rect, dx: 0, dy: 0, oneWay: def.skin === 'stone' };
+    this.roofY = level ? roofAbove(level, this.rect) : 0;
   }
 
   /** How far it has dropped from where it started. */
@@ -414,9 +420,43 @@ export class Crumble implements Entity {
     if (this.state === 'armed') {
       this.timer -= DT;
       if (this.timer <= 0) {
-        this.state = 'falling';
-        w.sound(this.def.skin === 'croc' ? 'splash' : 'crumble');
+        if (this.def.walk) {
+          // It turns round and goes.
+          this.state = 'walking';
+          this.face = this.def.walk.vx < 0 ? -1 : 1;
+        } else if (this.def.riseSpeed !== undefined) {
+          this.state = 'rising';
+        } else {
+          this.state = 'falling';
+          w.sound(this.def.skin === 'croc' ? 'splash' : 'crumble');
+        }
       }
+      return;
+    }
+    if (this.state === 'walking' && this.def.walk) {
+      const { vx, toX } = this.def.walk;
+      const remaining = toX - r.x;
+      const step = Math.sign(remaining) * Math.min(Math.abs(vx) * DT, Math.abs(remaining));
+      r.x += step;
+      this.solid.dx = step;
+      if (Math.abs(toX - r.x) < 0.01) {
+        // Arrived. Whoever is still on it is let go of; otherwise it is a ledge here.
+        if (standing) {
+          this.state = 'falling';
+          w.sound('crumble');
+        } else {
+          this.state = 'landed';
+        }
+      }
+      return;
+    }
+    if (this.state === 'rising' && this.def.riseSpeed !== undefined) {
+      const step = Math.min(this.def.riseSpeed * DT, r.y - this.roofY);
+      r.y -= step;
+      this.solid.dy = -step;
+      // The head room runs out before the figure does.
+      if (standing && r.y - p.h < this.roofY) w.kill(this.def.cause ?? 'The overhang');
+      if (r.y <= this.roofY) this.state = 'landed';
       return;
     }
     // Falling: a crocodile dives at its own pace, a capital drops. You ride it down either way.
@@ -441,6 +481,16 @@ export class Crumble implements Entity {
   solids(): MovingSolid[] {
     return this.state === 'gone' ? [] : [this.solid];
   }
+}
+
+/** The underside of the first solid tile above a rect, over the rect's own width. */
+function roofAbove(level: Level, r: Rect): number {
+  const tx0 = Math.floor(r.x / TILE);
+  const tx1 = Math.floor((r.x + r.w - 1) / TILE);
+  for (let ty = Math.floor(r.y / TILE) - 1; ty >= 0; ty--) {
+    for (let tx = tx0; tx <= tx1; tx++) if (level.isSolid(tx, ty)) return (ty + 1) * TILE;
+  }
+  return 0;
 }
 
 // ---------------------------------------------------------------------------

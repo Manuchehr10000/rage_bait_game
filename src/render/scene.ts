@@ -1787,7 +1787,7 @@ function drawEntityBack(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): voi
         // A figure carved deep enough to be a floor. The rect is its back; the sprite
         // hangs 2 px left of it and starts 2 px above it.
         const raked = s.level.data.decor.some((z) => z.kind === 'raking' && r.x >= z.x0 && r.x < z.x1);
-        drawFigure(ctx, d.figure ?? 'ibex', r.x - 4, r.y - 3, raked, d.face ?? 1);
+        drawFigure(ctx, d.figure ?? 'ibex', r.x - 4, r.y - 3, raked, (e as Crumble).face);
       } else if (d.skin === 'horns') {
         // Two horns reaching out from the animals on either side, meeting over the gap.
         const horn = frameOf('ibex-horn', 0, IBEX_HORN_SPRITE);

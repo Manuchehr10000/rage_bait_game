@@ -2,11 +2,12 @@ import { expect, test, type Page } from '@playwright/test';
 
 /**
  * Scripted playthroughs of Roc-aux-Sorciers, the second level of the game. The
- * contract here: in the raking light the wall is honest, every figure holds and
- * the only thing that changes is how high up it is carved. Out of the light the
- * figures are drawn the same and are not: three are engraving, one lets go, one
- * settles into the river, one is polished. Every death is the light or the
- * player, and the second attempt knows exactly where.
+ * contract here: in the raking light the wall tells you which figures are floors
+ * and is never wrong, but not what a floor does next: one walks back the way you
+ * came and one rises into the overhang. Out of the light the figures are drawn
+ * the same and are not: three are engraving, one lets go, one settles into the
+ * river, one is polished. Every death is the light or the player, and the second
+ * attempt knows exactly where.
  */
 
 interface Snap {
@@ -40,11 +41,14 @@ const DRIVER = `
   const onPolished = (r) => r.x >= polished.def.rect.x && r.x < polished.def.rect.x + polished.def.rect.w;
   /** The figures that stay where they are carved and let you stay on them. */
   const stable = carved.filter((c) => !c.def.fake && !onPolished(c.rect));
-  /** The one that drops a second after you land, and the one that settles into the river as you do. */
-  const letsGo = carved.find((c) => c.def.fake && c.def.sinkSpeed === undefined);
+  /** In the light: the one that walks back to the second, and the one that rises. */
+  const walks = carved.find((c) => c.def.walk !== undefined);
+  const rises = carved.find((c) => c.def.riseSpeed !== undefined);
+  /** Out of it: the one that drops a second after you land, and the one that settles into the river as you do. */
+  const letsGo = carved.find((c) => c.def.fake && c.def.sinkSpeed === undefined && !c.def.walk && c.def.riseSpeed === undefined);
   const settles = carved.find((c) => c.def.fake && c.def.sinkSpeed !== undefined);
-  /** The three that were only ever engraved: decor, and nothing to stand on. */
-  const engraved = g.level.data.decor.filter((d) => d.kind === 'engraving');
+  /** The three of the flat run that were only ever engraved: decor, and nothing to stand on. */
+  const engraved = g.level.data.decor.filter((d) => d.kind === 'engraving' && d.x > raking.x1);
   const blocks = E.filter((e) => e.def.kind === 'crumble' && e.def.skin === 'fallenBlock');
   const horns = E.find((e) => e.def.kind === 'crumble' && e.def.skin === 'horns');
   /** The block in Cave Taillebourg that is leaning, not attached. */
@@ -55,6 +59,8 @@ const DRIVER = `
   const standOn = (r) => { p.spawnAt(r.x + 9, r.y - 16); g.camera.x = r.x - 120; };
   /** The carved figure the tourist is over, if any. */
   const under = () => carved.map((c) => c.rect).find((r) => p.x + 5 >= r.x - 1 && p.x + 5 <= r.x + r.w);
+  /** Whether that figure is one that moves the moment you stand on it. */
+  const moves = (r) => carved.some((c) => c.rect === r && (c.def.walk || c.def.riseSpeed !== undefined));
   let phase = 'bank';
   let tick = 0;
   const run = (step, maxTicks) => {
@@ -89,6 +95,9 @@ const DRIVER = `
     if (!next) return;
     const gap = next.x - (u.x + u.w);
     const up = next.y < u.y;
+    // A figure that moves is left the moment you land on it: a hop if the next is
+    // up or across a gap, a walk straight off the end if it is down and a stride away.
+    if (moves(u)) { if (up || gap > 16) jump(gap > 16 ? 18 : 6); return; }
     if (right() < u.x + u.w - 6) return;
     // A step up across a stride is a hop, not a jump: a full jump carries 60 px and overshoots the next back.
     if (up && gap <= 16) jump(6);
@@ -142,24 +151,74 @@ test('the headlamp stays off through the whole sunlit half and comes on at the c
   expect(cave.lamp).toBe(true);
 });
 
-test('every figure in the raking light throws a shadow, every one of them holds, and they climb the wall', async ({ page }) => {
-  const r = await page.evaluate(`(() => { ${DRIVER}
+test('the raked run is, in order: holds, holds, gone, walks, rises, holds, holds, and it climbs the wall', async ({ page }) => {
+  const r = (await page.evaluate(`(() => { ${DRIVER}
     const inRaking = carved.filter((c) => c.rect.x >= raking.x0 && c.rect.x < raking.x1);
     const shaded = g.level.data.decor.filter((d) => d.kind === 'engraving' && d.x >= raking.x0 && d.x < raking.x1);
-    const heights = inRaking.map((c) => c.rect.y);
-    return {
-      lit: inRaking.length,
-      engravedInTheLight: shaded.length,
-      anyFake: inRaking.some((c) => c.def.fake),
-      anyPolished: inRaking.some((c) => onPolished(c.rect)),
-      levels: new Set(heights).size,
-      span: Math.max(...heights) - Math.min(...heights),
-    };
-  })()`);
-  expect(r).toEqual({ lit: 7, engravedInTheLight: 0, anyFake: false, anyPolished: false, levels: 6, span: 40 });
+    const all = [...inRaking.map((c) => ({ x: c.rect.x, y: c.rect.y, what: c.def.walk ? 'walks' : c.def.riseSpeed !== undefined ? 'rises' : c.def.fake ? 'gives' : onPolished(c.rect) ? 'polished' : 'holds' })),
+      ...shaded.map((d) => ({ x: d.x + 4, y: d.y + 3, what: 'gone' }))].sort((a, b) => a.x - b.x);
+    const heights = all.map((f) => f.y);
+    return { order: all.map((f) => f.what), pitch: [...new Set(all.slice(1).map((f, i) => f.x - all[i].x))], levels: new Set(heights).size, span: Math.max(...heights) - Math.min(...heights) };
+  })()`)) as { order: string[]; pitch: number[]; levels: number; span: number };
+  expect(r.order).toEqual(['holds', 'holds', 'gone', 'walks', 'rises', 'holds', 'holds']);
+  expect(r.pitch).toEqual([36]);
+  expect(r.levels).toBe(6);
+  expect(r.span).toBe(40);
 });
 
-test('the climb through the light is walked and hopped, never fallen from', async ({ page }) => {
+test('the fourth turns round, walks back to the second, and lets go of whoever is still on it', async ({ page }) => {
+  const r = await play(page, `
+    const faceBefore = walks.face;
+    standOn(walks.rect);
+    const step = () => { key('ArrowRight', false); if (walks.state === 'walking' && walks.face !== faceBefore) phase = 'turned'; };`, 60 * 8);
+  expect(r.phase).toBe('turned');
+  expect(r.cause).toBe('The Anglin');
+  // Let go of at the second figure's side, forty-four pixels back from where it was carved.
+  const second = (await page.evaluate(`(() => { ${DRIVER} return stable[1].rect; })()`)) as { x: number; w: number };
+  expect(r.x).toBeGreaterThanOrEqual(second.x + second.w - 2);
+  expect(r.x).toBeLessThan(second.x + second.w + 30);
+  expect(r.tick).toBeGreaterThan(50);
+});
+
+test('the fourth, walked back without you, stays at the second and is a ledge there', async ({ page }) => {
+  const r = await play(page, `
+    standOn(walks.rect);
+    let left = false;
+    const step = (i) => {
+      // One step onto it, then straight back off to the left, onto the second.
+      if (i < 4) key('ArrowRight', false);
+      else if (!left) { key('ArrowLeft', true); if (canJump()) { jump(); left = true; } }
+      else if (p.onGround && p.x < walks.rect.x - 4) key('ArrowLeft', false);
+      if (walks.state === 'landed') phase = 'parked at ' + walks.rect.x;
+    };`, 60 * 8);
+  expect(r.state).toBe('playing');
+  expect(r.total).toBe(0);
+  expect(r.phase).toBe('parked at ' + 400);
+});
+
+test('the fifth rises, and whoever is still on it when the head room runs out is crushed', async ({ page }) => {
+  const r = await play(page, `
+    const startY = rises.rect.y;
+    standOn(rises.rect);
+    const step = () => { key('ArrowRight', false); if (rises.state === 'rising' && rises.rect.y < startY - 8) phase = 'going up'; };`, 60 * 8);
+  expect(r.phase).toBe('going up');
+  expect(r.cause).toBe('The overhang');
+  expect(r.tick).toBeGreaterThan(60);
+  expect(r.tick).toBeLessThan(60 * 3);
+  // Left alone, it stops under the overhang and stays there.
+  const parked = await play(page, `
+    const sixth = stable.find((c) => c.rect.x > rises.rect.x).rect;
+    standOn(rises.rect);
+    const step = (i) => {
+      // Walk straight off it onto the sixth, and stop there.
+      key('ArrowRight', i >= 2 && !(p.onGround && p.x >= sixth.x));
+      if (rises.state === 'landed') phase = 'parked at ' + rises.rect.y;
+    };`, 60 * 8);
+  expect(parked.state).toBe('playing');
+  expect(parked.phase).toBe('parked at ' + 96);
+});
+
+test('the climb through the light is walked, hopped, and left the moment it moves, never fallen from', async ({ page }) => {
   const r = await play(page, `
     standOn(carved[0].rect);
     const end = carved.find((c) => c.rect.x >= raking.x1).rect;

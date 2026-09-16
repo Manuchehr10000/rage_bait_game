@@ -125,6 +125,17 @@ export interface CrumbleDef {
   floorY?: number;
   /** Whoever is still riding it when it lands dies of this. */
   cause?: DeathCause;
+  /**
+   * Once stood on, it turns round and walks along the wall at `vx` px/s until its
+   * left edge is at `toX`. Whoever is still on it when it gets there is let go of;
+   * if nobody is, it stays where it stopped and is a ledge there.
+   */
+  walk?: { vx: number; toX: number };
+  /**
+   * Once stood on, it rises at this many px/s until it meets whatever is above
+   * it. Whoever is still on it when the head room runs out dies of `cause`.
+   */
+  riseSpeed?: number;
 }
 
 /**

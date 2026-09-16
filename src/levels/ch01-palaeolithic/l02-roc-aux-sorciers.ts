@@ -14,9 +14,12 @@ import { TILE, type DeathCause } from '../../engine/types';
  *
  *   0..19   the bank of the Anglin at the foot of the cliff, and the gate of 1955
  *  20..     the river. From here the wall is the only way along
- *  21..36   the frieze in raking light: seven figures, all of them carved deep,
- *             all of them throwing a shadow, at seven heights up the wall. This
- *             is the tutorial for the trick, and for the climb
+ *  21..36   the frieze in raking light: seven figures at seven heights up the
+ *             wall. Six are carved deep and throw a shadow; one is engraved and
+ *             throws none. The light says which are floors, and it is right every
+ *             time. What it cannot say is what a floor does next: the fourth turns
+ *             round and walks back to the second, and the fifth rises into the
+ *             overhang
  *  39..56   the frieze in flat light: eight figures, identically drawn. The first
  *             and the last hold. Three were only ever engraved. One lets go a
  *             second after you land. One stands higher than the rest and settles
@@ -82,17 +85,33 @@ interface FriezeFigure {
   gives?: { delay: number; sinkSpeed?: number };
   /** Polished. It holds your weight and nothing else: whoever stands on it slides back off it. */
   polished?: boolean;
+  /**
+   * A carving that turns round and walks back along the wall at `vx` px/s the
+   * moment you stand on it, until its left edge is at `toX`. If you are still on
+   * it when it gets there it lets go of you; if you are not, it stays there.
+   */
+  walks?: { vx: number; toX: number };
+  /** A carving that rises at this many px/s from the moment you stand on it, until the overhang. */
+  rises?: number;
 }
 const FRIEZE: FriezeFigure[] = [
-  // In the raking light. All seven are sculpture, and all seven say so. They climb
-  // and drop along the wall, which is the one thing about the frieze the light
-  // does not need to tell you.
+  // In the raking light. The light says which of the seven are floors, and it is
+  // never wrong: six throw a shadow and hold your weight, the third throws none and
+  // is a drawing. What the light cannot tell you is what a floor does next.
+  //  1  sculpture. It holds.
   { x: 336, y: 208, figure: 'ibex', cut: 'deep' },
+  //  2  sculpture. It holds.
   { x: 372, y: 192, figure: 'horse', cut: 'deep', face: -1 },
-  { x: 408, y: 176, figure: 'bison', cut: 'deep' },
-  { x: 444, y: 200, figure: 'ibex', cut: 'deep' },
-  { x: 480, y: 184, figure: 'ibex', cut: 'deep', face: -1 },
+  //  3  engraving. No shadow, and nothing there.
+  { x: 408, y: 176, figure: 'bison', cut: 'line' },
+  //  4  sculpture. Stand on it and it turns round and walks back to the second,
+  //     and lets go of whoever is still on it when it gets there.
+  { x: 444, y: 200, figure: 'ibex', cut: 'deep', walks: { vx: -40, toX: 372 + 28 } },
+  //  5  sculpture. Stand on it and it rises, and keeps rising, into the overhang.
+  { x: 480, y: 184, figure: 'ibex', cut: 'deep', face: -1, rises: 40 },
+  //  6  sculpture. It holds.
   { x: 516, y: 216, figure: 'horse', cut: 'deep' },
+  //  7  sculpture. It holds.
   { x: 552, y: 192, figure: 'bison', cut: 'deep' },
   // Out of it. Eight figures, drawn like the seven before them, and only the
   // first and the last are what they look like.
@@ -174,18 +193,21 @@ export const ROC_AUX_SORCIERS: LevelData = {
   entities: [
     // The Anglin. It runs under the whole of the frieze, and it is a metre and a half deep.
     { kind: 'water', x0: BANK_X1, x1: CAVE_X0, startY: WATER_Y, cause: 'The Anglin' },
-    // Every figure carved deep enough to stand on. In the light, none of them
-    // ever gives way. Out of it, two of them do: one drops after a second, one
-    // settles into the river as soon as it is stood on.
+    // Every figure carved deep enough to stand on. Four of them do not stay
+    // where they are carved: in the light one walks and one rises, out of it one
+    // drops after a second and one settles into the river.
     ...FRIEZE.filter((f) => f.cut === 'deep').map((f) => ({
       kind: 'crumble' as const,
       skin: 'relief' as const,
       figure: f.figure,
       face: f.face,
       rect: { x: f.x, y: f.y, w: 28, h: 6 },
-      fake: f.gives !== undefined,
+      fake: f.gives !== undefined || f.walks !== undefined || f.rises !== undefined,
       delay: f.gives?.delay ?? 0,
       sinkSpeed: f.gives?.sinkSpeed,
+      walk: f.walks,
+      riseSpeed: f.rises,
+      cause: f.rises !== undefined ? ('The overhang' as const) : undefined,
     })),
     // The polished one. It is a ledge like the others and it holds. It is just
     // that nobody stays on it: it slides you back off the way you came, onto the
