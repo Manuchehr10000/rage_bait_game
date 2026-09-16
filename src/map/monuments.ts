@@ -25,7 +25,7 @@ export type MonumentId =
   | 'conical-tower'
   | 'iwan'
   | 'iron-bridge'
-  | 'three-masts';
+  | 'martello';
 
 /** The box every monument is authored in. */
 export const ART_W = 100;
@@ -407,39 +407,34 @@ const DRAW: Record<MonumentId, Draw> = {
   },
 
   /**
-   * Chapter 12 — HMS Victory. A first rate of 1765: three masts, three gun decks
-   * and the black-and-yellow chequer Nelson had her painted in, which is why the
-   * gunports show as squares along the side.
+   * Chapter 12 — a Martello tower. A hundred and three of them went up along the
+   * south and east coasts against an invasion that never came: a squat brick drum,
+   * wider than it is tall, battered inward, with a cordon under the parapet, one
+   * traversing gun on the roof and a door on the first floor with nothing under it
+   * but a ladder somebody could pull up.
    */
-  'three-masts': (ctx, ink, paper) => {
-    // Masts and yards first, so the hull sits over their heels.
-    const mast = (cx: number, top: number, yards: [number, number][]): void => {
-      poly(ctx, ink, [[cx - 1.6, 56], [cx - 1, top], [cx + 1, top], [cx + 1.6, 56]]);
-      for (const [y, half] of yards) box(ctx, ink, cx - half, y, half * 2, 1.4);
-    };
-    mast(28, 14, [[20, 11], [30, 13], [40, 14]]);
-    mast(52, 4, [[10, 13], [21, 15], [33, 16]]);
-    mast(75, 16, [[22, 10], [32, 12], [42, 12]]);
-    // Bowsprit.
-    ctx.save();
-    ctx.translate(88, 52);
-    ctx.rotate(-0.42);
-    box(ctx, ink, 0, -1.4, 20, 2.8);
-    ctx.restore();
-    // Hull, with the sheer rising fore and aft.
-    ctx.fillStyle = ink;
-    ctx.beginPath();
-    ctx.moveTo(8, 48);
-    ctx.quadraticCurveTo(50, 55, 92, 47);
-    ctx.lineTo(86, 68);
-    ctx.quadraticCurveTo(50, 73, 14, 67);
-    ctx.closePath();
-    ctx.fill();
-    // Two pale strakes: the chequer, and the gunports in it.
-    for (const [y, h] of [[54, 3.2], [61, 3.2]] as [number, number][]) {
-      box(ctx, paper, 15, y, 70, h);
-      for (let x = 18; x < 84; x += 8) box(ctx, ink, x, y, 3.4, h);
-    }
-    box(ctx, ink, 0, 68, 100, 8);
+  martello: (ctx, ink, paper) => {
+    // The shingle, falling away to the right along the chain.
+    poly(ctx, ink, [[0, 76], [0, 71], [46, 70], [78, 67], [100, 66], [100, 76]]);
+
+    // The near tower: wider than it is tall, and battered inward all the way up.
+    poly(ctx, ink, [[10, 70], [15, 35], [65, 35], [70, 70]]);
+    // The cordon, a shallow ring under the parapet.
+    box(ctx, ink, 12, 32, 56, 3.5);
+    // The parapet: a low straight wall, not a roof.
+    box(ctx, ink, 15, 26, 50, 6);
+    // One gun on the roof, traversing, laid out to sea. Its barrel is drawn
+    // longer than a 24-pounder's really was: at this size the true length is a
+    // nub, and a tower with no gun on it is just a drum.
+    box(ctx, ink, 34, 21, 14, 5);
+    poly(ctx, ink, [[44, 25], [44, 19.5], [25, 15.5], [25, 19]]);
+    // The door, on the first floor, with nothing under it but a ladder.
+    box(ctx, paper, 50, 45, 6, 11);
+    disc(ctx, paper, 53, 45, 3);
+
+    // The next one along the chain. They were spaced so their guns overlapped.
+    poly(ctx, ink, [[81, 66], [83, 51], [94, 51], [96, 66]]);
+    box(ctx, ink, 82, 49, 13, 2.5);
+    box(ctx, ink, 83.5, 45, 10, 4);
   },
 };

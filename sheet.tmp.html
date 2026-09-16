@@ -1,0 +1,13 @@
+<!doctype html><meta charset=utf-8><body style="margin:0;background:#e6d8b4">
+<canvas id=sheet></canvas>
+<script type="module">
+import { drawMonument } from '/src/map/monuments.ts';
+const ids=['martello'];
+const S=8,W=92,H=70;
+const c=document.getElementById('sheet');
+c.width=W*S; c.height=H*S;
+const x=c.getContext('2d'); x.scale(S,S);
+x.fillStyle='#e6d8b4'; x.fillRect(0,0,c.width,c.height);
+ids.forEach((id,i)=>drawMonument(x,id,0,0,W,H,'#2b2116','#e6d8b4'));
+window.ready=true;
+</script>

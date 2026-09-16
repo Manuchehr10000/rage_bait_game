@@ -221,7 +221,7 @@ export const CHAPTERS: Chapter[] = [
     dates: '1796–1815',
     anchor: 2,
     badge: { dx: 10, dy: -4 },
-    monument: { site: 4, art: 'three-masts' },
+    monument: { site: 0, art: 'martello' },
     sites: [
       { name: 'Martello Towers', lat: 51.02, lon: 1.0 },
       { name: 'Simplon Pass', lat: 46.25, lon: 8.03 },
