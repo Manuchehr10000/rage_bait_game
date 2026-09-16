@@ -27,7 +27,7 @@ import { VIEW_H, VIEW_W } from '../engine/types';
 import { blitFacing } from '../render/frame';
 import { tourist } from '../render/scene';
 import { CHAPTERS, chapterMonumentSite, chapterOpen, monumentArtId, type Chapter } from './atlas';
-import { LAND, RIVERS } from './geo';
+import { LAKES, LAND, RIVERS, type Polygon } from './geo';
 import { ART_H, ART_W, drawMonument } from './monuments';
 
 export type MapView = 'world' | 'chapter';
@@ -575,33 +575,42 @@ function drawLand(ctx: CanvasRenderingContext2D, proj: Projection): void {
   ctx.beginPath();
   ctx.rect(MAP.x + 3, MAP.y + 3, MAP.w - 6, MAP.h - 6);
   ctx.clip();
+  ctx.lineJoin = 'round';
+  ctx.lineWidth = 0.5;
+  // Every coastline in one path, so the fill and the line are laid down once
+  // rather than once per island. A hairline at this many points is what a
+  // brochure prints: the shape does the work, not the weight of the ink.
   ctx.fillStyle = LAND_FILL;
   ctx.strokeStyle = LAND_LINE;
-  ctx.lineWidth = 0.7;
-  ctx.lineJoin = 'round';
-  for (const poly of LAND) {
-    ctx.beginPath();
-    poly.forEach(([lon, lat], i) => {
-      const p = proj(lon, lat);
-      if (i === 0) ctx.moveTo(p.x, p.y);
-      else ctx.lineTo(p.x, p.y);
-    });
-    ctx.closePath();
-    ctx.fill();
-    ctx.stroke();
-  }
+  ctx.beginPath();
+  trace(ctx, LAND, proj, true);
+  ctx.fill();
+  ctx.stroke();
+  // Inland water, in the sea's colour, over the land it sits in.
+  ctx.fillStyle = PAPER;
+  ctx.strokeStyle = '#7d93a0';
+  ctx.beginPath();
+  trace(ctx, LAKES, proj, true);
+  ctx.fill();
+  ctx.stroke();
   ctx.strokeStyle = '#6f8fa0';
-  ctx.lineWidth = 0.8;
-  for (const river of RIVERS) {
-    ctx.beginPath();
-    river.forEach(([lon, lat], i) => {
+  ctx.lineWidth = 0.7;
+  ctx.beginPath();
+  trace(ctx, RIVERS, proj, false);
+  ctx.stroke();
+  ctx.restore();
+}
+
+/** Lay a list of rings into the current path. */
+function trace(ctx: CanvasRenderingContext2D, rings: Polygon[], proj: Projection, close: boolean): void {
+  for (const ring of rings) {
+    ring.forEach(([lon, lat], i) => {
       const p = proj(lon, lat);
       if (i === 0) ctx.moveTo(p.x, p.y);
       else ctx.lineTo(p.x, p.y);
     });
-    ctx.stroke();
+    if (close) ctx.closePath();
   }
-  ctx.restore();
 }
 
 function drawCompass(ctx: CanvasRenderingContext2D, x: number, y: number): void {

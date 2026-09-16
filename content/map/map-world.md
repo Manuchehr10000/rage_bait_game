@@ -10,8 +10,8 @@
 ## What it is
 
 The whole tour on one sheet, the way a brochure draws the world: parchment paper,
-coastlines in a warm line, land a shade darker than the sea, a compass rose in an empty
-ocean. Longitude −115 to 150 across the width, latitude 65 down to −40 across the
+coastlines in a warm line, land a shade darker than the sea, inland water in the sea's
+colour, a compass rose in an empty ocean. Longitude −115 to 150 across the width, latitude 65 down to −40 across the
 height, equirectangular. No badges, no route, no words; the game draws those on top.
 
 It occupies the left two thirds of the screen: the right third is the chapter panel and
@@ -29,8 +29,13 @@ from the previous chapter to the selected one. There is no route through all twe
 ## Must be right
 
 - Coastlines recognisable at a glance: the Mediterranean, the Nile delta, Britain,
-  Japan, the Yucatán, Sri Lanka, Java, Madagascar. Every site in `src/map/atlas.ts`
-  must fall on land.
+  Japan, the Yucatán, Sri Lanka, Java, Madagascar. The game's own coastlines now come
+  from Natural Earth by way of `tools/build-coastlines.mjs`, so a painting has a true
+  outline to trace rather than a guess.
+- Every site in `src/map/atlas.ts` falls on land. The generator checks this and fails
+  the build if a site is more than 5 km out to sea. Three sit on the waterline inside
+  that: Kilwa Kisiwani (3.1 km), HMS Victory (2.5 km, it is a ship in a dry dock) and
+  Songo Mnara (1.1 km). On this sheet that is a fortieth of a pixel.
 - The frame. If the projection is changed, the badges will land in the sea.
 - The size. It fills the map box only, 208 × 152, not the whole screen.
 

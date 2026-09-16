@@ -22,7 +22,8 @@ map box on the left of the screen.
 
 ## Must be right
 
-- The Nile's course and the position of Lake Nasser.
+- The Nile's course and the position of Lake Nasser. The game draws both from the
+  survey now, so there is a true line to paint over.
 - Abu Simbel and Philae drawn where they are now, on the lake shore and on Agilkia,
   not where they were built. The chapter gag depends on the coordinates being honest.
 - The frame: ask for the exact longitude and latitude bounds before painting; they

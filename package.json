@@ -9,6 +9,7 @@
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "assets:check": "node tools/check-assets.mjs",
+    "map:coastlines": "node tools/build-coastlines.mjs",
     "test": "playwright test"
   },
   "devDependencies": {

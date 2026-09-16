@@ -28,14 +28,22 @@ Ids: `map-world` for the world, `map-chNN-slug` for each chapter (`map-ch02-egyp
 `map-ch01-palaeolithic`, ...). Only the world and the built chapters are listed in
 `assets.json`; add an entry when a chapter gets its first level.
 
+The land the game draws underneath is not a guess. `src/map/geo.ts` is generated from
+Natural Earth, which is public domain, by `npm run map:coastlines` — coastlines at
+1:10m, lakes and the Nile at 1:50m, simplified hard in the open ocean and barely at all
+within two and a half degrees of a site, because a chapter map draws the same data
+twenty to fifty times larger. Do not edit that file by hand; run the tool, whose header
+says where to get the source layers.
+
 Positions come from real latitude and longitude in `src/map/atlas.ts`, projected the
 brochure way (equirectangular). The world map's frame is longitude −115 to 150 and
 latitude 65 to −40, drawn into the 208 × 152 map box. A chapter map is fitted to its
 five sites with a margin; ask for the exact frame before painting one, since it depends
 on the site coordinates.
 
-What must be right: coastlines, the Nile, and nothing else. What is deliberately wrong:
-everything a brochure gets wrong: scale, the vignettes, the cheerful colour.
+What must be right: coastlines, the lakes, the Nile, and nothing else. What is
+deliberately wrong: everything a brochure gets wrong: scale, the vignettes, the
+cheerful colour.
 
 Note that a chapter whose sites sit close together — chapter 1's four caves are inside
 sixty kilometres of each other — gets a map that is mostly empty, and that is correct.
