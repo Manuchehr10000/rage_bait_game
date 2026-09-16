@@ -77,6 +77,21 @@ jobs:
               ;;
           esac
 
+          # Listing projects only needs Pages Read. The deploy needs Pages Edit,
+          # and the two are a permission apart, so ask for the thing the deploy
+          # actually asks for and print what Cloudflare says when it says no.
+          token=$(curl -sS -X POST -w '\n%{http_code}' -H "Authorization: Bearer $CF_TOKEN" \
+            "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT/pages/projects/lost-tourist/upload-token")
+          code=$(echo "$token" | tail -1)
+          echo "request an upload token (needs Pages Edit): HTTP $code"
+          if [ "$code" != "200" ]; then
+            echo "Cloudflare said:"
+            echo "$token" | head -n -1 | head -c 800
+            echo
+            echo "::error::The token can read this account's Pages projects but cannot deploy to them, so it has Cloudflare Pages: Read where it needs Edit. Either the permission was not changed, or a new token was issued and the CLOUDFLARE_API_TOKEN secret still holds the old one."
+            exit 1
+          fi
+
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
         with:
