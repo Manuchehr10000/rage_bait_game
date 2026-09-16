@@ -230,3 +230,50 @@ test('a chapter whose every built level is cleared opens on its first site', asy
   expect(s.chapter).toBe(0);
   expect(s.site).toBe(0);
 });
+
+test('nothing printed on the map is ever standing where the tourist is', async ({ page }) => {
+  const clashes = await page.evaluate(() => {
+    type Rect = { x: number; y: number; w: number; h: number };
+    const g = (
+      window as unknown as {
+        __game: {
+          mapScreen: {
+            view: string;
+            chapter: number;
+            site: number;
+            current: { sites: unknown[] };
+            openChapter(i: number): void;
+            openWorld(): void;
+            touristRect(): Rect;
+            wordRects(): Rect[];
+          };
+        };
+      }
+    ).__game;
+    const m = g.mapScreen;
+    const hits = (a: Rect, b: Rect) => a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
+    const bad: string[] = [];
+    const check = (where: string) => {
+      const t = m.touristRect();
+      for (const r of m.wordRects()) if (hits(t, r)) bad.push(where);
+    };
+    m.openWorld();
+    for (let c = 0; c < 12; c++) {
+      m.chapter = c;
+      check(`world, chapter ${c + 1}`);
+    }
+    for (let c = 0; c < 12; c++) {
+      m.openChapter(c);
+      m.view = 'chapter';
+      m.chapter = c;
+      for (let i = 0; i < m.current.sites.length; i++) {
+        m.site = i;
+        check(`chapter ${c + 1}, site ${i + 1}`);
+      }
+    }
+    m.openWorld();
+    m.chapter = 0;
+    return bad;
+  });
+  expect(clashes).toEqual([]);
+});

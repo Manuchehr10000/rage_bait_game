@@ -3,7 +3,12 @@
 The start screen. One sheet, three instruments, and each of them answers exactly one
 question:
 
-- **the map**, left, 208 × 152 world px: *where on Earth*. Paper, land, one marker per
+- **the map**, left, 208 × 152 world px: *where on Earth*. The title and the chapter
+  header both sit in its bottom left corner, and the compass rose is out in the Indian
+  Ocean, because the tourist stands on the selected marker with his head a good deal
+  above it and the top left of a world map is the North Sea, which is where chapter 1
+  puts him. A test walks all twelve chapters and all sixty sites and fails if anything
+  printed on the map ends up where he is standing. Paper, land, one marker per
   stop. Nothing else. There is no route drawn through the chapters, because the tour's
   order is chronological and the map's order is geographical: France, Egypt, the Aegean,
   Persia, Italy, Mexico, Cambodia, Japan, Zimbabwe, Samarkand, England, France. A line

@@ -47,6 +47,16 @@ const LAND_LINE = '#8a7250';
 const MAP = { x: 0, y: 0, w: 208, h: 152 };
 const PANEL = { x: 208, y: 0, w: VIEW_W - 208, h: 152 };
 const RIBBON = { y: 152, h: VIEW_H - 152, rule: 166 };
+/**
+ * Where the words sit on the map, and how much room they take. The tourist
+ * stands on the selected marker and is drawn a head above it, so anything
+ * printed on the map has to keep out of his way: the title used to be top left,
+ * which is the North Sea, which is where chapter 1 puts him. These two boxes are
+ * the reserved area, and a test walks every chapter and every site to check
+ * nothing ever stands in them.
+ */
+const TITLE = { x: 6, y: 126, w: 116, h: 21 };
+const HEADER = { x: 6, y: 128, w: 152, h: 19 };
 
 /** The world map's frame in degrees. Equirectangular, which is what brochures use. */
 const WORLD = { lon0: -115, lon1: 150, lat0: 65, lat1: -40 };
@@ -269,7 +279,8 @@ export class MapScreen {
     if (!paint(ctx, 'map-world', MAP.x, MAP.y)) {
       drawPaper(ctx);
       drawLand(ctx, worldProject);
-      drawCompass(ctx, 26, 122);
+      // In the Indian Ocean: the bottom left corner is the title's now.
+      drawCompass(ctx, 158, 112);
     }
     // At most one leg: where you came from, to where you are standing.
     this.drawLeg(ctx, this.chapter > 0 ? this.worldBadge(this.chapter - 1) : null, this.worldBadge(this.chapter));
@@ -352,6 +363,17 @@ export class MapScreen {
     const f = tourist(this.current.costume ?? 'hiker', 'idle');
     const bob = Math.round(Math.sin(this.t * 3) * 1);
     blitFacing(ctx, f, at.x - 6, at.y - 22 + bob, 1);
+  }
+
+  /** Where the tourist stands, bob included, so the words can keep clear of him. */
+  touristRect(): { x: number; y: number; w: number; h: number } {
+    const at = this.view === 'world' ? this.worldBadge(this.chapter) : this.sitePin(this.site);
+    return { x: at.x - 6, y: at.y - 23, w: 12, h: 18 };
+  }
+
+  /** The words printed on the map, as rectangles. For the test that keeps them apart. */
+  wordRects(): { x: number; y: number; w: number; h: number }[] {
+    return [this.view === 'world' ? TITLE : HEADER];
   }
 
   // -------------------------------------------------------------------
@@ -458,7 +480,7 @@ export class MapScreen {
     ctx.textAlign = 'left';
 
     if (this.view === 'world') {
-      labelBox(ctx, s, 6, 6, [
+      labelBox(ctx, s, TITLE.x, TITLE.y, [
         { text: 'LOST TOURIST', font: `bold ${7 * s}px ${FONT}`, color: INK },
         { text: 'A guided tour in twelve chapters', font: `italic ${5 * s}px ${FONT}`, color: INK_SOFT },
       ]);
@@ -477,7 +499,7 @@ export class MapScreen {
       ctx.fillStyle = INK_SOFT;
       ctx.fillText(c.dates, px, 34 * s);
     } else {
-      labelBox(ctx, s, 6, 6, [
+      labelBox(ctx, s, HEADER.x, HEADER.y, [
         { text: `CHAPTER ${c.number} · ${c.name.toUpperCase()}`, font: `bold ${6 * s}px ${FONT}`, color: INK },
         { text: c.dates, font: `italic ${5 * s}px ${FONT}`, color: INK_SOFT },
       ]);
