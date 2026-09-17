@@ -4,11 +4,16 @@
  * Rules from PILLARS.md: a death sounds like what caused it, never like a jingle,
  * and the music and the wind never pause or react.
  *
- * There are two pieces of music. `tour` is what plays inside a level. `map` is the
- * brochure's own waltz, and it is the only cheerful thing in the game. Neither
- * knows how many times you have died. Switching screens cross-fades between them
- * and neither one restarts: whichever track you were not listening to kept
- * playing, and comes back exactly where it would have got to.
+ * One piece of music per chapter, plus the map's. `map` is the brochure's own
+ * waltz and the only cheerful thing in the game. `ch01` is a bone pipe in a cave.
+ * `ch02` is the double harmonic everyone hears as Egypt. None of them knows how
+ * many times you have died. Switching cross-fades between them and nothing
+ * restarts: whichever track you were not listening to kept playing, and comes
+ * back exactly where it would have got to.
+ *
+ * Chapter 1 also has a room. The reverb is generated, not loaded — a burst of
+ * noise with a decay on it, which is what an impulse response is — and the
+ * length of it is set by the level: a cliff shelter is nearly dry, Gargas is not.
  */
 
 export type Sfx =
@@ -37,8 +42,14 @@ export type Sfx =
   | 'thud'
   | 'click';
 
-/** `tour` plays in a level, `map` on the tour map. */
-export type MusicId = 'map' | 'tour';
+/** One per chapter, plus the tour map's own. */
+export type MusicId = 'map' | 'ch01' | 'ch02';
+
+/**
+ * How much space the level's music is played in. Set from the level's theme by
+ * the game; today only Chapter 1's pipe listens to it.
+ */
+export type Room = 'open' | 'chamber' | 'deep';
 
 const MUTE_KEY = 'lostTourist.muted';
 
@@ -56,9 +67,14 @@ export class GameAudio {
   /** One gain per track, so one can fade out under the other without stopping. */
   private music: Partial<Record<MusicId, GainNode>> = {};
   /** How far each track has got: when its next step falls, and which step it is. */
-  private nextNote: Record<MusicId, number> = { map: 0, tour: 0 };
-  private noteIndex: Record<MusicId, number> = { map: 0, tour: 0 };
-  private track: MusicId = 'tour';
+  private nextNote: Record<MusicId, number> = { map: 0, ch01: 0, ch02: 0 };
+  private noteIndex: Record<MusicId, number> = { map: 0, ch01: 0, ch02: 0 };
+  private track: MusicId = 'ch02';
+  /** The cave. Only Chapter 1 is routed through it. */
+  private reverb: ConvolverNode | null = null;
+  private wet: GainNode | null = null;
+  private room: Room = 'open';
+  private impulses = new Map<Room, AudioBuffer>();
 
   get isMuted(): boolean {
     return this.muted;
@@ -93,25 +109,27 @@ export class GameAudio {
 
   /**
    * Call once per frame; keeps the music scheduled a little ahead of real time.
-   * Both tracks are always scheduled, whichever one you can hear. That is what
+   * Every track is always scheduled, whichever one you can hear. That is what
    * makes the switch sound like a door opening rather than a tape starting: the
    * waltz you come back to is where it would have been if you had stayed.
+   *
+   * Each step says how long it is. The two written on a grid always answer with
+   * the same number; the pipe answers with the length of the note it just
+   * played, which is how a piece with no bar lines is scheduled at all.
    */
   update(): void {
     const ctx = this.ctx;
     if (!ctx) return;
     for (const id of MUSIC_IDS) {
-      const { step, length } = TRACKS[id];
       while (this.nextNote[id] < ctx.currentTime + 0.3) {
-        if (id === 'map') this.scheduleMapStep(this.nextNote[id], this.noteIndex[id]);
-        else this.scheduleTourNote(this.nextNote[id], this.noteIndex[id]);
-        this.noteIndex[id] = (this.noteIndex[id] + 1) % length;
-        this.nextNote[id] += step;
+        const gap = this.scheduleStep(id, this.nextNote[id], this.noteIndex[id]);
+        this.noteIndex[id] = (this.noteIndex[id] + 1) % TRACK_LENGTH[id];
+        this.nextNote[id] += gap;
       }
     }
   }
 
-  /** Cross-fade to the other track. Neither one stops; only the gains move. */
+  /** Cross-fade to another track. Nothing stops; only the gains move. */
   setMusic(id: MusicId): void {
     if (this.track === id) return;
     this.track = id;
@@ -120,6 +138,20 @@ export class GameAudio {
     for (const key of MUSIC_IDS) {
       this.music[key]?.gain.setTargetAtTime(key === id ? 1 : 0, ctx.currentTime, CROSSFADE);
     }
+  }
+
+  /**
+   * How much room the music is played in. The impulse response for each room is
+   * built once and kept; swapping it takes effect on the next note, which is why
+   * this is called on level load and never mid-level.
+   */
+  setRoom(room: Room): void {
+    if (this.room === room) return;
+    this.room = room;
+    const ctx = this.ctx;
+    if (!ctx || !this.reverb || !this.wet) return;
+    this.reverb.buffer = this.impulse(ctx, room);
+    this.wet.gain.setTargetAtTime(ROOMS[room].wet, ctx.currentTime, CROSSFADE);
   }
 
   play(name: Sfx): void {
@@ -405,7 +437,7 @@ export class GameAudio {
     lfo.start();
   }
 
-  /** One gain per track, and the tour's drone, which runs for the whole session. */
+  /** One gain per track, Chapter 1's room, and Chapter 2's drone. */
   private startMusic(): void {
     const ctx = this.ctx;
     if (!ctx || !this.master) return;
@@ -417,9 +449,19 @@ export class GameAudio {
       this.nextNote[id] = ctx.currentTime + 0.5;
       this.noteIndex[id] = 0;
     }
-    // A drone under the tour's melody. E2 and E3, barely there. The map has none:
-    // a brochure is printed on paper, and paper does not hum.
-    const out = this.music.tour;
+    // The room the pipe is played in. Only Chapter 1 is sent to it: Egypt's
+    // music was written dry and stays that way.
+    const cave = this.music.ch01;
+    if (cave) {
+      this.reverb = ctx.createConvolver();
+      this.reverb.buffer = this.impulse(ctx, this.room);
+      this.wet = ctx.createGain();
+      this.wet.gain.value = ROOMS[this.room].wet;
+      this.wet.connect(this.reverb).connect(cave);
+    }
+    // A drone under Chapter 2's melody. E2 and E3, barely there. The others have
+    // none: a brochure is printed on paper, and paper does not hum.
+    const out = this.music.ch02;
     if (!out) return;
     for (const [f, g] of [
       [82.4, 0.035],
@@ -435,10 +477,124 @@ export class GameAudio {
     }
   }
 
-  private scheduleTourNote(t: number, i: number): void {
+  /** Sound one step of a track, and say how long it is until the next one. */
+  private scheduleStep(id: MusicId, t: number, i: number): number {
+    if (id === 'map') {
+      this.scheduleMapStep(t, i);
+      return MAP_STEP;
+    }
+    if (id === 'ch02') {
+      this.scheduleCh02Note(t, i);
+      return CH02_STEP;
+    }
+    const note = CH01_PIPE[i];
+    if (!note) return 1;
+    this.pipe(t, note);
+    // The breath belongs to the phrase it starts, so it is scheduled by the note
+    // before it: always forwards in time, never into a moment already gone.
+    const next = CH01_PIPE[(i + 1) % CH01_PIPE.length];
+    if (next?.breath) this.breath(t + note.gap - BREATH_LEAD);
+    return note.gap;
+  }
+
+  /**
+   * One note on the pipe. Three sines, because a flute is very nearly one: the
+   * fundamental, a little of the octave, less of the twelfth. What makes it an
+   * instrument rather than an oscillator is everything else — the scoop up onto
+   * the note, the vibrato that only arrives once the note has been held a moment,
+   * and no attack worth the name, because air does not click.
+   */
+  private pipe(t: number, note: PipeNote): void {
     const ctx = this.ctx;
-    const out = this.music.tour;
-    const f = TOUR_MELODY[i];
+    const out = this.music.ch01;
+    if (!ctx || !out) return;
+    const { f, hold } = note;
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.linearRampToValueAtTime(0.055, t + 0.08);
+    g.gain.setValueAtTime(0.055, t + Math.max(0.1, hold - 0.14));
+    g.gain.exponentialRampToValueAtTime(0.0006, t + hold + 0.06);
+    g.connect(out);
+    if (this.wet) g.connect(this.wet);
+    // The shape of the vibrato: nothing at first, then all of it.
+    const lfo = ctx.createOscillator();
+    lfo.frequency.value = 4.6;
+    const vib = ctx.createGain();
+    vib.gain.setValueAtTime(0, t);
+    vib.gain.linearRampToValueAtTime(1, t + Math.min(0.5, hold));
+    lfo.connect(vib);
+    lfo.start(t);
+    lfo.stop(t + hold + 0.1);
+    for (const [mult, level] of [
+      [1, 1],
+      [2, 0.16],
+      [3, 0.05],
+    ] as const) {
+      const osc = ctx.createOscillator();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(f * mult * 0.988, t);
+      osc.frequency.exponentialRampToValueAtTime(f * mult, t + 0.06);
+      const depth = ctx.createGain();
+      depth.gain.value = f * mult * 0.006;
+      vib.connect(depth).connect(osc.frequency);
+      const og = ctx.createGain();
+      og.gain.value = level;
+      osc.connect(og).connect(g);
+      osc.start(t);
+      osc.stop(t + hold + 0.1);
+    }
+  }
+
+  /** Air through the tube before a phrase: the tell that someone is holding it. */
+  private breath(t: number): void {
+    const ctx = this.ctx;
+    const out = this.music.ch01;
+    if (!ctx || !out) return;
+    const src = this.noiseSource(ctx);
+    const bp = ctx.createBiquadFilter();
+    bp.type = 'bandpass';
+    bp.frequency.value = 1600;
+    bp.Q.value = 0.7;
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.linearRampToValueAtTime(0.022, t + 0.11);
+    g.gain.exponentialRampToValueAtTime(0.0004, t + 0.27);
+    src.connect(bp).connect(g).connect(out);
+    src.start(t);
+    src.stop(t + 0.3);
+  }
+
+  /**
+   * An impulse response, made rather than loaded: a burst of noise with a decay
+   * on it, a gap at the front for the distance to the far wall, and a lowpass
+   * that closes as the tail dies, because rock takes the top off first. Built
+   * once per room and kept.
+   */
+  private impulse(ctx: AudioContext, room: Room): AudioBuffer {
+    const cached = this.impulses.get(room);
+    if (cached) return cached;
+    const { decay, predelay } = ROOMS[room];
+    const n = Math.floor(ctx.sampleRate * decay);
+    const lead = Math.floor(ctx.sampleRate * predelay);
+    const buf = ctx.createBuffer(2, n, ctx.sampleRate);
+    for (let c = 0; c < 2; c++) {
+      const d = buf.getChannelData(c);
+      let y = 0;
+      for (let i = lead; i < n; i++) {
+        const u = (i - lead) / (n - lead);
+        const x = (Math.random() * 2 - 1) * Math.pow(1 - u, 2.5);
+        y += (0.45 - 0.35 * u) * (x - y);
+        d[i] = y;
+      }
+    }
+    this.impulses.set(room, buf);
+    return buf;
+  }
+
+  private scheduleCh02Note(t: number, i: number): void {
+    const ctx = this.ctx;
+    const out = this.music.ch02;
+    const f = CH02_MELODY[i];
     if (!ctx || !out || !f) return;
     const osc = ctx.createOscillator();
     osc.type = 'triangle';
@@ -601,21 +757,107 @@ const B4 = 493.88;
 const C5 = 523.25;
 const D5 = 587.33;
 const E5 = 659.25;
+const G5 = 783.99;
 
-const MUSIC_IDS = ['map', 'tour'] as const;
+const MUSIC_IDS = ['map', 'ch01', 'ch02'] as const;
 /** Time constant of the fade between tracks: about six tenths of a second. */
 const CROSSFADE = 0.2;
 
-// --- The tour --------------------------------------------------------------
+/**
+ * The rooms, as decay time, the gap before the first reflection, and how much of
+ * the sound goes round the room rather than straight to you. A cliff shelter is
+ * open air with one wall; Gargas is four hundred metres of limestone.
+ */
+const ROOMS: Record<Room, { decay: number; predelay: number; wet: number }> = {
+  open: { decay: 0.45, predelay: 0.004, wet: 0.1 },
+  chamber: { decay: 2.2, predelay: 0.012, wet: 0.4 },
+  deep: { decay: 2.6, predelay: 0.02, wet: 0.48 },
+};
+
+// --- Chapter 2 -------------------------------------------------------------
 // E double harmonic, the scale everyone hears as Egypt. Sparse and slow, like a museum.
 
-const TOUR_BPM = 64;
-const TOUR_STEP = 60 / TOUR_BPM / 2;
-const TOUR_MELODY: (number | 0)[] = [
+const CH02_BPM = 64;
+const CH02_STEP = 60 / CH02_BPM / 2;
+const CH02_MELODY: (number | 0)[] = [
   E4, 0, Gs4, 0, A4, 0, 0, 0, B4, 0, A4, Gs4, 0, F4, 0, 0,
   E4, 0, 0, 0, Ds4, 0, E4, 0, F4, 0, E4, 0, 0, 0, 0, 0,
   B4, 0, C5, 0, B4, 0, 0, 0, A4, 0, Gs4, 0, A4, 0, 0, 0,
   E5, 0, 0, 0, B4, 0, A4, 0, Gs4, 0, 0, 0, E4, 0, 0, 0,
+];
+
+// --- Chapter 1 -------------------------------------------------------------
+// A bone pipe, played by somebody who can play.
+//
+// The instrument is the one fact here. Isturitz, in the Pyrenean foothills about
+// 150 km from Gargas, gave up the largest set of Palaeolithic pipes known anywhere:
+// seventeen accepted and about five more disputed, dug by Passemard from 1912 and
+// the Saint-Périers from 1928. They run through every Upper Palaeolithic level of
+// the site and are thickest in the Gravettian, which is the period Gargas is, where
+// this chapter ends. Bird bone, mostly vulture, cut at both ends, with finger holes.
+// So the chapter is not scored with a guess about what these people had. It is
+// scored with the thing they left behind seventeen of. The count is in
+// content/ch01-palaeolithic/CHAPTER.md, with why it is not a round number.
+//
+// What is NOT here matters as much. No drum: no Palaeolithic drum survives, the
+// membrane would not, and thumping is the cliché that would make the chapter's
+// people into cavemen — pillar 11, and the tourist is the only idiot in this game.
+// No ancient melody is claimed, because none is known. And nothing is implied
+// about why anyone played in a cave: the resonance-and-paintings correlation is
+// real published work and genuinely contested, so the reverb here is only what a
+// cave does to a sound, which is physics and not an argument.
+//
+// Five phrases, no bar lines, and they end where breath ends. Anhemitonic
+// pentatonic on G — no semitones, no leading tone, nowhere on a modern map. It
+// reaches the twelfth twice, which on a pipe is not a finger but a harder breath.
+// Unlike the brochure, it lands every time, plainly, and then waits. The one
+// competent thing in the chapter is the music.
+
+/** A note on the pipe: what it sounds, how long it sounds, and when the next one starts. */
+interface PipeNote {
+  f: number;
+  /** How long the note is held. */
+  hold: number;
+  /** From this note's start to the next one's. Longer than `hold` after a phrase. */
+  gap: number;
+  /** The first note of a phrase, so a breath is taken before it. */
+  breath?: true;
+}
+
+/** How long before a phrase the player draws breath. */
+const BREATH_LEAD = 0.22;
+
+const CH01_PIPE: PipeNote[] = [
+  // Low, stepwise, and it comes home. Nothing here is uncertain.
+  { f: A3, hold: 0.9, gap: 0.95, breath: true },
+  { f: B3, hold: 0.5, gap: 0.55 },
+  { f: D4, hold: 1.1, gap: 1.15 },
+  { f: B3, hold: 0.5, gap: 0.55 },
+  { f: A3, hold: 1.6, gap: 4.8 },
+  // The twelfth: A3 to E5, which is a harder breath and not another finger.
+  { f: A3, hold: 0.6, gap: 0.65, breath: true },
+  { f: B3, hold: 0.45, gap: 0.5 },
+  { f: D4, hold: 0.8, gap: 0.85 },
+  { f: A3, hold: 0.4, gap: 0.45 },
+  { f: E5, hold: 1.7, gap: 1.75 },
+  { f: D5, hold: 1.1, gap: 1.15 },
+  { f: B3, hold: 1.4, gap: 5.2 },
+  // High and quick, all in the overblown register.
+  { f: D5, hold: 0.55, gap: 0.6, breath: true },
+  { f: E5, hold: 0.55, gap: 0.6 },
+  { f: G5, hold: 0.9, gap: 0.95 },
+  { f: E5, hold: 0.6, gap: 0.65 },
+  { f: D5, hold: 1.3, gap: 4.2 },
+  // Two notes and a long wait. In a cave the room finishes this one.
+  { f: G3, hold: 1.3, gap: 1.35, breath: true },
+  { f: A3, hold: 2.0, gap: 6.2 },
+  // Home, and the longest note in the piece is the last one.
+  { f: E4, hold: 0.7, gap: 0.75, breath: true },
+  { f: D4, hold: 0.6, gap: 0.65 },
+  { f: B3, hold: 0.7, gap: 0.75 },
+  { f: A3, hold: 0.5, gap: 0.55 },
+  { f: G3, hold: 0.9, gap: 0.95 },
+  { f: A3, hold: 2.2, gap: 7.0 },
 ];
 
 // --- The map ---------------------------------------------------------------
@@ -680,10 +922,11 @@ const MAP_MELODY: (number | 0)[] = [
   B4, 0, 0, 0, 0, 0,
 ];
 
-/** How long a step is, and how many there are before each track comes round again. */
-const TRACKS: Record<MusicId, { step: number; length: number }> = {
-  map: { step: MAP_STEP, length: MAP_MELODY.length },
-  tour: { step: TOUR_STEP, length: TOUR_MELODY.length },
+/** How many steps each track has before it comes round again. */
+const TRACK_LENGTH: Record<MusicId, number> = {
+  map: MAP_MELODY.length,
+  ch01: CH01_PIPE.length,
+  ch02: CH02_MELODY.length,
 };
 
 function makeNoise(ctx: AudioContext): AudioBuffer {

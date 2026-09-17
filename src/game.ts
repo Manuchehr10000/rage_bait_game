@@ -1,10 +1,10 @@
-import { GameAudio } from './engine/audio';
+import { GameAudio, type MusicId, type Room } from './engine/audio';
 import { Camera } from './engine/camera';
 import { createEntity, type Entity, type Platform, type Sweep, type Train, type Water, type World } from './engine/entities';
 import type { Stats } from './render/hud';
 import { renderHud } from './render/hud';
 import { Input } from './engine/input';
-import { Level, type LevelData } from './engine/level';
+import { Level, type LevelData, type Theme } from './engine/level';
 import { LEVELS, levelIndexFromHash } from './levels/index';
 import { PHYS, Player, type MovingSolid } from './engine/player';
 import { Progress } from './engine/progress';
@@ -23,6 +23,23 @@ type Screen = 'map' | 'level';
 
 /** How far above the spawn the tourist appears when dropping in from the map. */
 const FALL_IN_HEIGHT = 200;
+
+/**
+ * What each level sounds like: whose music, and how much room it is played in.
+ * A Record over Theme on purpose — a new level cannot be added without deciding.
+ * The room is a fact about the place, not about the music; today only Chapter 1's
+ * pipe is sent through it, so Egypt's three rooms are recorded and not yet heard.
+ */
+const SOUND_OF: Record<Theme, { track: MusicId; room: Room }> = {
+  capBlanc: { track: 'ch01', room: 'open' }, // a cliff shelter, open to the valley
+  rocAuxSorciers: { track: 'ch01', room: 'open' }, // the same, above the Anglin
+  pechMerle: { track: 'ch01', room: 'chamber' },
+  rouffignac: { track: 'ch01', room: 'chamber' },
+  gargas: { track: 'ch01', room: 'deep' }, // and the lamp goes out in it
+  abuSimbel: { track: 'ch02', room: 'open' }, // the facade; the sanctuary is cut into it
+  philae: { track: 'ch02', room: 'open' },
+  karnak: { track: 'ch02', room: 'chamber' }, // the hypostyle hall is a roofed forest
+};
 
 export class Game {
   private readonly ctx: CanvasRenderingContext2D;
@@ -163,7 +180,6 @@ export class Game {
   private enterLevel(index: number, fallIn: boolean): void {
     this.screen = 'level';
     this.leaveAfterDeath = false;
-    this.audio.setMusic('tour');
     this.loadLevel(index);
     if (fallIn) {
       this.player.y -= FALL_IN_HEIGHT;
@@ -203,6 +219,9 @@ export class Game {
     if (!data) throw new Error('no levels');
     this.levelIndex = LEVELS.indexOf(data);
     this.level = new Level(data);
+    const sound = SOUND_OF[data.theme];
+    this.audio.setMusic(sound.track);
+    this.audio.setRoom(sound.room);
     this.camera = new Camera(this.level.widthPx, data.cameraBottom);
     this.titleTimer = TITLE_TIME;
     try {

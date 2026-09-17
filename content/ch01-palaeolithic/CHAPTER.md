@@ -83,6 +83,55 @@ part of the costume that does anything: in the dark it is the only light there i
 - Every asset note separates **must be right** from **deliberately wrong**. There is
   no third category.
 
+## The sound
+
+The chapter is scored for one bone pipe, played by somebody who can play, in the room the
+level is actually in. There is no percussion anywhere in it. Five phrases, no bar lines,
+ending where breath ends.
+
+**Must be right.**
+
+- **The instrument.** Isturitz, at Saint-Martin-d'Arberoue in the Pyrénées-Atlantiques,
+  produced the largest set of Palaeolithic pipes known anywhere. They are bird bone,
+  mostly vulture, cut at both ends, with finger holes; they run through every Upper
+  Palaeolithic level of the site and are thickest in the Gravettian. Isturitz is about
+  150 km from Gargas, and Gargas is Gravettian. The chapter is scored with the instrument
+  these people left behind, in the right corner of France and the right period, and not
+  with a guess about what they might have had.
+- **The count is not round, and the reason is the usual one.** Passemard dug the site from
+  1912, René and Suzanne de Saint-Périer from 1928. Buisson reviewed the series in 1990
+  and 1994 and set aside five fragments whose perforations are doubtful or absent; Lawson
+  and d'Errico discuss two of those five again in 2002. So: seventeen accepted, about five
+  arguable, and any single figure quoted for Isturitz is a position in that argument. Cite
+  it the way the hands of Gargas are cited, never as a settled number.
+- **No drum.** No Palaeolithic drum survives and a membrane would not. The thumping
+  caveman drum is the cliché that would make the chapter's people primitive, and pillar 11
+  says the tourist is the only idiot in this game. The music is the one thing in the
+  chapter that is unambiguously competent.
+- **The room.** Levels 1 and 2 are open cliff shelters and are nearly dry. Levels 3 and 4
+  are chambers. Gargas is the longest. That is a fact about the places, and reverb is
+  physics.
+
+**Deliberately wrong.**
+
+- It is a synthesised pipe, not a recording of a replica. Nothing in this game is a file.
+- No ancient melody is claimed, implied or reconstructed, because none is known. The tune
+  was written in 2026. It uses an anhemitonic pentatonic — no semitones, no leading tone —
+  chosen because it sits in no modern culture in particular, not because anyone is known to
+  have played one in the Pyrenees.
+- The intonation is equal temperament, which is a modern convenience. Replicas of the
+  Isturitz pipes do not play in it.
+
+**In the notes; never in the level, and never implied by the audio.** Reznikoff and
+Dauvois, *La dimension sonore des grottes ornées* (Bulletin de la Société Préhistorique
+Française 85, 1988), found that painted panels at Arcy-sur-Cure, Le Portel and Niaux
+cluster at points of strong resonance, and argued that the painters chose those places for
+the sound. The correlation is real published work; the intention is contested. Later
+acoustic studies support parts of it and contradict others, and the original survey was
+measured with the author's own voice, a sound level meter and a wristwatch. So the caves in
+this chapter reverberate, because caves do, and nothing in the game suggests anybody
+painted there for the sound.
+
 ## Imagery
 
 Thin and mostly in copyright. Excavation reports, Cartailhac & Breuil 1906 from US-hosted
