@@ -5,9 +5,10 @@
  * and the music and the wind never pause or react.
  *
  * One piece of music per chapter, and the brochure's own. `map` is the waltz on
- * the world page and the only cheerful thing in the game. `mapCh02` is the same
- * brochure's Egypt page. `ch01` is a bone pipe in a cave; `ch02` is the double
- * harmonic everyone hears as Egypt. None of them knows how many times you have
+ * the world page and the only cheerful thing in the game; `mapCh01` and `mapCh02`
+ * are the same brochure's chapter pages, each one the tour operator's arrangement
+ * of that chapter's real music. `ch01` is a bone pipe in a cave; `ch02` is the
+ * double harmonic everyone hears as Egypt. None of them knows how many times you have
  * died. Switching cross-fades between them and nothing restarts: whichever track
  * you were not listening to kept playing, and comes back exactly where it would
  * have got to.
@@ -43,8 +44,11 @@ export type Sfx =
   | 'thud'
   | 'click';
 
-/** One per chapter, plus a page of the brochure. */
-export type MusicId = 'map' | 'mapCh02' | 'ch01' | 'ch02';
+/** A page of the brochure. Every one is played by the same three voices. */
+export type WaltzId = 'map' | 'mapCh01' | 'mapCh02';
+
+/** One per chapter, plus the brochure's pages. */
+export type MusicId = WaltzId | 'ch01' | 'ch02';
 
 /**
  * How much space the level's music is played in. Set from the level's theme by
@@ -68,8 +72,8 @@ export class GameAudio {
   /** One gain per track, so one can fade out under the other without stopping. */
   private music: Partial<Record<MusicId, GainNode>> = {};
   /** How far each track has got: when its next step falls, and which step it is. */
-  private nextNote: Record<MusicId, number> = { map: 0, mapCh02: 0, ch01: 0, ch02: 0 };
-  private noteIndex: Record<MusicId, number> = { map: 0, mapCh02: 0, ch01: 0, ch02: 0 };
+  private nextNote: Record<MusicId, number> = { map: 0, mapCh01: 0, mapCh02: 0, ch01: 0, ch02: 0 };
+  private noteIndex: Record<MusicId, number> = { map: 0, mapCh01: 0, mapCh02: 0, ch01: 0, ch02: 0 };
   private track: MusicId = 'ch02';
   /** The cave. Only Chapter 1 is routed through it. */
   private reverb: ConvolverNode | null = null;
@@ -480,22 +484,23 @@ export class GameAudio {
 
   /** Sound one step of a track, and say how long it is until the next one. */
   private scheduleStep(id: MusicId, t: number, i: number): number {
-    if (id === 'map' || id === 'mapCh02') {
-      this.scheduleWaltzStep(id, t, i);
-      return WALTZ_STEP;
-    }
     if (id === 'ch02') {
       this.scheduleCh02Note(t, i);
       return CH02_STEP;
     }
-    const note = CH01_PIPE[i];
-    if (!note) return 1;
-    this.pipe(t, note);
-    // The breath belongs to the phrase it starts, so it is scheduled by the note
-    // before it: always forwards in time, never into a moment already gone.
-    const next = CH01_PIPE[(i + 1) % CH01_PIPE.length];
-    if (next?.breath) this.breath(t + note.gap - BREATH_LEAD);
-    return note.gap;
+    if (id === 'ch01') {
+      const note = CH01_PIPE[i];
+      if (!note) return 1;
+      this.pipe(t, note);
+      // The breath belongs to the phrase it starts, so it is scheduled by the note
+      // before it: always forwards in time, never into a moment already gone.
+      const next = CH01_PIPE[(i + 1) % CH01_PIPE.length];
+      if (next?.breath) this.breath(t + note.gap - BREATH_LEAD);
+      return note.gap;
+    }
+    // Anything else is a page of the brochure, and they are all the same waltz.
+    this.scheduleWaltzStep(id, t, i);
+    return WALTZ_STEP;
   }
 
   /**
@@ -618,7 +623,7 @@ export class GameAudio {
    * it has something to say. Every page of the brochure is played by the same
    * three voices at the same tempo, because it is the same brochure.
    */
-  private scheduleWaltzStep(id: 'map' | 'mapCh02', t: number, i: number): void {
+  private scheduleWaltzStep(id: WaltzId, t: number, i: number): void {
     const out = this.music[id];
     const waltz = WALTZES[id];
     if (!out) return;
@@ -760,9 +765,10 @@ const B4 = 493.88;
 const C5 = 523.25;
 const D5 = 587.33;
 const E5 = 659.25;
+const Fs5 = 739.99;
 const G5 = 783.99;
 
-const MUSIC_IDS = ['map', 'mapCh02', 'ch01', 'ch02'] as const;
+const MUSIC_IDS = ['map', 'mapCh01', 'mapCh02', 'ch01', 'ch02'] as const;
 /** Time constant of the fade between tracks: about six tenths of a second. */
 const CROSSFADE = 0.2;
 
@@ -1006,15 +1012,99 @@ const MAP_CH02_MELODY: (number | 0)[] = [
   E4, 0, 0, 0, 0, 0,
 ];
 
+// --- The map, page one -----------------------------------------------------
+// The Palaeolithic page of the same brochure.
+//
+// The tempting joke is a drum: the operator putting a tom-tom under the cave art,
+// which is the exact thing the chapter itself refuses to do. It is not here. It
+// is the cheaper laugh, it would break the one rule these pages have — three
+// voices, one tempo, because it is one brochure — and a player reaches this page
+// before ever hearing the pipe, so the first Palaeolithic sound in the game would
+// be the caveman cliché with nothing yet to correct it. Pillar 11 is not a thing
+// to take a run-up at.
+//
+// The better joke needs no drum, because the pipe has exactly two properties and
+// the operator removes both. It has no meter: phrases end where breath ends. He
+// puts it in three-four. And it has silence — three to five seconds of nothing
+// between phrases, which in the caves is where the room does the work. He fills
+// every one of them, because you cannot sell a page with a hole in it. Forty-seven
+// notes here against thirty-six on the world page and thirty on Egypt's, and a note
+// on every beat of every bar except two: bar 8 and bar 16, where he has just got
+// somewhere and lets himself stop. The tune that breathed now never stops for breath.
+//
+// He harmonises G pentatonic with G, E minor, C and D — one, six, four, five, the
+// most ordinary progression in the language. Two quieter liberties. The pipe rests
+// on A and he rests on G, because A is not his root: he has moved the tune's home
+// to suit his chords, in bar 2 and again in bar 10. And the whole thing is up an
+// octave, because a music box does not want to be at the bottom of a bone pipe.
+//
+// Then the F#, in the melody this time, in bar 15. An anhemitonic pentatonic is
+// defined by having no semitone and no leading tone in it; the F# is a leading
+// tone, and it is there so that bar 16 can arrive on G. The world page's misprint
+// is an F# brightening C major. Egypt's is an F# in a scale with no such note.
+// This one hands a scale the one interval it is defined by refusing. Same hand,
+// three pages, and it gets worse. The D major it sits in is voiced [F#3, A3] —
+// the same two notes as the misprint chord on the world page, played straight.
+
+const MAP_CH01_BARS: { bass: number; pah: readonly [number, number] }[] = [
+  { bass: G2, pah: [D3, B3] }, //  1  G
+  { bass: G2, pah: [D3, B3] }, //  2  G — and he lands the phrase on G, not on the tune's A
+  { bass: E2, pah: [G3, B3] }, //  3  Em
+  { bass: E2, pah: [G3, B3] }, //  4  Em
+  { bass: C3, pah: [E3, G3] }, //  5  C — the same voicing the world page uses for C
+  { bass: C3, pah: [E3, G3] }, //  6  C
+  { bass: D3, pah: [Fs3, A3] }, //  7  D — the world page's misprint chord, played straight
+  { bass: D3, pah: [Fs3, A3] }, //  8  D
+  { bass: G2, pah: [D3, B3] }, //  9  G
+  { bass: G2, pah: [D3, B3] }, // 10  G — he moves the home again, the same way
+  { bass: E2, pah: [G3, B3] }, // 11  Em
+  { bass: E2, pah: [G3, B3] }, // 12  Em
+  { bass: C3, pah: [E3, G3] }, // 13  C
+  { bass: C3, pah: [E3, G3] }, // 14  C
+  { bass: D3, pah: [Fs3, A3] }, // 15  D, and the tune is made to play the F# itself
+  { bass: G2, pah: [D3, B3] }, // 16  G — home, and he is very pleased with it
+];
+
+/** The pipe's five phrases, up an octave and packed end to end with the gaps taken out. */
+const MAP_CH01_MELODY: (number | 0)[] = [
+  // The pipe's first phrase. It ended on A; this ends on G.
+  A4, 0, B4, 0, D5, 0,
+  B4, 0, A4, 0, G4, 0,
+  // Its second, the one that reaches the twelfth.
+  A4, 0, B4, 0, D5, 0,
+  A4, 0, E5, 0, D5, 0,
+  // Its third, high and quick, which was the only quick thing the pipe did.
+  B4, 0, D5, 0, E5, 0,
+  G5, 0, E5, 0, D5, 0,
+  // Its fourth was two notes and a long wait. This is where the wait would have
+  // been, so it is the busiest bar on the page: six notes and no room at all.
+  A4, B4, A4, G4, A4, B4,
+  A4, 0, 0, 0, 0, 0,
+  // The first phrase again, note for note, because identical things are identical.
+  A4, 0, B4, 0, D5, 0,
+  B4, 0, A4, 0, G4, 0,
+  // The third again.
+  D5, 0, E5, 0, G5, 0,
+  E5, 0, D5, 0, B4, 0,
+  // Its fifth, the one that came home.
+  E5, 0, D5, 0, B4, 0,
+  A4, 0, G4, 0, A4, 0,
+  // The leading tone the scale does not have, so that the next bar can arrive.
+  B4, 0, A4, 0, Fs5, 0,
+  G5, 0, 0, 0, 0, 0,
+];
+
 /** Every page of the brochure, played by the same three voices at the same tempo. */
-const WALTZES: Record<'map' | 'mapCh02', Waltz> = {
+const WALTZES: Record<WaltzId, Waltz> = {
   map: { bars: MAP_BARS, melody: MAP_MELODY },
+  mapCh01: { bars: MAP_CH01_BARS, melody: MAP_CH01_MELODY },
   mapCh02: { bars: MAP_CH02_BARS, melody: MAP_CH02_MELODY },
 };
 
 /** How many steps each track has before it comes round again. */
 const TRACK_LENGTH: Record<MusicId, number> = {
   map: MAP_MELODY.length,
+  mapCh01: MAP_CH01_MELODY.length,
   mapCh02: MAP_CH02_MELODY.length,
   ch01: CH01_PIPE.length,
   ch02: CH02_MELODY.length,

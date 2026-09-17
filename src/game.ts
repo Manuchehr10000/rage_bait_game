@@ -41,6 +41,12 @@ const SOUND_OF: Record<Theme, { track: MusicId; room: Room }> = {
   karnak: { track: 'ch02', room: 'chamber' }, // the hypostyle hall is a roofed forest
 };
 
+/** The pages of the brochure that have been arranged, by chapter number. */
+const MAP_PAGE: Record<number, MusicId> = {
+  1: 'mapCh01',
+  2: 'mapCh02',
+};
+
 export class Game {
   private readonly ctx: CanvasRenderingContext2D;
   private readonly world: HTMLCanvasElement;
@@ -163,13 +169,13 @@ export class Game {
 
   /**
    * Which waltz the brochure is playing. The world page gets the general one; a
-   * chapter page gets the operator's arrangement of that chapter, where one has
-   * been written. Chapter 1's page has not been arranged yet and gets the general
-   * waltz, which is what an un-arranged page should sound like.
+   * chapter page gets the operator's arrangement of that chapter, once someone has
+   * written it. A chapter with no arrangement falls back to the general waltz,
+   * which is what an un-arranged page should sound like.
    */
   private mapMusic(): MusicId {
     if (this.map.view === 'world') return 'map';
-    return this.map.current.number === 2 ? 'mapCh02' : 'map';
+    return MAP_PAGE[this.map.current.number] ?? 'map';
   }
 
   /** Back to the tour map, on the chapter of the level just left. */
