@@ -1,4 +1,5 @@
 import { Grid, type DecorDef, type EntityDef, type LevelData } from '../../engine/level';
+import { PHYS } from '../../engine/player';
 import { TILE } from '../../engine/types';
 
 /**
@@ -6,114 +7,175 @@ import { TILE } from '../../engine/types';
  *
  * The level where everything stops being trustworthy, and the first one in the
  * game that goes anywhere but sideways. Two things tell the tourist where to go
- * — the concrete walkway of the guided tour and a dozen footprints left in the
- * clay by an adolescent twenty-five thousand years ago — and they disagree. The
- * walkway is wrong every time.
+ * — the concrete walkway of the guided tour and the footprints of an adolescent
+ * who came through twenty-five thousand years ago — and they disagree.
  * History: content/ch01-palaeolithic/l03-pech-merle/LEVEL.md.
  *
- * It is 576 px tall against a 180 px window, so the camera is moving for most of
- * it. Pech Merle is a vertical system: an upper gallery you walk in at, a lower
- * one under it, and shafts between. The route drops about three hundred and
- * fifty pixels and climbs a hundred and thirty back, and the only way down is in
- * stages, because a fall of more than 200 px kills you anywhere in the game.
+ * The rules of this cave:
+ *   - the concrete is wrong every time. It runs out over the first shaft and it
+ *     gives way over the last one
+ *   - the prints are right every time. Where the boy stood, the clay holds; where
+ *     he did not, it is anybody's guess. He never climbed the discs, so nothing
+ *     in the Hall of the Discs is marked at all
+ *   - every shelf of clay in the cave is the same clay, drawn the same way, and
+ *     nine of the sixteen do something. What they do is learned by doing it
+ *   - and the two ledges that move disagree with each other: the one in the
+ *     Bear's Gallery carries you to safety and the one in the Hall of the Discs
+ *     carries you off the edge, so the lesson of the second level — leave
+ *     anything that moves, at once — is worth one death here and one life
  *
- *   0..27    the mouth and the upper gallery, at 128. Walkway and prints agree
- *  28..45    the Chapel of the Mammoths. The walkway runs out over the first
- *              shaft; the prints go down its side, four ledges, none of them far
- *  46..103   the Bear's Gallery, and it is a descent: a hundred and twelve pixels
- *              of stepped ledges over the lower gallery, hollows scooped in them
- *              where bears slept, and shafts between them that go all the way
- * 104..123   the Hall of the Discs, and this time it climbs: plates growing out
- *              of the wall at rising heights, two of them done holding
- * 124..141   the ceiling of finger tracings, low enough to cut a jump short
- * 142..175   the Spotted Horses. The walkway comes back and crosses the last
- *              shaft to the best view in the cave
- * 172        exit
+ *   0..17    the mouth and the upper gallery, at 128. Concrete and prints agree.
+ *              One hole in the floor, with clay a step under it
+ *  17..22    the Chapel of the Mammoths. The prints turn back at the lip of the
+ *              first shaft; the concrete carries on over it and stops in mid air
+ *  24..43    four steps down the side of the shaft. The second lets go, and the
+ *              third lifts you and then lets go
+ *  45..79    the Bear's Gallery: six shelves down over the lower gallery, hollows
+ *              where bears slept. One slides you off it, one lets go, one walks
+ *              you across to the last, and the last minds being jumped on
+ *  80..95    the Hall of the Discs, climbing. One snaps as you touch it and one
+ *              walks back the way you came and drops you at the bottom of it
+ *  96..108   the ceiling of finger tracings, low enough to cut a jump short. Two
+ *              holes; a slab of the roof that comes down between them and takes
+ *              the run-up with it; and in the middle of the second hole a stone
+ *              that will not take a landing
+ * 108..128   the Spotted Horses. The concrete comes back, crosses the last shaft,
+ *              and holds for six tenths of a second. Over it, three shelves, and
+ *              the prints go along those
+ * 124        exit
  */
-const W = 192;
-const H = 36;
+const W = 128;
+const H = 32;
 const px = (t: number) => t * TILE;
 
-/** The floors of the cave, and the bottom of it. */
+/** The floor of the upper gallery, and of the passage and the last chamber. */
 const UPPER = px(8);
 const MID = px(20);
-const LOW = px(30);
-/** The floor of the lower gallery. Everything that falls ends up here. */
-const EXIT_X = px(186);
+/** The floor of the lower gallery. Whatever reaches it is staying. */
+const BOTTOM = px(30);
+const EXIT_X = px(124);
 
 const g = new Grid(W, H);
-// The roof. It has to be high enough that a jump in the upper gallery is a whole
-// jump: at four tiles it clipped the apex and cost the first jump of the level
-// thirteen pixels of reach, which is the difference between the ledge and the shaft.
-g.fill(0, 0, W, 2, '#');
-g.fill(0, 0, 6, 2, ' '); // the mouth. The tour comes in from above, and so does he
-g.fill(0, H - 2, W, 2, '%'); // the floor of the lower gallery, a long way down
+g.fill(0, 0, W, 2, '#'); // the roof
+g.fill(0, 0, 5, 2, ' '); // the mouth. The tour comes in from above, and so does he
+g.fill(0, 30, W, 2, '%'); // the floor of the lower gallery, a long way down
 
-// a: the upper gallery. Concrete on clay, and one hole in it to hop. The clay
-// carries on a step below, so falling in this one costs a climb and nothing else.
-g.fill(0, 8, 28, 2, '%');
-g.fill(6, 8, 22, 1, '=');
-g.fill(20, 8, 2, 2, ' ');
-g.fill(18, 11, 6, 1, '%');
+// a: the upper gallery. Clay with concrete laid on it, and one hole to hop. The
+// clay carries on a step below, so falling in this one costs a climb and nothing else.
+g.fill(0, 8, 17, 2, '%');
+g.fill(4, 8, 13, 1, '=');
+g.fill(11, 8, 2, 2, ' ');
+g.fill(9, 11, 6, 1, '%');
 
-// b: the Chapel of the Mammoths. The concrete carries on over the first shaft and
-// stops in mid air, and what is under the end of it is two hundred and fifty pixels
-// of nothing. The prints go down the far side in four short steps, and the first of
-// them has to be jumped for, which is the whole of the level in one move.
-g.fill(28, 8, 7, 1, '=');
-const CHAPEL_STEPS = [
-  { x: 38, y: 11, w: 5 },
-  { x: 44, y: 14, w: 4 },
-  { x: 49, y: 17, w: 4 },
-  { x: 54, y: 20, w: 7 },
-];
-for (const s of CHAPEL_STEPS) g.fill(s.x, s.y, s.w, 1, '%');
+// b/c: the Chapel of the Mammoths. The clay stops at x17 and the concrete does not:
+// it runs five tiles out over the shaft and ends in mid air, with three hundred
+// and fifty pixels of nothing under it.
+g.fill(17, 8, 5, 1, '=');
+
+// f: the low passage under the finger tracings. The ceiling comes down to four
+// tiles over the floor, which takes a quarter off every jump made in here.
+g.fill(94, 0, 10, 16, '#');
+g.fill(96, 20, 10, 1, '%');
+g.fill(99, 20, 2, 1, ' '); // the first hole. The second is where the floor stops
+
+// g: the last chamber. Concrete to the edge of the last shaft, and the far side of it.
+g.fill(108, 20, 5, 1, '=');
+g.fill(121, 20, W - 121, 1, '%');
 
 /**
- * c: the Bear's Gallery. A long descent, stepping down and right over the lower
- * gallery. Every step is a short drop; the spaces between the ledges are not, and
- * go all the way to the floor. The hollows the bears left are scooped in the
- * ledges and are harmless, which is what a bear nest is: a shallow bowl in the
- * clay about thirty centimetres deep.
+ * Every shelf of clay in this cave is the same shelf: sixty-four pixels of the
+ * same tile, drawn by the same code as the floor it broke off (pillar 4). What
+ * each one does is in `does`, and nothing about how it looks says which is which.
+ *
+ *   holds   it is what it looks like
+ *   goes    it lets go a moment after he stands on it
+ *   lifts   it carries him up, and then lets go of him up there
+ *   slides  it will not let him stand still: he is carried off the far end
+ *   walks   it carries him forward to the next shelf and parks against it
+ *   minds   it holds for anybody who walks on. It will not take a landing
  */
-const BEAR_LEDGES: { x: number; y: number; w: number; nest?: boolean }[] = [
-  { x: 63, y: 21, w: 6, nest: true },
-  { x: 71, y: 22, w: 4 },
-  { x: 77, y: 24, w: 6, nest: true },
-  { x: 85, y: 25, w: 4 },
-  { x: 91, y: 26, w: 6, nest: true },
-  { x: 99, y: 28, w: 4 },
-  { x: 105, y: 29, w: 6, nest: true },
-  { x: 113, y: 30, w: 5 },
+type Does = 'holds' | 'goes' | 'lifts' | 'slides' | 'walks' | 'minds';
+interface Shelf {
+  x: number;
+  y: number;
+  does: Does;
+  /** A bear's bowl scraped in it. Thirty centimetres deep, and it means nothing. */
+  nest?: boolean;
+}
+const SHELF_W = 64;
+
+/**
+ * The four steps down the side of the first shaft. The prints go down them, and
+ * the prints are on the first and the last.
+ */
+const CHAPEL: Shelf[] = [
+  { x: 384, y: 176, does: 'holds' },
+  { x: 464, y: 224, does: 'goes' },
+  { x: 544, y: 272, does: 'lifts' },
+  { x: 624, y: 320, does: 'holds' },
 ];
-for (const l of BEAR_LEDGES) g.fill(l.x, l.y, l.w, 1, '%');
 
-// d: the Hall of the Discs. The floor here is the lower gallery and the way on is up.
-g.fill(118, 30, 4, 1, '%');
-
-// e: the low passage under the finger tracings, back at the middle floor, with a
-// ceiling three tiles over his head that takes a quarter off every jump.
-g.fill(140, 0, 18, 16, '#');
-g.fill(140, 20, 18, 2, '%');
-g.fill(146, 20, 2, 2, ' ');
-g.fill(152, 20, 2, 2, ' ');
-
-// f: the last chamber. Concrete to the edge of the last shaft, shelves above it.
-g.fill(158, 20, 8, 2, '%');
-g.fill(158, 20, 8, 1, '=');
-g.fill(167, 18, 2, 1, '%');
-g.fill(171, 18, 2, 1, '%');
-g.fill(175, 18, 2, 1, '%');
-g.fill(178, 20, W - 178, 2, '%');
-
-/** The calcite plates of the Hall of the Discs: they climb out of the lower gallery. */
-const DISCS: { x: number; y: number; snaps?: boolean }[] = [
-  { x: 1964, y: 456 },
-  { x: 2016, y: 424 },
-  { x: 2068, y: 392, snaps: true },
-  { x: 2120, y: 360 },
-  { x: 2172, y: 328, snaps: true },
+/**
+ * The Bear's Gallery. Six shelves down over the lower gallery. The second will
+ * not let him stand still and the gap after it is wider than a slide; the fifth
+ * walks him across to the sixth and parks there, and the sixth will take a man
+ * who walks on to it and not a man who jumps.
+ */
+const BEARS: Shelf[] = [
+  { x: 720, y: 336, does: 'holds', nest: true },
+  { x: 816, y: 352, does: 'slides' },
+  { x: 928, y: 352, does: 'holds' },
+  { x: 1024, y: 384, does: 'goes', nest: true },
+  { x: 1104, y: 416, does: 'walks' },
+  { x: 1200, y: 416, does: 'minds', nest: true },
 ];
+
+/** Where the fifth stops: hard against the sixth, so the way across is to stay on it. */
+const WALK_TO = 1136;
+/** How far the third of the Chapel lifts him before it lets go. */
+const LIFT_TO = 208;
+
+/**
+ * The Hall of the Discs, climbing back to the passage. Plates of calcite, not
+ * clay, and there are no prints anywhere near them: nobody climbed this. The
+ * second snaps as he touches it. The fourth walks back down the hall and lets go
+ * of whoever rode it, which is the other half of the fifth shelf of the gallery.
+ */
+const DISCS: { x: number; y: number; does: 'holds' | 'goes' | 'walks' }[] = [
+  { x: 1288, y: 392, does: 'holds' },
+  { x: 1340, y: 368, does: 'goes' },
+  { x: 1392, y: 344, does: 'holds' },
+  { x: 1444, y: 320, does: 'walks' },
+  { x: 1496, y: 296, does: 'holds' },
+];
+const DISC_W = 32;
+/** Where the fourth carries him: over the third, and too far from the fifth to jump. */
+const DISC_WALK_TO = 1392;
+
+/**
+ * The stone in the middle of the second hole. It is the obvious way over, it is
+ * the width of a boot, and it will not take a landing: the hole is jumped whole
+ * or it is not jumped.
+ */
+const LIP_X = 1704;
+/**
+ * The slab of roof between the two holes. It comes down a long way in front of
+ * him, on to the floor, and stays: the first hole is now jumped on to the top of
+ * it, and the run-up to the second hole is whatever is left of the floor past it,
+ * which is two strides. A man who jumps the second hole from up on the slab is
+ * jumping with a ceiling four tiles over his head, and the only thing he can
+ * reach from there is the stone.
+ */
+const BLOCK = { x: 1616, w: 48, bottom: 320 };
+/** The last run of the guided tour, laid across the deepest shaft in the cave. */
+const LAST_RUN = { x: px(113), w: 128 };
+/** The shelves over the last shaft, which is how the prints cross it. The middle one goes. */
+const SHELVES: Shelf[] = [
+  { x: 1824, y: 288, does: 'holds' },
+  { x: 1872, y: 288, does: 'goes' },
+  { x: 1920, y: 288, does: 'holds' },
+];
+const SHELVES_W = 32;
 
 /** A run of the boy's prints along a floor, every 22 px. */
 const trail = (x0: number, x1: number, y: number, back = false) => {
@@ -121,15 +183,17 @@ const trail = (x0: number, x1: number, y: number, back = false) => {
   for (let x = x0; x < x1; x += 22) out.push({ x, y, back });
   return out;
 };
+/** The prints on a shelf he stood on: two, near enough, whatever its width. */
+const onShelf = (s: { x: number; y: number }, w = SHELF_W) => trail(s.x + 8, s.x + w - 6, s.y - 5);
 
 /**
  * The prints are the one thing in this cave that is never wrong, so they are not
- * allowed to be: a print only survives if there is floor under it. Every shaft,
- * every hole and every stretch of nothing takes its own prints out.
+ * allowed to be. On the floors, a print only survives where there is floor under
+ * it. On the shelves, a print only survives where the shelf holds — which is the
+ * whole of the level's second half, and nothing anywhere says so.
  */
 const ROWS = g.rows();
 const floorAt = (x: number, y: number) => ((ROWS[Math.floor(y / TILE)] ?? '')[Math.floor(x / TILE)] ?? ' ') !== ' ';
-/** Both ends of the print, so half of one never hangs over a shaft. */
 const standing = (f: { x: number; y: number }) => floorAt(f.x, f.y + 5) && floorAt(f.x + 6, f.y + 5);
 
 export const PECH_MERLE: LevelData = {
@@ -139,7 +203,7 @@ export const PECH_MERLE: LevelData = {
   costume: 'hiker',
   widthTiles: W,
   heightTiles: H,
-  rows: g.rows(),
+  rows: ROWS,
   spawn: { x: 24, y: UPPER - 16 },
   cameraBottom: px(H),
   lampFromX: 96,
@@ -150,63 +214,120 @@ export const PECH_MERLE: LevelData = {
   exit: { x: EXIT_X, y: MID - 24, w: 12, h: 24 },
 
   decor: [
-    { kind: 'caveMouth', x0: 0, x1: px(6), floorY: UPPER },
+    { kind: 'caveMouth', x0: 0, x1: px(5), floorY: UPPER },
     { kind: 'dark', x0: 80, x1: px(W), lamp: 'headlamp', ambient: 0.78 },
     // The guided tour. Three runs of it, and every one stops somewhere useless.
-    { kind: 'walkway', x0: px(6), x1: px(20), y: UPPER },
-    { kind: 'walkway', x0: px(22), x1: px(35), y: UPPER },
-    { kind: 'walkway', x0: px(158), x1: px(171), y: MID },
+    { kind: 'walkway', x0: px(4), x1: px(11), y: UPPER },
+    { kind: 'walkway', x0: px(13), x1: px(22), y: UPPER },
+    { kind: 'walkway', x0: px(108), x1: px(113), y: MID },
     // The art. None of it is ever a floor; in this cave it is all on the wall.
-    { kind: 'cavePanel', panel: 'blackFrieze', rect: { x: 200, y: 36, w: 240, h: 48 } },
-    { kind: 'cavePanel', panel: 'mammoths', rect: { x: 470, y: 30, w: 250, h: 54 } },
-    { kind: 'cavePanel', panel: 'fingerCeiling', rect: { x: 2264, y: 266, w: 240, h: 24 } },
-    { kind: 'cavePanel', panel: 'spottedHorses', rect: { x: 2572, y: 216, w: 216, h: 62 } },
-    // The hollows the bears left, scooped in the ledges they slept on.
-    ...BEAR_LEDGES.filter((l) => l.nest).map((l) => ({ kind: 'bearNest' as const, x: px(l.x + 2), w: px(2), floorY: px(l.y) })),
+    { kind: 'cavePanel', panel: 'blackFrieze', rect: { x: 120, y: 36, w: 200, h: 48 } },
+    { kind: 'cavePanel', panel: 'mammoths', rect: { x: 360, y: 40, w: 220, h: 54 } },
+    { kind: 'cavePanel', panel: 'fingerCeiling', rect: { x: 1544, y: 226, w: 200, h: 24 } },
+    { kind: 'cavePanel', panel: 'spottedHorses', rect: { x: 1800, y: 180, w: 200, h: 62 } },
+    // The hollows the bears left, scooped in three of the six shelves. Two of the
+    // three hold and one does not, because a bear's bowl is thirty centimetres of
+    // clay and has never told anybody anything.
+    ...BEARS.filter((b) => b.nest).map((b) => ({ kind: 'bearNest' as const, x: b.x + 16, w: 32, floorY: b.y })),
     {
       kind: 'footprints',
       prints: [
-        ...trail(160, px(35), UPPER - 5),
-        // He came to the edge of the first shaft and turned round. Two prints face
-        // the way he came, and that is the whole warning the level gives.
-        { x: px(33), y: UPPER - 5, back: true },
-        { x: px(34), y: UPPER - 5, back: true },
-        // And then down the side of it, a step at a time.
-        ...CHAPEL_STEPS.flatMap((s) => trail(px(s.x) + 4, px(s.x + s.w), px(s.y) - 5)),
-        // All the way down the Bear's Gallery.
-        ...BEAR_LEDGES.flatMap((l) => trail(px(l.x) + 4, px(l.x + l.w), px(l.y) - 5)),
-        ...trail(px(118), px(122), LOW - 5),
-        // Nothing up the discs. Nobody climbed that.
-        ...trail(px(140), px(166), MID - 5),
-        ...trail(px(167) + 4, px(177), px(18) - 5),
-        ...trail(px(178), px(W), MID - 5),
-      ].filter(standing),
+        // Along the upper gallery, over the hole, to the lip of the first shaft.
+        ...trail(96, 272, UPPER - 5).filter(standing),
+        // He came to the edge and turned round. Two prints face the way he came,
+        // and that is the whole warning the level gives. The concrete goes on.
+        { x: 240, y: UPPER - 5, back: true },
+        { x: 256, y: UPPER - 5, back: true },
+        // Down the side of the shaft, and along the gallery, on the shelves that
+        // took his weight. He was not carrying a lamp and he came back out.
+        ...[...CHAPEL, ...BEARS].filter((s) => s.does === 'holds' || s.does === 'minds').flatMap((s) => onShelf(s)),
+        // Nothing at all on the discs.
+        ...trail(1540, 1680, MID - 5).filter(standing),
+        ...trail(1732, LAST_RUN.x, MID - 5).filter(standing),
+        ...SHELVES.filter((s) => s.does === 'holds').flatMap((s) => onShelf(s, SHELVES_W)),
+        ...trail(px(121) + 4, px(W), MID - 5).filter(standing),
+      ],
     } satisfies DecorDef,
   ],
 
   entities: [
     // The floor of the lower gallery. Whatever gets down here is staying.
-    { kind: 'hazard', rect: { x: 0, y: px(H - 2) - 4, w: px(W), h: 10 }, cause: 'The lower gallery' },
-    // The Hall of the Discs, climbing. Two of the plates are done holding.
+    { kind: 'hazard', rect: { x: 0, y: BOTTOM - 4, w: px(W), h: 10 }, cause: 'The lower gallery' },
+    // Every shelf of clay in the cave, and what each one does about being stood on.
+    ...[...CHAPEL, ...BEARS, ...SHELVES].map((s) => {
+      const w = SHELVES.includes(s) ? SHELVES_W : SHELF_W;
+      return {
+        kind: 'crumble' as const,
+        skin: 'clayLedge' as const,
+        rect: { x: s.x, y: s.y, w, h: TILE },
+        fake: s.does !== 'holds' && s.does !== 'slides',
+        // The one that lets go does it a second after he lands, which is long
+        // enough to believe it is not going to.
+        delay: s.does === 'goes' ? (SHELVES.includes(s) ? 0.15 : 1) : 0,
+        walk: s.does === 'walks' ? { vx: PHYS.runSpeed, toX: WALK_TO, letsGo: false } : undefined,
+        riseSpeed: s.does === 'lifts' ? 40 : undefined,
+        riseTo: s.does === 'lifts' ? LIFT_TO : undefined,
+        thenFalls: s.does === 'lifts' ? true : undefined,
+        fromAir: s.does === 'minds' ? true : undefined,
+        floorY: BOTTOM,
+        cause: 'The lower gallery' as const,
+      };
+    }),
+    // The second shelf of the gallery is wet, and it is on a slope. Standing on it
+    // is not one of the things you may do: it carries him off the far end, and the
+    // gap after it is wider than being carried gets you.
+    ...BEARS.filter((b) => b.does === 'slides').map((b) => ({
+      // The push runs past the end of the shelf, or it would only ever carry him
+      // to the edge and leave him standing on it.
+      kind: 'conveyor' as const,
+      rect: { x: b.x, y: b.y - 2, w: SHELF_W + 16, h: 8 },
+      vx: 150,
+    })),
+    // The Hall of the Discs, climbing. Calcite, not clay.
     ...DISCS.map((d) => ({
       kind: 'crumble' as const,
       skin: 'disc' as const,
-      rect: { x: d.x, y: d.y, w: 32, h: 6 },
-      fake: d.snaps === true,
-      delay: 0.3,
-      floorY: px(H - 2),
+      rect: { x: d.x, y: d.y, w: DISC_W, h: 6 },
+      fake: d.does !== 'holds',
+      delay: d.does === 'goes' ? 0 : 0,
+      walk: d.does === 'walks' ? { vx: -50, toX: DISC_WALK_TO } : undefined,
+      floorY: BOTTOM,
       cause: 'The lower gallery' as const,
     })),
+    // The far lip of the second hole in the passage. It is the width of a boot and
+    // it has been holding up a ceiling, not a man.
+    {
+      kind: 'crumble',
+      skin: 'clayLedge',
+      rect: { x: LIP_X, y: MID, w: TILE, h: TILE },
+      fake: true,
+      delay: 0.1,
+      floorY: BOTTOM,
+      cause: 'The lower gallery',
+    },
+    // The slab. It comes down as he enters the passage, well in front of him, and
+    // what it takes away is not the floor but the room to run at the second hole.
+    {
+      kind: 'roof',
+      x: BLOCK.x,
+      w: BLOCK.w,
+      h: 16,
+      fromY: px(16),
+      floorY: BLOCK.bottom,
+      triggerX: 1500,
+      delay: 0.2,
+      cause: 'The roof',
+    },
     // The last eighty pixels of the guided tour, laid across the deepest shaft in
     // the cave with the horses on the wall beside it. It has been holding for
     // forty seconds. It holds for six tenths of one more.
     {
       kind: 'crumble',
       skin: 'walkway',
-      rect: { x: px(166), y: MID, w: 80, h: 16 },
+      rect: { x: LAST_RUN.x, y: MID, w: LAST_RUN.w, h: 16 },
       fake: true,
       delay: 0.6,
-      floorY: px(H - 2),
+      floorY: BOTTOM,
       cause: 'The lower gallery',
     },
   ] satisfies EntityDef[],

@@ -388,6 +388,8 @@ export class Crumble implements Entity {
   private readonly solid: MovingSolid;
   /** Where the top of a rising one meets the rock above it. */
   private readonly roofY: number;
+  /** Whether the player was off the ground last frame, for the ones that mind being landed on. */
+  private wasAirborne = false;
 
   constructor(readonly def: CrumbleDef, level?: Level) {
     this.rect = { ...def.rect };
@@ -410,7 +412,12 @@ export class Crumble implements Entity {
     const r = this.rect;
     const standing = p.x + p.w > r.x && p.x < r.x + r.w && Math.abs(p.y + p.h - r.y) <= 2;
     if (this.state === 'idle') {
-      const go = this.def.onEvent ? w.events.has(this.def.onEvent) : standing;
+      // One that minds being landed on wants the player to have come through the
+      // air. Entities update before the player moves, so the ground under him last
+      // frame is the ground he was on before he arrived.
+      const arrived = standing && (!this.def.fromAir || this.wasAirborne);
+      const go = this.def.onEvent ? w.events.has(this.def.onEvent) : arrived;
+      this.wasAirborne = !p.onGround;
       if (go) {
         this.state = 'armed';
         this.timer = this.def.delay;
@@ -440,8 +447,9 @@ export class Crumble implements Entity {
       r.x += step;
       this.solid.dx = step;
       if (Math.abs(toX - r.x) < 0.01) {
-        // Arrived. Whoever is still on it is let go of; otherwise it is a ledge here.
-        if (standing) {
+        // Arrived. Unless it is one of the ones that carry you, whoever is still on
+        // it is let go of; otherwise it is a ledge where it stopped.
+        if (standing && this.def.walk.letsGo !== false) {
           this.state = 'falling';
           w.sound('crumble');
         } else {
@@ -451,12 +459,17 @@ export class Crumble implements Entity {
       return;
     }
     if (this.state === 'rising' && this.def.riseSpeed !== undefined) {
-      const step = Math.min(this.def.riseSpeed * DT, r.y - this.roofY);
+      const stop = Math.max(this.roofY, this.def.riseTo ?? this.roofY);
+      const step = Math.min(this.def.riseSpeed * DT, r.y - stop);
       r.y -= step;
       this.solid.dy = -step;
       // The head room runs out before the figure does.
-      if (standing && r.y - p.h < this.roofY) w.kill(this.def.cause ?? 'The overhang');
-      if (r.y <= this.roofY) this.state = 'landed';
+      if (standing && this.def.riseTo === undefined && r.y - p.h < this.roofY) w.kill(this.def.cause ?? 'The overhang');
+      if (r.y <= stop) {
+        // A thing that lifts you is a thing that drops you.
+        this.state = this.def.thenFalls ? 'falling' : 'landed';
+        if (this.state === 'falling') w.sound('crumble');
+      }
       return;
     }
     // Falling: a crocodile dives at its own pace, a capital drops. You ride it down either way.

@@ -29,20 +29,35 @@ concrete — and they disagree. **The walkway is wrong every time.**
 
 It is also the first level in the game that goes anywhere but sideways. Pech Merle is a
 vertical system: an upper gallery you walk in at, a lower one under it, and shafts
-between. The route drops about four hundred pixels and climbs a hundred and thirty back,
+between. The route drops about three hundred pixels and climbs a hundred back,
 and **the only way down is in stages**, because a fall of more than 200 px is fatal
-anywhere in the game (`PILLARS.md`, pillar 1). The cave is 576 px deep against a 180 px
+anywhere in the game (`PILLARS.md`, pillar 1). The cave is 512 px deep against a 180 px
 window, so the camera is moving for most of the level.
+
+**And it is the level where the clay stops holding still.** Sixteen shelves and plates
+carry the route, every one of them drawn from the same tiles as the floor they broke off,
+and half of them do something: one lets go, one lifts him and drops him, one slides him
+off, one walks him to safety, one walks him away from it, one snaps, one will not take a
+landing, one will not take a jump. Nothing about how any of them looks says which is
+which, nothing is random, and nothing changes between attempts. The first run is a list
+of deaths and the second run is the list, learned.
 
 > Cap Blanc: you see everything, and half of it lies.
 > Roc-aux-Sorciers: nothing lies, and you cannot see it.
 > Pech Merle: two things tell you where to go, and they disagree.
 
-It is also **three times the length of the first two levels, and there are no
-checkpoints**. That is the design, not an accident. A clean run is about thirty seconds;
-the last trap is at the very end, on the thing that has been reliable the whole way. What
-makes that fair rather than cheap is that nothing in the level is random, nothing changes
-between attempts, and there is no trap that a player who remembers cannot beat.
+And the one rule worth knowing, which the level never states: **where the boy stood, the
+clay is where it looks and will take his weight.** Prints mean safe. No prints mean it is
+anybody's guess — and in the Hall of the Discs, where he never went, there are none at
+all.
+
+It is **longer than the first two levels and there are no checkpoints**. That is the
+design, not an accident, and it is why the cave was cut back from 3,072 px to 2,048: a
+clean run is about twenty-one seconds against their twelve, so a death at the last trap
+costs a run and not an evening. The last trap is at the very end, on the thing that has
+been reliable the whole way. What makes that fair rather than cheap is that nothing in
+the level is random, nothing changes between attempts, and there is no trap that a player
+who remembers cannot beat.
 
 ## The beats
 
@@ -50,11 +65,11 @@ between attempts, and there is no trap that a player who remembers cannot beat.
 |---|---|---|---|
 | a | `a-entrance` | Down into the dark. The lamp comes on. Concrete underfoot and prints in the clay, going the same way | The cave is visited on a made path; the prints are where they have always been |
 | b | `b-frieze` | The Black Frieze on the wall, one hole in the floor to hop. Walkway and prints still agree | Twenty-five animals in black manganese outline |
-| c | `c-mammoths` | The floor runs out and the concrete does not: it carries on over the first shaft and stops in mid air, with three hundred and fifty pixels of nothing under the end of it. The prints turn back at the edge and go down the far side, four short steps | The Chapel of the Mammoths, seven metres of them in the upper gallery |
-| d | `d-bears` | No tour comes down here. A long descent: eight ledges stepping down over the lower gallery, hollows scooped in them where bears slept, and shafts between them that go all the way to the floor | Cave bears wintered in these galleries and scraped themselves hollows to do it in |
-| e | `e-discs` | And this one climbs: plates of calcite growing out of the wall at rising heights, two of them done holding — and no prints at all, because nobody came up this way | The Hall of the Discs: water under pressure out of a crack, set into fans |
-| f | `f-tracings` | A passage low enough to take half the jump away, with two holes in its floor | The ceiling of finger tracings, drawn in soft clay by someone who could reach it |
-| g | `g-horses` | The walkway comes back, runs to the best view in the cave, and holds for half a second more | The Spotted Horses, and the viewing point every visitor is taken to |
+| c | `c-mammoths` | The floor runs out and the concrete does not: it carries on over the first shaft and stops in mid air. The prints turn back at the edge and go down the far side, four steps — the second lets go, and the third lifts him and then lets go | The Chapel of the Mammoths, seven metres of them in the upper gallery |
+| d | `d-bears` | No tour comes down here. Six shelves stepping down over the lower gallery, hollows scooped in three of them where bears slept. One will not let him stand still; one lets go; one walks him across to the last; and the last takes a man who walks on to it and not a man who jumps | Cave bears wintered in these galleries and scraped themselves hollows to do it in |
+| e | `e-discs` | And this one climbs: five plates of calcite at rising heights, and no prints at all, because nobody came up this way. One snaps as he touches it; one walks back down the hall and drops him at the bottom of it | The Hall of the Discs: water under pressure out of a crack, set into fans |
+| f | `f-tracings` | A passage low enough to take a quarter off every jump, with two holes in its floor, a slab of the roof that comes down between them and takes the run-up with it, and a stone in the second hole that will not take a landing | The ceiling of finger tracings, drawn in soft clay by someone who could reach it |
+| g | `g-horses` | The walkway comes back, runs to the best view in the cave, and holds for six tenths of a second more. Over it, three shelves, and the prints go along those | The Spotted Horses, and the viewing point every visitor is taken to |
 
 ## Deliberate lies
 
@@ -65,16 +80,21 @@ between attempts, and there is no trap that a player who remembers cannot beat.
   They are not: a bear's nest is a bowl scraped in the clay about thirty centimetres
   deep, and falling in would cost a visitor their dignity and nothing else. They are
   drawn as what they are now, and the danger is the shafts, which are real.)*
-- **Two of the calcite discs give way.** Discs are fragile and are never walked on, but
-  they have been growing where they are for a very long time and they are not about to
-  drop.
+- **Nine of the sixteen ledges do something.** Clay shelves do not let go, lift, slide,
+  walk, take offence at being jumped on, or snap; discs are fragile and are never walked
+  on, but they have been growing where they are for a very long time and are not about to
+  drop, and none of them has ever moved sideways. This is the level's one big lie and it
+  is the whole middle of it.
+- **A slab of the roof comes down in the passage** as the tourist walks into it. The roof
+  of Pech Merle is not doing that.
 - **The last run of walkway collapses.** The concrete at Pech Merle is maintained,
   inspected and entirely safe. Nobody has ever gone through it.
 - **The walkway ends in mid air, twice.** A real visitor path does not stop over a hole;
   it goes round, or there is no path.
 - **The footprints run the whole length of the cave.** A dozen prints is what survives,
   in one stretch. The game lays a trail from the door to the exit, because the trail is
-  what the player reads instead of a sign (pillar 2).
+  what the player reads instead of a sign (pillar 2), and it marks every ledge that is
+  where it looks — which is a rule the real prints do not carry and cannot.
 - The **layout**: the galleries are in this order and at these distances because the level
   needs them to be. Spacing and jump distances are level design (`arc.md`, invariants).
 

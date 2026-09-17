@@ -109,7 +109,9 @@ export interface SweepDef {
 /** Looks like something to stand on. If fake, it gives way a moment after you do, or on an event. */
 export interface CrumbleDef {
   kind: 'crumble';
-  skin: 'croc' | 'capital' | 'rock' | 'floor' | 'talatat' | 'column' | 'stone' | 'relief' | 'fallenBlock' | 'horns' | 'disc' | 'walkway' | 'nodule' | 'stalagmite' | 'fallenRoof';
+  skin:
+    | 'croc' | 'capital' | 'rock' | 'floor' | 'talatat' | 'column' | 'stone' | 'relief' | 'fallenBlock'
+    | 'horns' | 'disc' | 'walkway' | 'nodule' | 'stalagmite' | 'fallenRoof' | 'clayLedge';
   rect: Rect;
   fake: boolean;
   delay: number;
@@ -127,15 +129,24 @@ export interface CrumbleDef {
   cause?: DeathCause;
   /**
    * Once stood on, it turns round and walks along the wall at `vx` px/s until its
-   * left edge is at `toX`. Whoever is still on it when it gets there is let go of;
-   * if nobody is, it stays where it stopped and is a ledge there.
+   * left edge is at `toX`. Unless `letsGo` is false, whoever is still on it when it
+   * gets there is dropped; otherwise it parks, and riding it is the way across.
    */
-  walk?: { vx: number; toX: number };
+  walk?: { vx: number; toX: number; letsGo?: boolean };
   /**
-   * Once stood on, it rises at this many px/s until it meets whatever is above
-   * it. Whoever is still on it when the head room runs out dies of `cause`.
+   * Once stood on, it rises at this many px/s: to `riseTo` if there is one, else
+   * until it meets the rock above it, and then whoever is still on it when the head
+   * room runs out dies of `cause`. `thenFalls` makes it let go where it stops, so a
+   * thing that lifts you is a thing that drops you.
    */
   riseSpeed?: number;
+  riseTo?: number;
+  thenFalls?: boolean;
+  /**
+   * It only minds being landed on. Walk onto it from the side and it holds for
+   * ever; arrive through the air and it does whatever it does.
+   */
+  fromAir?: boolean;
 }
 
 /**

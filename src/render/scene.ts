@@ -1808,6 +1808,12 @@ function drawEntityBack(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): voi
       } else if (d.skin === 'nodule') {
         // A nodule of flint that has weathered out of the wall and lies on the track bed.
         if (!paint(ctx, 'flint-nodule', r.x, r.y)) ctx.drawImage(NODULE_SPRITE, r.x, r.y);
+      } else if (d.skin === 'clayLedge') {
+        // A shelf of the cave's own clay. Drawn tile for tile exactly as the clay
+        // the level is cut out of, because that is what it is (pillar 4).
+        for (let i = 0; i < r.w / TILE; i++)
+          for (let j = 0; j < r.h / TILE; j++)
+            drawClay(ctx, Math.floor(r.x / TILE) + i, Math.floor(r.y / TILE) + j, r.x + i * TILE, r.y + j * TILE, j === 0);
       } else if (d.skin === 'walkway') {
         // The last run of concrete, laid across the hole on two steel bearers.
         for (let i = 0; i < r.w / TILE; i++) drawConcrete(ctx, r.x + i * TILE, r.y, true);

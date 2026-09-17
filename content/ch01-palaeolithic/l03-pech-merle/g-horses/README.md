@@ -1,19 +1,25 @@
 # Beat g · the Spotted Horses
 
-The end, and the second betrayal.
+The last chamber, and the walkway comes back for it: a run of concrete to the edge of the
+deepest shaft in the cave, and then a run of concrete straight across it, with the
+Spotted Horses on the wall beside it. Two horses back to back under black dots blown at
+the rock, with negative hands sprayed around them, about twenty-five thousand years old.
+It is the best view in the cave and it is where every visitor is taken.
 
-The chamber opens out and the concrete comes back: the last run of the guided tour, going
-straight to the viewing point in front of the most famous painting in the cave. Two horses
-back to back under blown black dots, with negative hands sprayed around them, about
-twenty-five thousand years old.
+**It has been holding for forty seconds. It holds for six tenths of one more.**
 
-The concrete crosses the deepest hole in the cave to get there. It has been holding for
-forty seconds. It holds for six tenths of one more.
+The way across is over it: three shelves of clay above the shaft, which is where the
+prints go — and the prints have been right for the whole level. The first holds, the
+**second lets go the instant he lands on it**, so it is a bounce and not a step, and the
+third holds and is walked off on to the far floor and the way out. There are no prints on
+the second.
 
-The prints go up onto the clay shelves to the right, a step above it, and across. They
-have been saying so all the way from the door.
+The exit is under the last shelf. A man who jumps off that one instead of walking off it
+goes over the top of it, which costs him nothing but a walk back, and is the only mistake
+in the level that costs nothing.
 
-**Never state the dots as a description of a real horse.** There is a live argument about
-whether Pleistocene horses carried leopard spotting and whether these dots record it; the
-chapter file names it as contested. The dots are painted as dots, the game takes no
-position, and neither does the art.
+## Deliberately wrong
+
+The concrete at Pech Merle is maintained, inspected and entirely safe; nobody has ever
+gone through it. The shelves over the shaft, and what the middle one does, are level
+design. The horses, the dots and the hands are where they are.
