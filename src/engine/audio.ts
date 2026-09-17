@@ -620,19 +620,23 @@ export class GameAudio {
   /**
    * One eighth of a waltz. A bar is six steps: the bass alone on beat one, the two
    * plucked chord notes on beats two and three, and the tune over the top whenever
-   * it has something to say. Every page of the brochure is played by the same
-   * three voices at the same tempo, because it is the same brochure.
+   * it has something to say. Every page is the same three voices at the same
+   * tempo, because it is the same brochure — and page one has a drummer as well,
+   * because the operator decided that page needed one.
    */
   private scheduleWaltzStep(id: WaltzId, t: number, i: number): void {
     const out = this.music[id];
     const waltz = WALTZES[id];
     if (!out) return;
+    const beat = i % WALTZ_STEPS_PER_BAR;
     const bar = waltz.bars[Math.floor(i / WALTZ_STEPS_PER_BAR) % waltz.bars.length];
     if (bar) {
-      const beat = i % WALTZ_STEPS_PER_BAR;
       if (beat === 0) this.waltzBass(t, bar.bass, out);
       else if (beat === 2 || beat === 4) for (const f of bar.pah) this.waltzChord(t, f, out);
     }
+    // The drummer does not read the rest of the part. He plays all three beats of
+    // all sixteen bars, including the last one, where everyone else has finished.
+    if (waltz.drum && beat % 2 === 0) this.waltzDrum(t, beat === 0 ? 0.062 : 0.044, out);
     const f = waltz.melody[i];
     if (f) this.waltzMelody(t, f, out);
   }
@@ -678,6 +682,46 @@ export class GameAudio {
     osc.connect(g).connect(out);
     osc.start(t);
     osc.stop(t + 0.9);
+  }
+
+  /**
+   * The tour operator's idea of a prehistoric drum. It is small, dry and thin on
+   * purpose: a deep boom with a room on it would sound like a cave, and this has
+   * to sound like a session player in a basement studio being told to make it
+   * primitive. Measured: 2.9 per cent of its energy below 120 Hz, where a kick
+   * drum puts sixty to eighty, two thirds of it between 120 and 250, and gone in
+   * seventy-three milliseconds against the four to eight hundred of a boomy tom.
+   * No reverb anywhere near it — the waltz tracks are not sent to the cave, only
+   * the pipe is. The brochure is what is playing, not the Palaeolithic, and the
+   * sound has to say so before anybody has to be told.
+   */
+  private waltzDrum(t: number, level: number, out: GainNode): void {
+    const ctx = this.ctx;
+    if (!ctx) return;
+    // The skin. Loud, high and gone in forty milliseconds: this is where a hand
+    // drum lives and where a kick drum does not.
+    const src = this.noiseSource(ctx);
+    const bp = ctx.createBiquadFilter();
+    bp.type = 'bandpass';
+    bp.frequency.value = 700;
+    bp.Q.value = 0.7;
+    const ng = ctx.createGain();
+    ng.gain.setValueAtTime(level * 3, t);
+    ng.gain.exponentialRampToValueAtTime(0.0004, t + 0.04);
+    src.connect(bp).connect(ng).connect(out);
+    src.start(t);
+    src.stop(t + 0.06);
+    // The body: a short drop that stops a long way short of the floor.
+    const osc = ctx.createOscillator();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(210, t);
+    osc.frequency.exponentialRampToValueAtTime(110, t + 0.05);
+    const og = ctx.createGain();
+    og.gain.setValueAtTime(level * 0.65, t);
+    og.gain.exponentialRampToValueAtTime(0.0004, t + 0.09);
+    osc.connect(og).connect(out);
+    osc.start(t);
+    osc.stop(t + 0.12);
   }
 
   /** Beats two and three: the oom-pah-pah, felt rather than heard. */
@@ -893,6 +937,8 @@ const WALTZ_STEP = 60 / WALTZ_BPM / 2;
 interface Waltz {
   bars: readonly { bass: number; pah: readonly [number, number] }[];
   melody: readonly (number | 0)[];
+  /** Whether the operator hired a drummer for this page. Only page one. */
+  drum?: true;
 }
 
 /** The left hand: one chord a bar, its root on beat one and two notes to answer. */
@@ -1015,22 +1061,27 @@ const MAP_CH02_MELODY: (number | 0)[] = [
 // --- The map, page one -----------------------------------------------------
 // The Palaeolithic page of the same brochure.
 //
-// The tempting joke is a drum: the operator putting a tom-tom under the cave art,
-// which is the exact thing the chapter itself refuses to do. It is not here. It
-// is the cheaper laugh, it would break the one rule these pages have — three
-// voices, one tempo, because it is one brochure — and a player reaches this page
-// before ever hearing the pipe, so the first Palaeolithic sound in the game would
-// be the caveman cliché with nothing yet to correct it. Pillar 11 is not a thing
-// to take a run-up at.
+// The pipe has exactly two properties and the operator removes both. It has no
+// meter: its phrases end where breath ends. He puts it in three-four. And it has
+// silence — three to five seconds of nothing between phrases, which in the caves is
+// where the room does the work. He fills every one of them, because you cannot sell
+// a page with a hole in it. Forty-seven notes here against thirty-six on the world
+// page and thirty on Egypt's, and a note on every beat of every bar except two:
+// bar 8 and bar 16, where he has just got somewhere and lets himself stop. The tune
+// that breathed now never stops for breath.
 //
-// The better joke needs no drum, because the pipe has exactly two properties and
-// the operator removes both. It has no meter: phrases end where breath ends. He
-// puts it in three-four. And it has silence — three to five seconds of nothing
-// between phrases, which in the caves is where the room does the work. He fills
-// every one of them, because you cannot sell a page with a hole in it. Forty-seven
-// notes here against thirty-six on the world page and thirty on Egypt's, and a note
-// on every beat of every bar except two: bar 8 and bar 16, where he has just got
-// somewhere and lets himself stop. The tune that breathed now never stops for breath.
+// And there is a drum. Designer's ruling, taken after it had been argued the other
+// way and built without one: the operator putting a beat under the cave art is the
+// joke, and it is the same joke as the three-four, said out loud. The risk it
+// carries is real and is handled in the sound rather than in an apology. A deep
+// boom with a room on it would be the primitivising cliché and would be heard as a
+// claim about the Palaeolithic; this one is small, dry, thin and band-limited well
+// above a kick, and reads as a session player in a basement. It is on every beat of
+// every bar, identical, with no fill and no variation, and it is still going in bar
+// 16 after the melody has arrived and stopped, because nobody told him. The point
+// of it is that it is cheap, and cheapness is the operator's, not the chapter's.
+// The chapter's own music still has no drum and never will: see
+// content/ch01-palaeolithic/CHAPTER.md, which now records both halves of that.
 //
 // He harmonises G pentatonic with G, E minor, C and D — one, six, four, five, the
 // most ordinary progression in the language. Two quieter liberties. The pipe rests
@@ -1097,7 +1148,7 @@ const MAP_CH01_MELODY: (number | 0)[] = [
 /** Every page of the brochure, played by the same three voices at the same tempo. */
 const WALTZES: Record<WaltzId, Waltz> = {
   map: { bars: MAP_BARS, melody: MAP_MELODY },
-  mapCh01: { bars: MAP_CH01_BARS, melody: MAP_CH01_MELODY },
+  mapCh01: { bars: MAP_CH01_BARS, melody: MAP_CH01_MELODY, drum: true },
   mapCh02: { bars: MAP_CH02_BARS, melody: MAP_CH02_MELODY },
 };
 

@@ -104,10 +104,20 @@ ending where breath ends.
   and d'Errico discuss two of those five again in 2002. So: seventeen accepted, about five
   arguable, and any single figure quoted for Isturitz is a position in that argument. Cite
   it the way the hands of Gargas are cited, never as a settled number.
-- **No drum.** No Palaeolithic drum survives and a membrane would not. The thumping
-  caveman drum is the cliché that would make the chapter's people primitive, and pillar 11
-  says the tourist is the only idiot in this game. The music is the one thing in the
-  chapter that is unambiguously competent.
+- **No drum in the chapter.** No Palaeolithic drum survives and a membrane would not. The
+  thumping caveman drum is the cliché that would make the chapter's people primitive, and
+  pillar 11 says the tourist is the only idiot in this game. In the five levels the music is
+  one pipe and nothing else, and it is the one thing in the chapter that is unambiguously
+  competent.
+- **The brochure has a drum, and that is the point.** The Chapter 1 page of the tour map is
+  not the chapter's music; it is the tour operator's arrangement of it, and he has hired a
+  drummer. It is on every beat, identical for sixteen bars, no fill, and still going in the
+  last bar after the tune has arrived and stopped. It is made small, dry and thin on
+  purpose: a deep boom with a cave on it would be heard as a claim about the Palaeolithic,
+  and this has to be heard as a session player in a basement studio. The absence in the
+  levels and the presence on the brochure are one statement, and the second is what makes
+  the first audible. Designer's ruling, taken after the page had been built without one.
+  The joke is the operator's budget and never the place.
 - **The room.** Levels 1 and 2 are open cliff shelters and are nearly dry. Levels 3 and 4
   are chambers. Gargas is the longest. That is a fact about the places, and reverb is
   physics.
