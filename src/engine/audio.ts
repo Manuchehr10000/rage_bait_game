@@ -621,8 +621,9 @@ export class GameAudio {
    * One eighth of a waltz. A bar is six steps: the bass alone on beat one, the two
    * plucked chord notes on beats two and three, and the tune over the top whenever
    * it has something to say. Every page is the same three voices at the same
-   * tempo, because it is the same brochure — and page one has a drummer as well,
-   * because the operator decided that page needed one.
+   * tempo, because it is the same brochure. The chapter pages have a drummer on
+   * top, and it is the same drummer playing the same bar, because the operator
+   * booked one session and got one thing.
    */
   private scheduleWaltzStep(id: WaltzId, t: number, i: number): void {
     const out = this.music[id];
@@ -937,7 +938,11 @@ const WALTZ_STEP = 60 / WALTZ_BPM / 2;
 interface Waltz {
   bars: readonly { bass: number; pah: readonly [number, number] }[];
   melody: readonly (number | 0)[];
-  /** Whether the operator hired a drummer for this page. Only page one. */
+  /**
+   * Whether the drummer plays on this page. He is one man on one afternoon, so
+   * where he plays at all he plays exactly the same part. Not on the world page:
+   * he was booked for local colour, and the cover has no locality to colour.
+   */
   drum?: true;
 }
 
@@ -1013,6 +1018,24 @@ const MAP_MELODY: (number | 0)[] = [
 // The world page never arrives. This one does: bar 16 is the root on the downbeat,
 // tidy and final and in the wrong place. Press Enter from here and it cross-fades
 // into the same tune played straight.
+//
+// And the drummer is on this page too — the same drummer, the same three square
+// beats, the same bar sixteen times over, not one thing about him changed from
+// page one. That is the joke and it is why there is no Egyptian rhythm here. The
+// obvious thing to put under a brochure's Egypt page is a hand drum playing the
+// pattern everyone means by Egyptian, and that would be the game producing a real
+// cliché about a real place with the brochure framing straining to excuse it.
+// This way the sound the game actually makes is a man who knows one thing being
+// asked for local colour twice, and the brochure's local colour turning out to be
+// identical on every page of it. Pillar 4 aimed at the tour operator: identical
+// things are identical, and here that is the joke and not the trap.
+//
+// He is far more exposed here than on page one, and he is not mixed down for it.
+// Same part, same levels, measured: he lifts the average beat of this page by 2.6 dB
+// against 0.9 on page one, and across the emptiest quarter of each page by 6.0 dB
+// against 2.2. This page has thirty notes to page one's forty-seven, so there is
+// more room and he fills all of it. The emptier the page, the more you hear what he
+// is doing, and that is correct.
 
 const MAP_CH02_BARS: { bass: number; pah: readonly [number, number] }[] = [
   { bass: E2, pah: [E3, B3] }, //  1  E, open: no third, because the tune keeps playing the fourth
@@ -1149,7 +1172,7 @@ const MAP_CH01_MELODY: (number | 0)[] = [
 const WALTZES: Record<WaltzId, Waltz> = {
   map: { bars: MAP_BARS, melody: MAP_MELODY },
   mapCh01: { bars: MAP_CH01_BARS, melody: MAP_CH01_MELODY, drum: true },
-  mapCh02: { bars: MAP_CH02_BARS, melody: MAP_CH02_MELODY },
+  mapCh02: { bars: MAP_CH02_BARS, melody: MAP_CH02_MELODY, drum: true },
 };
 
 /** How many steps each track has before it comes round again. */

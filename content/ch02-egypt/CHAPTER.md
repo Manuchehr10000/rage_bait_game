@@ -53,6 +53,37 @@ exact the temples are, the better the joke.
 - Every asset note separates **must be right** from **deliberately wrong**. There is no
   third category.
 
+## The sound
+
+The three levels are scored with one melody in E double harmonic, the scale everyone hears
+as Egypt, played straight and slow and sparse. The Chapter 2 page of the tour map is not
+that. It is the tour operator's waltz arrangement of the same melody, and it is the only
+place in the chapter where anything is mocked.
+
+**Must be right.**
+
+- The map page is the levels' melody, note for note, in the same scale. The joke is only
+  ever the arrangement, and the arrangement belongs to the operator.
+- Everywhere the game is not being the brochure, the melody is played straight.
+
+**Deliberately wrong.**
+
+- The brochure harmonises a scale that has no triads in it with triads, and finishes on a
+  B major, which needs an F#. E double harmonic is E F G# A B C D#. There is no F# in it.
+  The world map's own waltz carries the same wrong note, in C, and the Palaeolithic page
+  carries it a third time. One operator, one misprint, three pages.
+- There is a drum on the map page, and it is the same drummer playing the same bar as the
+  Palaeolithic page — not one thing about him changed. That is the point. He is one
+  session player the operator booked for one afternoon, and the brochure's local colour
+  turns out to be identical on every page of it.
+
+**Deliberately absent, and this one matters.** There is no Egyptian rhythm anywhere in this
+game. The obvious thing to put under a brochure's Egypt page is a hand drum playing the
+pattern that is meant by "Egyptian", and that would be the game making a real cliché about
+a real place, with the brochure framing straining to excuse it. A drummer who cannot play
+anything else makes the same point about the operator and costs the place nothing. Pillar
+11: the costume mocks the tourist, never the place, and so does the soundtrack.
+
 ## Imagery
 
 Strong and public domain: *Description de l'Égypte* (1809–28), Denon 1802, Lepsius
