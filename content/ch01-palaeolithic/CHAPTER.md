@@ -117,7 +117,9 @@ ending where breath ends.
   and this has to be heard as a session player in a basement studio. The absence in the
   levels and the presence on the brochure are one statement, and the second is what makes
   the first audible. Designer's ruling, taken after the page had been built without one.
-  The joke is the operator's budget and never the place.
+  The joke is the operator's budget and never the place. He is not this chapter's drummer,
+  either: he plays the identical bar on every page of the brochure, the world map included,
+  so he is not evoking the Palaeolithic and is not capable of it.
 - **The room.** Levels 1 and 2 are open cliff shelters and are nearly dry. Levels 3 and 4
   are chambers. Gargas is the longest. That is a fact about the places, and reverb is
   physics.

@@ -73,9 +73,11 @@ place in the chapter where anything is mocked.
   The world map's own waltz carries the same wrong note, in C, and the Palaeolithic page
   carries it a third time. One operator, one misprint, three pages.
 - There is a drum on the map page, and it is the same drummer playing the same bar as the
-  Palaeolithic page — not one thing about him changed. That is the point. He is one
-  session player the operator booked for one afternoon, and the brochure's local colour
-  turns out to be identical on every page of it.
+  Palaeolithic page — not one thing about him changed. That is the point. He is one session
+  player the operator booked for one afternoon, and he plays on every page of the brochure,
+  the world map included. He is not local colour and never was: a page about nowhere in
+  particular gets the identical bar. The operator put a drum on the brochure because a
+  brochure with a drum on it sounds livelier, and that is the whole of his brief.
 
 **Deliberately absent, and this one matters.** There is no Egyptian rhythm anywhere in this
 game. The obvious thing to put under a brochure's Egypt page is a hand drum playing the

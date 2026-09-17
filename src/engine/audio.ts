@@ -621,9 +621,10 @@ export class GameAudio {
    * One eighth of a waltz. A bar is six steps: the bass alone on beat one, the two
    * plucked chord notes on beats two and three, and the tune over the top whenever
    * it has something to say. Every page is the same three voices at the same
-   * tempo, because it is the same brochure. The chapter pages have a drummer on
-   * top, and it is the same drummer playing the same bar, because the operator
-   * booked one session and got one thing.
+   * tempo, because it is the same brochure — and every page has the drummer, the
+   * same man playing the same bar, because the operator booked one session and got
+   * one thing. There is no flag for it: a page without him is not a thing this
+   * brochure has.
    */
   private scheduleWaltzStep(id: WaltzId, t: number, i: number): void {
     const out = this.music[id];
@@ -637,7 +638,7 @@ export class GameAudio {
     }
     // The drummer does not read the rest of the part. He plays all three beats of
     // all sixteen bars, including the last one, where everyone else has finished.
-    if (waltz.drum && beat % 2 === 0) this.waltzDrum(t, beat === 0 ? 0.062 : 0.044, out);
+    if (beat % 2 === 0) this.waltzDrum(t, beat === 0 ? 0.062 : 0.044, out);
     const f = waltz.melody[i];
     if (f) this.waltzMelody(t, f, out);
   }
@@ -927,7 +928,16 @@ const CH01_PIPE: PipeNote[] = [
 // Sixteen bars, forty seconds, and it never arrives. The last bar sits on B over
 // G — the one note that wants to rise to C — and the loop answers it by dropping
 // to E instead. The tune has no downbeat on its own root anywhere in the piece,
-// so the map is always a departure and never a destination.
+// so the map is always a departure and never a destination. The drummer, who does
+// not know that, keeps time through all of it, which is the sound of a treadmill.
+//
+// He is on this page, and that is what settles what he is. It would be tidier if he
+// were local colour, hired to make each chapter page sound like somewhere; he was
+// held off the cover for exactly that reason and it was the wrong call, because it
+// gave him a purpose. He plays here too, under a piece about nowhere in particular,
+// and he plays the identical bar. So he was never evoking anything. The operator
+// put a drum on the brochure because a brochure with a drum on it sounds livelier
+// than one without, and that is the whole of his brief.
 
 const WALTZ_BPM = 72;
 /** Three beats to the bar, two steps to the beat. */
@@ -938,12 +948,6 @@ const WALTZ_STEP = 60 / WALTZ_BPM / 2;
 interface Waltz {
   bars: readonly { bass: number; pah: readonly [number, number] }[];
   melody: readonly (number | 0)[];
-  /**
-   * Whether the drummer plays on this page. He is one man on one afternoon, so
-   * where he plays at all he plays exactly the same part. Not on the world page:
-   * he was booked for local colour, and the cover has no locality to colour.
-   */
-  drum?: true;
 }
 
 /** The left hand: one chord a bar, its root on beat one and two notes to answer. */
@@ -1025,10 +1029,10 @@ const MAP_MELODY: (number | 0)[] = [
 // obvious thing to put under a brochure's Egypt page is a hand drum playing the
 // pattern everyone means by Egyptian, and that would be the game producing a real
 // cliché about a real place with the brochure framing straining to excuse it.
-// This way the sound the game actually makes is a man who knows one thing being
-// asked for local colour twice, and the brochure's local colour turning out to be
-// identical on every page of it. Pillar 4 aimed at the tour operator: identical
-// things are identical, and here that is the joke and not the trap.
+// This way the sound the game actually makes is a man who knows one thing, playing
+// it on every page of a brochure that sells twelve different places. Pillar 4 aimed
+// at the tour operator: identical things are identical, and here that is the joke
+// and not the trap.
 //
 // He is far more exposed here than on page one, and he is not mixed down for it.
 // Same part, same levels, measured: he lifts the average beat of this page by 2.6 dB
@@ -1171,8 +1175,8 @@ const MAP_CH01_MELODY: (number | 0)[] = [
 /** Every page of the brochure, played by the same three voices at the same tempo. */
 const WALTZES: Record<WaltzId, Waltz> = {
   map: { bars: MAP_BARS, melody: MAP_MELODY },
-  mapCh01: { bars: MAP_CH01_BARS, melody: MAP_CH01_MELODY, drum: true },
-  mapCh02: { bars: MAP_CH02_BARS, melody: MAP_CH02_MELODY, drum: true },
+  mapCh01: { bars: MAP_CH01_BARS, melody: MAP_CH01_MELODY },
+  mapCh02: { bars: MAP_CH02_BARS, melody: MAP_CH02_MELODY },
 };
 
 /** How many steps each track has before it comes round again. */
