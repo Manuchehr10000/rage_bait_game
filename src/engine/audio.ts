@@ -4,12 +4,13 @@
  * Rules from PILLARS.md: a death sounds like what caused it, never like a jingle,
  * and the music and the wind never pause or react.
  *
- * One piece of music per chapter, plus the map's. `map` is the brochure's own
- * waltz and the only cheerful thing in the game. `ch01` is a bone pipe in a cave.
- * `ch02` is the double harmonic everyone hears as Egypt. None of them knows how
- * many times you have died. Switching cross-fades between them and nothing
- * restarts: whichever track you were not listening to kept playing, and comes
- * back exactly where it would have got to.
+ * One piece of music per chapter, and the brochure's own. `map` is the waltz on
+ * the world page and the only cheerful thing in the game. `mapCh02` is the same
+ * brochure's Egypt page. `ch01` is a bone pipe in a cave; `ch02` is the double
+ * harmonic everyone hears as Egypt. None of them knows how many times you have
+ * died. Switching cross-fades between them and nothing restarts: whichever track
+ * you were not listening to kept playing, and comes back exactly where it would
+ * have got to.
  *
  * Chapter 1 also has a room. The reverb is generated, not loaded — a burst of
  * noise with a decay on it, which is what an impulse response is — and the
@@ -42,8 +43,8 @@ export type Sfx =
   | 'thud'
   | 'click';
 
-/** One per chapter, plus the tour map's own. */
-export type MusicId = 'map' | 'ch01' | 'ch02';
+/** One per chapter, plus a page of the brochure. */
+export type MusicId = 'map' | 'mapCh02' | 'ch01' | 'ch02';
 
 /**
  * How much space the level's music is played in. Set from the level's theme by
@@ -67,8 +68,8 @@ export class GameAudio {
   /** One gain per track, so one can fade out under the other without stopping. */
   private music: Partial<Record<MusicId, GainNode>> = {};
   /** How far each track has got: when its next step falls, and which step it is. */
-  private nextNote: Record<MusicId, number> = { map: 0, ch01: 0, ch02: 0 };
-  private noteIndex: Record<MusicId, number> = { map: 0, ch01: 0, ch02: 0 };
+  private nextNote: Record<MusicId, number> = { map: 0, mapCh02: 0, ch01: 0, ch02: 0 };
+  private noteIndex: Record<MusicId, number> = { map: 0, mapCh02: 0, ch01: 0, ch02: 0 };
   private track: MusicId = 'ch02';
   /** The cave. Only Chapter 1 is routed through it. */
   private reverb: ConvolverNode | null = null;
@@ -479,9 +480,9 @@ export class GameAudio {
 
   /** Sound one step of a track, and say how long it is until the next one. */
   private scheduleStep(id: MusicId, t: number, i: number): number {
-    if (id === 'map') {
-      this.scheduleMapStep(t, i);
-      return MAP_STEP;
+    if (id === 'map' || id === 'mapCh02') {
+      this.scheduleWaltzStep(id, t, i);
+      return WALTZ_STEP;
     }
     if (id === 'ch02') {
       this.scheduleCh02Note(t, i);
@@ -612,26 +613,29 @@ export class GameAudio {
   }
 
   /**
-   * One eighth of the map waltz. A bar is six steps: the bass alone on beat one,
-   * the two plucked chord notes on beats two and three, and the tune over the top
-   * whenever it has something to say, which is not often.
+   * One eighth of a waltz. A bar is six steps: the bass alone on beat one, the two
+   * plucked chord notes on beats two and three, and the tune over the top whenever
+   * it has something to say. Every page of the brochure is played by the same
+   * three voices at the same tempo, because it is the same brochure.
    */
-  private scheduleMapStep(t: number, i: number): void {
-    const bar = MAP_BARS[Math.floor(i / MAP_STEPS_PER_BAR) % MAP_BARS.length];
+  private scheduleWaltzStep(id: 'map' | 'mapCh02', t: number, i: number): void {
+    const out = this.music[id];
+    const waltz = WALTZES[id];
+    if (!out) return;
+    const bar = waltz.bars[Math.floor(i / WALTZ_STEPS_PER_BAR) % waltz.bars.length];
     if (bar) {
-      const beat = i % MAP_STEPS_PER_BAR;
-      if (beat === 0) this.mapBass(t, bar.bass);
-      else if (beat === 2 || beat === 4) for (const f of bar.pah) this.mapChord(t, f);
+      const beat = i % WALTZ_STEPS_PER_BAR;
+      if (beat === 0) this.waltzBass(t, bar.bass, out);
+      else if (beat === 2 || beat === 4) for (const f of bar.pah) this.waltzChord(t, f, out);
     }
-    const f = MAP_MELODY[i];
-    if (f) this.mapMelody(t, f);
+    const f = waltz.melody[i];
+    if (f) this.waltzMelody(t, f, out);
   }
 
   /** The tune: a music box in a travel agent's window, triangle with an octave ting. */
-  private mapMelody(t: number, f: number): void {
+  private waltzMelody(t: number, f: number, out: GainNode): void {
     const ctx = this.ctx;
-    const out = this.music.map;
-    if (!ctx || !out) return;
+    if (!ctx) return;
     const lp = ctx.createBiquadFilter();
     lp.type = 'lowpass';
     lp.frequency.value = 2600;
@@ -656,10 +660,9 @@ export class GameAudio {
   }
 
   /** Beat one: the root, short, the thing that makes it a waltz and not a drift. */
-  private mapBass(t: number, f: number): void {
+  private waltzBass(t: number, f: number, out: GainNode): void {
     const ctx = this.ctx;
-    const out = this.music.map;
-    if (!ctx || !out) return;
+    if (!ctx) return;
     const osc = ctx.createOscillator();
     osc.type = 'sine';
     osc.frequency.value = f;
@@ -673,10 +676,9 @@ export class GameAudio {
   }
 
   /** Beats two and three: the oom-pah-pah, felt rather than heard. */
-  private mapChord(t: number, f: number): void {
+  private waltzChord(t: number, f: number, out: GainNode): void {
     const ctx = this.ctx;
-    const out = this.music.map;
-    if (!ctx || !out) return;
+    if (!ctx) return;
     const osc = ctx.createOscillator();
     osc.type = 'triangle';
     osc.frequency.value = f;
@@ -737,6 +739,7 @@ export class GameAudio {
 const E2 = 82.41;
 const G2 = 98.0;
 const A2 = 110.0;
+const B2 = 123.47;
 const C3 = 130.81;
 const D3 = 146.83;
 const E3 = 164.81;
@@ -759,7 +762,7 @@ const D5 = 587.33;
 const E5 = 659.25;
 const G5 = 783.99;
 
-const MUSIC_IDS = ['map', 'ch01', 'ch02'] as const;
+const MUSIC_IDS = ['map', 'mapCh02', 'ch01', 'ch02'] as const;
 /** Time constant of the fade between tracks: about six tenths of a second. */
 const CROSSFADE = 0.2;
 
@@ -875,10 +878,16 @@ const CH01_PIPE: PipeNote[] = [
 // to E instead. The tune has no downbeat on its own root anywhere in the piece,
 // so the map is always a departure and never a destination.
 
-const MAP_BPM = 72;
+const WALTZ_BPM = 72;
 /** Three beats to the bar, two steps to the beat. */
-const MAP_STEPS_PER_BAR = 6;
-const MAP_STEP = 60 / MAP_BPM / 2;
+const WALTZ_STEPS_PER_BAR = 6;
+const WALTZ_STEP = 60 / WALTZ_BPM / 2;
+
+/** A page of the brochure: one chord a bar, and a tune six eighths to the line. */
+interface Waltz {
+  bars: readonly { bass: number; pah: readonly [number, number] }[];
+  melody: readonly (number | 0)[];
+}
 
 /** The left hand: one chord a bar, its root on beat one and two notes to answer. */
 const MAP_BARS: { bass: number; pah: readonly [number, number] }[] = [
@@ -922,9 +931,91 @@ const MAP_MELODY: (number | 0)[] = [
   B4, 0, 0, 0, 0, 0,
 ];
 
+// --- The map, page two -----------------------------------------------------
+// The Egypt page of the same brochure.
+//
+// It is not new music and it must not be. The obvious thing to put on a tour
+// operator's Egypt page is more Egyptian music, and that is the medley trap the
+// world page was written to avoid: it makes the place the joke. So this page
+// plays the Karnak tune — the one the player hears for real in the levels, note
+// for note, the same E double harmonic — rebarred into the brochure's own waltz.
+// Same 72 to the minute, same music box, same oom-pah-pah. The joke is entirely
+// the arrangement, which belongs to the operator, and never the melody, which
+// does not.
+//
+// What the arranger does to it is the point. The scale has no triads in it, so he
+// gives it a progression anyway: an open E he leans on, an A minor, and a dominant
+// to finish — E Am E B, Am E E B E, which is the most ordinary shape there is. He
+// leaves the third out of his E, not out of taste but because the tune keeps
+// playing an A over it and he could hear that much was wrong. What he does not
+// hear: the tune's G# landing on his A minor in bar 3 and making a major seventh
+// he did not order, and its F crossing the B of his E in bar 6 — a tritone, the
+// one place in the arrangement where the seam is audible, and it is a passing
+// note, so it is gone before he could have fixed it.
+//
+// E double harmonic is E F G# A B C D#. There is no F# in it. So the Egypt page
+// and the world page carry the same wrong note, in the same hand — pillar 4, one
+// misprint, two pages — and bars 7, 8 and 15 are where the brochure invents a
+// cadence for a scale that never had one.
+//
+// The world page never arrives. This one does: bar 16 is the root on the downbeat,
+// tidy and final and in the wrong place. Press Enter from here and it cross-fades
+// into the same tune played straight.
+
+const MAP_CH02_BARS: { bass: number; pah: readonly [number, number] }[] = [
+  { bass: E2, pah: [E3, B3] }, //  1  E, open: no third, because the tune keeps playing the fourth
+  { bass: E2, pah: [E3, B3] }, //  2  E
+  { bass: A2, pah: [E3, C4] }, //  3  Am, under a G# that makes it a chord he did not mean
+  { bass: A2, pah: [E3, C4] }, //  4  Am
+  { bass: E2, pah: [E3, B3] }, //  5  E
+  { bass: E2, pah: [E3, B3] }, //  6  E, and the tune's F walks over it
+  { bass: B2, pah: [Fs3, B3] }, //  7  B — the F# the scale does not contain
+  { bass: B2, pah: [Fs3, B3] }, //  8  B
+  { bass: A2, pah: [E3, C4] }, //  9  Am
+  { bass: A2, pah: [E3, C4] }, // 10  Am
+  { bass: E2, pah: [E3, B3] }, // 11  E
+  { bass: E2, pah: [E3, B3] }, // 12  E
+  { bass: E2, pah: [E3, B3] }, // 13  E
+  { bass: E2, pah: [E3, B3] }, // 14  E
+  { bass: B2, pah: [Fs3, B3] }, // 15  B, with the tune's A and D# on top: a dominant seventh
+  { bass: E2, pah: [E3, B3] }, // 16  E — home, on the beat, which is the wrong thing to do
+];
+
+/** The Karnak melody, one line per bar, six eighths each. */
+const MAP_CH02_MELODY: (number | 0)[] = [
+  // Karnak's first phrase, jammed into three time.
+  E4, 0, 0, 0, Gs4, 0,
+  A4, 0, 0, 0, 0, 0,
+  B4, 0, 0, 0, A4, Gs4,
+  F4, 0, E4, 0, 0, 0,
+  // Its second.
+  E4, 0, 0, 0, Ds4, 0,
+  E4, 0, F4, 0, E4, 0,
+  // Two bars the tune never had, to get to the cadence chord.
+  Ds4, 0, 0, 0, E4, 0,
+  B4, 0, 0, 0, 0, 0,
+  // Its third.
+  B4, 0, 0, 0, C5, 0,
+  B4, 0, 0, 0, A4, 0,
+  Gs4, 0, 0, 0, A4, 0,
+  A4, 0, 0, 0, 0, 0,
+  // Its fourth, and then the operator lands it.
+  E5, 0, 0, 0, 0, 0,
+  B4, 0, A4, 0, Gs4, 0,
+  A4, 0, 0, 0, Ds4, 0,
+  E4, 0, 0, 0, 0, 0,
+];
+
+/** Every page of the brochure, played by the same three voices at the same tempo. */
+const WALTZES: Record<'map' | 'mapCh02', Waltz> = {
+  map: { bars: MAP_BARS, melody: MAP_MELODY },
+  mapCh02: { bars: MAP_CH02_BARS, melody: MAP_CH02_MELODY },
+};
+
 /** How many steps each track has before it comes round again. */
 const TRACK_LENGTH: Record<MusicId, number> = {
   map: MAP_MELODY.length,
+  mapCh02: MAP_CH02_MELODY.length,
   ch01: CH01_PIPE.length,
   ch02: CH02_MELODY.length,
 };

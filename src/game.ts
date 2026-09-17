@@ -161,14 +161,25 @@ export class Game {
     }
   }
 
+  /**
+   * Which waltz the brochure is playing. The world page gets the general one; a
+   * chapter page gets the operator's arrangement of that chapter, where one has
+   * been written. Chapter 1's page has not been arranged yet and gets the general
+   * waltz, which is what an un-arranged page should sound like.
+   */
+  private mapMusic(): MusicId {
+    if (this.map.view === 'world') return 'map';
+    return this.map.current.number === 2 ? 'mapCh02' : 'map';
+  }
+
   /** Back to the tour map, on the chapter of the level just left. */
   private goToMap(): void {
     this.screen = 'map';
     this.leaveAfterDeath = false;
     this.audio.stopLoops();
-    this.audio.setMusic('map');
     if (this.level) this.map.showLevel(this.level.data.id);
     else this.map.openWorld();
+    this.audio.setMusic(this.mapMusic());
     try {
       history.replaceState(null, '', location.pathname + location.search);
     } catch {
@@ -284,6 +295,9 @@ export class Game {
     this.audio.update();
     if (this.screen === 'map') {
       this.act(this.map.update(this.input, DT));
+      // Turning to another page of the brochure changes what it is playing. Cheap
+      // to ask every frame: setMusic does nothing when the answer has not changed.
+      this.audio.setMusic(this.mapMusic());
       this.input.flush();
       return;
     }
