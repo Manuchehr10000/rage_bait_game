@@ -30,11 +30,18 @@ in the research. All five levels are built. The game starts here.
   rest of its cruelty comes from; the cave was cut by a third so that a death at the last
   trap costs about twenty seconds.
 - **Level 4 escalates by changing what he is doing:** he is walking up the track of the
-  visitors' train, and the train is behind him, on time, at exactly his speed. Flint in the
-  roof hangs four pixels above a walking head, so the level is where he may jump and where
-  he may not; and the visit ends where the real one does, at the edge of the floor that
-  was dug down under the Great Ceiling, with the train stopping exactly where a visitor
-  stands to look up. The one made floor in the cave is the one place it cannot reach.
+  visitors' train, and the train is behind him, on time, at exactly his speed. That makes
+  it the one level with a clock, so everything in it is priced in seconds rather than in
+  height. Flint in the roof says where he may not leave the ground and the stop boards say
+  where he must; two of the four check rails have a slot a boot goes into, and being caught
+  does not hurt him at all — he stands in the track and watches the light get bigger; twice
+  the track bed is gone with the rails still laid across the hole, because a rail holds up
+  a train and not a man; and the last board has a signal lamp over it that is out for a
+  third of a second, so the last thing the level asks for is the one thing it has spent
+  four hundred metres punishing, which is to stop. The visit ends where the real one does,
+  at the edge of the floor that was dug down under the Great Ceiling, with the train
+  stopping exactly where a visitor stands to look up. The one made floor in the cave is the
+  one place it cannot reach.
 - **Level 5 takes the light away:** the headlamp that has been on since the first door of
   the chapter runs down on a clock from the door of Gargas, and dies before the end. The
   thing worth seeing, the engravings of the Camarin under the hall floor, costs the light

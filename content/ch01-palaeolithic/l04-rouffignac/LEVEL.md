@@ -41,14 +41,27 @@ not stop until the visit does. The only light in the cave apart from his own lam
 headlight, and it reaches further up the track than he can see, so it is on the screen
 before the train is.
 
-**What kills him on the way is flint.** The walls of Rouffignac are full of it, in
-near-horizontal bands; some of it has weathered out and lies on the floor. In the roof
-it hangs *four pixels* above a walking head: walking under a band is nothing, and any jump
-under one is the end. On the floor it is a hop. So the level is where you may jump and
-where you may not, and the two places near the end where a rock on the floor sits close
-under a band in the roof and the hop has to be a short one, or an early one: the full jump
-you make when a rock is suddenly in front of you is still in the air when it reaches the
-flint.
+**Everything here is priced in seconds.** Every other level in the chapter kills with a
+height or a hole. This one has a clock, so a trap does not have to touch him to finish
+him: it only has to cost him more time than he has.
+
+- **The flint in the roof** hangs four pixels above a walking head. Walking under a band
+  is nothing; any jump under one is the end. The flint is how the level says *here you may
+  not leave the ground*, and no stop board is ever under one.
+- **The stop boards** have to be jumped. Walking into one stops him dead, which costs a
+  second, which is the whole gap.
+- **The check rails.** Four slots of track, all four drawn by the same code, and two of
+  them the kind a boot goes into and does not come out of. Nothing kills him there. He
+  stands in the track, in one piece, and watches the light behind him get bigger. It is
+  the only death in the game that takes its time.
+- **The track bed.** Twice it is not there any more. The rails are — laid straight across
+  the hole the way rails are, because rails hold up a train and not a man. Stepping on
+  what is left of the bed gives him a sixth of a second to be somewhere else.
+- **The signal.** Once, near the end, a lamp swings out of the roof over the last board
+  when he comes up to it, at exactly the height the flint hangs at. It is out for a third
+  of a second. The jump he takes without waiting is the jump it is there for; the third
+  of a second he spends waiting is the only part of the train's gap he ever spends on
+  purpose.
 
 **And then the visit ends.** The track runs out where the real one does, at the edge of
 the floor that was dug down under the Great Ceiling, and the train stops with its nose at
@@ -62,10 +75,10 @@ looks up — is where the train stops.
 | Beat | Folder | What the player meets | The history it comes from |
 |---|---|---|---|
 | a | `a-platform` | The mouth, a platform, the train waiting on its rails with its lights off. He walks past it up the track. Behind him, a light comes on and starts to move | Visits by electric train since 1959; the trains carry the lighting |
-| b | `b-bears` | Claw marks on the wall at shoulder height and hollows in the clay beyond the track. Among the claw marks, other scratches: straight, pale, in rows, with a line under them. Two rocks on the floor to hop | Countless claw marks and hibernation hollows; four centuries of visitors' names; Belleforest 1575 |
-| c | `c-rhinos` | The first band of flint across the roof, low. Above the track, three rhinoceros drawn round the nodules in the wall | The Frieze of Three Rhinos, Galerie Breuil; the nodules "define the decorated areas" |
-| d | `d-mammoths` | Two bands, and ten mammoths nose to tail along the wall with names scratched straight across them | The Frieze of Ten Mammoths; the LRMH record of graffiti removed from it |
-| e | `e-ceiling` | The bands come faster, the animals leave the walls for the roof, and twice a rock on the floor sits so close under the flint that only a tap, or a hop started early, gets over it | The panels move from the walls to the ceiling as the roof lowers toward the Great Ceiling |
+| b | `b-bears` | Claw marks on the wall at shoulder height and hollows in the clay beyond the track. Among the claw marks, other scratches: straight, pale, in rows, with a line under them. The first stop board, to teach the jump, and the first band of flint, to teach that he may not | Countless claw marks and hibernation hollows; four centuries of visitors' names; Belleforest 1575 |
+| c | `c-rhinos` | Three rhinoceros above the track, drawn round the nodules in the wall. The first two check rails, one of them with a boot in it, and the first stretch where the bed is gone and the rails are not | The Frieze of Three Rhinos, Galerie Breuil; the nodules "define the decorated areas"; a made track in a cave that has been carrying visitors since 1959 |
+| d | `d-mammoths` | Ten mammoths nose to tail along the wall with names scratched straight across them, another board, the other two check rails, and the second hole in the bed | The Frieze of Ten Mammoths; the LRMH record of graffiti removed from it |
+| e | `e-ceiling` | The ceiling comes down and the animals leave the walls for the roof. The last board, with a signal lamp over it that is out for a third of a second | The panels move from the walls to the ceiling as the roof lowers toward the Great Ceiling |
 | f | `f-great-ceiling` | The roof opens out and is covered in animals. The track ends at a step down onto a flat made floor. The train stops at the end of the track | The Great Ceiling, sixty-five animals; the hole beneath it filled and the floor lowered for visitors; the train halts here and everyone gets off |
 
 ## Deliberate lies
@@ -73,15 +86,21 @@ looks up — is where the train stops.
 - **The flint in the roof hangs low enough to matter.** The visited galleries of
   Rouffignac are large — some ten metres high — and the roof lowers gradually toward the
   Great Ceiling; nothing on the train route is at head height. The nodules are real, their
-  bands are real, and their height over the track is level design. This is the one big lie
-  in the level and it is the whole middle of it.
+  bands are real, and their height over the track is level design.
+- **The stop boards, the check rails, the holes in the bed and the signal lamp.** The line
+  is maintained, it is inspected, it carries about a kilometre of visitors an hour, and
+  none of these is on it. The check rail is a real piece of railway and a boot really does
+  go into the slot beside one; there are none in this cave. The signal is invented
+  outright and its note says so.
+- **The lower galleries are under the track.** They are under the Great Ceiling, which is
+  where the shaft is, and not under the middle of the line.
 - **The track fills the gallery.** The real galleries are a dozen metres wide with the
   track along one side. Here the walls close on the track so there is nowhere to step off,
   which is what stops the train ever passing you and becoming a wall you follow (pillar 5).
 - **The train runs at a walking man's speed and stops where you would stand.** It runs
   slowly and it stops near the Great Ceiling, not at a spot chosen for a joke.
-- **The nodules on the floor are on the track bed.** Flint weathers out of these walls; it
-  is not left lying between the rails of a train that runs every twenty minutes.
+- **Nothing is left lying between the rails** of a train that runs every twenty minutes,
+  and nothing is allowed to fall out of the bed under one.
 - **The layout**: the galleries are in this order and at these distances because the level
   needs them to be. Spacing and jump distances are level design (`arc.md`, invariants).
 

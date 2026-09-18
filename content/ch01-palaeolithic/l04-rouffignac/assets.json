@@ -1,5 +1,5 @@
 {
-  "$comment": "Sizes are world pixels (320 x 180 view). Painted files are 4x. See content/README.md. The clay floor is tile-clay from l03-pech-merle: the same clay, painted once. The panels (the rhinos, the ten mammoths, the Great Ceiling), the claw marks, the names, the rails, the platform and the flint lips in the roof are drawn by the game from the level data and are not listed here; their notes live in their beat folders.",
+  "$comment": "Sizes are world pixels (320 x 180 view). Painted files are 4x. See content/README.md. The clay floor is tile-clay from l03-pech-merle: the same clay, painted once. The panels (the rhinos, the ten mammoths, the Great Ceiling), the claw marks, the names, the rails, the check rails, the platform and the flint lips in the roof are drawn by the game from the level data and are not listed here; their notes live in their beat folders. The check rail that has a boot in it is drawn by the same code as the three that do not.",
   "level": "l04-rouffignac",
   "assets": [
     {
@@ -45,11 +45,18 @@
       "what": "One open car of the train: a roof, a bench, no sides. The game puts a red lamp on the back of the last one."
     },
     {
-      "id": "flint-nodule",
+      "id": "stop-sign",
       "w": 10,
-      "h": 8,
-      "beat": "c-rhinos",
-      "what": "A nodule of flint weathered out of the wall and lying on the track bed. A hop. Walking into it stops you."
+      "h": 18,
+      "beat": "b-bears",
+      "what": "A stop board on the track bed: a steel post with a round red-ringed plate, of the kind that tells a driver where to halt. Every board in the level is this board, and the only thing to do with one is jump it."
+    },
+    {
+      "id": "signal-lamp",
+      "w": 20,
+      "h": 10,
+      "beat": "e-ceiling",
+      "what": "The signal lamp on its arm, swung out of the roof across the track: a case with one lit eye. It is out for a third of a second, at the height the flint hangs at."
     }
   ]
 }

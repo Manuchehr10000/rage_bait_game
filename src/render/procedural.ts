@@ -1439,6 +1439,41 @@ function flintNodule(): HTMLCanvasElement {
 }
 export const NODULE_SPRITE = flintNodule();
 
+/**
+ * A stop board beside the track, 10 x 18: a steel post with a round plate on it,
+ * painted white with a red ring, of the kind that tells a driver where to halt.
+ * It stands on the track bed in the way of anybody walking up the line, and the
+ * only thing to do with it is jump it.
+ */
+function stopSign(): HTMLCanvasElement {
+  const g = new PixelGrid(10, 18);
+  g.rect(4, 8, 2, 10, 'K'); // the post
+  g.rect(2, 16, 6, 1, 'K'); // and its foot
+  g.rect(2, 1, 6, 7, 'R'); // the plate, red
+  g.rect(3, 0, 4, 1, 'R');
+  g.rect(3, 8, 4, 1, 'R');
+  g.rect(3, 2, 4, 5, 'C'); // white in the middle, and grey with it
+  g.rect(4, 3, 2, 3, 'R');
+  return compile(g.outline('O').rows(), ROUFFIGNAC);
+}
+export const STOP_SIGN_SPRITE = stopSign();
+
+/**
+ * The signal lamp on its arm, 20 x 10. It lives in the roof over the stop board
+ * and it swings out across the track when the train is due, at exactly the height
+ * of the flint: over the head of a man standing still, and through the head of a
+ * man in the air.
+ */
+function signalLamp(): HTMLCanvasElement {
+  const g = new PixelGrid(20, 10);
+  g.rect(0, 3, 14, 2, 'K'); // the arm
+  g.rect(12, 0, 8, 9, 'K'); // the lamp case
+  g.rect(13, 1, 6, 7, 'R');
+  g.rect(14, 2, 4, 2, 'L'); // and its one lit eye
+  return compile(g.outline('O').rows(), ROUFFIGNAC);
+}
+export const SIGNAL_LAMP_SPRITE = signalLamp();
+
 /** The body every car of the train shares: a low box on four small wheels. */
 function trainBody(g: PixelGrid): void {
   g.rect(1, 2, 26, 8, 'B');

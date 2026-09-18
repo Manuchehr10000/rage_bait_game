@@ -62,6 +62,11 @@ export class Player implements Rect {
   fellBy = 0;
   /** Set by the world each frame when the player is in swimmable water. */
   inWater = false;
+  /**
+   * Caught by something in the floor. The controls are still honest — they are
+   * simply attached to a man who is not going anywhere. Nothing lets go of him.
+   */
+  held = false;
   private strokeTimer = 0;
   /** Horizontal drag applied this frame by a conveyor. */
   private driftX = 0;
@@ -80,6 +85,7 @@ export class Player implements Rect {
     this.walkPhase = 0;
     this.fellFrom = null;
     this.fellBy = 0;
+    this.held = false;
   }
 
   /** A conveyor pulls the ground out from under you. Applied on top of your own movement. */
@@ -146,8 +152,8 @@ export class Player implements Rect {
       this.updateSwimming(input, level, solids, minX);
       return;
     }
-    // Horizontal intent.
-    const want = (input.right ? 1 : 0) - (input.left ? 1 : 0);
+    // Horizontal intent. A man with his boot in the track has none.
+    const want = this.held ? 0 : (input.right ? 1 : 0) - (input.left ? 1 : 0);
     if (want !== 0) {
       this.facing = want as 1 | -1;
       const accel = this.onGround ? PHYS.groundAccel : PHYS.airAccel;
@@ -164,7 +170,7 @@ export class Player implements Rect {
 
     this.justJumped = false;
     this.justStepped = false;
-    if (this.buffer > 0 && this.coyote > 0) {
+    if (this.buffer > 0 && this.coyote > 0 && !this.held) {
       this.justJumped = true;
       this.jumping = true;
       this.vy = -PHYS.jumpVelocity;

@@ -11,6 +11,7 @@ import type {
   PlatformDef,
   PusherDef,
   RoofDef,
+  SnareDef,
   SweepDef,
   ThrowerDef,
   TipperDef,
@@ -62,6 +63,8 @@ export function createEntity(def: EntityDef, level: Level): Entity {
       return new Chaser(def);
     case 'tipper':
       return new Tipper(def);
+    case 'snare':
+      return new Snare(def);
     case 'hazard':
       return new Hazard(def);
     case 'horse':
@@ -739,6 +742,31 @@ export class Hazard implements Entity {
 
   update(w: World): void {
     if (overlaps(this.def.rect, w.player)) w.kill(this.def.cause);
+  }
+}
+
+// ---------------------------------------------------------------------------
+
+/**
+ * The slot between the running rail and the check rail. Step into it and it has
+ * you: the boot is in, the foot is not coming out, and the only thing left to
+ * happen is the one that was always going to happen. It never lets go.
+ */
+export class Snare implements Entity {
+  caught = false;
+
+  constructor(readonly def: SnareDef) {}
+
+  update(w: World): void {
+    const p = w.player;
+    const r = this.def.rect;
+    // His feet have to be in it. Going over it in the air is going over it.
+    const feet = p.y + p.h;
+    if (!this.caught && p.onGround && feet >= r.y - 2 && feet <= r.y + r.h && centerX(p) >= r.x && centerX(p) <= r.x + r.w) {
+      this.caught = true;
+      p.held = true;
+      w.sound('thud');
+    }
   }
 }
 

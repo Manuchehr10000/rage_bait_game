@@ -1,17 +1,20 @@
-# Beat e · the ceiling comes down
+# Beat e · the ceiling comes down, and the signal
 
-The panels of Rouffignac move from the walls onto the ceiling as the roof lowers toward
-the Great Ceiling, and so do the level's: from here the animals are on the roof over the
-track, drawn small and close, and the tourist is running under them with a bigger light
-behind him than the one on his hat.
+The roof lowers toward the Great Ceiling and the art comes with it: the animals leave the
+walls for the roof, which is where they are as the gallery gets lower, and the last band
+of flint hangs over the last stretch of track.
 
-Four bands of flint in fifty tiles, and twice a nodule on the floor sits **thirty pixels
-short of a band in the roof**. Those two hops are the level's hardest thing and its only
-real demand on the hands. The roof here caps every jump at forty-eight pixels, so a
-**tap** is down again within thirty pixels wherever it starts, and a **full hop started
-early** — twenty pixels before the rock — is down before the flint too. What dies is the
-full hop made *at* the rock: the jump you make when a rock is suddenly in front of you.
-That is the natural mistake, and it is the one the level charges for. A player who
-declines the hop walks into the rock, stops, and finds out what the train is for.
+And the last stop board has a **signal lamp** over it.
 
-No new art. The roof panels and the bands are drawn by the game.
+He comes up to the board. Twelve hundredths of a second later the lamp swings out of the
+roof across the track, at exactly the height the flint hangs at, and two tenths after that
+it is back in the wall. A man standing at the board is underneath it and it does not touch
+him. A man in the air is not.
+
+So the last board in the level is the one board that cannot be taken at a run, and the
+answer to it is the one thing the whole level has been punishing: **stop**. A third of a
+second, and then jump. It is the only trap in the game that charges a price instead of
+taking a life, and the price is a third of the gap he has been keeping for four hundred
+metres.
+
+The lamp has its own note, and it is invented: there is no signalling on this line.

@@ -49,7 +49,7 @@ import { paint } from '../engine/assets';
 import { blit, blitFacing, frameOf, silhouette, withLamp, type Frame } from './frame';
 import { TRAIN, type Train } from '../engine/entities';
 import type { CavePanel } from '../engine/level';
-import { BEAR_STALAGMITE_SPRITE, NODULE_SPRITE, TRAIN_CAR_SPRITE, TRAIN_ENGINE_SPRITE, TRAIN_LAST_CAR_SPRITE } from './procedural';
+import { BEAR_STALAGMITE_SPRITE, NODULE_SPRITE, SIGNAL_LAMP_SPRITE, STOP_SIGN_SPRITE, TRAIN_CAR_SPRITE, TRAIN_ENGINE_SPRITE, TRAIN_LAST_CAR_SPRITE } from './procedural';
 
 /** Text drawn in screen space after scaling so it stays crisp. World coordinates. */
 export interface WorldText {
@@ -1194,6 +1194,10 @@ function drawDecor(ctx: CanvasRenderingContext2D, s: Scene, d: DecorDef): void {
       ctx.fillRect(d.x0, d.y - 5, d.x1 - d.x0, 1);
       break;
     }
+    case 'checkRail': {
+      drawCheckRail(ctx, d.x, d.w, d.y);
+      break;
+    }
     case 'trainPlatform': {
       // Where the visit begins: a concrete edge along the track, a post at each
       // end, and a chain between them that the tourist has already stepped over.
@@ -1738,6 +1742,11 @@ function drawCliff(ctx: CanvasRenderingContext2D, tx: number, ty: number, x: num
 function drawEntityBack(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): void {
   const d = e.def;
   switch (d.kind) {
+    case 'snare': {
+      // Drawn by the same code as the harmless ones, because it is the same track.
+      drawCheckRail(ctx, d.rect.x, d.rect.w, d.rect.y);
+      break;
+    }
     case 'platform': {
       const p = e as Platform;
       const r = p.rect;
@@ -1808,6 +1817,12 @@ function drawEntityBack(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): voi
       } else if (d.skin === 'nodule') {
         // A nodule of flint that has weathered out of the wall and lies on the track bed.
         if (!paint(ctx, 'flint-nodule', r.x, r.y)) ctx.drawImage(NODULE_SPRITE, r.x, r.y);
+      } else if (d.skin === 'stopSign') {
+        // A stop board on the track bed. Every one of them is this board.
+        if (!paint(ctx, 'stop-sign', r.x, r.y)) ctx.drawImage(STOP_SIGN_SPRITE, r.x, r.y);
+      } else if (d.skin === 'ballast') {
+        // A stretch of the track bed, drawn by the code that draws the rest of it.
+        for (let i = 0; i < r.w / TILE; i++) drawBallast(ctx, Math.floor(r.x / TILE) + i, Math.floor(r.y / TILE), r.x + i * TILE, r.y, true);
       } else if (d.skin === 'clayLedge') {
         // A shelf of the cave's own clay. Drawn tile for tile exactly as the clay
         // the level is cut out of, because that is what it is (pillar 4).
@@ -2238,8 +2253,38 @@ function drawEntityOverlay(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): 
   } else if (d.kind === 'sweep') {
     const sw = e as Sweep;
     if (d.skin === 'beam') drawBeam(ctx, s, sw);
+    else if (d.skin === 'signal') drawSignal(ctx, sw);
     else drawWave(ctx, s, sw);
   }
+}
+
+/**
+ * The slot between the running rail and a check rail: two lines of steel a boot's
+ * width apart, with the dark of the gap between them. Most of them are track.
+ */
+function drawCheckRail(ctx: CanvasRenderingContext2D, x: number, w: number, y: number): void {
+  ctx.fillStyle = COLORS.outline;
+  ctx.fillRect(x, y - 4, w, 3);
+  ctx.fillStyle = COLORS.rail;
+  ctx.fillRect(x, y - 5, w, 1);
+  ctx.fillRect(x, y - 1, w, 1);
+  ctx.fillStyle = COLORS.railLit;
+  ctx.fillRect(x, y - 6, w, 1);
+  for (let i = x + 3; i < x + w - 2; i += 9) ctx.fillRect(i, y - 5, 2, 1);
+}
+
+/**
+ * The signal lamp swinging out over the track on its arm, at the height the flint
+ * hangs at. It is only ever out for a moment, and a man standing still is under it.
+ */
+function drawSignal(ctx: CanvasRenderingContext2D, b: Sweep): void {
+  const band = b.band;
+  if (!band) return;
+  const y = b.def.bottom - 10;
+  if (!paint(ctx, 'signal-lamp', band.x - 4, y)) ctx.drawImage(SIGNAL_LAMP_SPRITE, band.x - 4, y);
+  // And the arm it came out on, back to the wall it lives in.
+  ctx.fillStyle = COLORS.outline;
+  ctx.fillRect(b.def.startX, y + 3, band.x - b.def.startX, 2);
 }
 
 function drawBeam(ctx: CanvasRenderingContext2D, s: Scene, b: Sweep): void {

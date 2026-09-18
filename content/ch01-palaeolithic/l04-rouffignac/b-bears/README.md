@@ -1,6 +1,6 @@
-# Beat b · the bears, and the names
+# Beat b · the bears, the names, and the first board
 
-Forty tiles of gallery with the far wall close on the track. Cave bears used these
+Twenty-eight tiles of gallery with the far wall close on the track. Cave bears used these
 galleries for thousands of winters before anyone drew on them, and they left two kinds of
 mark: **hollows** scraped in the clay to sleep in, which the level draws beyond the track
 as dark scoops with a lit rim, and **claw marks** on the walls at the height a bear
@@ -12,7 +12,11 @@ pale where the surface came off, in rows, with a line underneath** — and never
 that could be read (pillar 2). Belleforest saw this cave in 1575. The game says nothing
 about it. It draws the scratches.
 
-Two nodules on the floor here, well clear of anything, to teach the hop before the roof
-starts asking questions.
+The beat teaches the level's two words, in this order and nothing else near either of
+them. **The first stop board**, on its own, with room to see it coming: a jump gets over
+it and walking into it stops him dead. Then **the first band of flint**, on its own: walk
+under it and nothing happens, jump under it and it is over. Board means jump. Flint means
+do not. Everything after this is those two words in worse arrangements.
 
-No new art. The hollows, the claw marks and the names are drawn by the game.
+The board has its own note. The hollows, the claw marks and the names are drawn by the
+game.

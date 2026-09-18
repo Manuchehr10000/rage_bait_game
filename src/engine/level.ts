@@ -92,7 +92,7 @@ export interface WaterDef {
 /** A band of death that moves across a span after a trigger. Safe inside the safe rects, or above its top. */
 export interface SweepDef {
   kind: 'sweep';
-  skin: 'beam' | 'wave';
+  skin: 'beam' | 'wave' | 'signal';
   triggerX: number;
   delay: number;
   startX: number;
@@ -111,7 +111,8 @@ export interface CrumbleDef {
   kind: 'crumble';
   skin:
     | 'croc' | 'capital' | 'rock' | 'floor' | 'talatat' | 'column' | 'stone' | 'relief' | 'fallenBlock'
-    | 'horns' | 'disc' | 'walkway' | 'nodule' | 'stalagmite' | 'fallenRoof' | 'clayLedge';
+    | 'horns' | 'disc' | 'walkway' | 'nodule' | 'stalagmite' | 'fallenRoof' | 'clayLedge'
+    | 'stopSign' | 'ballast';
   rect: Rect;
   fake: boolean;
   delay: number;
@@ -212,6 +213,16 @@ export interface HazardDef {
   cause: DeathCause;
 }
 
+/**
+ * The slot between a running rail and the check rail beside it. A boot goes into
+ * it and does not come out. It does not kill anybody: it holds him where he is,
+ * and then the timetable does the rest.
+ */
+export interface SnareDef {
+  kind: 'snare';
+  rect: Rect;
+}
+
 /** A figure in a wall. If active, it steps out and shoves the player when they pass. */
 export interface PusherDef {
   kind: 'pusher';
@@ -296,6 +307,7 @@ export type EntityDef =
   | HazardDef
   | HorseDef
   | RoofDef
+  | SnareDef
   | TrainDef;
 
 // ---------------------------------------------------------------------------
@@ -364,6 +376,9 @@ export type DecorDef =
   | { kind: 'galleryWall'; x0: number; x1: number; top: number; bottom: number }
   /** The track, laid on the floor: two rails on sleepers. Purely a drawing; the floor is the floor. */
   | { kind: 'rails'; x0: number; x1: number; y: number }
+  // A check rail laid inside the running rail, with the slot between them. Most
+  // of them are just track, and the ones that are not look exactly like these.
+  | { kind: 'checkRail'; x: number; w: number; y: number }
   /** The platform the visit begins from: a concrete edge and a post with a chain. */
   | { kind: 'trainPlatform'; x0: number; x1: number; floorY: number }
   /**

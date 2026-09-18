@@ -1,9 +1,17 @@
 # Beat d · the ten mammoths
 
-Two bands of flint, and between them the **Frieze of Ten Mammoths**: ten of them small,
-in a row, trunks down, and across them the names. The LRMH holds a record of removing
-graffiti from this frieze, which is as documented as a scratched name gets. Four of the
-level's name-scratches are laid straight over the mammoths here, and they are the same
-kind of mark as the ones on the bear wall and a different kind from the bears'.
+Ten mammoths nose to tail along the wall, in black manganese outline, with visitors'
+names scratched straight across them. The LRMH has a record of removing graffiti from
+this frieze. The names are drawn as what they are — straight, pale, in rows — and never
+as anything you could read.
 
-No new art. The frieze, the names and the bands are drawn by the game.
+Under them, the level repeats itself with the pieces swapped: **a board** to jump, **the
+other two check rails**, one of them the kind with a boot in it, and **the second hole in
+the bed**. By now the player has seen each of these once, and the only new information is
+where they are this time.
+
+The second snare is the one that matters. The first one taught that a check rail can hold
+him; this one is a hundred pixels after a band of flint, so he comes at it out of a stretch
+where jumping was the thing that killed him, and the answer here is to jump.
+
+No new art.
