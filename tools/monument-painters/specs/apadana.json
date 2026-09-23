@@ -1,0 +1,248 @@
+{
+  "art": "apadana",
+  "site": "Persepolis (Takht-e Jamshid), Fars, Iran: the Apadana, the audience hall of Darius I and Xerxes. Chapter 4, ch04_persia, painter id \"apadana\", vignette map-monument-ch04-persepolis at 92 x 70 world px (368 x 280 painted).",
+  "view": "Stand at eye height in the open court east of the Apadana, a little south of the axis of the eastern stairway, looking north-west at it. The stair's relief façade runs across the lower third of the frame. Its southern wing, with the three registers of tribute-bearers, is nearest and on the left, and the façade recedes to the right past the central panel to the northern wing. Above and behind it, on the Apadana's platform, are the standing columns: tall, thin, fluted and free-standing, irregularly spaced because they are survivors from a grid of 72. Their tops stay inside the frame, because the tops are the point: none carries its capital. Put a clean brochure sky behind them, and nothing else. Kuh-e Rahmat, the mountain the terrace backs onto, lies east, behind the viewer, and is not in frame. Crop the stair's far northern end at the right edge if needed, never the central panel. Why this view: the eastern stairway was dug out of collapsed mud brick in 1931–34 (Herzfeld), and since then it has been the image that says \"Persepolis\" and nothing else. Mid-century brochures and the 1971 celebrations inherited it. Columns alone read as generic ruins. The Gate of All Nations lamassu belong to a different building from this painter's, and at 92 x 70 they read as Assyria (Nimrud and Nineveh are excluded from the chapter). The terrace retaining wall is only a wall in silhouette. At 92 x 70 what survives is a long, low, symmetrical block with a raised centre and four to six very tall thin shafts standing free above it, and that shape is unique to this site. Count the columns from a dated photograph taken from this spot and paint exactly those.",
+  "elements": [
+    {
+      "element": "Eastern stairway façade",
+      "fact": "Faces east onto the court. It was excavated 1931–34 from beneath collapsed mud-brick debris, so it is absent from every nineteenth-century view (Pesce 1857, Flandin & Coste 1840–41). Symmetrical about a central projection. Low relief in the same limestone as the columns. No paint survives on it today."
+    },
+    {
+      "element": "Central panel of the stair",
+      "fact": "A winged disc flanked by two seated sphinxes, above a blank rectangle with Persian and Median guards standing on either side, four to a side (Livius). The rectangle really is blank."
+    },
+    {
+      "element": "Triangular panels flanking the centre",
+      "fact": "Formed by the inclines of the flights. They show a row of cypresses, a lion goring a bull, and a row of date palms (Livius). Livius also records a lion-and-bull panel on the stair's northern part."
+    },
+    {
+      "element": "Southern wing of the stair (viewer's left)",
+      "fact": "Three stacked registers of tribute-bearers. Twenty-three delegations in all (Livius, Cabinet Oxford, ISAC). At this size they are a rhythm of small upright walking figures, not identifiable peoples."
+    },
+    {
+      "element": "Northern wing of the stair (right, receding)",
+      "fact": "Relief registers of Persian and Median figures. This is the standard description, but I could not re-check it this session. Paint it as the same register rhythm as the south wing, in the same stone."
+    },
+    {
+      "element": "Inscription panels at the stair ends",
+      "fact": "Xerxes' inscription XPb: Old Persian at the south end, Elamite and Babylonian at the north (Livius). Paint them as plain textured panels with no glyphs. There is no text in the game."
+    },
+    {
+      "element": "Apadana platform and hall",
+      "fact": "A hall about 60 x 60 m on 36 columns (6 x 6), with porticoes to the north, east and west of 12 columns each, in two rows of six: 72 columns in all (Cabinet Oxford, Livius, Persian Wikipedia). The mud-brick walls and the roof are gone. Nothing stands between the columns."
+    },
+    {
+      "element": "Standing columns",
+      "fact": "Thirteen stood at the start of the twentieth century. A fourteenth, complete but fallen, was re-erected later, and the date is disputed (1965 or the 1970s). Persian Wikipedia puts it at the north-east of the east portico. Today 14 stand. No source shows any of them carrying an animal capital."
+    },
+    {
+      "element": "Column form",
+      "fact": "Fluted shafts. The portico columns stand on bell-shaped bases ringed with palm leaves, under a discoid torus. The hall columns stand on square bases (Iranica). Total height is disputed: 19–20 m (Iranica, Persian Wikipedia), 24 m (English Wikipedia), 25 m (Livius). Whatever the figure, the columns are several times the height of the stair façade."
+    },
+    {
+      "element": "Capitals (not on any standing column; context only)",
+      "fact": "The hall and the north portico had three-part capitals: a double corolla of petals, then a block with superimposed volutes on all four sides, then two addorsed kneeling bull foreparts whose necks and heads reach out under the beams. The east and west porticoes had the animal foreparts set directly on the fluted shaft (Schmidt, Persepolis I, 1953, p. 80, via Iranica). The paired foreparts form a saddle that held the cedar beams."
+    },
+    {
+      "element": "Fallen capitals",
+      "fact": "An addorsed bull capital, presumably from a north-portico column, was photographed lying in front of the east wing of the north stairway (ISAC captions). The only intact double-griffin capital is on site, and its original building is unproven (Hunt, Stanford). Neither is in this view. Others are in museums, including the Oriental Institute in Chicago (a restored double bull on a fluted column) and the Metropolitan Museum (a bull's head). The giant capital in the Louvre comes from Susa, not Persepolis."
+    },
+    {
+      "element": "Court and ground",
+      "fact": "An open, dusty, sunlit court between the viewer and the stair. No vegetation at the foot of the stair."
+    },
+    {
+      "element": "Sky",
+      "fact": "The set's shared brochure sky, skyTop to skyLow. Nothing in it."
+    },
+    {
+      "element": "Kuh-e Rahmat",
+      "fact": "The terrace is built against the mountain's western foot, and the Apadana sits on the terrace's western side. Looking at the east stair you have your back to the mountain, so it is not in frame."
+    }
+  ],
+  "mustBeRight": [
+    "No column carries an animal capital: no bulls, lions or griffins on any column top.",
+    "The columns stand free with irregular gaps between them, not as an evenly spaced colonnade.",
+    "There is no roof, no beam and no wall between or behind the columns.",
+    "The column shafts are fluted: vertical grooves show on the lit side.",
+    "Every column is at least four times the height of the stair façade in front of it.",
+    "The stair façade is symmetrical about a central panel.",
+    "The central panel shows a winged disc between two seated sphinxes, above a blank rectangle with guards standing on both sides of it.",
+    "The triangular panels beside the centre show a lion attacking a bull, with rows of trees.",
+    "The wing on the viewer's left carries three stacked registers of small walking figures.",
+    "The stair, its reliefs and the columns are all one grey stone, the same colour; the reliefs carry no paint.",
+    "No legible writing anywhere; the inscription panels at the stair ends are plain texture.",
+    "No mountain rises behind the stair or the columns.",
+    "No lamassu or human-headed bull appears anywhere in the picture."
+  ],
+  "deliberatelyWrong": [
+    "Modern intrusions are left out: the barrier in front of the reliefs, any scaffolding on the columns, signs, ropes and visitors. A brochure cleans them away, and at 92 x 70 they would read as parts of the monument.",
+    "The relief registers are painted as a rhythm of upright figures, not as the 23 identifiable delegations. At this size a delegation is a few pixels, and inventing identifiable costumes would make things up.",
+    "The inscription panels are painted as texture, not cuneiform: the no-text rule.",
+    "The light comes from the upper right, the set's fixed rule. The real east façade is lit from behind a viewer standing in the court, in the morning.",
+    "The sky and overall colour are the set's cheerful brochure palette, cleaner and bluer than a hazy day in Fars.",
+    "The column count shown is only the columns visible from this viewpoint, not all fourteen: a crop, not a change. Any column shown stands where a photograph from this spot puts it."
+  ],
+  "palette": [
+    {
+      "name": "limestone-sun",
+      "hex": "#D4C8B0",
+      "material": "Weathered grey limestone of the column shafts and stair in full sun: pale, warm grey. Judged from the photographic record, not measured."
+    },
+    {
+      "name": "limestone-body",
+      "hex": "#B2A895",
+      "material": "The same limestone, side-on to the sun. The base colour for B.face on shafts and the stair façade."
+    },
+    {
+      "name": "limestone-deep",
+      "hex": "#7F7A73",
+      "material": "The same stone in the recesses: the flute hollows and the backgrounds of the registers. Mix toward B.C.shadow; do not use it neat for cast shadow."
+    },
+    {
+      "name": "relief-polished",
+      "hex": "#8E8B85",
+      "material": "The smoother, cooler grey of the carved relief surfaces on the stair, a touch darker and cooler than the weathered shafts."
+    },
+    {
+      "name": "weather-stain",
+      "hex": "#A67A52",
+      "material": "Orange-brown iron and lichen streaks running down the column shafts. Sparingly, as a few strokes."
+    },
+    {
+      "name": "fresh-break",
+      "hex": "#E2D9C6",
+      "material": "The paler broken tops of the shafts where the capitals once sat."
+    },
+    {
+      "name": "court-ground",
+      "hex": "#D6C39C",
+      "material": "The dusty, sunlit court and terrace surface in front of the stair."
+    },
+    {
+      "name": "plain-dust",
+      "hex": "#C4A87A",
+      "material": "Dry Marvdasht plain earth, only if a strip of the plain shows at the frame edge."
+    },
+    {
+      "name": "dry-scrub",
+      "hex": "#9B9361",
+      "material": "Sparse, dry, sun-bleached scrub, only at the frame edges. Use it instead of the set's green foliage, which is wrong for Fars."
+    },
+    {
+      "name": "far-hills",
+      "hex": "#A3A4AE",
+      "material": "Hazy distant ridges on the western horizon, if any horizon shows between the columns. Optional."
+    }
+  ],
+  "lighting": "Hard, dry, cloudless high sun, from the upper right as the set requires. The stair façade takes the light at a raking angle from the right, so each relief figure, the sphinxes and the triangular panels throw thin shadows to the lower left. That raking light is how the registers read at all. Each column is lit on its right flank with a cool shaded left flank, and the flutes show as a band of alternating light and dark on the lit side. The platform's edge throws a short, sharp shadow down onto the top of the stair façade. No cast shadow on the ground (content/README.md). No water, and no green except, at most, dry scrub.",
+  "pitfalls": [
+    "Putting double-bull capitals on the standing columns, as the current code does. That is a reconstruction: every Apadana capital is fallen, in fragments on the ground, or in a museum.",
+    "Painting an even, regular colonnade. The survivors are scattered positions in a grid of 72.",
+    "Using Flandin & Coste (1840–41) or any nineteenth-century plate as the reference for the eastern stairway. It was buried until 1931–34. Use Herzfeld's photographs (Freer/Sackler archives, 1923–34) or Schmidt, Persepolis I (1953), for reference only, and check rights first.",
+    "Painting the king's audience scene in the centre of the stair. The centre today shows the winged disc, the sphinxes, the guards and a blank panel.",
+    "Putting Kuh-e Rahmat behind the east stair. It is behind the viewer.",
+    "Borrowing the Egypt palette. This is grey limestone, not the warm yellow sandstone of chapter 2 (one stone per site).",
+    "Painting the reliefs in colour. The original paint is lost, and showing it would be another reconstruction.",
+    "Mixing in the Gate of All Nations lamassu, or the human-headed capitals attributed to the Tripylon, as parts of the Apadana.",
+    "Using the Louvre's famous bull capital as the model. It comes from Susa.",
+    "Giving every column a bell base. Only the portico columns had bell bases; the hall columns stood on square bases. In this view most bases are hidden behind the stair platform in any case.",
+    "Painting remnants of the composite capital (the corolla and volute block) on top of some hall columns, or leaving them off, without checking. See contested: this is unresolved.",
+    "Drawing walls, a roof or timber beams on the platform. The mud-brick walls are gone.",
+    "Making the winged figure over the central panel large or comic. It is small in the panel, and it is today a living community's emblem (punching direction)."
+  ],
+  "gate6": "clear. Persepolis is a palace ruin: not a place of active worship, not a recent grave, not an atrocity site. arc.md marks chapter 4 gate 6 clear, and section 4 has no ruling pending for persepolis. Two notes, neither needing a ruling. The Achaemenid royal tombs cut into Kuh-e Rahmat are behind the viewer and out of frame. The winged figure over the central panel is used today as a Zoroastrian emblem, so render it faithfully and never as a gag.",
+  "contested": [
+    "Whether any standing Apadana column still carries the lower members of its composite capital (the corolla and volute block, never the animals). Herzfeld's glass negative 2308 (1923–28, Smithsonian FSA A.6 04.GN.2308) is titled \"Apadana, Audience Hall, Column with Complex Capital: View before Excavation\", which suggests at least one did then. I could not see the image or find a current source. Check a dated photograph before painting any column top.",
+    "Column height: 19–20 m (Iranica \"more than 19 m\"; Persian Wikipedia about 20 m), 24 m (English Wikipedia), 25 m (Livius), and \"over 16.5 m\" in one other source. Capital height: about 8 m for the three-part capital (Iranica, Capitals) or 5.80 m (other sources). Paint proportions from a measured photograph, not from a number.",
+    "The date the fourteenth column was re-erected: 1965 in one source, the 1970s on Livius and English Wikipedia. IsMEO worked at Persepolis from 1964, under Tilia from 1965.",
+    "The animal on the east portico's capitals: double lions according to Persian sources (Persian Wikipedia, Kojaro) and one English source, while Schmidt says only \"addorsed animal capitals\" directly on the shaft for the east and west porticoes. The single intact double-griffin capital's original building is unproven (Hunt). Popular claims of lamassu capitals in the Apadana are unsupported. The human-headed capitals are placed in the Tripylon.",
+    "Flandin & Coste's publication date: issued in parts 1843–1854 (Bibliorare, Gallica, HathiTrust), 1881–82 according to Drawing Matter, 1851 in arc.md, probably the date of the Perse ancienne volumes.",
+    "The composition of the stair's northern wing (Persian and Median figures) and the exact profile of the flights: standard descriptions, but not re-checked this session."
+  ],
+  "sources": [
+    {
+      "title": "Livius, Persepolis: Apadana",
+      "url": "https://www.livius.org/articles/place/persepolis/persepolis-photos/persepolis-apadana/",
+      "detail": "72 columns: 6 x 6 in the hall, the rest in three porticoes. Thirteen standing by 1900; a complete fallen column re-erected in the 1970s as the fourteenth. Forty stood in the sixteenth century, hence Chehel Minar. De Bruijn saw storks nesting on the columns in 1704. Gives the height as 25 m."
+    },
+    {
+      "title": "Livius, Persepolis: Apadana East Stairs",
+      "url": "https://www.livius.org/articles/place/persepolis/persepolis-photos/persepolis-apadana-east-stairs/",
+      "detail": "Central panel: winged disc, two seated sphinxes, blank space, four Persian and Median guards on each side. Triangles with cypresses, a lion goring a bull and date palms. Xerxes XPb inscriptions: Old Persian at the south, Elamite and Babylonian at the north. A lion-and-bull panel on the northern part."
+    },
+    {
+      "title": "Encyclopaedia Iranica, Apadana (citing E. F. Schmidt, Persepolis I, 1953, p. 80)",
+      "url": "https://www.iranicaonline.org/articles/apadana/",
+      "detail": "Composite capitals crowned by addorsed bulls were reserved for the hall and the north portico; the east and west porticoes had addorsed animal capitals set directly on the fluted shaft."
+    },
+    {
+      "title": "Encyclopaedia Iranica, Capitals",
+      "url": "https://www.iranicaonline.org/articles/capitals/",
+      "detail": "The three-part Apadana capital: a double corolla of petals, a block with superimposed volutes on four sides, and a double protome. About 8 m high on columns of about 19 m. The animals are usually bulls, but also eagles (griffins) and lions."
+    },
+    {
+      "title": "Encyclopaedia Iranica, Persepolis (A. Sh. Shahbazi)",
+      "url": "https://www.iranicaonline.org/articles/persepolis/",
+      "detail": "36 hall columns, each more than 19 m high, with a square base, a fluted shaft and a composite capital."
+    },
+    {
+      "title": "ISAC (University of Chicago), Persepolis photographic archive: The Apadana",
+      "url": "https://isac.uchicago.edu/collections/photographic-archives/persepolis/apadana",
+      "detail": "Captions from the Schmidt expedition, 1935–39: \"Fallen Addorsed Bull Capital Presumably from a N Portico Column\"; \"N Stairway, E Wing with Bull Capital from the Northern Portico, in the Foreground\"."
+    },
+    {
+      "title": "Smithsonian, Freer/Sackler Archives, Ernst Herzfeld Papers, negative 2308",
+      "url": "https://www.si.edu/object/archives/components/sova-fsa-a-06-ref27040",
+      "detail": "\"Apadana, Audience Hall, Column with Complex Capital: View before Excavation\", glass negative, 1923–28. Evidence on whether a standing column kept its capital members. The image itself was not seen."
+    },
+    {
+      "title": "Tehran Times, Oldest known photographs reveal how Persepolis has changed over time",
+      "url": "https://www.tehrantimes.com/news/528368/Oldest-known-photographs-reveal-how-Persepolis-has-changed-over",
+      "detail": "Pesce's 1857 photographs. The eastern staircase of the Apadana was unexcavated then and was uncovered from collapsed mud-brick debris in 1931–34."
+    },
+    {
+      "title": "Persian Wikipedia, کاخ آپادانای تخت جمشید",
+      "url": "https://fa.wikipedia.org/wiki/%DA%A9%D8%A7%D8%AE_%D8%A2%D9%BE%D8%A7%D8%AF%D8%A7%D9%86%D8%A7%DB%8C_%D8%AA%D8%AE%D8%AA_%D8%AC%D9%85%D8%B4%DB%8C%D8%AF",
+      "detail": "14 of 72 columns stand, one of them restored, at the north-east of the east portico. Columns about 20 m and about 85 t. East portico capitals double lions, west portico bulls. A 36-column hall with porticoes of 12 to the north, east and west; about 3,660 m². Cited through search extracts."
+    },
+    {
+      "title": "Cabinet (University of Oxford), The Apadana at Persepolis",
+      "url": "https://www.cabinet.ox.ac.uk/apadana-persepolis",
+      "detail": "A hall of 60 x 60 m with 36 internal columns and porticoes to the north, west and east. The tribute-delegation reliefs are carved on the staircase to the east portico."
+    },
+    {
+      "title": "P. Hunt, Achaemenid Persian Griffin Capital at Persepolis (Stanford Archaeolog)",
+      "url": "https://web.stanford.edu/group/archaeolog/cgi-bin/archaeolog/2008/10/21/achaemenid-persian-griffin-capital-at-persepolis/",
+      "detail": "The only intact double-griffin capital; its original placement in the Apadana cannot be proven."
+    },
+    {
+      "title": "Flandin & Coste, Voyage en Perse (Gide et Baudry, 1843–1854)",
+      "url": "https://gallica.bnf.fr/ark:/12148/bpt6k56754751.texteImage",
+      "detail": "The public-domain plates of the 1840–41 mission, issued in 72 parts 1843–54, per Bibliorare. Good for the columns and the terrace. Cannot show the east stairway, which was buried."
+    },
+    {
+      "title": "Authenticity and Restoration: re-examining the implemented restorations in Persepolis (ResearchGate)",
+      "url": "https://www.researchgate.net/publication/297677499_Authenticity_and_Restoration_The_Benefits_of_Historical_Studies_on_Re-Examining_the_Implemented_Restorations_in_Persepolis",
+      "detail": "IsMEO restorations 1964–79. The capital ornament placed on a re-erected Gate of All Nations column for the 1971 celebrations is questioned. A warning that restored tops at Persepolis are not all original."
+    },
+    {
+      "title": "Gate of All Nations (English Wikipedia and Livius, via search extracts)",
+      "url": "https://www.livius.org/articles/place/persepolis/persepolis-photos/persepolis-gate-of-all-nations/",
+      "detail": "Of four columns, two survived and a third was reassembled from fragments. Bulls at the west doorway, human-headed winged bulls at the east. Used here to reject the gate for this vignette."
+    },
+    {
+      "title": "Oriental Institute Museum, Double Bull Capital on Fluted Column (Wikimedia Commons file title)",
+      "url": "https://commons.wikimedia.org/wiki/File:Double_Bull_Capital_on_Fluted_Column,_Iran,_Persepolis,_Apadana,_Achaemenid_Period,_reigns_of_Darius_I_and_Xerxes,_522-465_BC,_restored_limestone_-_Oriental_Institute_Museum,_University_of_Chicago_-_DSC07930.JPG",
+      "detail": "An Apadana capital, restored, in limestone, now in Chicago. Confirms the stone is limestone and that such capitals are off site."
+    }
+  ],
+  "repoCorrections": [
+    "content/map/README.md (chapter 4 row) and src/map/monuments.ts (apadana) draw every column crowned by a double-bull capital. No Apadana column stands with its animal capital today: the capitals are fallen (ISAC) or in museums (Oriental Institute, Met). Neither file lists this as deliberately wrong, so it is currently an accidental error. Paint the columns as they stand (recommended), or add \"capital restored in place\" to Deliberately wrong. The note that the bulls' horns are left off then becomes moot.",
+    "content/map/README.md calls the columns \"the slenderest in the ancient world for their height\". I found no source for the superlative. Cite it or drop it.",
+    "content/map/README.md and src/map/monuments.ts imply that every Apadana column had a double-bull capital. Per Schmidt (Persepolis I, p. 80, via Iranica), only the hall and the north portico had composite bull capitals; the east and west porticoes had animal capitals set directly on the shaft, and the east portico's animal is disputed.",
+    "src/map/monuments.ts: the comment says \"a shaft twelve times its own width\", but the drawn shaft is 4 wide and 30 tall (7.5:1). Every column gets a bell base, although the hall columns had square bases (Iranica). The composite capital's corolla and volute block are reduced to a 3-unit slab. The bulls are described as \"heads down\", while the sources describe kneeling bulls reaching their necks and heads forward under the beams.",
+    "content/research/arc.md, chapter 4 table: \"Apadana double stairway ... Flandin & Coste 1851, PD\" reads as if the plates cover the stairway with the reliefs. The eastern stairway was excavated only in 1931–34 (Tehran Times), so no nineteenth-century plate shows it. Flandin & Coste appeared in parts 1843–1854. arc.md section 7 has no Persepolis entries; the height and re-erection-date disputes and the east-portico capital dispute belong there."
+  ],
+  "confidence": "Medium. Verified across several independent sources: 72 columns (36 in the hall, three porticoes of 12); 13 standing by 1900 plus one re-erected, 14 today; which part of the building had which type of capital (Schmidt via Iranica); the composition of the eastern stairway's central panel and flanking triangles (Livius); the stairway uncovered only in 1931–34; limestone. Not verified: WebFetch was blocked by the egress proxy on every domain tried, and the session's search budget ran out, so I could not look at a single photograph or plate. Still open: whether any standing column keeps its corolla and volute members; which columns are visible from the east court; the exact profile of the flights; and the stone's colour, for which the palette is my own judgement from memory of photographs, not measured or sourced. Before painting, check the column tops and the column count against one dated photograph taken from the east court."
+}

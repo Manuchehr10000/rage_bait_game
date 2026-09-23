@@ -1,0 +1,198 @@
+{
+  "art": "lion-paws",
+  "site": "Sigiriya (Sīgiriya, Sinhagiri, \"Lion Rock\"), Matale District, Sri Lanka. The Lion Gate: the lion-staircase terrace at the north end of the rock, c. AD 477–495 (Kassapa I). 7.957 N, 80.757 E (Pleiades 50266), which matches the atlas entry (7.96, 80.76). Asset id map-monument-ch07-monsoon.",
+  "view": "Stand on the lion terrace near its northern edge, on the line of the stair, at a person's eye height. Look due south and tilt up. LOWER THIRD: the terrace floor, reddish earth with brick edging, running into the picture. The two paws sit left and right of centre with their claws toward the viewer, and a flight of steps climbs between them to the foot of the cliff. UPPER TWO THIRDS: the sheer north cliff of the rock rising to the summit edge. Let the rock narrow slightly toward the top, as it does when a camera tilts up, so a wedge of brochure sky shows in each upper corner, and keep the summit line flat. Put a fringe of dry-zone tree canopy at the lower left and right edges, where the terrace drops away. CROPPED OUT: the west face (off to the right), which carries the mirror-wall gallery and the fresco pocket. The water gardens at the western foot and Pidurangala rock about 1 km north are behind the viewer. Every modern fitting is left out. WHY THIS VIEW: the rock takes its name from the lion, \"of which only the paws remain\" (UNESCO Courier 1988), so a brochure headline leans on the paws. This is the only view that holds both halves of the name, the lion and the rock. The other classic view, the whole rock from the west over the water gardens, shrinks at 92 × 70 to a featureless flat-topped block that could be any mesa, and it hides the lion. The existing code silhouette mixes the two viewpoints: the whole rock outline with the terrace at plain level. The painting replaces it with this one real viewpoint.",
+  "elements": [
+    {
+      "element": "The two paws",
+      "fact": "Only the forepaws of the lion survive. Everything that stood above them is gone. They are built masonry, brick with lime plaster: UNESCO describes 'a gigantic lion constructed of bricks and plaster'. They are not carved from the living rock. One online source says 'carved from the natural rock', and that is wrong. H.C.P. Bell (Archaeological Survey of Ceylon) uncovered them in 1898."
+    },
+    {
+      "element": "The claws",
+      "fact": "The claws point north, toward the viewer, and rest on the terrace like a crouching lion's forepaws. A secondary source and the existing silhouette both give three claws on each paw, and the two paws mirror each other. NOT verified against a photograph or Bell's plates in this research, so count them on a reference before painting."
+    },
+    {
+      "element": "Scale of the paws",
+      "fact": "The paws dwarf the people climbing between them: each paw stands higher than a person. This comes from photographs remembered, not measured. No dimension could be sourced in this session."
+    },
+    {
+      "element": "The steps between the paws",
+      "fact": "The final ascent began with a stair between the paws, which led on (by reconstruction) into the lion's mouth. The paws and the first steps survive. The steps are human-scale and rise away from the viewer toward the cliff."
+    },
+    {
+      "element": "The terrace",
+      "fact": "A large platform at the northern end of the rock, at the foot of the sheer upper cliff, which Wikipedia puts 'about halfway up'. It is not at the level of the surrounding plain. The ground is dry-zone reddish earth and gravel, edged with brick."
+    },
+    {
+      "element": "The rock (north cliff)",
+      "fact": "A sheer, bare, near-vertical rock face: UNESCO calls it a 180 m 'granite peak' and the UNESCO Courier 'an immense rock of red gneiss, 180 m high'. It is a weathered warm reddish grey with dark vertical streaks. It is not a vegetated hill, not a dome and not a cone."
+    },
+    {
+      "element": "The summit",
+      "fact": "Broadly flat. Kassapa's palace survives on it only as foundations and rock-cut cisterns. From the terrace nothing stands on the skyline."
+    },
+    {
+      "element": "Mirror wall and frescoes",
+      "fact": "Both are on the WEST face and are not visible from this viewpoint. The frescoes sit in a sheltered pocket 'halfway up the west face' (UNESCO Courier). The mirror wall is the polished plaster wall of the gallery that runs along the west face to the lion terrace. Neither appears on the cliff above the paws."
+    },
+    {
+      "element": "Modern iron stairways, railings, the hornet shelter cage, signs, visitors",
+      "fact": "Metal stairs climb the rock above the paws to the summit ('the paws and first steps remain, followed by metal stairs leading toward the summit'). They are modern intrusions and are left out of the painting (see deliberatelyWrong)."
+    },
+    {
+      "element": "Vegetation",
+      "fact": "Dry-zone forest canopy below and around the rock. Only a fringe of treetops shows at the lower edges, beyond the terrace."
+    }
+  ],
+  "mustBeRight": [
+    "Exactly two paws, one each side of a central flight of steps.",
+    "No lion head, mane, body or open jaws above the paws: the rest of the lion is gone.",
+    "The paws are masonry (brick-red with patches of pale plaster), clearly a different material and colour from the rock behind them.",
+    "The claws point toward the viewer and rest on the terrace floor.",
+    "The two paws are mirror images: same size, same claw count. The count must match the reference photograph; secondary sources give three per paw.",
+    "Each paw stands taller than the human-scale steps beside it would put a person.",
+    "The steps rise between the paws, away from the viewer, toward the cliff.",
+    "The rock behind is a sheer, near-vertical bare cliff, not a green hill, dome or cone.",
+    "The rock is weathered warm reddish grey with dark vertical streaks, not pale grey granite and not bright orange.",
+    "The summit line is broadly flat with no building, wall, tower or roof on it.",
+    "No paintings of women on the cliff face in this view.",
+    "No gleaming mirror wall on the cliff face above the paws.",
+    "No water, moat or fountains in frame.",
+    "No stupa, Buddha image or temple anywhere in frame.",
+    "Nothing modern in frame: no iron stairways, handrails, cage, signs or visitors.",
+    "The rock and the paws are lit from the upper right."
+  ],
+  "deliberatelyWrong": [
+    "The modern metal stairways on the rock above the paws, the handrails and the hornet shelter are left out. At 92 × 70 a zigzag of one-pixel rails reads as cracks or a scribble, and a brochure sells the fifth century, not the fittings.",
+    "The terrace is empty. It is never empty in life, but the brochure clears it, and figures at this size would be specks that confuse the reading of the paws' scale.",
+    "The light comes from the upper right, the set's convention (_brush.js B.LIGHT). Facing south, that is afternoon sun from the west. The sun stands north of due west in the afternoon only between the March and September equinoxes, and north of the zenith at noon only from about mid-April to late August (the site is at 8 degrees N). The north face is lit like this only in that half of the year, and the brochure picked that season.",
+    "The brochure sky: cleaner and bluer than a real dry-zone sky (the set's shared skyTop and skyLow).",
+    "The depth of the terrace is compressed and the cliff shortened, so the paws and the summit edge fit one 92 × 70 frame. Looking up from the terrace, the true cliff would fill far more of the view.",
+    "The bee and hornet colonies hanging on the rock face, the grooves cut for the original stair, and the lichen and weathering detail are left off: at this size they read as holes or damage."
+  ],
+  "palette": [
+    {
+      "name": "rockLit",
+      "hex": "#b07e5c",
+      "material": "The rock's weathered skin in full sun: 'red gneiss' (UNESCO Courier 1988), warm rusty tan"
+    },
+    {
+      "name": "rockBody",
+      "hex": "#8e6a55",
+      "material": "The rock's mid-tone and the face turned from the sun, before the set's shadow mix"
+    },
+    {
+      "name": "rockStreak",
+      "hex": "#3d3531",
+      "material": "Dark vertical run-off streaks down the cliff"
+    },
+    {
+      "name": "rockSpall",
+      "hex": "#cdb399",
+      "material": "Pale patches where the weathered skin has flaked off"
+    },
+    {
+      "name": "brick",
+      "hex": "#b0603f",
+      "material": "Fired clay brick of the paws and the terrace edging, in sun"
+    },
+    {
+      "name": "limePlaster",
+      "hex": "#ddd3c0",
+      "material": "Weathered lime plaster surviving on the paws and claws, off-white to grey cream"
+    },
+    {
+      "name": "stepStone",
+      "hex": "#9d9186",
+      "material": "Stone treads of the steps between the paws"
+    },
+    {
+      "name": "terraceGround",
+      "hex": "#a57a58",
+      "material": "Dry-zone reddish-brown earth and gravel of the terrace floor"
+    },
+    {
+      "name": "foliage (shared)",
+      "hex": "#5d7f3b",
+      "material": "Dry-zone forest canopy at the lower edges; use the set's B.C.foliage and foliageDark, no site-specific colour needed"
+    }
+  ],
+  "lighting": "Bright afternoon sun from the upper right, the set's B.LIGHT. Facing south, that is sun from the west and a little north of it, raking across the north cliff and the fronts of the paws. The right-hand (west) flanks of the paws and of the steps catch the light. Their left sides and the claw undersides fall into the set's cool shadow mix. The cliff face is lit obliquely, so its dark streaks and overhangs model it. There is no cast shadow on the terrace floor beyond what the paws throw a little to the left. A brochure sky with no clouds over the summit.",
+  "pitfalls": [
+    "Painting the paws as grey stone carved out of the cliff. They are brick and plaster, a separate structure standing on the terrace.",
+    "Completing the lion: a head, mane, jaws or body over the stair. Only the paws survive, and the rest is a reconstruction.",
+    "Giving the paws a housecat's four or five rounded toes, different claw counts left and right, or claws turned upward. Count the claws on a real photograph first. This research could not verify the count.",
+    "Putting the famous painted women (the 'Sigiriya maidens') or the mirror wall on the face above the paws. Both are on the west face, out of this view.",
+    "Crowning the rock with a standing palace. The summit holds foundations and cisterns only.",
+    "Painting the rock as a smooth dome or a volcanic cone because of the popular 'magma plug' story. It is a sheer-sided, flat-topped block.",
+    "Grey granite colour, or the saturated orange of sunset photographs, instead of weathered reddish grey with dark streaks.",
+    "Adding the moat, water gardens or fountains in the foreground. They lie at the western foot of the rock, far below and behind this viewpoint.",
+    "Putting Pidurangala rock, its temple, a reclining Buddha or a stupa in the background. That is behind the viewer, and it is an active place of worship (gate 6).",
+    "Using a Chinese guardian lion or the sword-bearing lion of the Sri Lankan flag as the model for the paws.",
+    "Painting the terrace at the level of the plain, as the current code silhouette does. From this viewpoint the terrace is the ground, and the cliff rises from its back edge.",
+    "Painting the modern iron stairway because every photograph shows it. It is deliberately left out."
+  ],
+  "gate6": "clear. Sigiriya is an archaeological site (UNESCO World Heritage 1982) and is not a place of active worship. The Buddhist monastery that followed Kassapa lasted to about the 13th–14th century and survives as ruins. Kassapa's parricide is a 5th-century chronicle story, not recent death or atrocity. It has no entry in arc.md section 4, and arc.md marks it 'Gate 6 clear'. That is why it can replace Angkor Wat (active temple, open ruling) without a designer ruling. One caution for the frame: Pidurangala, the neighbouring rock about 1 km north, has a working Buddhist temple and a reclining Buddha image. It lies behind the viewer in this view and must stay out of frame, as must any stupa or Buddha image.",
+  "contested": [
+    "Geology of the rock: 'a hardened magma plug from an extinct volcano' (Wikipedia and most tourist text) versus 'granite peak' (UNESCO WHC brief description) versus 'red gneiss' (UNESCO Courier, August 1988). Sri Lanka's Grade 9 geography textbook lists Sigiriya among 'residual hills', the eroded remains of hard mountains. The painting needs none of these: a sheer, weathered reddish rock satisfies all of them.",
+    "Height: about 180 m (UNESCO WHC; UNESCO Courier 1988) versus 'nearly 200 m' (Wikipedia, tourism sources). The figure depends on where the plain is measured from.",
+    "What the lion looked like: 'the forequarters of a crouching lion' with 'galleries and staircases emerging from the mouth' (UNESCO) is a reconstruction from the surviving paws, the name Sinhagiri and the Culavamsa. No head or jaws survive. A popular claim says the three-toed paws belong to a mythical bird (Gurula) rather than a lion. It has no scholarly support seen here: exclude it and never state it.",
+    "Surviving frescoes: 21 figures (UNESCO Courier 1988) versus 22 (other sources). The graffiti refer to about 500 ladies, and Wikipedia says the paintings once covered much of the west face, 140 m by 40 m. Their identity (apsaras, court ladies, Paranavitana's cloud and lightning maidens) is unresolved.",
+    "Mirror-wall graffiti: Paranavitana (Sigiri Graffiti, 1956) published 685 verses of the 8th–10th centuries. Other counts are higher, with date ranges from the 6th to the 14th century.",
+    "Kassapa I's reign: 477–495 (UNESCO; Pleiades; arc.md). Other Sri Lankan chronologies shift it by a few years."
+  ],
+  "sources": [
+    {
+      "title": "UNESCO World Heritage Centre, 'Ancient City of Sigiriya', list no. 202 (inscribed 1982)",
+      "url": "https://whc.unesco.org/en/list/202/",
+      "detail": "Brief description: capital of 'the parricidal King Kassapa I (477–95)' on 'a granite peak standing some 180 m high'; 'galleries and staircases emerging from the mouth of a gigantic lion constructed of bricks and plaster'. The page was BLOCKED by the egress proxy in this session. The first sentence is confirmed verbatim by the Pleiades record below; the brick-and-plaster wording is quoted from memory and must be re-checked."
+    },
+    {
+      "title": "The UNESCO Courier, August 1988 (World Heritage issue), Sigiriya entry",
+      "url": "https://raw.githubusercontent.com/inidun/tagged_courier/f4138c72f988199f8766e56b15592abdccb5b621/curated_issues/1988_080978.txt",
+      "detail": "Read in this session (a text corpus of the Courier). 'an immense rock of red gneiss, 180 m high'; 'a staircase hewn in the rockface, leading up from an enormous statue of the forequarters of a crouching lion at the foot of the cliff. It was for this lion, of which only the paws remain, that the rock and later the city was named'; 'rock paintings halfway up the west face of the cliff... 21 graceful female figures'; the site was returned to Buddhist monks after Kassapa."
+    },
+    {
+      "title": "Pleiades gazetteer, place 50266 'Sigiriya'",
+      "url": "https://pleiades.stoa.org/places/50266",
+      "detail": "Read in this session via the isawnyu/pleiades.datasets JSON. Description: 'capital city of the parricidal King Kassapa I (A.D. 477–95)... UNESCO World Heritage Site in 1982'. Representative point 7.9571 N, 80.7573 E. Related Pleiades records cite Paranavitana, Sigiri Graffiti (2 vols, Archaeological Survey of Ceylon / OUP, 1956) for the mirror-wall verses."
+    },
+    {
+      "title": "Sri Lanka Educational Publications Department, Grade 9 Geography (English medium, new syllabus)",
+      "url": "https://raw.githubusercontent.com/nuuuwan/edupub_gov_lk/13fe5feff6f53b79e8f1f03aa095c29057fe84dc/data/txt/en-9-geography-new-syllabus-0.pdf.txt",
+      "detail": "Read in this session through code search. 'Residual hills are the remains of hard mountains which had been subjected to erosion. Kataragama, Mihintale, Sigiriya, Ritigala and Govindahela are examples.' This is the Sri Lankan state textbook's view of the rock's origin."
+    },
+    {
+      "title": "Wikipedia, 'Sigiriya' (older revision text in a public corpus)",
+      "url": "https://raw.githubusercontent.com/gianmarcopicarella/babelarity/24d67cf955fde847accce0b2e65439afe83ce1ba/Babelarity_Picarella.1788997/resources/corpus/127842.txt",
+      "detail": "A starting point only. 'On a small plateau about halfway up the side of this rock he built a gateway in the form of an enormous lion'; paintings once covered 'an area 140 metres long and 40 metres high', 'references in the graffiti to 500 ladies'; ruins of an upper palace on the flat top with rock-cut cisterns; monastery until the 13th–14th century; Paranavitana deciphered 685 verses. The live article was blocked."
+    },
+    {
+      "title": "Tourist-guide text (Lonely Planet-derived) in a public repository",
+      "url": "https://raw.githubusercontent.com/aymanfathima/travels-atlatic/01d357892b2a9b4332f08b05e4a5aa6aff4ac9f2/data/destinations.ts",
+      "detail": "Weak source, used only for corroboration. 'At the northern end of the rock, a narrow pathway emerges onto the large platform... The enormous lion paws were found during archaeological excavations in 1898. At one time a gigantic brick lion sat at this end of the rock... Today the paws and first steps remain, followed by metal stairs leading toward the summit.' Also: the frescoes are reached by 'an open-air spiral stairway' halfway up."
+    },
+    {
+      "title": "CeylonXplorer student site, Sigiriya entry",
+      "url": "https://raw.githubusercontent.com/LithiraJK/ceylonxplorer-htmlcss/df21d7b3c1f89aa0a0f3d501162eebcdc4cfac85/pages/cultural-sites.html",
+      "detail": "Weak source, and the only one found for the claw count: 'these gigantic paws have three fingers with protruding claws', given as evidence for a mythical-bird ('Gurula') reading. Verify the count on a photograph."
+    },
+    {
+      "title": "H.C.P. Bell, Archaeological Survey of Ceylon, Annual Reports (1890s–1900s)",
+      "detail": "Records of the 1898 excavation that uncovered the lion-staircase terrace and paws. This is the preferred public-domain visual reference for the paws as found, if the plates can be located. NOT seen in this session; archive.org was blocked."
+    },
+    {
+      "title": "W. Geiger (trans.), Culavamsa, Part I (1929), chapter 39",
+      "detail": "The chronicle source for Kassapa's move to Sihagiri and the lion-form staircase that named it. Cited from memory and not re-read in this session."
+    }
+  ],
+  "repoCorrections": [
+    "content/map/README.md, vignettes table, row 7 still reads 'Angkor Wat | Five towers in a quincunx...'. src/map/atlas.ts and src/map/monuments.ts switched chapter 7 to Sigiriya ('lion-paws') in commit 856cda3, but the table was not updated. The row should name Sigiriya and give what must be right about the outline: two brick-and-plaster forepaws, claws toward the viewer, the steps between them, the sheer rock above with a flat summit line and no buildings, nothing else of the lion.",
+    "src/map/monuments.ts, the 'lion-paws' comment says 'a plug of old magma'. That is stated as fact but is contested: UNESCO says granite, the UNESCO Courier 1988 says red gneiss, and Sri Lanka's geography textbook calls Sigiriya a residual hill. Reword neutrally ('a sheer rock standing out of the plain').",
+    "content/research/arc.md, chapter 7 table: the 'Rock plug' wording for Sigiriya has the same problem. Per content/research/README.md the research is corrected first, to neutral wording such as 'sheer rock'.",
+    "content/research/arc.md, section 6 (Imagery risk), chapter 7 row: 'Archaeological Survey of India reports for Chand Baori and Sigiriya' is wrong for Sigiriya, which is in Sri Lanka. Its reports are the Archaeological Survey of Ceylon's (H.C.P. Bell's Annual Reports, from the 1890s), then Sri Lanka's Department of Archaeology and the Central Cultural Fund (Cultural Triangle project, 1980s). The ASI reference is right for Chand Baori only.",
+    "src/map/monuments.ts, the 'lion-paws' silhouette puts the terrace at the level of the plain, at the foot of the whole rock outline. The lion terrace is actually on a platform at the foot of the sheer upper cliff, about halfway up the rock. That is acceptable only as a listed brochure compression; the painted view from the terrace replaces it.",
+    "src/map/monuments.ts, the 'lion-paws' comment says 'the rest of the lion, head and body, is gone'. It is safer to say 'whatever stood above the paws is gone', because the head and jaws are a reconstruction, not a recorded find."
+  ],
+  "confidence": "Medium-low overall, and it must be raised before painting. Web verification was mostly unavailable. WebSearch had used up its session budget (200/200). WebFetch was blocked by the egress proxy for whc.unesco.org, wikipedia (desktop and mobile), britannica.com, ccf.gov.lk, archive.org, commons.wikimedia.org and openstreetmap. Verified in this session, through GitHub-hosted copies: the UNESCO Courier 1988 text (red gneiss, 180 m, forequarters of a crouching lion, only the paws remain, frescoes on the west face, 21 figures), the Pleiades record (Kassapa I 477–95, coordinates), the Sri Lankan geography textbook (residual hill), and weak secondary text (1898 discovery, northern platform, metal stairs above the paws, three toes per paw). From prior knowledge only, not re-checked: UNESCO's 'bricks and plaster' wording, the Pidurangala temple, and the lighting and season arithmetic. NOT VERIFIED AT ALL: the claw count, the paws' real dimensions, how much plaster versus bare brick shows today, and the exact outline of the north cliff seen from the terrace. Check all four against a photograph and, if they can be found, Bell's 1898 plates before the painting is accepted. High confidence in the gate-6 verdict, the two-paws-only, no-head, masonry-not-rock reading, the flat summit with no standing buildings, and the frescoes and mirror wall being on the west face and out of this view. The palette is a judgement from 'red gneiss', fired brick and lime plaster, not a measured colour."
+}

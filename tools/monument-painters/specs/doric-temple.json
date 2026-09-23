@@ -1,0 +1,208 @@
+{
+  "art": "doric-temple",
+  "site": "Segesta, the Doric temple (chapter 5, ch05_classical, slug segesta). It stands on its own hill outside the walls, west of the Elymian city on Monte Barbaro. Temple coordinates are 37.9415 N, 12.8323 E, and the front faces east, at azimuth about 84 degrees.",
+  "view": "Stand on higher ground to the south-east of the temple, a couple of hundred metres off, and look west-north-west. The eye is level with the top of the steps or a little below, so the building stands against the sky. The east front is on the RIGHT, seen about 35 degrees off its axis, in full sun, and its pediment is the highest point in the picture. The south flank runs away to the LEFT in half-shade, with all fourteen of its columns countable. The west gable rises as a separate triangle at the far left end. Along the whole length between the two gables the top line is flat entablature with sky above it: there is no ridge. Through the five gaps of the east front you see the far west colonnade and the hills and sky beyond, not a wall. In the image the front takes about 36% of the temple's width and the flank about 64%, which is a 23 m front and a 58 m flank seen at 35 degrees. The temple fills about 70% of the plate width and nothing of it is cropped. The rounded hilltop fills the bottom third: grass and low scrub, falling away to the left and behind into the valley, with rolling hills and a pale far ridge on the horizon. Monte Barbaro, the theatre and the sea are behind the viewer or out of frame. No figures, paths, fences or signs.\n\nWhy this view: the shared brushes fix the sun at upper right. A north-east view would put the east front on the LEFT of the picture, facing away from that light, so the facade and its pediment would be in shade. From the south-east the lit front is on the right, and that agrees with a real Sicilian morning sun from the east. A three-quarter view from slightly below is the standard brochure framing of a Greek temple. It is also the only view that shows the three things that make Segesta Segesta: the fourteen-column flank, two separate gables with nothing between them, and daylight straight through a building with no cella. The current code silhouette is a front elevation and can show none of the three.",
+  "elements": [
+    {
+      "element": "Colonnade (peristyle)",
+      "fact": "Hexastyle peripteral: 6 columns on each front, 14 on each flank counting both corner columns, 36 in all. Smyth (1824) counted twelve columns on each side not counting the corner columns, which makes 14. Every column stands to full height (EB9)."
+    },
+    {
+      "element": "Column shafts",
+      "fact": "Unfluted: smooth, round, tapering shafts with no vertical grooves. This is the plainest sign the building was never finished. Doric: no base; each shaft rises straight off the top step. The shafts are stout, roughly five lower diameters tall (recalled figures: about 9.4 m high, about 1.95 m across at the foot)."
+    },
+    {
+      "element": "Capitals",
+      "fact": "Doric: a flared cushion (echinus) under a plain square slab (abacus). No volutes, no leaves."
+    },
+    {
+      "element": "Entablature",
+      "fact": "Runs unbroken round all four sides (EB9: 'its whole entablature quite perfect'). A plain smooth architrave. Above it a frieze of triglyphs with plain, uncarved metopes: 11 triglyphs across the front (2 at the corners, 4 over the inner columns, 5 over the gaps) and 27 along each flank. Then a projecting cornice."
+    },
+    {
+      "element": "Pediments",
+      "fact": "Both stand, the east over the front and the west at the far end. Low triangles with empty tympana: no sculpture and no acroteria."
+    },
+    {
+      "element": "Roof",
+      "fact": "None, and no roof was ever put on. Nothing spans between the two gables: no ridge, no tiles, no rafters. Sky shows above the flank entablature between them."
+    },
+    {
+      "element": "Cella",
+      "fact": "None stands. Behind the columns there is no wall, door or inner building, only the open floor. The far colonnade and the land and sky beyond show through every gap. Whether a cella was ever planned is disputed (see contested). What is shown is only what stands."
+    },
+    {
+      "element": "Stepped base (krepis) and lifting bosses",
+      "fact": "A stepped platform, not a podium. The step blocks were never given their final dressing, and the projecting knobs used to lift them are still on their faces. The number of steps was NOT verified in this session: count it on a measured plate (Serradifalco 1834, or Hittorff and Zanth) before painting, and do not default to the textbook three."
+    },
+    {
+      "element": "Stone",
+      "fact": "Local limestone, warm honey to ochre in sun, weathered in patches to grey-buff with darker streaks. Not marble, not white, not grey overall. The colour is recalled from standard descriptions and was not re-checked in this session."
+    },
+    {
+      "element": "State today",
+      "fact": "Standing to its full height: every column, the whole entablature and both pediments. No fallen drums, no broken columns, no collapse. Blocks have been restored and clamped since the 18th century, but none of that reads at plate scale."
+    },
+    {
+      "element": "The hill",
+      "fact": "The temple stands alone on its own rounded hilltop outside and west of the ancient city. I.Sicily places the Grotta Vanella excavation, on the north-east slope of Monte Barbaro, 1.9 km east of the temple. No other building stands within sight of it (a 19th-century guide). The ground falls away beyond it into the valley."
+    },
+    {
+      "element": "Monte Barbaro",
+      "fact": "The city's mountain, with the theatre on it. It lies to the east of the temple. In this view it is behind the viewer and out of frame. It is not the temple's hill."
+    },
+    {
+      "element": "Vegetation",
+      "fact": "Grass and low Mediterranean scrub on the slopes, and nothing growing on the platform. Use the set's shared foliage colours for the scrub. The hill grass is its own colour (see palette)."
+    },
+    {
+      "element": "Sky and water",
+      "fact": "The set's shared brochure sky. No water in frame: the Gulf of Castellammare is not part of this view."
+    }
+  ],
+  "mustBeRight": [
+    "Exactly six columns across the east front.",
+    "Exactly fourteen columns along the visible (south) flank, counting both corner columns.",
+    "Every column shaft is smooth: no fluting lines on any column.",
+    "No column has a base: every shaft rises straight off the top step.",
+    "Each capital is a flared cushion under a square slab, with no volutes and no leaves.",
+    "The entablature runs unbroken round the whole building: no gaps and no fallen blocks.",
+    "Eleven triglyphs across the east frieze, with plain metopes between them.",
+    "Two separate gables: the east pediment over the front on the right and the west pediment at the far left end.",
+    "Nothing joins the two gables: no roof, no ridge, no tiles. The line between them is flat entablature with sky above.",
+    "No cella: no wall, door or inner building behind the columns. The far colonnade and the land or sky beyond show through every gap in the front.",
+    "Both tympana are empty: no sculpture, and no statues or ornaments on the gable corners.",
+    "Small knobs project from the faces of the step blocks.",
+    "The stone is warm honey-ochre limestone, not white marble and not grey.",
+    "Every column stands to full height: no fallen drums and no broken columns anywhere.",
+    "The temple stands alone on its hilltop: no theatre, city wall or other building in frame.",
+    "The east front is on the right and in full sun; the south flank runs away to the left."
+  ],
+  "deliberatelyWrong": [
+    "The lifting bosses are enlarged to 2 to 3 px at plate size. The real knobs are small against a 58 m building and would vanish, and they are the one sign of the unfinished state besides the smooth shafts.",
+    "The sky is the set's shared brochure sky: cleaner and bluer than a real Sicilian sky.",
+    "The light is the set's fixed upper-right sun. Here that is a morning sun from the east behind the viewer's right shoulder, which is geographically possible. The season, late spring with the grass still green, is a brochure choice.",
+    "Modern intrusions are left out: visitor paths, fences, signs, tourists, the ticket area, roads in the valley, and the restoration patches and iron clamps on the stone.",
+    "The weathering is simplified: the mottled grey, orange and dark-streaked patina becomes two or three broad tones.",
+    "On the receding flank the triglyphs may merge into a rhythm where they fall below a pixel. On the front they are counted.",
+    "The landscape is compressed: the valley beyond the hill is suggested by the ground falling away, not drawn to scale."
+  ],
+  "palette": [
+    {
+      "name": "limestone-sun",
+      "hex": "#dcb679",
+      "material": "Segesta limestone on a face turned to the sun (east front, abacus tops, cornice)"
+    },
+    {
+      "name": "limestone-body",
+      "hex": "#c29a5f",
+      "material": "Segesta limestone, general mid-tone of shafts and steps before light or shade is mixed in"
+    },
+    {
+      "name": "limestone-patina",
+      "hex": "#a39883",
+      "material": "Grey-buff weathering patches on the shafts and upper entablature"
+    },
+    {
+      "name": "limestone-streak",
+      "hex": "#6f5a41",
+      "material": "Dark weathering streaks, block joints, the shadow line under the cornice and under each boss"
+    },
+    {
+      "name": "hill-grass",
+      "hex": "#a3a45a",
+      "material": "Grass on the temple hill in late spring, green turning to straw; warmer than the shared foliage green"
+    },
+    {
+      "name": "dry-grass",
+      "hex": "#cdb36e",
+      "material": "Patches of dried grass and bare stubble on the slopes"
+    },
+    {
+      "name": "earth",
+      "hex": "#9c7550",
+      "material": "Bare ground at the foot of the steps and in worn patches on the hill"
+    },
+    {
+      "name": "far-hills",
+      "hex": "#8e9f8a",
+      "material": "Rolling hills beyond the valley, softened by haze toward the set's skyLow"
+    }
+  ],
+  "lighting": "This uses the set's convention: sun at upper right (B.LIGHT), which here means a morning sun from the east behind the viewer's right shoulder. The east front and its pediment are in full sun and glow honey-gold. The south flank faces away and to the left, so it is in half-shade: the shared cool shadow is mixed into the limestone, never neat black. Each column casts a narrow shadow to its left onto the steps and along the stylobate. The underside of the cornice is a dark band. Through the gaps of the front, the inner faces of the far columns catch light, and sky and hills show between them, so the open interior reads as light, not a dark void. The top of each boss throws a tiny shadow below it. The gable edges stand crisp against the sky. The far west gable is slightly paler and cooler with distance.",
+  "pitfalls": [
+    "Fluting the columns out of textbook Doric habit. Segesta's are smooth; that is the point.",
+    "Drawing a cella wall or a dark doorway behind the front columns. Any temple drawn from memory has one; this one does not.",
+    "Adding a roof, a ridge or tiles between the two gables, or drawing only the front gable and leaving the far end square.",
+    "Getting the column count from another temple: 8 across the front (Parthenon) or 13 down the side (the Temple of Concordia at Agrigento is 6 by 13). Segesta is 6 by 14.",
+    "Giving the columns bases (Ionic habit) or volute capitals.",
+    "Painting white marble or cool grey. The stone is warm honey-ochre limestone.",
+    "Painting a ruin: fallen drums, broken columns, missing entablature. That is Selinunte. Segesta stands to full height.",
+    "Putting the lifting bosses on the column drums. They are on the faces of the step blocks.",
+    "Assuming three steps. The count was not verified here; check it on a measured plate first.",
+    "Setting the temple on Monte Barbaro, with the theatre, city walls or sea in view. The task brief itself says 'the hill, Monte Barbaro', but the temple has its own lower hill west of the city, with nothing else built in sight.",
+    "Putting sculpture in the pediments or statues on the gable corners.",
+    "Mirroring the plate to put the lit front on the left. From the south-east the east front is on the right.",
+    "Clipping the far west gable behind the flank, which loses the gap between the two gables that proves there is no roof.",
+    "Drawing the far flank's columns out of step with the near flank's. Both flanks have 14 columns at the same spacing, and they show through the gaps."
+  ],
+  "gate6": "clear. A temple of a dead religion, standing as a ruin, with no burials, no active worship and no atrocity in or near the frame.",
+  "contested": [
+    "Whether a cella was ever intended. One view (Mertens 1984, from his excavations) is that foundation trenches for a cella were begun: a full temple was planned and abandoned. An older view reads the building as a roofless colonnade built on purpose round an open-air Elymian cult place. Keep both as live. The painting shows only what stands: no cella.",
+    "Why work stopped. It is often linked to Segesta's wars: the Athenian expedition of 416-413 BC, then the Carthaginian campaign that destroyed Selinus in 409 BC. It could also have been money or something unrecorded. No ancient source says.",
+    "The deity is unknown. Attributions such as Aphrodite or Venus Erycina are speculation. Muccigrosso's temples dataset labels it 'Temple of Venus Erycina', citing Vici.org, which shows the label is in circulation, not that it is right.",
+    "Who designed it. The city was Elymian, not Greek (EB9). The Greek Doric design suggests a Greek architect, possibly Athenian-trained, but that is an inference from style.",
+    "Date. Usually given as c. 430-420 BC. The start and stop dates vary by author.",
+    "Unsupported popular claim, to keep out entirely: that the temple was a sham built to impress Athenian envoys. Thucydides 6.46 has Segesta deceiving the envoys with borrowed silver and the treasures at Eryx, not with this building."
+  ],
+  "sources": [
+    {
+      "title": "W. H. Smyth, Memoir descriptive of the resources, inhabitants and hydrography of Sicily (1824), p. 671, as quoted in a 19th-century commented edition of Cicero's Verrines (Internet Archive scan orationeswithcom01ciceuoft; OCR text on GitHub)",
+      "url": "https://github.com/latin-ocr/orationeswithcom01ciceuoft/blob/master/orationeswithcom01ciceuoft_0500.txt",
+      "detail": "ACCESSED (as a search excerpt). 'There are twelve Doric unfluted pillars on each side, without reckoning those at the [corners]', which gives 14 per flank, unfluted. The same note places the remains about six miles from Castellammare."
+    },
+    {
+      "title": "Encyclopaedia Britannica, 9th ed., vol. 21, 'Selinus' p. 658 and 'Segesta' p. 622 (Temple University Nineteenth-Century Knowledge Project transcription)",
+      "url": "https://github.com/TU-plogan/kp-editions/blob/main/eb09/TXT/s21/kp-eb0921-062201-0647m.txt",
+      "detail": "ACCESSED (as search excerpts). Selinus article: 'the temple at Segesta ... has still every column and its whole entablature quite perfect'. Segesta article: an Elymian city 'distinct from both the Siculi and the Greeks'; alliance with Athens 426 BC; Athenian expedition 416 BC; Carthage destroyed Selinus in 409 BC."
+    },
+    {
+      "title": "I.Sicily epigraphic corpus (J. Prag et al.), e.g. ISic020406",
+      "url": "https://github.com/ISicily/ISicily/blob/master/inscriptions/ISic020406.xml",
+      "detail": "ACCESSED (as a search excerpt). 'Grotta Vanella, on the north-east slope of Monte Barbaro ... 1.9km east of temple of Segesta.' The temple is not on Monte Barbaro."
+    },
+    {
+      "title": "J. Muccigrosso, Temples of the ancient Mediterranean dataset (sheet.csv)",
+      "url": "https://github.com/Jmuccigr/temples/blob/master/sheet.csv",
+      "detail": "ACCESSED (as a search excerpt). Record 1000240: Segesta, 37.941475, 12.832296, orientation 84, E. Labelled 'Temple of Venus Erycina' from Vici.org, an attribution listed as speculative above."
+    },
+    {
+      "title": "'The Mediterranean', early 20th-century travel guide (text in dhfbk/code-mixing corpus)",
+      "url": "https://github.com/dhfbk/code-mixing/blob/master/corpus/guide/The_Mediterranean.txt",
+      "detail": "ACCESSED (as a search excerpt). 'The Temple itself is perfect, except that its columns are still unfluted'; 'It has no rival temple near it, nor are there even the remains of any other building ... within sight'. Used for the setting only, not as an architectural authority."
+    },
+    {
+      "title": "D. Mertens, Der Tempel von Segesta und die dorische Tempelbaukunst des griechischen Westens in klassischer Zeit (Mainz: von Zabern, 1984)",
+      "detail": "NOT ACCESSED (the web was blocked in this session). The standard monograph and the source for the cella-trench argument, the lifting bosses, the dimensions and the date. Check the step count and the proportions here before the note is committed."
+    },
+    {
+      "title": "Domenico Lo Faso Pietrasanta, Duca di Serradifalco, Le antichità della Sicilia, vol. 1 (Palermo, 1834); J. I. Hittorff and L. Zanth, Architecture antique de la Sicile (1827-30)",
+      "detail": "NOT ACCESSED. Public-domain measured plates of the temple: the reference for the step count, the triglyph layout and the column proportions."
+    },
+    {
+      "title": "J.-P. Houel, Voyage pittoresque des isles de Sicile, de Malte et de Lipari, vol. 1 (1782); J.-C. R. de Saint-Non, Voyage pittoresque ou description des royaumes de Naples et de Sicile, vol. 4 (1785)",
+      "detail": "NOT ACCESSED. Public-domain Grand Tour views of the temple on its hill: the visual references for setting and composition."
+    },
+    {
+      "title": "Thomas Cole, Temple of Segesta with the Artist Sketching (1843), Museum of Fine Arts, Boston",
+      "detail": "NOT ACCESSED. A public-domain painted view of the temple in its landscape."
+    }
+  ],
+  "repoCorrections": [
+    "content/map/README.md, vignettes row 5: 'standing complete on its hill' contradicts 'it was never finished' and invites a painter to add a roof. The temple stands to full height (every column, the whole entablature, both pediments), but it has no roof and no cella, its columns were never fluted and its steps were never dressed. Suggested wording: 'A Doric hexastyle temple standing to full height on its own hill: six columns by fourteen, the entablature all the way round and both pediments, but no roof and no cella. The columns were never fluted and the lifting bosses are still on the steps: it was never finished.'",
+    "content/map/README.md, same row: 'no cella: it was never finished' presents the missing cella as the proof. Whether a cella was ever intended is disputed (Mertens's cella trench against the open-enclosure reading). The undisputed evidence is the unfluted columns and the undressed steps with their bosses.",
+    "src/map/monuments.ts, 'doric-temple': the doc comment repeats 'standing complete on its hill' and claims both pediments and no cella. The drawing is a front elevation, which can show only one pediment and cannot show the fourteen-column flank or the missing roof. The paper showing between its columns is the only hint that there is no cella. It also draws three steps, a count this research could not verify; check it against Serradifalco before the painted plate is made.",
+    "content/research/arc.md, chapter 5 table, 'Segesta / Taormina' row: the period 'Greek' is imprecise. Segesta was an Elymian city, distinct from the Greeks (EB9), and the temple is a Greek Doric building, c. 430-420 BC, in that non-Greek city. 'Temple or theatre on a height' is also loose. The theatre is on the city's height, Monte Barbaro. The temple is on a separate lower hill about 2 km to the west (I.Sicily puts Monte Barbaro's north-east slope 1.9 km east of the temple). Per the research README, arc.md should be corrected before any level uses it."
+  ],
+  "confidence": "Medium for the architecture, low for exact measurements. Web search was exhausted and the egress proxy blocked every authoritative site tried: Wikipedia, the Parco di Segesta, Treccani, Perseus, UNESCO, Wikimedia Commons, archive.org, Britannica. The only verification available was GitHub code search over public-domain texts and scholarly datasets.\n\nVERIFIED that way:\n- 6 by 14 = 36 columns, unfluted.\n- Every column and the whole entablature standing.\n- Segesta was Elymian, not Greek.\n- The temple is about 2 km west of Monte Barbaro's north-east slope, so it is not on Monte Barbaro.\n- It faces east, at about 84 degrees.\n- It stands alone.\n\nFROM STANDARD SCHOLARSHIP BUT NOT RE-CHECKED in this session: the lifting bosses on the steps, the cella trench (Mertens 1984), the date c. 430-420 BC, the proportions and dimensions, the colour of the stone, and the triglyph layout.\n\nNOT KNOWN: the number of steps.\n\nBefore the asset note is committed, re-verify the unchecked items against Mertens 1984 or the Serradifalco plates, and do not paint the step count until it is checked."
+}

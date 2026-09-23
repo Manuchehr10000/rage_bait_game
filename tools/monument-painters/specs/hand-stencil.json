@@ -1,0 +1,241 @@
+{
+  "art": "hand-stencil",
+  "site": "Gargas (Grottes de Gargas), Aventignan, Hautes-Pyrénées, France. Lower cave (Gargas I), the \"main dans la niche\": the single black negative hand in a small rock alcove that the visit shows. Gravettian; a bone pushed into a crack of the hand panel is dated 26,860 ± 460 BP (uncalibrated radiocarbon).",
+  "view": "The \"main dans la niche\", seen straight on at arm's length the way a visitor on the fitted path sees it. The celebrated hand is a black negative stencil in a small rocky alcove, sheltered and well preserved, with only the thumb whole and the four fingers stopping short. The official site calls it \"the star of Gargas\", and it is on the public visit. Frame: the opening of the niche fills most of the 92 × 70 box, and its rock rim shows as a darker lip on the left and at the bottom. The upper-right lip catches the lamp. The hand stands upright, a little above centre, fingers to the top of the frame, the black halo filling most of the recess, the wrist running out of the halo at the bottom. Cropped: the rest of the wall; every other hand; the red dot on the rock opposite that points visitors to the niche; the Sanctuaire des mains beyond it (a cramped room of about forty hands, closed to visitors); people, rails and lamps. Why this view: a brochure prints the one hand the site calls its star. One hand reads at 92 × 70, where a wall of 137 would be confetti. The level already ends on the wall. The niche hand also shows the Gargas pattern that the best statistic calls the commonest (four short fingers, whole thumb), in black, which does not read as blood. It matches the one-hand silhouette the code already draws, so the id and the layout stay as they are. Handedness and tilt of the real niche hand are NOT verified: match the reference photograph (Wikimedia \"Gargas - Main dans la niche.jpg\", on screen only). Without it, a left hand laid palm to the wall (thumb on the viewer's right) is the likelier default. Breuil and later writers say Gargas hands are mostly left hands, and the official site says they were mostly applied palm down.",
+  "elements": [
+    {
+      "element": "The hand",
+      "fact": "A negative stencil. The hand is bare rock, the same colour and grain as the wall outside the halo. Pigment was sprayed or blown round a hand held on the wall, 'most often palm down on the rock' (official site). It is not a handprint and not a painted hand."
+    },
+    {
+      "element": "The halo",
+      "fact": "Black: manganese oxide or charcoal. One blog says charcoal for this hand. The niche hand is described as 'a negative hand on a black ground'. A blown halo is densest at the edge of the hand and thins outward into bare rock in a speckled spray, with no hard outer line."
+    },
+    {
+      "element": "The thumb",
+      "fact": "Whole. On the incomplete hands of Gargas and Tibiran the thumb is always present (Quartär study). All ten finger patterns found at Gargas include an extended thumb (Leroi-Gourhan's inventory, via Overmann and Etxepare & Irurtzun). On a hand laid flat with fingers up, it rises outward and upward from the lower side of the palm."
+    },
+    {
+      "element": "The four fingers",
+      "fact": "All four are short. The niche hand has 'only the thumb intact, the four other fingers appearing cut at the first phalanx'. At Gargas the distal phalanx, and most often the middle one as well, is what is missing, so each stub is about one segment long and stands only a little above the webs. Four short fingers with the thumb whole is the commonest pattern at Gargas: 33 black and 22 red among the 112 hands Leroi-Gourhan characterised."
+    },
+    {
+      "element": "Finger stub ends",
+      "fact": "In a stencil the stub end is just the outline of whatever was against the wall. The picture shows a rounded, soft-edged end and nothing about the cause, which is contested."
+    },
+    {
+      "element": "The wrist",
+      "fact": "It leaves the stencil at the bottom: the arm stood away from the wall, so the halo is open there."
+    },
+    {
+      "element": "The niche",
+      "fact": "A small rocky alcove in the lower cave, on the visit. It sheltered the hand, which is why it survives well. Its exact shape and size are not documented in any source I could reach."
+    },
+    {
+      "element": "The rock",
+      "fact": "Limestone of the Bois du Gouret massif (official site). Gargas I is broad and low. The upper cave, Gargas II, is the one with walls covered in white calcite, so white calcite is not the colour of the hand wall. The pale buff-grey is taken from published photographs, not from a written source."
+    },
+    {
+      "element": "Light",
+      "fact": "A cave: no sun and no sky. The visit is lit artificially. The picture uses one warm lamp from the upper right, so it matches the set."
+    },
+    {
+      "element": "Excluded",
+      "fact": "Other hands (231 on about ten panels, by Barrière's count), the red dot opposite the niche, the Sanctuaire des mains, the engravings, bears, visitors, rails, text."
+    }
+  ],
+  "mustBeRight": [
+    "Exactly one hand stencil is in frame, and no other hand.",
+    "It is a negative stencil: the hand is bare rock and the pigment is sprayed round it.",
+    "The hand is the same colour and texture as the bare rock outside the halo, not lighter, not white.",
+    "The halo is black (dark grey-black), not red and not yellow.",
+    "The halo is darkest right against the edge of the hand and fades outward into the rock, with no hard outline.",
+    "The thumb is whole and longer than any of the four finger stubs.",
+    "The thumb angles outward and upward from the lower side of the palm: it does not point down toward the wrist and does not point straight up.",
+    "All four fingers are short stubs of about the same length, each standing only a little above the webs between them.",
+    "No finger stub rises above the others by more than a hand's natural stagger (middle slightly longest).",
+    "The stub ends are rounded and soft-edged like the rest of the outline: no square cut, no wound, no red at the tips, no drawn bent knuckle.",
+    "The fingers point to the top of the frame and the wrist runs out of the halo at the bottom.",
+    "The hand sits in a small rock recess whose rim frames it.",
+    "The light is a warm lamp from the upper right: no sky, sun or daylight anywhere in the picture.",
+    "Inside the recess the shadow lies just under the upper-right rim, and the lower-left inner wall of the recess is the lit side.",
+    "The hand casts no shadow and has no relief: it is paint on the rock."
+  ],
+  "deliberatelyWrong": [
+    "The lamp. A single warm lamp from the upper right, as a brochure photograph lights it. The visit's actual light positions are not documented; the set's light comes from the upper right.",
+    "Upright orientation. The hand is set fingers-up whatever its real tilt in the niche (not verified). A tilted hand with four stubs and one long thumb, turned so the thumb points up, reads as a thumbs-up, which is an insult in parts of West Africa, the Middle East, Iran, Afghanistan, Sardinia and Greece.",
+    "One hand stands for 231 on about ten panels. Legibility at 92 × 70; the level's last wall carries the multitude.",
+    "Scale. The hand is enlarged to fill most of the frame; the niche is simplified to a shallow rounded recess because its real outline is undocumented.",
+    "Brochure cheer. Pigment and rock are a shade cleaner and warmer than in situ, with the mottling of the wall simplified."
+  ],
+  "palette": [
+    {
+      "name": "Limestone, lit",
+      "hex": "#bfb197",
+      "material": "Bare Gargas I limestone in full light: the wall and the hand itself (colour from published photographs)"
+    },
+    {
+      "name": "Limestone, half-shade",
+      "hex": "#8b7f6b",
+      "material": "The same rock turned away from the lamp; the niche's outer lip on the left and bottom"
+    },
+    {
+      "name": "Limestone, niche shadow",
+      "hex": "#4d453b",
+      "material": "Rock in the shadow under the upper-right rim inside the recess"
+    },
+    {
+      "name": "Manganese black, dense",
+      "hex": "#241d16",
+      "material": "The halo against the hand's edge. The same value as the game's COLORS.manganese, so the vignette matches the level's black hands"
+    },
+    {
+      "name": "Black spray, thinning",
+      "hex": "#5e554a",
+      "material": "The outer spray of the halo, black dust over buff rock, fading into the lit limestone"
+    },
+    {
+      "name": "Red ochre (hematite)",
+      "hex": "#a0402c",
+      "material": "Not in this view. The other Gargas pigment, given for reference so any red matches the game's COLORS.ochreRed"
+    },
+    {
+      "name": "Lamp highlight",
+      "hex": "#f3cf8a",
+      "material": "Warm tint on the upper-right lip of the niche and the brightest rock"
+    },
+    {
+      "name": "Cave dark",
+      "hex": "#2a231c",
+      "material": "Beyond the lamp's reach at the edges of the frame"
+    }
+  ],
+  "lighting": "One warm artificial lamp from the upper right, as a brochure photograph of a cave interior is lit: no sun, no sky, no daylight. The pool of light is brightest at the upper right of the niche and falls off to near-dark at the lower-left corner of the frame. The recess is concave, so it lights the opposite way to a bump: the upper-right outer lip catches the light, the inside just under that rim is in shadow, and the lower-left inner wall faces the lamp and is lit. The stencil is flat paint: it takes the same light and shading as the rock under it and throws no shadow of its own. Colours in the palette are for neutral full light; tint them with the lamp highlight toward the upper right.",
+  "pitfalls": [
+    "Painting a positive handprint (paint on the palm) or a hand in paint. At Gargas every hand is a negative: the hand is bare rock.",
+    "Painting the hand as white paper or a lighter tone than the rock. It is the rock.",
+    "Making the halo red. Red round short fingers reads as bloody stumps, so the picture would state amputation, a contested cause. The niche hand is black anyway.",
+    "Square-cut stub ends, a scar, a bent-over knuckle, or a fold drawn in. Each one picks a side in the dispute. Draw only the rounded outline a stencil gives.",
+    "Stubs that are too long, so the hand reads as a normal hand with short fingers, or uneven, so one stands proud.",
+    "Pointing the thumb down toward the wrist. The code-drawn silhouette does this: a flat hand cannot.",
+    "Pointing the thumb straight up by tilting the hand: that is a thumbs-up.",
+    "Gesture shapes that exist among Gargas stencils or could be invented, and must not be used here: a lone long middle finger (the finger); index and middle long, the rest short (the V sign, insulting in Britain, Ireland, Australia, New Zealand); index and little finger long, middle and ring short (the corna, an insult in Italy, Spain, Portugal, Greece and Brazil; two real Gargas stencils have this with the thumb, the ASL 'I love you'); a lone long index (reads as pointing, or 'one'); one whole five-finger hand spread wide on its own (the Greek moutza). Safe shapes: four short fingers with a whole thumb, upright (the vignette); five whole fingers held together or naturally apart among other hands; four whole fingers with only the little finger short.",
+    "Giving the stencil a drop shadow or relief as if it were a cut-out.",
+    "Lighting the niche like a boss (lit inside the upper-right rim).",
+    "A hard dark outline round the hand or round the halo: blown pigment has a soft, speckled edge.",
+    "Daylight, sky, a torch flame in frame, or the tourist's headlamp beam: this is the brochure's lamp.",
+    "Painting the wall as white calcite. That is the upper cave, Gargas II; the hands are all in the lower cave.",
+    "Copying the level's red-majority wall. Across Gargas black hands outnumber red.",
+    "Adding a caption, a date or a number."
+  ],
+  "gate6": "Clear as a site: a decorated cave of a dead religion, managed for visitors, with no active worship. Must not be shown: (1) any cause for the short fingers. No blood, blade, wound, bandage or red at the fingertips; ritual amputation must not be stated as fact (arc.md section 7). (2) Human remains. Gargas holds Gravettian child remains (a mandible and a femur, Foucher et al. 2019), which stay out of frame and out of the picture. (3) Any rude gesture. The one hand is four short fingers and a whole thumb, upright, thumb angled out and up. That rules out the finger, the V, the corna, the thumbs-up and the moutza (see pitfalls for which shapes are safe).",
+  "contested": [
+    "Why the fingers are short: folded fingers (Leroi-Gourhan 1967, as a hunting code; Etxepare and Irurtzun 2021, as sign-language handshapes; Overmann 2014, as finger-counting); ritual or deliberate amputation (Sahly 1966; McCauley, Maxwell and Collard 2018, cross-cultural); disease and frostbite. All live. The Bradshaw Foundation argues from the absence of missing fingers on positive prints; that is an argument, not a settlement. The painting shows outlines and takes no side.",
+    "How many hands: 80, then 150 at the first studies; 217 (Sahly); 231 (Barrière); 'more than 200' (official site). Some have since been lost to erosion and vandalism.",
+    "How many are incomplete: 114 of 231 (McCauley et al. 2018; Bradshaw Foundation), 144 of 231 with only 10 whole (another count of Barrière's inventory), 'almost never complete' (hominides).",
+    "Colour counts: 143 black, 80 red, 2 bistre, 5 ochre, 1 white of 231 (inventory as reported by hominides and gallerix) against 'over a hundred black, 85 red, 4 white, 1 ochre' (loucrup65). Both put black in the majority.",
+    "Which fingers are most affected: the best-sourced figure is that the commonest single pattern is all four fingers short with the thumb whole (Leroi-Gourhan's data: 33 black and 22 red of 112 characterised; Etxepare and Irurtzun). A weaker popular source says the fourth and fifth fingers are most often short. Both can be true, one counting patterns and the other counting fingers; neither goes in the painting beyond this one hand.",
+    "Black pigment: manganese oxide (most sources) or charcoal (one blog, for the niche hand specifically).",
+    "The date: 26,860 ± 460 BP (GifA-92369) is an uncalibrated radiocarbon age on a bone in a crack of the hand panel. It dates the bone, associated with the hands, not the pigment. Popular articles say 30,000 to 35,000 years; in calendar years it is older than 27,000.",
+    "'Cut at the first phalanx' (French 'à la première phalange') is ambiguous about which segment remains; the Quartär study says the distal and usually the middle phalanx are the ones missing.",
+    "Handedness and tilt of the niche hand are unverified; check the photograph."
+  ],
+  "sources": [
+    {
+      "title": "Hominidés, 'Gargas grotte'",
+      "url": "https://www.hominides.com/musees-et-sites/gargas-grotte/",
+      "detail": "Colour inventory 143 black, 80 red, 2 bistre, 5 ochre, 1 white (231); 144 incomplete; about ten panels; pigments (iron oxide, goethite, manganese or charcoal); stencil techniques."
+    },
+    {
+      "title": "Préhistoire des Hautes-Pyrénées, 'Les mains de Gargas et de Tibiran'",
+      "url": "http://prehistoire.loucrup65.fr/mainsgargas.htm",
+      "detail": "'More than a hundred black, 85 red, 4 white, 1 ochre'; hands in groups; majority of left hands; Tibiran's dozen hands."
+    },
+    {
+      "title": "La ballade des grottes ornées, 'Les mains de Gargas' (2009)",
+      "url": "https://prehistoart.canalblog.com/archives/2009/10/04/15302123.html",
+      "detail": "The main à la niche: black-ground negative hand in a rocky alcove, only the thumb intact, four fingers cut at the first phalanx, said to be charcoal, well preserved; the red dot opposite; the Sanctuaire des mains, a cramped room of about forty hands closed to visitors."
+    },
+    {
+      "title": "Grottes de Gargas (official site), geology, archaeology, parietal art",
+      "url": "https://grottesdegargas.fr/grottes-de-gargas-geologie-archeologie-art-parietal-mains/",
+      "detail": "Limestone of the Bois du Gouret massif; Gargas II narrow with white calcite walls, Gargas I broad and low; all hands in Gargas I; hands of adults, adolescents and babies, mostly palm down; red, black, ochre; the niche hand as the star of the visit."
+    },
+    {
+      "title": "'Les mains incomplètes de Gargas, Tibiran et Maltravieso', Quartär",
+      "url": "https://journals.ub.uni-heidelberg.de/index.php/qu/article/download/80552/74594",
+      "detail": "Thumb present on the incomplete hands; the distal and most often the middle phalanx of the four fingers are missing; ten formulas out of fifteen possible at Gargas."
+    },
+    {
+      "title": "Overmann 2014, 'Finger-counting in the Upper Palaeolithic', Rock Art Research 31(1)",
+      "url": "http://www.ifrao.com/wp-content/uploads/2014/08/31-1-Overmann.pdf",
+      "detail": "112 of 157 Gargas stencils characterised by Leroi-Gourhan; all-but-thumb-bent pattern 33 times in black, 22 in red; the counting hypothesis."
+    },
+    {
+      "title": "Etxepare and Irurtzun 2021, 'Gravettian hand stencils as sign language formatives', Phil. Trans. R. Soc. B 376",
+      "url": "https://royalsocietypublishing.org/doi/full/10.1098/rstb.2020.0205",
+      "detail": "Ten configurations at Gargas, all with an extended thumb and all articulable in the air."
+    },
+    {
+      "title": "Inside Science (AIP) / Discover, 'Cave Paintings May Depict Ice Age Sign Language' (2021)",
+      "url": "https://www.aip.org/inside-science/cave-paintings-may-depict-ice-age-sign-language",
+      "detail": "The commonest Gargas position is all fingers except the thumb folded; two stencils with thumb, index and little finger raised (the ASL 'I love you'). Gives 30,000 to 35,000 years (popular figure)."
+    },
+    {
+      "title": "Clottes, 'Twenty Thousand Years of Palaeolithic Cave Art in Southern France', British Academy",
+      "url": "https://www.thebritishacademy.ac.uk/documents/3849/99p161.pdf",
+      "detail": "26,860 ± 460 BP (GifA-92369) on a bone in a crack beside hand stencils; Gargas and Cosquer dates reinforce each other."
+    },
+    {
+      "title": "Foucher et al. 2019, 'Les vestiges humains gravettiens de la grotte de Gargas', BSPF 116(1)",
+      "url": "https://www.persee.fr/doc/bspf_0249-7638_2019_num_116_1_14981",
+      "detail": "Child remains dated 24,930 ± 220 BP = 29,500–28,532 cal BP, which shows the calibration offset; human remains exist at the site (Gate 6)."
+    },
+    {
+      "title": "McCauley, Maxwell and Collard 2018, 'A Cross-cultural Perspective on Upper Palaeolithic Hand Images with Missing Phalanges', J. Paleolithic Archaeology 1",
+      "url": "https://link.springer.com/article/10.1007/s41982-018-0016-8",
+      "detail": "114 of 231 with missing digits; the amputation hypothesis on ethnographic grounds."
+    },
+    {
+      "title": "Bradshaw Foundation, 'Hand stencils and their missing fingers'",
+      "url": "https://www.bradshawfoundation.com/hands/hand_stencils_missing_fingers/index.php",
+      "detail": "114 of 231; the folded-finger argument from positive prints."
+    },
+    {
+      "title": "Leroi-Gourhan 1967, 'Les mains de Gargas. Essai pour une étude d'ensemble', BSPF 64",
+      "url": "https://www.persee.fr/doc/bspf_0249-7638_1967_hos_64_1_4105",
+      "detail": "The folded-finger typology and hunting-code hypothesis; the source of the pattern counts. In copyright."
+    },
+    {
+      "title": "Cartailhac and Breuil 1910, 'Les peintures et gravures murales des cavernes pyrénéennes. IV. Gargas', L'Anthropologie 21: 129–148",
+      "url": "https://catalog.hathitrust.org/Record/000521416",
+      "detail": "The public-domain visual reference (US-hosted scans only, per arc.md); the first inventory of the hands."
+    },
+    {
+      "title": "Regnault 1906, 'Empreintes de mains humaines dans la grotte de Gargas', BMSAP 7: 331–332",
+      "url": "https://www.persee.fr/doc/bmsap_0037-8984_1906_num_7_1_8167",
+      "detail": "The discovery of three red hands on 11 June 1906."
+    },
+    {
+      "title": "'Gargas - Main dans la niche.jpg', Wikimedia Commons",
+      "url": "https://fr.wikipedia.org/wiki/Fichier:Gargas_-_Main_dans_la_niche.jpg",
+      "detail": "Photograph of the niche hand, on screen only: check handedness, tilt, halo shape and rock colour. Not viewed by me."
+    },
+    {
+      "title": "Gesture references: Speak Greek on the moutza; Global Rescue on offensive gestures",
+      "url": "https://speakgreek.co.uk/blog/greek-gestures-moutza",
+      "detail": "Moutza (Greece); thumbs-up (West Africa, Middle East, Iran, Afghanistan, Sardinia, Greece); corna (Italy, Spain, Portugal, Greece, Brazil); back-of-hand V (UK, Ireland, Australia, NZ). Also https://www.globalrescue.com/common/blog/detail/offensive-international-travel-hand-gestures/"
+    }
+  ],
+  "repoCorrections": [
+    "content/map/README.md (Gargas row) and the comment on 'hand-stencil' in src/map/monuments.ts say 'the rock is the ink and the hand is the void/paper'. That is backwards: in a negative stencil the pigment is the ink and the hand is the bare rock. content/ch01-palaeolithic/l05-gargas/f-hands/README.md has it right.",
+    "src/map/monuments.ts 'hand-stencil': the thumb (translate(38,46), rotate(-0.9), box to x=-13) points down and to the left toward the wrist, its tip near (32,58), and is mostly swallowed by the palm, so it reads short. A flat hand's thumb cannot point back at the wrist, and at Gargas the thumb is whole on every incomplete hand. It should rise outward and upward from the lower side of the palm and be clearly longer than the finger stubs.",
+    "src/map/monuments.ts 'hand-stencil': the thumb is on the viewer's left, which is a right hand palm-down. Not wrong, but Gargas hands are mostly left hands (Breuil; loucrup65), mostly laid palm down (official site), so the typical stencil has its thumb on the viewer's right. Match the niche-hand photograph if that is the view painted.",
+    "content/ch01-palaeolithic/l05-gargas/LEVEL.md: 'red (ochre) and black (manganese), a very few yellow' omits the white hands (1 to 4 counted) and implies red first. Both published inventories put black in the majority (143 black to 80 red, or over 100 black to 85 red), and black may be charcoal as well as manganese.",
+    "src/render/scene.ts drawHands() colours hands red when hash % 9 < 5, which gives 55 red, 49 black, 1 yellow of the 105 hands drawn in l05 (rect x = 166 tiles, w = 320): a red majority with no source. The inventories put black in the majority.",
+    "LEVEL.md and f-hands/README.md: 'most often the fourth and fifth' is weakly sourced as written. The well-sourced statistic is that the commonest pattern is all four fingers short with the thumb whole (55 of 112 characterised hands), and every incomplete hand keeps the thumb. drawHands() shortens fingers at random, so that commonest pattern appears only 3 times in 105, while 55 hands are complete. Only 10 of 231 are whole by one count.",
+    "Gesture safety in src/render/scene.ts drawHands() (thumb drawn on the left, so f=0 is the index): random finger subsets draw, in l05 as built, a lone full middle finger on 5 hands (i = 2, 5, 62, 95 as children at lengths 1,3,1,1; i = 97 as an adult at 2,4,2,1), the corna (index and little full, middle and ring short) on 3 (i = 4, 26, 38), and the V (index and middle full) on 1 (i = 100). This breaks the map README's own rule that no finger stands proud. It also draws patterns that Leroi-Gourhan's ten attested formulas may not include; check against his figure, reproduced as fig. 2 in Etxepare and Irurtzun 2021.",
+    "arc.md, CHAPTER.md and LEVEL.md give 'c. 27,000 BP'. That is the uncalibrated radiocarbon age (26,860 ± 460 BP) of a bone in a crack of the hand panel, an associated date, not a date of the pigment. It should never be turned into '27,000 years ago' in calendar years, which is older (compare Foucher et al. 2019: 24,930 BP = 29,500–28,532 cal BP)."
+  ],
+  "confidence": "Medium-high on the substance, medium on the look. I could not open any page directly, because the egress proxy blocked every WebFetch (Wikipedia, Persée, the official site, Don's Maps, the Royal Society). Everything above comes from search-engine extracts of the cited pages, several of them cross-checked against each other. Solid: negative stencils in Gargas I only; black and red, with a few ochre and white, and black the majority; the thumb always whole on incomplete hands; four short fingers with the thumb whole as the commonest pattern; the niche hand as a black-ground hand with only the thumb whole, in a small alcove, on the visit; the 26,860 BP bone date; the live hypotheses. Not verified, so check the photograph before painting: the niche hand's handedness and tilt, the niche's shape, and the rock colour (pale buff-grey is taken from photographs, not text). The Sanctuaire-closed-to-visitors detail and the charcoal pigment rest on one blog each."
+}

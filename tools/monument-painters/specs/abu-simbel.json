@@ -1,0 +1,286 @@
+{
+  "art": "abu-simbel",
+  "site": "Great Temple of Abu Simbel, cut for Ramesses II (c. 1264–1244 BC), cut up and moved 1964–68. West bank of Lake Nasser, Nubia, Aswan Governorate, Egypt (atlas: lat 22.34, lon 31.63). Tour-map vignette for chapter 2: asset id map-monument-ch02-egypt, 92 × 70 world px, painted 368 × 280 by tools/monument-painters/abu-simbel.js.",
+  "view": "The front elevation, seen from the forecourt on the temple's own axis. The viewer looks west-north-west (bearing about 280°) and stands far enough back to take in the whole facade. Paint it as an elevation, with almost no upward perspective. The facade fills about the middle two-thirds of the plate's width and about three-quarters of its height. Above the baboon frieze there is a thin ragged edge of hill rock, then brochure sky in the top strip. The terrace edge and the pale forecourt make the bottom strip. Both side margins are the rough rock-fill slopes of the 1960s artificial hill, falling away from the facade's edges. In frame, left to right (south to north): hill rock; colossus 1 (southernmost, intact); colossus 2 (broken at the waist, its fallen head and torso on the ground at its feet); the single door with the Ra-Horakhty niche above it; colossus 3 (intact); colossus 4 (northernmost, intact); hill rock. Cropped out: Lake Nasser, which lies east, behind the viewer; the Small Temple, 100–150 m north, off the right edge; the sun chapel at the north end of the terrace and the rock stelae at the south end; the hill's crest; the visitor area. Why this view: it is the view in David Roberts's plate 'Front elevation of the Great Temple of Aboosimble, Nubia' (1846–49). It is also the postcard and brochure view since the temple reopened on 22 September 1968. It is the only view that shows all four colossi evenly, the one door, the broken second statue and the whole frieze in one rectangle, and it still reads at 92 × 70. It is true of the relocated temple, which UNESCO says was rebuilt in its original orientation. It also keeps the lake out of frame, so the map does not give away the chapter's relocation gag, which belongs on the end card.",
+  "elements": [
+    {
+      "element": "Facade",
+      "fact": "Cut from the hillside in the shape of a pylon, with the colossi 'backed against' it (1911 Britannica). It is taller than the colossi: the rock face goes on above their crowns up to the frieze, so the heads are backed by carved rock, not sky. Size is given as 30 × 35 m (World History Encyclopedia, Wikipedia) or 32–33 × 38 m (the repo's LEVEL.md and others). The side edges lean slightly inward, framed by a torus moulding. The facade, statues and all figures are one piece of rock-cut sandstone."
+    },
+    {
+      "element": "Four seated colossi of Ramesses II",
+      "fact": "About 20 m each (Memphis IEAA, Britannica; the Global Egyptian Museum says 22 m). Two sit on each side of the one entrance. Each sits frontally on a block throne with both hands flat on the knees and holds nothing. Each wears the nemes, the uraeus, a straight false beard and the double crown on top of the nemes (Wikipedia; World History Encyclopedia). Their feet rest on the Nine Bows (Global Egyptian Museum). The three intact ones are the same statue three times (pillar 4)."
+    },
+    {
+      "element": "The broken colossus",
+      "fact": "Second from the left as you face the facade: immediately left of, and south of, the door. The facade faces east, so the viewer's left is south. The head and torso fell in antiquity, 'probably the result of an earthquake' (Memphis IEAA); it was 'shattered at the waist'. What survives: the throne, the legs, the lap with the hands on the thighs, and the family figures at its legs. The Greek mercenaries' graffito of 591 BC is on the left leg of the colossus south of the entrance, but it is text and is not shown."
+    },
+    {
+      "element": "Fallen head and torso",
+      "fact": "They lie on the ground at the broken statue's feet. The 1964–68 engineers did not put them back; they set them at the foot of the rebuilt facade in the positions where they had been found. They must lie on the ground, not stand, and not be propped up. I found no text giving their exact arrangement or which way the head faces (see contested)."
+    },
+    {
+      "element": "Doorway",
+      "fact": "The only entrance. It sits in the middle of the facade, between colossi 2 and 3, on the temple's axis (azimuth about 100.5°). It is a plain tall rectangular opening, and its interior reads near-black in daylight."
+    },
+    {
+      "element": "Niche and Ra-Horakhty",
+      "fact": "A niche directly above the door holds a standing statue of Ra-Horakhty: falcon head, sun disc on his head. His right hand (viewer's left) rests on a user staff with an animal's head, and his left (viewer's right) rests on a small figure of Maat. With the sun they read User-Maat-Ra, the king's throne name. On each side of the niche the king is shown in relief, facing inward and adoring the god."
+    },
+    {
+      "element": "Upper registers",
+      "fact": "Top down, per the Global Egyptian Museum description: the row of baboons; a band of the king's cartouches flanked by royal cobras; a band of hieroglyphic text with the king's names and titles. Paint them only as horizontal texture. Nothing in them may be legible."
+    },
+    {
+      "element": "Baboon frieze",
+      "fact": "Twenty-two baboons along the very top of the facade, above the crowns. The count is consistent across Memphis, World History Encyclopedia, Wikipedia and tour sources. They squat upright, facing out (east, toward the sunrise), with both forepaws raised in adoration. All 22 are identical."
+    },
+    {
+      "element": "Family figures",
+      "fact": "Standing figures at the legs of every colossus, the broken one included, 'none higher than the knees of the pharaoh' (Wikipedia). There are three per statue: one beside each leg and one in front between the legs. By secondary sources, south to north: colossus 1: Bintanath, Nebettawy and an unnamed princess. Colossus 2 (broken): Nefertari, Queen-mother Tuya and Prince Amun-her-khepeshef. Colossus 3: Nefertari, Baketmut and Prince Ramesses. Colossus 4: Meritamen, Tuya and Princess Nefertari. At this scale they are unlabelled standing figures; the women wear long sheath dresses."
+    },
+    {
+      "element": "Terrace",
+      "fact": "The colossi rise from a platform reached by a flight of steps (1911 Britannica). It has a balustrade with a row of falcon statues alternating with statues of the king. Here it is shown as a plain low ledge (see deliberatelyWrong)."
+    },
+    {
+      "element": "Artificial hill",
+      "fact": "Since 1968 the facade has been set into an artificial hill: rock and sand fill over a reinforced-concrete dome (the Great Temple's is roughly 55–60 m across), made to look like the original cliff. Paint it as rough broken rock, a little browner and more varied than the carved face. It is not a sheer natural cliff and not a sand dune."
+    },
+    {
+      "element": "Setting and orientation",
+      "fact": "UNESCO: the temple was rebuilt 64 m above the old site and 180 m inland, in its original orientation. The axis points about 100.5° from north (east-south-east), so the facade is lit only in the morning. Lake Nasser lies in front and below, behind the viewer, out of frame. There is no vegetation in this frame."
+    },
+    {
+      "element": "Forecourt ground",
+      "fact": "Pale, warm sand and paving in front of the terrace. It is not grey, and no water reaches it."
+    },
+    {
+      "element": "Sky",
+      "fact": "The set's shared brochure sky, shown cloudless."
+    }
+  ],
+  "mustBeRight": [
+    "Four seated colossi in one row, two on each side of the door.",
+    "Exactly one doorway, between the second and third colossi.",
+    "The second colossus from the left is broken off at the waist: throne, legs, lap and hands remain; no chest, shoulders or head.",
+    "Colossi 1, 3 and 4 are complete and identical to each other.",
+    "Each complete colossus wears the nemes with the double crown on top: the tall white crown rising out of the red crown. None wears the white crown alone.",
+    "Each colossus sits frontally with both hands flat on its knees and holds nothing: no crook, no flail.",
+    "Pieces of the fallen head and torso lie on the ground at the feet of the broken colossus.",
+    "A row of 22 identical baboons runs along the top edge of the facade, above the crowns.",
+    "The baboons sit upright, facing out, with both forepaws raised.",
+    "A niche directly above the door holds a standing falcon-headed figure with a sun disc.",
+    "The niche figure has a staff on the viewer's left and a small figure of Maat on the viewer's right.",
+    "Small standing figures stand at the legs of every colossus, the broken one included, and none reaches above the king's knee.",
+    "The facade rises above the crowns, so the heads are backed by carved rock, not sky.",
+    "The facade's side edges lean slightly inward, like a pylon.",
+    "Facade, colossi and small figures are one warm sandstone; nothing is grey or white.",
+    "The sunlit side of every form is on the right, and shadows fall down and to the left.",
+    "The door opening is near-black.",
+    "Rough rock of the artificial hill surrounds the facade: no water in frame, and no sand drift piled against the statues.",
+    "No legible text or hieroglyphs anywhere."
+  ],
+  "deliberatelyWrong": [
+    "The terrace balustrade, with its row of falcon statues alternating with statues of the king, and the central stair are reduced to a plain low ledge. At 92 × 70 they would read as noise along the base line and blur the colossi's feet.",
+    "The family figures are unnamed standing shapes. Their crowns, plumes and side-locks are not resolved. At about 5–8 world px they cannot carry identities; their count, positions and knee height are kept.",
+    "The inscriptions (dedication band, cartouche-and-cobra band, cartouches on the colossi, each colossus's own name, the Greek mercenary graffito on the broken statue's leg, Belzoni's name) are at most horizontal texture. The no-text rule, and they are below the scale anyway.",
+    "The 1964–68 relocation joints are not painted. They are hairlines on the real stone and invisible at this size.",
+    "Small surface losses on the three intact colossi (uraei, beard tips, noses) are not drawn one by one. They are below the plate's resolution. Do not invent specific breaks either.",
+    "The side and base reliefs of the thrones (Hapi binding the Two Lands, bound captives, the Nine Bows) are left off. They are invisible frontally or too small.",
+    "The sky is brochure-clean and the colour cheerful: the set's shared style.",
+    "Lake Nasser and the Small Temple are left out of frame. This is composition, not error: the lake is behind the viewer in this view, and showing it would give away the chapter's relocation gag.",
+    "Unlike the code-drawn silhouette in src/map/monuments.ts, the painting includes the cornice and the 22 baboons. The map README's 'left off' rule was written for the flat silhouette, where they would merge the four figures into one trapezoid. In a painted plate the lit baboons stay separate against the sky."
+  ],
+  "palette": [
+    {
+      "name": "sandstone-sun",
+      "hex": "#E4B67E",
+      "material": "The Nubian sandstone of the facade and colossi in direct morning sun: warm golden buff. It is one stone (content/README.md: 'one stone per site', warm and yellow)."
+    },
+    {
+      "name": "sandstone-body",
+      "hex": "#C99462",
+      "material": "The same rock's local colour, the base to model from with B.lit and B.shade."
+    },
+    {
+      "name": "sandstone-rose",
+      "hex": "#C8876A",
+      "material": "The rose, iron-oxide bedding bands running horizontally through the facade and the statues alike. Sources call the cliff rose-coloured."
+    },
+    {
+      "name": "sandstone-recess",
+      "hex": "#8C5B3C",
+      "material": "Rock in the recesses between the colossi, under chins, nemes lappets and knees, before the set's cool shadow mix."
+    },
+    {
+      "name": "patina-streak",
+      "hex": "#A6754B",
+      "material": "Darker weathering streaks running down the facade and the colossi."
+    },
+    {
+      "name": "doorway-dark",
+      "hex": "#2A1D15",
+      "material": "The door opening and the back of the niche: warm near-black, one step off the set's ink."
+    },
+    {
+      "name": "hill-rubble",
+      "hex": "#B3804F",
+      "material": "Rock-fill surface of the 1960s artificial hill around and above the facade: browner and more broken than the carved face."
+    },
+    {
+      "name": "hill-rubble-dark",
+      "hex": "#6E4A31",
+      "material": "Shaded faces and gaps between the boulders of the artificial hill, and patches of desert varnish."
+    },
+    {
+      "name": "forecourt-sand",
+      "hex": "#E9D3A4",
+      "material": "The pale sand and paving of the forecourt and the terrace top."
+    }
+  ],
+  "lighting": "Bright mid-morning sun from the upper right. The temple axis points about 100.5° from north (east-south-east), so the facade is lit only in the morning and falls into the hill's shadow after about midday. Light from the viewer's right means the sun is north of the temple axis. That is true of the rising sun between the two alignment days, roughly late February to late October, and of the whole morning in summer. So paint a summer morning, with the sun high behind the viewer's right shoulder, which matches the set's B.LIGHT. Lit: the fronts and right-hand sides of the colossi, the knees, the crowns and faces, and the right sides of the baboons against the sky. In shadow: under the chins and nemes lappets onto the chests; under the knees and the hands; the left flank of each colossus and the facade just to its lower left; the door, near-black; the upper part of the niche under its lintel; the far side of every boulder in the hill fill. Use white-gold light, not the orange of the famous sunrise photographs, and no afternoon or sunset light on this face, which never gets it.",
+  "pitfalls": [
+    "Mirroring the break: painting the third colossus (right of the door) broken instead of the second (left of the door, south).",
+    "Borrowing from the Small Temple 100–150 m north, which has six standing colossi. Wikipedia's white-crown/double-crown split describes the Small Temple's king statues, not the Great Temple. Here every colossus wears the double crown.",
+    "Copying the setting from Roberts, Du Camp (1850) or Frith (c. 1859). Those views show sand up to the colossi's chests, or a head half dug out. Use them for the carving only; today the statues stand clear to their bases, in an artificial hill.",
+    "Looking for Abu Simbel in the Description de l'Égypte. It has no plates of it: the French expedition ended in 1801, and Europeans did not know the temple until Burckhardt saw it in 1813.",
+    "Painting afternoon or sunset glow on the facade. It faces east-south-east and is in shade after about midday.",
+    "Putting Lake Nasser at the colossi's feet. The lake is below the forecourt and in front, behind the viewer in this view.",
+    "Giving the colossi the crook and flail of the Osiride pillars inside, or making fists: the hands lie flat on the knees.",
+    "Dropping the double crown, making it all white, or making the crowns differ between the three intact heads.",
+    "Drawing the baboons as small monkeys on all fours, getting the count wrong, or making one baboon differ from the rest (pillar 4).",
+    "Making the family figures taller than the knee, or leaving them off the broken colossus, which kept its three figures.",
+    "Reattaching the fallen head, leaving it out, or standing it upright or on a plinth.",
+    "Drawing the relocation cuts as a bold grid.",
+    "Drawing the door as an arch, or showing the hall inside. It is a dark rectangle.",
+    "Wrapping the facade in a smooth natural cliff or a golden dune. Since 1968 the surround is broken rock fill.",
+    "Painting white patches on the northernmost colossus's face. Those were plaster left by Robert Hay's cast; Amelia Edwards had them scraped off and coffee-stained in 1874.",
+    "Legible or pseudo hieroglyphs anywhere: the no-text rule.",
+    "Using the set's foliage or water colours. Neither is in this frame."
+  ],
+  "gate6": "clear. The Great Temple belongs to a dead religion. It is rock-cut, holds no burials and is not a place of active worship. The site's human cost, the Nubian villages drowned by Lake Nasser, is not in this view, and nothing in the painting touches it.",
+  "contested": [
+    "Heights: the colossi are 20 m (Memphis IEAA, Britannica, Wikipedia) or 22 m (Global Egyptian Museum). The facade is 30 × 35 m (World History Encyclopedia, Wikipedia) or about 32–33 m high × 38 m wide (the repo's LEVEL.md and others).",
+    "When and why the second colossus fell. Popular accounts say soon after completion; one gives c. 1248 BC. Others give 27 BC, and seismic catalogues question whether the 27 BC earthquake happened at all (Brill, 'Earthquakes in Egypt in the Pharaonic Period'). The cause is 'probably' an earthquake (Memphis IEAA). Say 'in antiquity'.",
+    "Relocation figures. UNESCO: 64 m above and 180 m inland. Commonly: 65 m and 200 m. Britannica: more than 60 m. The repo says 210 m. Dates are 1964–68 (UNESCO) or 1963–68 (Britannica). Blocks: 1,036, also given as 1,035 or 1,042. Weights: 'some 30 tons each' (UNESCO), or facade blocks capped at 30 t and ceiling blocks at 20 t.",
+    "Solar alignment. Sources disagree on whether the move shifted the illumination by a day, and in which direction. UNESCO says the temple was rebuilt in the same orientation. Weyburne (ENiM 14, 2021) records ten successive days of sanctuary illumination in October 1959, so 'the day' is really a window.",
+    "Family-figure placement. Wikipedia's own articles conflict on where Bintanath and Nebettawy stand ('second southern colossus' vs 'southernmost colossus'). The per-statue list comes from secondary summaries. The unnamed third figure at colossus 1 is possibly Isetnofret.",
+    "The fallen pieces. No text I could reach describes how the head and torso lie, or whether the head keeps its crown. The repo's 'in front and to the left' is unverified.",
+    "The reliefs flanking the niche: the repo says sunk relief, one tour source says raised; not verified. Ra-Horakhty's right hand is on the user staff and his left on Maat in most accounts; one adds a feather to the right hand.",
+    "Baboon size: 'about 2 m each' appears only in a tour source; not verified. The count of 22 is not disputed.",
+    "Whether the red crown's curl was carved, or survives, on these colossi: not verified (see repoCorrections)."
+  ],
+  "sources": [
+    {
+      "title": "University of Memphis, Institute of Egyptian Art & Archaeology: Great Temple of Abu Simbel",
+      "url": "https://www.memphis.edu/egypt/resources/colortour/abusimbel-gtr2.php",
+      "detail": "Four colossi of 20 m; the head and torso of the statue left of the entrance fell in antiquity, probably in an earthquake; the temple faces east; Re-Horakhty in the niche; the four sanctuary gods."
+    },
+    {
+      "title": "UNESCO World Heritage Centre: Working Together: Abu Simbel",
+      "url": "https://whc.unesco.org/en/story-abu-simbel/",
+      "detail": "Wire-saw cutting from 1964; more than a thousand blocks of some 30 t; rebuilt inside an artificial cliff 64 m above and 180 m inland, in the same orientation; inaugurated 22 September 1968."
+    },
+    {
+      "title": "UNESCO World Heritage List 88: Nubian Monuments from Abu Simbel to Philae",
+      "url": "https://whc.unesco.org/en/list/88/",
+      "detail": "The site's listing."
+    },
+    {
+      "title": "Global Egyptian Museum (CIPEG): glossary entry 'Abu Simbel'",
+      "url": "https://www.globalegyptianmuseum.org/glossary.aspx?id=38",
+      "detail": "Four statues of 22 m, each with its own name; the Nine Bows under the feet; baboons at the top raising their forepaws to the sun; the registers of cartouches and titles."
+    },
+    {
+      "title": "Wikipedia: Abu Simbel",
+      "url": "https://en.wikipedia.org/wiki/Abu_Simbel",
+      "detail": "Colossi of 20 m with the double crown; family figures no higher than the knees, with the list of names; fallen pieces placed at the statue's feet as found; the Small Temple's white-crown/double-crown split, which is the pitfall. Used as a starting point only."
+    },
+    {
+      "title": "Wikipedia: Tuya (queen); Bintanath; Nebettawy; Meritamen",
+      "url": "https://en.wikipedia.org/wiki/Tuya_(queen)",
+      "detail": "Nefertari, Tuya and Amun-her-khepeshef flank the colossus left of the door; Bintanath and Nebettawy flank a southern colossus (the articles conflict on which); Meritamen is at the northernmost."
+    },
+    {
+      "title": "World History Encyclopedia: Abu Simbel, Facade of the Temple of Ramesses II",
+      "url": "https://www.worldhistory.org/image/15448/abu-simbel-facade-of-the-temple-of-ramesses-ii/",
+      "detail": "Facade 30 m high, 35 m long; four seated colossi with the double crown; frieze of 22 baboons with raised arms."
+    },
+    {
+      "title": "1911 Encyclopaedia Britannica, 'Abu Simbel' (Wikisource)",
+      "url": "https://en.wikisource.org/wiki/1911_Encyclop%C3%A6dia_Britannica/Abu_Simbel",
+      "detail": "'The hillside was recessed to form the façade, backed against which four immense seated colossi ... rise from a platform or forecourt reached from the river by a flight of steps.' Public domain."
+    },
+    {
+      "title": "Britannica: Abu Simbel (summary)",
+      "url": "https://www.britannica.com/summary/Abu-Simbel",
+      "detail": "Figures of 66 ft (20 m); moved 1963–68, sawn into blocks, rebuilt more than 60 m above the original site."
+    },
+    {
+      "title": "Astronomical interpretation for sun perpendicularity in Abu Simbel temple (ResearchGate)",
+      "url": "https://www.researchgate.net/publication/277139037_Astronomical_interpretation_for_SUN_PERPENDICULARITY_IN_ABU_SIMBEL_TEMPLE_PHENOMENON",
+      "detail": "Temple axis at 100°33′33″ from geographic north. The orientation literature gives about 97–102°."
+    },
+    {
+      "title": "K. A. Weyburne, 'Determining the Dates of the Illumination of the Great Temple at Abu Simbel', ENiM 14 (2021) 261–272",
+      "url": "http://www.enim-egyptologie.fr/revue/2021/12/Weyburne_ENiM14_p261-272.swf.pdf",
+      "detail": "Ten successive days of sanctuary illumination, 13–22 October 1959. Behind the contested alignment-date entry."
+    },
+    {
+      "title": "The Relocation of Abu Simbel (ResearchGate)",
+      "url": "https://www.researchgate.net/publication/372956489_The_Relocation_of_Abu_Simbel",
+      "detail": "Facade blocks limited to 30 t and 15 m², ceiling blocks to 20 t and 10 m²; reassembled inside concrete domes covered with rock."
+    },
+    {
+      "title": "Brill, 'Earthquakes in Egypt in the Pharaonic Period' (Offerings to the Discerning Eye)",
+      "url": "https://brill.com/display/book/edcoll/9789047441090/Bej.9789004178748.i-362_003.xml",
+      "detail": "An earthquake may have brought down the seated colossus. Behind the contested cause and date."
+    },
+    {
+      "title": "Axon (Edizioni Ca' Foscari): Inscription of Greek Mercenaries at Abu Simbel",
+      "url": "https://edizionicafoscari.unive.it/en/edizioni4/riviste/axon/2018/1/iscrizione-dei-mercenari-greci-ad-abu-simbel/",
+      "detail": "Greek graffito of Psammetichus II's campaign (592–591 BC) on the left leg of the seated colossus south of the entrance. Not shown: it is text."
+    },
+    {
+      "title": "Penn Museum, Expedition: Amelia Edwards and the New Aswan Dam",
+      "url": "https://www.penn.museum/sites/expedition/amelia-edwards-and-the-new-aswan-dam/",
+      "detail": "In 1874 Amelia Edwards found plaster from Robert Hay's cast on the northernmost colossus's face, had it cleaned and stained the stone with coffee."
+    },
+    {
+      "title": "David Roberts, Egypt and Nubia (1846–49): 'Front elevation of the Great Temple of Aboosimble, Nubia' and 'The Great Temple of Aboo-Simbel' (Library of Congress scans)",
+      "url": "https://loc.getarchive.net/collections/david-roberts-lithographs",
+      "detail": "Public-domain visual reference for the carving and the frontal composition. The sand still half-buries the statues, so do not copy the setting."
+    },
+    {
+      "title": "Maxime Du Camp, 'Westernmost Colossus of the Temple of Re, Abu Simbel', 1850, Metropolitan Museum of Art",
+      "url": "https://www.metmuseum.org/art/collection/search/283143",
+      "detail": "Public-domain photograph of one colossus's head and double crown dug out of the sand, with a man on the crown for scale. Reference for the head and crown."
+    },
+    {
+      "title": "Francis Frith, 'Rameses Colossus, Abou Simbel', c. 1859, J. Paul Getty Museum",
+      "url": "https://www.getty.edu/art/collection/objects/200455/francis-frith-rameses-colossus-abou-simbel-english-about-1859/",
+      "detail": "Public-domain photograph of a colossus. Reference for the face and headdress."
+    },
+    {
+      "title": "Khaled El-Enany, The Temples of Abu Simbel (ASR mini-guide)",
+      "url": "http://www.asramesseum.org/medias/files/abu-simbel-an.pdf",
+      "detail": "By an Egyptologist. The search extract confirms the baboon frieze on the east-facing facade with raised arms; the full PDF could not be opened."
+    }
+  ],
+  "repoCorrections": [
+    "content/ch02-egypt/l01-abu-simbel/b-colossi/colossus-seated.md says 'Nefertari and Tuya at the outer statues'. That is wrong. Nefertari and Tuya, with Amun-her-khepeshef, flank the colossus immediately left of the door, which is the broken one. The southernmost colossus has Princesses Bintanath and Nebettawy (shown in queens' regalia). Tuya appears again at the northernmost, with Meritamen and Princess Nefertari; Nefertari appears again at the north inner, with Baketmut and Prince Ramesses. Also, the child stands in front between the legs or feet, not 'between the knees'.",
+    "The same file's easter egg, 'Nefertari at the left leg of the southern colossus specifically', needs fixing. She stands at the left leg of the south inner colossus, the broken one; at the southernmost it is Bintanath. The egg belongs in colossus-broken.md.",
+    "content/ch02-egypt/l01-abu-simbel/easter-eggs.md says 'blocks up to 20 tonnes at the face'. Facade blocks were capped at 30 t (about 15 m²); 20 t was the cap for ceiling blocks, and UNESCO says 'some 30 tons' each. shared/relocation-block.md, which says up to about 30 t, is right.",
+    "LEVEL.md says the temples were rebuilt '65 m higher and about 210 m back'. UNESCO says 64 m above and 180 m inland; the common figures are 65 m and 200 m. I found no source for 210 m. Give a range and log it as contested.",
+    "LEVEL.md says the facade is 'about 33 m high and 38 m wide'. Other sources give 30 × 35 m, and the colossi are given as 20–22 m. State the ranges.",
+    "LEVEL.md says the sun dates moved 'a day later ... because the temple now sits at a slightly different bearing'. UNESCO says it was rebuilt in the same orientation, and sources disagree on whether the one-day shift happened and in which direction. Move this to contested.",
+    "colossus-broken.md says 'a Ramesside restoration text inside suggests the damage was known and left'. I found no source for this; remove it or cite one. It also asks for 'inner stone paler than the weathered surface'. The break is ancient and weathered, and no source says it reads paler, so do not require it. 'Everything above the lap came away' (also in its assets.json 'what') should match the sources' 'shattered at the waist'.",
+    "colossus-fallen.md says the pieces lie 'in front and to the left of the statue, as they do at the site'. Sources only say 'at its feet'. Check the 'to the left' against a photograph before relying on it.",
+    "colossus-head.md makes 'the curl of the red crown' the tell for the double crown. I could not confirm that the curl was carved on, or survives on, the Abu Simbel colossi. Check a photograph before making it a must-be-right.",
+    "content/map/README.md: the Abu Simbel row's 'Deliberately wrong: the cornice and the frieze of twenty-two baboons ... are left off' applies to the code silhouette only. The painted vignette's note should say the painting restores the 22 baboons. The row's 'broken off above the waist' should read 'at the waist', as the sources have it.",
+    "src/map/monuments.ts, 'abu-simbel' comment: 'it came down in an earthquake' should be 'probably in an earthquake'; the cause and date are disputed. The comment also says the head 'still lies at its feet', but the silhouette never draws the fallen pieces. And its facade block stops at lap height, so the heads stand against sky. That is acceptable as the documented silhouette simplification, but it must not carry into the painting: there the facade rises above the crowns.",
+    "CHAPTER.md and the arc's chapter-2 imagery line list the Description de l'Égypte. For Abu Simbel specifically it has no plates, because the expedition (1798–1801) predates Burckhardt's sighting in 1813. The arc line is not wrong for the chapter; the Abu Simbel notes just must not cite it."
+  ],
+  "confidence": "Medium-high on the facts that decide the silhouette and the must-be-right list. Medium on the family-figure arrangement and the rules behind the upper registers. Low-medium on the exact arrangement of the fallen pieces, the skyline of the artificial hill, and the exact hex values. The hex values are a design decision anchored to the sources' 'rose-coloured' and golden sandstone and to the repo's 'one warm stone' rule; they were not measured.\n\nThe high-confidence facts:\n- four seated colossi, two on each side of one door\n- the second from the left (south of the door) broken at the waist, with its pieces left at its feet\n- the double crown over the nemes on each colossus\n- 22 baboons with raised forepaws\n- Ra-Horakhty in the niche over the door, with the user staff and Maat\n- family figures no higher than the knee\n- the relocation into an artificial hill in the original orientation, with the axis about 100.5° (east-south-east)\n\nThe web check was done through search-engine extracts only. The egress proxy blocked every direct page fetch (Wikipedia, UNESCO, Britannica, Griffith Institute, archive.org, Gutenberg, the El-Enany guide), so I could not read Porter & Moss or view the Roberts, Lepsius, Du Camp or Frith plates themselves. The painter should check the fallen pieces and the hill profile against those plates and a modern photograph (reference only) before painting."
+}

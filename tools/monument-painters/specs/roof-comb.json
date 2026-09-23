@@ -1,0 +1,196 @@
+{
+  "art": "roof-comb",
+  "site": "Tikal, Petén, Guatemala. Temple I (Temple of the Great Jaguar), the funerary pyramid of Jasaw Chan K'awiil I (reigned 682-734). It stands on the east side of the Great Plaza and faces west across it to Temple II. Chapter 6, The Americas.",
+  "view": "Stand on the Great Plaza lawn, a little west of its centre, at a standing person's eye height, and look due east at the west face of Temple I. Show it face-on, or turned very slightly so that the right-hand (south) flanks catch the sun. The pyramid's base sits across the lower middle of the plate, on the lawn. Temple I fills about four fifths of the plate height, so the summit shrine and roof comb stand against the sky with room above the comb. Rainforest canopy fills the plate behind the pyramid and on both sides of it, and its top edge stays well below the summit shrine. Keep the plaza lawn open across the bottom, with nothing between the viewer and the stair. Cropped out: Temple II (it is behind the viewer, across the plaza), the North Acropolis (to the left) and the Central Acropolis (to the right). Why this view: it is the only one that shows all of the vignette's facts in one outline (the nine terraces, the single stair, the one door and the comb). A brochure is drawn to the face-on elevation. The famous canopy view from Temple IV turns Temple I into a small comb poking out of the trees, which becomes a smudge at 92 x 70. A view from the North Acropolis that fits both temples in gives two stepped masses side-on, the same trap Abu Simbel's baboon frieze was left off to avoid.",
+  "elements": [
+    {
+      "element": "Pyramid (substructure)",
+      "fact": "Nine stepped terraces, each set back from the one below. It is steep: the whole monument, pyramid, shrine and comb together, is taller than its base is wide. Limestone. Sources: 'nine tiers' (secondary teaching text) and 'nine stepped levels' (travel text); limestone (Wikipedia, Tikal)."
+    },
+    {
+      "element": "Stair",
+      "fact": "One stair only, on the front (west) face. It is centred and straight, running from the plaza floor to the summit shrine. The sides and back have no stair. It faces the Great Plaza and Temple II."
+    },
+    {
+      "element": "Summit shrine (the temple)",
+      "fact": "A single masonry building on top of the ninth terrace. It has three chambers, each behind the next, with doorways spanned by wooden lintels. The outer lintel is plain; the two inner ones were carved (Kelly 1996, p.133, via Wikipedia). From outside only ONE doorway shows: a dark opening centred above the stair. The shrine can be no wider than the terrace it stands on."
+    },
+    {
+      "element": "Roof comb",
+      "fact": "Masonry, not wood. It rises from the shrine's roof and is narrower than the shrine. It was built to carry a giant sculpture of the enthroned king, and 'little of this decoration survives' (Miller 1999, p.27, via Wikipedia). Paint it as a weathered block with rough projecting stubs and no readable figure. It holds up nothing."
+    },
+    {
+      "element": "Stone surface",
+      "fact": "Bare limestone, grey, weathered dark in streaks and patches, with lighter consolidated areas. No surviving plaster coat or paint shows at this scale. The original colour of Temple I is not established in the sources read, so do not paint it red."
+    },
+    {
+      "element": "Great Plaza (foreground)",
+      "fact": "An open plaza at the foot of the stair, a lawn today. The plaza is flanked east and west by the two great temple-pyramids, with the North Acropolis to the north and the Central Acropolis to the south (Coe 1999, p.123, via Wikipedia). No trees stand in front of the pyramid."
+    },
+    {
+      "element": "Rainforest canopy (background and sides)",
+      "fact": "Tikal lies in the tropical rainforest of northern Guatemala: kapok (Ceiba pentandra), tropical cedar and Honduras mahogany are among its trees (Wikipedia, Tikal). The canopy stands behind and beside the temple, and the shrine and comb rise clear above it against the sky."
+    },
+    {
+      "element": "Temple II",
+      "fact": "About 38 m tall. It stands on the west side of the plaza facing Temple I, so from this viewpoint it is behind the viewer and NOT in the frame."
+    },
+    {
+      "element": "Sky",
+      "fact": "The set's shared brochure sky (B.C.skyTop / skyLow), with a fair-weather cloud or two."
+    }
+  ],
+  "mustBeRight": [
+    "Exactly nine stepped terraces are counted between the plaza and the summit shrine.",
+    "Exactly one stair, straight up the middle of the front face, from the plaza to the shrine's doorway.",
+    "No stair on either visible side of the pyramid.",
+    "A single building on the summit, with one doorway, centred above the stair.",
+    "The shrine is no wider than the top terrace it stands on: nothing overhangs.",
+    "A roof comb stands on the shrine's roof and is narrower than the shrine.",
+    "The roof comb shows no readable figure or face: its sculpture is almost entirely gone.",
+    "The stone is bare grey limestone, darker in weathered patches: not yellow, not white, not red.",
+    "The whole monument (pyramid, shrine and comb) is taller than the pyramid is wide at its foot.",
+    "The shrine and roof comb stand clear against the sky, above the top of the forest canopy.",
+    "Open plaza lawn in front of the stair, with no trees between the viewer and the pyramid.",
+    "Temple II is not in the picture.",
+    "Sunlit from the right: right-hand flanks and terrace tops lit, left-hand flanks in cool shade, the doorway dark.",
+    "No people, no ropes or chains, no signs, no wooden visitor stair."
+  ],
+  "deliberatelyWrong": [
+    "The stair is a ruled band with light horizontal strokes, not a countable run of treads. At 368 x 280 its dozens of steps would be sub-pixel, and a wrong count would be a false claim.",
+    "Each terrace is a plain setback with a lit top and a shadowed face. The mouldings on the terrace faces and the treatment of their corners are left off at this size. Say so in the note, so that nobody reads plain corners as a claim.",
+    "The North Acropolis (left) and the Central Acropolis (right) are left out, and the canopy runs in where they stand. At 92 x 70 a second stepped mass beside Temple I would merge with its outline. This is the same reasoning as the baboon frieze at Abu Simbel.",
+    "The brochure sky is cleaner and bluer than any real Petén sky, and the lawn is tidier than the real one (shared set convention).",
+    "The canopy is simplified to a band of rounded crowns. No particular tree is claimed.",
+    "Temple II is omitted even though it is the plaza's other half. It stands behind the viewer from this spot, so leaving it out is correct for the viewpoint, and the note should say why it is absent."
+  ],
+  "palette": [
+    {
+      "name": "limestoneLit",
+      "hex": "#c4bcab",
+      "material": "Temple I limestone on a face in full afternoon sun (right flanks, terrace tops)"
+    },
+    {
+      "name": "limestone",
+      "hex": "#a39d8f",
+      "material": "Temple I limestone, base tone for the front face; darken with B.shade for the left flanks"
+    },
+    {
+      "name": "limestonePale",
+      "hex": "#d3cbb9",
+      "material": "Lighter consolidated or recently cleaned stone, in patches and on the stair band"
+    },
+    {
+      "name": "weatherDark",
+      "hex": "#55544c",
+      "material": "Dark biological crust (algae and lichen) streaking down from ledges, heaviest on the shrine and roof comb"
+    },
+    {
+      "name": "weatherBlack",
+      "hex": "#3b3d37",
+      "material": "Darkest streaks and the rough projecting stubs on the roof comb, in shadow"
+    },
+    {
+      "name": "doorway",
+      "hex": "#2e2a26",
+      "material": "The shrine's single doorway: interior darkness. Close to the set ink, slightly warmer"
+    },
+    {
+      "name": "mossLedge",
+      "hex": "#6d7b45",
+      "material": "Moss and grass on the horizontal terrace ledges (sparse, a few dabs)"
+    },
+    {
+      "name": "plazaLawn",
+      "hex": "#7b9e45",
+      "material": "Great Plaza grass in bright sun. Lighter and yellower than the shared foliage, so the lawn separates from the canopy"
+    },
+    {
+      "name": "canopy",
+      "hex": "#5d7f3b",
+      "material": "Rainforest canopy, the shared B.C.foliage, unchanged"
+    },
+    {
+      "name": "canopyDark",
+      "hex": "#2f4a28",
+      "material": "Canopy shadow and gaps between crowns, the shared B.C.foliageDark, unchanged"
+    },
+    {
+      "name": "canopyLit",
+      "hex": "#86a452",
+      "material": "Sunlit tops of crowns on their right sides (new; the shared set has no lit foliage tone)"
+    }
+  ],
+  "lighting": "Afternoon sun from the upper right, the house direction (B.LIGHT = 0.6, -0.8), and here it is also the true light. Temple I faces west onto the plaza, so its front is lit only after noon. Between the September and March equinoxes the afternoon sun at Tikal's 17 degrees N stands in the south-west, which is behind the right shoulder of a viewer facing east. Result: the front face is in sun, the right-hand (south) flanks of each terrace and the terrace tops are brightest, and the left-hand (north) flanks are in cool shade (B.shade). The doorway is black. The comb's projecting stubs throw small shadows down and to the left. The pyramid casts its shadow down-left onto the lawn (B.castShadow). A morning view would be backlit, with the whole front in shadow, and no brochure prints that.",
+  "pitfalls": [
+    "Painting Temple II beside Temple I. The two face each other across the plaza, east and west. From the stair's side, Temple II is behind you.",
+    "Giving it four stairs like El Castillo at Chichén Itzá. Temple I has one, on the west face only.",
+    "A roof comb that is openwork or pierced, like the combs at Palenque. Temple I's reads as a massive block. This is from photographs I could not re-open this session: check it against Maler 1911 or Maudslay.",
+    "A wooden roof comb. At least one online dataset says 'carved wooden roof comb'. The comb is masonry; only the door lintels were wood.",
+    "A seated king, a jaguar or any readable figure on the comb or the façade. The comb's giant seated king is almost entirely lost. The 'Great Jaguar' of the nickname is carved on Lintel 3, a wooden beam inside the shrine. That lintel is not on the outside, and parts of the lintels were taken to European museums in the 19th century.",
+    "A shrine wider than the top terrace (the current code does this), or a flat-topped pyramid with no shrine.",
+    "A broad, low pyramid. Temple I is steep, and the whole thing is taller than its base is wide.",
+    "Yellow sandstone like Egypt, white restored plaster, or all-over red. Today it is grey stone.",
+    "The 19th-century state. Maudslay's (1881-82) and Maler's photographs show it overgrown with trees growing out of the terraces. Use them for the geometry, not the surface. The brochure shows it cleared, as it has been since the University of Pennsylvania project (1956-1970).",
+    "Trees or undergrowth in front of the stair. The plaza is open.",
+    "Several doorways on the shrine. There is one; the three rooms lie one behind another.",
+    "Adding tourists, the climbing chain or rope of past decades, or signage. Climbing is restricted today, and none of it belongs in a brochure plate."
+  ],
+  "gate6": "Clear for this vignette as specified. Temple I is a ruin of a dead religion and the funerary monument of an 8th-century king. Jasaw Chan K'awiil I's tomb (Burial 116) was excavated in 1962, so it is not a grave of the recently dead. One thing for the designer, not verified this session because the web was unreachable: contemporary Maya spiritual guides are reported to hold ceremonies at Tikal, including in the Great Plaza. If that is confirmed, Tikal is an ambiguous case under gate 6. It should be flagged in content/research/arc.md for a designer ruling before any Tikal level is built, not decided by a level designer. The vignette shows only architecture, lawn and forest: no people, no ceremony, no altar in use. Keep it that way.",
+  "contested": [
+    "Height. 47 m (154 ft) in Wikipedia citing Martin & Grube 2000, and in most modern popular sources. 44 m (145 ft) in art-history survey texts and, by my recollection, W. R. Coe's Tikal handbook. The difference is probably the measuring base and the top point used. Keep both in the note and draw no ruler.",
+    "Date and builder. Jasaw Chan K'awiil I reigned 682-734 and was entombed in the structure in AD 734 (Martin & Grube 2000, p.43). Wikipedia gives completion 'around 740-750' (Webster 2002). That would put most of the building after his death, under his son Yik'in Chan K'awiil (reigned 734-766). Art-history captions still print 'ca. 700 C.E.'. The brief's 'c. 732-734 for Jasaw' is NOT established by what I could read. Write it as 'raised over the tomb of Jasaw Chan K'awiil I, who died in 734; probably finished by his son'.",
+    "Nine terraces as the nine levels of the underworld. This is a popular interpretation ('probably refer to'), not a documented Maya statement. Keep it out of anything stated as fact.",
+    "Temple II and the queen. Older Wikipedia text says Jasaw's wife, Lady Twelve Macaw, is entombed in Temple II. The current text says Temple II was dedicated to her but no tomb was found. This only matters if the note mentions Temple II.",
+    "Original colour. Maya temples of this period were plastered and painted, but I found no source here for Temple I's own colour scheme. Do not assert red, and do not paint it."
+  ],
+  "sources": [
+    {
+      "title": "Wikipedia, 'Tikal' (HTML snapshot mirrored on GitHub, adjkjc/adjkjc.github.io)",
+      "url": "https://raw.githubusercontent.com/adjkjc/adjkjc.github.io/master/en.wikipedia.org/wiki/Tikal.html",
+      "detail": "READ this session. Temple I rises 47 m. The Great Plaza is flanked east and west by two great temple-pyramids, with the North Acropolis to the north and the Central Acropolis to the south (cites Coe 1999, p.123). Temple II is 38 m. The site is limestone, in the rainforest of northern Guatemala (kapok, tropical cedar, mahogany). Méndez and Tut visited in 1848 with the artist Eusebio Lara. Maudslay was there in 1881-82. The University of Pennsylvania Tikal Project ran 1956-1970. Jasaw Chan K'awiil I reigned 682-734. Burial 116 is a vaulted chamber below plaza level (cites Sharer & Traxler 2006, pp.397-399)."
+    },
+    {
+      "title": "Wikipedia, 'Tikal' wikitext (GitHub vinhqdang/wikipedia_analysis, lang_model/enwiki/text/3380), read through GitHub code search fragments",
+      "url": "https://github.com/vinhqdang/wikipedia_analysis/blob/master/lang_model/enwiki/text/3380",
+      "detail": "READ (fragments). The Temple I paragraph: entombed AD 734 (Martin & Grube 2000, p.43); completed around 740-750 (Webster 2002, pl.15); 47 m; 'The massive roofcomb that topped the temple was originally decorated with a giant sculpture of the enthroned king, although little of this decoration survives' (Miller 1999, p.27); tomb found by Aubrey Trik (Penn) in 1962 (Coe 1999, p.124); three chambers each behind the next, with wooden lintels, the outer one plain and the two inner ones carved, some beams removed in the 19th century and some now in European museums (Kelly 1996, p.133)."
+    },
+    {
+      "title": "Wikipedia, 'Maya civilization' and 'Maya art' (GitHub-hosted copies: Jemteddy/gaillacsec; 241253/progetto_gestione_informazione dump)",
+      "detail": "READ (fragments). Central Petén style: tall pyramids with a summit shrine, a roof comb and a single doorway; Tikal Temple I is 'one of the finest examples'. Temple I Lintel 2 shows a war serpent and Lintel 3 a jaguar protector (cites W. R. Coe et al. 1961)."
+    },
+    {
+      "title": "Medieval art history gallery page (GitHub MDNich/MedievalArtHistoryWebpage, public/indigenous-americas-gallery)",
+      "detail": "READ (fragment). Secondary teaching text: Temple I is '145-foot-tall'; 'The nine tiers of the pyramid probably refer to the nine levels of the Mayan Underworld'; caption 'ca. 700 C.E. Limestone'. Used only as evidence that the height and date are disputed, and for the nine tiers."
+    },
+    {
+      "title": "Travel page, Tikal (GitHub kchris099/travel, north-america/guatemala/tikal.html)",
+      "detail": "READ (fragment). Weak source. Temple I 'anchors the eastern side of Tikal's Great Plaza'; 'Nine stepped levels, a high roof comb'; climbing the original stair is restricted. Corroboration only."
+    },
+    {
+      "title": "Maler, Teobert. Explorations in the Department of Peten, Guatemala: Tikal. Memoirs of the Peabody Museum, vol. V no. 1 (1911)",
+      "detail": "NOT OPENED (archive.org blocked). Public domain. The preferred plate reference for the geometry of the terraces, shrine and comb; it shows the pre-clearance state."
+    },
+    {
+      "title": "Maudslay, A. P. Biologia Centrali-Americana: Archaeology, vol. III (1889-1902), Tikal plates from his 1881-82 visits",
+      "detail": "NOT OPENED (archive.org and biodiversitylibrary.org blocked). Public domain. Photographs and plans of the great temples."
+    },
+    {
+      "title": "Miller 1999, Maya Art and Architecture; Martin & Grube 2000, Chronicle of the Maya Kings and Queens; Coe 1999, The Maya; W. R. Coe, Tikal: A Handbook of the Ancient Maya Ruins (1967 and later); Sharer & Traxler 2006, The Ancient Maya; Webster 2002, The Fall of the Ancient Maya; Kelly 1996, An Archaeological Guide to Northern Central America; Trik 1963, 'The Splendid Tomb of Temple I at Tikal', Expedition 6(1)",
+      "detail": "NOT OPENED this session. These are cited by the Wikipedia text above, and the note should cite them at page level once someone with access checks them."
+    },
+    {
+      "title": "UNESCO World Heritage List no. 64, Tikal National Park",
+      "url": "https://whc.unesco.org/en/list/64/",
+      "detail": "NOT OPENED (host blocked)."
+    }
+  ],
+  "repoCorrections": [
+    "src/map/monuments.ts 'roof-comb': the summit shrine, box(34, 20, 32, 14), is 32 wide, but the ninth terrace it stands on is 74 - 8*5.6 = 29.2 wide (x 35.4 to 64.6). The shrine overhangs the top of the pyramid by 1.4 on each side. Corbelled Maya masonry does not cantilever, and the shrine must be no wider than its terrace.",
+    "src/map/monuments.ts 'roof-comb': the proportions are squat. The whole drawing is 70 units tall on a 74-unit base, but Temple I is steep, taller than its base is wide. (Medium confidence: from standard photographs, not re-verified this session.)",
+    "content/map/README.md, the chapter 6 row, and the monuments.ts comment call the roof comb 'carrying nothing and holding up nothing'. Holding up nothing is right. Carrying nothing is wrong about what it was for: it was built to carry a giant sculpture of the enthroned king, of which little survives (Miller 1999, p.27). Suggest 'holding up nothing, and carrying almost nothing now of the giant seated king it was built for'.",
+    "content/map/README.md, chapter 6 row, and the monuments.ts comment: 'a roof comb ... taller than it [the temple]' could not be verified this session. Keep it only after checking a measured elevation (Tikal Reports or Coe's handbook) or Maler's or Maudslay's plates. The claim 'narrower than the temple' is consistent with what I could find.",
+    "src/map/monuments.ts 'roof-comb': the stair, box(42, 34, 16, 38), is drawn in ink on ink, so it vanishes into the terraces in the silhouette. That is harmless for the placeholder, but the painted plate must make the single stair read as a band."
+  ],
+  "confidence": "Medium, and lower than it should be. The web was unreachable. The WebSearch budget for the session was already spent (200 of 200), and the egress proxy blocked every reference host I tried: en.wikipedia.org, whc.unesco.org, www.penn.museum, www.britannica.com, archive.org, www.mesoweb.com, www.famsi.org, smarthistory.org, commons.wikimedia.org, www.loc.gov, www.biodiversitylibrary.org, www.gutenberg.org, www.worldhistory.org, api.crossref.org, www.wikidata.org and books.google.com. They can be allowed under Network access in the environment's settings. The only text I could read was GitHub-hosted copies of the Wikipedia Tikal and Maya articles, which carry page-cited references, plus two weak secondary pages. Checked against that text: 47 m (with a 44 m / 145 ft rival), the entombment in 734 and completion 740-750, the three rooms in line behind one door, the comb's lost colossal seated king, the east-side position facing Temple II across the plaza, limestone, rainforest, and nine tiers (secondary sources only). Resting on standard knowledge I could not re-open: grey weathered stone today, the solid (not openwork) comb, 'taller than wide', the lawn, and the gate 6 note on contemporary ceremonies. I inspected no public-domain plate. Before painting, someone with web access should check Maler 1911 or Maudslay (BCA vol. III) for the terrace count, the comb's width and height against the shrine, and the overall proportion."
+}

@@ -1,0 +1,254 @@
+{
+  "art": "martello",
+  "site": "Martello Towers, the south-coast chain in Kent and Sussex: towers numbered 1 (Folkestone) to 74 (Seaford), built 1805–08 on Twiss's plan. The map pin is at Dymchurch. English Heritage gives Dymchurch Martello Tower (Tower 24) as High Street, Romney Marsh TN29 0NU, 51.0238 N 0.9976 E, which matches atlas.ts (51.02, 1.0). The painting shows a typical south-coast tower as built, not a portrait of Tower 24.",
+  "view": "The viewer stands on the shingle on the landward side of the near tower, about 40–60 m off, a little left of the door's axis, with the eye at a standing man's height. He looks out toward the sea, which at Dymchurch is south-east. The near tower takes the left half to three-fifths of the plate and is whole in frame: foot on the shingle at about four-fifths of the way down, parapet top at about a quarter to a third down, gun inside the frame. Its landward face, with the only door, faces the viewer, and a ladder rises to that door. The Channel is a low, level horizon behind the tower, visible on both sides of it. Down the beach to the right, along the curve of the shingle, stands the next tower in the chain. It is the same shape and carries the same gun, and it is drawn at about a sixth to an eighth of the near tower's width. Sky fills the rest. Nothing else is in frame: no sea wall, no houses, no moat, no figures. The gun is laid level along the beach to the left, broadside to the viewer. Why this view: it is the one the period itself chose. Turner drew these towers on the beach near Bexhill (watercolour c.1808, Tate D08138) and published the scene in Liber Studiorum part VII in 1811 (Tate A00978/A00979). It is also the view a railway-poster or brochure artist would print: a squat tower on the shingle with its neighbour down the coast says \"a chain of towers along the beach\" without a word. The door has to face the viewer, because the first-floor door and its ladder are the site's signature. That puts the viewer on the landward side with the sea behind the tower. Tower 24 itself is not usable as a setting: it stands immediately behind the Dymchurch sea wall among houses. It is the reference for the tower and its gun only.",
+  "elements": [
+    {
+      "element": "Near tower, drum",
+      "fact": "A squat brick drum on a flat top, the 'overturned sand pail' of Gertrude Warden (1897), 'squatting at the water's edge' in Conrad's Amy Foster (1901). The walls batter inward from foot to parapet. One local source (Bexhill-OSM, citing the Bexhill Observer of 1933) gives 40 ft high, 40 ft across at the foot and 30 ft at the top. So the top is about three-quarters of the foot, and the foot is at least as wide as the tower is tall. Paint width to height at about 1.1–1.3, which sits inside every figure found."
+    },
+    {
+      "element": "Brick",
+      "fact": "The south-coast towers are brick, not stone. The Bexhill-OSM account says the Bexhill towers' bricks came by barge from Rye. Irish, Channel Island and Corsican towers are stone; these are not. Show brick coursing as a few broken horizontal strokes. The colour (yellow-buff stock) and whether Tower 24 is rendered today were not verified in this pass."
+    },
+    {
+      "element": "Parapet",
+      "fact": "A plain, solid, unbroken parapet round a flat gun platform, and the gun fires over it. There is no roof, no cone, no battlements, no embrasures and no machicolations. Jersey's older round towers have machicolations and do not count here."
+    },
+    {
+      "element": "Cordon under the parapet",
+      "fact": "UNVERIFIED in this pass. content/map/README.md and monuments.ts assert a cordon ring below the parapet. If Tower 24 photographs confirm it, paint it as a narrow projecting band, a few inches proud, not a ledge. If not, the batter runs straight to the parapet top."
+    },
+    {
+      "element": "The gun",
+      "fact": "One 24-pounder per tower, on a carriage that traverses through 360 degrees on a central pivot (Wish Tower history, from the Historic England list entry and its conservation plan; Bexhill-OSM: 'a 2.5 ton cannon mounted on a central pivot'). About 2.5 tons is consistent with a 50 cwt long 24-pounder, roughly 9 ft 6 in long; the length is recalled, not re-verified. Seen from the ground, only the barrel (and at most the top of the carriage) rises above the parapet crest, on the side the gun points. Paint the barrel dark iron and roughly level. Tower 24 today still carries a 24-pounder muzzle-loader on its gun platform (Wikipedia)."
+    },
+    {
+      "element": "First-floor door",
+      "fact": "One doorway, on the first floor, the only way in (Bexhill-OSM: 'only accessible through a removable ladder on the first floor'). Its sill is well above a man's head, with blank wall below. It faces the viewer because it is on the landward side, away from the thick seaward wall; that is the standard description but was not re-verified here. The round head drawn in monuments.ts was not verified either; a plain arched opening is the safe reading."
+    },
+    {
+      "element": "Ladder",
+      "fact": "One timber ladder leaning from the shingle to the door sill. The ladder was removable, so the garrison could pull it up (Bexhill-OSM). Not a stair, a bridge or a ramp. Any visitor stair or railing at Tower 24 today is modern."
+    },
+    {
+      "element": "Rest of the wall",
+      "fact": "No ground-floor door. The ground floor was the magazine and stores, reached through a trapdoor from inside (Bexhill-OSM; 2007 Wikipedia). Paint no loopholes or rows of windows. Whether the first floor had small windows beside the door was not verified, so leave them out."
+    },
+    {
+      "element": "Second tower",
+      "fact": "The same standard design: same proportions, same batter, same parapet, same single gun, only smaller. Real spacing on the Bexhill stretch, from the tower coordinates in Dr-Mx/bexhill-osm, runs 452–1,179 m between neighbours (towers 42–55). They were built close enough to support each other: 'a French vessel close to shore would be in range of 4 of these guns' (Bexhill-OSM), and 'built closer together for mutual protection' (Wish Tower history)."
+    },
+    {
+      "element": "Shingle beach",
+      "fact": "Flint shingle upper beach. The Sussex towers stood on shingle: at Tower 54 in 1865 a whale was washed up 'on the shingle close next to the tower' (Bexhill-OSM). Turner's 1811 plate is a beach scene. Plants, if any, are sparse, low and glaucous."
+    },
+    {
+      "element": "Sea",
+      "fact": "The English Channel as a low, level strip behind the towers. No ships are needed. If one is added, it must be a period sailing vessel, never a steamer."
+    },
+    {
+      "element": "No moat",
+      "fact": "Only a few towers had moats (Wikipedia: 'A few towers had moats'); the Wish Tower, No. 73, is one. Tower 24 stands 'immediately behind the sea wall' (Wikipedia). The typical tower painted here has no moat."
+    },
+    {
+      "element": "Sky and light",
+      "fact": "The set's shared brochure sky. The sun is at the upper right (content/README.md). Looking south-east along the Dymchurch coast, an afternoon sun in the south-west really is to the right and a little ahead, so the landward face is in half-shade and the right flank takes the light."
+    }
+  ],
+  "mustBeRight": [
+    "Two towers, both the same design: squat, flat-topped drums.",
+    "Neither tower is taller than it is wide at its foot, parapet included.",
+    "Both sides of each drum slope inward in straight lines from foot to parapet, and the top is visibly narrower than the foot.",
+    "The top of each tower is a plain, unbroken parapet: no battlements, embrasures, machicolations, roof or cone.",
+    "Each tower carries exactly one gun on its roof, the far tower included.",
+    "On the near tower, the gun's barrel shows above the parapet crest while its carriage is hidden, or all but hidden, behind the parapet.",
+    "The barrel is dark iron and roughly level, not cocked steeply upward.",
+    "The near tower has exactly one doorway, at first-floor height: its sill is well above a standing man's head, with blank wall beneath it.",
+    "A single wooden ladder rises from the ground to that doorway; there is no stair, bridge or ramp.",
+    "No door, window or loophole at ground level on either tower.",
+    "The walls read as brick, not as stone blocks.",
+    "The second tower stands further along the same beach, to the right, clearly smaller, with the same proportions and the same single gun as the first.",
+    "The towers stand on a shingle beach with the sea behind them: no moat, no sea wall, no houses.",
+    "Nothing later than 1808 is in frame: no railings, concrete, lamp posts, flagpoles, visitor stairs or rooftop additions."
+  ],
+  "deliberatelyWrong": [
+    "The second tower is drawn much nearer, and so larger, than the real spacing allows: neighbours stood about 450 to 1,200 m apart. At true distance it would be a speck, and the vignette exists to show that there was a chain.",
+    "The setting is a generic open stretch of shingle, not Tower 24's real position immediately behind the Dymchurch sea wall among houses. That is how Turner drew the towers near Bexhill, and sea wall and houses would bury the silhouette. The pin stays at Dymchurch.",
+    "Sky and sea are the set's brochure colours, cleaner and bluer than the Channel usually is, so the twelve plates read as one set.",
+    "The gun is laid along the beach, broadside to the viewer, not out to sea. A gun aimed at the sea behind the tower would foreshorten to a stub. Laying it along the beach is still true to purpose, because the chain was sited to sweep the landing beaches.",
+    "The far tower's door and ladder are left out if they come out smaller than a couple of pixels. They are left out for size, not because the towers differ.",
+    "Any small first-floor windows or vents beside the door are omitted. They were not verified, and one door alone keeps the 'only way in is the ladder' reading clean.",
+    "Brick coursing is suggested with a few broken strokes, not drawn course by course."
+  ],
+  "palette": [
+    {
+      "name": "stock brick",
+      "hex": "#c4a672",
+      "material": "Tower brick in sun: weathered yellow-buff brick, as built 1805–08. The colour was not verified in this pass; check Tower 24 or the Historic England entry before committing."
+    },
+    {
+      "name": "brick weathered",
+      "hex": "#a79b82",
+      "material": "Salt-weathered and patched brick in grey-buff, in broken patches toward the foot."
+    },
+    {
+      "name": "brick fleck",
+      "hex": "#6e5040",
+      "material": "Darker, harder-fired bricks scattered in the coursing: a few strokes, never a pattern."
+    },
+    {
+      "name": "lime mortar",
+      "hex": "#dbd2bc",
+      "material": "Lime mortar joints and the pale line of the parapet top, as broken horizontal strokes only."
+    },
+    {
+      "name": "gun iron",
+      "hex": "#2e2f31",
+      "material": "The cast-iron 24-pounder barrel, blacked, with one warm highlight along its top."
+    },
+    {
+      "name": "carriage",
+      "hex": "#6f7477",
+      "material": "Traversing-carriage timber. Mostly hidden behind the parapet. The lead-grey finish is recalled period Ordnance practice and was not verified; if in doubt, paint it as shadow under the barrel."
+    },
+    {
+      "name": "door",
+      "hex": "#4a3b2c",
+      "material": "Timber door, or the dark doorway opening, in the landward wall in half-shade."
+    },
+    {
+      "name": "ladder",
+      "hex": "#8b7457",
+      "material": "Weathered timber ladder."
+    },
+    {
+      "name": "shingle",
+      "hex": "#b3a58b",
+      "material": "Flint shingle beach, mid tone in sun."
+    },
+    {
+      "name": "shingle shade",
+      "hex": "#7f7464",
+      "material": "Shingle in shade and under the tower's cast shadow, before the shared B.C.shadow mix."
+    },
+    {
+      "name": "shingle light",
+      "hex": "#d8cdb5",
+      "material": "Sunlit pebble highlights and the crest of the beach."
+    },
+    {
+      "name": "shingle plants",
+      "hex": "#8ea89a",
+      "material": "Sparse glaucous clumps on the shingle (sea-kale type). Optional dressing; use in place of the set's foliage green on the beach."
+    },
+    {
+      "name": "Channel",
+      "hex": "#5b8f98",
+      "material": "Inshore English Channel, greener and greyer than the set's water (#4f8fb9). Use it for the horizon strip, or mix the set's water about 30% toward it."
+    }
+  ],
+  "lighting": "Bright summer afternoon, with the sun high at the upper right as content/README.md fixes it for every asset. This is also geographically plausible here. Seen from the landward side looking south-east over Hythe Bay, the afternoon sun in the south-west is to the right and a little ahead. Model the drum as a cylinder: the right flank takes full light (B.face turn about 0.6 on the right third), and it shades round to the left. The landward face with the door and ladder sits in half-light, so keep the door dark but not black. The parapet top gets a thin highlight line. The gun barrel gets one warm highlight along its top edge, and the rest of it is near-ink. The cast shadow falls down and to the left across the shingle, short because the sun is high. The far tower is lighter and slightly bluer through aerial perspective, with the same light direction and the same modelling.",
+  "pitfalls": [
+    "Drawing a tall lighthouse or castle tower with vertical sides. These are squat, battered drums.",
+    "Battlements, arrow slits, machicolations or a conical roof. The parapet is a plain wall and the gun fires over it. Jersey's round towers and the Corsican towers are the wrong models.",
+    "Stone masonry. The Kent and Sussex towers are brick; the stone ones are in Ireland, the Channel Islands and Corsica.",
+    "A ground-floor door or front steps. The only entrance is the first-floor door, reached by a ladder.",
+    "Two guns, or guns at several points round the parapet. The south-coast tower took a single 24-pounder on a central pivot.",
+    "Standing the gun carriage on top of the parapet, or cocking the barrel up like a mortar. The carriage is on the roof inside the parapet, and the barrel is roughly level over the crest.",
+    "Making the far tower a different shape or leaving off its gun. The towers were built to a standard design, and the current monuments.ts does both.",
+    "Copying the east-coast towers (1808–12: larger and a different plan), the quatrefoil tower at Aldeburgh (CC), or the Grand Redoubts at Dymchurch and Eastbourne, which are circular forts with eleven guns.",
+    "Painting a later state: 32-pounders (1830s upgrade, per the Wish Tower history), Coastguard lookouts, the damage from the 1860s rifled-gun trials (Towers 49, 50, 71), Second World War observation posts, or homes and cafés with windows and rooftop rooms.",
+    "Copying Tower 24's surroundings (sea wall, houses, fences) or any modern visitor stair or railing, if present.",
+    "Adding a moat. Only a few towers had one, and Tower 24 stands immediately behind the sea wall.",
+    "Pointing the gun straight out to sea behind the tower, where it foreshortens to nothing, and then drawing it foreshortened wrongly.",
+    "Painting the barrel as a stub. A 24-pounder long gun (about 9 ft 6 in, recalled) is about a third of a roughly 30 ft wide top.",
+    "Taking the cordon for granted. It is asserted in the repo but was not confirmed in this pass; check Tower 24 before painting a projecting band.",
+    "Committing to a brick colour or a rendered finish from memory. Check a photograph of Tower 24 or its Historic England list entry first."
+  ],
+  "gate6": "clear. A coastal artillery fortification that never fired at an invader; Tower 24 is an English Heritage museum. No worship, graves or atrocity in frame. Smugglers and Coast Blockade men were killed at the Bexhill towers in 1822 and 1832 (Bexhill-OSM), but those deaths are unmarked and nowhere in this view. Keep the modern military (the Hythe ranges) out of frame for period, not for gate 6.",
+  "contested": [
+    "Height and proportion: 'up to 40 feet (12 m)' (Wikipedia, Martello tower) and 40 ft high × 40 ft foot × 30 ft top (Bexhill-OSM, citing the Bexhill Observer, 6 May 1933), against the commonly repeated c. 33 ft for the south-coast type (not verified in this pass). So whether the drum is about as wide as it is tall, or clearly wider, is open. mustBeRight asks only that it is not taller than wide.",
+    "Wall thickness: 11 ft 6 in seaward and 9 ft 6 in landward (Bexhill-OSM) against the often-quoted ~13 ft and ~6 ft (not verified). The elliptical plan with a thicker seaward wall is the usual description but was not verified here. None of this shows in elevation.",
+    "How many south-coast towers: 74 (arc.md; Wikipedia, British anti-invasion preparations; Wish Tower history) against '75' (Wikipedia, Dymchurch Martello Tower). How many in England: 103, i.e. 74 plus 29 (Wish Tower history; Aldeburgh article), against 105 (2007 Schools Wikipedia).",
+    "Dates: 1805–08 for the chain (arc.md; Wikipedia), but individual towers ran later: the Wish Tower was begun 1806/07 and finished by 1810 (Wish Tower history), and a Rye Harbour summary dates its tower 1809–10. kent-map gives '1805 and 1812' for the 74, which blends in the east-coast phase.",
+    "Tower 24's restoration: Wikipedia says Tower 23 was restored externally in the early 1970s and Tower 24 was then restored using 23 as a guide, yet also that 24 opened in 1969 as the first Martello tower open to the public. The article contradicts itself.",
+    "The name: a misspelling of Mortella Point, Corsica (majority; 2007 Wikipedia), against Italian 'martello', the hammer that struck an alarm bell (minority; Wish Tower history).",
+    "Garrison: one officer and 24 men (Wish Tower history; Bexhill-OSM) against 'one officer and 15–25 men' (Wikipedia, the general figure for all Martello towers).",
+    "Where the bricks came from: by barge from Rye for the Bexhill towers (Bexhill-OSM), against the common claim that London stocks came by sea (not verified). This bears on the brick colour.",
+    "Twiss's 1804 survey: 88 sites between Seaford and Eastwear Bay (Wikipedia, anti-invasion preparations) against 58 towers (an LLM-written summary of the Sandgate Castle article, weak)."
+  ],
+  "sources": [
+    {
+      "title": "content/research/arc.md, Chapter 12 row",
+      "detail": "Martello Towers, Kent & Sussex, 74 towers 1805–08; battered drum, rooftop traversing gun, first-floor door by removable ladder, dry moat; gate 6 clear.",
+      "url": "/home/user/rage_bait_game/content/research/arc.md"
+    },
+    {
+      "title": "Wikipedia, 'British anti-invasion preparations of 1803–05' (text copy on GitHub)",
+      "detail": "Twiss surveyed 88 sites from Seaford to Eastwear Bay (1804). 74 towers built in Kent and Sussex 1805–08. Grand Redoubts at Eastbourne and Dymchurch (11 guns, 350 men). 29 east-coast towers Clacton–Slaughden by 1812.",
+      "url": "https://raw.githubusercontent.com/usamaahmedsh/synthetic-data-langchain-rag/main/data/raw/napoleon/pages/British_anti-invasion_preparations_of_1803_05.txt"
+    },
+    {
+      "title": "Wikipedia, 'Romney Marsh' (text copy on GitHub)",
+      "detail": "74 towers, Folkestone (1) to Seaford (74). Six built in pairs at Dymchurch to protect the sluices. Tower 24 is closest to its original condition and has its cannon. Built 1805–08.",
+      "url": "https://raw.githubusercontent.com/usamaahmedsh/synthetic-data-langchain-rag/main/data/raw/black_death/pages/Romney_Marsh.txt"
+    },
+    {
+      "title": "Wikipedia, 'Dymchurch Martello Tower' and 'Martello tower' introductions (OTT-QA table copy)",
+      "detail": "Tower 24 stands immediately behind the sea wall; scheduled monument and Grade II; paired with Tower 25 to guard the sluice gates; restoration after Tower 23; opened 1969; EH museum; 24-pounder muzzle-loader on the gun platform. Martello towers generally: up to 40 ft, 360° traverse, 'a few towers had moats'.",
+      "url": "https://raw.githubusercontent.com/wenhuchen/OTT-QA/master/data/traindev_request_tok/List_of_English_Heritage_properties_20.json"
+    },
+    {
+      "title": "Wish Tower (Tower 73), 'General History' (sources: Wish Tower Conservation and Management Plan, Historic England list entry)",
+      "detail": "103 towers: 74 on the south coast numbered from Folkestone, 29 in Essex and Suffolk lettered A–Z, AA–CC. A single 24-pounder on the roof traversing 360°. One officer and 24 men on the middle floor. Redoubts at Dymchurch, Eastbourne and Harwich. Towers built close for mutual protection. Wish Tower finished by 1810. Moat. 1830s 32-pounders. Tower 71's central pillar in the 1861 trials.",
+      "url": "https://raw.githubusercontent.com/eopb/infoFiWebTemplate/master/generalHistory.php"
+    },
+    {
+      "title": "Bexhill-OSM, 'Historic Tour: Martello Towers' and martello.geojson (citing Bexhill Observer 6 May 1933 p.7; Hutchinson, Martello Towers: A Brief History; Foley, Martello Towers)",
+      "detail": "Walls 11 ft 6 in seaward and 9 ft 6 in landward; 40 ft high, 40 ft base, 30 ft top; bricks by barge from Rye; 2.5-ton gun on a central pivot; three levels; entry only by a removable ladder on the first floor; magazine through a trapdoor; shot reached about a mile; a vessel near shore in range of four guns. Tower coordinates 42–55 give neighbour spacing of 452–1,179 m. Tower 54: whale on the shingle beside the tower, 1865.",
+      "url": "https://raw.githubusercontent.com/Dr-Mx/bexhill-osm/master/web/tour/listMartello/index.html"
+    },
+    {
+      "title": "J. M. W. Turner, 'Martello Towers near Bexhill, Sussex' (public domain)",
+      "detail": "Watercolour and graphite c.1808, Tate D08138 (Turner Bequest). Liber Studiorum part VII plate, 1811: etching by Turner (Tate A00978), mezzotint by William Say (Tate A00979). Impressions also at the Met. Tate subject index: beach, cliff, sea, boats, soldiers, fortification. This is the period visual reference.",
+      "url": "http://www.tate.org.uk/art/artworks/turner-martello-towers-nr-bexhill-sussex-a00978"
+    },
+    {
+      "title": "E. Nesbit, The Incredible Honeymoon (1916), quoted by the Kent literary map",
+      "detail": "A Dymchurch Martello 'behind the sea wall': 'one beautiful big room with a Norman-looking pillar in the middle, and a down-stairs part ... and an up-stairs, where the big gun is'. This is the central pillar.",
+      "url": "https://raw.githubusercontent.com/kent-map/kent/master/nesbit/nesbit-dymchurch/README.md"
+    },
+    {
+      "title": "Gertrude Warden, The Wooing of a Fairy (1897) p.35; Joseph Conrad, 'Amy Foster' (1901), via the Kent literary map",
+      "detail": "The towers seen from Lympne 'looked at this distance like children's overturned sand pails'; a Martello tower 'squatting at the water's edge' on the Marsh shore. These are period confirmations of the squat, battered profile.",
+      "url": "https://raw.githubusercontent.com/kent-map/kent/master/19c/19c-gertrude-warden-biography/README.md"
+    },
+    {
+      "title": "English Heritage site data (Dymchurch Martello Tower)",
+      "detail": "High Street, Romney Marsh TN29 0NU; 51.023793, 0.997553; EH ref 3711. Confirms the atlas pin.",
+      "url": "https://raw.githubusercontent.com/samuel-d-aya/geolytics_projects/main/UK/english_heritage/heritage.csv"
+    },
+    {
+      "title": "2007 Schools Wikipedia, 'Martello tower'",
+      "detail": "Mortella Point origin (1794); three storeys (magazine, garrison, roof gun); 105 in England (an older count). Used only as a starting point.",
+      "url": "https://raw.githubusercontent.com/epfl-ada/ada-2023-project-amonavis/main/datasets/plaintext_articles/Martello_tower.txt"
+    },
+    {
+      "title": "NOT REACHED in this session: English Heritage history page for Dymchurch Martello Tower; Historic England list entry for Tower 24; Sutcliffe, Martello Towers (1972); Clements, Towers of Strength (1999)",
+      "detail": "Egress was blocked for these, and they are the sources that should settle brick colour, render, cordon, door side and shape, and height before painting.",
+      "url": "https://www.english-heritage.org.uk/visit/places/dymchurch-martello-tower/history/"
+    }
+  ],
+  "repoCorrections": [
+    "src/map/monuments.ts, martello: the second tower is 15 units wide at its foot (x81–96, y66) and 21 tall to its parapet (y45). That makes it taller than it is wide: a different shape from the near tower (60 × 44), and the opposite of the README's 'wider than it is tall'. The towers were one standard design, so the far tower needs the near tower's proportions.",
+    "src/map/monuments.ts, martello: the second tower has no gun. Every south-coast tower carried one 24-pounder, so it needs the same gun, scaled.",
+    "src/map/monuments.ts, martello: the gun carriage is a 14 × 5 block standing entirely above the parapet crest (y21–26 on a parapet topped at y26). On a real tower the traversing carriage stands on the roof inside the parapet, and only the barrel (at most the carriage top) shows above it. The barrel is also cocked about 12–17° up, where a level lay is right, and its muzzle stops about 10 units inside the parapet edge instead of reaching it.",
+    "src/map/monuments.ts, martello: the comment says the door has 'nothing under it but a ladder', but no ladder is drawn. Draw the ladder, or the door just floats.",
+    "src/map/monuments.ts, martello: the comment says the gun is 'laid out to sea', but it points left, along the beach in a view whose sea lies behind the tower. Laying it along the beach is fine; fix the comment.",
+    "content/map/README.md, chapter 12 'Deliberately wrong': 'at this size the true length is a nub' is not right. A long 24-pounder is about 9 ft 6 in (recalled, not re-verified; about 2.5 tons is confirmed by Bexhill-OSM) against a top about 30 ft across (Bexhill-OSM), so the true barrel is about a third of the top's width. The code's barrel (about 19 of 50 units) is already near true scale. Drop the deliberate error, or restate it with a real exaggeration factor and a correct reason.",
+    "content/research/arc.md, chapter 12 row: 'dry moat' reads as a feature of every tower. Only a few had moats (the Wish Tower does; Tower 24, immediately behind the sea wall, has none recorded). Suggest 'dry moat on some'. Also, '1805–08' is the programme's dating; some towers were finished around 1810 (the Wish Tower).",
+    "content/research/arc.md, chapter 12 row, 'Board of Ordnance plans, PD': not verified. Manuscript Ordnance plans at The National Archives may be unpublished Crown copyright, reusable under licence rather than public domain. Turner's 'Martello Towers near Bexhill' (c.1808 and 1811) is a secure public-domain period image and should be named as the reference."
+  ],
+  "confidence": "Low to medium. The web tools failed: WebSearch reported its budget spent (200 of 200), and WebFetch and curl were blocked for english-heritage.org.uk, historicengland.org.uk, wikipedia, britannica, wikimedia, archive.org, gutenberg, loc.gov and others. Only GitHub-hosted material was reachable, so every source above is a copy found on GitHub; none is the site authority itself. Verified from those copies: the counts (74 on the south coast plus 29 lettered on the east coast, 103 in all); the dates; the single 24-pounder on a central pivot traversing 360°; the first-floor door with a removable ladder; the three levels and the central pillar; a garrison of one officer and 24 men; moats on only some towers; brick; shingle setting; neighbour spacing of 452–1,179 m; Tower 24's position behind the sea wall and its 24-pounder; the EH location; the Turner period images. One local source gives dimensions (40/40/30 ft), and they are contested. Not verified, from memory, and kept out of mustBeRight: the elliptical plan, the wall thicknesses, the 33 ft height, the brick colour and any render on Tower 24, the cordon, the door being on the landward side and round-headed, the 24-pounder's 9 ft 6 in length, the lead-grey carriage and the shingle plants. Before painting, a rerun with egress to the Historic England list entry for Tower 24 and EH's history page should settle brick colour or render, the cordon, and door side and shape. The repo corrections to monuments.ts (far tower proportions, missing gun, carriage on the parapet, missing ladder) are high confidence: they come from reading the code against itself and against the README."
+}

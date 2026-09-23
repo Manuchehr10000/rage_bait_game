@@ -2,6 +2,10 @@
 /**
  * Paints the monument vignettes for the tour map.
  *
+ * Each painter follows the research in tools/monument-painters/specs/<art>.json:
+ * the view to paint, what must be right, what is deliberately wrong, the palette
+ * and the sources, which the asset note is written from.
+ *
  * Each painter in tools/monument-painters/<art>.js registers a function on
  * window.PAINTERS; this harness loads the brushes and the painters into a
  * headless Chromium, runs each one on a transparent 368 x 280 canvas, and

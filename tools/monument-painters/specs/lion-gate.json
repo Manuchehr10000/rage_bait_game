@@ -1,0 +1,285 @@
+{
+  "art": "lion-gate",
+  "site": "Mycenae, the Lion Gate: main entrance on the north-west side of the Bronze Age citadel, built c. 1250 BC during the second extension of the circuit (chapter 3, level 4, `mycenae`; atlas 37.73 N, 22.76 E)",
+  "view": "The viewer stands on the approach ramp in the outer court, on the gate's own north-west to south-east axis, a few metres below and in front of the threshold, at standing eye height, looking south-east. From there the gate is seen square-on. The gate facade sits in the middle of the frame: the roughly square doorway at the bottom centre, the lintel over it, and the grey relief triangle over the lintel. On either side are horizontal courses of conglomerate ashlar that rise to about the relief's apex. The right quarter of the frame is the inner face of the bastion, cropped by the right edge, running from the foreground back to the gate. The left edge crops a narrower strip of the east flank (the earlier circuit wall, refaced in conglomerate). The bottom of the frame is the ramp floor rising to the threshold. The top is a band of the set's sky above the facade. Nothing inside the citadel appears except what shows through the opening. Grave Circle A lies inside and to the right, behind the bastion, and is out of frame. No people, no modern paths or barriers. Why this view: it is the only station point that shows all three of the site's facts together (the doorway under its single lintel, the relief with the headless lions and the downward-tapering column, and the bastion on the attacker's right). It is the gate as the nineteenth-century record shows it: Gell 1810, Dodwell 1834, Du Moncel 1843, and the pre-1898 DAI photograph 'Mykene 63' of a man at the gate. I could not open those images to confirm each one's exact station point. At 92 x 70 the view still reads as a square void under a triangle, between two walls. A tighter crop loses the bastion; a wider one shrinks the lions below legibility.",
+  "elements": [
+    {
+      "element": "Doorway opening",
+      "fact": "About 3.1 m by 2.95 m at the threshold (sources disagree on which figure is the width and which the height), narrowing upward to about 2.78 m under the lintel. Roughly square, not a tall door. It was closed by a double wooden door; pivot holes survive in the lintel and threshold and bolt sockets in the jambs. The doors are gone. The opening is a passage about 2 m deep (the lintel's depth), opening onto a small inner court about 4 x 4 m."
+    },
+    {
+      "element": "Jambs",
+      "fact": "Two monolithic uprights of conglomerate, given as about 3 x 1.74 x 0.54 m. With the lintel and threshold they are the four conglomerate monoliths of the gate. The jambs are the slimmer members. They lean inward slightly, which is why the opening narrows toward the top."
+    },
+    {
+      "element": "Lintel",
+      "fact": "One conglomerate block, about 4.5 m long, 2.0 m deep, 0.8 m high, about 20 tonnes. It is much longer than the opening (about 3.1 m), so its ends run into the walls on either side of the jambs."
+    },
+    {
+      "element": "Threshold",
+      "fact": "One conglomerate block, 4.56 x 2.31 x 0.88 m, about 20 tonnes, cracked under its own weight in antiquity. It sits at the head of the ramp."
+    },
+    {
+      "element": "Relieving triangle",
+      "fact": "Corbelled courses above the lintel leave a triangular space, so the weight goes to the sides and not onto the lintel. The space is filled completely by the relief slab, which does not carry load. A geometric study finds the triangle laid out as near-equilateral (chords about 3.80 m)."
+    },
+    {
+      "element": "Relief slab",
+      "fact": "One slab of grey limestone, not conglomerate: about 3.5 to 3.6 m wide at its base, 3.0 to 3.1 m high, up to about 0.7 m thick (Blackwell 2014). So it is about as tall as the doorway, wider at its base than the doorway, and shorter than the lintel. The only surviving Mycenaean monumental relief and the largest sculpture of the Bronze Age Aegean. It has fractures that an archaeoseismological study attributes probably to an earthquake."
+    },
+    {
+      "element": "The two lions",
+      "fact": "Two confronted animals carved in high relief, rearing on their hind legs, in profile, one on each side of the column. Hind feet rest on the lower part of the slab; forefeet rest on the pedestal of the column. The heads were made separately, in another material, and are lost; the necks survive. Whether they are lions or lionesses is disputed (see contested)."
+    },
+    {
+      "element": "Altar pedestal under the column",
+      "fact": "An altar with incurved (concave) sides, described in Greek as 'amphikoilos'. The column stands on it and both animals rest their forefeet on it. Some accounts describe one altar, others two incurved altars side by side (see contested)."
+    },
+    {
+      "element": "Column",
+      "fact": "Minoan type, wider at the top than at the foot (an inverted taper). It rises from the altar pedestal to a capital and abacus, above which sits a row of four discs, read as beam ends, carrying an upper member toward the apex."
+    },
+    {
+      "element": "Facade walls either side of the gate",
+      "fact": "Conglomerate blocks laid dry in roughly regular horizontal courses (ashlar), nine courses to the left of the gate and nine to the right. On both sides the fifth course is at the lintel's level. The right-hand courses do not line up exactly with the left. Three courses and a lintel's height plus about 3 m of relief, so the preserved facade stands about 7 m, reaching roughly to the relief's apex. This height is inferred from the course count and dimensions; confirm it against a photograph."
+    },
+    {
+      "element": "Bastion",
+      "fact": "On the west side of the approach, which is the right-hand side as you walk up to the gate, so the defenders faced an attacker's right side, the one without the shield. A rectangular bastion about 14.80 x 7.23 m, built in pseudo-ashlar of enormous conglomerate blocks. Its inner face forms the right-hand side of the outer court and faces north-east, into the court."
+    },
+    {
+      "element": "East flank",
+      "fact": "The left-hand side of the approach: the steep, smooth face of the earlier circuit wall, given a new facade of conglomerate when the gate was built."
+    },
+    {
+      "element": "Approach ramp and outer court",
+      "fact": "A partly natural, partly built ramp on a north-west to south-east axis, leading to an outer court about 15 x 7.5 m in front of the gate (one account)."
+    },
+    {
+      "element": "Circuit wall beyond the gate area",
+      "fact": "Elsewhere the citadel wall is cyclopean masonry. Wace describes the citadel rock as hard Mesozoic limestone. The conglomerate, dressed ashlar work belongs to the gate, the bastion and the refacing around them."
+    },
+    {
+      "element": "Setting",
+      "fact": "The citadel stands on a low hill between the peaks of Profitis Ilias (Agios Ilias) and Zara, separated from them by two ravines."
+    }
+  ],
+  "mustBeRight": [
+    "Both animals are headless: each body stops at the neck. Nothing above the neck is restored (no head, mane, crown or wings).",
+    "Two animals rear on their hind legs, in profile, facing each other, one on each side of a single column.",
+    "Each animal's forefeet rest on the pedestal the column stands on; the hind feet stand on the bottom edge of the relief slab.",
+    "The column is wider at the top than at the foot.",
+    "A row of four discs sits above the column's capital.",
+    "The triangle above the lintel is filled completely by the relief slab; no part of it is an open void.",
+    "The relief triangle is about as tall as the doorway and close to equilateral.",
+    "The relief's base is wider than the doorway and shorter than the lintel.",
+    "The relief slab is a cooler, greyer stone than the buff-brown conglomerate of the lintel, jambs and walls.",
+    "A single lintel block, longer than the doorway is wide, with its ends running into the walls beyond both jambs.",
+    "Each jamb is one upright block, and the opening narrows slightly toward the top.",
+    "The doorway is roughly square, as wide as it is tall, not a tall narrow door.",
+    "There are no doors in the opening.",
+    "The gate is built into a wall: masonry continues on both sides of the jambs and the lintel. It is not a free-standing trilithon.",
+    "The masonry on both sides of the gate is squared blocks in horizontal courses, not polygonal cyclopean blocks.",
+    "The lintel sits level with one of the flanking courses, the fifth from the bottom.",
+    "The bastion forms the right-hand side of the approach, not the left.",
+    "The gate is seen square-on from the ramp below it, with the ground rising to the threshold."
+  ],
+  "deliberatelyWrong": [
+    "The mountains around the citadel (Profitis Ilias, Zara) are left out or flattened to a pale band. Reason: at 92 x 70 any peak behind the facade competes with the relief triangle, which has to be the only triangle in the picture.",
+    "The fractures in the relief, the tool marks, the dowel seats at the necks, the pivot holes and bolt sockets, and the crack in the threshold are not drawn. Reason: they are below the plate's resolution, and half-drawn they read as dirt.",
+    "No visitors, guard, paths, barriers or signs. Reason: a brochure plate shows the monument empty, and pillar rules keep text out.",
+    "Brochure colour: the set's clean blue sky and warmed stone. Reason: the set's shared style, as on every plate.",
+    "The bastion's cast shadow is kept off the gate facade. Reason: a real late-afternoon sun from the west can throw the bastion's shadow across the right of the court; keeping the facade fully lit keeps the relief legible."
+  ],
+  "palette": [
+    {
+      "name": "conglomerate",
+      "hex": "#b39c7c",
+      "material": "Mycenae conglomerate ashlar in full sun: lintel, jambs, threshold, facade courses, bastion. Warm buff-grey."
+    },
+    {
+      "name": "conglomerateDark",
+      "hex": "#7d6a55",
+      "material": "Pebble and pit flecks and the dry joints between conglomerate blocks. Scatter through the stone with B.hatch, never as a flat fill."
+    },
+    {
+      "name": "conglomerateWarm",
+      "hex": "#a3714b",
+      "material": "Sparse warm flecks in the conglomerate. Use sparingly. This colour is a judgment and is not sourced; check it against a photograph."
+    },
+    {
+      "name": "reliefLimestone",
+      "hex": "#b8b3a8",
+      "material": "The grey limestone relief slab in sun: lions, column, altar and slab ground. It must sit cooler and greyer than the conglomerate beside it."
+    },
+    {
+      "name": "reliefWeathering",
+      "hex": "#6e6a60",
+      "material": "Dark weathering in the recesses of the relief: between the lions' legs, beside the column, under the discs."
+    },
+    {
+      "name": "passageShadow",
+      "hex": "#43372f",
+      "material": "The 2 m-deep passage under the lintel and the soffit. Warm dark, not black. Keep it lighter than the set's ink."
+    },
+    {
+      "name": "cyclopeanLimestone",
+      "hex": "#c2bba9",
+      "material": "Pale grey limestone of the cyclopean circuit, only if any shows beyond the gate area."
+    },
+    {
+      "name": "rampEarth",
+      "hex": "#c4a77c",
+      "material": "Packed earth and rock of the approach ramp and court floor."
+    },
+    {
+      "name": "dryGrass",
+      "hex": "#c9b56f",
+      "material": "Summer grass on the slopes above and beside the walls. It replaces the set's green foliage, since the light is a summer afternoon."
+    },
+    {
+      "name": "scrub",
+      "hex": "#6b7547",
+      "material": "Grey-green hillside scrub. Use the set's foliageDark (#2f4a28) only for its deepest accents."
+    }
+  ],
+  "lighting": "Use the set's sun, from the upper right, which is physically right for this gate. The gate faces north-west, so its facade is lit in the afternoon (a photographers' forum gives late afternoon as the best light). For a viewer looking south-east up the ramp, a west to west-north-west sun comes from the right and slightly behind. Consequences, all of which follow from the geometry: the facade and the relief are in raking light from the right, so each lion, the column and the altar cast short shadows to their left and down onto the slab. The bastion's inner face faces north-east, into the court and away from the sun, so it is in cool shadow (B.shade). The east flank faces south-west and is lit. The lintel's soffit and the passage under it are dark. The relief should read as a lit grey panel set in warm buff-grey walls. That contrast of material and value, not the silhouette, is what makes the triangle legible, because the facade stands about as high as the relief's apex.",
+  "pitfalls": [
+    "Painting heads on the lions. They were separate pieces and are lost; only the necks survive. This is the most likely mistake, and the current code silhouette already makes it.",
+    "Adding manes, wings or sphinx heads. Whether the animals were lions, lionesses or composite beasts is argued, and the painting must not settle it.",
+    "Tapering the column upward like a classical column. It is Minoan: wider at the top.",
+    "Leaving the relieving triangle as an empty void. That is the Treasury of Atreus, whose triangle is open now. At the Lion Gate the triangle is filled by the relief slab.",
+    "Drawing the gate as an arch, or the lions on the jambs. That is the Lion Gate at Hattusa.",
+    "Drawing polygonal cyclopean blocks around the gate. The chapter vocabulary says 'cyclopean gates', and the circuit is cyclopean, but the gate's own facade, the bastion and the refaced east flank are conglomerate in horizontal courses.",
+    "Drawing the gate as a free-standing trilithon with sky around the jambs, as the current silhouette does.",
+    "Putting the bastion on the left. It is on the west, the right as you approach.",
+    "Painting the relief in the same stone and colour as the lintel. The relief is a grey limestone slab; the lintel, jambs and walls are conglomerate.",
+    "Making the doorway tall and narrow like a house door. It is about as wide as it is high.",
+    "Putting doors in the opening.",
+    "Lions on all fours, or lions facing away from the column. They rear on their hind legs, facing each other, with forefeet on the column's pedestal.",
+    "Using Gell 1810 or Dodwell (drawn 1805-06, published 1834) for the ground level. Both predate Pittakis's clearance of the gate in 1841, so use them for the masonry and relief only. Du Moncel 1843 and later show the gate cleared.",
+    "Making the lintel very long in relation to the doorway, as the code does (2x). The real ratio is about 1.45x: 4.5 m over about 3.1 m.",
+    "Showing Grave Circle A. It lies inside, behind the bastion, and cannot be seen from the ramp."
+  ],
+  "gate6": "clear. Chapter 3 is gate-6 clear in content/research/arc.md: a Late Bronze Age fortification gate. Grave Circle A, a royal cemetery of about 3,500 years ago, not the recently dead, lies inside the gate to the right and is out of frame from the ramp in any case.",
+  "contested": [
+    "Lions or lionesses. Many modern accounts, and this repository, say lionesses; Mylonas held they were lions; the Greek name is 'Pyli ton Leonton', the Gate of the Lions. The painting shows only what survives and adds nothing that decides it. Asset notes should say 'lions (or lionesses)'.",
+    "Which way the lost heads faced. The traditional reconstruction turns them outward to face whoever approaches, which led some scholars to propose composite beasts or sphinxes. Blackwell (AJA 118.3, 2014), from tool marks, reconstructs them turned backward. The painting shows no heads, so it takes no side.",
+    "What the lost heads were made of: steatite, bronze or other metal, or another stone. Sources differ, and none is established.",
+    "One altar or two. The Greek description is a single double-concave altar, and English sources say an 'altar-like platform'. Blackwell and others describe incurved altars (plural), one for each animal, side by side. The painting shows the column standing on the pedestal where both sets of forefeet rest, and the note leaves the question open.",
+    "The opening's dimensions: '3.10 m wide by 2.95 m high' and '3.1 m high by 2.95 m wide' at the threshold both appear. Either way it is roughly square.",
+    "The date. The Greek Ministry of Culture and most sources give c. 1250 BC (mid-13th century); one encyclopedia summary gives the 14th century BC.",
+    "The relief's limestone: 'hard (Mesozoic) limestone' in one account (via Wace), 'relatively soft, lightweight grey limestone' in another. This cannot be seen in a painting; keep it as a dispute in the note.",
+    "What the column means (an aniconic goddess, the royal house, the palace or entrance) is interpretation. A claim that a further lost sculpture stood above the four discs is speculative. Neither goes in the painting as fact."
+  ],
+  "sources": [
+    {
+      "title": "Hellenic Ministry of Culture, Odysseus: Lions' Gate",
+      "url": "http://odysseus.culture.gr/h/2/eh255.jsp?obj_id=13401",
+      "detail": "The site authority. Date c. 1250 BC, north-west side of the acropolis; four megalithic blocks (threshold, two jambs, lintel of about 20 t); lions with forefeet on an altar flanking a column; the heads, of another material, lost. Read through search extracts only; the page was blocked by the proxy."
+    },
+    {
+      "title": "Wikipedia (el): Pyli ton Leonton",
+      "url": "https://el.wikipedia.org/wiki/%CE%A0%CF%8D%CE%BB%CE%B7_%CF%84%CF%89%CE%BD_%CE%9B%CE%B5%CF%8C%CE%BD%CF%84%CF%89%CE%BD",
+      "detail": "Four conglomerate blocks; threshold and lintel about 20 t each, jambs slimmer; limestone relief slab; lions on one double-concave ('amphikoilos') altar flanking a Minoan-type column; built mid-13th century BC in the second extension of the walls."
+    },
+    {
+      "title": "Wikipedia: Lion Gate (citing Wace 1949, Mylonas)",
+      "url": "https://en.wikipedia.org/wiki/Lion_Gate",
+      "detail": "Lintel 4.5 x 2.0 x 0.8 m; opening 3.10 x 2.95 m narrowing to 2.78 m; bastion on the west, 14.80 x 7.23 m, pseudo-ashlar of enormous conglomerate blocks; east side a conglomerate facade on the earlier enceinte; ramp on a north-west to south-east axis; flanking walls in nine courses each side, the fifth level with the lintel; heads made separately and missing, necks present; column wider at the top; row of four discs; Mylonas held they were lions."
+    },
+    {
+      "title": "Wikipedia: Mycenae",
+      "url": "https://en.wikipedia.org/wiki/Mycenae",
+      "detail": "Kyriakos Pittakis cleared the Lion Gate in 1841 for the Archaeological Society; Schliemann excavated from 1874."
+    },
+    {
+      "title": "N. G. Blackwell, 'Making the Lion Gate Relief at Mycenae: Tool Marks and Foreign Influence', AJA 118.3 (2014) 451-488",
+      "url": "https://ajaonline.org/article/1803/",
+      "detail": "Relief about 3.5 to 3.6 m wide at the base, 3.0 to 3.1 m high, about 0.7 m thick; 'rampant lions ... on incurved altars flanking a central column that supports an entablature of four beam ends'; argues the lost heads turned backward."
+    },
+    {
+      "title": "M. C. Shaw, 'The Lion Gate Relief of Mycenae Reconsidered', in Philia Epi eis G. E. Mylonan (Athens 1986) 108-123",
+      "url": "https://utoronto.scholaris.ca/items/db4cc276-e6a2-4358-b19e-56f5b2314e56",
+      "detail": "A scholarly re-examination of the relief. Located, but its contents could not be read."
+    },
+    {
+      "title": "'Earthquake-induced deformations at the Lion Gate, Mycenae, Greece'",
+      "url": "https://www.researchgate.net/publication/292139936_Earthquake-induced_deformations_at_the_Lion_Gate_Mycenae_Greece",
+      "detail": "Shifted, rotated, broken and fallen masonry, and fractures in the relief, probably of seismic origin, after the mid-13th century BC."
+    },
+    {
+      "title": "'On the Lions Gate at Mycenae: its Geometry and Roots'",
+      "url": "https://www.researchgate.net/publication/317416494_On_the_Lions_Gate_at_Mycenae_its_Geometry_and_Roots",
+      "detail": "The relief laid out as a near-equilateral triangle, chords about 3.80 m."
+    },
+    {
+      "title": "Madain Project: Lions' Gate of Mycenae",
+      "url": "https://madainproject.com/lions_gate_of_mycenae",
+      "detail": "Jambs 3 x 1.74 x 0.54 m; threshold 4.56 x 2.31 x 0.88 m, cracked in antiquity; pivot holes in the lintel and threshold; double wooden doors; bolt sockets in the jambs."
+    },
+    {
+      "title": "Odyssey Adventures: Mycenae, Fortifications",
+      "url": "https://www.odysseyadventures.ca/articles/mycenae/article_mycenae04-fortifications.html",
+      "detail": "Outer court about 15 x 7.5 m before the gate; small inner court about 4 x 4 m inside. Read through search extracts only."
+    },
+    {
+      "title": "Smarthistory / Khan Academy: Lion Gate",
+      "url": "https://smarthistory.org/lion-gate-mycenae/",
+      "detail": "The relief is grey limestone, set in and contrasting with the surrounding conglomerate; the heads, probably steatite or metal, are lost."
+    },
+    {
+      "title": "UNESCO World Heritage Centre 941: Archaeological Sites of Mycenae and Tiryns",
+      "url": "https://whc.unesco.org/en/list/941/",
+      "detail": "Inscribed 1999; the Lion Gate is named among the property's key monuments. Nomination file: https://whc.unesco.org/uploads/nominations/941.pdf (not readable here)."
+    },
+    {
+      "title": "William Gell, The Itinerary of Greece (1810), plates on Wikimedia Commons",
+      "url": "https://commons.wikimedia.org/wiki/Category:The_Itinerary_of_Greece_(1810)",
+      "detail": "Public domain. Includes 'Gate of the Lions, Mycenae'. Predates the 1841 clearance: use for the masonry, not the ground level."
+    },
+    {
+      "title": "Edward Dodwell, Views and Descriptions of Cyclopian, or Pelasgic Remains (1834)",
+      "url": "https://argolikivivliothiki.gr/2011/03/29/the-gate-of-the-lions-at-mycenae/",
+      "detail": "Public-domain coloured lithograph 'The Gate of the Lions at Mycenae', from visits in 1801-06. Commons category: https://commons.wikimedia.org/wiki/Category:Views_and_Descriptions_of_Cyclopian,_or,_Pelasgic_Remains,_in_Greece_and_Italy_(1834)"
+    },
+    {
+      "title": "Théodore du Moncel, The Lion Gate at Mycenae (1843)",
+      "url": "https://commons.wikimedia.org/wiki/File:Du_Moncel_Theodore_-_The_Lion_Gate_at_Mycenae_-_Google_Art_Project.jpg",
+      "detail": "Public domain; made after Pittakis's 1841 clearance. The best nineteenth-century plate for the ground level."
+    },
+    {
+      "title": "Wikimedia Commons: Lion Gate (Mycenae) in art; Relief of the Lion Gate",
+      "url": "https://commons.wikimedia.org/wiki/Category:Lion_Gate_(Mycenae)_in_art",
+      "detail": "Nineteenth-century depictions (Gell, Dodwell, Du Moncel, 1882, 1889). Relief detail: https://commons.wikimedia.org/wiki/Category:Relief_of_the_Lion_Gate,_Mycenae"
+    },
+    {
+      "title": "H. Schliemann, Mycenae (1878), Project Gutenberg",
+      "url": "https://www.gutenberg.org/files/56940/56940-h/56940-h.htm",
+      "detail": "Public domain worldwide (arc.md). Woodcuts and description of the 'Lions' Gate'. Could not be fetched here."
+    },
+    {
+      "title": "DAI Athens blog: 'Schliemann at the Lion Gate? Mykene 63'",
+      "url": "https://www.dainst.blog/people-at-the-dai-athens/2022/06/17/mykene-63/",
+      "detail": "A photograph of a man at the Lion Gate, inventoried in 1898. A late nineteenth-century photograph of the cleared gate."
+    },
+    {
+      "title": "Current World Archaeology: 'Magic of Mycenae'",
+      "url": "https://www.world-archaeology.com/features/magic-of-mycenae/",
+      "detail": "The citadel sits on a low hill between Profitis Ilias and Zara."
+    },
+    {
+      "title": "Rick Steves travel forum: light at the Lion Gate",
+      "url": "https://community.ricksteves.com/travel-forum/greece/morning-or-afternoon-light-to-photograph-lion-gate-at-mycenae-and-theater-at-epidauros",
+      "detail": "A weak source, used only for the lighting: the gate faces north-west and is lit in the late afternoon."
+    }
+  ],
+  "repoCorrections": [
+    "src/map/monuments.ts, lines 182-184: the comment 'The two lionesses, forepaws on the altar, heads towards the column' and polygons that peak at (44,15) and (56,15), right beside the column, draw heads leaning in to the column. The heads are lost and only the necks survive. No reconstruction I found points them at the column: the traditional one turns them out toward the viewer, and Blackwell 2014 turns them backward. The silhouette should end each body at the neck.",
+    "content/map/README.md (vignettes table, row 3) and src/map/monuments.ts (lines 168 and 182) call the animals 'lionesses' as settled fact. Lions or lionesses is disputed: Mylonas said lions, and the Greek name is the Gate of the Lions. Write 'two lions (or lionesses)'. Also add to README row 3 that the heads are missing, since that is the single most checkable fact about the relief.",
+    "src/map/monuments.ts, lines 172-175: the silhouette is two free-standing posts under a lintel with paper on both sides, which reads as a trilithon. The Lion Gate is built into coursed conglomerate walls, with the bastion forming the right-hand side of the approach. README row 3's outline brief ('two uprights, one lintel...') should say the gate is set in a wall.",
+    "src/map/monuments.ts proportions against the measured gate. The lintel is drawn 64 units long over a 32-unit doorway (2.0x); the real ratio is about 1.45x (4.5 m over about 3.1 m). The triangle's base is 42 against the doorway's 32 (1.3x); the real ratio is about 1.15x (3.5-3.6 m over 3.1 m). The triangle's height to width is 0.71; the real relief is about 0.85 (3.0-3.1 m high by 3.5-3.6 m wide, near-equilateral). The comment 'nearly as tall as it is wide' is right, but the drawing is flatter than that. The jambs are drawn vertical; the real opening narrows from about 3.1 m to 2.78 m at the top.",
+    "src/map/monuments.ts, line 181: the column runs down to the bottom edge of the relief (y = 30) and no altar is drawn, though the comment on line 182 names one. In the relief the column stands on the altar pedestal where the forefeet rest, so its foot is raised above the slab's lower edge. The four discs above the capital are also absent."
+  ],
+  "confidence": "Medium-high on the structure, which several independent sources agree on: four conglomerate monoliths (threshold, two jambs, one lintel); a grey limestone relief filling a corbelled relieving triangle; two rearing, confronted animals with their heads lost and necks preserved, forefeet on the column's pedestal; a Minoan column wider at the top, with four discs above the capital; the flanking walls in coursed conglomerate ashlar, nine courses a side with the fifth level with the lintel; the pseudo-ashlar conglomerate bastion on the west, which is the right as you approach. Medium on exact proportions: the figures come from secondary compilations of Wace and Mylonas plus Blackwell 2014, and the opening's width and height are swapped between sources. The facade height relative to the relief apex is inferred from the course count, not observed. Low on the hex values: they are judgments from the identified materials, since I could not view a single image, and #a3714b in particular is unsourced. Also low on the backdrop: I did not verify whether mountains show above the facade from the ramp. Method caveat: the egress proxy refused every WebFetch and curl (Wikipedia, culture.gr, archive.org, Gutenberg, Commons, brown.edu, perseus, odysseyadventures), and the session's web-search budget ran out. Everything above was checked against search-engine extracts of the cited pages, not full readings. Before painting, the painter should look at Du Moncel 1843, the DAI 'Mykene 63' photograph and the Commons relief photographs to confirm four things: the wall top against the relief apex, the height and masonry of the east flank, the altar as one piece or two, and the backdrop."
+}
