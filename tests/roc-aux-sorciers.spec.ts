@@ -439,3 +439,25 @@ test('a run that knows the level finishes with zero deaths', async ({ page }) =>
   expect(r.state).toBe('complete');
   expect(r.total).toBe(0);
 });
+
+test('the bedding lines of the cliff stay in the rock, off the slope of its face', async ({ page }) => {
+  // Every row of the cliff, from under the overhang to the valley floor: no pixel of
+  // a bedding line (shelterWallShade, #ab9d7e) left of where the sloping face is.
+  const r = (await page.evaluate(`(() => {
+    const g = window.__game; g.resetRun();
+    const cliff = g.level.data.decor.find((d) => d.kind === 'cliff');
+    g.player.spawnAt(24, 224); g.camera.x = 0; g.camera.y = 60; g.draw();
+    const W = g.wctx, S = 4, bottom = 18 * 16;
+    const stray = [];
+    for (let y = cliff.ceilingY + 1; y < 15 * 16; y++) {
+      if (y - g.camera.iy < 0 || y - g.camera.iy >= 180) continue;
+      const face = cliff.x0 - (48 * (y - cliff.ceilingY)) / (bottom - cliff.ceilingY);
+      for (let x = Math.max(0, Math.floor(face) - 48); x < Math.floor(face) - 1; x++) {
+        const d = W.getImageData((x - g.camera.ix) * S + 1, (y - g.camera.iy) * S + 1, 1, 1).data;
+        if (d[0] === 0xab && d[1] === 0x9d && d[2] === 0x7e) stray.push(x + ',' + y);
+      }
+    }
+    return { stray: stray.slice(0, 5), count: stray.length };
+  })()`)) as { stray: string[]; count: number };
+  expect(r).toEqual({ stray: [], count: 0 });
+});

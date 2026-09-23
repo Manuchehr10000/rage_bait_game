@@ -1036,7 +1036,10 @@ function drawDecor(ctx: CanvasRenderingContext2D, s: Scene, d: DecorDef): void {
       ctx.fillStyle = COLORS.shelterWallShade;
       for (let y = d.ceilingY + 11; y < floorY; y += 15) {
         const jog = hash(3, y) % 3;
-        for (let sx = d.x0 - 48 + Math.round((48 * (y - d.ceilingY)) / (floorY - d.ceilingY)); sx < d.x1; sx += 40) {
+        // Each bed starts at the face, which runs from x0 under the overhang out to
+        // 48 px short of it at the bottom: the lines stay in the rock.
+        const face = d.x0 - Math.floor((48 * (y - d.ceilingY)) / (floorY - d.ceilingY)) + 1;
+        for (let sx = face; sx < d.x1; sx += 40) {
           const len = 12 + (hash(sx, y) % 24);
           ctx.fillRect(sx, y + jog, Math.min(len, d.x1 - sx), 1);
         }
