@@ -7,8 +7,8 @@ calls a bear, `bear-stalagmite`, on the floor: a hop each.
 **Three patches of the floor are not floor.** The bears left wallows in the clay of Gargas,
 hollows where they slept, and each patch is the crust over one: two tiles of the same clay,
 drawn standing on the same rock as the rest of the hall until the moment it goes, a sixth of
-a second after he steps on it. There is a shaft under each and the bottom of it is the
-oubliettes. The first is between the block and the bear, the second between the bear and
+a second after he steps on it. There is a shaft under each, and the label calls it `The
+bear nests`, as it calls the wallow in the upper cave: the well has its own name. The first is between the block and the bear, the second between the bear and
 the Camarin, the third after it.
 
 Then the Camarin. A hole in the floor three tiles wide and three deep. A full jump clears

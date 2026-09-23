@@ -511,6 +511,17 @@ function drawKarnakGround(ctx: CanvasRenderingContext2D, s: Scene, cx: number, c
 /** How far up the track the train's headlight reaches, in px. Further than the tourist's lamp. */
 const TRAIN_LIGHT = 200;
 
+/**
+ * One stanchion of a handrail, standing at x on a floor at y in its foot. Every
+ * stanchion in the game is this one, so a foot that takes a boot is drawn exactly
+ * like every foot that does not.
+ */
+function drawStanchion(ctx: CanvasRenderingContext2D, x: number, y: number): void {
+  ctx.fillStyle = COLORS.rail;
+  ctx.fillRect(x + 2, y - 26, 2, 26);
+  ctx.fillRect(x, y - 2, 6, 2);
+}
+
 /** How far back a tread that rocks goes on its heel, in radians. Enough to see, not enough to fall off. */
 const ROCK_ANGLE = 0.1;
 
@@ -1316,14 +1327,8 @@ function drawDecor(ctx: CanvasRenderingContext2D, s: Scene, d: DecorDef): void {
       ctx.stroke();
       // A stanchion at the back of every tread, 32 px apart, standing on it in a
       // foot bolted down through the concrete. Every foot is this foot.
-      ctx.fillStyle = COLORS.rail;
       const posts = Math.round(dx / 32);
-      for (let i = 0; i <= posts; i++) {
-        const x = Math.round(d.x0 + (dx * i) / posts);
-        const y = Math.round(d.y0 + (dy * i) / posts);
-        ctx.fillRect(x + 2, y - 26, 2, 26);
-        ctx.fillRect(x, y - 2, 6, 2);
-      }
+      for (let i = 0; i <= posts; i++) drawStanchion(ctx, Math.round(d.x0 + (dx * i) / posts), Math.round(d.y0 + (dy * i) / posts));
       ctx.fillStyle = COLORS.railLit;
       ctx.beginPath();
       ctx.moveTo(d.x0, d.y0 - 27);
@@ -1877,6 +1882,15 @@ function drawEntityBack(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): voi
         for (let i = 0; i < r.w / TILE; i++) drawConcrete(ctx, r.x + i * TILE, r.y, true);
         ctx.fillStyle = COLORS.rail;
         ctx.fillRect(r.x, r.y + r.h - 3, r.w, 2);
+        if (d.post) {
+          // The path is railed like the stair: a stanchion at each end, each in the
+          // same foot as the stair's, and the rail and knee rail between them.
+          drawStanchion(ctx, r.x, r.y);
+          drawStanchion(ctx, r.x + r.w - 6, r.y);
+          ctx.fillStyle = COLORS.rail;
+          ctx.fillRect(r.x + 2, r.y - 27, r.w - 4, 2);
+          ctx.fillRect(r.x + 2, r.y - 16, r.w - 4, 1);
+        }
         ctx.restore();
       } else if (d.skin === 'tread') {
         // One tread of the fitted stair, drawn by the code that draws every other

@@ -91,6 +91,8 @@ export class Game {
   private lampOff = false;
   /** Seconds it has been burning. Only a level with a lampLife on its dark cares. */
   private lampT = 0;
+  /** It ran out while it was burning. Where the day does not reach, that is the end of the visit. */
+  private lampSpent = false;
 
   private state: State = 'playing';
   private deathTimer = 0;
@@ -322,6 +324,7 @@ export class Game {
     this.lampOn = false;
     this.lampOff = false;
     this.lampT = 0;
+    this.lampSpent = false;
     this.state = 'playing';
   }
 
@@ -445,6 +448,15 @@ export class Game {
     }
     // The battery. It is new at every door, and it only runs down while it is burning.
     if (this.lampOn && !this.lampOff) this.lampT += DT;
+    // Run out while burning, short of the day, and he sits down where he is: not in
+    // the air, on whatever he lands on. Put out in time, it never runs out at all.
+    const life = this.lampLife;
+    if (life !== undefined && this.lampT >= life) this.lampSpent = true;
+    const dark = this.level.data.decor.find((d) => d.kind === 'dark');
+    const until = dark && dark.kind === 'dark' ? dark.deadlyUntil : undefined;
+    if (this.lampSpent && until !== undefined && this.player.onGround && this.player.x + this.player.w / 2 < until) {
+      this.kill('The dark');
+    }
     this.camera.update(this.player);
     this.driveLoops();
 

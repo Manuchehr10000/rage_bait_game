@@ -13,28 +13,36 @@ import { TILE } from '../../engine/types';
  * The hardest level of the chapter, and the one where the tourist finally has a
  * decision to make. The headlamp that has been on since the first door runs down
  * as it burns in this one — but here it has a switch. L puts it out and lights it
- * again, and a lamp that is out does not run down. So the level is a budget:
- * every stretch he can cross in the dark is light he has for a stretch he cannot,
- * and the stretch he cannot is the well, at the end, where the fitted path is no
- * longer honest either.
+ * again, and a lamp that is out does not run down. And a lamp that runs out while
+ * it is burning, anywhere short of the day from the way out, ends the visit: he
+ * sits down in the dark. So the level has a clock, like the train before it, and
+ * the switch is the way to stop it: every stretch he can cross in the dark is light
+ * he has for a stretch he cannot, and the stretch he cannot is the well, at the
+ * end, where the fitted path is no longer honest either.
  *
  * Everything the chapter has taught is here once more, in its worst arrangement:
+ *   - a bears' wallow in the floor of the upper cave, crusted over, under the
+ *     painted animals: the one landmark, and it is only lit by the lamp
  *   - a stair of twelve identical treads. One lets go if he stands on it; one
- *     takes his boot and then lets go with him on it; one rocks back and pins him
- *     against the step behind, which costs him nothing but light; one is not
- *     there. The handrail runs straight over all of them
- *   - a hall with three patches of floor that are not floor, drawn as the floor
+ *     takes his boot and then lets go with him on it, and the roof comes down
+ *     over the one before it so that the jump over it is from the lip or not at
+ *     all; one rocks back and pins him against the step behind, which costs him
+ *     light, and light is time; one is not there. The handrail runs straight
+ *     over all of them
+ *   - a hall with three patches of floor that are the crust over a wallow
  *   - the Camarin, a hole in the hall floor a jump wide with a passage back under
  *     it to the engravings, which cost light to look at and nothing at all to
  *     look at in the dark
- *   - the well of the oubliettes, crossed on three slabs of the fitted path, and
- *     the middle one tips. Of all the fitted concrete in the level, the piece
- *     that lies last is the one over the deepest hole in the cave
+ *   - the well of the oubliettes, crossed on three railed slabs of the fitted
+ *     path. The middle one tips. The last one's stanchion foot takes his boot, and
+ *     lets go of it only when he stops pulling: the one trap in the chapter whose
+ *     answer is to do nothing, and then to go
  *   - and then the wall of hands, by daylight, with no trap on it at all
  *
  *   0..11    the hillside and the upper portal. Daylight, a steel door
  *  12..41    Gargas II, the upper cave: narrow, three tiles clear, finger tracings
- *              on the clay roof. Nothing in it: the place to put the lamp out
+ *              on the clay roof, and a wallow under the painted animals. The
+ *              place to put the lamp out, if he can count
  *  42..65    the tunnel: twelve fitted steps down under a roof cut high and flat
  *  66..109   the great hall of Gargas I. The block that joined the caves, the
  *              bear that is a stalagmite, three false floors, and the Camarin
@@ -83,19 +91,33 @@ const STAIR: Step[] = ['holds', 'holds', 'holds', 'lets go', 'holds', 'boot', 'h
 const CAMARIN_HOLE = 92;
 const CAMARIN_X0 = 88;
 
-/** Three stretches of the hall floor that are not floor any more. Drawn as the floor. */
+/**
+ * Three stretches of the hall floor that are the crust over a bears' wallow. Drawn
+ * as the floor.
+ */
 const FALSE_FLOORS = [74, 84, 100];
+/**
+ * And one in the upper cave, under the painted animals, which are the only thing
+ * to count from; with the lamp out they are not there to count from.
+ */
+const UPPER_WALLOW = 26;
+/** Where the day from the lower portal is enough to see by: the far edge of the slab that tips. */
+const DAY_FROM = px(117);
 
 /**
- * The three slabs of the fitted path across the well. The middle one is a step up,
- * and it tips: a sixth of a second after he lands on it, it is off its bearer and
- * not under him. So it is jumped from as it is landed on, or not at all.
+ * The three slabs of the fitted path across the well, railed like the stair. The
+ * middle one is a step up, and it tips: a sixth of a second after he lands on it,
+ * it is off its bearer and not under him, so it is jumped from as it is landed on,
+ * or not at all. The last one's foot takes his boot, and lets go of a boot that is
+ * left alone for three tenths of a second; six tenths after it took the boot the
+ * slab goes. Pull, and it keeps the boot. Stand still, then jump.
  */
 const SLABS = [
-  { x: px(111) + 8, y: LOWER, tips: false },
-  { x: px(115), y: LOWER - 16, tips: true },
-  { x: px(118) + 8, y: LOWER, tips: false },
-];
+  { x: px(111) + 8, y: LOWER, does: 'holds' },
+  { x: px(115), y: LOWER - 16, does: 'tips' },
+  { x: px(118) + 8, y: LOWER, does: 'boot' },
+] as const;
+const LAST_BOOT = SLABS[2];
 
 /** Where the bears were, on the walls of the lower cave. */
 const CLAWS = [px(72), px(78), px(90), px(98), px(104)];
@@ -105,6 +127,8 @@ const g = new Grid(W, H);
 g.fill(0, 8, 42, H - 8, '#');
 g.fill(0, 8, 42, 1, '%');
 g.fill(11, 0, 31, 5, '#'); // its roof, three tiles clear
+// The wallow: nothing under the crust.
+g.fill(UPPER_WALLOW, 8, 2, H - 8, ' ');
 // The stair. Every tread is fitted concrete on its own column of rock; the ones
 // that do something have their column taken away below them.
 for (let k = 0; k < STEPS; k++) {
@@ -114,11 +138,13 @@ for (let k = 0; k < STEPS; k++) {
 for (let k = 0; k < STEPS; k++) {
   if (STAIR[k] !== 'holds') g.fill(stepTx(k), stepRow(k), 2, H - stepRow(k), ' ');
 }
-// The tunnel's roof, cut high and flat in two lifts, so that a jump from any tread
-// is a whole jump: five tiles clear over the first step and more over every other.
-// The break between the lifts is over the eighth.
-g.fill(42, 0, 14, 4, '#');
-g.fill(56, 0, 14, 10, '#');
+// The tunnel's roof, cut in two flat lifts. The first is high, five tiles clear
+// over the first tread. The second comes down over the fifth, three tiles clear of
+// it: a jump from the fifth is half a jump, and the only one that clears the sixth
+// is from its lip. Four clear over the sixth, and a whole jump from every tread
+// after it.
+g.fill(42, 0, 8, 4, '#');
+g.fill(50, 0, 20, 10, '#');
 // The lower cave: rock under a clay floor, from the foot of the stair to the portal.
 g.fill(66, 20, W - 66, H - 20, '#');
 g.fill(66, 20, W - 66, 1, '%');
@@ -156,13 +182,14 @@ export const GARGAS: LevelData = {
 
   decor: [
     // In by the upper portal, out by the lower. The lower one's daylight reaches
-    // in far enough to find the wall of hands.
+    // in over the wall of hands and as far as the far edge of the slab that tips,
+    // which is where a spent lamp stops mattering.
     { kind: 'caveMouth', x0: 0, x1: px(11), floorY: UPPER },
-    { kind: 'caveMouth', x0: px(150), x1: px(W), floorY: LOWER, reach: 400, into: 'left' },
+    { kind: 'caveMouth', x0: px(150), x1: px(W), floorY: LOWER, reach: px(150) - DAY_FROM, into: 'left' },
     { kind: 'steelDoor', x: px(11) - 6, floorY: UPPER },
     // Darker than the show caves before it: here the lamp is what he sees by, so a
     // lamp that is out has to cost him something to look at.
-    { kind: 'dark', x0: px(12), x1: px(W), lamp: 'headlamp', ambient: 0.94, lampLife: LAMP_LIFE },
+    { kind: 'dark', x0: px(12), x1: px(W), lamp: 'headlamp', ambient: 0.94, lampLife: LAMP_LIFE, deadlyUntil: DAY_FROM },
     // The walls, at the height of each roof.
     { kind: 'galleryWall', x0: px(11), x1: px(42), top: px(5), bottom: UPPER },
     { kind: 'galleryWall', x0: px(70), x1: px(CAMARIN_HOLE), top: px(15), bottom: LOWER },
@@ -186,6 +213,16 @@ export const GARGAS: LevelData = {
   ] satisfies DecorDef[],
 
   entities: [
+    // The wallow in the upper cave: the crust goes a sixth of a second after he is on it.
+    {
+      kind: 'crumble',
+      skin: 'clayLedge',
+      rect: { x: px(UPPER_WALLOW), y: UPPER, w: px(2), h: TILE },
+      fake: true,
+      delay: 0.15,
+      solidBelow: true,
+    },
+    { kind: 'hazard', rect: { x: px(UPPER_WALLOW), y: UPPER + 40, w: px(2), h: 16 }, cause: 'The bear nests' },
     // The step that lets go. Half a second is longer than a man walking down a
     // stair spends on any one step, and exactly as long as a careful one does.
     ...stepsThat('lets go').map((k) => ({
@@ -249,16 +286,29 @@ export const GARGAS: LevelData = {
         delay: 0.15,
         solidBelow: true,
       },
-      { kind: 'hazard' as const, rect: { x: px(tx), y: LOWER + 40, w: px(2), h: 16 }, cause: 'The oubliettes' as const },
+      { kind: 'hazard' as const, rect: { x: px(tx), y: LOWER + 40, w: px(2), h: 16 }, cause: 'The bear nests' as const },
     ]),
-    // The fitted path across the well. The middle slab is not bearing on anything.
+    // The last slab's foot. A little wider than the slab, so that wherever on it he
+    // comes down, his boot is in it; it keeps a boot that is pulled at, and lets go
+    // of one that is left alone.
+    {
+      kind: 'snare',
+      rect: { x: LAST_BOOT.x - 5, y: LAST_BOOT.y, w: 42, h: 4 },
+      emits: 'lastBoot',
+      hidden: true,
+      letsGoStill: 0.3,
+    },
+    // The fitted path across the well. The middle slab is not bearing on anything;
+    // the last goes six tenths of a second after its foot takes a boot.
     ...SLABS.map((s) => ({
       kind: 'crumble' as const,
       skin: 'walkway' as const,
       rect: { x: s.x, y: s.y, w: 32, h: 8 },
-      fake: s.tips,
-      delay: s.tips ? 0.15 : 0,
-      tips: s.tips || undefined,
+      fake: s.does !== 'holds',
+      delay: s.does === 'tips' ? 0.15 : s.does === 'boot' ? 0.6 : 0,
+      onEvent: s.does === 'boot' ? 'lastBoot' : undefined,
+      tips: s.does !== 'holds' || undefined,
+      post: true,
     })),
     // The bottom of the well.
     { kind: 'hazard', rect: { x: px(110), y: px(H) - 12, w: px(12), h: 16 }, cause: 'The oubliettes' },

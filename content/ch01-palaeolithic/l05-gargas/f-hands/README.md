@@ -2,7 +2,8 @@
 
 The last wall of the chapter, seen by the day coming in at the way out. Twenty tiles of it
 near the lower portal, inside the reach of the day, so that it is lit from the right,
-strongest nearest the door. A player who never touched the switch has no light of his own
+strongest nearest the door. The day reaches on past the wall, fading, as far as the far edge
+of the slab that tips: from there on a spent lamp does not matter. A player who never touched the switch has no light of his own
 left by now; one who saved some can still have it.
 
 The wall: rock with four cracks across it, a splinter of bone pushed into one of them.

@@ -167,6 +167,11 @@ export interface CrumbleDef {
    * like its neighbours (pillar 4).
    */
   rocks?: boolean;
+  /**
+   * A stanchion of the handrail stands on its back in a foot, drawn exactly as the
+   * ones on the stair. It goes where the slab goes.
+   */
+  post?: boolean;
 }
 
 /**
@@ -244,6 +249,12 @@ export interface SnareDef {
   emits?: string;
   /** Drawn by something else already: the stanchion foot of a handrail, say. */
   hidden?: boolean;
+  /**
+   * A boot that is left alone this many seconds comes free, with the sound of a
+   * step, and then it never catches anybody again. Pulling at it (pressing to go
+   * anywhere, or to jump) starts the count again. Unset, it holds for ever.
+   */
+  letsGoStill?: number;
 }
 
 /** A figure in a wall. If active, it steps out and shoves the player when they pass. */
@@ -368,6 +379,13 @@ export type DecorDef =
        * unlit lamp, put out or spent, leaves only the small spill round his feet.
        */
       lampLife?: number;
+      /**
+       * A lamp that runs out while it is burning, anywhere left of this x, ends the
+       * visit: he sits down in the dark where he is ('The dark'). Right of it the day
+       * from the way out is enough to see by. A lamp put out with L never runs out, so
+       * it never does this. Only the level whose lamp runs down has one.
+       */
+      deadlyUntil?: number;
     }
   | { kind: 'spotlight'; x: number; floorY: number; top?: number }
   | { kind: 'museumWall'; x: number; w: number; doorX: number; top: number; floorY: number }

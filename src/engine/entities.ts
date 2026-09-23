@@ -757,12 +757,27 @@ export class Hazard implements Entity {
  */
 export class Snare implements Entity {
   caught = false;
+  /** Let go of: a boot that was left alone long enough. It does not catch again. */
+  freed = false;
+  /** Seconds the boot has been left alone. */
+  private still = 0;
 
   constructor(readonly def: SnareDef) {}
 
   update(w: World): void {
     const p = w.player;
     const r = this.def.rect;
+    // One that lets go of a still boot counts while he is not pulling at it.
+    const after = this.def.letsGoStill;
+    if (this.caught && !this.freed && after !== undefined && p.held) {
+      this.still = p.tugging ? 0 : this.still + DT;
+      if (this.still >= after - 1e-9) {
+        this.freed = true;
+        p.held = false;
+        w.sound('step');
+      }
+      return;
+    }
     // His feet have to be in it. Going over it in the air is going over it.
     const feet = p.y + p.h;
     if (!this.caught && p.onGround && feet >= r.y - 2 && feet <= r.y + r.h && centerX(p) >= r.x && centerX(p) <= r.x + r.w) {

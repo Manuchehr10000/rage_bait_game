@@ -16,10 +16,23 @@ For the designer. None of it is stated anywhere in the game.
   and the engravings at the end of it. Nothing says go in. They are the best thing in the
   cave, and looking at them by lamplight is exactly what costs the well its light.
 
+- **He sits down.** A lamp that gives out while it burns, short of the day, is `The dark`:
+  he sits down where he is, as cavers are told to, lamp dead, and there is one click of the
+  switch. It is the seated pose of `Gave up`, which sighs instead. The label keeps them apart.
+
+- **The one trap that wants nothing.** The last slab's foot keeps a boot for as long as it
+  is pulled at, and every instinct the chapter has built is to pull, or to jump. The boot
+  comes free with the sound of a footstep, which is the only sound in the level that means
+  go.
+
+- **The bears have their own noun.** Every wallow, upstairs and in the hall, is `The bear
+  nests` on the label, and only the well is `The oubliettes`. A player who reads the label
+  learns there were bears.
+
 - **The switch is the only thing in the game you spend.** Everything else is survived.
   The lamp only runs down while it burns, so every stretch walked in the dark is light in
-  hand at the well, and the upper cave, which has nothing in it at all, turns out to be the
-  most useful stretch in the level.
+  hand at the well, and the upper cave, which has nothing in it but one wallow, turns out to
+  be the most useful stretch in the level, for a player who can count to the wallow.
 
 - **Out is always less than on.** A lamp that is out, or run down, leaves the same small
   spill round his feet that a lit one has; what it takes away is the cone. There is no
@@ -36,9 +49,9 @@ For the designer. None of it is stated anywhere in the game.
 - **The snare from Rouffignac is on the stair.** Without a train to finish him, the tread
   does it, and it takes all of him: wherever on it he landed, he goes down with it.
 
-- **The roof is a trap by being generous.** Cut high so that every jump on the stair is a
-  whole one, and a whole jump over the rocking ninth goes over the tenth too and into the
-  step that is not there.
+- **The roof is a trap twice.** Low over the fifth tread, it makes the jump over the boot
+  half a jump. High after the sixth, it makes every jump a whole one, and a whole jump over
+  the rocking ninth goes over the tenth too and into the step that is not there.
 
 - **Half the hands are short of a finger.** Drawn, never explained. The research keeps
   amputation, frostbite and folded fingers alive, and the level takes no side.

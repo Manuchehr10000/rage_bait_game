@@ -45,12 +45,14 @@ in the research. All five levels are built. The game starts here.
   one place it cannot reach.
 - **Level 5 takes the light away and hands him the switch:** the headlamp that has been on
   since the first door of the chapter runs down as it burns from the door of Gargas, and L
-  puts it out, and a lamp that is out does not run down. So the hardest level of the chapter
-  is the first one with something to spend: every stretch he can cross in the dark is light
-  he has for the well. Everything the chapter taught is there again in its worst
+  puts it out, and a lamp that is out does not run down; one that runs out while it burns,
+  short of the day at the far end, sits him down in the dark for good. So the hardest level
+  of the chapter is the first one with something to spend, and it has a clock like
+  Rouffignac's train: every stretch he can cross in the dark is light he has for the well. Everything the chapter taught is there again in its worst
   arrangement — a stair of twelve identical treads, four of them not steps, one of them the
-  snare from Rouffignac; three patches of the hall floor that are not floor; and the one
-  piece of the fitted path that tips is the slab over the well. The thing worth
+  snare from Rouffignac, under a roof that makes the jump over it half a jump; bears'
+  wallows in both caves' floors; and over the well, one slab that tips and one whose foot
+  keeps a boot that is pulled at, and lets go of one that is left alone. The thing worth
   seeing, the engravings of the Camarin under the hall floor, costs the light the well needs,
   or costs nothing if he looks at them in the dark. The chapter ends on the wall of 137 hands near the lower portal, seen by
   the daylight from the way out. Half the hands are short of fingers, never the thumb, and the level says nothing about why.
@@ -69,9 +71,9 @@ in the research. All five levels are built. The game starts here.
   among them, and nobody recognised the drawings. In the notes; never in the level.
 - **Chapter error dossier, additions from level 5:** the counts of the hands of Gargas,
   eighty at the first study of 1906, then a hundred and fifty, two hundred and seventeen in
-  Sahly's survey of 1963, two hundred and thirty-one in Barrière's; the four explanations of
-  the short fingers, Sahly's mutilation (1966), disease and frostbite, Leroi-Gourhan's folded
-  fingers (1967), Etxepare and Irurtzun's hand signs (2021), none of them settled; and the
+  Sahly's survey of 1963, two hundred and thirty-one in Barrière's; the explanations of the
+  short fingers, Sahly's amputation (1966), frostbite and disease, and Leroi-Gourhan's folded
+  fingers (1967), perhaps as signs (Etxepare and Irurtzun, 2021), none of them settled; and the
   legend of the outlaw Blaise Ferrage hiding in the cave. In the notes; never in the level.
 
 ## The tone

@@ -36,6 +36,7 @@ export type DeathCause =
   | 'The train'
   | 'The oubliettes'
   | 'The tunnel'
+  | 'The dark'
   | 'Colossus head'
   | 'Baboon'
   | 'Lake Nasser'
@@ -61,7 +62,7 @@ export const DEATH_ANIM: Record<DeathCause, DeathAnim> = {
   'The horns': 'crush',
   'The rockfall': 'flat',
   'The lower gallery': 'gone',
-  'The bear nests': 'flat',
+  'The bear nests': 'gone',
   'The discs': 'flat',
   'The drop': 'flat',
   'The flint': 'plank',
@@ -69,6 +70,8 @@ export const DEATH_ANIM: Record<DeathCause, DeathAnim> = {
   'The train': 'crush',
   'The oubliettes': 'gone',
   'The tunnel': 'gone',
+  // He sits down where the light gave out, which is what you do, and waits.
+  'The dark': 'sit',
   'Colossus head': 'crush',
   Baboon: 'plank',
   'Lake Nasser': 'drown',
@@ -83,7 +86,10 @@ export const DEATH_ANIM: Record<DeathCause, DeathAnim> = {
 };
 
 /** What each death sounds like. Material, never musical. */
-export const DEATH_SOUND: Record<DeathCause, 'squish' | 'bonk' | 'drown' | 'burn' | 'snap' | 'whoosh' | 'fallAway' | 'sigh' | 'thud'> = {
+export const DEATH_SOUND: Record<
+  DeathCause,
+  'squish' | 'bonk' | 'drown' | 'burn' | 'snap' | 'whoosh' | 'fallAway' | 'sigh' | 'thud' | 'click'
+> = {
   'The Beune': 'drown',
   'The cast': 'thud',
   'The trench': 'thud',
@@ -93,7 +99,7 @@ export const DEATH_SOUND: Record<DeathCause, 'squish' | 'bonk' | 'drown' | 'burn
   'The horns': 'squish',
   'The rockfall': 'thud',
   'The lower gallery': 'fallAway',
-  'The bear nests': 'thud',
+  'The bear nests': 'fallAway',
   'The discs': 'thud',
   'The drop': 'thud',
   'The flint': 'bonk',
@@ -101,6 +107,8 @@ export const DEATH_SOUND: Record<DeathCause, 'squish' | 'bonk' | 'drown' | 'burn
   'The train': 'squish',
   'The oubliettes': 'fallAway',
   'The tunnel': 'fallAway',
+  // The switch, tried once more, on a lamp with nothing left in it.
+  'The dark': 'click',
   'Colossus head': 'squish',
   Baboon: 'bonk',
   'Lake Nasser': 'drown',
