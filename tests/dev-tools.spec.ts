@@ -18,7 +18,7 @@ type W = Window & { __game: any };
 
 async function open(page: Page, id: string): Promise<void> {
   await page.goto(`/#${id}`);
-  expect(await page.locator('#stamp').textContent(), 'a prod build has no dev tools: run `npx vite build` first').not.toMatch(/^prod/);
+  expect(await page.locator('#stamp').textContent(), 'a prod build has no dev tools: the test build is pinned to local in playwright.config.ts').not.toMatch(/^prod/);
   await page.waitForFunction((id) => (window as unknown as Partial<W>).__game?.levelData.id === id, id);
   // Stop the loop, and let a frame already queued run out, so the camera stays where the test puts it.
   await page.evaluate(async () => {

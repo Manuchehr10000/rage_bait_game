@@ -22,7 +22,7 @@ jobs:
         run: npx vite build
         env:
           BUILD_ENV: prod
-      - run: npx vite build
+      # No build here for the tests: Playwright makes its own, from this source, before it starts.
       - run: npx playwright install --with-deps chromium
       - run: npm test
       - uses: actions/upload-artifact@v4

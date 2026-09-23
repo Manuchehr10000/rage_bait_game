@@ -50,6 +50,8 @@ push to prove it.
 
 `npm test` runs scripted playthroughs in headless Chromium. Each one checks a design
 contract: the trap fires for the naive player and can be avoided by the one who remembers.
+It builds the game first, every time, so it always tests the source as it is; so does
+`npx playwright test` on a single file.
 
 `npm run assets:check` validates every art manifest against the files on disk.
 
