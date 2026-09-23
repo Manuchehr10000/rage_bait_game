@@ -1040,6 +1040,17 @@ export const HIKER_FRAMES = {
   ),
 };
 
+/**
+ * Held by the boot: the back boot planted where it was caught, and the other leg
+ * trying to go on without it. Two frames: the pull, and the boot not coming.
+ * The back boot is on the same pixels in both, because it is not going anywhere.
+ */
+export const HIKER_HELD: [HTMLCanvasElement, HTMLCanvasElement] = [
+  // The pull: he drops a pixel into it and the free leg goes on without him.
+  compile(['............', ...HIKER_HEAD, ...HIKER_TORSO, '.OPPO...OPPO', '.OBBO....OBB'], HIKER),
+  compile(hiker(['..OPPOOPPO..', '.OPPO.OPPO..', '.OBBO.OBBO..']), HIKER),
+];
+
 /** Sitting down, hat on, lamp on. For the one death you choose. */
 export const HIKER_SEATED = compile(
   [

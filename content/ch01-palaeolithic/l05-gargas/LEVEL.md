@@ -52,10 +52,10 @@ the level is a budget. The fastest run there is, with the lamp never touched, re
 first slab of the well exactly as the flicker starts. The upper cave has nothing in it to
 jump, and it is five seconds long: a player who walks it in the dark reaches the well with
 a third of the battery instead of a tenth. Nothing in the level says any of this. The key is
-on the controls line with the others. The cave is darker than the show caves before it, so
-a lamp that is out, or spent, leaves him the small spill of light round his feet and,
-ahead of him, a dark in which a tread or a slab is only a shade less black than the hole
-beside it.
+on the controls line here and in no other level, because this is the one where the lamp
+runs down. The cave is darker than the show caves before it, so a lamp that is out, or
+spent, leaves him the small spill of light round his feet and, ahead of him, a dark in
+which a tread or a slab is only a shade less black than the hole beside it.
 
 **The stair lies.** Twelve fitted concrete steps down the nineteenth-century tunnel, every
 one the same, every one standing on the same rock. Four of them are not steps. The fourth

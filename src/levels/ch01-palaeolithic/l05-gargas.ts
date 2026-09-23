@@ -145,7 +145,9 @@ export const GARGAS: LevelData = {
   widthTiles: W,
   heightTiles: H,
   rows: g.rows(),
-  spawn: { x: 40, y: UPPER - 16 },
+  // A few steps short of the door: still in the day, where the switch does nothing,
+  // and no more hillside than that between one death and the next attempt.
+  spawn: { x: px(8) + 8, y: UPPER - 16 },
   cameraBottom: px(H),
   lampFromX: px(11) + 16,
   fallCause: 'The oubliettes',

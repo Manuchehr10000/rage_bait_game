@@ -18,6 +18,14 @@
       "what": "The hiker flat on their back, headlamp still on. Used, rotated, by every death in the chapter."
     },
     {
+      "id": "hiker-held",
+      "w": 12,
+      "h": 16,
+      "beat": "shared",
+      "what": "The hiker with one boot caught in the floor, trying to walk on. Two frames: the pull, and the boot not coming.",
+      "frames": 2
+    },
+    {
       "id": "hiker-seated",
       "w": 13,
       "h": 14,

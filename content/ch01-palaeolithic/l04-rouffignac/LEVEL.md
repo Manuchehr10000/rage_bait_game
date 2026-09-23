@@ -52,8 +52,9 @@ him: it only has to cost him more time than he has.
   second, which is the whole gap.
 - **The check rails.** Four slots of track, all four drawn by the same code, and two of
   them the kind a boot goes into and does not come out of. Nothing kills him there. He
-  stands in the track, in one piece, and watches the light behind him get bigger. It is
-  the only death in the game that takes its time.
+  stands in the track, in one piece, pulling at his boot for as long as the player presses
+  to go on (`hiker-held`), and watches the light behind him get bigger. It is the only
+  death in the game that takes its time.
 - **The track bed.** Twice it is not there any more. The rails are — laid straight across
   the hole the way rails are, because rails hold up a train and not a man. Stepping on
   what is left of the bed gives him a sixth of a second to be somewhere else.

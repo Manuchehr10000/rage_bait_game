@@ -133,6 +133,8 @@ test('the lamp is lit at the door, L puts it out and lights it again, and it onl
     for (let i = 0; i < 10; i++) g.tick();
     lampKey(); g.tick();
     out.before = { lit: g.lamp, carried: g.lampCarried };
+    // This is the one level where the key is on the controls line.
+    out.onTheLine = !document.getElementById('lamp-key').hidden;
     // Through the door: lit.
     key('ArrowRight', true);
     for (let i = 0; i < 240 && !g.lampCarried; i++) g.tick();
@@ -173,6 +175,7 @@ test('the lamp is lit at the door, L puts it out and lights it again, and it onl
     return out;
   })()`)) as Record<string, unknown>;
   expect(r.before).toEqual({ lit: false, carried: false });
+  expect(r.onTheLine).toBe(true);
   expect(r.lit).toBe(true);
   expect(r.ctrlL).toBe(true);
   expect(r.putOut).toBe(true);
@@ -255,6 +258,46 @@ test('walked straight down, the stair takes your boot at the sixth step and then
   // And the tread that holds him is drawn like the rest: the snare draws nothing of its own.
   const hidden = await page.evaluate(`(() => { ${DRIVER} return { hidden: snare.def.hidden, same: booted.def.skin === letsGo.def.skin }; })()`);
   expect(hidden).toEqual({ hidden: true, same: true });
+});
+
+test('he starts a few steps short of the door, in the day, with the lamp not yet lit', async ({ page }) => {
+  const r = await page.evaluate(`(() => { ${DRIVER}
+    const s = g.level.data.spawn, door = D.find((d) => d.kind === 'steelDoor'), mouth = D.find((d) => d.kind === 'caveMouth' && d.reach === undefined);
+    for (let i = 0; i < 20; i++) g.tick();
+    let t = 0; key('ArrowRight', true);
+    for (; t < 300 && !g.lampCarried; t++) g.tick();
+    key('ArrowRight', false);
+    return { inTheDay: s.x + p.w <= mouth.x1, shortOfDoor: s.x < door.x, secsToLamp: Math.round((t / 60) * 10) / 10 };
+  })()`) as { inTheDay: boolean; shortOfDoor: boolean; secsToLamp: number };
+  expect(r.inTheDay).toBe(true);
+  expect(r.shortOfDoor).toBe(true);
+  // The retry loop: under a second from spawn to the lamp coming on.
+  expect(r.secsToLamp).toBeLessThan(1);
+});
+
+test('a man held by the boot pulls at it while you press on, and stands stuck while you do not', async ({ page }) => {
+  const r = (await page.evaluate(`(() => { ${DRIVER}
+    standOn(tread(5));
+    for (let i = 0; i < 4; i++) g.tick();
+    const held = p.held;
+    const W = g.wctx, S = 4;
+    // The same battery and the same camera for every picture, so the cone and the
+    // parallax behind him are the same and only he differs.
+    const sprite = () => { g.lampT = 1; g.camera.x = 730; g.camera.y = 150; g.draw(); const x = (Math.round(p.x) - 1 - g.camera.ix) * S, y = (Math.round(p.y) - g.camera.iy) * S; return Array.from(W.getImageData(x, y, 12 * S, 16 * S).data).join(','); };
+    const still = { pose: p.heldPose(), px: sprite() };
+    key('ArrowRight', true);
+    const seen = new Map();
+    for (let i = 0; i < 16; i++) { g.tick(); seen.set(p.heldPose(), sprite()); }
+    key('ArrowRight', false); g.tick();
+    const after = p.heldPose();
+    return { held, still: still.pose, poses: [...seen.keys()].sort(), pullDiffers: seen.get('pull') !== seen.get('stuck'), stuckIsStill: seen.get('stuck') === still.px, after, x: Math.round(p.x) };
+  })()`)) as Record<string, unknown>;
+  expect(r.held).toBe(true);
+  expect(r.still).toBe('stuck');
+  expect(r.poses).toEqual(['pull', 'stuck']);
+  expect(r.pullDiffers).toBe(true);
+  expect(r.stuckIsStill).toBe(true);
+  expect(r.after).toBe('stuck');
 });
 
 test('whoever the sixth step catches, it takes all of him down with it, wherever he landed on it', async ({ page }) => {

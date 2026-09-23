@@ -67,6 +67,13 @@ export class Player implements Rect {
    * simply attached to a man who is not going anywhere. Nothing lets go of him.
    */
   held = false;
+  /**
+   * Whether he is trying to go anywhere while held, and for how many ticks he has
+   * been at it. Drawn as a man pulling at his boot, so that what the controls did
+   * is on the screen: they moved a man who could not move.
+   */
+  tugging = false;
+  private tug = 0;
   private strokeTimer = 0;
   /** Horizontal drag applied this frame by a conveyor. */
   private driftX = 0;
@@ -86,6 +93,8 @@ export class Player implements Rect {
     this.fellFrom = null;
     this.fellBy = 0;
     this.held = false;
+    this.tugging = false;
+    this.tug = 0;
   }
 
   /** A conveyor pulls the ground out from under you. Applied on top of your own movement. */
@@ -140,6 +149,11 @@ export class Player implements Rect {
     this.fellBy = 0;
   }
 
+  /** Held: pulling at the boot, or stood with it stuck, a pull every eight ticks he tries. */
+  heldPose(): 'pull' | 'stuck' {
+    return this.tugging && Math.floor((this.tug - 1) / 8) % 2 === 0 ? 'pull' : 'stuck';
+  }
+
   animFrame(): 'idle' | 'walk1' | 'walk2' | 'jump' {
     if (this.inWater) return 'jump';
     if (!this.onGround) return 'jump';
@@ -152,7 +166,10 @@ export class Player implements Rect {
       this.updateSwimming(input, level, solids, minX);
       return;
     }
-    // Horizontal intent. A man with his boot in the track has none.
+    // Horizontal intent. A man with his boot in the track has none; he has a boot
+    // to pull at.
+    this.tugging = this.held && (input.left || input.right || input.jumpHeld);
+    this.tug = this.tugging ? this.tug + 1 : 0;
     const want = this.held ? 0 : (input.right ? 1 : 0) - (input.left ? 1 : 0);
     if (want !== 0) {
       this.facing = want as 1 | -1;

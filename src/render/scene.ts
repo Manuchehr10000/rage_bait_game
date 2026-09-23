@@ -20,6 +20,7 @@ import {
   IBEX_SPRITE,
   VENUS_SPRITE,
   HIKER_FRAMES,
+  HIKER_HELD,
   HIKER_SEATED,
   HORSE_SPRITE,
   ROOF_BLOCK_SPRITE,
@@ -2441,7 +2442,18 @@ function drawExit(ctx: CanvasRenderingContext2D, e: Rect): void {
 
 /** A lost tourist in a visibly wrong costume. Nobody will mention it. */
 export function drawPlayer(ctx: CanvasRenderingContext2D, p: Player, costume: Costume, lampOn: boolean): void {
-  blitFacing(ctx, tourist(costume, p.animFrame(), lampOn), Math.round(p.x) - 1, Math.round(p.y), p.facing);
+  const f = p.held ? heldTourist(costume, p.heldPose(), lampOn) : tourist(costume, p.animFrame(), lampOn);
+  blitFacing(ctx, f, Math.round(p.x) - 1, Math.round(p.y), p.facing);
+}
+
+/** Held by the boot: pulling at it, or stood with it stuck. A costume with no such frames just stands. */
+function heldTourist(costume: Costume, pose: 'pull' | 'stuck', lampOn: boolean): Frame {
+  const c = COSTUMES[costume];
+  if (!c.held) return tourist(costume, 'idle', lampOn);
+  const i = pose === 'pull' ? 0 : 1;
+  const f = frameOf(`${c.id}-held`, i, c.held[i]);
+  // The pull drops him a pixel, lamp and all.
+  return lampOn && c.lamp ? withLamp(f, c.lamp.x, c.lamp.y + (i === 0 ? 1 : 0)) : f;
 }
 
 const TOURIST_FRAME_INDEX = { idle: 0, walk1: 1, walk2: 2, jump: 3 } as const;
@@ -2449,10 +2461,17 @@ const TOURIST_FRAME_INDEX = { idle: 0, walk1: 1, walk2: 2, jump: 3 } as const;
 /** Art ids and code-drawn frames per costume. The hiker is chapter 1; the pharaoh is chapter 2. */
 const COSTUMES: Record<
   Costume,
-  { id: string; frames: typeof TOURIST_FRAMES; seated: HTMLCanvasElement; lamp?: { x: number; y: number } }
+  {
+    id: string;
+    frames: typeof TOURIST_FRAMES;
+    seated: HTMLCanvasElement;
+    lamp?: { x: number; y: number };
+    /** Held by the boot: the pull, and the boot not coming. Only the chapter with snares in it has them. */
+    held?: [HTMLCanvasElement, HTMLCanvasElement];
+  }
 > = {
   // The lens sits at sprite column 10, row 4, of the right-facing hiker.
-  hiker: { id: 'hiker', frames: HIKER_FRAMES, seated: HIKER_SEATED, lamp: { x: 10, y: 4 } },
+  hiker: { id: 'hiker', frames: HIKER_FRAMES, seated: HIKER_SEATED, lamp: { x: 10, y: 4 }, held: HIKER_HELD },
   pharaoh: { id: 'tourist', frames: TOURIST_FRAMES, seated: TOURIST_SEATED },
 };
 

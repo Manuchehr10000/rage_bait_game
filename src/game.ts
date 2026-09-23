@@ -159,10 +159,24 @@ export class Game {
 
   /** How much of the headlamp is left, 1 to 0. Always 1 where the lamp does not run down. */
   get lampLeft(): number {
-    const dark = this.level.data.decor.find((d) => d.kind === 'dark');
-    const life = dark && dark.kind === 'dark' ? dark.lampLife : undefined;
+    const life = this.lampLife;
     if (!this.lampOn || life === undefined) return 1;
     return Math.max(0, 1 - this.lampT / life);
+  }
+
+  /** Seconds of burning the lamp has in this level, if it runs down here at all. */
+  private get lampLife(): number | undefined {
+    const dark = this.level.data.decor.find((d) => d.kind === 'dark');
+    return dark && dark.kind === 'dark' ? dark.lampLife : undefined;
+  }
+
+  /**
+   * The switch is only on the controls line where it is worth having: where the lamp
+   * runs down. Everywhere else a lamp that can be put out is only a way to see less.
+   */
+  private showLampKey(): void {
+    const key = document.getElementById('lamp-key');
+    if (key) key.hidden = !(this.screen === 'level' && this.lampLife !== undefined);
   }
 
   /** Which screen is showing. For tests. */
@@ -223,6 +237,7 @@ export class Game {
   /** Back to the tour map, on the chapter of the level just left. */
   private goToMap(): void {
     this.screen = 'map';
+    this.showLampKey();
     this.leaveAfterDeath = false;
     this.audio.stopLoops();
     if (this.level) this.map.showLevel(this.level.data.id);
@@ -283,6 +298,7 @@ export class Game {
     this.audio.setRoom(sound.room);
     this.camera = new Camera(this.level.widthPx, data.cameraBottom);
     this.titleTimer = TITLE_TIME;
+    this.showLampKey();
     try {
       history.replaceState(null, '', `#${data.id}`);
     } catch {
@@ -420,9 +436,9 @@ export class Game {
       this.lampOn = true;
       this.audio.play('click');
     }
-    // The switch. It does nothing until the lamp has been lit, and then it does
-    // exactly one thing, every time.
-    if (lampSwitch && this.lampOn) {
+    // The switch. It does nothing until the lamp has been lit, and nothing where the
+    // lamp does not run down; where it does, it does exactly one thing, every time.
+    if (lampSwitch && this.lampOn && this.lampLife !== undefined) {
       this.lampOff = !this.lampOff;
       this.audio.play('click');
     }

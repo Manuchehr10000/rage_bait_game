@@ -31,8 +31,8 @@ npm install
 npm run dev
 ```
 
-Arrows or WASD to move, Space to jump, L to switch the headlamp off and on once it is lit
-(it only runs down while it burns), R to give up (it counts), M to mute, Enter for the
+Arrows or WASD to move, Space to jump, L to switch the headlamp off and on in the one cave
+where it runs down (it only runs down while it burns), R to give up (it counts), M to mute, Enter for the
 next level at the exit label. Esc returns to the map. Open `#cap-blanc`,
 `#roc-aux-sorciers`, `#pech-merle`, `#philae` or `#karnak` in the URL to start at that level.
 

@@ -15,8 +15,10 @@ drawn standing on the same rock (pillar 4). Four of them are not steps:
   down carefully, and a careful man stops on it.
 - **the sixth takes his boot.** Every tread has a stanchion of the handrail standing on its
   back in a foot bolted through the concrete, the same foot on all twelve. On the sixth, the
-  foot is exactly where a boot goes, and the boot stays. It does not hurt him. Six tenths of a second later the tread
-  he is held to lets go, with him on it. It is the snare from Rouffignac, with the stair in
+  foot is exactly where a boot goes, and the boot stays. It does not hurt him. If the
+  player presses on, he pulls at it (`hiker-held`), so it reads as a boot caught and not as
+  a key that did nothing. Six tenths of a second later the tread he is held to lets go,
+  with him on it. It is the snare from Rouffignac, with the stair in
   place of the timetable.
 - **the ninth rocks back** on its heel while he is on it, and it pushes him back faster than
   he can walk, against the riser of the eighth. Nothing happens to him at all. The lamp keeps
