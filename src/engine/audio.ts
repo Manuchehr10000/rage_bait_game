@@ -19,31 +19,38 @@
  * and Akrotiri is heard under the roof its visitors stand under.
  */
 
-export type Sfx =
-  | 'jump'
-  | 'land'
-  | 'step'
-  | 'coin'
-  | 'headCrack'
-  | 'headThud'
-  | 'baboon'
-  | 'dateLand'
-  | 'turnstile'
-  | 'squish'
-  | 'bonk'
-  | 'drown'
-  | 'burn'
-  | 'fallAway'
-  | 'sigh'
-  | 'snap'
-  | 'whoosh'
-  | 'splash'
-  | 'crumble'
-  | 'grind'
-  | 'winchStart'
-  | 'motorStart'
-  | 'thud'
-  | 'click';
+/**
+ * Every sound effect, as a list and not only a type, so tests/audio.spec.ts can
+ * play each one: a new effect is checked for a click the day it is added.
+ */
+export const SFX = [
+  'jump',
+  'land',
+  'step',
+  'coin',
+  'headCrack',
+  'headThud',
+  'baboon',
+  'dateLand',
+  'turnstile',
+  'squish',
+  'bonk',
+  'drown',
+  'burn',
+  'fallAway',
+  'sigh',
+  'snap',
+  'whoosh',
+  'splash',
+  'crumble',
+  'grind',
+  'winchStart',
+  'motorStart',
+  'thud',
+  'click',
+] as const;
+
+export type Sfx = (typeof SFX)[number];
 
 /** A page of the brochure. Every one is played by the same three voices. */
 export type WaltzId = 'map' | 'mapCh01' | 'mapCh02';
@@ -716,8 +723,10 @@ export class GameAudio {
     // louder than the whole breath. Measured in Chromium's own OfflineAudioContext:
     // 53 breaths in 120, up to 33 dB over the breath's attack; in a real render,
     // two breaths in five, 5 dB over the breath's own peak. Noise is where this
-    // shows. An oscillator starts at zero and hides it, which is why the pipe never
-    // clicked and the breath before it did.
+    // shows most. A sine starts at zero and hides it, which is why the pipe never
+    // clicked and the breath before it did — but not every oscillator starts at zero:
+    // the lyre's wave is cosine terms and starts at its peak, which is why its string
+    // gain is guarded too. tests/audio.spec.ts checks both.
     g.gain.value = 0;
     g.gain.setValueAtTime(0, t);
     g.gain.linearRampToValueAtTime(0.022, t + 0.11);
@@ -982,7 +991,8 @@ const E5 = 659.25;
 const Fs5 = 739.99;
 const G5 = 783.99;
 
-const MUSIC_IDS = ['map', 'mapCh01', 'mapCh02', 'ch01', 'ch02', 'ch03'] as const;
+/** Every track. Exported for tests/audio.spec.ts, which renders each one. */
+export const MUSIC_IDS = ['map', 'mapCh01', 'mapCh02', 'ch01', 'ch02', 'ch03'] as const;
 /** Time constant of the fade between tracks: about six tenths of a second. */
 const CROSSFADE = 0.2;
 
