@@ -2,9 +2,10 @@
 
 The last wall of the chapter, seen by the day coming in at the way out. Twenty tiles of it
 near the lower portal, inside the reach of the day, so that it is lit from the right,
-strongest nearest the door. The day reaches on past the wall, fading, as far as the far edge
-of the slab that tips: from there on a spent lamp does not matter. A player who never touched the switch has no light of his own
-left by now; one who saved some can still have it.
+strongest nearest the door. The day reaches on past the wall, fading, as far as the far
+edge of the slab that tips: from there on a spent lamp does not matter. A player who never
+touched the switch has no light of his own left by now; one who saved some can still have
+it.
 
 The wall: rock with four cracks across it, a splinter of bone pushed into one of them.
 About a hundred negative hands on it, the wall sprayed round each hand so the hand is the
@@ -26,7 +27,8 @@ portal is the way out.
 sources say 137 on this wall. The arrangement is the level's.
 
 **Never in a pixel:** why the fingers are short. Amputation, frostbite and disease, and
-fingers folded on purpose are all live, and the research forbids stating any of them (`arc.md`, "Ritual amputation must not be stated as fact").
+fingers folded on purpose are all live, and the research forbids stating any of them
+(`arc.md`, "Ritual amputation must not be stated as fact").
 
 No new art. The wall and its hands are a panel drawn by the game.
 

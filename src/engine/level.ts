@@ -168,8 +168,8 @@ export interface CrumbleDef {
    */
   rocks?: boolean;
   /**
-   * A stanchion of the handrail stands on its back in a foot, drawn exactly as the
-   * ones on the stair. It goes where the slab goes.
+   * Railed like the stair: a stanchion at each end in the stair's foot, drawn exactly
+   * as the stair's, and the rail and knee rail between them. It goes where the slab goes.
    */
   post?: boolean;
 }

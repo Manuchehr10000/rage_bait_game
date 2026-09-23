@@ -64,7 +64,8 @@ export class Player implements Rect {
   inWater = false;
   /**
    * Caught by something in the floor. The controls are still honest — they are
-   * simply attached to a man who is not going anywhere. Nothing lets go of him.
+   * simply attached to a man who is not going anywhere. Only a snare that lets go of
+   * a still boot ever lets go of him.
    */
   held = false;
   /**

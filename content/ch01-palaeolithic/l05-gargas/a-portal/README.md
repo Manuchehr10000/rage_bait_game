@@ -8,7 +8,7 @@ and a lamp that is out does not run down. If it runs out while it is burning, an
 short of the day at the other end of the cave, he sits down where he is and the visit is
 over (`The dark`).
 
-The switch does nothing outside. There is nothing lit to put out. That is the only thing
+The switch does nothing before the door. There is nothing lit to put out. That is the only thing
 the level does to introduce it: this is the one level where `L lamp` is on the controls
 line, because it is the one level where the lamp runs down, and the first player to press
 it in the door finds out what it is for. Everywhere else L does nothing.

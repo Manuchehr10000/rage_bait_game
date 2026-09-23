@@ -729,7 +729,7 @@ test('the last slab takes his boot, and lets go of it only when he stops pulling
       g.resetRun(); p.spawnAt(1845, 288); g.camera.x = 1740;
       // A new run is new traps.
       const lastBoot = g.entities.find((e) => e.def.kind === 'snare' && e.def.letsGoStill !== undefined);
-      let t0 = -1, h = 0, res = '?';
+      let t0 = -1, h = 0, res = '?', freed = false;
       for (let i = 0; i < 300; i++) {
         if (h > 0 && --h === 0) key('Space', false);
         if (i === 1) { key('Space', true); h = 12; }
@@ -737,36 +737,67 @@ test('the last slab takes his boot, and lets go of it only when he stops pulling
         const s = t0 < 0 ? -1 : i - t0;
         let right = true;
         if (s >= 0) {
-          if (policy === 'mash' && s % 6 === 0) { key('Space', true); h = 3; }
-          if (policy === 'jump at once' && s === 0) { key('Space', true); h = 12; }
-          if (policy === 'nothing') right = false;
+          // Only the one thing, and nothing else pressed.
+          if (policy !== 'pull') right = false;
+          if (policy === 'jump only') { key('Space', true); h = 0; }
+          if (policy === 'mash jump' && s % 6 === 0) { key('Space', true); h = 3; }
+          if (policy === 'left only') key('ArrowLeft', true);
           if (policy === 'let go') { right = s >= J; if (s === J) { key('Space', true); h = 12; } }
         }
         key('ArrowRight', right);
         g.tick();
+        if (lastBoot.freed) freed = true;
         if (g.state !== 'playing') { res = g.deathCause; break; }
         if (p.onGround && p.x > 1950) { res = 'over'; break; }
       }
-      key('ArrowRight', false); key('Space', false);
-      return res + (t0 < 0 ? ' (never caught)' : '');
+      key('ArrowRight', false); key('ArrowLeft', false); key('Space', false);
+      return (t0 < 0 ? 'never caught ' : '') + res + (freed ? ', freed' : ', held');
     };
     const out = {};
-    for (const pol of ['pull', 'mash', 'jump at once', 'nothing']) out[pol] = attempt(pol);
+    for (const pol of ['pull', 'jump only', 'mash jump', 'left only', 'nothing']) out[pol] = attempt(pol);
     out.letGo = [];
     for (let J = 0; J <= 44; J += 2) out.letGo.push(J + ':' + attempt('let go', J));
     return out;
   })()`)) as Record<string, unknown>;
-  // Everything a man does with a boot stuck is wrong, including nothing at all.
-  expect(r.pull).toBe('The oubliettes');
-  expect(r.mash).toBe('The oubliettes');
-  expect(r['jump at once']).toBe('The oubliettes');
-  expect(r.nothing).toBe('The oubliettes');
+  // Pulling either way, or holding or mashing a jump, keeps the boot to the end.
+  expect(r.pull).toBe('The oubliettes, held');
+  expect(r['jump only']).toBe('The oubliettes, held');
+  expect(r['mash jump']).toBe('The oubliettes, held');
+  expect(r['left only']).toBe('The oubliettes, held');
+  // Doing nothing gets the boot back, and the slab anyway.
+  expect(r.nothing).toBe('The oubliettes, freed');
   // Let go at once, and then jump: after three tenths, before six tenths.
-  const over = (r.letGo as string[]).filter((t) => t.endsWith(':over')).map((t) => Number(t.split(':')[0]));
-  expect(over.length).toBeGreaterThanOrEqual(8);
-  expect(Math.min(...over)).toBeGreaterThanOrEqual(18);
-  expect(Math.max(...over)).toBeLessThanOrEqual(38);
-  expect(over.every((J, i) => i === 0 || J - (over[i - 1] ?? NaN) === 2)).toBe(true);
+  const over = (r.letGo as string[]).filter((t) => t.includes(':over')).map((t) => Number(t.split(':')[0] ?? NaN));
+  expect(over).toEqual([18, 20, 22, 24, 26, 28, 30, 32, 34, 36]);
+
+  // The ruled times, to the tick: the boot comes free three tenths after the catch with the
+  // sound of a step, on that tick; the slab goes six tenths after it.
+  const timing = (await page.evaluate(`(() => { ${DRIVER}
+    g.resetRun(); p.spawnAt(1900, 290); g.camera.x = 1790;
+    const lb = g.entities.find((e) => e.def.kind === 'snare' && e.def.letsGoStill !== undefined);
+    const slab = g.entities.filter((e) => e.def.kind === 'crumble' && e.def.skin === 'walkway').sort((a, b) => a.def.rect.x - b.def.rect.x)[2];
+    const heard = []; let t = 0;
+    const play = g.audio.play.bind(g.audio); g.audio.play = (n) => { heard.push(t + ':' + n); return play(n); };
+    let caught = -1, freed = -1, went = -1;
+    for (t = 0; t < 80; t++) { g.tick(); if (caught < 0 && lb.caught) caught = t; if (freed < 0 && lb.freed) freed = t; if (went < 0 && slab.state === 'falling') went = t; }
+    g.audio.play = play;
+    return { freedAfter: freed - caught, wentAfter: went - caught, stepOnTheTick: heard.includes(freed + ':step') };
+  })()`)) as Record<string, unknown>;
+  expect(timing).toEqual({ freedAfter: 18, wentAfter: 36, stepOnTheTick: true });
+
+  // Pulled at until the slab has gone, the boot stays in on the way down: no step, no
+  // coming free in mid-air.
+  const down = (await page.evaluate(`(() => { ${DRIVER}
+    g.resetRun(); p.spawnAt(1900, 290); g.camera.x = 1790;
+    const lb = g.entities.find((e) => e.def.kind === 'snare' && e.def.letsGoStill !== undefined);
+    const heard = []; const play = g.audio.play.bind(g.audio); g.audio.play = (n) => { heard.push(n); return play(n); };
+    key('ArrowRight', true);
+    let t = 0;
+    for (; t < 200 && g.state === 'playing'; t++) { if (t === 45) key('ArrowRight', false); g.tick(); }
+    g.audio.play = play;
+    return { cause: g.deathCause, freed: lb.freed, stepped: heard.includes('step') };
+  })()`)) as Record<string, unknown>;
+  expect(down).toEqual({ cause: 'The oubliettes', freed: false, stepped: false });
 
   // Wherever on the slab he comes down, his boot is in the foot; and a boot that has
   // come free is not taken again.
@@ -787,14 +818,30 @@ test('the last slab takes his boot, and lets go of it only when he stops pulling
   expect(catches).toEqual({ all: true, freed: true, notAgain: true });
 });
 
+test('the stair’s boot, and every snare without a count, keeps a boot that is left alone', async ({ page }) => {
+  const r = (await page.evaluate(`(() => { ${DRIVER}
+    standOn(tread(5));
+    let heldAt30 = null;
+    for (let i = 0; i < 30; i++) g.tick();
+    heldAt30 = p.held && !snare.freed;
+    // Still held after half a second of nothing, so a jump now does not happen.
+    key('Space', true); g.tick(); key('Space', false);
+    for (let i = 0; i < 200 && g.state === 'playing'; i++) g.tick();
+    return { heldAt30, cause: g.state === 'dead' ? g.deathCause : g.state };
+  })()`)) as Record<string, unknown>;
+  expect(r).toEqual({ heldAt30: true, cause: 'The tunnel' });
+});
+
 test('a lamp that runs out while it burns, short of the day, is the end of the visit', async ({ page }) => {
   const r = (await page.evaluate(`(() => { ${DRIVER}
     const lit = () => { g.resetRun(); p.spawnAt(200, 112); for (let i = 0; i < 5; i++) g.tick(); };
+    const listen = () => { const heard = []; const play = g.audio.play.bind(g.audio); g.audio.play = (n) => { heard.push(n); return play(n); }; return () => { g.audio.play = play; return heard; }; };
     const out = {};
-    // Stood lit in the hall until it gives out: he sits down in the dark.
+    // Stood lit in the hall until it gives out: he sits down in the dark, with a click.
     lit(); p.spawnAt(1150, 304); g.camera.x = 1040;
+    const stop = listen();
     let t = 0; for (; t < 1500 && g.state === 'playing'; t++) g.tick();
-    out.stood = { cause: g.deathCause, state: g.state, secs: Math.round(t / 6) / 10 };
+    out.stood = { state: g.state, cause: g.deathCause, total: g.stats.total, secs: Math.round(t / 6) / 10, click: stop().includes('click') };
     // Put out at the flicker, it never runs out, and nothing happens for as long as he likes.
     lit(); p.spawnAt(1150, 304); g.camera.x = 1040;
     let pressed = false;
@@ -804,6 +851,10 @@ test('a lamp that runs out while it burns, short of the day, is the end of the v
     lit(); p.spawnAt(2000, 304); g.camera.x = 1890; g.lampT = 19.9;
     for (t = 0; t < 300 && g.state === 'playing'; t++) g.tick();
     out.inTheDay = { state: g.state, left: g.lampLeft };
+    // Run out back outside in the day he came in by: nothing either.
+    lit(); p.spawnAt(100, 112); g.lampT = 19.9;
+    for (t = 0; t < 300 && g.state === 'playing'; t++) g.tick();
+    out.outside = { state: g.state, left: g.lampLeft };
     // Run out in the air: he sits down where he lands, not in mid-air.
     lit(); p.spawnAt(1150, 304); g.camera.x = 1040;
     for (let i = 0; i < 20; i++) g.tick();
@@ -811,19 +862,44 @@ test('a lamp that runs out while it burns, short of the day, is the end of the v
     let airborneWhenOut = null;
     for (t = 0; t < 120 && g.state === 'playing'; t++) { g.tick(); if (airborneWhenOut === null && g.lampLeft <= 0) airborneWhenOut = !p.onGround; if (t === 10) key('Space', false); }
     key('Space', false);
-    out.air = { airborneWhenOut, cause: g.deathCause, onTheFloor: p.onGround && Math.round(p.y + p.h) === 320 };
+    out.air = { state: g.state, airborneWhenOut, cause: g.deathCause, onTheFloor: p.onGround && Math.round(p.y + p.h) === 320 };
+    // The edge of the day is the far edge of the slab that tips, to the pixel of his
+    // middle: dropped on to it with a spent lamp, which is how he meets it.
+    const edge = (cx) => {
+      lit(); p.spawnAt(cx - p.w / 2, 270); g.camera.x = 1760; g.lampT = 20;
+      for (let i = 0; i < 30 && g.state === 'playing' && !p.onGround; i++) g.tick();
+      return g.state === 'dead' ? g.deathCause : g.state;
+    };
+    out.edge = { at1871: edge(1871), at1872: edge(1872) };
+    // Sat down on the slab that tips, he stays sat on it: a body sets nothing off.
+    lit(); p.spawnAt(1846, 270); g.camera.x = 1760; g.lampT = 20;
+    const seat = g.entities.filter((e) => e.def.kind === 'crumble' && e.def.skin === 'walkway').sort((a, b) => a.def.rect.x - b.def.rect.x)[1];
+    for (let i = 0; i < 30 && g.state === 'playing'; i++) g.tick();
+    const sat = { cause: g.state === 'dead' ? g.deathCause : g.state, underHimAllThrough: true };
+    for (t = 0; t < 44 && g.state === 'dead'; t++) { g.tick(); if (seat.state !== 'idle' || seat.rect.y !== 304) sat.underHimAllThrough = false; }
+    out.sat = sat;
+    // On a crust that is already going when the lamp gives out, the crust has him first.
+    lit(); p.spawnAt(1184 + 8, 304); g.camera.x = 1080;
+    for (let i = 0; i < 3; i++) g.tick();
+    g.lampT = 20;
+    for (t = 0; t < 120 && g.state === 'playing'; t++) g.tick();
+    out.crust = g.deathCause;
     return out;
   })()`)) as Record<string, any>;
-  expect(r.stood).toEqual({ cause: 'The dark', state: 'dead', secs: expect.any(Number) });
+  expect(r.stood).toEqual({ state: 'dead', cause: 'The dark', total: 1, secs: expect.any(Number), click: true });
   expect(r.stood.secs).toBeGreaterThan(19);
   expect(r.stood.secs).toBeLessThan(21);
   expect(r.putOut).toBe('playing');
   expect(r.inTheDay).toEqual({ state: 'playing', left: 0 });
-  expect(r.air).toEqual({ airborneWhenOut: true, cause: 'The dark', onTheFloor: true });
+  expect(r.outside).toEqual({ state: 'playing', left: 0 });
+  expect(r.air).toEqual({ state: 'dead', airborneWhenOut: true, cause: 'The dark', onTheFloor: true });
+  expect(r.edge).toEqual({ at1871: 'The dark', at1872: 'playing' });
+  expect(r.sat).toEqual({ cause: 'The dark', underHimAllThrough: true });
+  expect(r.crust).toBe('The bear nests');
 
-  // On the honest route, with the lamp never put out, a second and a half of standing
-  // still anywhere before the well is the end; with the upper cave walked dark, five
-  // seconds is nothing.
+  // On the honest route, with the lamp never put out, the ruled budget: about eighty
+  // frames of standing still in all, wherever they are spent; with the upper cave
+  // walked dark, five seconds is nothing.
   const stop = (at: number, n: number, bank: boolean) => play(page, `
     let left = ${n}, out = false, back = false;
     const step = () => {
@@ -833,20 +909,28 @@ test('a lamp that runs out while it burns, short of the day, is the end of the v
       known();
     };`);
   for (const at of [600, 1200, 1650]) {
-    const s = await stop(at, 90, false);
-    expect(s.cause, 'stopped at ' + at).toBe('The dark');
+    const fine = await stop(at, 80, false);
+    expect(fine.state, 'stood 80 at ' + at).toBe('complete');
+    const dead = await stop(at, 86, false);
+    expect(dead.state, 'stood 86 at ' + at).toBe('dead');
+    expect(dead.total).toBe(1);
+    expect(dead.cause).toBe('The dark');
   }
-  const brief = await stop(600, 40, false);
-  expect(brief.state).toBe('complete');
   const banked = await stop(1200, 300, true);
   expect(banked.state).toBe('complete');
   expect(banked.total).toBe(0);
 });
 
 test('the upper cave has a wallow in its floor, under the painted animals', async ({ page }) => {
-  const walked = await play(page, `const step = () => key('ArrowRight', true);`, 60 * 6);
-  // Walked into from the door, it is the first thing that kills him.
-  expect(walked.cause).toBe('The bear nests');
+  const walked = (await page.evaluate(`(() => { ${DRIVER}
+    const heard = []; const play = g.audio.play.bind(g.audio); g.audio.play = (n) => { heard.push(n); return play(n); };
+    key('ArrowRight', true);
+    let t = 0; for (; t < 360 && g.state === 'playing'; t++) g.tick();
+    key('ArrowRight', false); g.audio.play = play;
+    return { state: g.state, total: g.stats.total, cause: g.deathCause, fellAway: heard.includes('fallAway'), secs: t / 60 };
+  })()`)) as { state: string; total: number; cause: string; fellAway: boolean; secs: number };
+  // Walked into from the door, it is the first thing that kills him, and it sounds like a fall.
+  expect(walked).toEqual({ state: 'dead', total: 1, cause: 'The bear nests', fellAway: true, secs: expect.any(Number) });
   expect(walked.secs).toBeLessThan(4);
   const shape = (await page.evaluate(`(() => { ${DRIVER}
     const w = upperWallow.def.rect, beasts = D.find((d) => d.kind === 'cavePanel' && d.panel === 'gargasBeasts').rect;
@@ -854,4 +938,31 @@ test('the upper cave has a wallow in its floor, under the painted animals', asyn
       goes: upperWallow.def.fake && upperWallow.def.delay === 0.15, drawnAsTheFloor: upperWallow.def.solidBelow === true };
   })()`)) as Record<string, unknown>;
   expect(shape).toEqual({ y: 128, nothingUnder: true, underTheBeasts: true, goes: true, drawnAsTheFloor: true });
+});
+
+test('every stanchion is the same stanchion in the same foot: the three slabs and the stair', async ({ page }) => {
+  // Without the dark, so the light is the same everywhere; each post and foot sampled
+  // at the same place relative to where it stands.
+  const r = (await page.evaluate(`(() => { ${DRIVER}
+    D.find((d) => d.kind === 'dark').x0 = 1e9;
+    p.spawnAt(700, 400);
+    const W = g.wctx, S = 4;
+    const sample = (cx, cy, x, y) => {
+      g.camera.x = cx; g.camera.y = cy; g.draw();
+      const px = (wx, wy) => Array.from(W.getImageData((wx - g.camera.ix) * S + 1, (wy - g.camera.iy) * S + 1, 1, 1).data).slice(0, 3).join(',');
+      const pts = [];
+      for (let dy = -24; dy <= -4; dy += 4) pts.push(px(x + 2, y + dy), px(x + 3, y + dy));
+      for (let dx = 0; dx < 6; dx++) pts.push(px(x + dx, y - 2), px(x + dx, y - 1));
+      return pts.join(' ');
+    };
+    const out = {};
+    slabs.forEach((e, i) => { const q = e.def.rect; out['slab' + (i + 1) + 'back'] = sample(q.x - 100, q.y - 120, q.x, q.y); out['slab' + (i + 1) + 'front'] = sample(q.x - 100, q.y - 120, q.x + q.w - 6, q.y); });
+    const t = tread(6); out.stair = sample(t.x - 100, t.y - 120, t.x, t.y);
+    return out;
+  })()`)) as Record<string, string>;
+  const all = Object.values(r);
+  expect(all.length).toBe(7);
+  // One colour, and the same pixels, for every one of them.
+  expect(new Set(all).size).toBe(1);
+  expect(new Set((all[0] ?? '').split(' ')).size).toBe(1);
 });

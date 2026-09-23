@@ -53,7 +53,7 @@ For the designer. None of it is stated anywhere in the game.
   half a jump. High after the sixth, it makes every jump a whole one, and a whole jump over
   the rocking ninth goes over the tenth too and into the step that is not there.
 
-- **Half the hands are short of a finger.** Drawn, never explained. The research keeps
+- **Half the hands are short of fingers, never the thumb.** Drawn, never explained. The research keeps
   amputation, frostbite and folded fingers alive, and the level takes no side.
 
 - **One yellow hand.** One of the 137, as counted. It is on the wall near the right-hand

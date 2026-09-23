@@ -270,13 +270,21 @@ test('in the Hall of the Discs one snaps under you and one walks back and drops 
   expect(snapped.cause).toBe('The lower gallery');
 
   // The fourth is the shelf of the gallery backwards: stay on it and it takes you
-  // back down the hall and lets go where it stops.
+  // back down the hall and lets go where it stops, over the third, which holds. It
+  // does not kill him. It leaves him where the fifth is out of reach and the fourth is
+  // gone, and the way on is the lower gallery.
   const rode = await play(page, `
     const startX = walksBack.rect.x;
+    const third = discs.slice().sort((a, b) => a.def.rect.x - b.def.rect.x)[2];
     standOn(walksBack);
-    const step = () => { key('ArrowRight', false); if (walksBack.rect.x < startX - 24) phase = 'carried back'; };`, 60 * 8);
-  expect(rode.phase).toBe('carried back');
-  expect(rode.cause).toBe('The lower gallery');
+    const step = () => {
+      key('ArrowRight', false);
+      if (walksBack.rect.x < startX - 24 && phase === 'in') phase = 'carried back';
+      if (phase === 'carried back' && p.onGround && Math.abs(p.y + p.h - third.rect.y) <= 1) phase = 'set down on the third';
+    };`, 60 * 8);
+  expect(rode.phase).toBe('set down on the third');
+  expect(rode.state).toBe('playing');
+  expect(rode.total).toBe(0);
 });
 
 test('the slab comes down between the holes and takes the run-up with it', async ({ page }) => {

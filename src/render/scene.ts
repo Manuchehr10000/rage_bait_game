@@ -513,8 +513,8 @@ const TRAIN_LIGHT = 200;
 
 /**
  * One stanchion of a handrail, standing at x on a floor at y in its foot. Every
- * stanchion in the game is this one, so a foot that takes a boot is drawn exactly
- * like every foot that does not.
+ * stanchion with a foot, on the stair and on the fitted path at Gargas, is this one,
+ * so a foot that takes a boot is drawn exactly like every foot that does not.
  */
 function drawStanchion(ctx: CanvasRenderingContext2D, x: number, y: number): void {
   ctx.fillStyle = COLORS.rail;

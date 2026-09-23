@@ -57,7 +57,9 @@ first slab of the well exactly as the flicker starts.
 **And when it runs out, the visit is over.** A lamp that runs out while it is burning,
 anywhere short of the far edge of the slab that tips, where the day from the way out takes
 over, and he sits down where he is, in the dark, which is what you do (`The dark`). He
-does not sit down in mid-air: he sits down on what he lands on. A lamp put out with L never
+does not sit down in mid-air: he sits down on what he lands on, and it stays under him.
+Standing on something already giving way, he goes down with it instead: the wallow or the
+tread has him before the dark does. Back out in the day he came in by, nothing happens. A lamp put out with L never
 runs out, so putting it out before it dies is always safe, and the price is the rest of the
 way by the spill round his feet. So the level has a clock, as Rouffignac has its train: a
 run that never touches the switch can stand still for about a second and a third in all,
@@ -110,10 +112,11 @@ on it it goes off its bearer, the far end first, and is not under him any more. 
 still on it goes into the oubliettes with it. The first and third are too far apart to jump
 between, so the middle one has to be touched and left in the same breath. And the last one's
 foot takes his boot, wherever on it he comes down, and six tenths of a second later the
-slab goes. Pulling at the boot keeps it in; so does jumping, and so does pressing anything
-at all. Left alone for three tenths of a second, the boot comes free with the sound of a
-step, and there is three tenths of a second left to jump. It is the chapter's one trap
-whose answer is to do nothing, and it comes straight after the one that punished him for
+slab goes. Pressing to go either way is pulling at the boot, and it keeps it in; so does
+holding a jump. Anything else is leaving it alone. Left alone for three tenths of a second
+while he stands on the slab, the boot comes free with the sound of a step, and there is
+three tenths of a second left to jump. It is the level's one trap whose answer is to do
+nothing, and it comes straight after the one that punished him for
 not leaving at once; and a man who does nothing at all goes down with the slab too, having
 seen his boot come free. Slab 1 is the one honest slab, and the only place over the well to
 stand and look. In the first version of this level the fitted path over the well was the

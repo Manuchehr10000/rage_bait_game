@@ -28,6 +28,8 @@ export interface World {
   cameraX: number;
   /** Names of events fired this attempt. Entities read it; platforms and sweeps write it. */
   events: Set<string>;
+  /** False while a death plays out. The world keeps moving; a body sets nothing off. */
+  alive: boolean;
   kill(cause: DeathCause): void;
   sound(name: Sfx): void;
 }
@@ -415,6 +417,7 @@ export class Crumble implements Entity {
     const r = this.rect;
     const standing = p.x + p.w > r.x && p.x < r.x + r.w && Math.abs(p.y + p.h - r.y) <= 2;
     if (this.state === 'idle') {
+      if (!w.alive) return;
       // One that minds being landed on wants the player to have come through the
       // air. Entities update before the player moves, so the ground under him last
       // frame is the ground he was on before he arrived.
@@ -753,7 +756,8 @@ export class Hazard implements Entity {
 /**
  * The slot between the running rail and the check rail. Step into it and it has
  * you: the boot is in, the foot is not coming out, and the only thing left to
- * happen is the one that was always going to happen. It never lets go.
+ * happen is the one that was always going to happen. It never lets go, unless it
+ * is the kind that lets go of a boot left alone (letsGoStill).
  */
 export class Snare implements Entity {
   caught = false;
@@ -765,11 +769,14 @@ export class Snare implements Entity {
   constructor(readonly def: SnareDef) {}
 
   update(w: World): void {
+    if (!w.alive) return;
     const p = w.player;
     const r = this.def.rect;
-    // One that lets go of a still boot counts while he is not pulling at it.
+    // One that lets go of a still boot counts while he is not pulling at it, and only
+    // while the boot is in something: a boot going down the well with its slab stays in.
     const after = this.def.letsGoStill;
     if (this.caught && !this.freed && after !== undefined && p.held) {
+      if (!p.onGround) return;
       this.still = p.tugging ? 0 : this.still + DT;
       if (this.still >= after - 1e-9) {
         this.freed = true;

@@ -14,15 +14,16 @@ stanchion foot on the stair at Gargas. Frame 0 is the pull: the whole man a pixe
 the free leg thrown forward, the caught boot planted behind. Frame 1 is the boot not coming:
 both feet down, the caught one still where it was.
 
-He only pulls while the player is pressing something. With no input he stands in frame
-1. So a player who presses right and gets nowhere sees a man trying to walk right and
-getting nowhere, and knows it was the floor and not the keyboard (pillar 1: the controls
-never lie; they are attached to a man who is not going anywhere).
+He only pulls while the player is pressing to go either way, or holding a jump. Otherwise
+he stands in frame 1. So a player who presses right and gets nowhere sees a man trying to
+walk right and getting nowhere, and knows it was the floor and not the keyboard (pillar 1:
+the controls never lie; they are attached to a man who is not going anywhere).
 
 ## Where it stands in the game
 
-Every snare in chapter 1, identically: the two with a boot in them at Rouffignac and the
-sixth step at Gargas. Drawn on the player's own box, facing the way he was going.
+Every snare in chapter 1, identically: the two with a boot in them at Rouffignac, the
+sixth step at Gargas, and the foot on the last slab over the well at Gargas, the one that
+lets go of a boot left alone. Drawn on the player's own box, facing the way he was going.
 
 ## Must be right
 

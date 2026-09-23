@@ -12,9 +12,10 @@ the same breath: a jump off it within about a quarter of a second of landing, or
 
 **The last slab keeps a boot that is pulled at.** Its foot takes his boot wherever on the
 slab he comes down, and six tenths of a second later the slab goes, as the middle one did.
-Pressing to go on is pulling at the boot, and so is jumping, and so is pressing anything:
-it keeps the boot. Left alone for three tenths of a second, the boot comes free with the
-sound of a step and he stands up straight, and there are three tenths of a second left to
+Pressing to go either way is pulling at the boot, and so is holding a jump: either keeps
+the boot, and he is drawn pulling. Anything else, the lamp included, is leaving it alone.
+Left alone for three tenths of a second, with the slab still under him, the boot comes free
+with the sound of a step and he stands up straight, and there are three tenths of a second left to
 jump for the far rim. So the answer is to let go of everything the moment he lands, and
 then go. It comes straight after the slab that punished him for not leaving at once, and a
 man who does nothing at all goes down with it as well, having seen his boot come free:

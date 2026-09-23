@@ -35,7 +35,7 @@ import { TILE } from '../../engine/types';
  *     look at in the dark
  *   - the well of the oubliettes, crossed on three railed slabs of the fitted
  *     path. The middle one tips. The last one's stanchion foot takes his boot, and
- *     lets go of it only when he stops pulling: the one trap in the chapter whose
+ *     lets go of it only when he stops pulling: the one trap in the level whose
  *     answer is to do nothing, and then to go
  *   - and then the wall of hands, by daylight, with no trap on it at all
  *
@@ -43,7 +43,8 @@ import { TILE } from '../../engine/types';
  *  12..41    Gargas II, the upper cave: narrow, three tiles clear, finger tracings
  *              on the clay roof, and a wallow under the painted animals. The
  *              place to put the lamp out, if he can count
- *  42..65    the tunnel: twelve fitted steps down under a roof cut high and flat
+ *  42..65    the tunnel: twelve fitted steps down under a flat roof in two lifts,
+ *              low over the fifth
  *  66..109   the great hall of Gargas I. The block that joined the caves, the
  *              bear that is a stalagmite, three false floors, and the Camarin
  * 110..121   the well of the oubliettes, crossed on the path's three slabs

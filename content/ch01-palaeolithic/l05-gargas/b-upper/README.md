@@ -7,7 +7,8 @@ silhouettes, as the first part of the visit shows them.
 Thirty tiles, five seconds, and one thing to jump: **a bears' wallow in the floor**, two
 tiles of clay crust under the second of the painted animals, with a shaft under it. A man
 who walks on to it goes down it a sixth of a second later (`The bear nests`), three and a
-half seconds after the door: the first lesson of the level, and a cheap one to repeat.
+half seconds after he starts, three after the door: the first lesson of the level, and a
+cheap one to repeat.
 
 Every time after that it is **the place to put the lamp out**: the floor is flat, the roof
 is flat, and five seconds walked in the spill of an unlit lamp is five seconds of light in

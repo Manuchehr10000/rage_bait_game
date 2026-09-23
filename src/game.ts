@@ -1,6 +1,6 @@
 import { GameAudio, type MusicId, type Room } from './engine/audio';
 import { Camera } from './engine/camera';
-import { createEntity, type Entity, type Platform, type Sweep, type Train, type Water, type World } from './engine/entities';
+import { createEntity, Crumble, type Entity, type Platform, type Sweep, type Train, type Water, type World } from './engine/entities';
 import type { Stats } from './render/hud';
 import { renderHud } from './render/hud';
 import { Input } from './engine/input';
@@ -325,6 +325,8 @@ export class Game {
     this.lampOff = false;
     this.lampT = 0;
     this.lampSpent = false;
+    // A new attempt has not died of anything yet.
+    this.deathCause = 'Fall';
     this.state = 'playing';
   }
 
@@ -396,6 +398,7 @@ export class Game {
       player: this.player,
       cameraX: this.camera.x,
       events: this.events,
+      alive: this.state === 'playing',
       kill: (c) => this.kill(c),
       sound: (n) => this.audio.play(n),
     };
@@ -448,14 +451,20 @@ export class Game {
     }
     // The battery. It is new at every door, and it only runs down while it is burning.
     if (this.lampOn && !this.lampOff) this.lampT += DT;
-    // Run out while burning, short of the day, and he sits down where he is: not in
-    // the air, on whatever he lands on. Put out in time, it never runs out at all.
+    // Run out while burning, in the dark and short of the day, and he sits down where
+    // he is: not in the air, on whatever he lands on, and not on anything already on
+    // its way down, which takes him itself. Put out in time, it never runs out at all.
     const life = this.lampLife;
     if (life !== undefined && this.lampT >= life) this.lampSpent = true;
     const dark = this.level.data.decor.find((d) => d.kind === 'dark');
-    const until = dark && dark.kind === 'dark' ? dark.deadlyUntil : undefined;
-    if (this.lampSpent && until !== undefined && this.player.onGround && this.player.x + this.player.w / 2 < until) {
-      this.kill('The dark');
+    if (this.lampSpent && dark && dark.kind === 'dark' && dark.deadlyUntil !== undefined && this.player.onGround) {
+      const cx = this.player.x + this.player.w / 2;
+      const under = this.player.lastContacts.standingOn;
+      const going = under !== null && this.entities.some((e) => e instanceof Crumble && e.rect === under && (e.state === 'armed' || e.state === 'falling'));
+      if (cx >= dark.x0 && cx < dark.deadlyUntil && !going) {
+        this.kill('The dark');
+        return;
+      }
     }
     this.camera.update(this.player);
     this.driveLoops();

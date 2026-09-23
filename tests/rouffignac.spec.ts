@@ -206,6 +206,17 @@ test('four check rails, two of them with a boot in them, and nothing to tell the
   expect(caught.held).toBe(true);
   expect(caught.cause).toBe('The train');
 
+  // Stood in it doing nothing, it does not let go either: only the train ends it.
+  const still = (await page.evaluate(`(() => { ${DRIVER}
+    const s = snares[0].def.rect;
+    p.spawnAt(s.x + 11, 176); g.camera.x = s.x - 170;
+    for (let i = 0; i < 6; i++) g.tick();
+    const caught = p.held;
+    for (let i = 0; i < 60; i++) g.tick();
+    return { caught, stillHeld: p.held, freed: !!snares[0].freed };
+  })()`)) as Record<string, boolean>;
+  expect(still).toEqual({ caught: true, stillHeld: true, freed: false });
+
   // And the other kind is track. Walking over it does nothing whatever.
   const fine = await play(page, `
     const r = rails[0];
