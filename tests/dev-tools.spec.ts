@@ -18,6 +18,7 @@ type W = Window & { __game: any };
 
 async function open(page: Page, id: string): Promise<void> {
   await page.goto(`/#${id}`);
+  expect(await page.locator('#stamp').textContent(), 'a prod build has no dev tools: run `npx vite build` first').not.toMatch(/^prod/);
   await page.waitForFunction((id) => (window as unknown as Partial<W>).__game?.levelData.id === id, id);
   // Stop the loop, and let a frame already queued run out, so the camera stays where the test puts it.
   await page.evaluate(async () => {
@@ -27,9 +28,9 @@ async function open(page: Page, id: string): Promise<void> {
   });
 }
 
-/** Put the real mouse over the middle of a world pixel, given the camera as it stands. */
-async function hover(page: Page, wx: number, wy: number): Promise<Point> {
-  const at = await page.evaluate(
+/** Where on the page the middle of a world pixel is, given the camera as it stands. */
+async function mouseAt(page: Page, wx: number, wy: number): Promise<{ x: number; y: number }> {
+  return page.evaluate(
     ({ wx, wy }) => {
       const g = (window as unknown as W).__game;
       const r = document.getElementById('game')!.getBoundingClientRect();
@@ -38,8 +39,39 @@ async function hover(page: Page, wx: number, wy: number): Promise<Point> {
     },
     { wx, wy },
   );
+}
+
+/** Put the real mouse over a world pixel, draw a frame with the readout in it, and read what it names. */
+async function hover(page: Page, wx: number, wy: number): Promise<Point> {
+  const at = await mouseAt(page, wx, wy);
   await page.mouse.move(at.x, at.y);
-  return page.evaluate(() => (window as unknown as W).__game.devPoint as Point);
+  return page.evaluate(() => {
+    const g = (window as unknown as W).__game;
+    g.draw();
+    return g.devPoint as Point;
+  });
+}
+
+/** The colour on the game canvas at a page position, and one world pixel away from it. */
+async function drawnAt(page: Page, at: { x: number; y: number }, dx: number, dy: number): Promise<[string, string]> {
+  return page.evaluate(
+    ({ at, dx, dy }) => {
+      const g = (window as unknown as W).__game;
+      const c = document.getElementById('game') as HTMLCanvasElement;
+      const r = c.getBoundingClientRect();
+      const x = Math.floor(((at.x - r.left) * c.width) / r.width);
+      const y = Math.floor(((at.y - r.top) * c.height) / r.height);
+      const rgb = (x: number, y: number) => Array.from(c.getContext('2d')!.getImageData(x, y, 1, 1).data.slice(0, 3)).join(',');
+      return [rgb(x, y), rgb(x + dx * g.scale, y + dy * g.scale)] as [string, string];
+    },
+    { at, dx, dy },
+  );
+}
+
+/** G, as a real key press, and a frame drawn after it. */
+async function toggle(page: Page): Promise<void> {
+  await page.keyboard.press('KeyG');
+  await page.evaluate(() => (window as unknown as W).__game.draw());
 }
 
 test('Y = 0 is the top row of the floor the tourist spawns on, and up is positive', async ({ page }) => {
@@ -83,6 +115,84 @@ test('the readout names every pixel it is put over, wherever the camera is', asy
   }
 });
 
+test('the readout names the pixel the world draws under the mouse', async ({ page }) => {
+  await open(page, 'karnak');
+  // An ankh block, found from the level's tiles and not from the camera. Its
+  // outline is drawn on the edge of its tile, so its two opposite corner pixels
+  // are the same colour and each differs from the pixel diagonally outside it.
+  // A world drawn even one pixel off from the readout breaks one of the three.
+  const b = await page.evaluate(() => {
+    const g = (window as unknown as W).__game;
+    const L = g.level;
+    const cx = g.camera.ix;
+    const cy = g.camera.iy;
+    for (let ty = 0; ty < L.heightTiles; ty++) {
+      for (let tx = 0; tx < L.widthTiles; tx++) {
+        const x = tx * 16;
+        const y = ty * 16;
+        if (L.tile(tx, ty) === '?' && x - 1 >= cx && x + 17 <= cx + 320 && y - 1 >= cy && y + 17 <= cy + 180) {
+          return { x, y, floor: g.levelData.spawn.y + g.player.h };
+        }
+      }
+    }
+    return null;
+  });
+  expect(b, 'an ankh block on screen at the start of Karnak').not.toBeNull();
+  if (!b) return;
+
+  const corners: [number, number, number, number][] = [
+    [b.x, b.y, -1, -1],
+    [b.x + 15, b.y + 15, 1, 1],
+  ];
+  const seen: string[] = [];
+  for (const [wx, wy, ox, oy] of corners) {
+    expect(await hover(page, wx, wy)).toEqual({ x: wx, y: b.floor - wy });
+    const at = await mouseAt(page, wx, wy);
+    await toggle(page); // hidden, so the guides are not what is under the mouse
+    const [under, outside] = await drawnAt(page, at, ox, oy);
+    await toggle(page);
+    expect(under, `corner ${wx},${wy} against the pixel outside it`).not.toBe(outside);
+    seen.push(under);
+  }
+  expect(seen[0], 'both corners of the outline').toBe(seen[1]);
+});
+
+test('each tick sits on the top edge of the pixel the readout names with its number', async ({ page }) => {
+  await open(page, 'karnak');
+  const floor = await page.evaluate(() => (window as unknown as W).__game.levelData.spawn.y + (window as unknown as W).__game.player.h);
+  expect(await hover(page, 100, floor)).toEqual({ x: 100, y: 0 });
+  const at = await mouseAt(page, 100, floor);
+
+  // With the mouse off the canvas, so no guide crosses the ruler.
+  const below = await page.evaluate(() => document.getElementById('game')!.getBoundingClientRect().bottom + 3);
+  await page.mouse.move(640, below);
+  const col = await page.evaluate((atY) => {
+    const g = (window as unknown as W).__game;
+    g.draw();
+    const c = document.getElementById('game') as HTMLCanvasElement;
+    const r = c.getBoundingClientRect();
+    const s = g.scale;
+    // Just right of the axis line and inside every tick; nothing else is drawn there.
+    const x = Math.max(1, Math.round(s * 0.5)) + 1;
+    const data = c.getContext('2d')!.getImageData(x, 0, 1, c.height).data;
+    // Above the X numbers, which start at the left edge at the start of a level.
+    const limit = c.height - 9 * s;
+    const ink: number[] = [];
+    for (let y = 0; y < limit; y++) if (data[y * 4] === 239 && data[y * 4 + 1] === 230 && data[y * 4 + 2] === 207) ink.push(y);
+    // The top canvas row of the pixel under the mouse, which the readout calls Y = 0.
+    const zero = Math.floor(((atY - r.top) * c.height) / r.height / s) * s;
+    return { s, ink, zero, limit };
+  }, at.y);
+
+  expect(col.s, 'the default viewport draws at 4x, where ticks are crisp').toBe(4);
+  // A tick every 10 world px, two canvas rows thick, straddling the top edge of its pixel.
+  const expected: number[] = [];
+  for (let row = col.zero % 40; row <= col.limit; row += 40) {
+    for (const r of [row - 1, row]) if (r >= 0 && r < col.limit) expected.push(r);
+  }
+  expect(col.ink).toEqual(expected);
+});
+
 test('below the spawn floor Y is negative: the lower gallery at Pech Merle', async ({ page }) => {
   await open(page, 'pech-merle');
   const p = await page.evaluate(() => {
@@ -103,6 +213,11 @@ test('G hides it and shows it again; off the canvas and on the map there is no p
   expect(await page.evaluate(() => (window as unknown as W).__game.devPoint)).toBeNull();
   await page.keyboard.press('KeyG');
   expect(await page.evaluate(() => (window as unknown as W).__game.devPoint)).not.toBeNull();
+  // Ctrl+G and Cmd+G are the browser's.
+  for (const combo of ['Control+KeyG', 'Meta+KeyG', 'Alt+KeyG']) {
+    await page.keyboard.press(combo);
+    expect(await page.evaluate(() => (window as unknown as W).__game.devPoint), combo).not.toBeNull();
+  }
 
   const below = await page.evaluate(() => document.getElementById('game')!.getBoundingClientRect().bottom + 3);
   await page.mouse.move(640, below);
@@ -116,4 +231,20 @@ test('G hides it and shows it again; off the canvas and on the map there is no p
   });
   expect(await page.evaluate(() => (window as unknown as W).__game.currentScreen)).toBe('map');
   expect(await page.evaluate(() => (window as unknown as W).__game.devPoint)).toBeNull();
+});
+
+test('a resize under a still mouse names what is under the mouse after it', async ({ page }) => {
+  await open(page, 'cap-blanc');
+  const before = await hover(page, 200, 180);
+  const at = await mouseAt(page, 200, 180);
+  await page.setViewportSize({ width: 1000, height: 600 });
+  await page.waitForFunction(() => (window as unknown as W).__game.scale === 3);
+  const afterResize = await page.evaluate(() => (window as unknown as W).__game.devPoint as Point);
+  // The same place on the page, arrived at by moving there: what a fresh reading says.
+  await page.mouse.move(at.x + 50, at.y + 50);
+  await page.mouse.move(at.x, at.y);
+  const fresh = await page.evaluate(() => (window as unknown as W).__game.devPoint as Point);
+  expect(fresh).not.toBeNull();
+  expect(afterResize).toEqual(fresh);
+  expect(afterResize, 'the canvas moved under the mouse').not.toEqual(before);
 });

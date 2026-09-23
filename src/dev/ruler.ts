@@ -58,6 +58,7 @@ export function renderRuler(ctx: CanvasRenderingContext2D, scale: number, v: Rul
   const W = VIEW_W * s;
   const H = VIEW_H * s;
   const line = Math.max(1, Math.round(s * 0.5));
+  // Ticks start on whole canvas pixels, or an odd width smears each one across two faint rows.
   const ticks: [number, number, number, number][] = [];
   const labels: Label[] = [];
 
@@ -68,7 +69,7 @@ export function renderRuler(ctx: CanvasRenderingContext2D, scale: number, v: Rul
     const sx = Math.round((x - v.camX) * s);
     const major = x % MAJOR === 0;
     const len = (major ? 3 : 1.5) * s;
-    ticks.push([sx - line / 2, H - len, line, len]);
+    ticks.push([Math.round(sx - line / 2), H - len, line, len]);
     if (major) labels.push({ text: String(x), x: sx, y: H - 4 * s, centred: true });
   }
 
@@ -79,7 +80,7 @@ export function renderRuler(ctx: CanvasRenderingContext2D, scale: number, v: Rul
     const sy = Math.round((top - y) * s);
     const major = y % MAJOR === 0;
     const len = (major ? 3 : 1.5) * s;
-    ticks.push([0, sy - line / 2, len, line]);
+    ticks.push([0, Math.round(sy - line / 2), len, line]);
     if (major && sy > CLEAR_TOP * s && sy < H - CLEAR_BOTTOM * s) {
       labels.push({ text: String(y), x: 4.5 * s, y: sy + 1.5 * s, centred: false });
     }

@@ -1,4 +1,4 @@
-import { defineConfig, type Plugin } from 'vite';
+import { defineConfig, normalizePath, type Plugin } from 'vite';
 // @ts-expect-error -- plain JS, and the config is the only thing that loads it.
 import { png, svg, check } from './tools/favicon.mjs';
 
@@ -60,17 +60,24 @@ function indexingRules(): Plugin {
  * not a build.
  */
 function noDevToolsInProd(): Plugin {
+  let devDir = '';
   return {
     name: 'lost-tourist-no-dev-tools',
     apply: 'build',
+
+    configResolved(config) {
+      devDir = `${normalizePath(config.root)}/src/dev/`;
+    },
 
     generateBundle(_, bundle) {
       if (!isProd) return;
       const leaked: string[] = [];
       for (const chunk of Object.values(bundle)) {
         if (chunk.type !== 'chunk') continue;
-        for (const [id, m] of Object.entries(chunk.modules)) {
-          if (id.replace(/\\/g, '/').includes('/src/dev/') && m.renderedLength > 0) leaked.push(id);
+        // A module the bundler dropped is not listed at all. Anything listed is in,
+        // even at no length: a stylesheet imported from here is listed that way.
+        for (const id of Object.keys(chunk.modules)) {
+          if (normalizePath(id).startsWith(devDir)) leaked.push(id);
         }
       }
       if (leaked.length) this.error(`dev tools in the prod bundle:\n  ${leaked.join('\n  ')}`);

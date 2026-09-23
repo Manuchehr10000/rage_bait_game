@@ -10,26 +10,27 @@ import { renderRuler, rulerPoint, type RulerView, type ScreenPoint } from './rul
 export class DevTools {
   /** G hides everything here, so the level can be seen the way a player sees it. */
   private on = true;
-  /** The pointer over the canvas, in view units. Null while it is anywhere else. */
-  private pointer: ScreenPoint | null = null;
+  /** Where the mouse last was over the canvas, in page px. Null once it has left. */
+  private mouse: { x: number; y: number } | null = null;
   private cursor = '';
 
   constructor(private readonly canvas: HTMLCanvasElement) {
     window.addEventListener('keydown', (e) => {
-      if (e.code === 'KeyG' && !e.repeat) this.on = !this.on;
+      // Bare G only. Ctrl+G and Cmd+G belong to the browser.
+      if (e.code === 'KeyG' && !e.repeat && !e.ctrlKey && !e.metaKey && !e.altKey) this.on = !this.on;
     });
     canvas.addEventListener('mousemove', (e) => {
-      const r = canvas.getBoundingClientRect();
-      this.pointer = { x: ((e.clientX - r.left) / r.width) * VIEW_W, y: ((e.clientY - r.top) / r.height) * VIEW_H };
+      this.mouse = { x: e.clientX, y: e.clientY };
     });
     canvas.addEventListener('mouseleave', () => {
-      this.pointer = null;
+      this.mouse = null;
     });
   }
 
   /** The world pixel under the pointer, as the ruler names it. Null off a level, off the canvas, or hidden. */
   point(view: RulerView | null): { x: number; y: number } | null {
-    return this.on && view && this.pointer ? rulerPoint(view, this.pointer) : null;
+    const at = this.pointer();
+    return this.on && view && at ? rulerPoint(view, at) : null;
   }
 
   /** Over everything else on the scaled canvas. `view` is null on the map, which has no ruler. */
@@ -37,7 +38,20 @@ export class DevTools {
     const live = this.on && view !== null;
     // A crosshair names a pixel better than an arrow does. Not on the map, whose pointer is for clicking.
     this.setCursor(live ? 'crosshair' : '');
-    if (live) renderRuler(ctx, scale, view, this.pointer);
+    if (live) renderRuler(ctx, scale, view, this.pointer());
+  }
+
+  /**
+   * The mouse in view units, from where the canvas is now rather than where it
+   * was when the mouse last moved: a resize under a still mouse moves the canvas,
+   * and the readout has to name what is under the mouse after it.
+   */
+  private pointer(): ScreenPoint | null {
+    if (!this.mouse) return null;
+    const r = this.canvas.getBoundingClientRect();
+    const x = ((this.mouse.x - r.left) / r.width) * VIEW_W;
+    const y = ((this.mouse.y - r.top) / r.height) * VIEW_H;
+    return x >= 0 && x < VIEW_W && y >= 0 && y < VIEW_H ? { x, y } : null;
   }
 
   private setCursor(c: string): void {
