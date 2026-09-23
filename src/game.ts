@@ -202,6 +202,7 @@ export class Game {
       camY: this.camera.iy,
       floorY: this.level.data.spawn.y + this.player.h,
       levelW: this.level.widthPx,
+      level: this.level.data.id,
     };
   }
 

@@ -19,8 +19,8 @@ export class DevTools {
   private cursor = '';
   /** The level as the last frame showed it. A click copies what was on screen. Null on the map or while hidden. */
   private view: RulerView | null = null;
-  /** What the last click tried to copy, whether it worked, and until when to say so. */
-  private copied: { text: string; ok: boolean; until: number } | null = null;
+  /** The point the last click tried to copy, whether it worked, and until when to say so. */
+  private copied: { point: string; ok: boolean; until: number } | null = null;
 
   constructor(private readonly canvas: HTMLCanvasElement) {
     window.addEventListener('keydown', (e) => {
@@ -57,29 +57,32 @@ export class DevTools {
   }
 
   /**
-   * The point under the mouse, onto the clipboard, as the label writes it. The
-   * async clipboard wants https or localhost, which is everywhere these run; where
+   * The point under the mouse, onto the clipboard, as the label writes it and
+   * after the level's id: `karnak (96, 64)`. The label leaves the level out, since
+   * the level is on screen; a paste does not have it. The async clipboard wants https or localhost, which is everywhere these run; where
    * it is missing or refuses, the label says so rather than leave it to be found
    * out at the paste.
    */
   private async copy(): Promise<void> {
     const p = this.point(this.view);
     if (!p) return;
-    const text = pointText(p);
+    const view = this.view;
+    if (!view) return;
+    const point = pointText(p);
     let ok = true;
     try {
-      await navigator.clipboard.writeText(text);
+      await navigator.clipboard.writeText(`${view.level} ${point}`);
     } catch {
       ok = false; // refused, or no navigator.clipboard at all
     }
-    this.copied = { text, ok, until: performance.now() + COPIED_FOR };
+    this.copied = { point, ok, until: performance.now() + COPIED_FOR };
   }
 
   /** What the label says after the point: whether it was just copied, while the mouse is still on it. */
   private note(view: RulerView): string | null {
     const c = this.copied;
     const p = this.point(view);
-    if (!c || !p || performance.now() > c.until || pointText(p) !== c.text) return null;
+    if (!c || !p || performance.now() > c.until || pointText(p) !== c.point) return null;
     return c.ok ? 'copied' : 'not copied';
   }
 

@@ -29,6 +29,11 @@ export interface RulerView {
   /** World y of Y = 0: the floor under the spawn. */
   floorY: number;
   levelW: number;
+  /**
+   * The level's id, as in its URL. Y = 0 is a different height in every level, so
+   * a point copied without its level names nothing.
+   */
+  level: string;
 }
 
 /** A point on the screen, in view units: 0 to VIEW_W across, 0 to VIEW_H down. */

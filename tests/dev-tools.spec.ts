@@ -270,7 +270,7 @@ test('a resize under a still mouse names what is under the mouse after it', asyn
   expect(afterResize, 'the canvas moved under the mouse').not.toEqual(before);
 });
 
-test('a click copies the point as the label writes it, and the label says so', async ({ page, context }) => {
+test('a click copies the point as the label writes it, after the level, and the label says so', async ({ page, context }) => {
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
   await open(page, 'karnak');
   const floor = await page.evaluate(() => (window as unknown as W).__game.levelData.spawn.y + (window as unknown as W).__game.player.h);
@@ -279,7 +279,7 @@ test('a click copies the point as the label writes it, and the label says so', a
 
   const at = await mouseAt(page, 150, floor + 5);
   await page.mouse.click(at.x, at.y);
-  await expect.poll(() => clipboard(page)).toBe('(150, -5)');
+  await expect.poll(() => clipboard(page)).toBe('karnak (150, -5)');
   expect(await label(page)).toBe('(150, -5) copied');
 
   // One pixel over, and the label is about a different point: it no longer says so.
