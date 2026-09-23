@@ -1,7 +1,6 @@
 import { GameAudio, type MusicId, type Room } from './engine/audio';
 import { Camera } from './engine/camera';
 import { createEntity, type Entity, type Platform, type Sweep, type Train, type Water, type World } from './engine/entities';
-import { AXES, renderAxes } from './render/axes';
 import type { Stats } from './render/hud';
 import { renderHud } from './render/hud';
 import { Input } from './engine/input';
@@ -12,6 +11,8 @@ import { Progress } from './engine/progress';
 import { locate } from './map/atlas';
 import { MapScreen } from './map/screen';
 import { renderWorld, type Scene, type WorldText } from './render/scene';
+import { DevTools } from './dev/tools';
+import type { RulerView } from './dev/ruler';
 import { ART_SCALE, DEATH_SOUND, DT, overlaps, TILE, VIEW_H, VIEW_W, type DeathCause } from './engine/types';
 
 /** How long a death plays before the reset. The world keeps moving through it. */
@@ -21,6 +22,12 @@ const LIFETIME_KEY = 'lostTourist.lifetimeDeaths';
 
 type State = 'playing' | 'dead' | 'complete';
 type Screen = 'map' | 'level';
+
+/**
+ * The tools for building the game (src/dev/): a ruler, and the point under the
+ * pointer. Every build has them but prod, which does not even carry the code.
+ */
+const DEV_TOOLS = __BUILD_ENV__ !== 'prod';
 
 /** How far above the spawn the tourist appears when dropping in from the map. */
 const FALL_IN_HEIGHT = 200;
@@ -92,8 +99,8 @@ export class Game {
 
   private stats: Stats = { total: 0, byCause: new Map(), lifetime: readLifetime() };
 
-  /** The ruler on a level's edges (render/axes.ts). Dev builds only; G hides it. */
-  private axes = AXES;
+  /** The ruler and the pointer readout. Null in prod. */
+  private readonly dev: DevTools | null;
 
   private acc = 0;
   private last = 0;
@@ -114,10 +121,10 @@ export class Game {
     this.wctx = wctx;
 
     this.input = new Input(window);
+    this.dev = DEV_TOOLS ? new DevTools(canvas) : null;
     window.addEventListener('keydown', (e) => {
       this.audio.unlock();
       if (e.code === 'KeyM' && !e.repeat) this.audio.toggleMute();
-      if (e.code === 'KeyG' && !e.repeat && AXES) this.axes = !this.axes;
     });
     this.resize();
     window.addEventListener('resize', () => this.resize());
@@ -166,6 +173,22 @@ export class Game {
   /** The map screen, for tests. */
   get mapScreen(): MapScreen {
     return this.map;
+  }
+
+  /** The world pixel under the pointer, as the dev ruler names it. For tests. */
+  get devPoint(): { x: number; y: number } | null {
+    return this.dev?.point(this.rulerView()) ?? null;
+  }
+
+  /** Where the dev ruler is: X from the start of the level, Y up from the floor the tourist spawns on. */
+  private rulerView(): RulerView | null {
+    if (this.screen !== 'level') return null;
+    return {
+      camX: this.camera.ix,
+      camY: this.camera.iy,
+      floorY: this.level.data.spawn.y + this.player.h,
+      levelW: this.level.widthPx,
+    };
   }
 
   private pointer(e: MouseEvent, click: boolean): void {
@@ -477,6 +500,7 @@ export class Game {
       this.map.draw(this.wctx);
       this.ctx.drawImage(this.world, 0, 0, this.canvas.width, this.canvas.height);
       this.map.drawText(this.ctx, this.scale, this.stats.lifetime);
+      this.dev?.draw(this.ctx, this.scale, null);
       return;
     }
     this.texts = [];
@@ -495,14 +519,6 @@ export class Game {
     renderWorld(this.wctx, scene);
 
     this.ctx.drawImage(this.world, 0, 0, this.canvas.width, this.canvas.height);
-    if (AXES && this.axes) {
-      renderAxes(this.ctx, this.scale, {
-        camX: this.camera.ix,
-        camY: this.camera.iy,
-        floorY: this.level.data.spawn.y + this.player.h,
-        levelW: this.level.widthPx,
-      });
-    }
     renderHud(this.ctx, this.scale, {
       stats: this.stats,
       texts: this.texts,
@@ -513,6 +529,7 @@ export class Game {
       levelName: this.level.data.name,
       title: this.titleTimer > 0 ? Math.min(1, this.titleTimer / 0.4, (TITLE_TIME - this.titleTimer) / 0.4) : 0,
     });
+    this.dev?.draw(this.ctx, this.scale, this.rulerView());
   }
 }
 

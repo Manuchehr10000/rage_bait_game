@@ -36,10 +36,16 @@ Arrows or WASD to move, Space to jump, L to switch the headlamp off and on once 
 next level at the exit label. Esc returns to the map. Open `#cap-blanc`,
 `#roc-aux-sorciers`, `#pech-merle`, `#philae` or `#karnak` in the URL to start at that level.
 
-Every build except prod draws a ruler on the edges of a level, so a point on screen can
-be named: X along the bottom is world px from the start of the level; Y up the left is px
-above the floor the tourist spawns on, negative below it. G hides it. The world counts y
-downward, so a point read off the ruler is world x = X, world y = spawn floor − Y.
+Dev tools, in every build except prod, so a point on screen can be named: a ruler on the
+edges of a level, and the exact point under the mouse as `(X, Y)`. X is world px from the
+start of the level; Y is px above the floor the tourist spawns on, negative below it. G
+hides them. The world counts y downward, so `(X, Y)` is the world pixel at x = X,
+y = spawn floor − Y.
+
+They live in `src/dev/` and never reach a player. dev and main are one history, so the
+source goes to main when dev is promoted; the code does not go to prod. The prod build
+refuses to finish if anything from `src/dev/` is in its bundle, and CI builds prod on every
+push to prove it.
 
 `npm test` runs scripted playthroughs in headless Chromium. Each one checks a design
 contract: the trap fires for the naive player and can be avoided by the one who remembers.
@@ -68,7 +74,7 @@ src/
     procedural.ts         the code-drawn sprites used until a painting exists
     frame.ts              one abstraction over painted and code-drawn frames (tourist, deaths)
     hud.ts                death counter and exit label, drawn in screen space
-    axes.ts               the dev ruler on a level's edges; never in prod
+  dev/                    tools for building the game: the ruler and the pointer readout. Never in prod
   levels/
     index.ts              level order and URL hash lookup
     ch01-palaeolithic/    one file per level: geometry, decor, entity list

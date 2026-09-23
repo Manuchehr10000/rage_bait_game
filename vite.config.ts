@@ -52,6 +52,33 @@ function indexingRules(): Plugin {
 }
 
 /**
+ * The tools for building the game live in src/dev/ and never reach a player.
+ * dev and main are one history, promoted by fast-forward, so the source goes to
+ * main with everything else; what must not go is the code in the prod bundle.
+ * The game only makes them outside prod and the bundler drops them from it.
+ * This is the check that it did: a prod bundle with any of src/dev/ in it is
+ * not a build.
+ */
+function noDevToolsInProd(): Plugin {
+  return {
+    name: 'lost-tourist-no-dev-tools',
+    apply: 'build',
+
+    generateBundle(_, bundle) {
+      if (!isProd) return;
+      const leaked: string[] = [];
+      for (const chunk of Object.values(bundle)) {
+        if (chunk.type !== 'chunk') continue;
+        for (const [id, m] of Object.entries(chunk.modules)) {
+          if (id.replace(/\\/g, '/').includes('/src/dev/') && m.renderedLength > 0) leaked.push(id);
+        }
+      }
+      if (leaked.length) this.error(`dev tools in the prod bundle:\n  ${leaked.join('\n  ')}`);
+    },
+  };
+}
+
+/**
  * The tab icon, drawn from the same grid and the same palette as the tourist
  * himself — see tools/favicon.mjs. Three files, because browsers do not agree:
  * an SVG, which everything modern prefers and which stays sharp at any size;
@@ -92,7 +119,7 @@ function favicon(): Plugin {
 }
 
 export default defineConfig({
-  plugins: [favicon(), indexingRules()],
+  plugins: [favicon(), indexingRules(), noDevToolsInProd()],
   define: {
     __BUILD_ENV__: JSON.stringify(buildEnv),
     __COMMIT__: JSON.stringify(commit),

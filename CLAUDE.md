@@ -16,5 +16,9 @@ Conventions:
   accidentally wrong: each note separates "must be right" from "deliberately wrong".
 - No text inside a level. Identical things are identical (pillar 4).
 - Run `npm run typecheck`, `npm run assets:check` and `npm test` before pushing.
-- A point the designer names as "X, Y" is read off the dev ruler (`src/render/axes.ts`):
-  world x = X, world y = the spawn floor (`spawn.y + 16`) − Y.
+- A point the designer names as "(X, Y)" is read off the dev ruler or the pointer readout
+  (`src/dev/ruler.ts`): world x = X, world y = the spawn floor (`spawn.y + 16`) − Y.
+- Dev tools live in `src/dev/` and never reach prod. game.ts makes them only when
+  `__BUILD_ENV__ !== 'prod'`; nothing else imports them. The prod build fails if any of
+  `src/dev/` is in its bundle (vite.config.ts), and CI builds prod to check. Promoting dev
+  to main carries the source, never the code a player downloads.

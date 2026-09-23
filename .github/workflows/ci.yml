@@ -16,6 +16,12 @@ jobs:
       - run: npm ci
       - run: npm run typecheck
       - run: npm run assets:check
+      # The build main deploys, which refuses to carry anything from src/dev/.
+      # Here, so a leak fails on the way into dev and not on the way out to prod.
+      - name: Prod build carries no dev tools
+        run: npx vite build
+        env:
+          BUILD_ENV: prod
       - run: npx vite build
       - run: npx playwright install --with-deps chromium
       - run: npm test
