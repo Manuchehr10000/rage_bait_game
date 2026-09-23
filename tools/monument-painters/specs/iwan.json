@@ -5,15 +5,15 @@
   "elements": [
     {
       "element": "The building shown",
-      "fact": "Only the Ulugh Beg Madrasa. It stands on the west side of the Registan, so its facade faces east (ruwiki Samarkand: 'западное строение'). It was completed in 1420. The plan is about 56 × 81 m, and the 56 m side is the facade: an 81 m facade cannot fit an 18 m arch into a portal two-thirds of its width with piers as narrow as the photographs show (Soviet album)."
+      "fact": "Only the Ulugh Beg Madrasa. It stands on the west side of the Registan, so its facade faces east (ruwiki Samarkand: 'западное строение'). It was completed in 1420. The plan is about 56 × 81 m (Soviet album; the same figure in English Wikipedia's search snippet), and the 56 m side is the facade: an 81 m facade cannot fit an 18 m arch into a portal two-thirds of its width with piers as narrow as the photographs show, and a 34.7 m high portal two-thirds of 56 m wide (about 37 m) matches the near-square portal in the photographs. The facade's exact compass bearing was not measured; 'faces east' means roughly east."
     },
     {
       "element": "Pishtaq (portal frame)",
-      "fact": "A flat-topped rectangle, symmetrical and centred, with nothing standing on its top edge. It occupies two-thirds of the facade's length ('занимает 2/3 длины лицевого фасада', Soviet album). It is the tallest mass of the building and stands slightly proud of the wings: its side return face shows in oblique photographs. Estimated from oblique photographs only: roughly as tall as it is wide."
+      "fact": "A flat-topped rectangle, symmetrical and centred, with nothing standing on its top edge. It occupies two-thirds of the facade's length ('занимает 2/3 длины лицевого фасада', Soviet album; English Wikipedia: 'occupies two thirds of the side of the madrasa'). It is about 34.7 m high (English Wikipedia), roughly twice the height of the rest of the building (English Wikipedia; illustrarch gives the flanking walls as about 17–18 m against about 35 m). Two-thirds of 56 m is about 37 m, so the portal is roughly as wide as it is tall. It is the tallest mass of the building and stands slightly proud of the wings: its side return face shows in oblique photographs."
     },
     {
       "element": "The arch",
-      "fact": "A single pointed ('стрельчатая') arch with a span of about 18 m (Soviet album), roughly half the portal's width. Its apex sits at about four-fifths of the portal's height (read from photographs). It is the Timurid pointed arch: not a horseshoe arch, not an onion arch, not round."
+      "fact": "A single pointed ('стрельчатая') arch, the Timurid pointed arch: not a horseshoe arch, not an onion arch, not round. The Soviet album gives a span of about 18 m, roughly half the portal's width; no second source for the span was reached. Its apex sits at about four-fifths of the portal's height (read from photographs only)."
     },
     {
       "element": "Cable moulding",
@@ -21,7 +21,7 @@
     },
     {
       "element": "Spandrels above the arch",
-      "fact": "A dark-blue (cobalt) field of large star rosettes in lighter blue and white (photographs registon3 and registon12). The portal is faced with cut-tile mosaic in light blue, dark blue, green, white, black and yellow (Soviet album). The star-point count was not verified."
+      "fact": "A dark-blue (cobalt) field of large star rosettes in lighter blue and white (photographs registon3 and registon12). Guide and architecture-blog sources reached through search snippets describe a mosaic panel above the arch with stars, one naming five- and ten-pointed stars (illustrarch and travel-guide snippets); the point count was not checked against a scholarly source or a photograph. The portal is faced with cut-tile mosaic in light blue, dark blue, green, white, black and yellow (Soviet album)."
     },
     {
       "element": "Portal piers",
@@ -29,19 +29,19 @@
     },
     {
       "element": "Iwan (the recess behind the arch)",
-      "fact": "A deep vaulted recess with a geometric net vault. At its back wall are the entrance door and an arched opening above it (photographs). It is a recess with a back wall, not a hole through the building."
+      "fact": "A deep vaulted recess with a geometric net vault. At its back are three entrances; the central one, under a large pointed arch, is closed by an openwork grille (panjara) (Russian Wikipedia, 'Медресе Улугбека (Самарканд)', search snippet: 'В глубине портала имеется три входа, из которых центральный ... закрыт ажурной панджарой'; English Wikipedia: the entrance is made by three successive iwans). There is an arched opening above the central door (photographs). It is a recess with a back wall, not a hole through the building."
     },
     {
       "element": "Wings between the portal and the minarets",
-      "fact": "Narrow flat walls, 'treated flat, without the usual deep arches' ('решены плоскостно, без обычных глубоких арок', Soviet album). They carry two tiers of shallow blind panels with pattern and a small door at the foot. They rise to about half the portal's height (read from photographs). There are no arcades and no open loggias; the two-storey arcades on the square belong to Tilya-Kori."
+      "fact": "Narrow flat walls, 'treated flat, without the usual deep arches' ('решены плоскостно, без обычных глубоких арок', Soviet album). They carry two tiers of shallow blind panels with pattern and a small door at the foot. They rise to about half the portal's height: the portal is 'twice the height of the rest of the building' (English Wikipedia), and illustrarch gives about 17–18 m against about 35 m. There are no arcades and no open loggias; the two-storey arcades on the square belong to Tilya-Kori."
     },
     {
       "element": "Front minarets",
-      "fact": "Two in this view, one at each end of the facade. The building had four corner minarets ('По углам здания высились четыре высоких минарета'). In the 18th century one fell and the others lost their tops (Soviet album). The two rear minarets are short stumps today (photographs registon3 and registon5) and a frontal view hides them. The front pair are cylindrical with a slight taper, upright, of equal height, and their crowns sit level with the portal's top or slightly above it (read from photographs)."
+      "fact": "Two in this view, one at each end of the facade. The building had four corner minarets, each about 33 m high ('По углам здания высились четыре высоких минарета', Soviet album; 33 m in English and Russian Wikipedia snippets). Only the two eastern (front) minarets survive at full height (Turkestan Travel and Wikipedia snippets); the rear ones are short stumps (photographs registon3 and registon5) and a frontal view hides them. Both front minarets leaned and both were straightened: the north-eastern in January 1932 (about 180 cm off vertical before; Shukhov with M. F. Mauer), the south-eastern in 1965 (engineers E. M. Gendel and E. O. Nelle) (IIAS 'The Restored Splendours of Timurid Samarqand' and Russian-language snippets). The front pair are cylindrical with a slight taper, upright and of equal height. With the minarets at about 33 m and the portal at about 34.7 m, the crowns sit roughly level with the portal's top edge, at most marginally below it; the photographs read level to slightly above, which may be perspective."
     },
     {
       "element": "Minaret decoration",
-      "fact": "The shafts carry a diamond (lozenge) lattice of blue and turquoise glazed brick on buff brick (banna'i). There is an inscription band just under the crown and another near the foot, over a pale stone plinth. The crown is a flared stalactite (muqarnas) ring with no lantern ('завершаются венцом сталактитов без фонарей', Soviet album). The crowns are post-18th-century restorations."
+      "fact": "The shafts carry a diamond (lozenge) lattice of blue and turquoise glazed brick on buff brick (banna'i). There is an inscription band just under the crown and another near the foot, over a pale stone plinth. The crown is a flared stalactite (muqarnas) ring with no lantern ('завершаются венцом сталактитов без фонарей', Soviet album; 'terminate in muqarna honeycomb decoration', travel-guide snippet). The crowns are restorations; the Soviet album says the minarets lost their tops in the 18th century."
     },
     {
       "element": "Wall surfaces",
@@ -49,15 +49,15 @@
     },
     {
       "element": "Domes",
-      "fact": "None stand tall today. The lecture halls' high domes and the mosque's vaults were lost in the 18th century (Soviet album), and the Soviet restorers did not rebuild them. Photographs show only a low, smooth, unglazed brick dome cap behind the south wing, just clearing its parapet in oblique views. There is no ribbed dome, no drum and no turquoise dome."
+      "fact": "None stand tall today. The madrasa had four domed lecture halls (darskhanas) at the corners (MIT notes; Archnet snippet). The high domes and the mosque's vaults were lost (Soviet album: 18th century). Later the second storey was pulled down on the orders of a Bukhara governor, a major earthquake in 1817–18 destroyed much of the building, and under Emir Haydar the south-west mosque and two corner darskhanas were re-roofed with flat timber beam roofs (Archnet snippet). No restoration rebuilt a high dome. Photographs show only a low, smooth, unglazed brick dome cap behind the south wing, just clearing its parapet in oblique views. There is no ribbed dome, no drum and no turquoise dome."
     },
     {
       "element": "State today",
-      "fact": "The leaning minaret was straightened in 1932 ('выпрямлен падающий минарет', Soviet album), by Shukhov with architect M. F. Mauer (ruwiki). The second minaret's base was reinforced in 1966–67 and the facade decoration was renewed (Soviet album). The courtyard's second storey was rebuilt (courtyard photographs). Paint the building as it stands now."
+      "fact": "The north-eastern minaret was straightened on 7–11 January 1932 by V. G. Shukhov with architect M. F. Mauer; the south-eastern minaret was straightened in 1965 to a design by E. M. Gendel and E. O. Nelle (IIAS; Russian-language snippets). The Soviet album instead says the second minaret's base was reinforced in 1966–67 and the facade decoration renewed. The second storey of the student cells was reconstructed in the 1990s (Archnet snippet; courtyard photographs). Paint the building as it stands now."
     },
     {
       "element": "Foreground",
-      "fact": "The empty paved Registan square, laid in pinkish-buff fired-brick pavers (photographs). The facade rises from the paving on a low plinth. There is no wide stair in front; the grand stair is at Sher-Dor."
+      "fact": "The empty paved Registan square, paved in fired brick (search snippet: 'paved with fired bricks and cobbles'; 'brick-paved'); the pinkish-buff colour is read from photographs. The facade rises from the paving on a low plinth. There is no wide stair in front; the grand stair is at Sher-Dor."
     }
   ],
   "mustBeRight": [
@@ -67,18 +67,18 @@
     "The portal is a flat-topped rectangle about two-thirds as wide as the whole facade",
     "Nothing stands on top of the portal",
     "The portal is the tallest part of the building mass; each wing reaches about half its height",
-    "There is one pointed arch, about half the portal's width, reaching about four-fifths of the portal's height",
+    "There is one pointed arch, clearly narrower than the portal with broad piers either side (about half its width, one source), its apex well below the portal's top edge",
     "The arch is edged by a thin light-blue rope (cable) moulding",
-    "The field above the arch is dark blue with large light star rosettes",
+    "The field above the arch is dark blue with large light star shapes",
     "The wings are flat walls with shallow panels: no arcades, loggias or deep arched niches",
     "There are exactly two minarets, both vertical and of the same height",
-    "The minaret crowns sit about level with the portal's top: not towering over it, not below it",
+    "The minaret crowns sit roughly level with the portal's top edge (about 33 m against 34.7 m): not towering over it, and not clearly short of it",
     "Each minaret ends in a flared stalactite crown with no lantern, cupola, balcony or spire",
     "The minaret shafts carry a diamond lattice in blue on buff brick",
     "Buff brick is the ground colour of every wall; the blue is pattern on it, not solid tile",
     "A pale grey-white marble dado runs along the foot of the portal",
     "The facade is in sunlight, with shadows falling down and to the left",
-    "The foreground is empty pinkish-buff paving: no people, stalls or stairs"
+    "The foreground is empty fired-brick paving: no people, stalls or stairs"
   ],
   "deliberatelyWrong": [
     "The inscription bands (the portal frame, and under the crown and near the foot of each minaret) are painted as rhythmic banded texture, never as letters. There are two reasons: the no-text rule, and invented Arabic script on a religious building is either gibberish or says something nobody chose.",
@@ -86,7 +86,7 @@
     "The low unglazed dome cap behind the south wing is left off. From straight ahead at square level it is at most a sliver above the parapet. Any dome bump would reintroduce the Sher-Dor dome error this vignette exists to remove.",
     "Modern intrusions are left out: the floodlights along the portal's top edge, lamp posts, railings, the small steps and handrails at the wing doors, visitors and souvenir stalls.",
     "The small doors at the foot of each wing are dropped or reduced to a dark notch. At this size they would be about two pixels.",
-    "The iwan interior is simplified to a shaded vault over a lit back wall with one pointed doorway. The net-vault pattern and the upper opening are dropped.",
+    "The iwan interior is simplified to a shaded vault over a lit back wall with one pointed doorway. The two side entrances, the openwork grille over the central door, the net-vault pattern and the upper opening are dropped.",
     "The lawns and conifers along the south flank are cropped out.",
     "The sky and the saturation of the glaze are brochure-clean, following the set's shared sky and palette."
   ],
@@ -137,12 +137,12 @@
       "material": "Pinkish-buff fired-brick pavers of the Registan square, the foreground ground colour in place of a generic ground"
     }
   ],
-  "lighting": "A June morning, roughly 8 a.m. local solar time. The sun is in the east-north-east, about 30–35° up, behind the viewer's right shoulder. This is the one real light that satisfies both the set's upper-right sun and a sunlit facade. The facade faces east, so it is in its own shadow from late morning onward. At Samarkand's latitude (39.65° N) the June sun stays north of due east until it is about 38° high, so it can light the facade from the right.\n\nThe facade is lit almost frontally with a slight rake from the right:\n- Each minaret cylinder is lit on its right and shaded on its left.\n- Each minaret throws a cast shadow down and to the left. The north-east minaret's shadow falls across the north wing; the south-east minaret's falls onto the ground outside the building.\n- The portal stands slightly proud of the wings, so it throws a thin shadow onto the south (left) wing along its edge.\n- Inside the iwan the shading is inverted. The right (north) jamb's inner face and the upper right of the vault are in shadow. The left inner face and most of the back wall are lit.\n- The glazed tiles catch small warm highlights; the unglazed brick stays matte.",
+  "lighting": "A June morning, roughly 7 a.m. local solar time. The sun is in the east-north-east (azimuth about 80°, some 10° north of due east), about 25–30° up, behind the viewer's right shoulder. This is the one real light that satisfies both the set's upper-right sun and a sunlit facade. The facade faces roughly east, so it is in its own shadow from late morning onward. At Samarkand's latitude (39.65° N) the June-solstice sun crosses due east at about 38.6° altitude, near 8 a.m. solar time; after that it is south of east and no longer comes from the right. (Computed from standard solar geometry for 21 June; the facade's exact bearing was not measured, so treat the hour as approximate.)\n\nThe facade is lit almost frontally with a slight rake from the right:\n- Each minaret cylinder is lit on its right and shaded on its left.\n- Each minaret throws a cast shadow down and to the left. The north-east minaret's shadow falls across the north wing; the south-east minaret's falls onto the ground outside the building.\n- The portal stands slightly proud of the wings, so it throws a thin shadow onto the south (left) wing along its edge.\n- Inside the iwan the shading is inverted. The right (north) jamb's inner face and the upper right of the vault are in shadow. The left inner face and most of the back wall are lit.\n- The glazed tiles catch small warm highlights; the unglazed brick stays matte.",
   "pitfalls": [
     "Painting Sher-Dor, or borrowing from it: the tigers-and-sun tympanum, the two ribbed turquoise domes flanking the portal, a stair in front. It is the square's other big-portal facade, it faces Ulugh Beg, and it is what the current code-drawn silhouette resembles.",
     "Putting a turquoise dome behind the portal to make it 'look like Samarkand'. That dome belongs to Tilya-Kori, which is post-1600, or to Gur-e Amir, which is a different site.",
     "Painting the famous three-madrasa postcard view from the southern platform. It puts two 17th-century buildings into a 1200–1600 chapter.",
-    "Leaning minarets. The one that leaned was straightened in 1932, and the other's base was reinforced in 1966–67. They must not lean symmetrically outward either.",
+    "Leaning minarets. Both front minarets leaned and both were straightened: the north-eastern in 1932, the south-eastern in 1965. They must not lean symmetrically outward either.",
     "Solid blue walls. The ground is buff brick and the blue is lattice and pattern.",
     "Two-storey arcades on the outer wings. Those are Tilya-Kori and the courtyard; Ulugh Beg's outer wings are flat panels.",
     "Free-standing minarets with sky between them and the portal. The wings join them.",
@@ -156,12 +156,15 @@
   ],
   "gate6": "Clear for the Ulugh Beg facade. arc.md says the madrasas are now museums and gate 6 is largely clear, and the courtyard photographs show souvenir stalls and visitors. There are two cautions:\n- Keep Tilya-Kori out of frame. Its west wing is the city's congregational mosque ('городская соборная мечеть', Soviet album), and the view already crops it.\n- Never invent Arabic lettering in the inscription bands. The portal carries a foundation inscription, and fake script on a religious building risks saying something unintended.",
   "contested": [
-    "Which minaret leaned and was straightened in 1932 is not settled by the sources I reached. The Soviet album says only 'the falling minaret' and that 'the second minaret' had its base reinforced in 1966–67. Russian Wikipedia's Shukhov article says the 'eastern' minaret, straightened with architect M. F. Mauer, but both front minarets are on the east side. Guide literature often says north-eastern; I did not verify that in any source I reached. Paint both upright and name neither.",
+    "Which minaret leaned is now settled: both did. The north-eastern was straightened in 1932 (Shukhov, with Mauer) and the south-eastern in 1965 (Gendel and Nelle), per the IIAS article and Russian-language sources reached through search snippets. Still open: the Soviet album dates the second minaret's work to 1966–67 and calls it base reinforcement, against 1965 and straightening elsewhere. One travel-guide snippet says the minarets are 'still flouting the perpendicular', which may mean a small residual lean; at 92 × 70 paint both upright.",
+    "When the minarets fell or lost their tops is not agreed. The Soviet album says one fell and the others lost their tops in the 18th century; a travel-guide snippet says a minaret collapsed in 1870, and the 1907 earthquake is said to have tilted the minarets. Only the two eastern minarets stand at full height today either way.",
+    "The minaret-to-portal height relation rests on two figures from secondary sources (minarets about 33 m, portal about 34.7 m), which put the crowns marginally below the portal's top; the photographs read level to slightly above. The 33 m figure is quoted for all four minarets and may describe the original design rather than today's restored crowns.",
     "The original form of the lost domes is not known. The Soviet album says ribbed turquoise domes like Sher-Dor's 'evidently' (очевидно) stood on Ulugh Beg too, which is an inference, not evidence. The MIT notes say only that the four corner chambers were domed. Do not reconstruct them.",
-    "That the star mosaic reflects Ulugh Beg's astronomy is a popular reading. I found no source for it, and star patterns are standard Timurid ornament. Keep it out of the notes as fact.",
+    "That the star mosaic reflects Ulugh Beg's astronomy is a popular reading, repeated by guide and architecture-blog sources ('thought to reference his astronomical interests'). No scholarly source for it was reached, and star patterns are standard Timurid ornament. Keep it out of the notes as fact. The five- and ten-pointed star count comes from the same kind of source and is unverified.",
     "Dates of the later madrasas vary by source. Sher-Dor: 1619–1636 (ruwiki) against 1619 to 1635/36 (Soviet album). Tilya-Kori: 1646–1660 (common) against begun 1646–47, finishing work still going on in 1650, some parts never completed, and the outer dome of its mosque never built (Soviet album). Both are after 1600 on every version.",
     "Observatory dates: arc.md says c. 1420–28. The English Wikipedia Samarkand text (in a GitHub dump) says built between 1424 and 1429. Vámbéry (1864) says begun 1440, which is wrong. The Soviet album gives no date.",
-    "The dimensions (56 × 81 m) and the arch span (about 18 m) come from one Soviet album and were not cross-checked. I could not find a source for the portal or minaret heights; the proportions given here were read from oblique photographs."
+    "The arch span (about 18 m) comes from one Soviet album and was not cross-checked; the arch apex at four-fifths of the portal's height is read from photographs only. The plan dimensions (56 × 81 m), the portal at two-thirds of the facade, the portal height (34.7 m) and the wings at about half the portal's height are now corroborated by English Wikipedia and illustrarch search snippets.",
+    "The facade's exact compass bearing was not measured. The lighting hour assumes it faces due east; if the Registan's axis is rotated, the hour shifts."
   ],
   "sources": [
     {
@@ -193,6 +196,36 @@
       "title": "Modern photographs of the Registan (copyright; reference on screen only, never for the repository)",
       "url": "https://github.com/Zafarali2000/samarqand/tree/main/images/Desktop/Registon",
       "detail": "Used for visual checks. registon3.jpg: oblique night view of the whole Ulugh Beg facade (rope moulding, flat wings at half height, minaret crowns, low dome cap, rear-minaret stump). registon12.jpg: spandrel star field, north-east minaret, Tilya-Kori corner tower beside it. registon5, 6 and 8: daylight colour of brick, glaze and paving, and the minaret crowns level with the portal. registon9.jpg: Sher-Dor head-on, shown for contrast. registon1, 2, 4 and 11: the ribbed domes belong to Sher-Dor, not Ulugh Beg."
+    },
+    {
+      "title": "IIAS The Newsletter no. 95 (2023), 'The Restored Splendours of Timurid Samarqand' (search-result snippets only; page and PDF fetch blocked; author not seen)",
+      "url": "https://www.iias.asia/the-newsletter/article/restored-splendours-timurid-samarqand",
+      "detail": "Reconstruction project begun 1920 by M. F. Mauer, chief architect of Samarqand from 1917; after a decade of preparation the north-eastern minaret was straightened in 1932 by V. G. Shukhov; E. O. Nelle drew the straightening of the south-eastern minaret in the 1950s and E. M. Gendel executed it in 1965."
+    },
+    {
+      "title": "English Wikipedia, 'Ulugh Beg Madrasa' (search-result snippets only; fetch blocked)",
+      "url": "https://en.wikipedia.org/wiki/Ulugh_Beg_Madrasa",
+      "detail": "Plan 56 × 81 m; a minaret about 33 m high at each of the four angles; a 34.7 m high pishtaq; the entrance is made by three successive iwans; the pishtaq is twice the height of the rest of the building and occupies two thirds of the side; the north-eastern minaret leaned 180 cm before 1932."
+    },
+    {
+      "title": "Russian Wikipedia, 'Медресе Улугбека (Самарканд)' (search-result snippet only; fetch blocked)",
+      "url": "https://ru.wikipedia.org/wiki/Медресе_Улугбека_(Самарканд)",
+      "detail": "Four minarets of 33 m once stood at the corners; the main facade's element is the pishtaq; in the depth of the portal are three entrances, the central one framed by a large pointed arch and closed by an openwork panjara."
+    },
+    {
+      "title": "Archnet, 'Madrasah-i Ulugh Beg (Samarkand)' and 'Registan Square Restoration' (search-result snippets only; fetch blocked)",
+      "url": "https://www.archnet.org/sites/2123",
+      "detail": "Originally two-storeyed with four domed darskhanas at the corners; second storey demolished on a Bukhara governor's order; 1817–18 earthquake; flat timber roofs over the south-west mosque and two darskhanas under Emir Haydar; north-eastern minaret straightened 1932, south-eastern 1965; second storey of cells reconstructed in the 1990s."
+    },
+    {
+      "title": "Russian-language travel and news pages on the minarets (kupibilet.ru, zarnews.uz, anhor.uz; search-result snippets only)",
+      "url": "https://www.kupibilet.ru/gid/uzbekistan/samarkand/medrese-ulugbeka",
+      "detail": "North-eastern minaret straightened 7–11 January 1932 to the design of Shukhov and Mauer; south-eastern minaret straightened in 1965 to the design of E. M. Gendel and E. O. Nelle by Karim Oblakulov's team."
+    },
+    {
+      "title": "illustrarch, 'Registan Square: How Three Madrasas Shaped the Greatest Public Space on the Silk Road', and travel guides (Turkestan Travel, travel-video.info) (search-result snippets only)",
+      "url": "https://illustrarch.com/history-heritage/78555-registan-square-architecture.html",
+      "detail": "Pishtaq about 35 m against flanking walls of about 17–18 m; a mosaic panel with five- and ten-pointed stars above the arch; minarets ending in muqarnas; only the two eastern minarets remain; one minaret collapsed in 1870; the square is brick-paved. Secondary and uncited; used only where it agrees with the stronger sources."
     }
   ],
   "repoCorrections": [
@@ -200,10 +233,10 @@
     "content/map/README.md, same row: 'a minaret at each corner' describes the original plan. Today only the two front minarets stand full height; one fell and the rear ones are stumps. The frontal outline shows two, one at each end of the facade. The row should also name the building ('Registan: the Ulugh Beg Madrasa'), because a vignette of 'the Registan' invites the three-madrasa postcard view.",
     "content/map/README.md, same row: missing. The portal takes two-thirds of the facade, and flat wings about half the portal's height join it to the minarets.",
     "src/map/monuments.ts, iwan: the dome and drum drawn centred above the portal (box 41,15,18,9 and the dome path) should go. No dome rises above the Ulugh Beg portal. Even at Sher-Dor, the two domes flank the portal rather than sitting over it.",
-    "src/map/monuments.ts, iwan: the comment 'The minarets, leaning very slightly outward as they do' and the asymmetric polygons that draw the lean are wrong. The leaning minaret was straightened in 1932 and the other's base reinforced in 1966–67. Draw both vertical with a symmetric slight taper.",
+    "src/map/monuments.ts, iwan: the comment 'The minarets, leaning very slightly outward as they do' and the asymmetric polygons that draw the lean are wrong. Both front minarets leaned and both were straightened, the north-eastern in 1932 and the south-eastern in 1965. Draw both vertical with a symmetric slight taper.",
     "src/map/monuments.ts, iwan: there are no wings. The sky gaps at x 18–24 and 76–82 between the minarets and the portal are wrong; flat walls about half the portal's height fill them.",
     "src/map/monuments.ts, iwan: the arch is 32 of the portal's 52 units wide (62%). The sources give about 18 m in a portal of about 37 m, roughly half, so the arch is a little too wide. The portal width (52 of 82, about two-thirds) and the arch apex height are right.",
-    "content/research/arc.md, chapter 10, Registan row: 'leaning minaret' describes the building before 1932. If a level beat uses the lean, it depicts the pre-1932 state; the present-day vignette must show the minarets upright. The observatory date 'c. 1420–28' disagrees with the 1424–1429 given elsewhere; I record that under contested rather than correct it."
+    "content/research/arc.md, chapter 10, Registan row: 'leaning minaret' describes the building before 1932–1965; both front minarets leaned, and both have since been straightened. If a level beat uses the lean, it depicts the pre-1932 state; the present-day vignette must show the minarets upright. The observatory date 'c. 1420–28' disagrees with the 1424–1429 given elsewhere; I record that under contested rather than correct it."
   ],
-  "confidence": "Overall: medium, with web access badly limited.\n\n- The session's web search budget was already used up (200 of 200) before this task started.\n- The egress policy blocked UNESCO WHC, Wikipedia, Wikimedia Commons, the Library of Congress (the Turkestan Album 1871–72 and the Prokudin-Gorsky plates), Archnet, Britannica, Gutenberg and CrossRef. Only GitHub was reachable, so every source above is a GitHub-hosted text or image. No nineteenth-century public-domain plate was consulted. Before sign-off, the loc.gov Turkestan Album and Prokudin-Gorsky plates should be checked, for the pre-1932 lean and for which minaret it was.\n\nBy claim:\n- High: the dates and the chapter window (MIT, the Soviet album and ruwiki agree); the loss of the high domes and the absence of any dome in today's view (the Soviet album plus several photographs); the Sher-Dor dome mix-up in the current art; the 1932 straightening (two sources); the east-facing facade.\n- Medium: the proportions. The two-thirds portal width and the 18 m span come from one source. The half-height wings, the arch at four-fifths of the portal's height and the crowns level with the portal were read from oblique photographs.\n- Medium: the palette hexes, which are estimates read from photographs, not measurements.\n- Unresolved: which minaret leaned.\n\nNothing was written to the project. Temporary downloads sit in the session scratchpad under reg/."
+  "confidence": "Overall: medium-high for the silhouette and the claims in mustBeRight; medium for the palette and the lighting hour.\n\n- Web verification pass (2026-09-23): all 12 allowed searches were used. Every page fetch attempted was blocked by the egress proxy (Wikipedia, Archnet, IIAS, AramcoWorld, Leiden Iran-Turan, travel guides, Russian sites), so the new evidence is search-result snippets, not read pages. The loc.gov Turkestan Album and Prokudin-Gorsky plates were still not reachable.\n\nBy claim:\n- High: the dates and the chapter window; the east-facing facade on the west side of the square; no high dome today (Soviet album, Archnet, photographs); two front minarets only at full height; both minarets straightened (NE 1932, SE 1965: IIAS, Archnet and Russian sources agree); the portal at two-thirds of the facade and about twice the height of the wings (Soviet album plus English Wikipedia and illustrarch); the plan 56 × 81 m (two sources).\n- Medium: the minaret crowns roughly level with the portal (figures 33 m against 34.7 m from secondary sources, photographs slightly disagree); the arch span (one source) and its apex height (photographs); the star-point count (guide sources only); the iwan's three entrances (Russian Wikipedia snippet).\n- Medium: the palette hexes, which are estimates read from photographs; the lighting hour, which is computed but assumes a due-east facade.\n- Lowered from the previous version: nothing. Resolved: which minaret leaned (both, in turn).\n\nNothing outside this spec was written."
 }

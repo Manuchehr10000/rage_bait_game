@@ -1,15 +1,15 @@
 {
   "art": "iron-bridge",
-  "site": "The Iron Bridge over the River Severn, Ironbridge Gorge near Coalbrookdale, Shropshire. Chapter 11, `ch11_industrial`, site slug `iron_bridge`, painter id `iron-bridge`, asset id `map-monument-ch11-industrial`. Work began November 1777. The masonry abutments went up in 1777–78, the ribs were raised in summer 1779 and first spanned the river on 2 July 1779. The bridge opened on 1 January 1781. It was closed to vehicles on 18 June 1934, pedestrian tolls ended in 1950, and it is Grade I listed and part of the Ironbridge Gorge World Heritage Site (1986). English Heritage's 2017–18 conservation returned it to red-brown.",
-  "view": "The downstream (east) face, seen from the riverside a short way downstream, with the eye low near the water, looking upstream (west). Downstream really is east here: Buildwas is upstream of Ironbridge and Coalport downstream. The 2019 Commons photograph of the red-brown paint is captioned 'east side'.\n\nSquared up almost to an elevation, turned only enough that the four rib frames behind the face rib show as receding arcs inside the opening.\n\nFrame (92 × 70, painted 368 × 280, edge to edge):\n- **Centre:** the main arch, about 60–65% of the plate width, with its crown and humped deck in the upper third.\n- **Left (south):** the stone pier at the south foot of the span, then the first of the two small cast-iron land arches, cut by the frame edge or riverside trees. The tollhouse shows only as a pitched grey roof, a chimney and a strip of upper wall behind the deck's south end. It stands on the upstream (west) side of the south approach, so from this side the bridge end partly hides it. The July 2020 photo taken from this side shows exactly that.\n- **Right (north):** solid buff-grey masonry of the north abutment running into the bank. Any town houses go up the hillside above right, never on the left.\n- **Behind:** steep deciduous woods on both gorge sides rising above deck level, with a band of sky only at the top.\n- **Foreground:** the Severn across the full width, with the arch's reflection.\n\n**Why this view.** It is the one standpoint that gets the whole single span, the river it was built to clear for masted boats, and the wooded gorge into one small picture. The arch and its reflection read as a ring even at 92 px. The asymmetric ends (land arches and tollhouse left, masonry right) tell a knowing viewer which way they are facing. It is also the view the first artists took: William Williams painted it from mid-river in 1780. A brochure moves the photographer onto the bank and squares the face up.\n\n**Cropped out:**\n- the second land arch and the south approach\n- St Luke's church, which stands due north of the bridge up the hill, off the right edge\n- the town's riverfront, behind the viewer's right shoulder\n- any other bridge downstream",
+  "site": "The Iron Bridge over the River Severn, Ironbridge Gorge near Coalbrookdale, Shropshire. Chapter 11, `ch11_industrial`, site slug `iron_bridge`, painter id `iron-bridge`, asset id `map-monument-ch11-industrial`. Work began November 1777. The masonry abutments went up in 1777–78, the ribs were raised in summer 1779 and first spanned the river on 2 July 1779. The bridge opened on 1 January 1781. It was scheduled as an Ancient Monument in 1934 (18 January, per current Wikipedia as quoted in search results) and closed to vehicles with effect from 18 June 1934. Pedestrian tolls ended in 1950, when ownership passed to Shropshire County Council. It is Grade I listed and part of the Ironbridge Gorge World Heritage Site (1986). English Heritage's £3.6 million conservation of 2017–18 returned it to the very dark red-brown found by paint analysis, and the bridge reopened fully at the end of 2018.",
+  "view": "The downstream (east) face, seen from the riverside a short way downstream, with the eye low near the water, looking upstream (west). Downstream really is east here: Buildwas is upstream of Ironbridge and Coalport downstream. The 2019 Commons photograph of the red-brown paint is captioned 'east side'.\n\nSquared up almost to an elevation, turned only enough that the four rib frames behind the face rib show as receding arcs inside the opening.\n\nFrame (92 × 70, painted 368 × 280, edge to edge):\n- **Centre:** the main arch, about 60–65% of the plate width, with its crown and humped deck in the upper third.\n- **Left (south):** the stone pier at the south foot of the span, then the first of the two small cast-iron land arches, cut by the frame edge or riverside trees. The tollhouse shows only as a pitched dark grey roof, a chimney and a strip of upper wall behind the deck's south end. Historic England's list entry places it at the south end, 'built against its west side', with its upper storey at bridge level, so from this downstream side the bridge end hides all but its top. The July 2020 photograph taken from this side, re-examined this session, shows exactly that: roof and chimney above the deck behind the left-hand stone pier.\n- **Right (north):** solid buff-grey masonry of the north abutment running into the bank. Any town houses go up the hillside above right, never on the left.\n- **Behind:** steep deciduous woods on both gorge sides rising above deck level, with a band of sky only at the top.\n- **Foreground:** the Severn across the full width, with the arch's reflection.\n\n**Why this view.** It is the one standpoint that gets the whole single span, the river it was built to clear for masted boats, and the wooded gorge into one small picture. The arch and its reflection read as a ring even at 92 px. The asymmetric ends (land arches and tollhouse left, masonry right) tell a knowing viewer which way they are facing. It is also the view the first artists took: William Williams painted it from mid-river in 1780. A brochure moves the photographer onto the bank and squares the face up.\n\n**Cropped out:**\n- the second land arch and the south approach\n- St Luke's church, which stands due north of the bridge up the hill, off the right edge\n- the town's riverfront, behind the viewer's right shoulder\n- any other bridge downstream",
   "elements": [
     {
       "element": "Main span",
-      "fact": "A single cast-iron arch of 100 ft 6 in (30.63 m) with no pier in the river, near-semicircular. Ressler calls the arch rings 'semicircular'. Petroski-derived text says the reflection 'completes the semicircular structure to form a wide-open eye'. The code and the README already say semicircular."
+      "fact": "A single cast-iron arch of 100 ft 6 in (30.63 m) with no pier in the river, near-semicircular. Ressler calls the arch rings 'semicircular'. Petroski-derived text says the reflection 'completes the semicircular structure to form a wide-open eye'. The code and the README already say semicircular. A 2026 search summary of the EBSCO Research Starter 'Construction of the First Iron Bridge' also gives a 'single-span semicircular arch' of about 100 ft."
     },
     {
       "element": "Five ribs",
-      "fact": "Five parallel cast-iron rib frames (Wikipedia 2017 citing engineering-timelines; Ressler). Each main rib was cast in two halves, about 70 ft long and about 5¼–5½ tons each, bolted together at the crown (EB 9th ed.: 'Each of the ribs consisted of two pieces'). From the viewpoint only the face rib is seen whole; the other four recede under the arch."
+      "fact": "Five parallel cast-iron rib frames (Wikipedia 2017 citing engineering-timelines; Ressler; EBSCO Research Starter: 'five arch ribs, each cast in two halves'). Each main rib was cast in two halves, about 70 ft long and about 5¼–5½ tons each, bolted together at the crown (EB 9th ed.: 'Each of the ribs consisted of two pieces'). From the viewpoint only the face rib is seen whole; the other four recede under the arch."
     },
     {
       "element": "Face-rib geometry",
@@ -37,7 +37,7 @@
     },
     {
       "element": "Colour",
-      "fact": "Red-brown. English Heritage's £3.6 million conservation of 2017–18 'returned the bridge to its original red-brown colour' (2,400 litres of paint; the bridge reopened in December 2018). The same colour appears in William Williams's 1780 painting and was reported as confirmed by analysis during the conservation. Before that it was grey (2009 photograph). In the 20th century it was not painted at all until 1980."
+      "fact": "A very dark red-brown, a mahogany shade. English Heritage's own press texts (quoted in search results this session): 'Detailed analysis of those samples revealed that the world's first iron bridge was originally painted in a very dark red-brown lead-based oil paint'. The paint consultant Crick-Smith's microscopic analysis concluded 'the earliest paint was a lead oil-paint, dark red-brown in colour'. Six painters applied 2,400 litres to return it to that colour during the £3.6 million 2017–18 conservation; the bridge was fully reopened at the end of 2018. English Heritage says the result matches William Williams's 1780 painting. Before that it was 'black or slate grey' for decades, grey-blue by 2017 (grey in the 2009 photograph). In the 20th century it was not painted at all until 1980 (Wikipedia 2017)."
     },
     {
       "element": "Stone abutments",
@@ -53,7 +53,7 @@
     },
     {
       "element": "Tollhouse",
-      "fact": "A brick house at the south end (Wikipedia 2017 caption: 'The brick tollhouse at one end of the bridge'), on the west side of the approach. A 2020 photograph looks north over the bridge to the town with the tollhouse on its left. It has a pitched slate roof and chimney stacks. According to a local-history source it was open for business from the bridge's opening, 1 January 1781. It was restored as an information centre in the 1970s (the Ironbridge Gorge Museum Trust, 1972, per the same source) and is now run as 'Iron Bridge and Tollhouse'."
+      "fact": "Historic England list entry 1279735 (Grade II, 'Former Toll House of the Iron Bridge', quoted in search results): at the south end of the bridge and 'built against its west side'; red brick; three storeys with the upper storey at bridge level; two windows (now bricked up) with segmental heads; plain eaves; a tile roof, not slate; dated early 19th century. Tolls were charged from the opening on 1 January 1781, but this building is not of 1781: a local-history source's claim that the tollhouse was 'open for business' from that date refers to the toll, not this building. The January 2020 photograph looks north over the bridge to the town with the tollhouse on its left, its roof reading dark grey and a chimney stack on the gable. It became redundant when tolls ended in 1950, was opened as an information centre by the Ironbridge Gorge Museum Trust (1972, per the local source) and is now run as 'Iron Bridge and Tollhouse'."
     },
     {
       "element": "River Severn",
@@ -82,11 +82,11 @@
     "Reverse-curve (ogee) members sit in the spandrel next to each ring and the uprights.",
     "The deck passes over the crown and rises gently to mid-span; it is neither flat nor steeply humped.",
     "A see-through railing of close-set thin vertical bars runs along the deck edge.",
-    "All the ironwork, railings included, is one red-brown: not grey, black, silver, pillar-box red or bright rust-orange.",
+    "All the ironwork, railings included, is one very dark red-brown (mahogany): not grey, black, silver, pillar-box red or bright rust-orange.",
     "Under the arch, further ribs recede behind the face rib as parallel arcs; if they can be counted there are exactly five ribs.",
     "The iron springs from buff-grey stone masonry at both ends; no brick in the bridge itself.",
     "The two ends differ: at the left (south) end, beyond a stone pier, at least one small iron land arch continues the bridge; the right (north) end runs straight into solid masonry.",
-    "A small house with a pitched grey roof and a chimney (the tollhouse) shows behind the left end of the deck, partly hidden by it; nothing like it at the right end.",
+    "A small house with a pitched dark roof and a chimney (the tollhouse) shows behind the left end of the deck, partly hidden by it; nothing like it at the right end.",
     "Steep slopes of deciduous trees rise above deck level on both sides; sky shows only above them.",
     "The river runs under the arch in the foreground and reflects it.",
     "Any town houses are on the right (north) side only.",
@@ -96,7 +96,7 @@
   ],
   "deliberatelyWrong": [
     "The cast inscription along the outer ribs is left off ('This Bridge was cast at Coalbrook-Dale and erected in the year MDCCLXXIX'). The game carries no text, and at 92 × 70 it would be a smudge that reads as dirt.",
-    "The colour is the fresh, even post-2018 red-brown. A real mid-century brochure would have shown an unpainted, weathered bridge: it was not painted at all in the 20th century until 1980, and in 1950 it 'had not been cleaned or painted for many years'. Red-brown is chosen because it is both the colour the bridge wore new (English Heritage's analysis, as reported) and the colour it wears today, so it is right at either end of the story.",
+    "The colour is the fresh, even post-2018 dark red-brown. A real mid-century brochure would have shown an unpainted, weathered bridge: it was not painted at all in the 20th century until 1980, and in 1950 it 'had not been cleaned or painted for many years'. Red-brown is chosen because it is both the colour the bridge wore new (English Heritage's paint analysis: 'a very dark red-brown lead-based oil paint') and the colour it wears today, so it is right at either end of the story.",
     "The face is squared up more than any riverbank standpoint allows, as a brochure artist would redraw it, so it reads as an elevation.",
     "The radial links, the cross-bracing between the five ribs and the dovetail and mortise joinery are reduced to a few strokes. The real count was not verified and does not survive at vignette size.",
     "The railing is simplified to a regular comb of bars between plain posts; the real posts carry cast decoration.",
@@ -109,13 +109,13 @@
   "palette": [
     {
       "name": "Iron paint, sunlit face",
-      "hex": "#9a5638",
-      "material": "Cast iron in the 2018 red-brown paint, face of the ribs and deck fascia in full sun. Taken from photographs: midday January railings measure about #845038 to #926349, and the deck fascia at dawn measures #a3653c before correcting for the warm light."
+      "hex": "#8c4e36",
+      "material": "Cast iron in the 2018 paint, face of the ribs and deck fascia in full sun. English Heritage calls the colour 'very dark red-brown', a mahogany shade, so the sunlit value stays inside the measured midday range rather than the warmer dawn reading: midday January railings measure about #845038 to #926349; the deck fascia at dawn measures #a3653c, which is the warm light, not the paint."
     },
     {
       "name": "Iron paint, base",
-      "hex": "#7f4230",
-      "material": "The same paint as a local colour, for the painter's brush to light and shade."
+      "hex": "#6e3829",
+      "material": "The same paint as a local colour, for the painter's brush to light and shade. Darkened from the earlier #7f4230 to match English Heritage's 'very dark red-brown'."
     },
     {
       "name": "Iron paint, in shade",
@@ -140,12 +140,12 @@
     {
       "name": "Tollhouse brick",
       "hex": "#8b5a45",
-      "material": "The brick walls of the tollhouse. The hex is an estimate: the only photograph shows the walls in shade (about #28211b to #3b3127). At vignette size it is a few pixels."
+      "material": "The red brick walls of the tollhouse (Historic England list entry 1279735). The hex is an estimate: the only photograph shows the walls in shade (about #28211b to #3b3127). At vignette size it is a few pixels."
     },
     {
       "name": "Tollhouse roof",
-      "hex": "#565a63",
-      "material": "Grey slate roof and chimney caps."
+      "hex": "#57565b",
+      "material": "The tile roof (Historic England: 'tile roof', not slate) and chimney caps. The tiles read a weathered dark grey in the January and July 2020 photographs, so the hex stays a dark warm grey; the exact tile colour was not measured in sun."
     },
     {
       "name": "River Severn",
@@ -165,8 +165,9 @@
   ],
   "lighting": "Keep the set's sun, upper right. For a view facing west this is a north-easterly sun low over the viewer's right shoulder. That is true on a summer morning here, not a brochure lie: at 52.63°N near midsummer the sun stays north of due east until about 07:17 local solar time, roughly 08:30 BST, at up to about 30° altitude. The photograph taken at 05:58 BST on 31 July 2020 from this side shows the downstream face lit warmly from the right.\n\nWhat is lit and what is in shade:\n- **Lit:** the face rib, its rings and ogees, the deck fascia, the railing and the viewer-facing masonry of both abutments.\n- **Cool shade:** the underside of the arch, the four ribs receding behind the face rib, the left (shadow) sides of the uprights and piers, and the tollhouse's near wall.\n- **Woods:** the slopes behind stay darker than the bridge, so the red-brown frame reads against them. Use the set's foliage for the sunlit canopy and foliageDark for the shaded slopes.\n- **Reflection:** darker and slightly broken, closing the arch into a near-ring.\n- **Shadows:** the deck may cast a thin shadow onto the upper spandrel.\n\nUse the set's shared sky, sun, shadow and ink.",
   "pitfalls": [
-    "Painting it grey, silver or black. Most photographs from before 2018 show the grey paint of c. 1980–2017 (grey in 2009), and many assume cast iron is black.",
-    "Painting it bright orange rust or pillar-box red. It is a deep red-brown.",
+    "Painting it grey, silver or black. Most photographs from before 2018 show the grey paint of c. 1980–2017 (grey in 2009; 'black or slate grey' for decades, grey-blue by 2017), and many assume cast iron is black. Most early prints are monochrome engravings too: of at least 47 known images before 1845, all but four are grey-black engravings.",
+    "Painting it bright orange rust or pillar-box red. It is a very dark red-brown, a mahogany shade. Dawn photographs make it look orange; that is the light.",
+    "Giving the tollhouse a slate roof or dating it to 1781. The list entry has a tile roof and an early-19th-century date.",
     "Copying the current code silhouette: vertical struts from the arch to the deck across the haunches. The real spandrel is filled by two more concentric ribs that die into the deck, plus radial links.",
     "Putting the rings at the crown or mid-haunch, painting them as solid discs, or leaving out the ogees. The rings sit near the ends beside the uprights.",
     "A flat deck and flat railing. The deck peaks gently over the crown.",
@@ -179,27 +180,26 @@
     "A pointed, elliptical or flattened arch.",
     "Blue, clear water. The Severn in the gorge is olive-green and brown.",
     "Adding traffic. No vehicle has crossed since 18 June 1934.",
-    "Adding the 1909 toll-free concrete bridge or the Coalport bridge, both downstream, or the power-station cooling towers that appear in photographs until their demolition on 6 December 2019.",
+    "Adding any downstream bridge: the Jackfield Free Bridge (a reinforced-concrete two-arch bridge of 1909, replaced by the present Jackfield Bridge, reopened 18 October 1994) or the Coalport bridge. Also leave out the Ironbridge power-station cooling towers, which appear in photographs until their demolition on 6 December 2019.",
     "Conifer forest. The gorge woods are deciduous broadleaf.",
     "Painting the cast inscription or the toll board as lettering."
   ],
   "gate6": "clear. Engineering, a scheduled monument and a working footbridge. No worship, no graves, no atrocity. The Coalport ferry drowning of 1799 happened downstream at Coalport, not here, and nothing of it is in frame. The no-text rule, not gate 6, keeps the cast inscription and the toll board out.",
   "contested": [
     "Who designed it. The rings and ogees match a gazebo Pritchard rebuilt, which suggests the final design was his (Wikipedia 2017, citing Smith 1979). Smiles (1863) says Pritchard's plan used iron only at the crown and was set aside for a design by Darby's pattern-maker Thomas Gregory. Pevsner says the executed design is 'probably Abraham Darby's'. Keep open.",
-    "The colour of Williams's 1780 painting. Before 2018 it was read as rust on unpainted iron (Wikipedia caption, January 2017: 'rust-red in colour, suggesting that it was unpainted'). The 2017–18 English Heritage conservation took it as the original red-brown paint, reportedly confirmed by paint analysis. The primary English Heritage statement could not be fetched this session. Simple English Wikipedia dates the painting 1777, which is wrong: it is 1780.",
+    "The reading of Williams's 1780 painting. Before 2018 it was read as rust on unpainted iron (Wikipedia caption, January 2017: 'rust-red in colour, suggesting that it was unpainted'). English Heritage's 2018 paint analysis (Crick-Smith, microscopic sampling) found the earliest coat was a dark red-brown lead oil paint and says the painting shows that paint, so the rust reading is superseded for the bridge's colour. What remains open is only how literally Williams recorded it; the other early colour images disagree in shade (Robertson 1788 'dark red', Varley c. 1802 'reddy-brown', Westwood 1835 'pinkish'). Simple English Wikipedia dates the painting 1777, which is wrong: it is 1780.",
     "The number of parts. Older accounts (Wikipedia 2007) give 'more than 800 castings of 12 basic types'; later ones (Wikipedia 2017, citing engineering-timelines) give 'almost 1,700 individual components'.",
     "The weight. 378½ tons (EB 7th ed.; Wikipedia's '378 long tons 10 cwt'), '379 tons' (Wikipedia 2007) and 'nearly 400 tons' (popular accounts). The figures are close.",
-    "The height. 'Rising to 60 feet above the river' (Wikipedia 2007) against 'the main arch spans 100 feet and it's 40 feet high' (Ressler), though Ressler also calls the arch rings semicircular. The painting follows the near-semicircular shape that all sources and photographs agree on, not a figure.",
+    "The height. 'Rising to 60 feet above the river' (Wikipedia 2007; a 2026 secondary summary says 60 ft above high water, to the deck, not the arch's rise) against 'the main arch spans 100 feet and it's 40 feet high' (Ressler), though Ressler also calls the arch rings semicircular. The painting follows the near-semicircular shape that all sources and photographs agree on, not a figure.",
     "The opening date. 1 January 1781 (Cossons & Trinder via Wikipedia; local sources). Smiles (1863) says 'opened for traffic in 1779', running it together with the 1779 erection.",
     "The land-arch dates. Smiles puts 'two small land arches' on the Broseley side in 1800. Wikipedia 2007 has the south stone abutment demolished by 1802 and replaced by temporary timber arches. Wikipedia 2017 (Cossons & Trinder) has timber from repairs begun in 1800 and cast iron from December 1820.",
-    "The date of Rooker's view. arc.md lists 'Rooker engraving 1782'. A Petroski-derived essay calls it 'his 1792 painting'. Neither was checkable this session.",
-    "The tollhouse's building date. A local-history source says it was open for business from 1 January 1781. The building's own date was not confirmed against its list entry, which was unreachable."
+    "Where tolls were taken before the present tollhouse. Tolls were charged from 1 January 1781, but the standing tollhouse is dated early 19th century by its list entry (1279735). Whether an earlier toll building stood there was not established."
   ],
   "sources": [
     {
       "title": "Wikipedia, 'The Iron Bridge', revision 762443703 (January 2017)",
       "url": "https://en.wikipedia.org/w/index.php?title=The_Iron_Bridge&oldid=762443703",
-      "detail": "Read from a copy on GitHub (raw.githubusercontent.com/SoominHeo/data/a6adaa59/wiki/sample/random_sample1/eng/8946.txt) because en.wikipedia.org is blocked in this session. Cites Cossons & Trinder 2002, English Heritage and engineering-timelines. Used for: span 100 ft 6 in; five ribs; 378 t 10 cwt; about 1,700 parts; the rings and ogees and Pritchard's gazebo; two south cast-iron land arches and the north stone arch; repairs of 1783, 1784, 1791, 1792 and 1800; iron land arches December 1820; the 1902 parapet collapse; closure 18 June 1934; tolls to 1950; the 1972–75 invert and stone renewal; the 1980 painting 'for the first time in the 20th century'; the 1999–2000 repaint; the brick tollhouse; the town at the north end; the Williams 1780 painting 'from mid-river'."
+      "detail": "Read from a copy on GitHub (raw.githubusercontent.com/SoominHeo/data/a6adaa59/wiki/sample/random_sample1/eng/8946.txt) because en.wikipedia.org is blocked; re-fetched and re-checked on 2026-09-23 for November 1777, 2 July 1779, 1 January 1781, 378 long tons 10 cwt, almost 1,700 components, cracks December 1784, iron land arches December 1820, closure 'with effect from 18 June 1934' and tolls to 1950. Cites Cossons & Trinder 2002, English Heritage and engineering-timelines. Used for: span 100 ft 6 in; five ribs; 378 t 10 cwt; about 1,700 parts; the rings and ogees and Pritchard's gazebo; two south cast-iron land arches and the north stone arch; repairs of 1783, 1784, 1791, 1792 and 1800; iron land arches December 1820; the 1902 parapet collapse; closure 18 June 1934; tolls to 1950; the 1972–75 invert and stone renewal; the 1980 painting 'for the first time in the 20th century'; the 1999–2000 repaint; the brick tollhouse; the town at the north end; the Williams 1780 painting 'from mid-river'."
     },
     {
       "title": "Cossons, N. and Trinder, B., The Iron Bridge: Symbol of the Industrial Revolution (Phillimore, 2002; first edition 1979)",
@@ -233,7 +233,7 @@
     {
       "title": "Shropshire Notebook (dmfbsh/salop), history entries and photographs",
       "url": "https://raw.githubusercontent.com/dmfbsh/salop/7bbb74f64c958fe8a3f513825d40cea41cbd9f2e/_data_source/Shropshire_Notebook-History.md",
-      "detail": "Local-history site. Text: the English Heritage project cost £3.6 million and 'returned the bridge to its original red-brown colour (which took 2400 litres of paint)'; the tollhouse was open for business from 1 January 1781 and the Ironbridge Gorge Museum Trust opened it as a Tourist Information Centre in 1972; the cooling towers were demolished on 6 December 2019. Its photographs (the photographer's copyright, for reference only, never for the repository) were examined and colour-sampled: 1shropshire/assets/images/history/2009-04-19_17-41-55_00006342.jpg (grey paint, north end, rings and ogees, south pier and land arch), 2020-07-31_05_58_17_DSC_7646.jpg (red-brown, from the downstream north bank, tollhouse behind the south end, the inscription on the outer rib, lit from the right at 05:58 BST), and 2020-01-12_12_28_07_DSC_6193.jpg (tollhouse on the west of the south approach, red-brown railings, the town and St Luke's to the north)."
+      "detail": "Local-history site. Text: the English Heritage project cost £3.6 million and 'returned the bridge to its original red-brown colour (which took 2400 litres of paint)'; the tollhouse was open for business from 1 January 1781 and the Ironbridge Gorge Museum Trust opened it as a Tourist Information Centre in 1972; the cooling towers were demolished on 6 December 2019. Its photographs (the photographer's copyright, for reference only, never for the repository) were examined and colour-sampled: 1shropshire/assets/images/history/2009-04-19_17-41-55_00006342.jpg (grey paint, north end, rings and ogees, south pier and land arch), 2020-07-31_05_58_17_DSC_7646.jpg (red-brown, from the downstream north bank, tollhouse behind the south end, the inscription on the outer rib, lit from the right at 05:58 BST), and 2020-01-12_12_28_07_DSC_6193.jpg (tollhouse on the west of the south approach, red-brown railings, the town and St Luke's to the north). All three were downloaded again from raw.githubusercontent.com and viewed directly in the verification pass of 2026-09-23: the July 2020 view confirms the stone pier and iron land arch at the left end, solid masonry at the right, the deck and railing rising to mid-span, and the tollhouse's dark roof and chimney above the deck at the left; the January 2020 view confirms the tollhouse on the left looking north, its dark roof and gable chimney, and St Luke's tower ahead."
     },
     {
       "title": "Qualla, 'The Iron Bridge' summary with Wikimedia Commons image metadata",
@@ -249,13 +249,34 @@
       "detail": "Public-domain visual reference: the bridge seen from mid-river, the red-brown ironwork, the gorge. Darby paid Williams 10 guineas in October 1780. Not viewed this session."
     },
     {
-      "title": "Michael Angelo Rooker, The Cast Iron Bridge near Coalbrookdale (engraving, 1782 per arc.md)",
-      "detail": "Public domain. It shows a towpath passing through an arch in an abutment, according to a Petroski-derived description. Not viewed this session."
+      "title": "William Ellis after Michael Angelo Rooker, 'The Cast Iron Bridge near Coalbrookdale' (engraving, published by J. Phillips, London, 1782)",
+      "url": "https://www.monticello.org/research-education/thomas-jefferson-encyclopedia/coalbrookdale-iron-bridge/",
+      "detail": "Public domain. Date and engraver confirmed from search-result text of the Monticello encyclopedia entry (Jefferson bought a copy) and an Alamy caption ('Cast Iron Bridge near Coalbrookdale, Shropshire', 1782. By W. Ellis after Michael Angelo Rooker). The '1792 painting' in a Petroski-derived essay is wrong for this print. It shows a towpath through an arch in an abutment, according to that essay. The image itself was not viewed; the pages were blocked to direct fetch."
     },
     {
-      "title": "English Heritage, Iron Bridge (site authority)",
-      "url": "https://www.english-heritage.org.uk/visit/places/iron-bridge/",
-      "detail": "The primary authority for the 2017–18 conservation and the paint analysis. Blocked by the egress proxy this session. Confirm the red-brown finding here before this note is marked high confidence."
+      "title": "English Heritage, 'English Heritage experts uncover original colour of the Iron Bridge' (press release, May 2018) and 'The Iron Bridge reopens to the public following £3.6 million project'",
+      "url": "https://www.english-heritage.org.uk/about/search-news/iron-bridge-colour/",
+      "detail": "Primary authority for the colour. Direct fetch was blocked by the egress proxy, but its text was reached through search results this session (also mirrored at wired-gov.net, 17 May 2018): samples from inaccessible parts and detached pieces; 'originally painted in a very dark red-brown lead-based oil paint'; Crick-Smith's microscopic analysis, 'the earliest paint was a lead oil-paint, dark red-brown in colour'; 'a red-brown, mahogany shade'; previously 'black or slate grey' for decades, grey-blue before the work; of at least 47 images before 1845 all but four are grey-black engravings; six painters, 2,400 litres; the same colour as William Williams's 1780 painting. Reopening text: https://www.english-heritage.org.uk/about/search-news/the-iron-bridge-saved"
+    },
+    {
+      "title": "Historic England, list entry 1279735, 'Former Toll House of the Iron Bridge (Ironbridge Gorge Museum Trust Information Centre)', Grade II",
+      "url": "https://historicengland.org.uk/listing/the-list/list-entry/1279735",
+      "detail": "Blocked to direct fetch; the entry text was quoted in two search results this session: south end of the bridge, built against its west side; red brick; three storeys, upper storey at bridge level; two bricked-up windows with segmental heads; plain eaves; tile roof; early C19. Corrects the earlier 'slate roof' and the 1781 building date."
+    },
+    {
+      "title": "EBSCO Research Starters, 'Construction of the First Iron Bridge'",
+      "url": "https://www.ebsco.com/research-starters/history/construction-first-iron-bridge",
+      "detail": "Search-result text only: single-span semicircular arch of about 100 ft, five arch ribs each cast in two halves, about 1,700 cast-iron pieces, 378 tons, opened 1 January 1781."
+    },
+    {
+      "title": "ITV News Central, 'Ironbridge power station cooling towers are demolished', 6 December 2019",
+      "url": "https://www.itv.com/news/central/2019-12-06/ironbridge-power-station-cooling-towers-are-demolished",
+      "detail": "Search-result text: the four cooling towers were demolished on 6 December 2019."
+    },
+    {
+      "title": "Structurae, 'Jackfield Bridge (Ironbridge, 1994)', and Wikimedia Commons 'Category:Jackfield Bridge (1994)'",
+      "url": "https://structurae.net/en/structures/jackfield-bridge",
+      "detail": "Search-result text: the 1994 Jackfield Bridge replaced the Jackfield Free Bridge, a reinforced-concrete open-spandrel two-arch bridge opened in 1909; reopened 18 October 1994. Used only for the pitfall about downstream bridges."
     },
     {
       "title": "UNESCO World Heritage Centre, Ironbridge Gorge (371)",
@@ -269,7 +290,7 @@
     "src/map/monuments.ts, 'iron-bridge': the deck is a flat box. The real deck rises gently to a slight peak over the crown.",
     "src/map/monuments.ts, 'iron-bridge': the ends are mirror images. The real bridge is asymmetrical: two small cast-iron land arches continue it at the south end (left from downstream), and the north end is solid masonry.",
     "content/map/README.md, vignettes table row 11: 'One semicircular arch of cast iron, the deck carried over the crown, and the rings in the spandrels' is correct but leaves out what makes the outline this bridge. It should add the two outer concentric ribs that end at the deck, the masonry abutments, and the south land arches.",
-    "content/research/arc.md, chapter 11: nothing wrong found. 1777–1781, 'first major cast-iron arch' and the cracks and ground-movement repairs (1784, 1791, 1792, 1800, 1820, 1972–75) are all confirmed. 'Rooker engraving 1782' could not be checked this session, and one secondary text dates Rooker's view 1792. src/map/atlas.ts (52.63, −2.49) matches the bridge's coordinates (52.627, −2.486)."
+    "content/research/arc.md, chapter 11: nothing wrong found. 1777–1781, 'first major cast-iron arch' and the cracks and ground-movement repairs (1784, 1791, 1792, 1800, 1820, 1972–75) are all confirmed. 'Rooker engraving 1782' is confirmed: the engraving is by William Ellis after Rooker's drawing, published by J. Phillips in London in 1782; arc.md's shorthand is acceptable, but 'Ellis after Rooker' is the exact credit. src/map/atlas.ts (52.63, −2.49) matches the bridge's coordinates (52.627, −2.486)."
   ],
-  "confidence": "Medium.\n\n**What limited checking.** The session's web-search budget was already used up (200 of 200). The egress proxy blocked English Heritage, Historic England, UNESCO, Wikipedia, Wikimedia Commons, archive.org and Britannica. Checking therefore went through GitHub-hosted copies:\n- a January 2017 Wikipedia revision citing Cossons & Trinder\n- the transcript of Ressler's engineering lecture\n- two public-domain Britannica articles\n- Smiles (1863)\n- a local-history site with three dated photographs, examined and colour-sampled\n\n**High confidence:** the structure (single near-semicircular span of 100 ft 6 in, five ribs, three concentric arcs per face, end uprights, a ring and ogees near each end, humped deck, masonry abutments, two iron land arches at the south end only), the orientation (east face downstream, tollhouse south and west of the approach, town north), and the red-brown colour since 2018, grey before.\n\n**Medium:** that English Heritage chose red-brown from paint analysis as the original colour. Two independent secondary reports say so and the 1780 painting agrees, but the primary English Heritage statement was unreachable.\n\n**Low:** the tollhouse's building date (one local source) and the tollhouse brick hex (estimated from a shaded photograph).\n\nBefore this note is marked high, confirm the red-brown analysis on the English Heritage site and the tollhouse on its Historic England list entry."
+  "confidence": "Medium-high (verification pass, 2026-09-23).\n\n**Verification pass.** Twelve web searches (the full budget) were used; every direct fetch of a non-GitHub page was blocked by the egress proxy (English Heritage, Historic England, geograph, Wikimedia upload, ASCE, IHBC, trade and news sites), so primary texts were read through search-result quotations. Confirmed: English Heritage's paint analysis of 2018 (very dark red-brown lead oil paint, Crick-Smith), the 2017–18 £3.6 million project and 2,400 litres; five ribs cast in halves, a semicircular single span of about 100 ft, about 1,700 parts, 378 tons, 1 January 1781 opening; closure to vehicles 1934 and tolls to 1950; the 1902 parapet fall; Rooker's view as Ellis's 1782 engraving; the cooling-tower demolition on 6 December 2019. Corrected: the tollhouse has a tile roof (not slate) and is early 19th century (not 1781), per its list entry; the 1909 concrete Free Bridge was replaced in 1994; the iron paint hexes were darkened to English Heritage's 'very dark red-brown'. The three reference photographs were downloaded and viewed directly, confirming the view's layout. Still not reached: the English Heritage and Historic England pages themselves, the Rooker and Williams images, and the tollhouse roof colour in sun.\n\n**Original note (first pass).** Medium.\n\n**What limited checking.** The session's web-search budget was already used up (200 of 200). The egress proxy blocked English Heritage, Historic England, UNESCO, Wikipedia, Wikimedia Commons, archive.org and Britannica. Checking therefore went through GitHub-hosted copies:\n- a January 2017 Wikipedia revision citing Cossons & Trinder\n- the transcript of Ressler's engineering lecture\n- two public-domain Britannica articles\n- Smiles (1863)\n- a local-history site with three dated photographs, examined and colour-sampled\n\n**High confidence:** the structure (single near-semicircular span of 100 ft 6 in, five ribs, three concentric arcs per face, end uprights, a ring and ogees near each end, humped deck, masonry abutments, two iron land arches at the south end only), the orientation (east face downstream, tollhouse south and west of the approach, town north), and the red-brown colour since 2018, grey before.\n\n**Medium (now raised to high by the verification pass):** that English Heritage chose red-brown from paint analysis as the original colour; English Heritage's own press text was reached through search results.\n\n**Low:** the tollhouse brick hex and roof hex (estimated from shaded photographs). The tollhouse's building date, low in the first pass, is now settled as early 19th century by its list entry.\n\nBefore this note is marked high, read the English Heritage press release and the Historic England entries 1279735 and 1015325 directly, and view the Williams painting and the Ellis-after-Rooker engraving."
 }

@@ -1,19 +1,19 @@
 {
   "art": "tiered-roofs",
   "site": "Himeji Castle (Himeji-jō, \"White Egret Castle\"), on Himeyama hill in Himeji, Hyōgo, Japan. Chapter 8, East Asia (ch08_east_asia), slug himeji, vignette id map-monument-ch08-himeji. The atlas position 34.84 N, 134.69 E is correct.",
-  "view": "The postcard view from the Sannomaru hiroba, the big lawn just inside Otemon at the south of the castle. The viewer stands near the south end of the lawn and looks north-north-east up at the hilltop.\n\nIn frame: the connected keep complex on the skyline. The main keep is right of centre, highest and largest. To its left and lower are the West small keep, with the Inui (north-west) small keep behind it, joined to the main keep by the low Ha corridor-turret (watari-yagura). Every building is white plaster under grey tile. Beneath the complex is one tall stone wall with a concave face, steep at the top and flaring at the foot, topped by a white plaster wall with a grey tile coping. At the foot of the frame is a band of dark pines, with a sliver of lawn or pale gravel.\n\nCropped out:\n- Otemon, which is behind the viewer and is a 1938 rebuild anyway.\n- The Nishi-no-maru long corridor at the far left.\n- The Hishi-no-mon and the lower gates.\n- The East small keep, which is hidden behind the main keep from this side anyway.\n- People, lamps, scaffolding and any modern fittings.\n\nWhy this view: it is the one every brochure and postcard prints, the white keep standing over its walls. The cluster of small keeps is what tells Himeji apart from a generic single-keep castle. The curved stone wall is the chapter's signature mechanic in arc.md (\"the curved batter of the wall face\"). The complex is wider than tall, which suits the 92 x 70 landscape frame.",
+  "view": "The postcard view from the Sannomaru hiroba, the big lawn just inside Otemon at the south of the castle. The viewer stands near the south end of the lawn and looks north up at the hilltop.\n\nIn frame: the connected keep complex on the skyline. The main keep, which stands at the south-east corner of the complex, is right of centre, highest and largest. To its left and lower is the West small keep (Nishi-kotenshu), joined to the main keep by a low two-storey corridor-turret (watari-yagura); the Inui (north-west) small keep may show further left and behind it. Every building is white plaster under grey tile. Beneath the complex is one tall stone wall with a concave face, steeper at the top and flaring at the foot, topped by a white plaster wall with a grey tile coping. At the foot of the frame is a band of dark pines, with a sliver of lawn or pale gravel.\n\nCropped out:\n- Otemon, which is behind the viewer and is a 1938 construction, not an original gate.\n- The corner turret of the Kamiyamazato bailey and the Ri-1 and Ri-2 corridor-turrets, which stand below and to the left of the West small keep in this view; they are folded into the single wall.\n- The Nishi-no-maru long corridor at the far left.\n- The Hishi-no-mon and the lower gates.\n- The East small keep, which stands north of the main keep and is behind it from this side.\n- People, lamps, scaffolding and any modern fittings.\n\nWhy this view: it is the one every brochure and postcard prints, the white keep standing over its walls. The small keep beside the main keep is what tells Himeji apart from a generic single-keep castle. The curved stone wall is the chapter's signature mechanic in arc.md (\"the curved batter of the wall face\"). The complex is wider than tall, which suits the 92 x 70 landscape frame.",
   "elements": [
     {
       "element": "Main keep (dai-tenshu)",
-      "fact": "Five roof tiers outside, six floors inside plus one basement (五重六階地下一階). About 31.5 m tall on a stone base of about 14.85 m, about 46 m overall. It is of the lookout type (bōrō-gata): a large hip-and-gable lower block with the upper storeys set on it. Each storey is narrower than the one below. The frame is timber, entirely coated in white lime plaster (白漆喰総塗籠)."
+      "fact": "Five roof tiers outside, six floors inside plus one basement (五重六階地下一階). About 31.5 m tall (31.49 m) on a stone base of 14.85 m, about 46 m overall. It is of the lookout type (bōrō-gata): a large hip-and-gable lower block with the upper storeys set on it. Each storey is narrower than the one below. The frame is timber, entirely coated in white lime plaster (白漆喰総塗籠)."
     },
     {
       "element": "Main keep gables",
-      "fact": "The faces carry a mix of triangular gables (irimoya-hafu and chidori-hafu, including a pair set side by side, 比翼) and curved kara-hafu. The arrangement differs from tier to tier and from face to face, so the keep never reads as a stack of identical roofs. Which gable type sits on which tier of the south face was NOT verified in this pass; take it from a photograph."
+      "fact": "The faces carry a mix of triangular gables (irimoya-hafu and chidori-hafu, including a pair set side by side, 比翼入母屋破風) and curved eave gables (noki kara-hafu), arranged differently tier by tier and face by face. On the south face, as the Himeji City official tier pages are summarised in search results (the pages themselves could not be opened): tier 2 has a curved kara-hafu at the centre over a large lattice window, with the great hip-and-gable roof of the lower block crossing east-west above it; tier 3 has the paired hip-and-gable gables (比翼); tier 4 has triangular chidori-hafu (its curved gables are on the east and west faces); the top tier has a curved kara-hafu on the south face, and its roof's gable ends face east and west. Tier 1 of the south face was not verified. Medium confidence: check the whole sequence against a photograph of the south face before painting."
     },
     {
       "element": "Top roof and shachihoko",
-      "fact": "The top ridge ends in two shachihoko (a fish with a tiger's head), one at each end. They are fired grey tile like the roof, not gold (gold is Nagoya). There is no central spire or finial."
+      "fact": "The top roof is hip-and-gable with its gable ends to east and west, so from the south its ridge runs across the picture and ends in two shachihoko (a fish with a tiger's head), one at the left end and one at the right. They are fired grey tile like the roof, not gold (gold is Nagoya). There is no central spire or finial. Smaller shachihoko also sit on lower ridge ends; one Himeji guide counts eleven on the main keep."
     },
     {
       "element": "Roofs",
@@ -25,15 +25,15 @@
     },
     {
       "element": "Windows",
-      "fact": "Small rectangular lattice windows in rows, read as dark openings in the white walls. There is no external balcony or railing on any storey."
+      "fact": "The main keep has rows of rectangular lattice windows, read as dark openings in the white walls, including a larger lattice window under the tier-2 kara-hafu on the south face. There is no external balcony or railing on any storey. The small keeps are different at the top: the West small keep has a bell-shaped katōmado (華頭窓) with lattice on the south side of its top floor, and the Inui small keep has katōmado without lattice on its top-floor west and south sides."
     },
     {
       "element": "Smaller keeps (ko-tenshu) and corridors",
-      "fact": "The keep is a connected complex (連立式天守): the main keep, East, West and Inui (north-west) small keeps, and four corridor-turrets (the I, Ro, Ha and Ni watari-yagura) round a courtyard. All eight are National Treasures, designated 1951. Seen from the south, the West small keep stands left of the main keep, joined by the Ha corridor-turret, with the Inui keep behind it further left. The East keep sits north of the main keep, behind it. Each small keep is much lower, with (to my knowledge) three roof tiers; medium confidence on the tier count."
+      "fact": "The keep is a connected complex (連立式天守): the main keep at the south-east corner, the East, West and Inui (north-west) small keeps, and four two-storey corridor-turrets (the I, Ro, Ha and Ni watari-yagura) joining them in a square round a courtyard. All eight are National Treasures (designated 1951, not re-verified here). Every small keep has three roof tiers: the East small keep three floors and one basement, the West small keep three floors and two basements, and the Inui small keep, the largest of the three, four floors and one basement. From the Sannomaru the West small keep stands left of the main keep; the Inui keep lies further left and behind; the East keep is north of the main keep, behind it. Which lettered corridor-turret joins which pair could not be settled: search summaries disagreed, so the letters are left off the painting note."
     },
     {
       "element": "Stone walls (ishigaki)",
-      "fact": "The face is concave, steep near the top and splaying outward at the foot: the 'fan slope' (扇の勾配, ōgi no kōbai), also called sori (反り). The stones are irregular, roughly fitted and wedge-packed (the Ikeda-era walls are mostly uchikomi-hagi). The corners are laid long-and-short alternately (sangi-zumi). The colour is mixed warm grey and grey-brown with dark joints. It is not brick, not smooth ashlar, not a straight slope and not domed."
+      "fact": "The face is concave, steeper near the top and splaying outward at the foot: the 'fan slope' (扇の勾配, ōgi no kōbai), also called sori (反り). The honmaru walls are mostly Ikeda-era (1601–09): roughly dressed, fitted stones packed with wedge stones (uchikomi-hagi), with corners laid long-and-short alternately (sangi-zumi). The older Hashiba-era walls (1580–82), mostly in the Ni-no-maru, are rougher unworked stone (nozura-zumi). The curve is gentle: one guide gives about 65 degrees at the foot rising to about 70 near the top. The colour is mixed warm grey and grey-brown with dark joints. It is not brick, not smooth ashlar, not a straight slope and not domed."
     },
     {
       "element": "Plaster walls (dobei) along the terraces",
@@ -41,11 +41,11 @@
     },
     {
       "element": "Setting",
-      "fact": "The keep stands on Himeyama hill, not at the waterside; the inner moat is far below and behind the viewer on this line. Pines grow on the slopes. The Sannomaru lawn and pale decomposed-granite (masa) gravel paths are in the foreground. The cherry trees in the grounds are real but largely modern plantings, so their omission is a choice, not a correction."
+      "fact": "The keep stands on Himeyama hill, not at the waterside; the inner moat is far below and behind the viewer on this line. Pines grow on the slopes. The Sannomaru lawn and pale decomposed-granite (masa) gravel paths are in the foreground. Otemon was built in 1938 and the Sakuramon bridge in front of it in 2007. The cherry trees in the grounds are real but largely modern plantings, so their omission is a choice, not a correction."
     },
     {
       "element": "Date",
-      "fact": "The present keep complex was built by Ikeda Terumasa in 1601–1609. The west bailey (Nishi-no-maru) was added by Honda Tadamasa in 1617–18. An earlier three-storey keep built by Hideyoshi in 1581 was replaced. By tradition the castle was founded by the Akamatsu clan in 1333 or 1346. The standing fabric falls 1 to 9 years past the chapter window of AD 600–1600. This is noted only; the chapter is unchanged. Restorations: the Shōwa dismantle-and-rebuild of the main keep, 1956–64, and the Heisei re-plastering and re-roofing, 2009–15, reopened March 2015. UNESCO World Heritage, 1993."
+      "fact": "The present keep complex was built by Ikeda Terumasa in 1601–1609. The west bailey (Nishi-no-maru) was added by Honda Tadamasa in 1617–18. An earlier three-storey keep built by Hideyoshi in 1581 was replaced. By tradition the castle was founded by the Akamatsu clan in 1333 or 1346. The standing fabric falls 1 to 9 years past the chapter window of AD 600–1600. This is noted only; the chapter is unchanged. Restorations: the Shōwa dismantle-and-rebuild of the main keep, 1956–64, and the Heisei restoration, 2009–15, which re-laid all of the main keep's roughly 75,000 roof tiles, renewed the wall plaster and the tile-joint plaster, and reopened on 27 March 2015. UNESCO World Heritage, 1993."
     }
   ],
   "mustBeRight": [
@@ -53,16 +53,16 @@
     "The main keep is the tallest and largest building in the picture.",
     "Each storey of the main keep is narrower than the one below it.",
     "The main keep's gables differ from tier to tier; the keep is not a stack of identical roofs like a pagoda.",
-    "The main keep shows both triangular gables and at least one curved (kara-hafu) gable.",
-    "The top ridge carries two fish ornaments (shachihoko), one at each end; there is no single central spike.",
+    "The main keep's south face shows both triangular gables and curved kara-hafu gables; the top tier carries a kara-hafu under the top roof.",
+    "The top ridge runs left to right across the picture and carries two fish ornaments (shachihoko), one at each end; there is no single central spike.",
     "The shachihoko are grey like the roof tiles, not gold.",
     "All building walls are white plaster from the stone to the eaves; no black boarding and no exposed brown timber.",
     "The band under every eave is shadow on white plaster, not brown rafters.",
     "The roofs are grey tile; not green copper, not blue, not black, not orange.",
     "No gold appears anywhere on the buildings.",
     "No storey has an outside balcony or railing.",
-    "Windows are small dark rectangles in rows, not large panes or arched openings.",
-    "At least one smaller keep stands to the LEFT of the main keep, much lower and with fewer roof tiers, joined to it by a low connecting building.",
+    "The main keep's windows are small dark rectangles in rows, not large glass panes and not arched openings.",
+    "The West small keep stands to the LEFT of the main keep, much lower, with three roof tiers, joined to it by a low connecting building.",
     "No smaller keep stands to the right of the main keep at the same depth.",
     "The stone wall under the keeps has a concave face: steeper at the top than at the foot, flaring outward at the base.",
     "The stone wall is irregular fitted stones, not brick courses and not smooth blocks.",
@@ -72,8 +72,9 @@
   ],
   "deliberatelyWrong": [
     "The several walled terraces between the Sannomaru and the keep (the gates, the Bizen-maru and the keep's own base) are compressed into one tall curved stone wall directly under the keep complex. At 92 x 70 the stacked terraces read as noise, and the concave batter is the chapter's signature mechanic, so it is given one clean wall.",
-    "Window lattice bars, loopholes, crest tiles, gable pendants (gegyo) and individual tiles are reduced to dark marks and a few white joint lines, or left out. They are below the scale of the vignette.",
-    "Otemon (a 1938 rebuild), the Hishi-no-mon, the lower turrets and the Nishi-no-maru long corridor are left out, so the keep complex reads as one shape.",
+    "The concavity of the stone face is drawn stronger than it is. The real change of angle is only a few degrees (about 65 to 70 degrees by one guide), which would read as a straight slope at 92 x 70; the exaggeration keeps the direction right: steep above, flared at the foot.",
+    "Window lattice bars, loopholes, crest tiles, gable pendants (gegyo), the smaller shachihoko on the lower ridges and individual tiles are reduced to dark marks and a few white joint lines, or left out. They are below the scale of the vignette. The bell-shaped katōmado on the small keeps' top floors may likewise be reduced to dark rectangles.",
+    "Otemon (a 1938 building), the Hishi-no-mon, the lower turrets (including the Kamiyamazato corner turret and the Ri-1 and Ri-2 corridor-turrets below the West small keep) and the Nishi-no-maru long corridor are left out, so the keep complex reads as one shape.",
     "The shachihoko may be drawn up to about twice their true size, so that two read as two at 92 x 70 rather than vanishing into the ridge.",
     "The sky, the pine greens and the cheer are the set's brochure colours, not a real day's. The season is unspecified and cherry blossom is left out on purpose."
   ],
@@ -134,7 +135,7 @@
       "material": "Japanese black pine on Himeyama: darker and bluer than the set's foliage, which stays for the Sannomaru lawn"
     }
   ],
-  "lighting": "Bright late-morning sun from the upper right, as the set fixes for every asset. With the view facing north-north-east, that means light from the east-south-east, behind the viewer's right shoulder.\n\n- **The keep:** the south faces are lit. The right-hand side of each projecting gable is brightest, and the left-hand sides and the west faces of the small keeps are in cool shade (plaster mixed with the set's shadow colour, never grey paint).\n- **Under the eaves:** under every roof tier runs a band of cool shadow on white. This rhythm of white storey and shadow band is what makes the keep read as tiered.\n- **Roofs:** sunlit slopes are silver-grey with fine white joint lines; the eave edges are darker.\n- **The stone wall:** the concavity is shown with light. The steep upper part is darker, and the flared foot faces more of the sky and is lighter, so the curve reads as a gradient rather than an outline.\n- **Pines:** dark, with sun catching their right-hand edges.\n\nThe white has changed over time. The castle is at its whitest since the 2009–15 restoration, when the plaster and the tile-joint plaster were renewed; photographs from before 2009 show it much greyer. Brochure white is right for today.",
+  "lighting": "Bright late-morning sun from the upper right, as the set fixes for every asset. With the view facing north, that means light from the south-east, behind the viewer's right shoulder.\n\n- **The keep:** the south faces are lit. The right-hand side of each projecting gable is brightest, and the left-hand sides and the west faces of the small keeps are in cool shade (plaster mixed with the set's shadow colour, never grey paint).\n- **Under the eaves:** under every roof tier runs a band of cool shadow on white. This rhythm of white storey and shadow band is what makes the keep read as tiered.\n- **Roofs:** sunlit slopes are silver-grey with fine white joint lines; the eave edges are darker.\n- **The stone wall:** the concavity is shown with light. The steep upper part is darker, and the flared foot faces more of the sky and is lighter, so the curve reads as a gradient rather than an outline.\n- **Pines:** dark, with sun catching their right-hand edges.\n\nThe white has changed over time. The castle was at its whitest when it reopened in March 2015, after the plaster and the tile-joint plaster were renewed; photographs from before 2009 show it much greyer. The walls stay white, but the joint plaster on the roofs was expected to darken with mould and dirt within four or five years, so by the 2020s the roofs read greyer than the 2015 brochures. Brochure white walls are right; keep the white joint lines on the roofs fine and slightly muted.",
   "pitfalls": [
     "Painting a pagoda: a symmetrical stack of identical shrinking roofs with a central spire. Himeji is a lookout-type keep with irregular gables that differ tier to tier, and its top ridge has two shachihoko, one at each end.",
     "Gold shachihoko, which belong to Nagoya, or gold trim and green copper roofs, which belong to the Osaka reconstruction.",
@@ -143,37 +144,40 @@
     "A railed balcony round the top storey (Inuyama and several concrete rebuilds have one; Himeji does not).",
     "Sweeping upturned Chinese eaves. The Japanese corner lift is slight.",
     "A straight trapezoid stone base, as the current code draws it, or a convex, domed one. The face is concave.",
-    "Mirror-reversing the complex: from the south the small keeps are on the left. Small keeps on the right is the view from the north.",
+    "Mirror-reversing the complex: the main keep is at the south-east corner, so from the south the small keeps are on the left. Small keeps on the right is the view from the north.",
     "Putting the East small keep beside the main keep; from the south it is behind it.",
     "Moat water lapping at the keep's foot. The keep is on a hilltop and the moats are far below.",
     "Mount Fuji in the background (Himeji is in Hyōgo, some 400 km away), cherry blossom everywhere, red torii, or Otemon in the foreground as if it were an original gate.",
     "Painting the keep as stone. Only the base is stone; the keep is a plastered timber frame.",
-    "Placing gable types tier by tier from memory. The per-tier arrangement on the south face was not verified here, so copy it from a photograph."
+    "Placing gable types tier by tier from memory. The per-tier arrangement on the south face was not verified here, so copy it from a photograph.",
+    "Giving the main keep arched (katōmado) windows. On this side the bell-shaped windows belong to the top floors of the West and Inui small keeps, not the main keep."
   ],
-  "gate6": "Clear for the exterior vignette: it shows a fortification and palace buildings. One flag for any later level: the top floor of the main keep houses a small shrine to Osakabe (長壁 / 刑部), still maintained with offerings. That makes it a place of active worship inside the building. The vignette does not show it, since it is interior and out of frame. A level that enters the keep's top floor would need a designer ruling first, and arc.md's Himeji row does not mention the shrine yet. The 1945 air raids on Himeji killed civilians in the city, but the castle is not a site of those deaths, and nothing here touches them.",
+  "gate6": "Clear for the exterior vignette: it shows a fortification and palace buildings. One flag for any later level: the top (sixth) floor of the main keep houses a shrine to Osakabe (長壁 / 刑部大神), a deity worshipped on Himeyama before the castle was built. The castle's Osakabe shrine was moved to the grounds of the Sōsha shrine in 1879, and the shrine on the keep's top floor was re-established after that; it is still maintained. That makes it a place of active worship inside the building. The vignette does not show it, since it is interior and out of frame. A level that enters the keep's top floor would need a designer ruling first, and arc.md's Himeji row does not mention the shrine yet. The 1945 air raids on Himeji killed civilians in the city, but the castle is not a site of those deaths, and nothing here touches them.",
   "contested": [
     "Founding date. Tradition gives an Akamatsu fort in 1333 and a castle by Akamatsu Sadanori in 1346, but both rest on later (Edo-period) chronicles, and some historians treat the Akamatsu founding as unproven. The documented history starts with the Kuroda family and Hideyoshi's three-storey keep of 1581. Keep this as a dispute in the note, not a fact.",
     "Chapter window. What stands is 1601–09 (the keep complex, Ikeda Terumasa) and 1617–18 (the Nishi-no-maru, Honda Tadamasa), just past chapter 8's AD 600–1600. Only the traditional 1346 founding and the lost 1581 keep fall inside it. The note should say so; the chapter is not changed.",
     "Why the stone face curves. The defensive reading (it throws a climber off, like Kumamoto's 'musha-gaeshi') and the structural reading (the concave profile keeps a rubble-backed wall stable) are both given in the literature. The research's phrase 'un-climbable by design' overstates it: such walls were climbable, and the curve makes the top harder, not impossible.",
     "The Meiji sale. The story that the castle was auctioned in the early 1870s for 23 yen 50 sen, and that the buyer abandoned it because demolition cost more, is widely repeated. The buyer, the date and whether the sale was ever completed are disputed.",
     "The 1945 bomb. The story that an incendiary landed on the keep's top floor during the July 1945 raid and failed to go off is repeated, not established.",
-    "The whiteness. After the 2015 reopening the keep was called 'too white' (白すぎ). The restorers put this down to fresh plaster, including on the tile joints, that would weather. How white is 'right' depends on the year, not a dispute about the building."
+    "The whiteness. After the 2015 reopening the keep was called 'too white' (白すぎ). The restorers put this down to the tile-joint plaster (屋根目地漆喰), laid thick, which they said would darken with mould and dirt within four or five years and return towards the old colour. How white is 'right' depends on the year, not on a dispute about the building.",
+    "Which lettered corridor-turret joins which pair of keeps. Search summaries in this pass disagreed (one had I joining the main and East keeps, Ro the East and Inui, and Ha the Inui and West; another had Ni joining the Inui and West keeps). The earlier draft's 'the Ha corridor-turret joins the West small keep to the main keep' is unconfirmed and has been removed. Settle it from the Himeji City site before any level uses the letters.",
+    "The south face, tier by tier. The gable sequence in the elements comes from search-result summaries of the Himeji City official tier pages, not from the pages or a photograph, and tier 1 of the south face is unknown. It is kept out of mustBeRight except for the presence of both gable types and the kara-hafu under the top roof."
   ],
   "sources": [
     {
       "title": "UNESCO World Heritage Centre, Himeji-jo (WHC 661)",
       "url": "https://whc.unesco.org/en/list/661/",
-      "detail": "The inscription, 1993, criteria (i) and (iv); the keep complex as the finest surviving early-17th-century castle; white plaster; 1601–09 construction. NOT FETCHED in this pass: the proxy blocked the domain."
+      "detail": "The inscription, 1993, criteria (i) and (iv); the keep complex as the finest surviving early-17th-century castle; white plaster; 1601–09 construction. NOT FETCHED, 2026-09-23 either: the domain is blocked. Cited from knowledge."
     },
     {
       "title": "Himeji Castle official site (Himeji City)",
       "url": "https://www.himejicastle.jp/en/",
-      "detail": "Main keep 五重六階地下一階 (five tiers, six floors and a basement); heights; the connected keep complex; Heisei restoration 2009–15; the Osakabe shrine on the top floor. NOT FETCHED: blocked."
+      "detail": "NOT FETCHED (blocked), but its Japanese pages were reached through search-result summaries: see the Himeji City entries below."
     },
     {
       "title": "Agency for Cultural Affairs, Cultural Heritage Online / national designation database",
       "url": "https://bunka.nii.ac.jp/",
-      "detail": "The eight National Treasure buildings (main keep, three small keeps, I/Ro/Ha/Ni watari-yagura) with structure notes, designated 1951. NOT FETCHED: blocked."
+      "detail": "The eight National Treasure buildings (main keep, three small keeps, I/Ro/Ha/Ni watari-yagura) with structure notes. NOT FETCHED: bunka.nii.ac.jp and online.bunka.go.jp (文化遺産オンライン, 姫路城大天守, https://online.bunka.go.jp/heritages/detail/147461) both blocked; the latter appeared in search results only."
     },
     {
       "title": "Bunkazai Hogo Iinkai, 国宝重要文化財姫路城保存修理工事報告書 (report of the Shōwa restoration, c. 1964–65)",
@@ -195,7 +199,57 @@
     {
       "title": "Wikipedia, 姫路城 (ja) and Himeji Castle (en)",
       "url": "https://ja.wikipedia.org/wiki/姫路城",
-      "detail": "A starting point only; it collects the dates, restorations, the small keeps' tier counts and the Meiji-sale and 1945-bomb anecdotes. NOT FETCHED: blocked."
+      "detail": "A starting point only. NOT FETCHED: blocked. Appeared in search results only."
+    },
+    {
+      "title": "Himeji City, 姫路城公式サイト, 姫路城の規模",
+      "url": "https://www.city.himeji.lg.jp/castle/0000007746.html",
+      "detail": "Reached through search-result summaries only (the domain blocks fetching). Used for: the connected keep complex of a main keep of five tiers, six floors and a basement and three small keeps joined by two-storey watari-yagura; the three small keeps' tiers, floors and basements; all eight buildings National Treasures."
+    },
+    {
+      "title": "Himeji City, 姫路城公式サイト, 大天守 初重 and 大天守 四重 (per-tier pages)",
+      "url": "https://www.city.himeji.lg.jp/castle/0000014380.html",
+      "detail": "Also https://www.city.himeji.lg.jp/castle/0000014396.html. Reached through search-result summaries only. Used for the gable placement by tier and face: tier-1 chidori-hafu on the west face and kara-hafu on the east face; the south-face kara-hafu at tier 2 over a large lattice window; paired irimoya-hafu at tier 3; chidori-hafu at tier 4; kara-hafu on the south and north of the top tier with its gable ends east and west."
+    },
+    {
+      "title": "お城めぐりFAN, 姫路城特別公開エキスパートガイド: 西小天守 and 乾小天守",
+      "url": "https://www.shirofan.com/shiro/kinki/himeji/special/nishi_kotenshu.html",
+      "detail": "Also .../special/inui_kotenshu.html. Search-result summaries only. Used for: the West small keep's top-floor south katōmado with lattice; the Inui small keep's top-floor west and south katōmado without lattice, their frames said to be reused from Hideyoshi's keep; the Inui keep as the largest of the three small keeps."
+    },
+    {
+      "title": "美術展ナビ, <城、その「美しさ」の背景> 第106回 姫路城小天守と渡櫓 (2025)",
+      "url": "https://artexhibition.jp/topics/features/20250509-AEJ2641772/",
+      "detail": "Search-result summary only. Corroborates the katōmado on the small keeps."
+    },
+    {
+      "title": "姫路城 guide sites on Otemon and the Sannomaru (じゃらんnet; お城めぐりFAN 姫路城大手門; 攻城団 大手門と桜門橋)",
+      "url": "https://kojodan.jp/castle/1/memo/1131.html",
+      "detail": "Search-result summaries only. Used for: Otemon completed in 1938 (昭和13年); the Sakuramon bridge built in 2007; the Sannomaru lawn facing the keep complex."
+    },
+    {
+      "title": "姫路城 guide (himejijo-jpn.info) and search summaries of Himeji City's 城の楽しみ方 page",
+      "url": "https://www.city.himeji.lg.jp/castle/0000007738.html",
+      "detail": "Search-result summaries only. Used for: the main keep at the south-east of the complex; from the Sannomaru the West small keep to the left of the main keep, with the Kamiyamazato corner turret and the Ri-1 and Ri-2 corridor-turrets below it to the left; from Otokoyama in the north-west all four keeps visible."
+    },
+    {
+      "title": "Stone-wall guides: 姫路城の石垣 (himejijo-jpn.info/guide11g.html); Hyōgo Prefectural Museum of History curator column 68",
+      "url": "https://himejijo-jpn.info/guide11g.html",
+      "detail": "Also https://rekihaku.pref.hyogo.lg.jp/curator/11191/. Search-result summaries only. Used for: Hashiba-era (1580–82) nozura-zumi walls mostly in the Ni-no-maru; Ikeda-era (1601–09) walls mostly in the honmaru with uchikomi-hagi, sangi-zumi corners and the fan slope; one guide's figure of about 65 degrees at the foot and 70 near the top."
+    },
+    {
+      "title": "現存天守12城～日本100名城: 姫路城 (heiwa-ga-ichiban.jp)",
+      "url": "https://heiwa-ga-ichiban.jp/oshiro/himeji/",
+      "detail": "Search-result summary only. Used for: main keep 31.49 m on a 14.85 m stone base, about 5,700 t; shachihoko from several periods, eleven on the main keep."
+    },
+    {
+      "title": "Nikkei, 姫路城、まばゆく復活「平成の大修理」終える (March 2015) and 「白すぎ姫路城」 (June 2015)",
+      "url": "https://www.nikkei.com/article/DGXLASDG26H31_W5A320C1CC0000/",
+      "detail": "Also https://www.nikkei.com/article/DGXMZO88411920T20C15A6000000/ and Kajima's restoration pages (kajima.co.jp, blocked). Search-result summaries only. Used for: reopening on 27 March 2015; about 75,000 tiles numbered, lifted and re-laid; joint plaster in three coats; the 'too white' look put down to thick roof-joint plaster expected to darken in four or five years."
+    },
+    {
+      "title": "Osakabe shrine: お城めぐりFAN 姫路城大天守・最上階; castle-himeji.com 長壁神社; 4travel 長壁神社",
+      "url": "https://www.shirofan.com/shiro/kinki/himeji/tensyu/tenshu6f.html",
+      "detail": "Search-result summaries only. Used for: the Osakabe (刑部大神) shrine on the main keep's top (sixth) floor today; a deity worshipped on Himeyama before the castle; re-established in the keep after the castle's shrine was moved to the Sōsha grounds in 1879."
     }
   ],
   "repoCorrections": [
@@ -207,5 +261,5 @@
     "content/research/arc.md, chapter 8 table: Himeji 'present form 1601–09' lies outside the chapter's AD 600–1600, but carries no flag, whereas Pontcysyllte in chapter 11 is flagged 'just past the chapter window'. Nijō (1603) has the same issue. Also, 1601–09 covers the keep complex only; the Nishi-no-maru is 1617–18.",
     "content/research/arc.md, chapter 8: the Himeji row has no gate-6 note, but the keep's top floor houses a maintained shrine to Osakabe. This matters for any level that goes inside the keep, not for the vignette."
   ],
-  "confidence": "Medium. The web verification this task asked for could NOT be done. Every authoritative domain I tried was blocked by the egress proxy: whc.unesco.org, himejicastle.jp, city.himeji.lg.jp, bunka.nii.ac.jp, kunishitei.bunka.go.jp, en/ja/m.wikipedia.org, wikidata, commons, britannica, japan-guide, jcastle.info, archive.org, loc.gov, jstage, ndl.go.jp, Met API and HathiTrust. The session's WebSearch budget was also already spent (200 of 200). Everything above comes from prior knowledge of the sources listed, not from pages fetched in this pass.\n\n- High confidence: five tiers, six floors and a basement; about 31.5 m on a base of about 14.85 m; white plaster over everything, eaves included; grey tile with white joint plaster; grey, not gold, shachihoko, two on the top ridge; the connected complex of one main and three small keeps with four corridor-turrets and eight National Treasures; the dates 1581, 1601–09 and 1617–18; the restorations of 1956–64 and 2009–15; UNESCO 1993; the Osakabe shrine on the top floor; the concave stone-wall profile.\n- Medium confidence: from the south, the West and Inui small keeps sit to the left and the East keep is hidden behind; each small keep has three tiers; Otemon is a 1938 rebuild.\n- Low confidence: which gable type sits on which tier of the south face. It is deliberately kept out of mustBeRight.\n\nRecommend a re-run with web access, at least against the Himeji City site and a photograph of the south face, before the gables are painted."
+  "confidence": "Medium, up from the earlier draft on the counts and layout. Web fetching was still blocked for every page tried in this pass (city.himeji.lg.jp, hyogo-c.ed.jp, online.bunka.go.jp, nippon.com, kajima.co.jp, wanderkokuho.com, castle-himeji.com, himejicastletours.com), so all verification comes from the 12 search-result summaries this pass was allowed, now spent. Summaries are second-hand and one pair of them contradicted each other.\n\n- Confirmed by search: five tiers, six floors and a basement; 31.49 m on a 14.85 m base; the connected complex of one main keep at the south-east corner and three small keeps of three tiers each (with their floors and basements), four two-storey corridor-turrets, eight National Treasures; the West small keep to the left of the main keep from the Sannomaru; Otemon built 1938; the fan-slope, uchikomi-hagi and sangi-zumi stone walls of the Ikeda period; the Heisei restoration and reopening on 27 March 2015 and the 'too white' joint plaster; the Osakabe shrine on the top floor; katōmado on the small keeps' top floors.\n- Found wrong and corrected: the Ha corridor-turret as the link from the West small keep to the main keep (unconfirmed, removed); 'no arched windows' as a rule for the whole complex (the small keeps have bell-shaped katōmado); 'brochure white is right for today' for the roofs; the view direction (north, not north-north-east).\n- Medium: the south-face gable sequence by tier (from summaries of the official tier pages; tier 1 unknown); the Inui keep's visibility behind the West keep; the 65 to 70 degree wall figure.\n- From knowledge, not re-verified: the dates 1581, 1601–09 and 1617–18; the 1956–64 Shōwa restoration; UNESCO 1993; National Treasure designation in 1951; the gentle eave lift; no gold on the exterior.\n\nRecommend a check against a photograph of the south face before the gables are painted."
 }
