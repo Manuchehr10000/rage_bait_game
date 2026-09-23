@@ -37,6 +37,15 @@ const DRIVER = `
   const splitter = horses[8];
   const last = horses[9];
   const roof = E.find((e) => e.def.kind === 'roof');
+  /** The deposit that gives way, a few strides short of the exit. */
+  const slump = E.find((e) => e.def.kind === 'crumble' && e.def.skin === 'clayLedge');
+  /** Up the deposit's step with a short hop, then over the slump from its lip. */
+  const outOver = () => {
+    key('ArrowRight', true);
+    if (!canJump()) return;
+    if (p.lastContacts.right) { jump(6); return; }
+    if (p.y + p.h === slump.def.rect.y && right() >= slump.def.rect.x - 6 && right() <= slump.def.rect.x) jump(10);
+  };
   const roofX = roof.def.x;
   const stream = E.find((e) => e.def.kind === 'water');
   const streamX = stream.def.x0;
@@ -334,7 +343,7 @@ test('a run that knows the level finishes with zero deaths', async ({ page }) =>
           break;
         // Let the overhang have its block, then climb it and walk out.
         case 'roof': key('ArrowRight', false); if (roof.state === 'landed') phase = 'out'; break;
-        case 'out': key('ArrowRight', true); if (canJump() && p.lastContacts.right) jump(); break;
+        case 'out': outOver(); break;
       }
     };`, 60 * 60);
   expect(r.state).toBe('complete');
@@ -347,4 +356,37 @@ test('Enter at the exit label leads on to Roc-aux-Sorciers', async ({ page }) =>
     window.dispatchEvent(new KeyboardEvent('keydown', { code: 'Enter' })); window.dispatchEvent(new KeyboardEvent('keyup', { code: 'Enter' }));
     g.tick(); return { screen: g.currentScreen, level: g.levelData.id }; })()`);
   expect(after).toEqual({ screen: 'level', level: 'roc-aux-sorciers' });
+});
+
+test('two tiles of the deposit short of the exit give way, and are drawn as the deposit', async ({ page }) => {
+  // From the far floor with the block down: walk it, and the deposit takes you.
+  const from = (script: string) => play(page, `
+    p.spawnAt(1110, 224); g.camera.x = 1000;
+    for (let i = 0; i < 200 && roof.state !== 'landed'; i++) g.tick();
+    ${script}`, 60 * 10);
+  const walked = await from(`const step = () => { key('ArrowRight', true); if (canJump() && p.lastContacts.right) jump(6); };`);
+  expect(walked.state).toBe('dead');
+  expect(walked.total).toBe(1);
+  expect(walked.cause).toBe('The trench');
+  // The whole jump anybody makes up the step of the deposit comes down on it.
+  const bounded = await from(`const step = () => { key('ArrowRight', true); if (canJump() && p.lastContacts.right) jump(18); };`);
+  expect(bounded.cause).toBe('The trench');
+  expect(bounded.state).toBe('dead');
+  // Hop up, and over it from its lip.
+  const over = await from(`const step = () => outOver();`);
+  expect(over.state).toBe('complete');
+  expect(over.total).toBe(0);
+
+  // Drawn to the pixel as the deposit that would be there.
+  const r = (await page.evaluate(`(() => { ${DRIVER}
+    const W = g.wctx, S = 4, L = g.level, q = slump.def.rect;
+    p.spawnAt(100, 224);
+    const grab = () => { g.camera.x = q.x - 120; g.camera.y = 108; g.draw();
+      return Array.from(W.getImageData((q.x - g.camera.ix) * S, (q.y - g.camera.iy) * S, q.w * S, (256 - q.y) * S).data).join(','); };
+    const asItIs = grab();
+    for (let tx = q.x / 16; tx < (q.x + q.w) / 16; tx++) for (let ty = q.y / 16; ty < L.heightTiles; ty++) L.setTile(tx, ty, '%');
+    g.entities = E.filter((e) => e !== slump);
+    return { same: grab() === asItIs, def: { fake: slump.def.fake, delay: slump.def.delay, tips: slump.def.tips, x: q.x } };
+  })()`)) as Record<string, unknown>;
+  expect(r).toEqual({ same: true, def: { fake: true, delay: 0.15, tips: true, x: 1232 } });
 });

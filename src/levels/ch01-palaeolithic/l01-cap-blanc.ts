@@ -25,10 +25,19 @@ import { TILE, type DeathCause } from '../../engine/types';
  *  69..73   the far floor, lit end to end with no lamp over it. Land at its very
  *             edge and stay there: a stride in, the overhang lets go of a block,
  *             and it comes down where a full jump would have put you.
- *  74..     the deposit the excavation left in place
+ *  74..     the deposit the excavation left in place. Two tiles of it, a few
+ *             strides short of the way out, are sediment and nothing under it:
+ *             stand on them and they go down into the dig, and so does he
  *  81       exit
  */
 const W = 84;
+/**
+ * Where the deposit gives way, named from the dev ruler as cap-blanc (1250, 16): two
+ * tiles of it that are not holding anything up any more, least of all a man. The
+ * whole column of sediment, top to bottom, drawn exactly as the deposit around it
+ * (pillar 4), and it goes a sixth of a second after he stands on it.
+ */
+const SLUMP_X = 77;
 const H = 18;
 const GROUND = 15;
 const px = (t: number) => t * TILE;
@@ -48,6 +57,7 @@ g.fill(21, GROUND, 5, H - GROUND, '#'); // bedrock under the wall and the shelte
 g.fill(21, 0, W - 21, 7, '#'); // the overhang
 g.fill(69, GROUND, 5, H - GROUND, '#'); // the far floor
 g.fill(74, GROUND - 1, W - 74, H - GROUND + 1, '%'); // the deposit
+g.fill(SLUMP_X, GROUND - 1, 2, H - GROUND + 1, ' '); // where it gives way: drawn as the deposit by the entity
 
 /**
  * The frieze. Sprite x of each horse; the ledge is the back, 28 px from x + 4.
@@ -136,6 +146,16 @@ export const CAP_BLANC: LevelData = {
       triggerX: FAR_FLOOR,
       delay: 0.2,
       cause: 'The roof',
+    },
+    // The deposit, giving way. It takes him down with it, out of the bottom of the dig.
+    {
+      kind: 'crumble',
+      skin: 'clayLedge',
+      rect: { x: px(SLUMP_X), y: px(GROUND - 1), w: px(2), h: px(H - GROUND + 1) },
+      fake: true,
+      delay: 0.15,
+      // It does not sink under him like a lift he can jump off: it is not under him.
+      tips: true,
     },
     // The floor of the trench.
     { kind: 'hazard', rect: { x: TRENCH_X0, y: TRENCH_FLOOR - 2, w: TRENCH_X1 - TRENCH_X0, h: 8 }, cause: 'The trench' },

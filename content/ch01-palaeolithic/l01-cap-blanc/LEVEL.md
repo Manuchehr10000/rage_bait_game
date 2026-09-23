@@ -31,7 +31,7 @@ the ruined castle of **Commarque**.
 | c | `c-frieze` | Five horses under museum lamps; their backs are the floor. The third is plaster and goes if you stand about on it; the fifth walks out from under you | Ten is the count of horses on the frieze; the backs are relief deep enough to stand on in the game's scale; none is plaster, and none has ever moved |
 | d | `d-dark` | The lamps end, and not one of the last five is honest. The sixth holds for six seconds and is the only place to stand. The seventh jumps when you jump at it from the sixth, once, then comes back down to stay. The eighth comes up and throws you back. The ninth breaks in the middle. The tenth holds, which by then nobody believes | The far end of the frieze is less well lit for a visitor; the darkness is the level's. Roof fall is the one true thing here: shelters are made and unmade by the overhang letting go, and the Magdalenian layers at Cap Blanc were sealed under it |
 | e | `e-dig` | The far floor, lit end to end and with no lamp over it. Land at its very edge and stand still: a stride in, the overhang lets go of a block, and it comes down where a full jump would have put you. It stays as a step | Roof fall is what seals the archaeology of a shelter, and the Cap Blanc frieze lay under it until 1909. The deposit at the far end is what the excavation left in place |
-| f | `f-exit` | The far floor and the way out | The visitor leaves by the same door; the game lets you leave at the far end |
+| f | `f-exit` | The deposit and the way out over it. Two tiles of the deposit, a few strides short of the exit, give way a sixth of a second after he stands on them, and he goes down with them into the dig. They are drawn as the deposit. The whole jump anybody makes up the step of the deposit comes down on them; a short hop up and a jump over is the way out | The deposit is what the excavation left in place: unexcavated sediment, the same layers the trench section shows. The visitor leaves by the same door; the game lets you leave at the far end |
 
 ## What the level teaches
 
@@ -76,6 +76,8 @@ let it settle. Six seconds is enough to do that twice and not much more.
 - The fifth walks, the sixth collapses, the seventh jumps, the eighth rears and the ninth
   breaks in two. They are carved in high relief into a limestone wall and have not moved
   since the Magdalenian.
+- Two tiles of the deposit at the far end give way under him. The deposit left in place
+  is loose sediment, but it is not walked on and it has never opened under anybody.
 - The overhang lets a block go on cue, on the far floor. Roof fall is real and is what
   seals the archaeology of every shelter; it does not wait for a visitor to arrive.
 - The floor of the trench kills. It is a metre and a half down.
