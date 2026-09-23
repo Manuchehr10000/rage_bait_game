@@ -209,7 +209,7 @@ PAINTERS['abu-simbel'] = function (ctx, W, H, B) {
   const flankL = edge.filter((p) => p[0] <= FL + LEAN).concat([[FL + LEAN, TOP], [FL, GY + 2], [0, GY + 2]]);
   const flankR = [[FR - LEAN, TOP]].concat(edge.filter((p) => p[0] >= FR - LEAN), [[368, GY + 2], [FR, GY + 2]]);
   const RIM = mixh(S.rubble, S.rubbleDark, 0.28);
-  const TONE_L = shd(mixh(S.rubble, S.rubbleDark, 0.18), 0.3);
+  const TONE_L = shd(mixh(S.rubble, S.rubbleDark, 0.12), 0.18);
   const TONE_R = lit(S.rubble, 0.12);
   B.fill(ctx, hill, RIM);
   B.fill(ctx, flankL, TONE_L);
@@ -257,14 +257,14 @@ PAINTERS['abu-simbel'] = function (ctx, W, H, B) {
     const r = B.rng(2604);
     const rocks = [];
     // A jittered grid: even cover without rows.
-    for (let gy = 28; gy < GY + 6; gy += 10) {
+    for (let gy = 30; gy < GY + 6; gy += 17) {
       const big = Math.max(0, (gy - 50) / (GY - 50));
-      const step = 16 + big * 6;
+      const step = 27 + big * 8;
       for (let gx = -6 + (Math.floor(gy / 10) % 2) * step * 0.5; gx < W + 8; gx += step) {
         const x = gx + (r() - 0.5) * step * 0.9;
         const yy = gy + (r() - 0.5) * 10;
         const slab = r() < 0.4;
-        const w = 7 + r() * 4 + big * 4 + (r() < 0.15 ? 4 : 0) + (slab ? 2 : 0);
+        const w = 11 + r() * 5 + big * 5 + (slab ? 3 : 0);
         const h = w * (slab ? 0.42 + r() * 0.12 : 0.66 + r() * 0.26);
         const ang = (r() - 0.5) * (slab ? 0.7 : 0.3);
         const seed = Math.floor(r() * 1e6);
@@ -274,7 +274,7 @@ PAINTERS['abu-simbel'] = function (ctx, W, H, B) {
         if (x + w * 0.9 + 3 > edgeL(yy) && x - w * 0.9 - 3 < edgeR(yy)) continue;
         // Thinning toward the frame: texture, not pattern.
         const d = Math.min(x, W - x);
-        if (r() > 0.35 + d / 45) continue;
+        if (r() > 0.25 + d / 60) continue;
         rocks.push([x, yy, w, h, ang, seed]);
       }
     }
@@ -312,7 +312,8 @@ PAINTERS['abu-simbel'] = function (ctx, W, H, B) {
   // sandstone with its statues. It rises well above the crowns. In the morning
   // sun it glows: half a step below the colossi, not a muddy ground.
 
-  const WALL = mixh(mixh(S.sun, S.body, 0.5), S.rose, 0.1);
+  // A clear step below the colossi, so the statues stand forward of it at 92 x 70.
+  const WALL = mixh(mixh(S.sun, S.body, 0.74), S.rose, 0.16);
   {
     const g = ctx.createLinearGradient(FL, GY, FR, TOP);
     g.addColorStop(0, shd(WALL, 0.1));
@@ -711,7 +712,11 @@ PAINTERS['abu-simbel'] = function (ctx, W, H, B) {
   // their upper faces catching the sun, the lip soft.
   // High on the south side over the stump of the left arm, falling in a few
   // big steps to the right: its broken top turns up toward the sun.
-  const BREAK = [[-27, 66.6], [-22.5, 65.4], [-16, 66.2], [-9.5, 62.4], [-3, 63], [3.5, 59.8], [11, 60.4], [16.5, 57], [22, 57.6], [27, 56.2]];
+  // The throne and the lap stay whole to the seat; above them only the stump
+  // of the waist stands, narrower than the throne, ragged, higher in the
+  // middle than at the arms. That is what makes it a broken statue and not a
+  // broken box.
+  const BREAK = [[-27, 54.4], [-23, 56.2], [-18.5, 61.5], [-15, 58.8], [-11.5, 68.5], [-6.5, 63.6], [-1.5, 74.5], [3.5, 65.4], [9, 71.2], [14, 61.4], [18.5, 60.2], [23, 56.4], [27, 54.4]];
   const broken = B.layer(LW, LH);
   const toLayer = (pts) => pts.map((p) => [LOX + p[0], LOY - p[1]]);
   {
@@ -872,15 +877,21 @@ PAINTERS['abu-simbel'] = function (ctx, W, H, B) {
 
   {
     const g = ctx.createLinearGradient(0, GY, 0, FLOOR);
-    g.addColorStop(0, mixh(S.sand, S.body, 0.3));
-    g.addColorStop(1, lit(S.sand, 0.25));
+    // A step below the statues' lit faces, so the eye stays on the facade.
+    g.addColorStop(0, mixh(S.sand, S.body, 0.55));
+    g.addColorStop(1, mixh(S.sand, S.body, 0.32));
     ctx.fillStyle = g;
     ctx.fillRect(0, GY, W, FLOOR - GY);
+    // The colossi throw their shadows forward and to the left across the floor.
+    for (let i = 0; i < 4; i++) {
+      const x = CX[i];
+      wash(ctx, [[x - 25, GY], [x + 24, GY], [x + 12, FLOOR], [x - 37, FLOOR]], SHADOW, 0.2);
+    }
     // A line of shadow where the facade meets the floor.
     wash(ctx, [[0, GY], [W, GY], [W, GY + 2], [0, GY + 2]], SHADOW, 0.25);
-    roll(ctx, [[0, FLOOR], [W, FLOOR], [W, LEDGE], [0, LEDGE]], mixh(S.sand, S.body, 0.3));
+    roll(ctx, [[0, FLOOR], [W, FLOOR], [W, LEDGE], [0, LEDGE]], mixh(S.sand, S.body, 0.5));
     line(ctx, 0, FLOOR + 0.5, W, FLOOR + 0.5, 1, B.alpha(HI, 0.8));
-    B.ground(ctx, W, H, LEDGE, S.sand);
+    B.ground(ctx, W, H, LEDGE, mixh(S.sand, S.body, 0.45));
     wash(ctx, [[0, LEDGE], [W, LEDGE], [W, LEDGE + 3], [0, LEDGE + 3]], SHADOW, 0.22);
     // Paving, barely.
     const r = B.rng(58);
@@ -897,30 +908,36 @@ PAINTERS['abu-simbel'] = function (ctx, W, H, B) {
   // size: it lies on its side, crown to the south, tipped back so its face
   // looks out and up; the white crown is broken off above the red.
   {
-    const K = 0.8; // how far it is tipped: the width of the head foreshortened
-    const head = B.layer(56, 34);
+    // It has rolled onto the side of its nemes, crown to the south, and lies
+    // tipped well over with the face still turned out to us, so it reads as
+    // a head at any size. Drawn full size on a plate-sized layer.
+    const T = -1.02; // radians the head is tipped over, toward the south
+    const ct = Math.cos(T);
+    const st = Math.sin(T);
+    // Where the break at the neck (h = 84) comes to rest on the floor.
+    const NX = 150;
+    const NY = 247;
+    const head = B.layer(W, H);
     {
       const c = head.getContext('2d');
       c.save();
-      // Upright (x, h) to the picture: h runs to the left, x runs up.
-      c.setTransform(0, -K, -1, 0, 26 + 104, 17);
+      // Upright (x, h) to the picture, rotated by T about the neck.
+      c.setTransform(ct, st, st, -ct, NX - 84 * st, NY + 84 * ct);
       paintHead(c, { stump: true, bold: true });
-      // The old break at the neck, weathered: the end of the beard and the
-      // nemes, a little shade, no fresh edge.
       wash(c, [[-16.4, 86.6], [16.4, 86.6], [16.4, 88.6], [-16.4, 88.6]], SHADOW, 0.16);
       c.restore();
-      // Light in the picture: its top toward the sun, its underside on the ground.
+      // Its top toward the sun, its underside on the ground.
       c.save();
       c.globalCompositeOperation = 'source-atop';
-      const g = c.createLinearGradient(0, 2, 0, 32);
+      const g = c.createLinearGradient(0, 200, 0, 250);
       g.addColorStop(0, B.alpha(SUN, 0.14));
-      g.addColorStop(0.45, B.alpha(SUN, 0));
-      g.addColorStop(0.75, B.alpha(SHADOW, 0));
+      g.addColorStop(0.5, B.alpha(SUN, 0));
+      g.addColorStop(0.8, B.alpha(SHADOW, 0));
       g.addColorStop(1, B.alpha(SHADOW, 0.3));
       c.fillStyle = g;
-      c.fillRect(0, 0, 56, 34);
+      c.fillRect(0, 0, W, H);
       c.restore();
-      inkRound(head, 0.8);
+      inkRound(head, 0.9);
     }
     // The torso: a chunk of the right shoulder and chest, the end of a nemes
     // lappet on it and the rows of the broad collar. Flat on the terrace.
@@ -952,7 +969,7 @@ PAINTERS['abu-simbel'] = function (ctx, W, H, B) {
       c.restore();
       inkRound(torso, 0.7);
     }
-    for (const [img, x, y] of [[torso, 92, 232], [head, 118, 219]]) {
+    for (const [img, x, y] of [[torso, 150, 230], [head, 0, 0]]) {
       ctx.save();
       ctx.globalAlpha = 0.3;
       ctx.drawImage(silhouette(img, SHADOW), x - 4, y + 2);
