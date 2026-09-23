@@ -16,6 +16,11 @@ export interface ArtEntry {
   id: string;
   /** Painted file, relative to the manifest's folder. Omit while unpainted. */
   file?: string;
+  /**
+   * For art made by a script rather than by hand: the script, relative to the
+   * repository root. It stands in for the .aseprite a hand painting keeps.
+   */
+  source?: string;
   /** Size of one frame in world pixels. */
   w: number;
   h: number;

@@ -20,7 +20,7 @@ export type MonumentId =
   | 'apadana'
   | 'doric-temple'
   | 'roof-comb'
-  | 'lotus-towers'
+  | 'lion-paws'
   | 'tiered-roofs'
   | 'conical-tower'
   | 'iwan'
@@ -93,8 +93,8 @@ const DRAW: Record<MonumentId, Draw> = {
   /**
    * Chapter 1 — Gargas. A hand stencil: the rock is the ink and the hand is the
    * paper, which is how the thing was actually made, by blowing pigment around a
-   * hand held flat on the wall. Two fingers are short: Gargas is the cave of the
-   * incomplete hands.
+   * hand held flat on the wall. Every finger stops short: Gargas is the cave of
+   * the incomplete hands, and why they are incomplete is still argued.
    */
   'hand-stencil': (ctx, ink, paper) => {
     poly(ctx, ink, [
@@ -253,38 +253,36 @@ const DRAW: Record<MonumentId, Draw> = {
   },
 
   /**
-   * Chapter 7 — Angkor Wat. Five towers in a quincunx, so the elevation shows
-   * the central one tall and four lower around it, each one shaped like a lotus
-   * bud, over the long galleries and the causeway.
+   * Chapter 7 — Sigiriya. The rock: a plug of old magma standing sheer out of
+   * the plain, flat on top where the palace was. At its foot on the north side,
+   * the two paws of the lion that the stair once climbed through; the rest of
+   * the lion, head and body, is gone. Not Angkor Wat: that is an active temple,
+   * flagged in content/research/arc.md and not ruled on, and a vignette is
+   * production like any other asset.
    */
-  'lotus-towers': (ctx, ink) => {
+  'lion-paws': (ctx, ink, paper) => {
     ground(ctx, ink);
-    box(ctx, ink, 2, 64, 96, 8);
-    box(ctx, ink, 8, 52, 84, 12);
-    const tower = (cx: number, top: number, half: number): void => {
-      // Stepped tiers with a lotus bud on top; a smooth cone is not a prasat.
-      const h = 52 - top;
-      const shoulder = 52 - h * 0.7;
-      for (let i = 0; i < 4; i++) {
-        const w = half * 2 * (1 - i * 0.16);
-        const y1 = 52 - (h * 0.7 * i) / 4;
-        const y0 = 52 - (h * 0.7 * (i + 1)) / 4;
-        box(ctx, ink, cx - w / 2, y0, w, y1 - y0);
-      }
-      const bw = half * 2 * (1 - 0.16 * 3) * 0.86;
-      ctx.fillStyle = ink;
-      ctx.beginPath();
-      ctx.moveTo(cx - bw / 2, shoulder);
-      ctx.quadraticCurveTo(cx - bw / 2, top + h * 0.08, cx, top);
-      ctx.quadraticCurveTo(cx + bw / 2, top + h * 0.08, cx + bw / 2, shoulder);
-      ctx.closePath();
-      ctx.fill();
+    ctx.fillStyle = ink;
+    ctx.beginPath();
+    ctx.moveTo(6, 72);
+    ctx.quadraticCurveTo(8, 34, 22, 16);
+    ctx.lineTo(38, 9);
+    ctx.lineTo(70, 9);
+    ctx.quadraticCurveTo(88, 15, 92, 42);
+    ctx.lineTo(95, 72);
+    ctx.closePath();
+    ctx.fill();
+    // Daylight between the rock and the terrace in front of it.
+    box(ctx, paper, 18, 50, 64, 3);
+    // The terrace, the two paws and the stair between them.
+    box(ctx, ink, 18, 53, 64, 19);
+    const paw = (x: number): void => {
+      box(ctx, paper, x, 55, 15, 1.4);
+      for (let i = 0; i < 3; i++) disc(ctx, paper, x + 3 + i * 4.5, 70, 1.6);
     };
-    tower(19, 30, 8);
-    tower(81, 30, 8);
-    tower(33, 21, 8.5);
-    tower(67, 21, 8.5);
-    tower(50, 4, 10.5);
+    paw(24);
+    paw(61);
+    for (let i = 0; i < 5; i++) box(ctx, paper, 43 + i * 0.6, 57 + i * 3, 14 - i * 1.2, 1.2);
   },
 
   /**

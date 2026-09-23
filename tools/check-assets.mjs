@@ -6,7 +6,8 @@
  *  - ids are unique across the whole game
  *  - every entry has a note: <beat>/<id>.md (or shared/<id>.md)
  *  - every listed file exists and is a PNG of exactly w*4*frames by h*4 pixels
- *  - warns when a PNG has no .aseprite beside it
+ *  - warns when a PNG has no .aseprite beside it and no `source` script
+ *  - every `source` script exists
  *
  * Exit code 1 on any error. Run with `npm run assets:check`.
  */
@@ -80,6 +81,10 @@ for (const manifestPath of walk(root)) {
     const wantH = e.h * ART_SCALE;
     if (size.w !== wantW || size.h !== wantH) {
       errors.push(`${where}: ${e.file} is ${size.w}x${size.h}, expected ${wantW}x${wantH} (${e.w}x${e.h} world px${frames > 1 ? ` x ${frames} frames` : ''} at ${ART_SCALE}x)`);
+    }
+    if (e.source) {
+      if (!existsSync(join(process.cwd(), e.source))) errors.push(`${where}: source ${e.source} does not exist`);
+      continue;
     }
     const ase = filePath.replace(/\.png$/, '.aseprite');
     if (!existsSync(ase)) warnings.push(`${where}: no ${relative(process.cwd(), ase)} beside the PNG`);

@@ -10,6 +10,7 @@
     "typecheck": "tsc --noEmit",
     "assets:check": "node tools/check-assets.mjs",
     "map:coastlines": "node tools/build-coastlines.mjs",
+    "map:monuments": "node tools/paint-monuments.mjs",
     "test": "playwright test"
   },
   "devDependencies": {

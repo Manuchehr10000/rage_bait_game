@@ -5,7 +5,7 @@ single source of truth for site identity, period, costume and status. It does no
 contain level design; beats are decided one at a time in design conversation and
 live in each level's own asset notes.
 
-Last revised: 2026-09-15. Curator mode dropped by designer ruling the same day; facts that cannot be shown without text live in the asset notes and nowhere in the game.
+Last revised: 2026-09-23. Great Zimbabwe ruled: walls, passage and tower only (section 4). 2026-09-15: curator mode dropped by designer ruling; facts that cannot be shown without text live in the asset notes and nowhere in the game.
 
 ---
 
@@ -237,7 +237,7 @@ castles, Oceania and Polynesia, the steppe and nomadic cultures.
 
 | # | Site | Slug | Place | Period | Gate notes |
 |---|---|---|---|---|---|
-| — | Great Zimbabwe | `great_zimbabwe` | Masvingo, ZW | 11th–15th c. | Hill Complex on kopje, 11 m drystone wall, conical tower. Colonial misattribution (Bent, Hall) is a documented error beat. Bent 1892, PD. **Flag:** a revered locus on site — build from walls and tower |
+| — | Great Zimbabwe | `great_zimbabwe` | Masvingo, ZW | 11th–15th c. | Hill Complex on kopje, 11 m drystone wall, conical tower. Colonial misattribution (Bent, Hall) is a documented error beat. Bent 1892, PD. **Flag:** a revered locus on site — build from walls and tower (ruled 2026-09-23, section 4) |
 | — | Gede / Gedi | `gede` | Kilifi, KE | 12th–17th c. | Coral-rag walls in forest, pillar tomb, palace. Imagery: Kirkman reports only |
 | — | Kilwa Kisiwani | `kilwa_kisiwani` | TZ | 11th–16th c. | Husuni Kubwa palace terraces to the sea, Gereza fort. **Flag:** ruined mosque plus living Islam — use secular fabric |
 | — | Loropéni | `loropeni` | BF | c. 11th–17th c. | Drystone laterite curtain walls to 6 m, one controlled entrance. Gate 6 clear |
@@ -307,9 +307,17 @@ is recorded here, not in the level.
 | `chand_baori` | 7 | Adjoining temple is a functioning shrine | Build in the stepwell only |
 | `foguang` | 8 | Monastic use, statues in situ | Substitute a museum-managed timber hall if refused |
 | `kilwa_kisiwani`, `gede`, `songo_mnara` | 9 | Ruined mosques; living Islam on the coast | Secular palace, fort and house fabric only |
-| `great_zimbabwe` | 9 | A revered locus on site | Walls, passage and tower only |
 | `bam` | 10 | 2003 earthquake killed at least 26,271 in the modern town | Citadel architecture only |
 | `hms_victory` | 12 | Commissioned warship; Nelson-death plaque | Ruling required before scheduling |
+
+### Ruled
+
+Rulings the designer has made, moved out of the table above. A ruling binds every
+use of the site: levels, asset notes, and the tour map.
+
+| Site | Chapter | Issue | Ruling | Date |
+|---|---|---|---|---|
+| `great_zimbabwe` | 9 | A revered locus on site | Walls, passage and tower only, as recommended. First applied to the chapter 9 vignette on the tour map; the revered locus stays out of frame there and in any level | 2026-09-23 |
 
 ---
 

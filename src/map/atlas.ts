@@ -144,7 +144,7 @@ export const CHAPTERS: Chapter[] = [
     name: 'Monsoon Asia',
     dates: 'AD 400–1300',
     anchor: 4,
-    monument: { site: 4, art: 'lotus-towers' },
+    monument: { site: 0, art: 'lion-paws' },
     sites: [
       { name: 'Sigiriya', lat: 7.96, lon: 80.76 },
       { name: 'Ajanta', lat: 20.55, lon: 75.7 },
