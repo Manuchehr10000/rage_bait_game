@@ -270,9 +270,7 @@ test('in the Hall of the Discs one snaps under you and one walks back and drops 
   expect(snapped.cause).toBe('The lower gallery');
 
   // The fourth is the shelf of the gallery backwards: stay on it and it takes you
-  // back down the hall and lets go where it stops, over the third, which holds. It
-  // does not kill him. It leaves him where the fifth is out of reach and the fourth is
-  // gone, and the way on is the lower gallery.
+  // back down the hall, past the third, and lets go where nothing holds.
   const rode = await play(page, `
     const startX = walksBack.rect.x;
     const third = discs.slice().sort((a, b) => a.def.rect.x - b.def.rect.x)[2];
@@ -280,11 +278,26 @@ test('in the Hall of the Discs one snaps under you and one walks back and drops 
     const step = () => {
       key('ArrowRight', false);
       if (walksBack.rect.x < startX - 24 && phase === 'in') phase = 'carried back';
-      if (phase === 'carried back' && p.onGround && Math.abs(p.y + p.h - third.rect.y) <= 1) phase = 'set down on the third';
+      if (p.onGround && Math.abs(p.y + p.h - third.rect.y) <= 1 && p.x + p.w > third.rect.x && p.x < third.rect.x + third.rect.w) phase = 'set down on the third';
     };`, 60 * 8);
-  expect(rode.phase).toBe('set down on the third');
-  expect(rode.state).toBe('playing');
-  expect(rode.total).toBe(0);
+  expect(rode.phase).toBe('carried back');
+  expect(rode.state).toBe('dead');
+  expect(rode.total).toBe(1);
+  expect(rode.cause).toBe('The lower gallery');
+
+  // Wherever on it he stood, it drops him: never on the third.
+  const everywhere = (await page.evaluate(`(() => { ${DRIVER}
+    const out = [];
+    for (let dx = -8; dx <= 30; dx += 2) {
+      g.resetRun();
+      const w = g.entities.filter((e) => e.def.kind === 'crumble' && e.def.skin === 'disc').find((e) => e.def.walk);
+      p.spawnAt(w.def.rect.x + dx, w.def.rect.y - 16); g.camera.x = Math.max(0, w.def.rect.x - 120);
+      let t = 0; for (; t < 600 && g.state === 'playing'; t++) g.tick();
+      out.push(g.state === 'dead' ? g.deathCause : 'alive at ' + Math.round(p.x));
+    }
+    return out;
+  })()`)) as string[];
+  expect(everywhere.every((c) => c === 'The lower gallery')).toBe(true);
 });
 
 test('the slab comes down between the holes and takes the run-up with it', async ({ page }) => {

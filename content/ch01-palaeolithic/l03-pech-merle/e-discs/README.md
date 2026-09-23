@@ -9,8 +9,9 @@ that has been right every time, its absence is the information, and it is the on
 in the level with none. Everything in this hall has to be learned by doing it.
 
 - **the second snaps** the moment he touches it. It is a bounce, not a ledge.
-- **the fourth walks back down the hall** with him on it, and lets go where it stops,
-  which is over the third and out of reach of the fifth.
+- **the fourth walks back down the hall** with him on it, back past the third, and lets
+  go where nothing that holds is under him: down on to the second, which snaps, or
+  straight to the floor of the lower gallery. Either way it is `The lower gallery`.
 
 The fourth is the fifth shelf of the Bear's Gallery turned round. One carried him forward
 to safety and would not let go; this one carries him backwards and does. Between them

@@ -149,8 +149,12 @@ const DISCS: { x: number; y: number; does: 'holds' | 'goes' | 'walks' }[] = [
   { x: 1496, y: 296, does: 'holds' },
 ];
 const DISC_W = 32;
-/** Where the fourth carries him: over the third, and too far from the fifth to jump. */
-const DISC_WALK_TO = 1392;
+/**
+ * Where the fourth carries him: back past the third, far enough that nothing that
+ * holds is under any part of him, and lets go. Below is the second, which snaps, or
+ * the floor of the lower gallery. He is not left stranded; he is dropped.
+ */
+const DISC_WALK_TO = 1350;
 
 /**
  * The stone in the middle of the second hole. It is the obvious way over, it is
