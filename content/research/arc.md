@@ -5,7 +5,7 @@ single source of truth for site identity, period, costume and status. It does no
 contain level design; beats are decided one at a time in design conversation and
 live in each level's own asset notes.
 
-Last revised: 2026-09-24. Tikal ruled: architecture only (section 4). 2026-09-23: Great Zimbabwe ruled: walls, passage and tower only (section 4). 2026-09-15: curator mode dropped by designer ruling; facts that cannot be shown without text live in the asset notes and nowhere in the game.
+Last revised: 2026-09-24. Corrections from the monument research for the tour map: Gargas date, Persepolis imagery, Segesta, Sigiriya, Himeji, Great Zimbabwe, Registan and Martello rows, sections 6 and 7. Tikal ruled: architecture only (section 4). 2026-09-23: Great Zimbabwe ruled: walls, passage and tower only (section 4). 2026-09-15: curator mode dropped by designer ruling; facts that cannot be shown without text live in the asset notes and nowhere in the game.
 
 ---
 
@@ -79,7 +79,7 @@ castles, Oceania and Polynesia, the steppe and nomadic cultures.
 
 ### Chapter 1 — Palaeolithic Europe · `ch01_palaeolithic`
 
-- **Dates:** 27,000–13,000 BP
+- **Dates:** 27,000–13,000 BP. These are radiocarbon years before present, not calendar years; never write them as "years ago".
 - **Costume:** modern hiking clothes, bucket hat, headlamp. He came for the guided tour. No furs, ever.
 - **Vocabulary:** carved shelter ledges, cave ceilings and shafts, bear-nest floor pits, lamp-limited sight.
 - **Status:** LOCKED
@@ -94,6 +94,7 @@ castles, Oceania and Polynesia, the steppe and nomadic cultures.
 
 - **Level 1 teaches:** a relief ledge is a floor; light is a resource; what you see may be a cast.
 - **Level 5 ends on:** walls of hand stencils with missing finger segments.
+- **Gargas date:** "c. 27,000 BP" is 26,860 ± 460 BP (GifA-92369; Clottes), an uncalibrated radiocarbon age on a splinter of bone in a crack of a hand panel. It dates the bone, associated with the hands, not the pigment. In calendar years it is older than 27,000 (compare Foucher et al. 2019: child remains at 24,930 ± 220 BP = 29,500–28,532 cal BP). Popular articles say 30,000 to 35,000 years; do not repeat that either.
 - **Chapter error dossier:** Henri Breuil's copies. Altamira Great Ceiling boar/bison reidentification (Breuil 1906 → Freeman 1987 → Rice 1992); a hind printed mirror-reversed in the 1906 plates; stratigraphic order wrong in several panels, corrected 1935. The Trois-Frères "Sorcerer" drawing contested by Ucko & Rosenfeld and Hutton, defended by Clottes. Font-de-Gaume figure numbering corrected by Reiche et al. 2023.
 - **Imagery:** thin. Most decorated caves are sealed or their photography is in copyright. Base on excavation reports plus Cartailhac & Breuil 1906 from US-hosted scans only (EU copyright in the plates runs to end of 2031).
 - **Gate 6:** clear. Do not build the chapter around replica caves; note replicas as modern intrusions only.
@@ -152,7 +153,7 @@ castles, Oceania and Polynesia, the steppe and nomadic cultures.
 
 | # | Site | Slug | Place | Period | Gate notes |
 |---|---|---|---|---|---|
-| — | Persepolis | `persepolis` | Fars, IR | c. 518–330 BC | Apadana double stairway, columns, terrace. Flandin & Coste 1851, PD |
+| — | Persepolis | `persepolis` | Fars, IR | c. 518–330 BC | Apadana double stairways, columns, terrace. Flandin & Coste, *Voyage en Perse*, issued in parts 1843–54, PD. The eastern stairway with its reliefs was excavated only in 1931–34, so no nineteenth-century plate shows it; base it on the excavation reports |
 | — | Behistun | `behistun` | Kermanshah, IR | c. 520 BC | Cliff face, relief band, cut-away access ledge. Rawlinson drawings, PD |
 | — | Naqsh-e Rustam | `naqsh_e_rustam` | Fars, IR | 5th c. BC + Sassanian | Cruciform rock tombs, Ka'ba tower. Flandin & Coste, PD |
 | — | Susa | `susa` | Khuzestan, IR | Elamite–Achaemenid | Tell, excavation "château". Dieulafoy 1890–92, PD |
@@ -173,7 +174,7 @@ castles, Oceania and Polynesia, the steppe and nomadic cultures.
 | — | Ephesus | `ephesus` | Selçuk, TR | Hellenistic–Roman | Library façade, hillside theatre, colonnaded street |
 | — | Ostia Antica | `ostia_antica` | Rome, IT | Republican–Imperial | Multi-storey insulae, theatre, silted harbour |
 | — | Pompeii | `pompeii` | Naples, IT | Buried AD 79 | **GATE 6 FLAG** — body casts are graves. Architecture only; casts out of frame. Niccolini 1854–96, PD |
-| — | Segesta / Taormina | `segesta` | Sicily, IT | Greek | Temple or theatre on a height. Grand Tour engravings, PD |
+| — | Segesta / Taormina | `segesta` | Sicily, IT | Elymian city; Greek Doric temple c. 430–420 BC | Segesta was an Elymian city, not a Greek one; its temple is a Greek Doric building in it, standing unfinished on its own low hill about 2 km west of the city's height, Monte Barbaro, which carries the theatre. Grand Tour engravings, PD |
 | — | Leptis Magna | `leptis_magna` | LY | esp. AD 193–211 | Theatre, basilica, harbour mole. **Flag:** conflict-zone heritage, note it |
 
 ### Chapter 6 — The Americas · `ch06_americas`
@@ -203,7 +204,7 @@ castles, Oceania and Polynesia, the steppe and nomadic cultures.
 
 | # | Site | Slug | Place | Period | Gate notes |
 |---|---|---|---|---|---|
-| — | Sigiriya | `sigiriya` | LK | c. AD 477–495 | Rock plug, lion's-paw gate, mirror wall. Gate 6 clear |
+| — | Sigiriya | `sigiriya` | LK | c. AD 477–495 | Sheer rock out of the plain, lion's-paw gate, mirror wall. Gate 6 clear. What the rock is made of is contested (section 7): never call it a plug |
 | — | Ajanta Caves | `ajanta` | Maharashtra, IN | c. 2nd c. BC – 5th c. AD | Horseshoe cliff, cave façades. Griffiths 1896–97, PD. Gate 6 clear |
 | — | Chand Baori | `chand_baori` | Abhaneri, Rajasthan, IN | 8th–9th c. | Thirteen storeys descending; the only level that goes *down*. **FLAG:** adjoining Harshat Mata temple is active — build in the well only |
 | — | Borobudur | `borobudur` | Java, ID | c. AD 800 | Stepped terraces, bell-stupas, buried base. **GATE 6 FLAG** — active pilgrimage. van Kinsbergen 1873, PD |
@@ -220,9 +221,9 @@ castles, Oceania and Polynesia, the steppe and nomadic cultures.
 
 | # | Site | Slug | Place | Period | Gate notes |
 |---|---|---|---|---|---|
-| — | Himeji Castle | `himeji` | Hyōgo, JP | present form 1601–09 | Keep on fitted-stone base; the concave batter that throws a climber's weight back; doubling-back maze approach |
+| — | Himeji Castle | `himeji` | Hyōgo, JP | present form 1601–09 (keep complex), 1617–18 (Nishi-no-maru) | Keep on fitted-stone base; the concave batter that throws a climber's weight back; doubling-back maze approach. **Flag:** what stands is just past the chapter window; only the traditional 1346 founding and Hideyoshi's lost keep of 1581 fall inside it. **Gate 6 note:** the keep's top floor houses a maintained shrine to Osakabe; any level inside the keep keeps it out of frame |
 | — | Great Wall | `great_wall` | Badaling / Jinshanling / Mutianyu, CN | Ming, 15th–16th c. | Ridgeline, watchtowers, rebuilt vs "wild" sections. Geil 1909, PD |
-| — | Nijō Castle | `nijo` | Kyoto, JP | 1603 | Sloped wall, moat, nightingale floors — a beat you hear |
+| — | Nijō Castle | `nijo` | Kyoto, JP | 1603 | Sloped wall, moat, nightingale floors — a beat you hear. **Flag:** just past the chapter window |
 | — | Gyeongbokgung | `gyeongbokgung` | Seoul, KR | 1395, rebuilt 1867 | Throne hall on double terrace, pond pavilion. **Flag:** colonial-era survey photography, check provenance |
 | — | Foguang Temple East Hall | `foguang` | Shanxi, CN | AD 857 | Tang bracket-sets. **GATE 6 FLAG** — monastic use, statues in situ. Liang Sicheng drawings in copyright to c. 2042 |
 
@@ -237,13 +238,13 @@ castles, Oceania and Polynesia, the steppe and nomadic cultures.
 
 | # | Site | Slug | Place | Period | Gate notes |
 |---|---|---|---|---|---|
-| — | Great Zimbabwe | `great_zimbabwe` | Masvingo, ZW | 11th–15th c. | Hill Complex on kopje, 11 m drystone wall, conical tower. Colonial misattribution (Bent, Hall) is a documented error beat. Bent 1892, PD. **Flag:** a revered locus on site — build from walls and tower (ruled 2026-09-23, section 4) |
+| — | Great Zimbabwe | `great_zimbabwe` | Masvingo, ZW | 11th–15th c. | Great Enclosure: drystone outer wall to about 11 m (9.6 m by one field guide), conical tower, Parallel Passage. Colonial misattribution (Mauch, Bent, Hall) is a documented error beat. Mauch 1871–74, Bent 1892, Hall 1902 and 1905, Randall-MacIver 1906, all PD; Randall-MacIver is the one whose text is also right. **Flag:** the revered locus is the Hill Complex on the kopje, with its caves, the Eastern Enclosure and the soapstone birds. Out of frame: build from walls, passage and tower (ruled 2026-09-23, section 4) |
 | — | Gede / Gedi | `gede` | Kilifi, KE | 12th–17th c. | Coral-rag walls in forest, pillar tomb, palace. Imagery: Kirkman reports only |
 | — | Kilwa Kisiwani | `kilwa_kisiwani` | TZ | 11th–16th c. | Husuni Kubwa palace terraces to the sea, Gereza fort. **Flag:** ruined mosque plus living Islam — use secular fabric |
 | — | Loropéni | `loropeni` | BF | c. 11th–17th c. | Drystone laterite curtain walls to 6 m, one controlled entrance. Gate 6 clear |
 | — | Songo Mnara | `songo_mnara` | TZ | 14th–16th c. | Palace and house blocks. Reserve |
 
-- **Imagery:** no pre-1930 European imagery for Kilwa, Gede, Loropéni, Songo Mnara. Base on 20th-century excavation reports (Chittick, Kirkman, Pradines) and measured surveys. Budget reference art.
+- **Imagery:** Great Zimbabwe has public-domain plates and photographs from 1871 to 1906 (row above). No pre-1930 European imagery for Kilwa, Gede, Loropéni, Songo Mnara. Base on 20th-century excavation reports (Chittick, Kirkman, Pradines) and measured surveys. Budget reference art.
 
 ### Chapter 10 — Islamic Central Asia & al-Andalus · `ch10_islamic`
 
@@ -254,7 +255,7 @@ castles, Oceania and Polynesia, the steppe and nomadic cultures.
 
 | # | Site | Slug | Place | Period | Gate notes |
 |---|---|---|---|---|---|
-| — | Registan & Ulugh Beg Observatory | `samarkand_registan` | Samarkand, UZ | madrasa 1417–20; observatory c. 1420–28 | Iwan portals, leaning minaret, buried marble sextant trench rediscovered 1908. Turkestan Album 1871–72, PD. Madrasas now museums — gate 6 largely clear |
+| — | Registan & Ulugh Beg Observatory | `samarkand_registan` | Samarkand, UZ | madrasa 1417–20; observatory c. 1420–28 or 1424–29 (section 7) | Iwan portals, the two front minarets (both leaned; straightened 1932 and 1965, so any lean is the pre-1932 state and never today's), buried marble sextant trench rediscovered 1908. Turkestan Album 1871–72, PD. Madrasas now museums — gate 6 largely clear |
 | — | Alhambra | `alhambra` | Granada, ES | 13th–14th c. | Alcazaba ramparts, Court of the Lions, Charles V palace inserted into the Nasrid fabric. Jones & Goury 1842–45, PD |
 | — | Medina Azahara | `medina_azahara` | Córdoba, ES | AD 936–1010, sacked | Terraced palace platforms, anastylosis from fallen fragments. Velázquez Bosco photos from 1911, PD |
 | — | Sultan Han | `sultan_han` | Aksaray, TR | Seljuk, 1229 | Blank walls, one carved portal, covered stable hall, raised kiosk-mosque |
@@ -269,7 +270,7 @@ castles, Oceania and Polynesia, the steppe and nomadic cultures.
 
 | # | Site | Slug | Place | Period | Gate notes |
 |---|---|---|---|---|---|
-| — | The Iron Bridge | `iron_bridge` | Coalbrookdale, Shropshire, GB | 1777–1781 | First major cast-iron arch; early cracks and ground-movement repairs are a flaw beat. Rooker engraving 1782, PD |
+| — | The Iron Bridge | `iron_bridge` | Coalbrookdale, Shropshire, GB | 1777–1781 | First major cast-iron arch; early cracks and ground-movement repairs are a flaw beat. Rooker engraving 1782 (William Ellis after Michael Angelo Rooker), PD |
 | — | Cromford Mill | `cromford` | Derbyshire, GB | 1771 | First water-powered cotton mill; leat, wheel, weir |
 | — | Ditherington Flaxmill | `ditherington` | Shrewsbury, GB | 1797 | First iron-framed building; floor-to-floor climb, engine house, hoist |
 | — | Cornish beam-engine house | `east_pool` | Cornwall, GB | late 18th c. | Bob wall, chimney, shaft head, cliff |
@@ -284,7 +285,7 @@ castles, Oceania and Polynesia, the steppe and nomadic cultures.
 
 | # | Site | Slug | Place | Period | Gate notes |
 |---|---|---|---|---|---|
-| — | Martello Towers | `martello_towers` | Kent & Sussex, GB | 74 towers, 1805–08 | Battered drum, rooftop traversing gun, first-floor door reached only by removable ladder, dry moat. Board of Ordnance plans, PD. Gate 6 clear |
+| — | Martello Towers | `martello_towers` | Kent & Sussex, GB | 74 towers, 1805–08; some finished c. 1810 | Battered drum of brick under a smooth render, one 24-pounder on a rooftop traversing carriage (the east-coast towers had three pieces), first-floor door reached only by removable ladder, dry moat on some (the Wish Tower has one; Tower 24 has none recorded). Turner, *Martello Towers near Bexhill* (c. 1808 and 1811), PD. Board of Ordnance manuscript plans may be Crown copyright, not PD: check before use. Gate 6 clear |
 | — | Simplon Pass military road | `simplon_pass` | Brig CH – Domodossola IT | 1801–1805 | Terraced hairpins, rock galleries, arched bridges, modern tarmac over the line. Lory *Voyage pittoresque* 1811, PD. Gate 6 clear |
 | — | Neuf-Brisach | `neuf_brisach` | Alsace, FR | Vauban 1698–1703, active through the wars | Concentric bastions, ravelins, dry ditches, town gates. Vauban plans and plan-relief. Gate 6 clear |
 | — | Chappe semaphore tower | `chappe_saverne` | Saverne, Alsace, FR | line opened 1798, ran to 1852 | Rooftop mast with two coded arms, sighting telescope, counterweight gear. Figuier c. 1867 engraving, PD. **Flag:** the standing structure is a faithful 1968 reconstruction — an authenticity note, not a gate 6 issue |
@@ -345,9 +346,9 @@ minimum differentiator, which is binding on level design.
 | 3 | Mixed — Schliemann clear, Akrotiri has nothing | Marinatos 1968–76; Doumas 1992 |
 | 4, 5 | Strong | — |
 | 6 | Uneven | Catherwood, Maudslay, Maler, Squier where they reach |
-| 7 | Partial | Archaeological Survey of India reports for Chand Baori and Sigiriya |
+| 7 | Partial | Archaeological Survey of India reports for Chand Baori; for Sigiriya, the Archaeological Survey of Ceylon (H.C.P. Bell's Annual Reports, from the 1890s), then Sri Lanka's Department of Archaeology and the Central Cultural Fund (Cultural Triangle, 1980s) |
 | 8 | Partial | Liang Sicheng 1930s drawings are in copyright to c. 2042 |
-| 9 | Weakest in the game | Chittick, Kirkman, Pradines excavation reports; commission reference art |
+| 9 | Weakest in the game for the coastal and Sahel sites; Great Zimbabwe is well covered (Mauch, Bent, Hall, Randall-MacIver, 1871–1906) | Chittick, Kirkman, Pradines excavation reports; commission reference art |
 | 10, 11, 12 | Strong | — |
 
 The public-domain criterion silently biases the arc toward places nineteenth-century
@@ -368,7 +369,16 @@ Keep these as live disputes in the asset notes, never as settled, and never in a
 - Gargas missing fingers: frostbite, amputation and folded-finger hypotheses all live. Ritual amputation must not be stated as fact.
 - Pech Merle spotted horses: the 2011 leopard-complex allele finding is contested on dating grounds.
 - Phaistos Disc: undeciphered; a minority hoax claim exists.
-- Fringe claims to exclude entirely: the Dendera "light", Serapeum precision-machining, and any pre-Bent attribution of Great Zimbabwe to Phoenicians or Sheba.
+- Gargas hands: the colour counts differ (143 black, 80 red, 2 bistre, 5 ochre, 1 white of 231, against more than 100 black, 85 red, 4 white, 1 ochre) but both put black in the majority; the black is manganese in most sources, charcoal in one. How many hands are incomplete: 114, 144, or "almost never complete". The commonest pattern is all four fingers short with the thumb whole (55 of the 112 Leroi-Gourhan characterised), and every incomplete hand keeps its thumb; that the fourth and fifth fingers are the ones most often short is a weaker popular claim.
+- Abu Simbel relocation figures: 64 m higher and 180 m inland (UNESCO), 65 m and 200 m (common), more than 60 m (Britannica). Facade 30 × 35 m or about 33 × 38 m; colossi 20–22 m. Whether the move shifted the sun days by one, and which way: UNESCO says the temple was rebuilt in the same orientation; the illumination is a window of days, not one day. When and why the second colossus fell: soon after completion, or 27 BC, probably an earthquake; say "in antiquity". Which family figure stands at which colossus: the secondary summaries conflict.
+- Persepolis: Apadana column height (from about 16.5 m to 25 m in the sources) and capital height (5.8 m or about 8 m); when the fourteenth column was re-erected (1965 or the 1970s); the animal on the east portico's capitals (double lions, or Schmidt's unspecified "addorsed animals").
+- Segesta temple: whether a cella was ever intended (Mertens's cella trenches against a roofless colonnade built on purpose round an open-air cult place); why work stopped; its deity. Exclude the popular story that it was a sham built to fool the Athenian envoys (Thucydides 6.46 has them fooled with borrowed silver).
+- Sigiriya: what the rock is (magma plug, granite, red gneiss, a residual hill); its height (about 180 m or nearly 200 m); what the lion above the paws looked like (a reconstruction; nothing above the paws survives).
+- Himeji: the Akamatsu founding of 1333/1346 rests on later chronicles; the Meiji sale for 23 yen 50 sen; the unexploded bomb of 1945. Whether the curve of the stone face is defensive or structural.
+- Great Zimbabwe: whether the conical tower or the outer wall beside it is the higher; what the tower was for; whether the Hill, Great Enclosure and Valley were built in sequence or overlapping.
+- Registan: the observatory's dates (c. 1420–28, or 1424–29); when the minarets fell or lost their tops; whether the second front minaret was straightened in 1965 or reinforced in 1966–67.
+- Martello towers: 74 or 75 on the south coast; height and diameter (about 10 m high and 13 m across the foot by Historic England, 40 × 40 ft by an older local source); whether the name is from Mortella Point or from a hammer.
+- Fringe claims to exclude entirely: the Dendera "light", Serapeum precision-machining, and every foreign-builder attribution of Great Zimbabwe, before, by and after Bent: Mauch 1871 (Sheba), Bent 1892 (Phoenicians or Arabs), Hall 1902–05 (Phoenicians or Sabaeans), and the Rhodesian-era guidebooks that repeated them. Randall-MacIver (1906) and Caton-Thompson (1931) are the correction. The misattribution may appear only as a documented error, never as a possibility.
 
 ---
 

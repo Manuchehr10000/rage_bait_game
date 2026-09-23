@@ -7,14 +7,17 @@ between them in the nineteenth century for visitors, and today the visit goes in
 upper cave and out by the lower.
 
 Gargas is the *sanctuary of hands*: about **231 negative hand stencils**, something like
-thirty per cent of all the hand stencils known in Europe. They are red (ochre) and black
-(manganese), a very few yellow, and every one of them is in the lower cave. **On a single
-wall near what is today the exit, 137 hands have been counted, one of them yellow.** Most
-of the hands are not whole: one or more fingers, most often the fourth and fifth, are
-short. Félix Regnault, who had known the cave for thirty years, saw three red hands on a
-stalagmitic relief in the middle of the cave on **11 June 1906**, and sent for Cartailhac
-and Breuil. A splinter of bone wedged into a crack of a wall of hands gave a radiocarbon
-date close to **27,000 BP**: Gravettian.
+thirty per cent of all the hand stencils known in Europe. Most are black (manganese oxide,
+perhaps charcoal in places), many red (ochre), a very few yellow or ochre and one to four
+white, and every one of them is in the lower cave. **On a single wall near what is today
+the exit, 137 hands have been counted, one of them yellow.** Half or more of the hands are
+not whole, and every incomplete hand keeps its thumb: the commonest pattern is all four
+fingers short and the thumb whole. Félix Regnault, who had known the cave for thirty years,
+saw three red hands on a stalagmitic relief in the middle of the cave on **11 June 1906**,
+and sent for Cartailhac and Breuil. A splinter of bone wedged into a crack of a wall of
+hands gave a radiocarbon age of 26,860 ± 460 BP, close to **27,000 BP**: Gravettian. It
+dates the bone, which goes with the hands, not the paint; and it is in radiocarbon years,
+so in calendar years it is older. Never write it as "27,000 years ago".
 
 The lower cave also holds most of the cave's **148 engraved figures**, more than seventy per
 cent of them in one small smooth-walled side chamber, the **Camarin**, among them a bull and
@@ -106,7 +109,7 @@ There is no trap on that wall.
 | c | `c-tunnel` | Twelve fitted steps down under a roof cut high, a handrail beside them. The fourth lets go of whoever stands on it; the sixth takes his boot and then goes; the ninth rocks back and pins him against the eighth; the eleventh is not there. At the bottom, the block that first joined the two caves. A hop | The nineteenth-century tunnel; the stairs with barriers; the rockfall said to have joined the caves in the Middle Ages |
 | d | `d-hall` | The great hall of Gargas I, wide and five tiles high. Claw marks on the walls. The bear that is a stalagmite: a hop. Three patches of floor that are the crust over a wallow. The Camarin: a hole a jump wide, and under the floor, four tiles back, the engravings | The great hall; the bears, their claw marks and their wallows in the clay; the Salle de l'Ours; the Camarin and its 148 engravings, the Great Bull and Great Horse |
 | e | `e-well` | The floor is gone. Three slabs of the path across it, the middle one higher, and the middle one tips. By now the lamp is flickering, or out, unless it was put out earlier | The Oubliettes de Gargas, a shaft about twenty metres deep; the fitted route |
-| f | `f-hands` | The wall of hands, lit from the right by the day. Adults' hands high, children's low; red, black, one yellow; about half of them short of a finger. The lower portal | 137 hands on one wall near the exit, one yellow; the incomplete fingers; the bone splinter; the lower portal is the way out |
+| f | `f-hands` | The wall of hands, lit from the right by the day. Adults' hands high, children's low; black and red, one yellow; about half of them short of fingers, never the thumb. The lower portal | 137 hands on one wall near the exit, one yellow; the incomplete fingers; the bone splinter; the lower portal is the way out |
 
 ## Deliberate lies
 
@@ -145,9 +148,9 @@ There is no trap on that wall.
   like a bear.
 - The Camarin is real, smooth-walled, small, and holds most of the engravings.
 - The well is real and it is deep.
-- The hands are real, in the lower cave only, red and black with a very few yellow,
-  adults' and children's, and most of them are short of a finger or more. The wall near the
-  exit with 137 of them is where the level ends.
+- The hands are real, in the lower cave only, black and red with a very few yellow and
+  white, adults' and children's, and half or more of them are short of fingers, never of
+  the thumb. The wall near the exit with 137 of them is where the level ends.
 - The steel door, the stairs with their barriers and the non-slip floor are the modern
   visit as it is.
 
@@ -189,22 +192,44 @@ to have hidden in the cave, live here and in the chapter dossier.
   https://www.hominides.com/musees-et-sites/gargas-grotte/
 - Don's Maps, Gargas, on the bears (wallows, claw marks, polished passages), the bone in the
   crack dated close to 27,000 BP, and the colours: https://donsmaps.com/gargas.html
+- Clottes, *Twenty Thousand Years of Palaeolithic Cave Art in Southern France*, British
+  Academy, for 26,860 ± 460 BP (GifA-92369) on the bone beside the hands:
+  https://www.thebritishacademy.ac.uk/documents/3849/99p161.pdf
+- Foucher et al. 2019, *Les vestiges humains gravettiens de la grotte de Gargas*, BSPF 116,
+  for the calibration offset (24,930 ± 220 BP = 29,500–28,532 cal BP):
+  https://www.persee.fr/doc/bspf_0249-7638_2019_num_116_1_14981
+- Hominidés, for the colour inventory (143 black, 80 red, 2 bistre, 5 ochre, 1 white) and the
+  pigments; Préhistoire des Hautes-Pyrénées for the other count (more than 100 black, 85 red,
+  4 white, 1 ochre): https://www.hominides.com/musees-et-sites/gargas-grotte/ and
+  http://prehistoire.loucrup65.fr/mainsgargas.htm
+- Overmann 2014, *Finger-counting in the Upper Palaeolithic*, Rock Art Research 31, for
+  Leroi-Gourhan's counts (all four fingers short with the thumb whole: 33 black and 22 red of
+  112 characterised): http://www.ifrao.com/wp-content/uploads/2014/08/31-1-Overmann.pdf
+- *Les mains incomplètes de Gargas, Tibiran et Maltravieso*, Quartär, for the thumb present
+  on every incomplete hand and ten formulas of fifteen possible:
+  https://journals.ub.uni-heidelberg.de/index.php/qu/article/download/80552/74594
 - Azinat, on Blaise Ferrage and the legend that he hid at Gargas:
   https://www.azinat.com/2017/02/lhistoire-incroyable-dun-ariegeois-meconnu-blaise-ferrage
 
 ## Confidence
 
 **Solid.** Two caves, upper and lower, joined by a tunnel for visitors; in by the upper,
-out by the lower; the hands in the lower cave only; red and black with rare yellow; most
-hands incomplete, the fourth and fifth fingers most often; Regnault, 11 June 1906; the
+out by the lower; the hands in the lower cave only; black the commonest colour, then red,
+with rare yellow and white; many hands incomplete, the thumb whole on every one of them, and
+all four fingers short the commonest pattern; Regnault, 11 June 1906; the
 Camarin with most of the engravings; the Salle de l'Ours; the finger tracings and paintings
-of the upper cave; the bears; the bone splinter close to 27,000 BP; the fifty-minute visit
+of the upper cave; the bears; the bone splinter at 26,860 ± 460 BP (radiocarbon, and a date
+for the bone, not the paint); the fifty-minute visit
 on a fitted route with a steel door.
 
 **Discrepant in the sources:** whether the caves were first joined by a mediaeval rockfall
 or only by the nineteenth-century tunnel; the count of hands (217, 231, "about 250"); how
-many are incomplete (49 short of a finger by one count, 144 by another, "almost never
-complete" by a third). The level draws about half of them short.
+many are incomplete (49 short of a finger by one count, 114 or 144 of 231 by others, "almost
+never complete" by a third); the colours (143 black and 80 red, or more than 100 black and 85
+red; one white or four); whether the black is manganese or, in places, charcoal; and whether
+the fourth and fifth fingers are the ones most often short, which a weaker popular source
+says (it counts fingers where Leroi-Gourhan counted patterns, so both may hold). The level
+draws about half of them short.
 
 **Not verified, so ask before painting:** that the 137-hand wall is the last thing on the
 visit before the exit (one tourism source says "near what is today the exit"); the exact

@@ -33,7 +33,7 @@ Beat b. Drawn behind the colossi; the ground line is at the image's bottom edge.
 
 ## Deliberately wrong
 
-The facade is drawn shorter than real (the real one is 33 m to the colossi's 20 m; ours is about 1.6 colossi tall) so the cornice is visible when the camera rises.
+The facade's height is chosen so the cornice is visible when the camera rises: about 1.6 colossi tall. The sources give 30 to 33 m for the facade against 20 to 22 m for the colossi, 1.4 to 1.65 colossi, so ours is at the tall end of the range rather than wrong; it is listed here because it was chosen for the camera, not measured.
 
 ## Easter eggs
 

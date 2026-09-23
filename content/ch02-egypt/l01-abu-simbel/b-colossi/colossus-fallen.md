@@ -17,7 +17,7 @@ Beat b, on the ground in front of the broken statue, 6 px left of its box. 72 ×
 
 ## Must be right
 
-The face is recognisably the same face as the intact heads, on its side. The crown fragment should be there. The pieces lie in front and to the left of the statue, as they do at the site.
+The face is recognisably the same face as the intact heads, on its side. The crown fragment should be there. The pieces lie in front of the statue, at its feet, as the sources have it. Whether they lie to its left, as this note once said, is unverified: check a photograph before relying on it. Where the sprite sits is layout.
 
 ## Deliberately wrong
 

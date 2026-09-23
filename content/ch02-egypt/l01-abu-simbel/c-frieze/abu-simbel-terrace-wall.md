@@ -21,7 +21,7 @@ Same stone and same cornice profile as the facade: they must look like one build
 
 ## Deliberately wrong
 
-The position of the frieze. Real baboons are 33 m up.
+The position of the frieze. Real baboons are about 30 m up, along the top of a facade given as 30 to 33 m.
 
 ## Easter eggs
 

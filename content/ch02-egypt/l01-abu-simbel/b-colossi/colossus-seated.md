@@ -9,9 +9,9 @@
 
 ## What it is
 
-Ramesses II enthroned, from the shoulders down. The head is a separate sprite that sits exactly on top of this one. Hands flat on the thighs, a pleated **shendyt** kilt between the knees, a broad collar, feet forward on the base. **Cartouches** sunk into the chest and each upper arm. On the sides of the throne (not visible from the front) the Nile gods bind the two lands; on the front face of the throne base, rows of bound captives, Nubians on one side and Asiatics on the other.
+Ramesses II enthroned, from the shoulders down. The head is a separate sprite that sits exactly on top of this one. Hands flat on the thighs, a pleated **shendyt** kilt, a broad collar, feet forward on the base. **Cartouches** sunk into the chest and each upper arm. On the sides of the throne (not visible from the front) the Nile gods bind the two lands; on the front face of the throne base, rows of bound captives, Nubians on one side and Asiatics on the other.
 
-At the legs, the **family**: a queen beside each shin (Nefertari and Tuya at the outer statues; the pattern varies), a prince or princess standing between the knees, each about knee-high to the king.
+At the legs, the **family**, each about knee-high to the king: a woman of the family beside each shin, and a prince or princess standing in front between the feet. Who they are changes from statue to statue (see `../LEVEL.md`). Queen Nefertari and the king's mother Tuya flank the broken colossus, left of the door; the southernmost has Princesses Bintanath and Nebettawy, in queens' regalia, not Nefertari. Tuya appears again at the northernmost, Nefertari again right of the door.
 
 ## Where it stands in the game
 
@@ -21,17 +21,19 @@ Beat b, four times, 80 px apart. The head sprite (32 × 48) sits centred on top;
 
 - Hands flat, not fists. The king is at rest.
 - The kilt pleats are vertical and the belt has a buckle with the cartouche.
-- The family figures: sheath dresses on the women, a queen's crown with plumes and disc on Nefertari, a side-lock on a child.
+- The family figures: sheath dresses on the women, a queen's crown with plumes and disc on the queen, a side-lock on the child. The child stands in front between the feet, not between the knees.
 - The throne is a plain block with a low back; not a chair.
 - Feet: bare, on a low base.
 
 ## Deliberately wrong
 
+The family figures are the same on every statue. At the site they differ from statue to statue (see `../LEVEL.md`); here they are generic and unlabelled, so the one sprite serves all four positions.
+
 The captives on the throne base are optional at this size. If painted, they must be there on every colossus, not one.
 
 ## Easter eggs
 
-Nefertari at the left leg of the southern colossus specifically. The join lines.
+The join lines. (Queen Nefertari at the king's left leg belongs to the broken colossus, not this one: see `colossus-broken.md`.)
 
 ## Sources
 
@@ -42,4 +44,4 @@ Nefertari at the left leg of the southern colossus specifically. The join lines.
 
 ## Confidence
 
-Posture, kilt, collar, cartouches and family figures: well documented. Which relative stands at which leg of which statue differs between sources; do not label them.
+Posture, kilt, collar, cartouches and the presence of family figures: well documented. Which relative stands at which leg of which statue comes from secondary summaries that conflict in places; do not label them.

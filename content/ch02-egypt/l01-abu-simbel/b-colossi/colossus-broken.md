@@ -9,7 +9,7 @@
 
 ## What it is
 
-The second colossus from the left. Everything above the lap came away in antiquity, most likely an earthquake not long after the temple was finished (a Ramesside restoration text inside suggests the damage was known and left). The break runs roughly across the waist; the lap, the hands on the thighs, the legs, the throne and the family figures remain. The fallen head and torso lie in front (separate sprite).
+The second colossus from the left, the one immediately left of the door. It is shattered at the waist: everything above came away in antiquity, probably in an earthquake (when is disputed; see Confidence). The lap, the hands on the thighs, the legs, the throne and the family figures remain. At its legs the sources put Queen Nefertari, the king's mother Tuya and Prince Amun-her-khepeshef. The fallen head and torso lie in front (separate sprite).
 
 ## Where it stands in the game
 
@@ -17,17 +17,19 @@ Beat b, second position. Same 64 × 112 box and same ground line as the intact s
 
 ## Must be right
 
-- The break line is jagged, with the inner stone paler than the weathered surface.
+- The break line is jagged. It is an ancient break, weathered like the rest of the stone; no source says it reads paler, so do not make it a feature.
 - Everything below the break is identical to the intact statue: same lap, same family figures, same throne. Pillar 4: the only difference between the statues is what is true.
 - The upper break must not look like a clean saw cut. The relocation cuts are hairlines; this is a fracture.
 
 ## Deliberately wrong
 
-None. Everything about this one is meant to be right.
+The family figures are the intact statue's, generic and unlabelled (see `colossus-seated.md`). At the site this one has Nefertari, Tuya and Amun-her-khepeshef.
 
 ## Easter eggs
 
-It has been like this for 3,000 years, and the 1968 engineers put the pieces back exactly where they had lain. That fact is the egg.
+It has been like this since antiquity, and the 1968 engineers put the pieces back exactly where they had lain. That fact is the egg.
+
+Queen Nefertari stands at the king's left leg of this statue, the broken one, not at the southernmost, where it is Princess Bintanath. An egg only if the family figures are ever made statue by statue.
 
 ## Sources
 
@@ -38,4 +40,4 @@ It has been like this for 3,000 years, and the 1968 engineers put the pieces bac
 
 ## Confidence
 
-Well documented. The earthquake date is an inference; say 'in antiquity' rather than a year.
+The break and the pieces at its feet: well documented. When and why it broke is disputed: soon after completion in popular accounts, 27 BC in others (and seismic catalogues question whether that earthquake happened); the cause is probably an earthquake. Say 'in antiquity' rather than a year. The family-figure list comes from secondary summaries.

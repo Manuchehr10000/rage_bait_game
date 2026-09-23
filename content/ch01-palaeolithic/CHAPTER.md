@@ -1,6 +1,7 @@
 # Chapter 1 · Palaeolithic Europe
 
-Source: `content/research/arc.md`, chapter 1. Dates 27,000 to 13,000 BP. Status: locked
+Source: `content/research/arc.md`, chapter 1. Dates 27,000 to 13,000 BP, in radiocarbon years:
+never "years ago". Status: locked
 in the research. All five levels are built. The game starts here.
 
 | Level | Site | Place | Period | Built |
@@ -9,7 +10,7 @@ in the research. All five levels are built. The game starts here.
 | 2 | Roc-aux-Sorciers | Angles-sur-l'Anglin, Vienne, France | Mid Magdalenian, c. 15,000 BP | yes |
 | 3 | Pech Merle | Cabrerets, Lot, France | Gravettian, c. 25,000 BP | yes |
 | 4 | Rouffignac | Rouffignac-St-Cernin, Dordogne, France | Magdalenian, c. 13,000–15,000 BP | yes |
-| 5 | Gargas | Aventignan, Hautes-Pyrénées, France | Gravettian, c. 27,000 BP | yes |
+| 5 | Gargas | Aventignan, Hautes-Pyrénées, France | Gravettian, c. 27,000 BP (a bone beside the hands, radiocarbon) | yes |
 
 - **Costume:** modern hiking clothes, bucket hat, headlamp. He came for the guided tour.
   No furs, ever.
@@ -52,7 +53,7 @@ in the research. All five levels are built. The game starts here.
   piece of the fitted path that tips is the slab over the well. The thing worth
   seeing, the engravings of the Camarin under the hall floor, costs the light the well needs,
   or costs nothing if he looks at them in the dark. The chapter ends on the wall of 137 hands near the lower portal, seen by
-  the daylight from the way out. Half the hands are short of a finger, and the level says nothing about why.
+  the daylight from the way out. Half the hands are short of fingers, never the thumb, and the level says nothing about why.
 - **Level 5 ends on:** walls of hand stencils with missing finger segments.
 - **Imagery:** thin. Most decorated caves are sealed or their photography is in
   copyright. Base on excavation reports plus Cartailhac & Breuil 1906 from US-hosted

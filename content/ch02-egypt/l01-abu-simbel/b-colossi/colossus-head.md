@@ -9,7 +9,7 @@
 
 ## What it is
 
-The king's head: **nemes** headcloth with the striped lappets falling to the shoulders, a **uraeus** cobra on the brow, the **false beard** plaited, the long cosmetic line at the eyes, the slight smile. On top, the **double crown** (pschent): the red crown of Lower Egypt as a low outer band with its curl at the front, the tall white crown of Upper Egypt rising out of it.
+The king's head: **nemes** headcloth with the striped lappets falling to the shoulders, a **uraeus** cobra on the brow, the **false beard** plaited, the long cosmetic line at the eyes, the slight smile. On top, the **double crown** (pschent): the red crown of Lower Egypt as a low outer band, the tall white crown of Upper Egypt rising out of it.
 
 The sprite is 32 × 48. The lower 32 × 32 is the head and nemes and is the hitbox; the top 16 rows are the crown. When the fourth head falls it falls crown and all.
 
@@ -22,7 +22,7 @@ Beat b, three heads over the three intact colossi. The game draws it at the top 
 - Nemes stripes run along the lappets, and the headband across the brow is plain.
 - The uraeus is a cobra with its hood spread, centred on the brow.
 - The beard is straight and plaited, attached under the chin, not a natural beard.
-- The double crown must read as two crowns: the curl of the red crown is the tell.
+- The double crown must read as two crowns: the low red crown round the foot of the tall white one. The red crown's curl is not a must-be-right: whether it was carved on these colossi, or survives, is unverified. Check a photograph before painting it.
 - All three heads are identical. Pillar 4.
 
 ## Deliberately wrong
