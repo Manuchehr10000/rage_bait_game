@@ -111,7 +111,9 @@ PAINTERS['lion-paws'] = function (ctx, W, H, B) {
   // that is some 100 px. The stair between them is about 2.2 m wide and climbs
   // on, narrowing into the distance, to the foot of the cliff.
 
-  const TOPY = 12; // the summit line, with some 10 px of sky above it
+  // The summit runs off the top of the plate: seen from the lion terrace the
+  // rock towers, and a flat ruled top across the frame read as a desert butte.
+  const TOPY = -6;
   const BASE = 250; // where the outer toes and the first step meet the terrace
   const PX1 = 150; // the left paw's inner side, along the stair; the right paw mirrors it
   const STAIR_TOP = 132; // the last step visible, in the shade at the cliff's foot
@@ -444,8 +446,10 @@ PAINTERS['lion-paws'] = function (ctx, W, H, B) {
       }
       // Surviving lime plaster over the top of the foot: a few crisp, pale
       // patches, the brick showing red between them.
-      const PL = lit(S.plaster, 0.12);
-      B.fill(c, P([[62, 198], [68, 192.6], [76, 190], [86, 194.6], [100, 196.4], [110, 199.4], [104, 203.4], [90, 204], [78, 200.6], [68, 203]]), PL);
+      // Kept close in value to the brick: a pale flash on each foot read as a
+      // cartoon pad, not as weathered lime.
+      const PL = mixh(lit(S.plaster, 0.06), S.brick, 0.42);
+      B.fill(c, P([[62, 198], [68, 193.6], [76, 192], [84, 195.6], [96, 197.4], [104, 200.4], [98, 202.4], [88, 201.6], [78, 200.6], [68, 202]]), PL);
       // A shallow cool dip down the middle of the foot where the toes part.
       wash(c, P([[74, 214], [84, 199], [90, 199], [86, 214]]), SHADOW, 0.16);
       wash(c, P([[108, 214], [114, 200], [120, 200], [118, 214]]), SHADOW, 0.16);

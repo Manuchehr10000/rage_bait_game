@@ -53,8 +53,8 @@ the width of the plate at its foot and narrows toward the top, as rock does when
 tilts up. It is painted in five tall flat planes, cool on the left and stepping warmer to
 the sunlit right. On the right a sunny shoulder leans out over a shaded undercut. Four
 dark run-off streaks hang from the lip, darkest at the top. Three pale angular patches
-show where the weathered skin has flaked away. The summit line is flat and bare, with a lit
-lip and a band of shade under it. The foot of the cliff, behind the paws, is one calm
+show where the weathered skin has flaked away. The summit runs off the top of the plate,
+so the face towers; the sky shows only in the upper corners. The foot of the cliff, behind the paws, is one calm
 band of cool shade under a thin lit edge, so the tops of the paws stand clear of it.
 
 Above, the set's brochure sky, cloudless: a strip along the top of the plate and a wedge
@@ -108,8 +108,8 @@ paws is gone" is what is known. And the chapter 7 row of the vignettes table in
 - The terrace is the ground, and the cliff rises from its back edge. The terrace is not at
   the level of the plain.
 - The rock is a sheer, bare, near-vertical cliff. Not a green hill, not a dome, not a cone.
-- The summit line is broadly flat. No palace, wall, tower or roof on it: the summit holds
-  foundations and cisterns only, and none shows from here.
+- Nothing built shows on the rock from here. The summit, out of frame above, holds
+  foundations and cisterns only.
 - No painted women on the cliff face and no gleaming mirror wall. Both are on the west
   face, out of this view.
 - No water, moat, fountains or water gardens in frame. They lie at the western foot of the
@@ -144,8 +144,8 @@ paws is gone" is what is known. And the chapter 7 row of the vignettes table in
   The plate throws them to the left and a little toward the viewer, the set's rule, onto
   the terrace and across the lowest steps.
 - **The view is compressed.** The depth of the terrace is shortened and the cliff cut
-  down, so the paws and the summit edge fit one 92 × 70 frame. Looking up from the terrace,
-  the real cliff would fill far more of the view.
+  so the paws and the towering face fit one 92 × 70 frame. The summit is left out of
+  frame: a flat ruled top across the plate read as a desert butte.
 - **The terrace is empty.** It never is in life. A brochure clears it, and figures at this
   size would be specks that confuse the paws' scale.
 - **The modern fittings are left out.** The metal stairways that climb the rock above the

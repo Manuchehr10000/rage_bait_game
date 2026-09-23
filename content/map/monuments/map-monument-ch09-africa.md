@@ -39,9 +39,9 @@ In the plate:
   little downward at the foot. Short end joints stand about a course apart and crowd
   toward the edges. The right front is lit, the left flank in cool shade, with a soft
   terminator between. A thin sunlit arris runs under each joint on the lit side.
-- **Its top** is flat and lit along its edge. It is broken in two places where blocks of
-  the top course are gone: a low step across the left shoulder, and a notch right of
-  centre.
+- **Its top** is flat and lit along its edge, worn uneven in two shallow places where
+  stones of the top course are gone, across the left shoulder and right of centre. Never
+  a full course deep: square notches made it read as a castle battlement.
 - **The small tower**, to the right of the great one with a gap of court between them. It
   is the same masonry at 0.42 of the size, broken off in a steep ragged slope from about
   3 m on its left to about 1 m on its right. Six fallen blocks lie spilled at its right

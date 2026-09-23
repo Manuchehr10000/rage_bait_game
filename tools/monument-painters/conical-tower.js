@@ -405,7 +405,9 @@ PAINTERS['conical-tower'] = function (ctx, W, H, B) {
   // The conical tower: flat-topped, its top edge ragged where a few blocks of
   // the top course (and one of the course under it) are gone.
   const TOPM = TH_M;
-  const gaps = [[-1.58, -0.7, 1], [-0.7, -0.52, 0.5], [0.12, 0.6, 1]];
+  // Shallow, uneven losses, never a full course: two square notches a course
+  // deep made the flat top read as a castle battlement.
+  const gaps = [[-1.58, -1.02, 0.5], [0.28, 0.58, 0.35]];
   const bigTop = function (th) {
     for (const [a, b, n] of gaps) if (th >= a && th < b) return TOPM - n * COURSE_M;
     return TOPM;

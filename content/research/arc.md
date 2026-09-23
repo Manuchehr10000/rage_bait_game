@@ -5,7 +5,7 @@ single source of truth for site identity, period, costume and status. It does no
 contain level design; beats are decided one at a time in design conversation and
 live in each level's own asset notes.
 
-Last revised: 2026-09-23. Great Zimbabwe ruled: walls, passage and tower only (section 4). 2026-09-15: curator mode dropped by designer ruling; facts that cannot be shown without text live in the asset notes and nowhere in the game.
+Last revised: 2026-09-24. Tikal ruled: architecture only (section 4). 2026-09-23: Great Zimbabwe ruled: walls, passage and tower only (section 4). 2026-09-15: curator mode dropped by designer ruling; facts that cannot be shown without text live in the asset notes and nowhere in the game.
 
 ---
 
@@ -187,7 +187,7 @@ castles, Oceania and Polynesia, the steppe and nomadic cultures.
 |---|---|---|---|---|---|
 | — | Teotihuacan | `teotihuacan` | MX | c. 100 BC – AD 550 | Sun and Moon pyramids; Batres over-restoration c. 1906 is a reconstruction beat. Charnay 1880s, PD |
 | — | Chichén Itzá | `chichen_itza` | Yucatán, MX | c. AD 600–1200 | El Castillo, ball court, equinox serpent-shadow. Catherwood 1843, Maudslay 1889–1902, PD |
-| — | Tikal | `tikal` | Petén, GT | c. AD 200–900 | Steep temple stairs, roof-combs. Maudslay, Maler, PD |
+| — | Tikal | `tikal` | Petén, GT | c. AD 200–900 | Steep temple stairs, roof-combs. Maudslay, Maler, PD. **Flag:** contemporary Maya ceremonies in the Great Plaza — architecture only (ruled 2026-09-24, section 4) |
 | — | Monte Albán | `monte_alban` | Oaxaca, MX | c. 500 BC – AD 800 | Levelled hilltop, danzantes, Building J |
 | — | Ollantaytambo | `ollantaytambo` | Cusco, PE | Inca, 15th c. | Stacked terraces, unfinished megaliths, quarry ramp. Squier 1877, PD |
 
@@ -319,6 +319,7 @@ use of the site: levels, asset notes, and the tour map.
 | Site | Chapter | Issue | Ruling | Date |
 |---|---|---|---|---|
 | `great_zimbabwe` | 9 | A revered locus on site | Walls, passage and tower only, as recommended. First applied to the chapter 9 vignette on the tour map; the revered locus stays out of frame there and in any level | 2026-09-23 |
+| `tikal` | 6 | Contemporary Maya ceremonies are held at the site, in the Great Plaza (found in re-verification, 2026-09-23) | Architecture only: no ceremony, modern altar, fire circle, offerings or people in frame, in the tour-map vignette or in any level | 2026-09-24 |
 
 ---
 

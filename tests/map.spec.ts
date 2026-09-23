@@ -277,3 +277,28 @@ test('nothing printed on the map is ever standing where the tourist is', async (
   });
   expect(clashes).toEqual([]);
 });
+
+test('every chapter shows its painted plate in the panel, not the flat fallback', async ({ page }) => {
+  const colours = await page.evaluate(() => {
+    const g = (window as unknown as { __game: { mapScreen: { view: string; chapter: number }; scale: number; draw(): void } }).__game;
+    const canvas = document.querySelector('#game') as HTMLCanvasElement;
+    const ctx = canvas.getContext('2d')!;
+    const out: number[] = [];
+    for (let c = 0; c < 12; c++) {
+      g.mapScreen.view = 'world';
+      g.mapScreen.chapter = c;
+      g.draw();
+      // The plate's frame in the world view, inset past its keyline.
+      const s = g.scale;
+      const d = ctx.getImageData((218 + 4) * s, (40 + 4) * s, (92 - 8) * s, (70 - 8) * s).data;
+      const seen = new Set<number>();
+      for (let i = 0; i < d.length; i += 4) seen.add((d[i]! << 16) | (d[i + 1]! << 8) | d[i + 2]!);
+      out.push(seen.size);
+    }
+    return out;
+  });
+  // Measured: a painted plate shows 239 to 255 colours here (its palette is
+  // capped at 255); the code-drawn silhouette, antialiased at this scale, about
+  // 156. 200 sits clear of both.
+  for (const [i, n] of colours.entries()) expect(n, `chapter ${i + 1}`).toBeGreaterThan(200);
+});

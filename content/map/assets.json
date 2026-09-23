@@ -1,5 +1,5 @@
 {
-  "$comment": "The tour map. Sizes are world pixels (320 x 180 view; the map box is 208 x 152 of it). Painted files are 4x. Beat '.' means the note sits in this folder.",
+  "$comment": "The tour map. Sizes are world pixels (320 x 180 view; the map box is 208 x 152 of it, a monument plate 92 x 70). Painted files are 4x. Beat '.' means the note sits in this folder; the monument plates and their notes are in monuments/.",
   "level": "map",
   "assets": [
     {
@@ -15,6 +15,114 @@
       "h": 152,
       "beat": ".",
       "what": "The Nile from Abu Simbel to Saqqara, zoomed, as the chapter's own map. No pins, no route, no words."
+    },
+    {
+      "id": "map-monument-ch01-palaeolithic",
+      "w": 92,
+      "h": 70,
+      "beat": "monuments",
+      "file": "monuments/map-monument-ch01-palaeolithic.png",
+      "source": "tools/monument-painters/hand-stencil.js",
+      "what": "The chapter 1 plate in the map's panel: Gargas, a full-frame brochure picture. Painted by script; see the note."
+    },
+    {
+      "id": "map-monument-ch02-egypt",
+      "w": 92,
+      "h": 70,
+      "beat": "monuments",
+      "file": "monuments/map-monument-ch02-egypt.png",
+      "source": "tools/monument-painters/abu-simbel.js",
+      "what": "The chapter 2 plate in the map's panel: Abu Simbel, a full-frame brochure picture. Painted by script; see the note."
+    },
+    {
+      "id": "map-monument-ch03-aegean",
+      "w": 92,
+      "h": 70,
+      "beat": "monuments",
+      "file": "monuments/map-monument-ch03-aegean.png",
+      "source": "tools/monument-painters/lion-gate.js",
+      "what": "The chapter 3 plate in the map's panel: Mycenae, a full-frame brochure picture. Painted by script; see the note."
+    },
+    {
+      "id": "map-monument-ch04-persia",
+      "w": 92,
+      "h": 70,
+      "beat": "monuments",
+      "file": "monuments/map-monument-ch04-persia.png",
+      "source": "tools/monument-painters/apadana.js",
+      "what": "The chapter 4 plate in the map's panel: Persepolis, a full-frame brochure picture. Painted by script; see the note."
+    },
+    {
+      "id": "map-monument-ch05-classical",
+      "w": 92,
+      "h": 70,
+      "beat": "monuments",
+      "file": "monuments/map-monument-ch05-classical.png",
+      "source": "tools/monument-painters/doric-temple.js",
+      "what": "The chapter 5 plate in the map's panel: Segesta, a full-frame brochure picture. Painted by script; see the note."
+    },
+    {
+      "id": "map-monument-ch06-americas",
+      "w": 92,
+      "h": 70,
+      "beat": "monuments",
+      "file": "monuments/map-monument-ch06-americas.png",
+      "source": "tools/monument-painters/roof-comb.js",
+      "what": "The chapter 6 plate in the map's panel: Tikal, a full-frame brochure picture. Painted by script; see the note."
+    },
+    {
+      "id": "map-monument-ch07-monsoon",
+      "w": 92,
+      "h": 70,
+      "beat": "monuments",
+      "file": "monuments/map-monument-ch07-monsoon.png",
+      "source": "tools/monument-painters/lion-paws.js",
+      "what": "The chapter 7 plate in the map's panel: Sigiriya, a full-frame brochure picture. Painted by script; see the note."
+    },
+    {
+      "id": "map-monument-ch08-east-asia",
+      "w": 92,
+      "h": 70,
+      "beat": "monuments",
+      "file": "monuments/map-monument-ch08-east-asia.png",
+      "source": "tools/monument-painters/tiered-roofs.js",
+      "what": "The chapter 8 plate in the map's panel: Himeji, a full-frame brochure picture. Painted by script; see the note."
+    },
+    {
+      "id": "map-monument-ch09-africa",
+      "w": 92,
+      "h": 70,
+      "beat": "monuments",
+      "file": "monuments/map-monument-ch09-africa.png",
+      "source": "tools/monument-painters/conical-tower.js",
+      "what": "The chapter 9 plate in the map's panel: Great Zimbabwe, a full-frame brochure picture. Painted by script; see the note."
+    },
+    {
+      "id": "map-monument-ch10-islamic",
+      "w": 92,
+      "h": 70,
+      "beat": "monuments",
+      "file": "monuments/map-monument-ch10-islamic.png",
+      "source": "tools/monument-painters/iwan.js",
+      "what": "The chapter 10 plate in the map's panel: Registan, a full-frame brochure picture. Painted by script; see the note."
+    },
+    {
+      "id": "map-monument-ch11-industrial",
+      "w": 92,
+      "h": 70,
+      "beat": "monuments",
+      "file": "monuments/map-monument-ch11-industrial.png",
+      "source": "tools/monument-painters/iron-bridge.js",
+      "what": "The chapter 11 plate in the map's panel: The Iron Bridge, a full-frame brochure picture. Painted by script; see the note."
+    },
+    {
+      "id": "map-monument-ch12-napoleonic",
+      "w": 92,
+      "h": 70,
+      "beat": "monuments",
+      "file": "monuments/map-monument-ch12-napoleonic.png",
+      "source": "tools/monument-painters/martello.js",
+      "what": "The chapter 12 plate in the map's panel: Martello Towers, a full-frame brochure picture. Painted by script; see the note."
     }
   ]
 }

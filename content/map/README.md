@@ -57,26 +57,37 @@ and an empty quiet map beats a busy confusing one.
 
 ## The vignettes
 
-One monument per chapter, `src/map/monuments.ts`, drawn by the game as a flat silhouette
-with no interior detail until somebody paints one. To paint one, add an entry for
-`map-monument-chNN-slug` to `assets.json` with a note beside it, at 92 × 70 world px;
-the painted version takes over automatically.
+One painted plate per chapter in the panel: 92 × 70 world px, painted 368 × 280,
+filling its keyline frame edge to edge. Each is one of that chapter's own five sites,
+never a famous monument borrowed from elsewhere and never one the research rejected.
+Each plate has its note beside it in `monuments/`, with what must be right, what is
+deliberately wrong, what is contested, and the sources; the note is the authority,
+not this page.
 
-**Each vignette is one of that chapter's own five sites**, never a famous monument
-borrowed from elsewhere, and never one the research rejected. Giza is not the vignette
-for Egypt, because `content/research/arc.md` rejects Giza as a level.
-
-| Ch | Site | What must be right about the outline |
+| Ch | Plate | Note |
 |---|---|---|
-| 1 | Gargas | A hand stencil, pigment blown around a hand: the rock is the ink and the hand is the void. All four fingers stop at a knuckle and the thumb is whole — Gargas is the cave of the incomplete hands. No finger stands proud of the others: a hand with one finger up is a gesture, and pillar 11 says the tourist is the joke, never the place. |
-| 2 | Abu Simbel | Four seated colossi of Ramesses II, one doorway between the inner pair, and the second colossus broken off above the waist. **Deliberately wrong:** the cornice and the frieze of twenty-two baboons above the heads are left off, because in silhouette they would flatten the four figures into one trapezoid. |
-| 3 | Mycenae | The Lion Gate: two uprights, one lintel, the relieving triangle above it, two lionesses flanking a column that is wider at the top than at the foot. |
-| 4 | Persepolis | Apadana columns, the slenderest in the ancient world for their height, under a capital of two bull foreparts back to back with the roof beam in the saddle between. **Deliberately wrong:** the bulls' horns are left off, because two horns on a skyline at this size read as antennae. |
-| 5 | Segesta | A Doric hexastyle temple standing complete on its hill, with both pediments and no cella: it was never finished. |
-| 6 | Tikal | Temple I: nine terraces, a stair straight up the front, and a roof comb narrower than the temple under it and taller than it, carrying nothing and holding up nothing. Chosen over El Castillo so that the Americas do not read as a pyramid a second time after Egypt. |
-| 7 | Angkor Wat | Five towers in a quincunx, so the elevation shows the central one tall and four lower, each shaped like a lotus bud, over the galleries and the causeway. |
-| 8 | Himeji | A stone base curving outward at the foot, then storeys under roofs with the eaves turned up at the corners. Chosen over the Great Wall, which is a line and not a shape. |
-| 9 | Great Zimbabwe | The conical tower seen over the enclosure wall, with the smaller second tower beside it that has largely fallen. Dry stone, no mortar, no door, no stair: solid all the way through. |
-| 10 | Registan | The pishtaq: a pointed arch in a rectangular frame taller than the building behind it, a ribbed melon dome on a drum, a minaret at each corner. |
-| 11 | The Iron Bridge | One semicircular arch of cast iron, the deck carried over the crown, and the rings in the spandrels. |
-| 12 | Martello Towers | A squat brick drum, wider than it is tall, battered inward all the way up, with the cordon ring under a low straight parapet, one traversing gun on the roof, and a door on the first floor with nothing under it but a ladder that could be pulled up after you. A second tower stands down the shingle: a hundred and three of them went up along the south and east coasts, spaced so their guns overlapped, against an invasion that never came. **Deliberately wrong:** the gun's barrel is drawn longer than a 24-pounder's was, because at this size the true length is a nub and a tower with no gun on it is just a drum. |
+| 1 | Gargas, the hand in the niche | `monuments/map-monument-ch01-palaeolithic.md` |
+| 2 | Abu Simbel, the Great Temple | `monuments/map-monument-ch02-egypt.md` |
+| 3 | Mycenae, the Lion Gate | `monuments/map-monument-ch03-aegean.md` |
+| 4 | Persepolis, the Apadana and its eastern stair | `monuments/map-monument-ch04-persia.md` |
+| 5 | Segesta, the unfinished temple | `monuments/map-monument-ch05-classical.md` |
+| 6 | Tikal, Temple I (architecture only: gate-6 ruling, arc.md §4) | `monuments/map-monument-ch06-americas.md` |
+| 7 | Sigiriya, the lion's paws (Angkor Wat carries an unresolved gate-6 flag) | `monuments/map-monument-ch07-monsoon.md` |
+| 8 | Himeji, from the south | `monuments/map-monument-ch08-east-asia.md` |
+| 9 | Great Zimbabwe, the conical tower inside the Great Enclosure (walls and tower only: arc.md §4) | `monuments/map-monument-ch09-africa.md` |
+| 10 | Registan, the Ulugh Beg Madrasa (the only one inside the chapter's dates) | `monuments/map-monument-ch10-islamic.md` |
+| 11 | The Iron Bridge, from downstream | `monuments/map-monument-ch11-industrial.md` |
+| 12 | Martello Towers, Dymchurch | `monuments/map-monument-ch12-napoleonic.md` |
+
+**How they are made.** Each plate is painted by a script in `tools/monument-painters/`,
+following the research in `tools/monument-painters/specs/`, and regenerated with
+`npm run map:monuments` (or `-- <painter>` for one). The Abu Simbel plate is the
+standard the others were matched to: flat brochure illustration, light from the upper
+right, the shared sky and shadow colours from `_brush.js`. A plate is saved as an
+indexed PNG and must stay under 64 kB, because all twelve load before the first
+screen. A hand painting can replace any plate at the same size; drop the `source`
+from its manifest entry and keep the `.aseprite` beside it as usual.
+
+If a plate is missing, the map falls back to the flat silhouette in
+`src/map/monuments.ts`. Those silhouettes predate the research and are placeholders
+only.

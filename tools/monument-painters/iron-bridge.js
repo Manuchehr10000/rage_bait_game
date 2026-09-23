@@ -45,10 +45,10 @@
 PAINTERS['iron-bridge'] = function (ctx, W, H, B) {
   // The research palette, a little sunnier than life.
   const S = {
-    ironSun: '#8c4e36', // the 2018 paint in full sun
+    ironSun: '#9c5639', // the 2018 paint in full sun
     iron: '#6e3829', // its local colour
     ironShade: '#4d2419', // under the arch, the receding ribs
-    stone: '#b0a488', // buff-grey ashlar in sun
+    stone: '#a39679', // buff-grey ashlar in sun, a step below the sky
     stoneShade: '#6f695c', // turned away, and the joints
     brick: '#8b5a45', // tollhouse and town brick
     roof: '#57565b', // tile roofs
@@ -206,9 +206,11 @@ PAINTERS['iron-bridge'] = function (ctx, W, H, B) {
   // value step behind the iron: the far ridge palest and coolest, the two
   // spurs a little nearer and greener, the sunlit town spur warmest.
   const WOOD_LOW = mixh(B.C.foliage, B.C.foliageDark, 0.5);
-  const FAR_RIDGE = mixh(lit(B.C.foliage, 0.1), B.C.skyLow, 0.5);
-  const SPUR_S = mixh(shd(B.C.foliage, 0.1), B.C.skyLow, 0.24);
-  const SPUR_N = mixh(lit(B.C.foliage, 0.2), B.C.skyLow, 0.22);
+  // The woods are hazed well back toward the sky so the iron, the subject,
+  // stands a clear value step in front of them (the pilot's first lesson).
+  const FAR_RIDGE = mixh(lit(B.C.foliage, 0.1), B.C.skyLow, 0.64);
+  const SPUR_S = mixh(shd(B.C.foliage, 0.06), B.C.skyLow, 0.46);
+  const SPUR_N = mixh(lit(B.C.foliage, 0.2), B.C.skyLow, 0.44);
 
   // ---------------------------------------------------------------------------
   // 1. The shared sky, cloudless as the pilot's, down behind the ridge.
@@ -691,7 +693,7 @@ PAINTERS['iron-bridge'] = function (ctx, W, H, B) {
     // The Severn's olive, taking the sky: pale and cool at the far water,
     // deepening toward the viewer, so the foot of the plate is neither empty
     // nor as heavy as the bridge.
-    const RIVER = mixh(S.river, B.C.skyLow, 0.46);
+    const RIVER = mixh(S.river, B.C.skyLow, 0.6);
     ctx.fillStyle = vgrad(ctx, WL, H, [[0, mixh(RIVER, B.C.skyLow, 0.2)], [0.4, RIVER], [1, shd(RIVER, 0.18)]]);
     ctx.fillRect(0, WL, W, H - WL);
 
