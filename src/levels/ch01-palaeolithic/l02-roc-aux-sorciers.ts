@@ -26,19 +26,19 @@ import { TILE, type DeathCause } from '../../engine/types';
  *             into the river under you. One is polished and slides you back
  *  58..64   the confronting ibex, nose to nose across the one gap on the wall that
  *             is too wide to jump. Their horns meet over it and their horns hold
- *  65..82   the collapse of c. 17,000 BP: six blocks that sealed the frieze, lying
- *             face down in the river margin, all the same stone. The first settles
- *             under a man who stands on it. The second turns over the moment he is
+ *  65..87   the collapse of c. 17,000 BP: six blocks that sealed the frieze, lying
+ *             face down in the river margin at uneven gaps, all the same stone.
+ *             The first settles under a man who stands on it. The second turns over the moment he is
  *             on it. The third is wet and slides him back. The fourth holds. The
  *             fifth lies higher, on its rubble, and hops out of reach of the first
  *             jump taken at it, once. The sixth creeps back into the fifth under
  *             him and breaks. Above them the five women, at his own height, doing
  *             nothing at all
- *  82..     Cave Taillebourg. The lamp finally earns its place, and the one thing
+ *  87..     Cave Taillebourg. The lamp finally earns its place, and the one thing
  *             it picks out is the one thing in the level that is not attached
- *  92       exit
+ *  97       exit
  */
-const W = 96;
+const W = 101;
 const H = 18;
 const GROUND = 15;
 const px = (t: number) => t * TILE;
@@ -50,19 +50,19 @@ const px = (t: number) => t * TILE;
  */
 const CEILING = px(6);
 const BANK_X1 = px(20);
-const CAVE_X0 = px(82);
+const CAVE_X0 = px(87);
 /** The height of the confronting pair, and of the horns between them. */
 const LEDGE_Y = 208;
 /** The blocks of the collapse lie lower, in the margin of the river. */
 const BLOCK_Y = 232;
 const WATER_Y = px(GROUND) + 8;
-const EXIT_X = px(92);
+const EXIT_X = px(97);
 
 const g = new Grid(W, H);
 g.fill(0, GROUND, 20, H - GROUND, '='); // the bank, as far as the river
 g.fill(12, 0, W - 12, 6, '#'); // the overhang, and the cliff above it
-g.fill(82, GROUND, W - 82, H - GROUND, '='); // the floor of Cave Taillebourg
-g.fill(87, GROUND, 3, H - GROUND, ' '); // where the floor of the cave fell in
+g.fill(87, GROUND, W - 87, H - GROUND, '='); // the floor of Cave Taillebourg
+g.fill(92, GROUND, 3, H - GROUND, ' '); // where the floor of the cave fell in
 
 /**
  * The frieze. Every figure is drawn from the same three sprites and the back of
@@ -160,19 +160,34 @@ const RAKED_X1 = 596;
  *   shy      lies a step higher, on its rubble, so it is jumped onto; the first
  *              jump taken at it from the fourth makes it hop out of reach, once,
  *              and it comes back down to stay
- *   creeps   stood on, it creeps back into the fifth and breaks where it hits it
- * The first is where a man walking off the confronting ibex comes down.
+ *   creeps   stood on, it creeps back into the fifth and breaks where it hits it;
+ *              too far from the fifth to the cave to jump whole, so it is touched
+ *              and left
+ * The first is where a man walking off the confronting ibex comes down, with room
+ * on it to run at the jump over the second.
  */
 type BlockDoes = 'sinks' | 'flips' | 'slides' | 'holds' | 'shy' | 'creeps';
 const BLOCK_W = 40;
-const BLOCKS: { x: number; y: number; does: BlockDoes }[] = [
-  { x: 1052, y: BLOCK_Y, does: 'sinks' },
-  { x: 1092, y: BLOCK_Y, does: 'flips' },
-  { x: 1132, y: BLOCK_Y, does: 'slides' },
-  { x: 1172, y: BLOCK_Y, does: 'holds' },
-  { x: 1212, y: BLOCK_Y - 16, does: 'shy' },
-  { x: 1272, y: BLOCK_Y, does: 'creeps' },
+/**
+ * Where each lies, from the first: the gap before it, in px. Uneven, as a fall
+ * leaves them, and fixed, so the second attempt meets the same gaps as the first
+ * (pillar 3). The one before the sixth is what it creeps across.
+ */
+const BLOCK_ORDER: { does: BlockDoes; gap: number; up?: number }[] = [
+  { does: 'sinks', gap: 0 },
+  { does: 'flips', gap: 2 },
+  { does: 'slides', gap: 4 },
+  { does: 'holds', gap: 20 },
+  { does: 'shy', gap: 10, up: 16 },
+  { does: 'creeps', gap: 24 },
 ];
+const FIRST_BLOCK_X = 1072;
+const BLOCKS: { x: number; y: number; does: BlockDoes }[] = [];
+for (const [i, b] of BLOCK_ORDER.entries()) {
+  const prev = BLOCKS[i - 1];
+  const x = prev ? prev.x + BLOCK_W + b.gap : FIRST_BLOCK_X;
+  BLOCKS.push({ x, y: BLOCK_Y - (b.up ?? 0), does: b.does });
+}
 const blockRect = (b: (typeof BLOCKS)[number]) => ({ x: b.x, y: b.y, w: BLOCK_W, h: 12 });
 const blockThat = (d: BlockDoes) => {
   const b = BLOCKS.find((x) => x.does === d);
@@ -180,11 +195,12 @@ const blockThat = (d: BlockDoes) => {
   return b;
 };
 /** The women of the frieze, on the wall above them. */
-const WOMEN = [1072, 1120, 1168, 1216, 1264];
+/** Clear of the one block that lies high enough to cover a woman's knees. */
+const WOMEN = [1088, 1146, 1204, 1248, 1344];
 
 /** The gap in the cave floor, and the thing beside it that is not a way across. */
-const PIT_X0 = px(87);
-const PIT_X1 = px(90);
+const PIT_X0 = px(92);
+const PIT_X1 = px(95);
 
 export const ROC_AUX_SORCIERS: LevelData = {
   id: 'roc-aux-sorciers',

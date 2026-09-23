@@ -359,20 +359,22 @@ test('their horns are the way across, and they hold', async ({ page }) => {
 /**
  * The collapse, crossed the only way it can be: jump from the first over the one that
  * turns over, off the wet one at once, hop in place on the one that holds to set the
- * shy one off, let it come back down, jump on to it, and from its lip over the one
- * that creeps, on to the floor of the cave.
+ * shy one off, let it come back down, jump on to it, down on to the one that creeps
+ * and straight off it again, on to the floor of the cave.
  */
 const CROSS = `
+  const JUMP_1 = 18, JUMP_3 = 12, JUMP_4 = 10;
   const onB = (b) => p.onGround && p.x + p.w > b.rect.x && p.x < b.rect.x + b.rect.w && Math.abs(p.y + p.h - b.rect.y) <= 2;
   const crossCollapse = () => {
     const bl = g.entities.filter((e) => e.def.skin === 'fallenBlock').sort((a, b) => a.def.rect.x - b.def.rect.x);
     switch (phase) {
-      case 'collapse': key('ArrowRight', true); if (canJump() && onB(bl[0]) && p.x + p.w >= 1080) { jump(10); phase = 'to4'; } break;
-      case 'to4': key('ArrowRight', true); if (canJump() && onB(bl[2])) { jump(8); phase = 'on4'; } break;
+      case 'collapse': key('ArrowRight', true); if (canJump() && onB(bl[0]) && p.x + p.w >= bl[0].rect.x + bl[0].rect.w - 2) { jump(JUMP_1); phase = 'to4'; } break;
+      case 'to4': key('ArrowRight', true); if (canJump() && onB(bl[2])) { jump(JUMP_3); phase = 'on4'; } break;
       case 'on4': if (canJump() && onB(bl[3])) { key('ArrowRight', false); jump(4); phase = 'provoked'; } else key('ArrowRight', true); break;
       case 'provoked': key('ArrowRight', false); if (bl[4].state === 'landed' && canJump()) phase = 'to5'; break;
-      case 'to5': key('ArrowRight', true); if (canJump() && p.x + p.w >= 1208) { jump(10); phase = 'on5'; } break;
-      case 'on5': key('ArrowRight', true); if (canJump() && onB(bl[4]) && p.x + p.w >= 1250) { jump(12); phase = 'over6'; } break;
+      case 'to5': key('ArrowRight', true); if (canJump() && p.x + p.w >= bl[3].rect.x + bl[3].rect.w - 4) { jump(JUMP_4); phase = 'on5'; } break;
+      case 'on5': key('ArrowRight', true); if (canJump() && onB(bl[4]) && p.x + p.w >= bl[4].rect.x + bl[4].rect.w - 2) { jump(8); phase = 'on6'; } break;
+      case 'on6': key('ArrowRight', true); if (canJump() && onB(bl[5])) { jump(12); phase = 'over6'; } break;
       case 'over6': key('ArrowRight', true); if (p.onGround && p.x >= caveX0) phase = 'cave'; break;
     }
   };
@@ -382,11 +384,14 @@ test('six blocks of the collapse, one stone, six ways of being one', async ({ pa
   const shape = (await page.evaluate(`(() => { ${DRIVER}
     const bl = blocks.slice().sort((a, b) => a.def.rect.x - b.def.rect.x);
     return { n: bl.length, sameSize: bl.every((b) => b.def.rect.w === 40 && b.def.rect.h === 12),
-      edgeToEdge: [0, 1, 2, 3].every((i) => bl[i].def.rect.x + 40 === bl[i + 1].def.rect.x),
-      stepUp: bl[4].def.rect.y === bl[3].def.rect.y - 16, gapBefore6: bl[5].def.rect.x - (bl[4].def.rect.x + 40),
-      sixthAtTheCave: bl[5].def.rect.x + 40 === caveX0, firstUnderTheIbex: bl[0].def.rect.x < carved[carved.length - 1].rect.x + 28 };
-  })()`)) as Record<string, unknown>;
-  expect(shape).toEqual({ n: 6, sameSize: true, edgeToEdge: true, stepUp: true, gapBefore6: 20, sixthAtTheCave: true, firstUnderTheIbex: true });
+      gaps: [0, 1, 2, 3, 4].map((i) => bl[i + 1].def.rect.x - (bl[i].def.rect.x + 40)), toTheCave: caveX0 - (bl[5].def.rect.x + 40),
+      stepUp: bl[4].def.rect.y === bl[3].def.rect.y - 16,
+      // No woman is drawn behind a block: none of the five overlaps any of the six.
+      womenClear: g.level.data.decor.filter((d) => d.kind === 'venus').every((v) => bl.every((b) => {
+        const r = b.def.rect; return v.x + 14 <= r.x || v.x >= r.x + r.w || v.y + 26 <= r.y; })) };
+  })()`)) as Record<string, any>;
+  // Uneven, and the same on every attempt.
+  expect(shape).toEqual({ n: 6, sameSize: true, gaps: [2, 4, 20, 10, 24], toTheCave: 20, stepUp: true, womenClear: true });
 
   const trial = (setup: string, step: string) => play(page, `
     const bl = blocks.slice().sort((a, b) => a.def.rect.x - b.def.rect.x);
@@ -403,16 +408,17 @@ test('six blocks of the collapse, one stone, six ways of being one', async ({ pa
   // 3. The wet one drags a man standing on it back into the hole the second left.
   const third = await trial(`standOn(bl[2].rect);`, `key('ArrowRight', false);`);
   expect(third).toMatchObject({ state: 'dead', cause: 'The Anglin' });
-  expect(third.x).toBeLessThan(1132);
+  const thirdX = (await page.evaluate(`(() => { ${DRIVER} return blocks.slice().sort((a, b) => a.def.rect.x - b.def.rect.x)[2].def.rect.x; })()`)) as number;
+  expect(third.x).toBeLessThan(thirdX);
   // 4. The fourth holds, as long as he likes.
   const fourth = await trial(`standOn(bl[3].rect);`, `key('ArrowRight', false);`);
   expect(fourth).toMatchObject({ state: 'playing', y: 216 });
   // 5. Jumped at from the fourth, the fifth is not there: it has hopped out of reach.
-  const fifth = await trial(`standOn(bl[3].rect);`, `key('ArrowRight', true); if (canJump() && p.x + p.w >= 1206 && phase === 'bank') { jump(12); phase = 'jumped'; } if (bl[4].state === 'hopping') phase = 'jumped, and it hopped';`);
+  const fifth = await trial(`standOn(bl[3].rect);`, `key('ArrowRight', true); if (canJump() && p.x + p.w >= bl[3].rect.x + bl[3].rect.w - 4 && phase === 'bank') { jump(10); phase = 'jumped'; } if (bl[4].state === 'hopping') phase = 'jumped, and it hopped';`);
   expect(fifth).toMatchObject({ phase: 'jumped, and it hopped', state: 'dead', cause: 'The Anglin' });
   // 6. Stood on, the sixth creeps back into the fifth and breaks, and he goes in with it.
-  const sixth = await trial(`standOn(bl[5].rect);`, `key('ArrowRight', false); if (bl[5].state === 'walking') phase = 'creeping'; if (bl[5].state === 'falling' && phase === 'creeping') phase = 'broke at ' + Math.round(bl[5].rect.x);`);
-  expect(sixth.phase).toBe('broke at 1252');
+  const sixth = await trial(`standOn(bl[5].rect);`, `key('ArrowRight', false); if (bl[5].state === 'walking') phase = 'creeping'; if (bl[5].state === 'falling' && phase === 'creeping') phase = 'broke ' + (bl[5].rect.x === bl[4].rect.x + bl[4].rect.w ? 'against the fifth' : 'at ' + bl[5].rect.x);`);
+  expect(sixth.phase).toBe('broke against the fifth');
   expect(sixth).toMatchObject({ state: 'dead', cause: 'The Anglin' });
 });
 
@@ -421,7 +427,8 @@ test('the shy block hops once, for the first jump taken at it from the fourth, a
     const bl = () => g.entities.filter((e) => e.def.skin === 'fallenBlock').sort((a, b) => a.def.rect.x - b.def.rect.x);
     const out = {};
     // A hop in place on the fourth sets it off; it goes up, is not there, and comes back.
-    g.resetRun(); p.spawnAt(1180, 200); for (let i = 0; i < 20; i++) g.tick();
+    const four = bl()[3].def.rect;
+    g.resetRun(); p.spawnAt(four.x + 20, four.y - 32); for (let i = 0; i < 20; i++) g.tick();
     key('Space', true); g.tick(); key('Space', false);
     const five = bl()[4];
     let top = five.rect.y, solidsInAir = 1;
@@ -432,16 +439,17 @@ test('the shy block hops once, for the first jump taken at it from the fourth, a
     for (let i = 0; i < 10; i++) g.tick();
     out.again = five.state;
     // Walking at it from the fourth is a wall: it is a step up.
-    g.resetRun(); p.spawnAt(1180, 200); for (let i = 0; i < 10; i++) g.tick();
-    key('ArrowRight', true); for (let i = 0; i < 60; i++) g.tick(); key('ArrowRight', false);
-    out.walked = { stopped: p.x + p.w <= bl()[4].def.rect.x + 0.5, state: bl()[4].state };
+    // Walking off the fourth at it is a fall into the gap under its step.
+    g.resetRun(); p.spawnAt(four.x + 20, four.y - 32); for (let i = 0; i < 10; i++) g.tick();
+    key('ArrowRight', true); for (let i = 0; i < 90 && g.state === 'playing'; i++) g.tick(); key('ArrowRight', false);
+    out.walked = { died: g.state === 'dead' ? g.deathCause : g.state, state: bl()[4].state };
     return out;
   })()`)) as Record<string, any>;
   expect(r.hop).toEqual({ state: 'landed', rose: expect.any(Number), backWhereItWas: true, solidsInAir: 0 });
   // Forty-eight px of hop, less what a fixed step loses at the top.
   expect(r.hop.rose).toBeGreaterThanOrEqual(44);
   expect(r.again).toBe('landed');
-  expect(r.walked).toEqual({ stopped: true, state: 'idle' });
+  expect(r.walked).toEqual({ died: 'The Anglin', state: 'idle' });
 });
 
 test('crossing the collapse the one way it can be crossed gets you to the cave dry', async ({ page }) => {
@@ -501,7 +509,7 @@ test('a run that knows the level finishes with zero deaths', async ({ page }) =>
           if (p.x >= last.x) phase = 'collapse';
           break;
         // The collapse, block by block.
-        case 'collapse': case 'to4': case 'on4': case 'provoked': case 'to5': case 'on5': case 'over6':
+        case 'collapse': case 'to4': case 'on4': case 'provoked': case 'to5': case 'on5': case 'on6': case 'over6':
           crossCollapse();
           break;
         // Ignore the ledge the lamp finds. Jump the gap it is leaning over.

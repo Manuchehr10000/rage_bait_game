@@ -21,12 +21,16 @@ Each of them does one thing, and nothing about any of them says which:
    holds for good. The answer is to set it off with a hop in place on the fourth, let it
    come down, and then go. It is Cap Blanc's seventh horse again, in stone.
 6. **creeps**: stood on, it creeps back along the margin into the fifth, and breaks where
-   it meets it. Jumped over from the fifth's lip, it is nothing.
+   it meets it. It is too far from the fifth to the cave to jump it whole: it is touched
+   and left.
 
-A man walking off the confronting ibex comes down on the first, with his toes over the
-second. The crossing is a jump over the second, a jump straight off the third, a hop in
-place on the fourth, a wait, a jump onto the fifth, and a jump from its lip to the floor
-of the cave. The wait on the fourth is a pause before the last trap of the level, as Cap
+They lie at uneven gaps, as a fall leaves them: next to nothing between the first three,
+a stride before the fourth, less before the fifth, a long one before the sixth, and
+another before the floor of the cave. The gaps are the same on every attempt (pillar 3).
+A man walking off the confronting ibex comes down in the middle of the first, with room to
+run at the jump over the second. The crossing is a full jump over the second, a jump
+straight off the third, a hop in place on the fourth, a wait, a jump onto the fifth, down
+on to the sixth and straight off it on to the floor of the cave. The wait on the fourth is a pause before the last trap of the level, as Cap
 Blanc's seventh horse is: pillar 5 is bent here, not kept.
 
 Above them, on the wall at his own height, are the five women: `venus`, five times, doing
