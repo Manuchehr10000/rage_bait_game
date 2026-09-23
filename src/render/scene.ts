@@ -1915,7 +1915,16 @@ function drawEntityBack(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): voi
       } else if (d.skin === 'disc') {
         if (!paint(ctx, 'calcite-disc', r.x, r.y)) ctx.drawImage(DISC_SPRITE, r.x, r.y);
       } else if (d.skin === 'fallenBlock') {
+        // One that goes over turns over as it goes, face up at last, about its middle.
+        const turn = d.tips && c.state === 'falling' ? Math.min(Math.PI, c.fallen / 10) : 0;
+        ctx.save();
+        if (turn > 0) {
+          ctx.translate(r.x + r.w / 2, r.y + r.h / 2);
+          ctx.rotate(turn);
+          ctx.translate(-(r.x + r.w / 2), -(r.y + r.h / 2));
+        }
         if (!paint(ctx, 'fallen-block', r.x, r.y)) ctx.drawImage(FALLEN_BLOCK_SPRITE, r.x, r.y);
+        ctx.restore();
       } else if (d.skin === 'talatat') {
         for (let i = 0; i < r.w / TILE; i++) if (!paint(ctx, 'talatat', r.x + i * TILE, r.y)) ctx.drawImage(TALATAT_SPRITE, r.x + i * TILE, r.y);
       } else if (d.skin === 'floor') {

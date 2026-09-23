@@ -27,7 +27,7 @@ acknowledgement that the tourist has no business being here at all.
 | b | `b-raked` | Seven figures of the frieze in low sun at seven heights up the wall. Six throw a shadow and are floors; the third throws none and is a drawing. The fourth turns round and walks back to the second with him on it, and lets go of him there. The fifth rises into the overhang, and does not stop | Bas-relief is only legible in raking light. It is how the frieze was found in 1950 and how it is still photographed. The frieze is 2.6 m high and the figures sit at every height on it; the roof of the shelter came down once |
 | c | `c-flat` | Eight more, out of the light, identical marks on the same wall. The first and the last hold. Three were only ever engraved, so there is nothing there to stand on. One lets go a second after he lands on it. One is carved higher than the rest and settles into the river under him. One is polished and slides him back off it | The site carries monumental sculpture and discreet engraving side by side. In flat light the two are the same lines. Carved blocks did come off this wall in the fall that sealed it |
 | d | `d-horns` | Two ibex nose to nose across a gap wider than a running jump. Their horns meet over it, and their horns hold | Eight ibex, the commonest animal of the frieze, including a confronting pair |
-| e | `e-collapse` | The blocks of the roof fall, lying face down in the river margin. Every one settles under a man who stands on it. Above them the five women, at his own height, doing nothing whatever | The rockfall of c. 17,000 BP that ended the occupation and sealed the frieze; the five female figures, life size, waist to knees |
+| e | `e-collapse` | The blocks of the roof fall, lying face down in the river margin: six of them, one stone drawn one way, and each does one thing. The first settles under a man who stands on it. The second turns over the moment he is on it. The third is wet and drags him back. The fourth holds. The fifth lies a step higher on its rubble and hops out of reach of the first jump taken at it from the fourth, once, then comes back down to stay. The sixth creeps back into the fifth under him and breaks. Above them the five women, at his own height, doing nothing whatever | The rockfall of c. 17,000 BP that ended the occupation and sealed the frieze; the five female figures, life size, waist to knees |
 | f | `f-taillebourg` | The deeper cave. Dark, so the lamp finally earns its place — and the one ledge it finds is a sculpted block that came off the roof and is attached to nothing | Cave Taillebourg is engraved rather than carved, and its own rockfalls are what closed it |
 
 ## What the level teaches
@@ -72,8 +72,10 @@ came off seventeen thousand years ago and is leaning where it landed.
   polished: the limestone is matt, and the surfaces were ochred, never burnished.
 - **The horns of the confronting ibex bridge a gap and carry a man.** They meet on the
   real wall. They are a few centimetres of limestone and they carry nothing.
-- **The blocks of the collapse sink under a standing man.** They came to rest in the
-  Magdalenian and have not moved since. This is the level's one running pressure.
+- **The blocks of the collapse move.** They came to rest in the Magdalenian and have not
+  moved since: none of them sinks, turns over, hops, or creeps, and none is slicker than
+  wet limestone in a river margin is. Which block does what, and that there are six in a
+  row at the water's edge, is level design.
 - **A block of the fall is still leaning, loose, in Cave Taillebourg**, seventeen
   thousand years later, exactly where a man would put his foot.
 - The **scale**: the frieze here is longer and the animals are further apart than 20 m of

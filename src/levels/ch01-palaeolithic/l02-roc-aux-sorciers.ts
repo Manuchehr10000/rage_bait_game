@@ -26,10 +26,14 @@ import { TILE, type DeathCause } from '../../engine/types';
  *             into the river under you. One is polished and slides you back
  *  58..64   the confronting ibex, nose to nose across the one gap on the wall that
  *             is too wide to jump. Their horns meet over it and their horns hold
- *  65..82   the collapse of c. 17,000 BP: the blocks that sealed the frieze, lying
- *             face down in the river margin. Every one of them settles under a man
- *             who stands on it. Above them the five women, at his own height,
- *             doing nothing at all
+ *  65..82   the collapse of c. 17,000 BP: six blocks that sealed the frieze, lying
+ *             face down in the river margin, all the same stone. The first settles
+ *             under a man who stands on it. The second turns over the moment he is
+ *             on it. The third is wet and slides him back. The fourth holds. The
+ *             fifth lies higher, on its rubble, and hops out of reach of the first
+ *             jump taken at it, once. The sixth creeps back into the fifth under
+ *             him and breaks. Above them the five women, at his own height, doing
+ *             nothing at all
  *  82..     Cave Taillebourg. The lamp finally earns its place, and the one thing
  *             it picks out is the one thing in the level that is not attached
  *  92       exit
@@ -46,7 +50,7 @@ const px = (t: number) => t * TILE;
  */
 const CEILING = px(6);
 const BANK_X1 = px(20);
-const CAVE_X0 = px(81);
+const CAVE_X0 = px(82);
 /** The height of the confronting pair, and of the horns between them. */
 const LEDGE_Y = 208;
 /** The blocks of the collapse lie lower, in the margin of the river. */
@@ -57,7 +61,7 @@ const EXIT_X = px(92);
 const g = new Grid(W, H);
 g.fill(0, GROUND, 20, H - GROUND, '='); // the bank, as far as the river
 g.fill(12, 0, W - 12, 6, '#'); // the overhang, and the cliff above it
-g.fill(81, GROUND, W - 81, H - GROUND, '='); // the floor of Cave Taillebourg
+g.fill(82, GROUND, W - 82, H - GROUND, '='); // the floor of Cave Taillebourg
 g.fill(87, GROUND, 3, H - GROUND, ' '); // where the floor of the cave fell in
 
 /**
@@ -147,11 +151,34 @@ const RAKED_X0 = 328;
 const RAKED_X1 = 596;
 
 /**
- * The blocks of the collapse, lying where they fell. They touch, near enough:
- * a stride apart, so the run across is a walk and never a jump. Standing is the
- * only mistake available here.
+ * The blocks of the collapse, lying where they fell, edge to edge, all the same
+ * stone drawn the same way (pillar 4), and each of them does one thing:
+ *   sinks    settles into the river a second after he stands on it
+ *   flips    turns over the moment he is on it, and he goes in
+ *   slides   wet: holds, and drags him back toward the one that flipped
+ *   holds    it is a block
+ *   shy      lies a step higher, on its rubble, so it is jumped onto; the first
+ *              jump taken at it from the fourth makes it hop out of reach, once,
+ *              and it comes back down to stay
+ *   creeps   stood on, it creeps back into the fifth and breaks where it hits it
+ * The first is where a man walking off the confronting ibex comes down.
  */
-const BLOCKS = [1064, 1112, 1160, 1208, 1256];
+type BlockDoes = 'sinks' | 'flips' | 'slides' | 'holds' | 'shy' | 'creeps';
+const BLOCK_W = 40;
+const BLOCKS: { x: number; y: number; does: BlockDoes }[] = [
+  { x: 1052, y: BLOCK_Y, does: 'sinks' },
+  { x: 1092, y: BLOCK_Y, does: 'flips' },
+  { x: 1132, y: BLOCK_Y, does: 'slides' },
+  { x: 1172, y: BLOCK_Y, does: 'holds' },
+  { x: 1212, y: BLOCK_Y - 16, does: 'shy' },
+  { x: 1272, y: BLOCK_Y, does: 'creeps' },
+];
+const blockRect = (b: (typeof BLOCKS)[number]) => ({ x: b.x, y: b.y, w: BLOCK_W, h: 12 });
+const blockThat = (d: BlockDoes) => {
+  const b = BLOCKS.find((x) => x.does === d);
+  if (!b) throw new Error(`no block that ${d}`);
+  return b;
+};
 /** The women of the frieze, on the wall above them. */
 const WOMEN = [1072, 1120, 1168, 1216, 1264];
 
@@ -229,15 +256,25 @@ export const ROC_AUX_SORCIERS: LevelData = {
       delay: 0,
     },
     // The collapse. Sculpted blocks face down in the river margin, resting on rubble.
-    // Not one of them is a lie: every one of them goes under anybody who stands on it.
-    ...BLOCKS.map((x) => ({
+    ...BLOCKS.map((b) => ({
       kind: 'crumble' as const,
       skin: 'fallenBlock' as const,
-      rect: { x, y: BLOCK_Y, w: 40, h: 12 },
-      fake: true,
-      delay: 1,
-      sinkSpeed: 26,
+      rect: blockRect(b),
+      fake: b.does !== 'holds' && b.does !== 'slides',
+      delay: b.does === 'sinks' ? 1 : 0,
+      sinkSpeed: b.does === 'sinks' ? 26 : undefined,
+      tips: b.does === 'flips' || b.does === 'creeps' || undefined,
+      shy: b.does === 'shy' ? { from: blockRect(blockThat('holds')), height: 48 } : undefined,
+      walk: b.does === 'creeps' ? { vx: -30, toX: blockThat('shy').x + BLOCK_W } : undefined,
+      thenFalls: b.does === 'creeps' || undefined,
     })),
+    // The wet one drags him back the way he came, faster than he can walk, toward
+    // the one that turned over. Wider than the block so there is no dry lip on it.
+    {
+      kind: 'conveyor',
+      rect: { x: blockThat('slides').x - 5, y: blockThat('slides').y - 2, w: BLOCK_W + 10, h: 6 },
+      vx: POLISHED_SLIDE,
+    },
     // Taillebourg. By lamplight this reads exactly like the wall it is leaning on.
     // It came off the roof in the same collapse and it is attached to nothing.
     {

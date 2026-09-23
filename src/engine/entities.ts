@@ -385,7 +385,7 @@ export class Sweep implements Entity {
 
 export class Crumble implements Entity {
   readonly rect: Rect;
-  state: 'idle' | 'armed' | 'walking' | 'rising' | 'falling' | 'landed' | 'gone' = 'idle';
+  state: 'idle' | 'armed' | 'walking' | 'rising' | 'hopping' | 'falling' | 'landed' | 'gone' = 'idle';
   /** Which way a figure faces. One that walks turns round first. */
   face: 1 | -1;
   private timer = 0;
@@ -416,6 +416,31 @@ export class Crumble implements Entity {
     this.solid.dy = 0;
     const r = this.rect;
     const standing = p.x + p.w > r.x && p.x < r.x + r.w && Math.abs(p.y + p.h - r.y) <= 2;
+    if (this.state === 'idle' && this.def.shy) {
+      // It minds one thing: a jump taken at it from the ledge before it. The player
+      // moved last frame, so a jump he just took started a few px above that ledge.
+      if (!w.alive) return;
+      const f = this.def.shy.from;
+      const feet = p.y + p.h;
+      if (p.justJumped && p.x + p.w > f.x && p.x < f.x + f.w && feet >= f.y - 12 && feet <= f.y + 1) {
+        this.state = 'hopping';
+        this.vy = -Math.sqrt(2 * PHYS.gravity * this.def.shy.height);
+        w.sound('grind');
+      }
+      return;
+    }
+    if (this.state === 'hopping') {
+      const before = r.y;
+      this.vy += PHYS.gravity * DT;
+      r.y = Math.min(this.def.rect.y, r.y + this.vy * DT);
+      this.solid.dy = r.y - before;
+      if (this.vy > 0 && r.y >= this.def.rect.y) {
+        r.y = this.def.rect.y;
+        this.state = 'landed';
+        w.sound('thud');
+      }
+      return;
+    }
     if (this.state === 'idle') {
       if (!w.alive) return;
       // One that minds being landed on wants the player to have come through the
@@ -455,7 +480,7 @@ export class Crumble implements Entity {
       if (Math.abs(toX - r.x) < 0.01) {
         // Arrived. Unless it is one of the ones that carry you, whoever is still on
         // it is let go of; otherwise it is a ledge where it stopped.
-        if (standing && this.def.walk.letsGo !== false) {
+        if ((standing && this.def.walk.letsGo !== false) || this.def.thenFalls) {
           this.state = 'falling';
           w.sound('crumble');
         } else {
@@ -499,8 +524,10 @@ export class Crumble implements Entity {
 
   solids(): MovingSolid[] {
     if (this.state === 'gone') return [];
-    // One that tips is off its bearer the moment it goes: nothing to ride down.
+    // One that tips is off its bearer the moment it goes: nothing to ride down. One
+    // that hops is in the air, not where he meant to land.
     if (this.def.tips && this.state === 'falling') return [];
+    if (this.state === 'hopping') return [];
     return [this.solid];
   }
 }

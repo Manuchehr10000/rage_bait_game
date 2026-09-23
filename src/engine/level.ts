@@ -138,7 +138,8 @@ export interface CrumbleDef {
    * Once stood on, it rises at this many px/s: to `riseTo` if there is one, else
    * until it meets the rock above it, and then whoever is still on it when the head
    * room runs out dies of `cause`. `thenFalls` makes it let go where it stops, so a
-   * thing that lifts you is a thing that drops you.
+   * thing that lifts you is a thing that drops you; on one that walks, it goes where
+   * it stops whether or not anybody is still on it.
    */
   riseSpeed?: number;
   riseTo?: number;
@@ -167,6 +168,12 @@ export interface CrumbleDef {
    * like its neighbours (pillar 4).
    */
   rocks?: boolean;
+  /**
+   * Shy: the first jump he takes from `from` makes it hop `height` px straight up
+   * and come back down to where it was, once. While it is in the air it is not there
+   * to land on. Back down, it holds for good. Standing on it does nothing.
+   */
+  shy?: { from: Rect; height: number };
   /**
    * Railed like the stair: a stanchion at each end in the stair's foot, drawn exactly
    * as the stair's, and the rail and knee rail between them. It goes where the slab goes.

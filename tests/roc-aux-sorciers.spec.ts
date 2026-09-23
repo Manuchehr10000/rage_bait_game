@@ -145,7 +145,8 @@ test('the headlamp stays off through the whole sunlit half and comes on at the c
   expect(middle.lamp).toBe(false);
   // Into Cave Taillebourg, and it comes on and stays on.
   const cave = await play(page, `
-    p.spawnAt(caveX0 - 60, 224); g.camera.x = caveX0 - 200;
+    // From the last block of the collapse, walked straight off into the cave.
+    p.spawnAt(caveX0 - 36, 216); g.camera.x = caveX0 - 200;
     const step = () => { key('ArrowRight', true); if (g.lamp) { key('ArrowRight', false); phase = 'lit'; } };`, 60 * 8);
   expect(cave.phase).toBe('lit');
   expect(cave.lamp).toBe(true);
@@ -222,7 +223,7 @@ test('the climb through the light is walked, hopped, and left the moment it move
   const r = await play(page, `
     standOn(carved[0].rect);
     const end = carved.find((c) => c.rect.x >= raking.x1).rect;
-    const step = () => { cross(); if (p.onGround && p.x >= end.x) phase = 'through'; };`, 60 * 10);
+    const step = () => { if (phase === 'through') { key('ArrowRight', false); return; } cross(); if (p.onGround && p.x >= end.x) phase = 'through'; };`, 60 * 10);
   expect(r.phase).toBe('through');
   expect(r.state).toBe('playing');
   expect(r.total).toBe(0);
@@ -311,7 +312,7 @@ test('bounce off the polished one the moment you land and the eighth holds', asy
   const r = await play(page, `
     const eighth = stable.filter((c) => c.rect.x > raking.x1)[1].rect;
     standOn(settles.rect);
-    const step = () => { cross(); if (p.onGround && p.x >= eighth.x) phase = 'eighth'; };`, 60 * 8);
+    const step = () => { if (phase === 'eighth') { key('ArrowRight', false); return; } cross(); if (p.onGround && p.x >= eighth.x) phase = 'eighth'; };`, 60 * 8);
   expect(r.phase).toBe('eighth');
   expect(r.state).toBe('playing');
   expect(r.total).toBe(0);
@@ -340,7 +341,7 @@ test('their horns are the way across, and they hold', async ({ page }) => {
     standOn(near);
     const step = () => {
       // Walk out onto them. They are level with the backs on either side.
-      key('ArrowRight', true);
+      key('ArrowRight', phase !== 'across');
       if (p.onGround && p.x >= far.x) phase = 'across';
     };`, 60 * 8);
   expect(r.phase).toBe('across');
@@ -355,22 +356,100 @@ test('their horns are the way across, and they hold', async ({ page }) => {
   expect(held).toEqual({ fake: false, span: 76, level: true });
 });
 
-test('every block of the collapse goes under a man who stands on it', async ({ page }) => {
-  const r = await play(page, `
-    standOn(blocks[0].rect);
-    const step = () => { key('ArrowRight', false); if (blocks[0].state === 'falling') phase = 'sinking'; };`, 60 * 8);
-  expect(r.phase).toBe('sinking');
-  expect(r.cause).toBe('The Anglin');
+/**
+ * The collapse, crossed the only way it can be: jump from the first over the one that
+ * turns over, off the wet one at once, hop in place on the one that holds to set the
+ * shy one off, let it come back down, jump on to it, and from its lip over the one
+ * that creeps, on to the floor of the cave.
+ */
+const CROSS = `
+  const onB = (b) => p.onGround && p.x + p.w > b.rect.x && p.x < b.rect.x + b.rect.w && Math.abs(p.y + p.h - b.rect.y) <= 2;
+  const crossCollapse = () => {
+    const bl = g.entities.filter((e) => e.def.skin === 'fallenBlock').sort((a, b) => a.def.rect.x - b.def.rect.x);
+    switch (phase) {
+      case 'collapse': key('ArrowRight', true); if (canJump() && onB(bl[0]) && p.x + p.w >= 1080) { jump(10); phase = 'to4'; } break;
+      case 'to4': key('ArrowRight', true); if (canJump() && onB(bl[2])) { jump(8); phase = 'on4'; } break;
+      case 'on4': if (canJump() && onB(bl[3])) { key('ArrowRight', false); jump(4); phase = 'provoked'; } else key('ArrowRight', true); break;
+      case 'provoked': key('ArrowRight', false); if (bl[4].state === 'landed' && canJump()) phase = 'to5'; break;
+      case 'to5': key('ArrowRight', true); if (canJump() && p.x + p.w >= 1208) { jump(10); phase = 'on5'; } break;
+      case 'on5': key('ArrowRight', true); if (canJump() && onB(bl[4]) && p.x + p.w >= 1250) { jump(12); phase = 'over6'; } break;
+      case 'over6': key('ArrowRight', true); if (p.onGround && p.x >= caveX0) phase = 'cave'; break;
+    }
+  };
+`;
 
-  const all = (await page.evaluate(`(() => { ${DRIVER} return blocks.map((b) => b.def.fake); })()`)) as boolean[];
-  expect(all.length).toBeGreaterThan(4);
-  expect(all.every(Boolean)).toBe(true);
+test('six blocks of the collapse, one stone, six ways of being one', async ({ page }) => {
+  const shape = (await page.evaluate(`(() => { ${DRIVER}
+    const bl = blocks.slice().sort((a, b) => a.def.rect.x - b.def.rect.x);
+    return { n: bl.length, sameSize: bl.every((b) => b.def.rect.w === 40 && b.def.rect.h === 12),
+      edgeToEdge: [0, 1, 2, 3].every((i) => bl[i].def.rect.x + 40 === bl[i + 1].def.rect.x),
+      stepUp: bl[4].def.rect.y === bl[3].def.rect.y - 16, gapBefore6: bl[5].def.rect.x - (bl[4].def.rect.x + 40),
+      sixthAtTheCave: bl[5].def.rect.x + 40 === caveX0, firstUnderTheIbex: bl[0].def.rect.x < carved[carved.length - 1].rect.x + 28 };
+  })()`)) as Record<string, unknown>;
+  expect(shape).toEqual({ n: 6, sameSize: true, edgeToEdge: true, stepUp: true, gapBefore6: 20, sixthAtTheCave: true, firstUnderTheIbex: true });
+
+  const trial = (setup: string, step: string) => play(page, `
+    const bl = blocks.slice().sort((a, b) => a.def.rect.x - b.def.rect.x);
+    ${setup}
+    const step = () => { ${step} };`, 60 * 6);
+  // 1. Stood on, it settles into the river after a second.
+  const first = await trial(`standOn(bl[0].rect);`, `key('ArrowRight', false); if (bl[0].state === 'armed' && phase === 'bank') phase = 'armed'; if (bl[0].state === 'falling') phase = 'sinking';`);
+  expect(first).toMatchObject({ phase: 'sinking', state: 'dead', cause: 'The Anglin' });
+  // 2. Walked on to from the first, it turns over at once and he goes in.
+  const second = await trial(`standOn(bl[0].rect);`, `key('ArrowRight', true); if (bl[1].state === 'falling' && phase === 'bank') phase = 'over at ' + Math.round(p.x);`);
+  expect(second.state).toBe('dead');
+  expect(second.cause).toBe('The Anglin');
+  expect(second.phase).toMatch(/^over at /);
+  // 3. The wet one drags a man standing on it back into the hole the second left.
+  const third = await trial(`standOn(bl[2].rect);`, `key('ArrowRight', false);`);
+  expect(third).toMatchObject({ state: 'dead', cause: 'The Anglin' });
+  expect(third.x).toBeLessThan(1132);
+  // 4. The fourth holds, as long as he likes.
+  const fourth = await trial(`standOn(bl[3].rect);`, `key('ArrowRight', false);`);
+  expect(fourth).toMatchObject({ state: 'playing', y: 216 });
+  // 5. Jumped at from the fourth, the fifth is not there: it has hopped out of reach.
+  const fifth = await trial(`standOn(bl[3].rect);`, `key('ArrowRight', true); if (canJump() && p.x + p.w >= 1206 && phase === 'bank') { jump(12); phase = 'jumped'; } if (bl[4].state === 'hopping') phase = 'jumped, and it hopped';`);
+  expect(fifth).toMatchObject({ phase: 'jumped, and it hopped', state: 'dead', cause: 'The Anglin' });
+  // 6. Stood on, the sixth creeps back into the fifth and breaks, and he goes in with it.
+  const sixth = await trial(`standOn(bl[5].rect);`, `key('ArrowRight', false); if (bl[5].state === 'walking') phase = 'creeping'; if (bl[5].state === 'falling' && phase === 'creeping') phase = 'broke at ' + Math.round(bl[5].rect.x);`);
+  expect(sixth.phase).toBe('broke at 1252');
+  expect(sixth).toMatchObject({ state: 'dead', cause: 'The Anglin' });
 });
 
-test('crossing the collapse without stopping gets you to the cave dry', async ({ page }) => {
+test('the shy block hops once, for the first jump taken at it from the fourth, and then holds', async ({ page }) => {
+  const r = (await page.evaluate(`(() => { ${DRIVER}
+    const bl = () => g.entities.filter((e) => e.def.skin === 'fallenBlock').sort((a, b) => a.def.rect.x - b.def.rect.x);
+    const out = {};
+    // A hop in place on the fourth sets it off; it goes up, is not there, and comes back.
+    g.resetRun(); p.spawnAt(1180, 200); for (let i = 0; i < 20; i++) g.tick();
+    key('Space', true); g.tick(); key('Space', false);
+    const five = bl()[4];
+    let top = five.rect.y, solidsInAir = 1;
+    for (let i = 0; i < 60; i++) { g.tick(); top = Math.min(top, five.rect.y); if (five.state === 'hopping') solidsInAir = Math.min(solidsInAir, five.solids().length); }
+    out.hop = { state: five.state, rose: five.def.rect.y - top, backWhereItWas: five.rect.y === five.def.rect.y, solidsInAir };
+    // A second jump from the fourth does nothing: it stays where it came down.
+    key('Space', true); g.tick(); key('Space', false);
+    for (let i = 0; i < 10; i++) g.tick();
+    out.again = five.state;
+    // Walking at it from the fourth is a wall: it is a step up.
+    g.resetRun(); p.spawnAt(1180, 200); for (let i = 0; i < 10; i++) g.tick();
+    key('ArrowRight', true); for (let i = 0; i < 60; i++) g.tick(); key('ArrowRight', false);
+    out.walked = { stopped: p.x + p.w <= bl()[4].def.rect.x + 0.5, state: bl()[4].state };
+    return out;
+  })()`)) as Record<string, any>;
+  expect(r.hop).toEqual({ state: 'landed', rose: expect.any(Number), backWhereItWas: true, solidsInAir: 0 });
+  // Forty-eight px of hop, less what a fixed step loses at the top.
+  expect(r.hop.rose).toBeGreaterThanOrEqual(44);
+  expect(r.again).toBe('landed');
+  expect(r.walked).toEqual({ stopped: true, state: 'idle' });
+});
+
+test('crossing the collapse the one way it can be crossed gets you to the cave dry', async ({ page }) => {
   const r = await play(page, `
-    standOn(blocks[0].rect);
-    const step = () => { key('ArrowRight', true); if (p.x >= caveX0) phase = 'cave'; };`, 60 * 10);
+    ${CROSS}
+    p.spawnAt(1030, 192); g.camera.x = 920;
+    phase = 'collapse';
+    const step = () => { crossCollapse(); if (phase === 'cave') key('ArrowRight', false); };`, 60 * 12);
   expect(r.phase).toBe('cave');
   expect(r.state).toBe('playing');
   expect(r.total).toBe(0);
@@ -406,6 +485,7 @@ test('the gap it is leaning over can be jumped by anyone who ignores it', async 
 
 test('a run that knows the level finishes with zero deaths', async ({ page }) => {
   const r = await play(page, `
+    ${CROSS}
     const last = carved[carved.length - 1].rect;
     const step = () => {
       switch (phase) {
@@ -420,10 +500,9 @@ test('a run that knows the level finishes with zero deaths', async ({ page }) =>
           cross();
           if (p.x >= last.x) phase = 'collapse';
           break;
-        // The blocks are all going down. Keep moving and they go down behind you.
-        case 'collapse':
-          key('ArrowRight', true);
-          if (p.onGround && p.x >= caveX0) phase = 'cave';
+        // The collapse, block by block.
+        case 'collapse': case 'to4': case 'on4': case 'provoked': case 'to5': case 'on5': case 'over6':
+          crossCollapse();
           break;
         // Ignore the ledge the lamp finds. Jump the gap it is leaning over.
         case 'cave':
