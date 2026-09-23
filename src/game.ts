@@ -27,8 +27,11 @@ const FALL_IN_HEIGHT = 200;
 /**
  * What each level sounds like: whose music, and how much room it is played in.
  * A Record over Theme on purpose — a new level cannot be added without deciding.
- * The room is a fact about the place, not about the music; today only Chapter 1's
- * pipe is sent through it, so Egypt's three rooms are recorded and not yet heard.
+ * The room is a fact about the place, not about the music; Chapter 1's pipe and
+ * Chapter 3's lyre are sent through it, and Egypt's three rooms are recorded and not
+ * heard. Chapter 3 has no level yet, but its five sites are already decided in
+ * content/ch03-aegean/CHAPTER.md: each is { track: 'ch03' } in the open, except
+ * Akrotiri, which is 'hall', the roof its visitors stand under.
  */
 const SOUND_OF: Record<Theme, { track: MusicId; room: Room }> = {
   capBlanc: { track: 'ch01', room: 'open' }, // a cliff shelter, open to the valley

@@ -309,6 +309,7 @@ is recorded here, not in the level.
 | `kilwa_kisiwani`, `gede`, `songo_mnara` | 9 | Ruined mosques; living Islam on the coast | Secular palace, fort and house fabric only |
 | `bam` | 10 | 2003 earthquake killed at least 26,271 in the modern town | Citadel architecture only |
 | `hms_victory` | 12 | Commissioned warship; Nelson-death plaque | Ruling required before scheduling |
+| `akrotiri` | 3 | In September 2005 the site's protective roof collapsed shortly before it was finished, killing one visitor and injuring seven; the site reopened under a new roof in April 2012. The chapter's signature mechanic is the multi-storey collapse, and the protagonist is a tourist. Spyridon Marinatos, the excavator, died at the site in 1974; sources differ on whether his grave is inside the ruins or was moved beyond them | Collapse at Akrotiri comes only from the Bronze Age earthquakes and the eruption; the modern roof never falls and the 2005 death is never staged. Marinatos's grave never in frame. Verify its position before level 3 is designed |
 
 ### Ruled
 

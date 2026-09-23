@@ -11,11 +11,12 @@
  * double harmonic everyone hears as Egypt. None of them knows how many times you have
  * died. Switching cross-fades between them and nothing restarts: whichever track
  * you were not listening to kept playing, and comes back exactly where it would
- * have got to.
+ * have got to. `ch03` is a plucked lyre with seven strings, one pitch each.
  *
- * Chapter 1 also has a room. The reverb is generated, not loaded — a burst of
- * noise with a decay on it, which is what an impulse response is — and the
- * length of it is set by the level: a cliff shelter is nearly dry, Gargas is not.
+ * Chapters 1 and 3 also have a room. The reverb is generated, not loaded — a burst
+ * of noise with a decay on it, which is what an impulse response is — and the
+ * length of it is set by the level: a cliff shelter is nearly dry, Gargas is not,
+ * and Akrotiri is heard under the roof its visitors stand under.
  */
 
 export type Sfx =
@@ -48,13 +49,13 @@ export type Sfx =
 export type WaltzId = 'map' | 'mapCh01' | 'mapCh02';
 
 /** One per chapter, plus the brochure's pages. */
-export type MusicId = WaltzId | 'ch01' | 'ch02';
+export type MusicId = WaltzId | 'ch01' | 'ch02' | 'ch03';
 
 /**
  * How much space the level's music is played in. Set from the level's theme by
- * the game; today only Chapter 1's pipe listens to it.
+ * the game; Chapter 1's pipe and Chapter 3's lyre listen to it, Egypt does not.
  */
-export type Room = 'open' | 'chamber' | 'deep';
+export type Room = 'open' | 'chamber' | 'deep' | 'hall';
 
 const MUTE_KEY = 'lostTourist.muted';
 
@@ -72,14 +73,28 @@ export class GameAudio {
   /** One gain per track, so one can fade out under the other without stopping. */
   private music: Partial<Record<MusicId, GainNode>> = {};
   /** How far each track has got: when its next step falls, and which step it is. */
-  private nextNote: Record<MusicId, number> = { map: 0, mapCh01: 0, mapCh02: 0, ch01: 0, ch02: 0 };
-  private noteIndex: Record<MusicId, number> = { map: 0, mapCh01: 0, mapCh02: 0, ch01: 0, ch02: 0 };
+  private nextNote: Record<MusicId, number> = { map: 0, mapCh01: 0, mapCh02: 0, ch01: 0, ch02: 0, ch03: 0 };
+  private noteIndex: Record<MusicId, number> = { map: 0, mapCh01: 0, mapCh02: 0, ch01: 0, ch02: 0, ch03: 0 };
   private track: MusicId = 'ch02';
   /** The cave. Only Chapter 1 is routed through it. */
   private reverb: ConvolverNode | null = null;
   private wet: GainNode | null = null;
   private room: Room = 'open';
   private impulses = new Map<Room, AudioBuffer>();
+  /**
+   * The room for Chapter 3, and for any later chapter that wants one: only one
+   * level's room is ever live. Unlike the cave, its send is taken after the track's
+   * fader, so it is silent whenever the lyre is, and a track that is not playing
+   * costs it nothing. Chapter 1's path is not touched.
+   */
+  private sharedReverb: ConvolverNode | null = null;
+  private sharedWet: GainNode | null = null;
+  /** The lyre's soundbox, one for every string, and the filter the fingertip goes through. */
+  private lyreBox: { body: BiquadFilterNode; pluck: BiquadFilterNode } | null = null;
+  /** Each string's voices, built once: a PeriodicWave costs about a millisecond to make. */
+  private lyreWaves = new Map<number, LyreVoice[]>();
+  /** What each string (1 = lowest) is still sounding, so plucking it again stops it. */
+  private lyreRinging = new Map<number, GainNode[]>();
 
   get isMuted(): boolean {
     return this.muted;
@@ -154,9 +169,15 @@ export class GameAudio {
     if (this.room === room) return;
     this.room = room;
     const ctx = this.ctx;
-    if (!ctx || !this.reverb || !this.wet) return;
-    this.reverb.buffer = this.impulse(ctx, room);
-    this.wet.gain.setTargetAtTime(ROOMS[room].wet, ctx.currentTime, CROSSFADE);
+    if (!ctx) return;
+    if (this.reverb && this.wet) {
+      this.reverb.buffer = this.impulse(ctx, room);
+      this.wet.gain.setTargetAtTime(ROOMS[room].wet, ctx.currentTime, CROSSFADE);
+    }
+    if (this.sharedReverb && this.sharedWet) {
+      this.sharedReverb.buffer = this.impulse(ctx, room);
+      this.sharedWet.gain.setTargetAtTime(ROOMS[room].wet, ctx.currentTime, CROSSFADE);
+    }
   }
 
   play(name: Sfx): void {
@@ -442,7 +463,7 @@ export class GameAudio {
     lfo.start();
   }
 
-  /** One gain per track, Chapter 1's room, and Chapter 2's drone. */
+  /** One gain per track, the rooms, the lyre's soundbox, and Chapter 2's drone. */
   private startMusic(): void {
     const ctx = this.ctx;
     if (!ctx || !this.master) return;
@@ -463,6 +484,44 @@ export class GameAudio {
       this.wet = ctx.createGain();
       this.wet.gain.value = ROOMS[this.room].wet;
       this.wet.connect(this.reverb).connect(cave);
+    }
+    // The lyre's soundbox. A box is one resonance shared by every string, so it is
+    // built once here and not once a note: four filters for the whole chapter.
+    const lyre = this.music.ch03;
+    if (lyre) {
+      const low = ctx.createBiquadFilter();
+      low.type = 'highpass'; // a small box radiates little below its air mode
+      low.frequency.value = LYRE.lowCut;
+      low.Q.value = -3; // Web Audio's lowpass and highpass Q is in dB: -3 is Butterworth
+      const air = ctx.createBiquadFilter();
+      air.type = 'peaking';
+      air.frequency.value = LYRE.air;
+      air.Q.value = 1.4;
+      air.gain.value = 4;
+      const wood = ctx.createBiquadFilter();
+      wood.type = 'peaking';
+      wood.frequency.value = LYRE.wood;
+      wood.Q.value = 1.4;
+      wood.gain.value = 3;
+      const top = ctx.createBiquadFilter();
+      top.type = 'lowpass';
+      top.frequency.value = LYRE.topCut;
+      top.Q.value = -3;
+      low.connect(air).connect(wood).connect(top).connect(lyre);
+      const pluck = ctx.createBiquadFilter();
+      pluck.type = 'bandpass';
+      pluck.frequency.value = LYRE.pluckAt;
+      pluck.Q.value = 0.8;
+      pluck.connect(low);
+      this.lyreBox = { body: low, pluck };
+      // Every string's waves now, at the key press that unlocked audio, and never inside a frame.
+      for (const f of CH03_STRINGS) this.lyreString(ctx, f);
+      // The room, taken after the fader: what the player cannot hear sends nothing.
+      this.sharedReverb = ctx.createConvolver();
+      this.sharedReverb.buffer = this.impulse(ctx, this.room);
+      this.sharedWet = ctx.createGain();
+      this.sharedWet.gain.value = ROOMS[this.room].wet;
+      lyre.connect(this.sharedWet).connect(this.sharedReverb).connect(this.master);
     }
     // A drone under Chapter 2's melody. E2 and E3, barely there. The others have
     // none: a brochure is printed on paper, and paper does not hum.
@@ -487,6 +546,16 @@ export class GameAudio {
     if (id === 'ch02') {
       this.scheduleCh02Note(t, i);
       return CH02_STEP;
+    }
+    if (id === 'ch03') {
+      const note = CH03_LYRE[i];
+      if (!note) return 1;
+      // A pair is struck lower string first, the upper a finger's width of time after
+      // it, and each is struck lighter: two strings are not twice as loud as one.
+      const touch = note.also === undefined ? 1 : LYRE.dyad;
+      this.lyre(t, note.string, note.hold, touch);
+      if (note.also !== undefined) this.lyre(t + LYRE.spread, note.also, note.alsoHold ?? note.hold, touch);
+      return note.gap;
     }
     if (id === 'ch01') {
       const note = CH01_PIPE[i];
@@ -549,6 +618,84 @@ export class GameAudio {
       osc.start(t);
       osc.stop(t + hold + 0.1);
     }
+  }
+
+  /**
+   * One string of the lyre, plucked, and left to ring for `ring` seconds unless it
+   * dies first. Four voices: the fundamental, the octave, the next two partials,
+   * and everything above, each dying at its own rate, because a plucked string
+   * loses its top first and that loss is most of what makes it sound plucked. The
+   * soundbox and the room are shared; a pluck makes ten nodes.
+   */
+  private lyre(t: number, string: number, ring: number, touch: number): void {
+    const ctx = this.ctx;
+    const box = this.lyreBox;
+    const f = CH03_STRINGS[string - 1];
+    if (!ctx || !box || f === undefined) return;
+    // One string, one note: plucking it again stops what it was still sounding.
+    for (const g of this.lyreRinging.get(string) ?? []) {
+      g.gain.cancelScheduledValues(t);
+      g.gain.setTargetAtTime(0, t, 0.008);
+    }
+    // The pitch settles from a hair sharp as the string's swing, and so its
+    // tension, dies down. Slacker low strings settle further.
+    const settle = LYRE.settleCents * Math.min(1.5, LYRE.settleRef / f);
+    const ringing: GainNode[] = [];
+    for (const { wave, tau } of this.lyreString(ctx, f)) {
+      const osc = ctx.createOscillator();
+      osc.setPeriodicWave(wave);
+      osc.frequency.value = f;
+      osc.detune.setValueAtTime(settle, t);
+      osc.detune.setTargetAtTime(0, t, LYRE.settleTau);
+      const g = ctx.createGain();
+      // Made silent, not left at the default of one: a start that lands a hair
+      // before its first automation event would let one sample through at full gain.
+      g.gain.value = 0;
+      g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(touch, t + LYRE.attack);
+      g.gain.setTargetAtTime(0, t + LYRE.attack, tau);
+      g.gain.setTargetAtTime(0, t + ring, LYRE.damp); // the left hand stops it
+      osc.connect(g).connect(box.body);
+      osc.start(t);
+      osc.stop(t + Math.min(ring + 6 * LYRE.damp, 7 * tau) + 0.02);
+      ringing.push(g);
+    }
+    this.lyreRinging.set(string, ringing);
+    // The fingertip leaving the string: four milliseconds of noise through the box,
+    // from the same place in the noise every time, so every fingertip is the same.
+    const src = this.noiseSource(ctx);
+    const ng = ctx.createGain();
+    ng.gain.value = 0;
+    ng.gain.setValueAtTime(0, t);
+    ng.gain.linearRampToValueAtTime(LYRE.pluck * touch, t + 0.001);
+    ng.gain.setTargetAtTime(0, t + 0.001, LYRE.pluckTau);
+    src.connect(ng).connect(box.pluck);
+    src.start(t, 0);
+    src.stop(t + 0.03);
+  }
+
+  /**
+   * A string's voices, built once and kept. The waves are unnormalised, so their
+   * coefficients are the levels, and cosine-phase, so the four of them add up to
+   * the pulse a plucked string puts on the bridge.
+   */
+  private lyreString(ctx: AudioContext, f: number): LyreVoice[] {
+    const known = this.lyreWaves.get(f);
+    if (known) return known;
+    const top = Math.min(LYRE.partials, Math.floor(LYRE.highest / f));
+    const voices: LyreVoice[] = [];
+    for (const [first, last, at] of LYRE.bands) {
+      if (first > top) break;
+      const end = Math.min(last, top);
+      const real = new Float32Array(end + 1);
+      for (let n = first; n <= end; n++) real[n] = LYRE.level * plucked(n, f);
+      voices.push({
+        wave: ctx.createPeriodicWave(real, new Float32Array(end + 1), { disableNormalization: true }),
+        tau: 1 / stringLoss(at * f),
+      });
+    }
+    this.lyreWaves.set(f, voices);
+    return voices;
   }
 
   /** Air through the tube before a phrase: the tell that someone is holding it. */
@@ -794,9 +941,11 @@ const B2 = 123.47;
 const C3 = 130.81;
 const D3 = 146.83;
 const E3 = 164.81;
+const F3 = 174.61;
 const Fs3 = 185.0;
 const G3 = 196.0;
 const A3 = 220.0;
+const Bb3 = 233.08;
 const B3 = 246.94;
 const C4 = 261.63;
 const D4 = 293.66;
@@ -814,20 +963,192 @@ const E5 = 659.25;
 const Fs5 = 739.99;
 const G5 = 783.99;
 
-const MUSIC_IDS = ['map', 'mapCh01', 'mapCh02', 'ch01', 'ch02'] as const;
+const MUSIC_IDS = ['map', 'mapCh01', 'mapCh02', 'ch01', 'ch02', 'ch03'] as const;
 /** Time constant of the fade between tracks: about six tenths of a second. */
 const CROSSFADE = 0.2;
 
 /**
- * The rooms, as decay time, the gap before the first reflection, and how much of
- * the sound goes round the room rather than straight to you. A cliff shelter is
- * open air with one wall; Gargas is four hundred metres of limestone.
+ * The rooms, as the length of the generated impulse, the gap before the first
+ * reflection, and how much of the sound goes round the room rather than straight
+ * to you. A cliff shelter is open air with one wall; Gargas is four hundred metres
+ * of limestone. `decay` is the impulse's length, not a reverberation time: the
+ * generator's envelope is not exponential, so a room's T30 comes out near 1.1
+ * times `decay` and its early decay near 1.7 times it.
  */
 const ROOMS: Record<Room, { decay: number; predelay: number; wet: number }> = {
   open: { decay: 0.45, predelay: 0.004, wet: 0.1 },
   chamber: { decay: 2.2, predelay: 0.012, wet: 0.4 },
   deep: { decay: 2.6, predelay: 0.02, wet: 0.48 },
+  // Akrotiri: the whole visit is under one modern roof, large and low, over ash,
+  // pumice and rubble. Its size is known only roughly, so this is an estimate —
+  // 1.2 to 2 s by Sabine — and not a measurement. Under a roof that size a listener
+  // a few metres from a player hears the room not far under the player, so this
+  // is, if anything, dry.
+  hall: { decay: 1.6, predelay: 0.027, wet: 0.45 },
 };
+
+// --- Chapter 3 -------------------------------------------------------------
+// A plucked lyre with seven strings, played by somebody who can play.
+//
+// The instrument is the fact here. The lyre is pictured on Crete and on the
+// mainland alike at the end of the chapter's period: on the libation side of the
+// Hagia Triada sarcophagus, a few kilometres west of Phaistos, 14th century BC,
+// where its strings are reported as seven; on the throne-room wall at Pylos, 13th
+// century BC, with five; and a Linear B tablet from Thebes counts two lyre-players,
+// ru-ra-ta-e. So Crete and the Argolid are scored with the same instrument, and
+// with the same tune, the same tuning and the same hand, because nothing shows that
+// either played differently and the music does not claim what nobody knows.
+//
+// What is NOT here matters as much. No tuning, scale, notation or melody survives
+// from the Aegean. The seven pitches are borrowed, and say so: the only tuning system
+// written down anywhere in these centuries is in the Old Babylonian texts from Ur,
+// whose tunings are read as diatonic, and D E F G A Bb C is seven adjacent steps of
+// one — no F# (the brochure's), no leading tone, no augmented second (Egypt's).
+// Those texts also retune an instrument one string at a time, and this chapter does
+// not: a tuning that changed between Crete and the mainland would be heard as a claim
+// that the mainland tuned differently. No drum, though sistra are attested: the
+// levels have no percussion in any chapter, and the brochure's drummer only means
+// something against that. Plucked, never bowed: bowing is two thousand years later,
+// and the modern Cretan lyra, which is bowed, is a different instrument.
+//
+// A lyre has no fingerboard. Here each string sounds one pitch, which is a choice,
+// since how Aegean players used the left hand is not known; the only pitch movement
+// is the few cents a plucked string settles by as its swing dies. The full list of
+// what is right and what is chosen is in content/ch03-aegean/CHAPTER.md.
+//
+// No meter. A pulse of 0.74 s, phrases of uneven length, and a left hand that stops
+// a string when one a step, a tritone or a seventh away is plucked, lets thirds,
+// fourths, fifths and sixths ring, and never lets more than two sound at once. Twice
+// a loop it lies across the strings at a phrase end, and whatever is left is the
+// room. The room is the only thing a site changes, and it is the place as a visitor
+// stands in it today.
+
+/** One of a string's voices: a band of its partials, and how fast that band dies. */
+interface LyreVoice {
+  wave: PeriodicWave;
+  tau: number;
+}
+
+const LYRE = {
+  /** Where the finger takes the string, as a fraction of its length from the bridge. */
+  beta: 0.22,
+  /** Where a soft fingertip stops exciting partials, in Hz. A quill would be far higher. */
+  finger: 2800,
+  /** Nothing above this goes into a wave, and never more than this many partials. */
+  highest: 8000,
+  partials: 40,
+  /** Amplitude decay of a partial at f is b1 + b3 f^2 per second: higher dies faster. */
+  b1: 2.3,
+  b3: 5e-6,
+  /** A string's partials in four voices: [first, last, decay taken at this multiple of f]. */
+  bands: [
+    [1, 1, 1],
+    [2, 2, 2],
+    [3, 4, 3.3],
+    [5, 40, 6.6],
+  ] as const,
+  /** Seconds for the finger to let go; a click shorter than this is a synthesiser. */
+  attack: 0.003,
+  /** The pitch settle: cents sharp at the pluck on the reference string, and how fast it goes. */
+  settleCents: 7,
+  settleRef: G3,
+  settleTau: 0.09,
+  /** How fast the left hand stops a string. */
+  damp: 0.03,
+  /** A pair: the upper string this long after the lower, and each struck this much lighter. */
+  spread: 0.025,
+  dyad: 0.7,
+  /** The fingertip. */
+  pluck: 0.05,
+  pluckTau: 0.004,
+  pluckAt: 2000,
+  /** The box: little below its air mode, the air mode itself, the wood, and the top. */
+  lowCut: 100,
+  air: 180,
+  wood: 1000,
+  topCut: 4200,
+  /** Scales every wave: measured peaks 0.072-0.073 after the master in every room. */
+  level: 0.05,
+};
+
+/** A partial's amplitude at the bridge: sin(n pi beta) / n, softened by the fingertip. */
+function plucked(n: number, f: number): number {
+  return Math.sin(n * Math.PI * LYRE.beta) / n / Math.sqrt(1 + ((n * f) / LYRE.finger) ** 4);
+}
+
+/** How fast, per second, a partial at f loses amplitude. */
+function stringLoss(f: number): number {
+  return LYRE.b1 + LYRE.b3 * f * f;
+}
+
+/** The seven strings, lowest first: tone, semitone, tone, tone, semitone, tone. */
+export const CH03_STRINGS = [D3, E3, F3, G3, A3, Bb3, C4] as const;
+
+/** Seconds a string rings when nobody stops it: longer than any of them lasts. */
+const RING = 4;
+
+/** A pluck: which string (1 = lowest), when the hand stops it, and when the next pluck falls. */
+export interface LyreNote {
+  string: number;
+  /** A second string, struck `LYRE.spread` after the first. */
+  also?: number;
+  hold: number;
+  /** When the second string is stopped, if not at `hold`. */
+  alsoHold?: number;
+  gap: number;
+}
+
+export const CH03_LYRE: LyreNote[] = [
+  // Home and its third together; a turn round the fourth; home, left to ring.
+  { string: 1, also: 3, hold: RING, alsoHold: 1.485, gap: 1.48 },
+  { string: 5, hold: 0.77, gap: 0.74 },
+  { string: 4, hold: 0.4, gap: 0.37 },
+  { string: 3, hold: 0.4, gap: 0.37 },
+  { string: 4, hold: 1.14, gap: 1.11 },
+  { string: 5, hold: RING, gap: 0.74 },
+  { string: 3, hold: 0.77, gap: 0.74 },
+  { string: 2, hold: 0.77, gap: 0.74 },
+  { string: 1, hold: 2.59, gap: 2.59 },
+  // From the lowest string to the top one and down; the hand stops the fourth, and the room answers.
+  { string: 1, hold: 1.51, gap: 0.74 },
+  { string: 5, hold: 2.25, gap: 0.74 },
+  { string: 7, hold: 1.51, gap: 1.48 },
+  { string: 6, hold: 0.4, gap: 0.37 },
+  { string: 5, hold: 0.4, gap: 0.37 },
+  { string: 4, hold: 0.555, gap: 2.59 },
+  // The turn upside down; home, held; a skip to the fifth; rests on the third, reached from above.
+  { string: 3, hold: 0.77, gap: 0.74 },
+  { string: 4, hold: 0.4, gap: 0.37 },
+  { string: 3, hold: 1.88, gap: 0.37 },
+  { string: 1, hold: 1.51, gap: 1.48 },
+  { string: 2, hold: 2.25, gap: 0.74 },
+  { string: 4, hold: 0.77, gap: 0.74 },
+  { string: 5, hold: 0.4, gap: 0.37 },
+  { string: 4, hold: 0.4, gap: 0.37 },
+  { string: 3, hold: 2.615, gap: 2.59 },
+  // The first phrase again, note for note, until it leaves for the top string; stopped on the second.
+  { string: 1, also: 3, hold: RING, alsoHold: 1.485, gap: 1.48 },
+  { string: 5, hold: 0.77, gap: 0.74 },
+  { string: 4, hold: 0.4, gap: 0.37 },
+  { string: 3, hold: 0.4, gap: 0.37 },
+  { string: 4, hold: RING, gap: 1.11 },
+  { string: 6, hold: 1.14, gap: 1.11 },
+  { string: 7, hold: 1.51, gap: 0.74 },
+  { string: 5, hold: 1.295, gap: 0.74 },
+  { string: 2, hold: 0.555, gap: 2.59 },
+  // From the top string down; home struck twice; home and its fifth, the longest ring in the loop.
+  { string: 7, hold: 1.14, gap: 1.11 },
+  { string: 6, hold: 0.4, gap: 0.37 },
+  { string: 5, hold: 0.77, gap: 0.74 },
+  { string: 4, hold: 1.51, gap: 0.74 },
+  { string: 2, hold: 0.77, gap: 0.74 },
+  { string: 3, hold: 1.48, gap: 0.74 },
+  { string: 1, hold: 0.37, gap: 0.37 },
+  { string: 1, hold: 1.14, gap: 0.37 },
+  { string: 3, hold: 0.77, gap: 0.74 },
+  { string: 2, hold: 0.77, gap: 0.74 },
+  { string: 1, also: 5, hold: RING, gap: 3.33 },
+];
 
 // --- Chapter 2 -------------------------------------------------------------
 // E double harmonic, the scale everyone hears as Egypt. Sparse and slow, like a museum.
@@ -1186,6 +1507,7 @@ const TRACK_LENGTH: Record<MusicId, number> = {
   mapCh02: MAP_CH02_MELODY.length,
   ch01: CH01_PIPE.length,
   ch02: CH02_MELODY.length,
+  ch03: CH03_LYRE.length,
 };
 
 function makeNoise(ctx: AudioContext): AudioBuffer {
