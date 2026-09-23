@@ -171,7 +171,10 @@ export class Player implements Rect {
     this.tugging = this.held && (input.left || input.right || input.jumpHeld);
     this.tug = this.tugging ? this.tug + 1 : 0;
     const want = this.held ? 0 : (input.right ? 1 : 0) - (input.left ? 1 : 0);
-    if (want !== 0) {
+    if (this.held) {
+      // Held is held: no run-out, no slide.
+      this.vx = 0;
+    } else if (want !== 0) {
       this.facing = want as 1 | -1;
       const accel = this.onGround ? PHYS.groundAccel : PHYS.airAccel;
       this.vx = approach(this.vx, want * PHYS.runSpeed, accel * DT);

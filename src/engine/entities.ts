@@ -768,9 +768,11 @@ export class Snare implements Entity {
     if (!this.caught && p.onGround && feet >= r.y - 2 && feet <= r.y + r.h && centerX(p) >= r.x && centerX(p) <= r.x + r.w) {
       this.caught = true;
       p.held = true;
-      // The boot is in it, so all of him is over it: whatever it is fitted to takes
-      // him with it, and no edge of him is left resting on the next thing along.
+      // The boot is in it, so all of him is over it and he stops dead: whatever it is
+      // fitted to takes him with it, and no edge of him is left resting on, or slides
+      // on to, the next thing along.
       p.x = Math.max(r.x, Math.min(p.x, r.x + r.w - p.w));
+      p.vx = 0;
       if (this.def.emits) w.events.add(this.def.emits);
       w.sound('thud');
     }

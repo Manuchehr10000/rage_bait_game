@@ -330,6 +330,32 @@ test('whoever the sixth step catches, it takes all of him down with it, wherever
   }
   // The band that used to hang him on the seventh step's rock.
   expect(r.filter((t) => t.x >= 855 && t.x <= 859).every((t) => t.caught)).toBe(true);
+
+  // And arriving at a run, the way anybody does: from the third tread, every take-off
+  // from its back to the lip of the fifth, at every hold. Whoever is caught stops dead
+  // where he is caught, so nobody slides on over the seventh and hangs there.
+  const ran = (await page.evaluate(`(() => { ${DRIVER}
+    let caught = 0; const hung = [];
+    for (let x0 = 740; x0 <= 830; x0 += 2) for (const f of [3, 6, 9, 12, 18]) {
+      g.resetRun();
+      p.spawnAt(738, 128); g.camera.x = 620;
+      for (let i = 0; i < 3; i++) g.tick();
+      let h = -1, at = -1;
+      for (let i = 0; i < 260 && g.state === 'playing'; i++) {
+        key('ArrowRight', true);
+        if (h < 0 && p.onGround && p.x + p.w >= x0) { key('Space', true); h = f; }
+        if (h > 0) { h--; if (h === 0) key('Space', false); }
+        g.tick();
+        if (p.held && at < 0) at = i;
+        if (at >= 0 && i - at > 90 && g.state === 'playing') { hung.push(x0 + '/' + f + ' at ' + Math.round(p.x * 10) / 10); break; }
+      }
+      key('ArrowRight', false); key('Space', false);
+      if (at >= 0) caught++;
+    }
+    return { caught, hung };
+  })()`)) as { caught: number; hung: string[] };
+  expect(ran.caught).toBeGreaterThan(100);
+  expect(ran.hung).toEqual([]);
 });
 
 test('the fourth step lets go of a man who stands on it, and not of one who walks down it', async ({ page }) => {
