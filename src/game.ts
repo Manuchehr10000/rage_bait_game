@@ -70,7 +70,7 @@ export class Game {
   private coins: { x: number; y: number; t: number }[] = [];
   private texts: WorldText[] = [];
 
-  /** The headlamp. Off outside; switched on once past the door, and it stays on. */
+  /** The headlamp has been lit: off outside, lit once past the door. Whether it is burning is lampOff's business. */
   private lampOn = false;
   /**
    * Switched off by the tourist, with L. Only a lamp that has been lit at the door
@@ -78,7 +78,7 @@ export class Game {
    * the game that is about spending something rather than surviving something.
    */
   private lampOff = false;
-  /** Seconds it has been on. Only a level with a lampLife on its dark cares. */
+  /** Seconds it has been burning. Only a level with a lampLife on its dark cares. */
   private lampT = 0;
 
   private state: State = 'playing';
@@ -395,8 +395,7 @@ export class Game {
       this.lampOff = !this.lampOff;
       this.audio.play('click');
     }
-    // The battery. It has been on since the first door of the chapter, and it only
-    // runs down while it is burning.
+    // The battery. It is new at every door, and it only runs down while it is burning.
     if (this.lampOn && !this.lampOff) this.lampT += DT;
     this.camera.update(this.player);
     this.driveLoops();

@@ -111,6 +111,26 @@ test('the cave is dark, the tourist has a lamp, and the train runs at exactly hi
   expect(r).toEqual({ ambient: 0.78, lamp: 'headlamp', speed: 90, delay: 1, cars: 2, parked: 'idle' });
 });
 
+test('past the door L puts the lamp out and lights it again, and here it never runs down', async ({ page }) => {
+  const r = await page.evaluate(`(() => { ${DRIVER}
+    const lampKey = () => { key('KeyL', true); key('KeyL', false); };
+    key('ArrowRight', true);
+    for (let i = 0; i < 300 && !g.lampCarried; i++) g.tick();
+    key('ArrowRight', false);
+    for (let i = 0; i < 30; i++) g.tick();
+    const lit = g.lamp;
+    lampKey(); g.tick();
+    const out = !g.lamp;
+    for (let i = 0; i < 120; i++) g.tick();
+    lampKey(); g.tick();
+    const again = g.lamp;
+    for (let i = 0; i < 120; i++) g.tick();
+    return { lit, out, again, left: g.lampLeft };
+  })()`);
+  // No lampLife on this cave's dark: the switch is only ever a way to see less.
+  expect(r).toEqual({ lit: true, out: true, again: true, left: 1 });
+});
+
 test('a run that knows the level finishes clean, and the train never gains a pixel', async ({ page }) => {
   const r = await play(page, `const step = () => known();`);
   expect(r.state).toBe('complete');

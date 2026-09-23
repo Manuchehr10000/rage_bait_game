@@ -510,6 +510,9 @@ function drawKarnakGround(ctx: CanvasRenderingContext2D, s: Scene, cx: number, c
 /** How far up the track the train's headlight reaches, in px. Further than the tourist's lamp. */
 const TRAIN_LIGHT = 200;
 
+/** How far back a tread that rocks goes on its heel, in radians. Enough to see, not enough to fall off. */
+const ROCK_ANGLE = 0.1;
+
 const darkLayer = document.createElement('canvas');
 darkLayer.width = VIEW_W;
 darkLayer.height = VIEW_H;
@@ -542,8 +545,8 @@ function drawDarkness(ctx: CanvasRenderingContext2D, s: Scene, cx: number, cy: n
   const pyc = Math.round(p.y) + 8 - cy;
   if (dark.lamp === 'headlamp') {
     // The lamp on the hat: a cone the way you are facing, and a little spill around
-    // you. Where the battery runs down, the cone shortens with it and the spill
-    // shrinks to what a pair of eyes can do in the dark.
+    // you. Where the battery runs down, the cone shortens with it; put out or spent,
+    // there is no cone and the spill is all there is.
     const f = p.facing;
     const hx = pxc + f * 2;
     const hy = pyc - 4;
@@ -1310,11 +1313,15 @@ function drawDecor(ctx: CanvasRenderingContext2D, s: Scene, d: DecorDef): void {
       ctx.moveTo(d.x0, d.y0 - 16);
       ctx.lineTo(d.x1, d.y1 - 16);
       ctx.stroke();
+      // A stanchion at the back of every tread, 32 px apart, standing on it in a
+      // foot bolted down through the concrete. Every foot is this foot.
       ctx.fillStyle = COLORS.rail;
-      for (let t = 0; t <= 1; t += 1 / 12) {
-        const x = Math.round(d.x0 + dx * t);
-        const y = Math.round(d.y0 + dy * t);
-        ctx.fillRect(x, y - 26, 2, 26);
+      const posts = Math.round(dx / 32);
+      for (let i = 0; i <= posts; i++) {
+        const x = Math.round(d.x0 + (dx * i) / posts);
+        const y = Math.round(d.y0 + (dy * i) / posts);
+        ctx.fillRect(x + 2, y - 26, 2, 26);
+        ctx.fillRect(x, y - 2, 6, 2);
       }
       ctx.fillStyle = COLORS.railLit;
       ctx.beginPath();
@@ -1454,7 +1461,6 @@ function drawCornice(ctx: CanvasRenderingContext2D, x: number, y: number, w: num
 // ---------------------------------------------------------------------------
 
 function drawTiles(ctx: CanvasRenderingContext2D, level: Level, cx: number, cy: number): void {
-  const theme = level.data.theme;
   const x0 = Math.floor(cx / TILE) - 1;
   const x1 = Math.ceil((cx + VIEW_W) / TILE) + 1;
   const y0 = Math.floor(cy / TILE) - 1;
@@ -1463,49 +1469,68 @@ function drawTiles(ctx: CanvasRenderingContext2D, level: Level, cx: number, cy: 
     for (let tx = x0; tx <= x1; tx++) {
       const c = level.tile(tx, ty);
       if (c === ' ') continue;
-      const x = tx * TILE;
-      const y = ty * TILE;
-      const open = !level.isSolid(tx, ty - 1);
-      if (paint(ctx, tileArtId(theme, c, open), x, y)) continue;
-      if (c === '=') {
-        if (theme === 'pechMerle' || theme === 'gargas') drawConcrete(ctx, x, y, open);
-        else if (theme === 'rouffignac') drawBallast(ctx, tx, ty, x, y, open);
-        else if (theme === 'capBlanc' || theme === 'rocAuxSorciers') drawMeadowPath(ctx, tx, ty, x, y, open);
-        else if (theme === 'abuSimbel') drawSand(ctx, level, tx, ty, x, y, open);
-        else if (theme === 'philae') drawGranite(ctx, tx, ty, x, y, open);
-        else drawPaving(ctx, tx, ty, x, y, open);
-      } else if (c === '%' && (theme === 'pechMerle' || theme === 'rouffignac' || theme === 'gargas')) {
-        drawClay(ctx, tx, ty, x, y, open);
-      } else if (c === '%' && (theme === 'capBlanc' || theme === 'rocAuxSorciers')) {
-        drawSediment(ctx, tx, ty, x, y, open);
-      } else if (c === '#' || c === '%') {
-        if (theme === 'pechMerle' || theme === 'gargas') drawCaveRock(ctx, tx, ty, x, y, open);
-        else if (theme === 'rouffignac') drawFlintRock(ctx, tx, ty, x, y, open);
-        else if (theme === 'capBlanc' || theme === 'rocAuxSorciers') drawBedrock(ctx, tx, ty, x, y, open);
-        else if (theme === 'abuSimbel') drawCliff(ctx, tx, ty, x, y, open);
-        else if (theme === 'philae') drawColumnDrum(ctx, x, y, open);
-        else drawSandstone(ctx, x, y, ty % 2 === 1, open);
-      } else if (c === '?') {
-        ctx.fillStyle = COLORS.statueLight;
-        ctx.fillRect(x, y, TILE, TILE);
-        ctx.fillStyle = COLORS.outline;
-        ctx.fillRect(x, y, TILE, 1);
-        ctx.fillRect(x, y + TILE - 1, TILE, 1);
-        ctx.fillRect(x, y, 1, TILE);
-        ctx.fillRect(x + TILE - 1, y, 1, TILE);
-        ctx.fillRect(x + 7, y + 6, 2, 7);
-        ctx.fillRect(x + 4, y + 8, 8, 2);
-        ctx.fillRect(x + 6, y + 3, 4, 1);
-        ctx.fillRect(x + 5, y + 4, 1, 2);
-        ctx.fillRect(x + 10, y + 4, 1, 2);
-      } else if (c === 'x') {
-        ctx.fillStyle = COLORS.statueShade;
-        ctx.fillRect(x, y, TILE, TILE);
-        ctx.fillStyle = COLORS.outline;
-        ctx.fillRect(x, y, TILE, 1);
-        ctx.fillRect(x, y, 1, TILE);
-      }
+      drawTileAt(ctx, level, c, tx, ty, !level.isSolid(tx, ty - 1));
     }
+  }
+}
+
+/**
+ * One tile of the level, painted if there is a painting of it and drawn by the
+ * theme's own code if not. `tx, ty` pick its grain; `x, y` say where it is, for a
+ * tile that has come loose and is somewhere else. Anything that stands in for a tile (a tread that lets
+ * go, the rock it has not got under it, a patch of floor that is not floor) is
+ * drawn through here too, so that when the paintings land the disguise and the
+ * thing it disguises change together (pillar 4).
+ */
+function drawTileAt(
+  ctx: CanvasRenderingContext2D,
+  level: Level,
+  c: string,
+  tx: number,
+  ty: number,
+  open: boolean,
+  x = tx * TILE,
+  y = ty * TILE,
+): void {
+  const theme = level.data.theme;
+  if (paint(ctx, tileArtId(theme, c, open), x, y)) return;
+  if (c === '=') {
+    if (theme === 'pechMerle' || theme === 'gargas') drawConcrete(ctx, x, y, open);
+    else if (theme === 'rouffignac') drawBallast(ctx, tx, ty, x, y, open);
+    else if (theme === 'capBlanc' || theme === 'rocAuxSorciers') drawMeadowPath(ctx, tx, ty, x, y, open);
+    else if (theme === 'abuSimbel') drawSand(ctx, level, tx, ty, x, y, open);
+    else if (theme === 'philae') drawGranite(ctx, tx, ty, x, y, open);
+    else drawPaving(ctx, tx, ty, x, y, open);
+  } else if (c === '%' && (theme === 'pechMerle' || theme === 'rouffignac' || theme === 'gargas')) {
+    drawClay(ctx, tx, ty, x, y, open);
+  } else if (c === '%' && (theme === 'capBlanc' || theme === 'rocAuxSorciers')) {
+    drawSediment(ctx, tx, ty, x, y, open);
+  } else if (c === '#' || c === '%') {
+    if (theme === 'pechMerle' || theme === 'gargas') drawCaveRock(ctx, tx, ty, x, y, open);
+    else if (theme === 'rouffignac') drawFlintRock(ctx, tx, ty, x, y, open);
+    else if (theme === 'capBlanc' || theme === 'rocAuxSorciers') drawBedrock(ctx, tx, ty, x, y, open);
+    else if (theme === 'abuSimbel') drawCliff(ctx, tx, ty, x, y, open);
+    else if (theme === 'philae') drawColumnDrum(ctx, x, y, open);
+    else drawSandstone(ctx, x, y, ty % 2 === 1, open);
+  } else if (c === '?') {
+    ctx.fillStyle = COLORS.statueLight;
+    ctx.fillRect(x, y, TILE, TILE);
+    ctx.fillStyle = COLORS.outline;
+    ctx.fillRect(x, y, TILE, 1);
+    ctx.fillRect(x, y + TILE - 1, TILE, 1);
+    ctx.fillRect(x, y, 1, TILE);
+    ctx.fillRect(x + TILE - 1, y, 1, TILE);
+    ctx.fillRect(x + 7, y + 6, 2, 7);
+    ctx.fillRect(x + 4, y + 8, 8, 2);
+    ctx.fillRect(x + 6, y + 3, 4, 1);
+    ctx.fillRect(x + 5, y + 4, 1, 2);
+    ctx.fillRect(x + 10, y + 4, 1, 2);
+  } else if (c === 'x') {
+    ctx.fillStyle = COLORS.statueShade;
+    ctx.fillRect(x, y, TILE, TILE);
+    ctx.fillStyle = COLORS.outline;
+    ctx.fillRect(x, y, TILE, 1);
+    ctx.fillRect(x, y, 1, TILE);
   }
 }
 
@@ -1790,7 +1815,7 @@ function drawEntityBack(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): voi
       if (d.solidBelow && (c.state === 'idle' || c.state === 'armed')) {
         const tx0 = Math.floor(r.x / TILE);
         for (let ty = Math.floor((r.y + r.h) / TILE); ty < s.level.heightTiles; ty++)
-          for (let i = 0; i < r.w / TILE; i++) drawCaveRock(ctx, tx0 + i, ty, (tx0 + i) * TILE, ty * TILE, false);
+          for (let i = 0; i < r.w / TILE; i++) drawTileAt(ctx, s.level, '#', tx0 + i, ty, false);
       }
       // A crocodile looks like a rock until it moves. Then you see the back.
       if (d.skin === 'croc') {
@@ -1831,17 +1856,17 @@ function drawEntityBack(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): voi
         if (!paint(ctx, 'stop-sign', r.x, r.y)) ctx.drawImage(STOP_SIGN_SPRITE, r.x, r.y);
       } else if (d.skin === 'ballast') {
         // A stretch of the track bed, drawn by the code that draws the rest of it.
-        for (let i = 0; i < r.w / TILE; i++) drawBallast(ctx, Math.floor(r.x / TILE) + i, Math.floor(r.y / TILE), r.x + i * TILE, r.y, true);
+        for (let i = 0; i < r.w / TILE; i++) drawTileAt(ctx, s.level, '=', Math.floor(r.x / TILE) + i, Math.floor(r.y / TILE), true, r.x + i * TILE, r.y);
       } else if (d.skin === 'clayLedge') {
         // A shelf of the cave's own clay. Drawn tile for tile exactly as the clay
         // the level is cut out of, because that is what it is (pillar 4).
         for (let i = 0; i < r.w / TILE; i++)
           for (let j = 0; j < r.h / TILE; j++)
-            drawClay(ctx, Math.floor(r.x / TILE) + i, Math.floor(r.y / TILE) + j, r.x + i * TILE, r.y + j * TILE, j === 0);
+            drawTileAt(ctx, s.level, '%', Math.floor(r.x / TILE) + i, Math.floor(r.y / TILE) + j, j === 0, r.x + i * TILE, r.y + j * TILE);
       } else if (d.skin === 'walkway') {
-        // The last run of concrete, laid across the hole on two steel bearers. One
-        // that is going does not drop flat: it tips off its bearer, the far end first.
-        const tip = c.state === 'falling' ? Math.min(0.9, c.fallen / 30) : 0;
+        // A run of concrete laid across a hole on two steel bearers. Most that go drop
+        // flat; one that tips goes off its bearer, the far end first.
+        const tip = d.tips && c.state === 'falling' ? Math.min(0.9, c.fallen / 30) : 0;
         ctx.save();
         if (tip > 0) {
           ctx.translate(r.x, r.y);
@@ -1854,8 +1879,19 @@ function drawEntityBack(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): voi
         ctx.restore();
       } else if (d.skin === 'tread') {
         // One tread of the fitted stair, drawn by the code that draws every other
-        // tread of it: nothing about a step says what it does (pillar 4).
-        for (let i = 0; i < r.w / TILE; i++) drawConcrete(ctx, r.x + i * TILE, r.y, true);
+        // tread of it: nothing about a step says what it does (pillar 4). One that
+        // rocks goes back on its heel while he is on it, near end down, and is level
+        // again the moment he is off.
+        const on = d.rocks === true && s.player.x + s.player.w > r.x && s.player.x < r.x + r.w && Math.abs(s.player.y + s.player.h - r.y) <= 2;
+        ctx.save();
+        if (on) {
+          ctx.translate(r.x + r.w, r.y);
+          ctx.rotate(-ROCK_ANGLE);
+          ctx.translate(-(r.x + r.w), -r.y);
+        }
+        const ty = Math.floor(r.y / TILE);
+        for (let i = 0; i < r.w / TILE; i++) drawTileAt(ctx, s.level, '=', Math.floor(r.x / TILE) + i, ty, true, r.x + i * TILE, r.y);
+        ctx.restore();
       } else if (d.skin === 'disc') {
         if (!paint(ctx, 'calcite-disc', r.x, r.y)) ctx.drawImage(DISC_SPRITE, r.x, r.y);
       } else if (d.skin === 'fallenBlock') {

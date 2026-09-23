@@ -495,7 +495,10 @@ export class Crumble implements Entity {
   }
 
   solids(): MovingSolid[] {
-    return this.state === 'gone' ? [] : [this.solid];
+    if (this.state === 'gone') return [];
+    // One that tips is off its bearer the moment it goes: nothing to ride down.
+    if (this.def.tips && this.state === 'falling') return [];
+    return [this.solid];
   }
 }
 
@@ -765,6 +768,9 @@ export class Snare implements Entity {
     if (!this.caught && p.onGround && feet >= r.y - 2 && feet <= r.y + r.h && centerX(p) >= r.x && centerX(p) <= r.x + r.w) {
       this.caught = true;
       p.held = true;
+      // The boot is in it, so all of him is over it: whatever it is fitted to takes
+      // him with it, and no edge of him is left resting on the next thing along.
+      p.x = Math.max(r.x, Math.min(p.x, r.x + r.w - p.w));
       if (this.def.emits) w.events.add(this.def.emits);
       w.sound('thud');
     }

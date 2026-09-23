@@ -12,6 +12,7 @@ first player to press it in the door finds out what it is for.
 **Must be right:** the upper portal is the way in and the lower is the way out; the door
 is steel and modern; the day is the same day as the exit's.
 
-**Deliberately wrong:** the lamp's clock. Nothing on the door starts it.
+**Deliberately wrong:** the lamp's twenty seconds. Nothing on the door starts it, and a
+new battery is in it every time he comes back through the door.
 
 No new art. The mouth and the door are drawn by the game.

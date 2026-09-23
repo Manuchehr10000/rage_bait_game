@@ -52,43 +52,50 @@ the level is a budget. The fastest run there is, with the lamp never touched, re
 first slab of the well exactly as the flicker starts. The upper cave has nothing in it to
 jump, and it is five seconds long: a player who walks it in the dark reaches the well with
 a third of the battery instead of a tenth. Nothing in the level says any of this. The key is
-on the controls line with the others, and a lamp that is out leaves him the small spill of
-light round his feet and nothing ahead of him at all.
+on the controls line with the others. The cave is darker than the show caves before it, so
+a lamp that is out, or spent, leaves him the small spill of light round his feet and,
+ahead of him, a dark in which a tread or a slab is only a shade less black than the hole
+beside it.
 
 **The stair lies.** Twelve fitted concrete steps down the nineteenth-century tunnel, every
 one the same, every one standing on the same rock. Four of them are not steps. The fourth
 lets go half a second after he stands on it, which is longer than a man walking down a stair
 spends on any step and exactly as long as a careful one does. The sixth takes his boot in the
-foot of the handrail's stanchion, and then the tread he is held to lets go. The ninth tips
-back under him and pins him against the riser of the eighth, which does not hurt him at all
-and burns his light for as long as it takes him to jump off it. The eleventh is not there;
-the handrail goes straight over the gap.
+foot of the handrail's stanchion, and then the tread he is held to lets go. The ninth rocks
+back on its heel under him and pins him against the riser of the eighth, which does not hurt
+him at all and burns his light for as long as it takes him to jump off it. The eleventh is
+not there; the handrail goes straight over the gap. The roof over the stair is cut high, so
+every jump on it is a whole jump, and a whole jump off the lip of the eighth clears the
+ninth, the tenth, and lands in the eleventh.
 
-**The hall floor lies.** Three patches of the clay are not floor any more, drawn standing on
-the rock they have not got.
+**The hall floor lies.** The bears of Gargas left wallows in the clay, hollows where they
+slept. Three patches of the hall floor are the crust over one, drawn as the clay they are,
+standing on the rock they have not got, and a sixth of a second after he steps on one it
+is not there.
 
 **The trade.** The Camarin is a hole in the floor of the great hall, a full jump wide: a
 tap falls in. From the bottom of it a passage runs back under the floor you came along to
 the wall with the engravings on it. Going in is a drop, a look, a walk back and a climb
-out, and it costs two or three seconds of the lamp, more if you look properly — or nothing
-at all, if he puts the lamp out and looks at them by the spill round his feet. Nobody tells
-you the engravings are there.
+out, and it costs a couple of seconds of the lamp, more if you look properly — or nothing
+at all, if he puts the lamp out and looks at them by the spill round his feet, a hand's
+width at a time. Nobody tells you the engravings are there.
 
 **The well is real, and the fitted path across it lies once.** Three slabs, the middle one
-a step up, and the middle one tips: it is not bearing on anything, it goes off its bearer
-the far end first the moment he is on it, and it takes whoever is still standing there into
-the oubliettes. The first and third are too far apart to jump between, so the middle one has
-to be touched and left in the same breath. In the first version of this level the fitted
-path over the well was the one made thing in the chapter that never lied, the deliberate
-answer to Pech Merle's concrete. That answer is spent here on purpose: the hardest level ends
-with even the path over the deepest hole in the chapter not to be trusted. With a lamp the
-crossing is hard; with the spill of an unlit one it is three jumps at the edge of what can be
-seen.
+a step up, and the middle one tips: it is not bearing on anything, and a sixth of a second
+after he lands on it it goes off its bearer, the far end first, and is not under him any
+more. Whoever is still on it goes into the oubliettes with it. The first and third are too
+far apart to jump between, so the middle one has to be touched and left in the same breath.
+In the first version of this level the fitted path over the well was the one made thing in
+the chapter that never lied, the deliberate answer to Pech Merle's concrete. That answer is
+spent here on purpose: the hardest level ends with even the path over the deepest hole in
+the cave not to be trusted. With a lamp the crossing is hard; with an unlit one it is three
+jumps into a dark in which the slabs are a shade less black than the well.
 
 **Daylight reaches the hands.** The wall of hands is near the way out, and the level puts
-it inside the reach of the day coming in at the lower portal, so it is the one piece of
-art in the whole chapter seen by daylight, and the tourist arrives at it, every time, with
-his own light dead. The chapter ends on it. There is no trap on that wall.
+it inside the reach of the day coming in at the lower portal, strongest nearest the door.
+A player who never touched the switch arrives at it with his own light dead, and sees it by
+the day alone; one who saved light on the way can still have some. The chapter ends on it.
+There is no trap on that wall.
 
 ## The beats
 
@@ -96,8 +103,8 @@ his own light dead. The chapter ends on it. There is no trap on that wall.
 |---|---|---|---|
 | a | `a-portal` | The hillside and the upper portal with its steel door. The lamp comes on in the door, and its clock starts; from here on, L puts it out and lights it again | Two portals on the hillside; the visit goes in by the upper cave; the steel entry door |
 | b | `b-upper` | The upper cave, narrow: three tiles clear. Lines drawn with fingers in the clay of the roof, a few painted animals on the wall. Nothing to jump, and five seconds of it: the place to put the lamp out | Gargas II: finger tracings on the clay walls and low ceiling; some animal paintings |
-| c | `c-tunnel` | Twelve fitted steps down under a roof cut high, a handrail beside them. The fourth lets go of whoever stands on it; the sixth takes his boot and then goes; the ninth tips back and pins him against the eighth; the eleventh is not there. At the bottom, the block that first joined the two caves. A hop | The nineteenth-century tunnel; the stairs with barriers; the rockfall said to have joined the caves in the Middle Ages |
-| d | `d-hall` | The great hall of Gargas I, wide and five tiles high. Claw marks on the walls. The bear that is a stalagmite: a hop. Three patches of floor that are not floor. The Camarin: a hole a jump wide, and under the floor, four tiles back, the engravings | The great hall; the bears; the Salle de l'Ours; the Camarin and its 148 engravings, the Great Bull and Great Horse |
+| c | `c-tunnel` | Twelve fitted steps down under a roof cut high, a handrail beside them. The fourth lets go of whoever stands on it; the sixth takes his boot and then goes; the ninth rocks back and pins him against the eighth; the eleventh is not there. At the bottom, the block that first joined the two caves. A hop | The nineteenth-century tunnel; the stairs with barriers; the rockfall said to have joined the caves in the Middle Ages |
+| d | `d-hall` | The great hall of Gargas I, wide and five tiles high. Claw marks on the walls. The bear that is a stalagmite: a hop. Three patches of floor that are the crust over a wallow. The Camarin: a hole a jump wide, and under the floor, four tiles back, the engravings | The great hall; the bears, their claw marks and their wallows in the clay; the Salle de l'Ours; the Camarin and its 148 engravings, the Great Bull and Great Horse |
 | e | `e-well` | The floor is gone. Three slabs of the path across it, the middle one higher, and the middle one tips. By now the lamp is flickering, or out, unless it was put out earlier | The Oubliettes de Gargas, a shaft about twenty metres deep; the fitted route |
 | f | `f-hands` | The wall of hands, lit from the right by the day. Adults' hands high, children's low; red, black, one yellow; about half of them short of a finger. The lower portal | 137 hands on one wall near the exit, one yellow; the incomplete fingers; the bone splinter; the lower portal is the way out |
 
@@ -107,12 +114,15 @@ his own light dead. The chapter ends on it. There is no trap on that wall.
   This is the level's one big lie and the whole level is built on it. That it only runs
   down while it is lit is true of every lamp there is.
 - **The stair.** The visit's stairs are fitted, railed and safe. None of their treads lets
-  go, none of them tips, none of them is missing, and nobody's boot has stayed in a
-  stanchion foot. All four are level design; the stair itself, its rail and its concrete are
+  go, none of them rocks, none of them is missing, and nobody's boot has stayed in a
+  stanchion foot. All four are level design; that there are stairs with barriers on them is
   the visit as it is.
-- **The hall floor.** It is clay over rock and it does not open under anybody.
-- **The middle slab over the well tips.** The fitted path at Gargas is maintained and
-  inspected. The slabs, and the tipping, are level design.
+- **The concrete.** The treads and the slabs are the fitted concrete of Pech Merle, reused.
+  What the stairs and the path at Gargas are made of is not in the sources.
+- **The hall floor.** The wallows are real, and they are shallow hollows in the clay. None of
+  them is a crust over a drop, and the hall floor does not open under anybody.
+- **The middle slab over the well tips.** Nothing in the sources says the fitted path has
+  ever failed anybody. The slabs, and the tipping, are level design.
 - **The Camarin is under the floor.** It is a side chamber off the lower cave, reached on
   foot. Here it is a hole and a passage under the hall so that going in has a cost in time
   that a side room would not have.
@@ -131,7 +141,8 @@ his own light dead. The chapter ends on it. There is no trap on that wall.
 
 - Two caves, in by the upper and out by the lower, joined by a tunnel cut for visitors.
 - The upper cave is narrow and its clay roof carries finger tracings; the lower is broad.
-- The bears are real: claw marks on the walls and a stalagmite shaped like a bear.
+- The bears are real: claw marks on the walls, wallows in the clay, and a stalagmite shaped
+  like a bear.
 - The Camarin is real, smooth-walled, small, and holds most of the engravings.
 - The well is real and it is deep.
 - The hands are real, in the lower cave only, red and black with a very few yellow,
@@ -143,8 +154,8 @@ his own light dead. The chapter ends on it. There is no trap on that wall.
 ## Not in the level
 
 The missing fingers are the best question the site has, and the research forbids an
-answer: mutilation (Sahly, 1966), disease and frostbite, fingers folded on purpose
-(Leroi-Gourhan, 1967), hand signs (Etxepare and Irurtzun, 2021) are all live. The level
+answer: amputation (Sahly, 1966), frostbite and disease, and fingers folded on purpose
+(Leroi-Gourhan, 1967), perhaps as signs (Etxepare and Irurtzun, 2021), are all live. The level
 draws short fingers and says nothing. The 1906 discovery and the counts that followed
 (eighty, a hundred and fifty, two hundred and seventeen, two hundred and thirty-one), the
 bone splinter and its date, and the eighteenth-century outlaw Blaise Ferrage who is said

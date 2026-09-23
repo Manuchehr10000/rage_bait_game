@@ -12,7 +12,7 @@ import { TILE } from '../../engine/types';
  *
  * The hardest level of the chapter, and the one where the tourist finally has a
  * decision to make. The headlamp that has been on since the first door runs down
- * on a clock from this one — but here it has a switch. L puts it out and lights it
+ * as it burns in this one — but here it has a switch. L puts it out and lights it
  * again, and a lamp that is out does not run down. So the level is a budget:
  * every stretch he can cross in the dark is light he has for a stretch he cannot,
  * and the stretch he cannot is the well, at the end, where the fitted path is no
@@ -20,7 +20,7 @@ import { TILE } from '../../engine/types';
  *
  * Everything the chapter has taught is here once more, in its worst arrangement:
  *   - a stair of twelve identical treads. One lets go if he stands on it; one
- *     takes his boot and then lets go with him on it; one tips back and pins him
+ *     takes his boot and then lets go with him on it; one rocks back and pins him
  *     against the step behind, which costs him nothing but light; one is not
  *     there. The handrail runs straight over all of them
  *   - a hall with three patches of floor that are not floor, drawn as the floor
@@ -28,8 +28,8 @@ import { TILE } from '../../engine/types';
  *     it to the engravings, which cost light to look at and nothing at all to
  *     look at in the dark
  *   - the well of the oubliettes, crossed on three slabs of the fitted path, and
- *     the middle one tips. Seven hundred pixels of honest concrete in this level
- *     and the one piece that lies is the one over the deepest hole
+ *     the middle one tips. Of all the fitted concrete in the level, the piece
+ *     that lies last is the one over the deepest hole in the cave
  *   - and then the wall of hands, by daylight, with no trap on it at all
  *
  *   0..11    the hillside and the upper portal. Daylight, a steel door
@@ -67,8 +67,9 @@ const stepRow = (k: number) => 9 + k;
  *   lets go  half a second after he stands on it, it goes, and so does he
  *   boot     the stanchion foot of the handrail takes his boot, and then the tread
  *              he is held to lets go
- *   tips     it tips back under him and pins him against the step behind it. It
- *              does not hurt him. It burns his light while he gets off it
+ *   tips     it rocks back on its heel under him and pins him against the step
+ *              behind it. It does not hurt him. It burns his light while he gets
+ *              off it
  *   gone     there is no tread here; there is the handrail, going straight over
  */
 type Step = 'holds' | 'lets go' | 'boot' | 'tips' | 'gone';
@@ -85,7 +86,11 @@ const CAMARIN_X0 = 88;
 /** Three stretches of the hall floor that are not floor any more. Drawn as the floor. */
 const FALSE_FLOORS = [74, 84, 100];
 
-/** The three slabs of the fitted path across the well. The middle one is a step up, and it tips. */
+/**
+ * The three slabs of the fitted path across the well. The middle one is a step up,
+ * and it tips: a sixth of a second after he lands on it, it is off its bearer and
+ * not under him. So it is jumped from as it is landed on, or not at all.
+ */
 const SLABS = [
   { x: px(111) + 8, y: LOWER, tips: false },
   { x: px(115), y: LOWER - 16, tips: true },
@@ -107,13 +112,13 @@ for (let k = 0; k < STEPS; k++) {
   g.fill(stepTx(k), stepRow(k), 2, 1, '=');
 }
 for (let k = 0; k < STEPS; k++) {
-  const s = STAIR[k];
-  if (s === 'lets go' || s === 'boot' || s === 'gone') g.fill(stepTx(k), stepRow(k), 2, H - stepRow(k), ' ');
+  if (STAIR[k] !== 'holds') g.fill(stepTx(k), stepRow(k), 2, H - stepRow(k), ' ');
 }
-// The tunnel's roof, cut high and flat in two lifts, so that a jump on the stair is
-// a whole jump. The lift comes down over the seventh step, which is walked.
-g.fill(42, 0, 14, 5, '#');
-g.fill(56, 0, 14, 12, '#');
+// The tunnel's roof, cut high and flat in two lifts, so that a jump from any tread
+// is a whole jump: five tiles clear over the first step and more over every other.
+// The break between the lifts is over the eighth.
+g.fill(42, 0, 14, 4, '#');
+g.fill(56, 0, 14, 10, '#');
 // The lower cave: rock under a clay floor, from the foot of the stair to the portal.
 g.fill(66, 20, W - 66, H - 20, '#');
 g.fill(66, 20, W - 66, 1, '%');
@@ -153,7 +158,9 @@ export const GARGAS: LevelData = {
     { kind: 'caveMouth', x0: 0, x1: px(11), floorY: UPPER },
     { kind: 'caveMouth', x0: px(150), x1: px(W), floorY: LOWER, reach: 400, into: 'left' },
     { kind: 'steelDoor', x: px(11) - 6, floorY: UPPER },
-    { kind: 'dark', x0: px(12), x1: px(W), lamp: 'headlamp', ambient: 0.8, lampLife: LAMP_LIFE },
+    // Darker than the show caves before it: here the lamp is what he sees by, so a
+    // lamp that is out has to cost him something to look at.
+    { kind: 'dark', x0: px(12), x1: px(W), lamp: 'headlamp', ambient: 0.94, lampLife: LAMP_LIFE },
     // The walls, at the height of each roof.
     { kind: 'galleryWall', x0: px(11), x1: px(42), top: px(5), bottom: UPPER },
     { kind: 'galleryWall', x0: px(70), x1: px(CAMARIN_HOLE), top: px(15), bottom: LOWER },
@@ -166,8 +173,9 @@ export const GARGAS: LevelData = {
     { kind: 'cavePanel', panel: 'fingerCeiling', rect: { x: px(14), y: px(5) + 2, w: px(10), h: 12 } },
     { kind: 'cavePanel', panel: 'gargasBeasts', rect: { x: px(22), y: 86, w: 110, h: 30 } },
     { kind: 'cavePanel', panel: 'fingerCeiling', rect: { x: px(31), y: px(5) + 2, w: px(10), h: 12 } },
-    // The handrail, straight down the stair and straight over the step that is not there.
-    { kind: 'stairRail', x0: px(42), y0: px(9), x1: px(66), y1: LOWER },
+    // The handrail, straight down the stair and straight over the step that is not
+    // there: a stanchion on the back of every tread, the last on the twelfth.
+    { kind: 'stairRail', x0: px(stepTx(0)), y0: px(stepRow(0)), x1: px(stepTx(STEPS - 1)), y1: px(stepRow(STEPS - 1)) },
     ...CLAWS.map((x, i) => ({ kind: 'clawMarks' as const, x, y: 272 + ((i * 9) % 20) })),
     // The Camarin's engravings, on the wall at the end of the passage.
     { kind: 'cavePanel', panel: 'camarin', rect: { x: px(CAMARIN_X0) + 2, y: px(21) + 1, w: 44, h: 30 } },
@@ -200,14 +208,25 @@ export const GARGAS: LevelData = {
         solidBelow: true,
       },
     ]),
-    // The step that tips back. It pins him against the riser of the step behind
-    // it, which is faster than he can walk, and nothing else happens at all except
-    // that the lamp keeps burning.
-    ...stepsThat('tips').map((k) => ({
-      kind: 'conveyor' as const,
-      rect: { x: px(stepTx(k)), y: px(stepRow(k)) - 2, w: px(2), h: 8 },
-      vx: -150,
-    })),
+    // The step that rocks back. It goes back on its heel while he is on it and
+    // pins him against the riser of the step behind, which is faster than he can
+    // walk, and nothing else happens at all except that the lamp keeps burning.
+    ...stepsThat('tips').flatMap((k) => [
+      {
+        kind: 'crumble' as const,
+        skin: 'tread' as const,
+        rect: stepRect(k),
+        fake: false,
+        delay: 0,
+        rocks: true,
+        solidBelow: true,
+      },
+      {
+        kind: 'conveyor' as const,
+        rect: { x: px(stepTx(k)), y: px(stepRow(k)) - 2, w: px(2), h: 8 },
+        vx: -150,
+      },
+    ]),
     // Under every step that is not a step, the shaft it stood on.
     ...[...stepsThat('lets go'), ...stepsThat('boot'), ...stepsThat('gone')].map((k) => ({
       kind: 'hazard' as const,
@@ -237,6 +256,7 @@ export const GARGAS: LevelData = {
       rect: { x: s.x, y: s.y, w: 32, h: 8 },
       fake: s.tips,
       delay: s.tips ? 0.15 : 0,
+      tips: s.tips || undefined,
     })),
     // The bottom of the well.
     { kind: 'hazard', rect: { x: px(110), y: px(H) - 12, w: px(12), h: 16 }, cause: 'The oubliettes' },

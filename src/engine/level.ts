@@ -155,6 +155,18 @@ export interface CrumbleDef {
    * exactly like one with rock under it, until it is too late (pillar 4).
    */
   solidBelow?: boolean;
+  /**
+   * It tips off its bearer rather than dropping flat: once it goes it is drawn
+   * swinging down, far end first, and it stops being something to stand on at
+   * once. Whoever is on it goes with it, not down on it.
+   */
+  tips?: boolean;
+  /**
+   * Drawn rocked back, the near end down, for as long as he stands on it. It does
+   * not go anywhere; something else does the pushing. At rest it is drawn exactly
+   * like its neighbours (pillar 4).
+   */
+  rocks?: boolean;
 }
 
 /**
@@ -350,10 +362,10 @@ export type DecorDef =
        */
       ambient?: number;
       /**
-       * Seconds the headlamp lasts from the moment it is switched on. Unset, it
-       * lasts for ever. Set, the beam shortens on a fixed clock from the door,
-       * flickers for the last tenth, and goes out; what is left is a dark-adapted
-       * pair of eyes. A player who does not dawdle arrives with more light.
+       * Seconds of burning the headlamp has. Unset, it lasts for ever. Set, the
+       * beam shortens as it burns, flickers for the last tenth, and goes out. L puts
+       * it out and lights it again, and a lamp that is out does not run down. An
+       * unlit lamp, put out or spent, leaves only the small spill round his feet.
        */
       lampLife?: number;
     }
@@ -432,7 +444,7 @@ export interface LevelData {
   theme: Theme;
   /** The chapter's costume. Picks the tourist's sprites and nothing else. */
   costume: Costume;
-  /** Past this x the tourist switches the headlamp on, and it stays on. */
+  /** Past this x the tourist switches the headlamp on. From then on L puts it out and lights it again. */
   lampFromX?: number;
   widthTiles: number;
   heightTiles: number;

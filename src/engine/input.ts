@@ -11,6 +11,8 @@ export class Input {
 
   constructor(target: Window) {
     target.addEventListener('keydown', (e) => {
+      // Ctrl+L, Cmd+R and the rest belong to the browser, not to the tourist.
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
       if (e.repeat) {
         if (GAME_KEYS.has(e.code)) e.preventDefault();
         return;
