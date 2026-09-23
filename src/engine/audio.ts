@@ -709,9 +709,21 @@ export class GameAudio {
     bp.frequency.value = 1600;
     bp.Q.value = 0.7;
     const g = ctx.createGain();
-    g.gain.setValueAtTime(0.0001, t);
+    // Made silent, not left at the default of one, as the lyre's are. Every time
+    // the scheduler makes lands on a sample boundary give or take float error, and
+    // when the error falls one way the source starts a sample before the gain's
+    // first event: one sample of noise at full gain, in the quiet before a phrase,
+    // louder than the whole breath. Measured in Chromium's own OfflineAudioContext:
+    // 53 breaths in 120, up to 33 dB over the breath's attack; in a real render,
+    // two breaths in five, 5 dB over the breath's own peak. Noise is where this
+    // shows. An oscillator starts at zero and hides it, which is why the pipe never
+    // clicked and the breath before it did.
+    g.gain.value = 0;
+    g.gain.setValueAtTime(0, t);
     g.gain.linearRampToValueAtTime(0.022, t + 0.11);
     g.gain.exponentialRampToValueAtTime(0.0004, t + 0.27);
+    // And down to true zero before the source stops, not to a small step.
+    g.gain.linearRampToValueAtTime(0, t + 0.29);
     src.connect(bp).connect(g).connect(out);
     src.start(t);
     src.stop(t + 0.3);
@@ -855,6 +867,7 @@ export class GameAudio {
     bp.frequency.value = 700;
     bp.Q.value = 0.7;
     const ng = ctx.createGain();
+    ng.gain.value = 0; // see breath(): noise under a scheduled envelope starts silent
     ng.gain.setValueAtTime(level * 3, t);
     ng.gain.exponentialRampToValueAtTime(0.0004, t + 0.04);
     src.connect(bp).connect(ng).connect(out);
@@ -915,6 +928,12 @@ export class GameAudio {
     filter.type = type;
     filter.frequency.value = freq;
     const g = ctx.createGain();
+    // See breath(). A call at currentTime did not leak; a delayed one, whose time
+    // is a sum of decimals like the scheduler's, did, about four calls in nine.
+    // Through a highpass the stray sample passes nearly whole, and it was measured
+    // there: the lamp switch's second tick and the crackle of a burn, by up to
+    // 22 dB over their own attack. Through a lowpass it is scaled almost to nothing.
+    g.gain.value = 0;
     g.gain.setValueAtTime(level, t);
     g.gain.exponentialRampToValueAtTime(0.001, t + dur);
     src.connect(filter).connect(g).connect(this.master);
