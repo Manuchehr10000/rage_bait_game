@@ -44,6 +44,11 @@ export function rulerPoint(v: RulerView, at: ScreenPoint): { x: number; y: numbe
   return { x: v.camX + col, y: v.floorY - (v.camY + row) };
 }
 
+/** How a point is written, on the label and on the clipboard alike. */
+export function pointText(p: { x: number; y: number }): string {
+  return `(${p.x}, ${p.y})`;
+}
+
 interface Label {
   text: string;
   x: number;
@@ -52,8 +57,17 @@ interface Label {
   centred: boolean;
 }
 
-/** Draws on the scaled canvas. `pointer` is where the mouse is, or null when it is off the canvas. */
-export function renderRuler(ctx: CanvasRenderingContext2D, scale: number, v: RulerView, pointer: ScreenPoint | null): void {
+/**
+ * Draws on the scaled canvas. `pointer` is where the mouse is, or null when it is
+ * off the canvas; `note` is said after the point on its label, if anything is.
+ */
+export function renderRuler(
+  ctx: CanvasRenderingContext2D,
+  scale: number,
+  v: RulerView,
+  pointer: ScreenPoint | null,
+  note: string | null = null,
+): void {
   const s = scale;
   const W = VIEW_W * s;
   const H = VIEW_H * s;
@@ -106,7 +120,7 @@ export function renderRuler(ctx: CanvasRenderingContext2D, scale: number, v: Rul
     ctx.fillText(l.text, x, l.y);
   }
 
-  if (pointer) renderReadout(ctx, s, v, pointer, line);
+  if (pointer) renderReadout(ctx, s, v, pointer, line, note);
   ctx.restore();
 }
 
@@ -114,7 +128,14 @@ export function renderRuler(ctx: CanvasRenderingContext2D, scale: number, v: Rul
  * The point under the pointer, exactly: dashed guides from it to the two rulers,
  * so the number can be checked against the ticks, and the number itself.
  */
-function renderReadout(ctx: CanvasRenderingContext2D, s: number, v: RulerView, pointer: ScreenPoint, line: number): void {
+function renderReadout(
+  ctx: CanvasRenderingContext2D,
+  s: number,
+  v: RulerView,
+  pointer: ScreenPoint,
+  line: number,
+  note: string | null,
+): void {
   const W = VIEW_W * s;
   const H = VIEW_H * s;
   const p = rulerPoint(v, pointer);
@@ -136,7 +157,7 @@ function renderReadout(ctx: CanvasRenderingContext2D, s: number, v: RulerView, p
   }
   ctx.setLineDash([]);
 
-  const text = `(${p.x}, ${p.y})`;
+  const text = note ? `${pointText(p)} ${note}` : pointText(p);
   ctx.font = `${4.5 * s}px ${FONT}`;
   const pad = 1.5 * s;
   const w = ctx.measureText(text).width + 2 * pad;

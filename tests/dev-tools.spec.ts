@@ -248,3 +248,52 @@ test('a resize under a still mouse names what is under the mouse after it', asyn
   expect(afterResize).toEqual(fresh);
   expect(afterResize, 'the canvas moved under the mouse').not.toEqual(before);
 });
+
+test('a click copies the point as the label writes it, and the label says so', async ({ page, context }) => {
+  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+  await open(page, 'karnak');
+  const floor = await page.evaluate(() => (window as unknown as W).__game.levelData.spawn.y + (window as unknown as W).__game.player.h);
+  const named = await hover(page, 150, floor + 5);
+  expect(named).toEqual({ x: 150, y: -5 });
+
+  const at = await mouseAt(page, 150, floor + 5);
+  await page.mouse.click(at.x, at.y);
+  await expect.poll(() => page.evaluate(() => navigator.clipboard.readText())).toBe('(150, -5)');
+  const note = () =>
+    page.evaluate(() => {
+      const g = (window as unknown as W).__game;
+      g.draw();
+      return g.dev.note(g.rulerView()) as string | null;
+    });
+  expect(await note()).toBe('copied');
+
+  // One pixel over, and the label is about a different point: it no longer says so.
+  await page.mouse.move(at.x + 4, at.y);
+  expect(await note()).toBeNull();
+
+  // Hidden with G, a click copies nothing.
+  await page.evaluate(() => navigator.clipboard.writeText('untouched'));
+  await page.keyboard.press('KeyG');
+  await page.evaluate(() => (window as unknown as W).__game.draw());
+  await page.mouse.click(at.x, at.y);
+  await page.waitForTimeout(100);
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('untouched');
+});
+
+test('where the clipboard refuses, the label says it was not copied', async ({ page }) => {
+  await open(page, 'karnak');
+  await page.evaluate(() => {
+    navigator.clipboard.writeText = () => Promise.reject(new Error('refused'));
+  });
+  await hover(page, 150, 200);
+  const at = await mouseAt(page, 150, 200);
+  await page.mouse.click(at.x, at.y);
+  await expect
+    .poll(() =>
+      page.evaluate(() => {
+        const g = (window as unknown as W).__game;
+        return g.dev.note(g.rulerView()) as string | null;
+      }),
+    )
+    .toBe('not copied');
+});
