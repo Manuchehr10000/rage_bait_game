@@ -66,7 +66,7 @@ export function renderRuler(
   scale: number,
   v: RulerView,
   pointer: ScreenPoint | null,
-  note: string | null = null,
+  note: string | null,
 ): void {
   const s = scale;
   const W = VIEW_W * s;
@@ -162,10 +162,12 @@ function renderReadout(
   const pad = 1.5 * s;
   const w = ctx.measureText(text).width + 2 * pad;
   const h = 6.5 * s;
-  // Up and to the right of the point, unless that is off the screen.
+  // Up and to the right of the point, unless that is off the screen. The side is
+  // chosen for the longest note, so the label does not jump across when one appears.
+  const room = ctx.measureText(`${pointText(p)} not copied`).width + 2 * pad;
   let bx = px + 4 * s;
   let by = py - 4 * s - h;
-  if (bx + w > W) bx = px - 4 * s - w;
+  if (bx + room > W) bx = px - 4 * s - w;
   if (by < 0) by = py + 4 * s;
   ctx.fillStyle = EDGE;
   ctx.fillRect(bx, by, w, h);

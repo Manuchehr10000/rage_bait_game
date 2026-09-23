@@ -74,6 +74,27 @@ async function toggle(page: Page): Promise<void> {
   await page.evaluate(() => (window as unknown as W).__game.draw());
 }
 
+/** The readout's label, as the next frame draws it. Undefined when there is none. */
+async function label(page: Page): Promise<string | undefined> {
+  return page.evaluate(() => {
+    const drawn: string[] = [];
+    const proto = CanvasRenderingContext2D.prototype;
+    const fillText = proto.fillText;
+    proto.fillText = function (this: CanvasRenderingContext2D, text: string, x: number, y: number, maxWidth?: number) {
+      drawn.push(text);
+      fillText.call(this, text, x, y, maxWidth);
+    };
+    try {
+      (window as unknown as W).__game.draw();
+    } finally {
+      proto.fillText = fillText;
+    }
+    return drawn.find((t) => t.startsWith('('));
+  });
+}
+
+const clipboard = (page: Page) => page.evaluate(() => navigator.clipboard.readText());
+
 test('Y = 0 is the top row of the floor the tourist spawns on, and up is positive', async ({ page }) => {
   await open(page, 'cap-blanc');
   const g = await page.evaluate(() => {
@@ -253,47 +274,70 @@ test('a click copies the point as the label writes it, and the label says so', a
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
   await open(page, 'karnak');
   const floor = await page.evaluate(() => (window as unknown as W).__game.levelData.spawn.y + (window as unknown as W).__game.player.h);
-  const named = await hover(page, 150, floor + 5);
-  expect(named).toEqual({ x: 150, y: -5 });
+  expect(await hover(page, 150, floor + 5)).toEqual({ x: 150, y: -5 });
+  expect(await label(page)).toBe('(150, -5)');
 
   const at = await mouseAt(page, 150, floor + 5);
   await page.mouse.click(at.x, at.y);
-  await expect.poll(() => page.evaluate(() => navigator.clipboard.readText())).toBe('(150, -5)');
-  const note = () =>
-    page.evaluate(() => {
-      const g = (window as unknown as W).__game;
-      g.draw();
-      return g.dev.note(g.rulerView()) as string | null;
-    });
-  expect(await note()).toBe('copied');
+  await expect.poll(() => clipboard(page)).toBe('(150, -5)');
+  expect(await label(page)).toBe('(150, -5) copied');
 
   // One pixel over, and the label is about a different point: it no longer says so.
   await page.mouse.move(at.x + 4, at.y);
-  expect(await note()).toBeNull();
+  expect(await label(page)).toBe('(151, -5)');
 
   // Hidden with G, a click copies nothing.
   await page.evaluate(() => navigator.clipboard.writeText('untouched'));
-  await page.keyboard.press('KeyG');
-  await page.evaluate(() => (window as unknown as W).__game.draw());
+  await toggle(page);
   await page.mouse.click(at.x, at.y);
   await page.waitForTimeout(100);
-  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('untouched');
+  expect(await clipboard(page)).toBe('untouched');
 });
 
-test('where the clipboard refuses, the label says it was not copied', async ({ page }) => {
+test('on the map a click copies nothing, nor does a double-click on a pin in the level it opens', async ({ page, context }) => {
+  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+  // Arrive on the map from a level, so a level's view has been drawn and left behind.
+  // The loop is left running: frames are drawn between the clicks, as they are for a person.
+  await page.goto('/#cap-blanc');
+  await page.waitForFunction(() => (window as unknown as Partial<W>).__game?.currentScreen === 'level');
+  await page.waitForTimeout(150);
+  await page.keyboard.press('Escape');
+  await expect.poll(() => page.evaluate(() => (window as unknown as W).__game.currentScreen)).toBe('map');
+  await page.evaluate(() => navigator.clipboard.writeText('untouched'));
+  const box = (await page.locator('#game').boundingBox())!;
+  const at = (p: { x: number; y: number }) => ({ x: box.x + (p.x / 320) * box.width, y: box.y + (p.y / 180) * box.height });
+
+  const egypt = at(await page.evaluate(() => (window as unknown as W).__game.mapScreen.worldBadge(1)));
+  await page.mouse.click(egypt.x, egypt.y);
+  await expect.poll(() => page.evaluate(() => (window as unknown as W).__game.mapScreen.view)).toBe('chapter');
+  const karnak = at(await page.evaluate(() => (window as unknown as W).__game.mapScreen.sitePin(2)));
+  await page.mouse.move(karnak.x, karnak.y);
+  await page.mouse.down({ clickCount: 1 });
+  await page.mouse.up({ clickCount: 1 });
+  await expect.poll(() => page.evaluate(() => (window as unknown as W).__game.currentScreen)).toBe('level');
+  await page.waitForTimeout(150); // a level frame has been drawn under the mouse
+  await page.mouse.down({ clickCount: 2 });
+  await page.mouse.up({ clickCount: 2 });
+  await page.waitForTimeout(100);
+  expect(await clipboard(page)).toBe('untouched');
+});
+
+test('where the clipboard refuses or is missing, the label says not copied, and then stops saying it', async ({ page }) => {
   await open(page, 'karnak');
   await page.evaluate(() => {
     navigator.clipboard.writeText = () => Promise.reject(new Error('refused'));
   });
   await hover(page, 150, 200);
-  const at = await mouseAt(page, 150, 200);
+  let at = await mouseAt(page, 150, 200);
   await page.mouse.click(at.x, at.y);
-  await expect
-    .poll(() =>
-      page.evaluate(() => {
-        const g = (window as unknown as W).__game;
-        return g.dev.note(g.rulerView()) as string | null;
-      }),
-    )
-    .toBe('not copied');
+  await expect.poll(() => label(page)).toMatch(/ not copied$/);
+  await page.waitForTimeout(1600);
+  expect(await label(page)).toMatch(/^\(\d+, -?\d+\)$/);
+
+  // http:// anywhere but localhost has no navigator.clipboard at all.
+  await page.evaluate(() => Object.defineProperty(navigator, 'clipboard', { value: undefined, configurable: true }));
+  await hover(page, 160, 200);
+  at = await mouseAt(page, 160, 200);
+  await page.mouse.click(at.x, at.y);
+  await expect.poll(() => label(page)).toMatch(/ not copied$/);
 });

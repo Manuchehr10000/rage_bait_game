@@ -1,14 +1,15 @@
 import { VIEW_H, VIEW_W } from '../engine/types';
 import { pointText, renderRuler, rulerPoint, type RulerView, type ScreenPoint } from './ruler';
 
-/** How long the label says a point was copied, in ms, while the mouse stays on it. */
+/** How long the label says whether a point was copied, in ms, while the mouse stays on it. */
 const COPIED_FOR = 1500;
 
 /**
  * Tools for building the game, not for playing it: a ruler on the edges of a
- * level, the exact point under the pointer, and a click to copy it. The game only makes one outside
- * prod, and the prod build refuses a bundle with anything from this folder in it
- * (vite.config.ts), so no player ever sees or downloads them.
+ * level, the exact point under the pointer, and a click to copy it. The game
+ * only makes one outside prod, and the prod build refuses a bundle with anything
+ * from this folder in it (vite.config.ts), so no player ever sees or downloads
+ * them.
  */
 export class DevTools {
   /** G hides everything here, so the level can be seen the way a player sees it. */
@@ -16,7 +17,7 @@ export class DevTools {
   /** Where the mouse last was over the canvas, in page px. Null once it has left. */
   private mouse: { x: number; y: number } | null = null;
   private cursor = '';
-  /** The level as the last frame showed it. A click copies what was on screen. Null on the map. */
+  /** The level as the last frame showed it. A click copies what was on screen. Null on the map or while hidden. */
   private view: RulerView | null = null;
   /** What the last click tried to copy, whether it worked, and until when to say so. */
   private copied: { text: string; ok: boolean; until: number } | null = null;
@@ -33,7 +34,11 @@ export class DevTools {
       this.mouse = null;
     });
     // A click over a level does nothing else: the map is the only screen that takes one.
-    canvas.addEventListener('click', () => this.copy());
+    // The second click of a double-click is not a second copy. On the map, it
+    // lands on the level the first click opened, and would overwrite the clipboard.
+    canvas.addEventListener('click', (e) => {
+      if (e.detail <= 1) void this.copy();
+    });
   }
 
   /** The world pixel under the pointer, as the ruler names it. Null off a level, off the canvas, or hidden. */
@@ -57,18 +62,17 @@ export class DevTools {
    * it is missing or refuses, the label says so rather than leave it to be found
    * out at the paste.
    */
-  private copy(): void {
+  private async copy(): Promise<void> {
     const p = this.point(this.view);
     if (!p) return;
     const text = pointText(p);
-    const said = (ok: boolean) => {
-      this.copied = { text, ok, until: performance.now() + COPIED_FOR };
-    };
-    if (!navigator.clipboard) return said(false);
-    navigator.clipboard.writeText(text).then(
-      () => said(true),
-      () => said(false),
-    );
+    let ok = true;
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch {
+      ok = false; // refused, or no navigator.clipboard at all
+    }
+    this.copied = { text, ok, until: performance.now() + COPIED_FOR };
   }
 
   /** What the label says after the point: whether it was just copied, while the mouse is still on it. */
