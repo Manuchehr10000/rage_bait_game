@@ -173,6 +173,9 @@ There is no trap on that wall.
 - **The wall of hands is lit by daylight.** It is near the exit, and it is inside a cave;
   no day reaches it, let alone the well. The daylight is the level's answer to the lamp
   dying.
+- **Every short hand is short the same way.** All four fingers short and the thumb whole is
+  the commonest pattern at Gargas, not the only one; the others are not in the sources the
+  game has, and a guessed one risks a rude sign. See `f-hands/README.md`.
 - **The tunnel is twelve straight steps under a flat roof in two lifts.** The stairs are
   real; their number, their fall, the height of the cut over them and where it comes down
   are level design.

@@ -48,6 +48,8 @@ import {
 import { DEATH_ANIM, TILE, VIEW_H, VIEW_W, type Costume, type DeathCause, type Rect } from '../engine/types';
 import { paint } from '../engine/assets';
 import { blit, blitFacing, frameOf, silhouette, withLamp, type Frame } from './frame';
+import { handStencils } from './hands';
+import { hash } from './hash';
 import { TRAIN, type Train } from '../engine/entities';
 import type { CavePanel } from '../engine/level';
 import { BEAR_STALAGMITE_SPRITE, NODULE_SPRITE, SIGNAL_LAMP_SPRITE, STOP_SIGN_SPRITE, TRAIN_CAR_SPRITE, TRAIN_ENGINE_SPRITE, TRAIN_LAST_CAR_SPRITE } from './procedural';
@@ -2167,10 +2169,11 @@ function drawCavePanel(ctx: CanvasRenderingContext2D, panel: CavePanel, r: Rect)
 
 /**
  * The wall of hands at Gargas: negative stencils, the pigment blown round a hand
- * held to the rock, so the hand is the one part of the wall that is bare. Red
- * ochre and manganese black, one yellow; adults' hands and children's, the small
- * ones low down; and about half of them with fingers that stop short. Why they
- * stop short is not the game's business, and the wall says nothing about it.
+ * held to the rock, so the hand is the one part of the wall that is bare. Black
+ * for most, red ochre for many, one yellow; adults' hands and children's, the
+ * small ones low down; and about half of them with all four fingers short and
+ * the thumb whole. Which hands, and how, is in ./hands.ts. Why they stop short
+ * is not the game's business, and the wall says nothing about it.
  */
 function drawHands(ctx: CanvasRenderingContext2D, r: Rect): void {
   ctx.fillStyle = COLORS.cave;
@@ -2189,29 +2192,19 @@ function drawHands(ctx: CanvasRenderingContext2D, r: Rect): void {
   }
   ctx.fillStyle = COLORS.calciteLit;
   ctx.fillRect(r.x + 21, r.y + 17, 1, 4);
-  // The hands. Adults above, children below; roughly half with fingers short.
-  const count = Math.floor(r.w / 9) * 3;
-  for (let i = 0; i < count; i++) {
-    const h = hash(i * 13, r.x);
-    const child = i % 3 === 2;
-    const w = child ? 6 : 8;
-    const tall = child ? 5 : 7;
-    const x = r.x + 4 + ((i * 37 + (h % 5)) % (r.w - 12));
-    const y = child ? r.y + r.h - 12 - (h % 5) : r.y + 4 + ((i * 17 + (h >> 3)) % Math.max(1, r.h - 22));
-    // The halo of blown pigment. Red for most, black for many, yellow for one.
-    ctx.fillStyle = i === 7 ? '#c9a23a' : h % 9 < 5 ? COLORS.ochreRed : COLORS.manganese;
+  // The hands. Adults above, children below.
+  const HALO = { black: COLORS.manganese, red: COLORS.ochreRed, yellow: '#c9a23a' };
+  for (const hand of handStencils(r)) {
+    const { x, y, w, tall } = hand;
+    // The halo of blown pigment.
+    ctx.fillStyle = HALO[hand.pigment];
     ctx.fillRect(x - 3, y - 2, w + 6, tall + 8);
     ctx.fillRect(x - 4, y, w + 8, tall + 4);
-    // The hand, which is the rock: a palm and five fingers, some of them short.
+    // The hand, which is the rock: a palm, a whole thumb and four fingers.
     ctx.fillStyle = COLORS.cave;
     ctx.fillRect(x, y + 3, w, tall - 1); // palm
     ctx.fillRect(x - 2, y + 4, 2, 2); // thumb
-    const short = h % 2 === 0;
-    for (let f = 0; f < 4; f++) {
-      const full = child ? 3 : 4;
-      const len = short && ((h >> (4 + f)) & 1) === 1 ? Math.max(1, full - 2 - (f % 2)) : full;
-      ctx.fillRect(x + f * 2, y + 3 - len, 1, len);
-    }
+    hand.fingers.forEach((len, f) => ctx.fillRect(x + f * 2, y + 3 - len, 1, len));
   }
 }
 
@@ -2645,11 +2638,6 @@ function drawDrownSurface(ctx: CanvasRenderingContext2D, s: Scene, t: number): v
 // Helpers.
 // ---------------------------------------------------------------------------
 
-function hash(x: number, y: number): number {
-  let h = (x * 374761393 + y * 668265263) | 0;
-  h = (h ^ (h >> 13)) * 1274126177;
-  return (h ^ (h >> 16)) >>> 0;
-}
 
 function mix(a: string, b: string, t: number): string {
   const pa = parseInt(a.slice(1), 16);

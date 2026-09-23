@@ -24,7 +24,10 @@ finger, the V, the corna); the hand is the rock colour and the halo is the pigme
 portal is the way out.
 
 **Deliberately wrong:** the daylight reaches it. The count is about a hundred where the
-sources say 137 on this wall. The arrangement is the level's.
+sources say 137 on this wall. The arrangement is the level's. Every short hand has all four
+fingers short alike, the commonest pattern, where the site has about ten: the others are not
+in any source the game has, and a guessed pattern risks a rude sign. On the wall as placed
+today: 66 black, 38 red, 1 yellow; 50 hands short, 17 of them children's.
 
 **Never in a pixel:** why the fingers are short. Amputation, frostbite and disease, and
 fingers folded on purpose are all live, and the research forbids stating any of them
@@ -32,9 +35,6 @@ fingers folded on purpose are all live, and the research forbids stating any of 
 
 No new art. The wall and its hands are a panel drawn by the game.
 
-**The wall as drawn today does not meet this.** `drawHands()` in `src/render/scene.ts`
-makes more red hands than black (59 red, 45 black, 1 yellow of 105, with the wall where it
-stands today), and it shortens fingers at random: all four short, the commonest pattern at
-the site, comes up twice in 105, and the random subsets leave a lone full middle finger on 6
-hands, the corna on 2 and the V on 4. Until it is fixed, the note is right and the wall is
-wrong.
+Which hands, their colours and their fingers are in `src/render/hands.ts`, and
+`tests/hands.spec.ts` holds the wall to this note: black above red, one yellow, about half
+short, and no short hand with a finger left whole.

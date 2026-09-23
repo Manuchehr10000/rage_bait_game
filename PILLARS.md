@@ -54,7 +54,7 @@ Abu Simbel → Philae → Karnak → Dendera → Saqqara. Giza is rejected by th
 | Beat | Trap | The history behind it |
 |---|---|---|
 | Honest opening | none | Temple cut by Ramesses II, four 20 m colossi |
-| Colossi | three intact heads look identical; only the fourth drops; the broken statue is safe | the second colossus lost its upper body in an earthquake |
+| Colossi | three intact heads look identical; only the fourth drops; the broken statue is safe | the second colossus is shattered at the waist, in antiquity, probably by an earthquake |
 | Frieze | 22 identical baboons; one throws a date | 22 baboons on the facade face east to greet the sun |
 | Relocation | numbered blocks rise 65 m and slide back; Lake Nasser fills the pit and keeps rising | 1,036 blocks, 65 m higher, 200 m back, 1964 to 1968 |
 | Sanctuary | sun beam sweeps in; only Ptah's niche is dark | sun reaches the sanctuary on 22 Feb and 22 Oct; Ptah is never lit |
