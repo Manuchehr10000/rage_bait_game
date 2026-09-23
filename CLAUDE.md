@@ -16,3 +16,5 @@ Conventions:
   accidentally wrong: each note separates "must be right" from "deliberately wrong".
 - No text inside a level. Identical things are identical (pillar 4).
 - Run `npm run typecheck`, `npm run assets:check` and `npm test` before pushing.
+- A point the designer names as "X, Y" is read off the dev ruler (`src/render/axes.ts`):
+  world x = X, world y = the spawn floor (`spawn.y + 16`) − Y.

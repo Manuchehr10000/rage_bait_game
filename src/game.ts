@@ -1,6 +1,7 @@
 import { GameAudio, type MusicId, type Room } from './engine/audio';
 import { Camera } from './engine/camera';
 import { createEntity, type Entity, type Platform, type Sweep, type Train, type Water, type World } from './engine/entities';
+import { AXES, renderAxes } from './render/axes';
 import type { Stats } from './render/hud';
 import { renderHud } from './render/hud';
 import { Input } from './engine/input';
@@ -91,6 +92,9 @@ export class Game {
 
   private stats: Stats = { total: 0, byCause: new Map(), lifetime: readLifetime() };
 
+  /** The ruler on a level's edges (render/axes.ts). Dev builds only; G hides it. */
+  private axes = AXES;
+
   private acc = 0;
   private last = 0;
   private time = 0;
@@ -113,6 +117,7 @@ export class Game {
     window.addEventListener('keydown', (e) => {
       this.audio.unlock();
       if (e.code === 'KeyM' && !e.repeat) this.audio.toggleMute();
+      if (e.code === 'KeyG' && !e.repeat && AXES) this.axes = !this.axes;
     });
     this.resize();
     window.addEventListener('resize', () => this.resize());
@@ -490,6 +495,14 @@ export class Game {
     renderWorld(this.wctx, scene);
 
     this.ctx.drawImage(this.world, 0, 0, this.canvas.width, this.canvas.height);
+    if (AXES && this.axes) {
+      renderAxes(this.ctx, this.scale, {
+        camX: this.camera.ix,
+        camY: this.camera.iy,
+        floorY: this.level.data.spawn.y + this.player.h,
+        levelW: this.level.widthPx,
+      });
+    }
     renderHud(this.ctx, this.scale, {
       stats: this.stats,
       texts: this.texts,

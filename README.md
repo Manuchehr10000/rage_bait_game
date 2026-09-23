@@ -36,6 +36,11 @@ Arrows or WASD to move, Space to jump, L to switch the headlamp off and on once 
 next level at the exit label. Esc returns to the map. Open `#cap-blanc`,
 `#roc-aux-sorciers`, `#pech-merle`, `#philae` or `#karnak` in the URL to start at that level.
 
+Every build except prod draws a ruler on the edges of a level, so a point on screen can
+be named: X along the bottom is world px from the start of the level; Y up the left is px
+above the floor the tourist spawns on, negative below it. G hides it. The world counts y
+downward, so a point read off the ruler is world x = X, world y = spawn floor − Y.
+
 `npm test` runs scripted playthroughs in headless Chromium. Each one checks a design
 contract: the trap fires for the naive player and can be avoided by the one who remembers.
 
@@ -63,6 +68,7 @@ src/
     procedural.ts         the code-drawn sprites used until a painting exists
     frame.ts              one abstraction over painted and code-drawn frames (tourist, deaths)
     hud.ts                death counter and exit label, drawn in screen space
+    axes.ts               the dev ruler on a level's edges; never in prod
   levels/
     index.ts              level order and URL hash lookup
     ch01-palaeolithic/    one file per level: geometry, decor, entity list
