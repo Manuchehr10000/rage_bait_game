@@ -81,6 +81,7 @@ const GAME_KEYS = new Set([
   'KeyD',
   'KeyS',
   'KeyR',
+  'KeyL',
   'Enter',
   'Escape',
 ]);

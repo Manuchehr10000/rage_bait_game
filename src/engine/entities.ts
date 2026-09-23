@@ -765,6 +765,7 @@ export class Snare implements Entity {
     if (!this.caught && p.onGround && feet >= r.y - 2 && feet <= r.y + r.h && centerX(p) >= r.x && centerX(p) <= r.x + r.w) {
       this.caught = true;
       p.held = true;
+      if (this.def.emits) w.events.add(this.def.emits);
       w.sound('thud');
     }
   }

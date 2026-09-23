@@ -38,25 +38,52 @@ away, and it ends on a grand feature that the player sees by a light that is not
 > Roc-aux-Sorciers: nothing lies, and you cannot see it.
 > Pech Merle: two things tell you where to go, and they disagree.
 > Rouffignac: you are on the track, and the train is on time.
-> Gargas: the lamp is running down, and the thing worth seeing costs light.
+> Gargas: the lamp is running down, it has a switch, and what it costs is yours to spend.
 
-**The lamp dies.** The headlamp has been on since the first door of the chapter. From this
-door it is on a clock: thirty seconds. It shortens the whole way, holding up for most of
-its life and collapsing at the end, flickers for the last tenth, and goes out. Nothing in
-the level says so. The player learns it by watching the cone shrink, and, the first time,
-by crossing the well without it.
+It is the last level of the chapter and the hardest. Everything the first four taught is
+here again in its worst arrangement, and one thing is new: **for the first time in the
+game the tourist has something to spend rather than something to survive.**
+
+**The lamp dies, and it has a switch.** The headlamp has been on since the first door of
+the chapter. From this door it runs down: twenty seconds of burning. It shortens the whole
+way, holding up for most of its life and collapsing at the end, flickers for the last
+tenth, and goes out. But here, L puts it out, and a lamp that is out does not run down. So
+the level is a budget. The fastest run there is, with the lamp never touched, reaches the
+first slab of the well exactly as the flicker starts. The upper cave has nothing in it to
+jump, and it is five seconds long: a player who walks it in the dark reaches the well with
+a third of the battery instead of a tenth. Nothing in the level says any of this. The key is
+on the controls line with the others, and a lamp that is out leaves him the small spill of
+light round his feet and nothing ahead of him at all.
+
+**The stair lies.** Twelve fitted concrete steps down the nineteenth-century tunnel, every
+one the same, every one standing on the same rock. Four of them are not steps. The fourth
+lets go half a second after he stands on it, which is longer than a man walking down a stair
+spends on any step and exactly as long as a careful one does. The sixth takes his boot in the
+foot of the handrail's stanchion, and then the tread he is held to lets go. The ninth tips
+back under him and pins him against the riser of the eighth, which does not hurt him at all
+and burns his light for as long as it takes him to jump off it. The eleventh is not there;
+the handrail goes straight over the gap.
+
+**The hall floor lies.** Three patches of the clay are not floor any more, drawn standing on
+the rock they have not got.
 
 **The trade.** The Camarin is a hole in the floor of the great hall, a full jump wide: a
 tap falls in. From the bottom of it a passage runs back under the floor you came along to
 the wall with the engravings on it. Going in is a drop, a look, a walk back and a climb
-out, and it costs two or three seconds of the lamp, more if you look properly, which is the
-difference between crossing the well with light and crossing it without. Nobody tells you the engravings are there.
-The lamp's spill shows a hollow under the floor as you pass over it.
+out, and it costs two or three seconds of the lamp, more if you look properly — or nothing
+at all, if he puts the lamp out and looks at them by the spill round his feet. Nobody tells
+you the engravings are there.
 
-**The well is real and it is crossed on the fitted path:** three slabs, the middle one a
-step up, and all three of them hold. The floor between them is gone all the way down. With
-a lamp the crossing is easy; with a pair of eyes it is three jumps at the edge of what you
-can see.
+**The well is real, and the fitted path across it lies once.** Three slabs, the middle one
+a step up, and the middle one tips: it is not bearing on anything, it goes off its bearer
+the far end first the moment he is on it, and it takes whoever is still standing there into
+the oubliettes. The first and third are too far apart to jump between, so the middle one has
+to be touched and left in the same breath. In the first version of this level the fitted
+path over the well was the one made thing in the chapter that never lied, the deliberate
+answer to Pech Merle's concrete. That answer is spent here on purpose: the hardest level ends
+with even the path over the deepest hole in the chapter not to be trusted. With a lamp the
+crossing is hard; with the spill of an unlit one it is three jumps at the edge of what can be
+seen.
 
 **Daylight reaches the hands.** The wall of hands is near the way out, and the level puts
 it inside the reach of the day coming in at the lower portal, so it is the one piece of
@@ -67,17 +94,25 @@ his own light dead. The chapter ends on it. There is no trap on that wall.
 
 | Beat | Folder | What the player meets | The history it comes from |
 |---|---|---|---|
-| a | `a-portal` | The hillside and the upper portal with its steel door. The lamp comes on in the door, and its clock starts | Two portals on the hillside; the visit goes in by the upper cave; the steel entry door |
-| b | `b-upper` | The upper cave, narrow: three tiles clear. Lines drawn with fingers in the clay of the roof, a few painted animals on the wall. Nothing to jump | Gargas II: finger tracings on the clay walls and low ceiling; some animal paintings |
-| c | `c-tunnel` | Twelve fitted steps down, a rail beside them, and at the bottom the block that first joined the two caves. A hop | The nineteenth-century tunnel; the stairs with barriers; the rockfall said to have joined the caves in the Middle Ages |
-| d | `d-hall` | The great hall of Gargas I, wide and five tiles high. Claw marks on the walls. The bear that is a stalagmite: a hop. The Camarin: a hole a jump wide, and under the floor, four tiles back, the engravings | The great hall; the bears; the Salle de l'Ours; the Camarin and its 148 engravings, the Great Bull and Great Horse |
-| e | `e-well` | The floor is gone. Three slabs of the path across it, the middle one higher. By now the lamp is short, or out | The Oubliettes de Gargas, a shaft about twenty metres deep; the fitted route |
+| a | `a-portal` | The hillside and the upper portal with its steel door. The lamp comes on in the door, and its clock starts; from here on, L puts it out and lights it again | Two portals on the hillside; the visit goes in by the upper cave; the steel entry door |
+| b | `b-upper` | The upper cave, narrow: three tiles clear. Lines drawn with fingers in the clay of the roof, a few painted animals on the wall. Nothing to jump, and five seconds of it: the place to put the lamp out | Gargas II: finger tracings on the clay walls and low ceiling; some animal paintings |
+| c | `c-tunnel` | Twelve fitted steps down under a roof cut high, a handrail beside them. The fourth lets go of whoever stands on it; the sixth takes his boot and then goes; the ninth tips back and pins him against the eighth; the eleventh is not there. At the bottom, the block that first joined the two caves. A hop | The nineteenth-century tunnel; the stairs with barriers; the rockfall said to have joined the caves in the Middle Ages |
+| d | `d-hall` | The great hall of Gargas I, wide and five tiles high. Claw marks on the walls. The bear that is a stalagmite: a hop. Three patches of floor that are not floor. The Camarin: a hole a jump wide, and under the floor, four tiles back, the engravings | The great hall; the bears; the Salle de l'Ours; the Camarin and its 148 engravings, the Great Bull and Great Horse |
+| e | `e-well` | The floor is gone. Three slabs of the path across it, the middle one higher, and the middle one tips. By now the lamp is flickering, or out, unless it was put out earlier | The Oubliettes de Gargas, a shaft about twenty metres deep; the fitted route |
 | f | `f-hands` | The wall of hands, lit from the right by the day. Adults' hands high, children's low; red, black, one yellow; about half of them short of a finger. The lower portal | 137 hands on one wall near the exit, one yellow; the incomplete fingers; the bone splinter; the lower portal is the way out |
 
 ## Deliberate lies
 
-- **The lamp runs down on a clock.** A headlamp does not die in thirty seconds. This is the
-  level's one big lie and the whole level is built on it.
+- **The lamp runs down on a clock.** A headlamp does not die in twenty seconds of burning.
+  This is the level's one big lie and the whole level is built on it. That it only runs
+  down while it is lit is true of every lamp there is.
+- **The stair.** The visit's stairs are fitted, railed and safe. None of their treads lets
+  go, none of them tips, none of them is missing, and nobody's boot has stayed in a
+  stanchion foot. All four are level design; the stair itself, its rail and its concrete are
+  the visit as it is.
+- **The hall floor.** It is clay over rock and it does not open under anybody.
+- **The middle slab over the well tips.** The fitted path at Gargas is maintained and
+  inspected. The slabs, and the tipping, are level design.
 - **The Camarin is under the floor.** It is a side chamber off the lower cave, reached on
   foot. Here it is a hole and a passage under the hall so that going in has a cost in time
   that a side room would not have.
@@ -86,8 +121,9 @@ his own light dead. The chapter ends on it. There is no trap on that wall.
 - **The wall of hands is lit by daylight.** It is near the exit, and it is inside a cave;
   no day reaches it. The daylight is the level's answer to the lamp dying, and the one
   time in the chapter the art is seen by a light the tourist did not bring.
-- **The tunnel is twelve straight steps.** The stairs are real; their number and their
-  fall are level design.
+- **The tunnel is twelve straight steps under a high flat roof.** The stairs are real;
+  their number, their fall and the height of the cut over them are level design. The roof
+  is high so that a jump on the stair is a whole jump.
 - **The layout**: the beats are in this order and at these distances because the level
   needs them to be (`arc.md`, invariants).
 

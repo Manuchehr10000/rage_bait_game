@@ -72,6 +72,12 @@ export class Game {
 
   /** The headlamp. Off outside; switched on once past the door, and it stays on. */
   private lampOn = false;
+  /**
+   * Switched off by the tourist, with L. Only a lamp that has been lit at the door
+   * can be put out, and a lamp that is out does not run down: the one decision in
+   * the game that is about spending something rather than surviving something.
+   */
+  private lampOff = false;
   /** Seconds it has been on. Only a level with a lampLife on its dark cares. */
   private lampT = 0;
 
@@ -126,8 +132,13 @@ export class Game {
     return this.level.data;
   }
 
-  /** True once the headlamp is on. For tests. */
+  /** True while the headlamp is burning: lit at the door and not switched off since. For tests. */
   get lamp(): boolean {
+    return this.lampOn && !this.lampOff;
+  }
+
+  /** True once the lamp has been lit at the door, whether or not it is burning now. For tests. */
+  get lampCarried(): boolean {
     return this.lampOn;
   }
 
@@ -261,6 +272,7 @@ export class Game {
     this.player.spawnAt(d.spawn.x, d.spawn.y);
     this.camera.reset();
     this.lampOn = false;
+    this.lampOff = false;
     this.lampT = 0;
     this.state = 'playing';
   }
@@ -311,6 +323,7 @@ export class Game {
     const restart = this.input.takeRestartPressed();
     const next = this.input.takeNextPressed();
     const escape = this.input.takePressed('Escape');
+    const lampSwitch = this.input.takePressed('KeyL');
     this.input.flush();
     if (this.state === 'complete') {
       const nextIndex = this.nextLevelIndex();
@@ -376,8 +389,15 @@ export class Game {
       this.lampOn = true;
       this.audio.play('click');
     }
-    // The battery. It has been on since the first door of the chapter.
-    if (this.lampOn) this.lampT += DT;
+    // The switch. It does nothing until the lamp has been lit, and then it does
+    // exactly one thing, every time.
+    if (lampSwitch && this.lampOn) {
+      this.lampOff = !this.lampOff;
+      this.audio.play('click');
+    }
+    // The battery. It has been on since the first door of the chapter, and it only
+    // runs down while it is burning.
+    if (this.lampOn && !this.lampOff) this.lampT += DT;
     this.camera.update(this.player);
     this.driveLoops();
 
@@ -462,7 +482,7 @@ export class Game {
       texts: this.texts,
       time: this.time,
       death: this.state === 'dead' ? { cause: this.deathCause, t: 1 - this.deathTimer / DEATH_TIME } : null,
-      lampOn: this.lampOn,
+      lampOn: this.lampOn && !this.lampOff,
       lampLeft: this.lampLeft,
     };
     renderWorld(this.wctx, scene);

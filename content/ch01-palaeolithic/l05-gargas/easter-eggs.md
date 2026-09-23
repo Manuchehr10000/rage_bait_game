@@ -14,9 +14,25 @@ For the designer. None of it is stated anywhere in the game.
   hollow under the hall floor and something drawn in it. Nothing says go in. The engravings
   are the best thing in the cave, and seeing them is exactly what costs the well its light.
 
-- **The fitted path holds.** Pech Merle's concrete lied every time; Rouffignac's lowered
-  floor was the one safe place. The three slabs across the Oubliettes are the guided
-  tour's, and every one of them holds. What fails is the lamp.
+- **The switch is the only thing in the game you spend.** Everything else is survived.
+  The lamp only runs down while it burns, so every stretch walked in the dark is light in
+  hand at the well, and the upper cave, which has nothing in it at all, turns out to be the
+  most useful stretch in the level.
+
+- **Out is always less than on.** A lamp that is out, or run down, leaves the same small
+  spill round his feet that a lit one has; what it takes away is the cone. There is no
+  trick in which the dark shows more.
+
+- **The fitted path held, once.** In the first version of this level the three slabs across
+  the Oubliettes all held — the deliberate answer to Pech Merle's concrete. The hardest
+  level spends that: the middle one tips, and it is the piece over the deepest hole in the
+  chapter.
+
+- **The fourth step punishes care.** Walked at a normal pace it goes behind him. It only
+  takes the man who has died further down and is coming down slowly this time.
+
+- **The snare from Rouffignac is on the stair.** Without a train to finish him, the tread
+  does it.
 
 - **Half the hands are short of a finger.** Drawn, never explained. The research keeps four
   hypotheses alive and the level takes no side.

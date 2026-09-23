@@ -112,7 +112,7 @@ export interface CrumbleDef {
   skin:
     | 'croc' | 'capital' | 'rock' | 'floor' | 'talatat' | 'column' | 'stone' | 'relief' | 'fallenBlock'
     | 'horns' | 'disc' | 'walkway' | 'nodule' | 'stalagmite' | 'fallenRoof' | 'clayLedge'
-    | 'stopSign' | 'ballast';
+    | 'stopSign' | 'ballast' | 'tread';
   rect: Rect;
   fake: boolean;
   delay: number;
@@ -148,6 +148,13 @@ export interface CrumbleDef {
    * ever; arrive through the air and it does whatever it does.
    */
   fromAir?: boolean;
+  /**
+   * Drawn standing on the rock it has nothing under it: a column of the level's
+   * own rock from its underside to the bottom of the level, for as long as it has
+   * not started to go. So a tread or a patch of floor with a shaft under it looks
+   * exactly like one with rock under it, until it is too late (pillar 4).
+   */
+  solidBelow?: boolean;
 }
 
 /**
@@ -221,6 +228,10 @@ export interface HazardDef {
 export interface SnareDef {
   kind: 'snare';
   rect: Rect;
+  /** Fired when it catches somebody, for whatever he is standing on to listen to. */
+  emits?: string;
+  /** Drawn by something else already: the stanchion foot of a handrail, say. */
+  hidden?: boolean;
 }
 
 /** A figure in a wall. If active, it steps out and shoves the player when they pass. */

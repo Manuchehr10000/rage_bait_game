@@ -198,7 +198,7 @@ export interface Scene {
   time: number;
   /** The death in progress, t from 0 to 1, or null. */
   death: { cause: DeathCause; t: number } | null;
-  /** True once the tourist has switched the headlamp on. */
+  /** True while the headlamp is burning: lit at the door, and not switched off. */
   lampOn: boolean;
   /** How much of the battery is left, 1 to 0. Always 1 where the lamp does not run down. */
   lampLeft: number;
@@ -562,14 +562,16 @@ function drawDarkness(ctx: CanvasRenderingContext2D, s: Scene, cx: number, cy: n
       cone(76 * k, 30 * k, 1);
       cone(96 * k, 44 * k, 0.45);
     }
-    const eyes = s.lampOn && k <= 0 ? 1 : 0;
+    // The spill round his feet. It is there with the lamp and without it, so a lamp
+    // that is out or run down is always strictly less light than one that is not:
+    // what it takes away is the cone, and the cone is everything ahead of him.
     d.globalAlpha = 1;
     d.beginPath();
-    d.arc(pxc, pyc, eyes ? 22 : 12, 0, Math.PI * 2);
+    d.arc(pxc, pyc, 12, 0, Math.PI * 2);
     d.fill();
     d.globalAlpha = 0.5;
     d.beginPath();
-    d.arc(pxc, pyc, eyes ? 32 : 18, 0, Math.PI * 2);
+    d.arc(pxc, pyc, 18, 0, Math.PI * 2);
     d.fill();
     d.globalAlpha = 1;
   } else {
@@ -1744,7 +1746,8 @@ function drawEntityBack(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): voi
   switch (d.kind) {
     case 'snare': {
       // Drawn by the same code as the harmless ones, because it is the same track.
-      drawCheckRail(ctx, d.rect.x, d.rect.w, d.rect.y);
+      // One that is part of something already drawn is not drawn again.
+      if (!d.hidden) drawCheckRail(ctx, d.rect.x, d.rect.w, d.rect.y);
       break;
     }
     case 'platform': {
@@ -1783,6 +1786,12 @@ function drawEntityBack(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): voi
       const c = e as Crumble;
       if (c.state === 'gone') break;
       const r = c.rect;
+      // Standing on rock it has not got, until it goes.
+      if (d.solidBelow && (c.state === 'idle' || c.state === 'armed')) {
+        const tx0 = Math.floor(r.x / TILE);
+        for (let ty = Math.floor((r.y + r.h) / TILE); ty < s.level.heightTiles; ty++)
+          for (let i = 0; i < r.w / TILE; i++) drawCaveRock(ctx, tx0 + i, ty, (tx0 + i) * TILE, ty * TILE, false);
+      }
       // A crocodile looks like a rock until it moves. Then you see the back.
       if (d.skin === 'croc') {
         if (c.state === 'falling') {
@@ -1830,10 +1839,23 @@ function drawEntityBack(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): voi
           for (let j = 0; j < r.h / TILE; j++)
             drawClay(ctx, Math.floor(r.x / TILE) + i, Math.floor(r.y / TILE) + j, r.x + i * TILE, r.y + j * TILE, j === 0);
       } else if (d.skin === 'walkway') {
-        // The last run of concrete, laid across the hole on two steel bearers.
+        // The last run of concrete, laid across the hole on two steel bearers. One
+        // that is going does not drop flat: it tips off its bearer, the far end first.
+        const tip = c.state === 'falling' ? Math.min(0.9, c.fallen / 30) : 0;
+        ctx.save();
+        if (tip > 0) {
+          ctx.translate(r.x, r.y);
+          ctx.rotate(tip);
+          ctx.translate(-r.x, -r.y);
+        }
         for (let i = 0; i < r.w / TILE; i++) drawConcrete(ctx, r.x + i * TILE, r.y, true);
         ctx.fillStyle = COLORS.rail;
         ctx.fillRect(r.x, r.y + r.h - 3, r.w, 2);
+        ctx.restore();
+      } else if (d.skin === 'tread') {
+        // One tread of the fitted stair, drawn by the code that draws every other
+        // tread of it: nothing about a step says what it does (pillar 4).
+        for (let i = 0; i < r.w / TILE; i++) drawConcrete(ctx, r.x + i * TILE, r.y, true);
       } else if (d.skin === 'disc') {
         if (!paint(ctx, 'calcite-disc', r.x, r.y)) ctx.drawImage(DISC_SPRITE, r.x, r.y);
       } else if (d.skin === 'fallenBlock') {

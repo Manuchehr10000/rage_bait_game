@@ -1,12 +1,14 @@
 import { expect, test, type Page } from '@playwright/test';
 
 /**
- * Scripted playthroughs of Gargas, the fifth level of the game and the end of the
- * first chapter. The contract: the headlamp runs down on a clock from the door and
- * goes out before the end; the fastest run crosses the well with light and a run
- * that went down into the Camarin crosses it without; the well kills whoever walks
- * into it; the wall of hands is inside the reach of the day from the lower portal;
- * and you go in high and come out low.
+ * Scripted playthroughs of Gargas, the fifth level and the end of the first
+ * chapter, and the hardest thing in it. The contract: the headlamp has a switch,
+ * and a lamp that is out does not run down, so the level is a budget of light;
+ * the fastest run that never uses the switch comes to the well as the flicker
+ * starts. The stair's twelve treads are identical and four of them are not
+ * steps; three patches of the hall floor are not floor; the middle slab of the
+ * fitted path over the well tips; and the wall of hands at the end, by daylight,
+ * is not a trap.
  */
 
 interface Snap {
@@ -17,11 +19,10 @@ interface Snap {
   total: number;
   phase: string;
   secs: number;
-  hops: number;
-  /** The lamp left at the first slab of the well, at the wall of hands, and at the end. */
+  /** The lamp left at the first slab of the well, and at the end. */
   atWell: number | null;
-  atHands: number | null;
   left: number;
+  held: boolean;
 }
 
 const DRIVER = `
@@ -30,63 +31,64 @@ const DRIVER = `
   const p = g.player;
   const L = g.level;
   const key = (c, d) => window.dispatchEvent(new KeyboardEvent(d ? 'keydown' : 'keyup', { code: c }));
+  const lampKey = () => { key('KeyL', true); key('KeyL', false); };
   let hold = 0;
   const jump = (frames = 18) => { key('Space', true); hold = frames; };
   const canJump = () => p.onGround && hold === 0;
   const E = g.entities;
-  const slabs = E.filter((e) => e.def.kind === 'crumble' && e.def.skin === 'walkway').map((e) => e.rect);
-  const blocks = E.filter((e) => e.def.kind === 'crumble' && (e.def.skin === 'stalagmite' || e.def.skin === 'fallenRoof')).map((e) => e.rect);
-  const solid = (x, y) => L.isSolid(Math.floor(x / 16), Math.floor(y / 16));
-  const floorAt = (x, y) => solid(x, y) || slabs.some((r) => x >= r.x && x <= r.x + r.w && y >= r.y - 1 && y <= r.y + r.h + 1);
-  const right = () => p.x + p.w;
-  const feet = () => p.y + p.h + 1;
-  let hops = 0;
+  const D = g.level.data.decor;
+  const treads = E.filter((e) => e.def.kind === 'crumble' && e.def.skin === 'tread');
+  const booted = treads.find((e) => e.def.onEvent === 'boot');
+  const letsGo = treads.find((e) => !e.def.onEvent);
+  const tips = E.find((e) => e.def.kind === 'conveyor');
+  const snare = E.find((e) => e.def.kind === 'snare');
+  const falseFloors = E.filter((e) => e.def.kind === 'crumble' && e.def.skin === 'clayLedge');
+  const slabs = E.filter((e) => e.def.kind === 'crumble' && e.def.skin === 'walkway').sort((a, b) => a.def.rect.x - b.def.rect.x);
+  const tipper = slabs.find((e) => e.def.fake);
+  /** The stair: tread k of twelve, from the top (0 is the first), as a rect. */
+  const tread = (k) => ({ x: (42 + 2 * k) * 16, y: (9 + k) * 16, w: 32, h: 16 });
+  const onIt = (r) => p.x + p.w > r.x && p.x < r.x + r.w && Math.abs(p.y + p.h - r.y) <= 3;
+  const standOn = (r) => { p.spawnAt(r.x + 8, r.y - 16); g.camera.x = Math.max(0, r.x - 120); };
   /**
-   * The honest route: run, hop the two things standing on the hall floor, and jump
-   * every edge for the nearest landing at this level or a slab's height above it.
-   * A full jump clears the Camarin; a tap clears each gap of the well.
+   * The honest route, as a list of the things that have to be jumped and where
+   * each one starts: the boot, the tipping step, the missing step, the block, the
+   * three false floors, the bear, the Camarin, and on to the well. Off the tipping
+   * slab the moment he is on it.
    */
-  const known = (wantIn = false) => {
+  const JUMPS = [
+    { x0: 832, f: 18 }, { x0: 928, f: 18 }, { x0: 992, f: 18 },
+    { x0: 1088, f: 10 }, { x0: 1184, f: 10 }, { x0: 1280, f: 10 }, { x0: 1344, f: 10 },
+    { x0: 1472, f: 18 }, { x0: 1600, f: 10 },
+    { x0: 1760, f: 8 }, { x0: 1816, f: 10 }, { x0: 1928, f: 8 },
+  ];
+  const jumped = new Set();
+  const known = () => {
     key('ArrowRight', true);
     if (!canJump()) return;
-    const b = blocks.find((r) => r.x - right() >= 0 && r.x - right() <= 14 && r.y < p.y + p.h);
-    if (b) { jump(8); hops++; return; }
-    if (floorAt(right() + 2, feet())) return;
-    if (wantIn && right() > 2000 && right() < 2070) return; // the Camarin: walk in
-    for (let dx = 2; dx <= 64; dx += 2) {
-      for (const dy of [0, -16, 16]) {
-        if (floorAt(right() + dx, feet() + dy)) { jump(dy < 0 || dx > 30 ? 20 : 6); hops++; return; }
-      }
-    }
-  };
-  /** Down into the Camarin, to the end of its passage, back, and out. */
-  let camarin = 'before';
-  const visit = () => {
-    if (camarin === 'before') { known(true); if (p.y >= 350) camarin = 'in'; return; }
-    if (camarin === 'in') { key('ArrowRight', false); key('ArrowLeft', true); if (p.x <= 1953) camarin = 'back'; return; }
-    if (camarin === 'back') { key('ArrowLeft', false); key('ArrowRight', true); if (p.x >= 2050 && canJump()) { jump(20); hops++; camarin = 'out'; } return; }
-    known();
+    if (onIt(tipper.rect)) { jump(12); return; }
+    const right = p.x + p.w;
+    const j = JUMPS.find((j) => !jumped.has(j.x0) && right >= j.x0 - 6 && right <= j.x0 + 2);
+    if (j) { jump(j.f); jumped.add(j.x0); }
   };
   let phase = 'in';
   let ticks = 0;
-  let atWell = null, atHands = null;
+  let atWell = null;
   const run = (step, maxTicks) => {
     for (let i = 0; i < maxTicks; i++) {
       ticks = i;
       if (hold > 0) { hold--; if (hold === 0) key('Space', false); }
       step(i);
       g.tick();
-      if (atWell === null && p.x >= 2424) atWell = g.lampLeft;
-      if (atHands === null && p.x >= 2656) atHands = g.lampLeft;
+      if (atWell === null && p.x >= slabs[0].def.rect.x) atWell = g.lampLeft;
       if (g.state !== 'playing') break;
     }
     key('ArrowRight', false); key('ArrowLeft', false); key('Space', false);
     return { state: g.state, cause: g.deathCause, x: Math.round(p.x), y: Math.round(p.y), total: g.stats.total, phase,
-      secs: Math.round((ticks / 60) * 10) / 10, hops, atWell, atHands, left: g.lampLeft };
+      secs: Math.round((ticks / 60) * 10) / 10, atWell, left: g.lampLeft, held: p.held };
   };
 `;
 
-async function play(page: Page, script: string, ticks = 60 * 90): Promise<Snap> {
+async function play(page: Page, script: string, ticks = 60 * 60): Promise<Snap> {
   return page.evaluate(`(() => { ${DRIVER} ${script} return run(step, ${ticks}); })()`);
 }
 
@@ -109,106 +111,235 @@ test('the level is the fifth in the tour, the last of the chapter, and still the
   expect(info).toEqual({ costume: 'hiker', at: 4 });
 });
 
-test('the cave is dark, the lamp has thirty seconds, and the day comes in at the lower portal', async ({ page }) => {
+test('the cave is dark, the lamp has twenty seconds of burning, and the day comes in at the lower portal', async ({ page }) => {
   const r = await page.evaluate(`(() => { ${DRIVER}
-    const D = g.level.data.decor;
     const dark = D.find((d) => d.kind === 'dark');
     const mouths = D.filter((d) => d.kind === 'caveMouth');
     const day = mouths.find((m) => m.reach !== undefined);
     const hands = D.find((d) => d.kind === 'cavePanel' && d.panel === 'hands').rect;
     return { ambient: dark.ambient, lamp: dark.lamp, life: dark.lampLife, mouths: mouths.length, into: day.into, reach: day.reach,
       handsInTheDay: hands.x >= day.x0 - day.reach && hands.x + hands.w <= day.x0,
-      inHigh: g.level.data.spawn.y, outLow: g.level.data.exit.y };
+      inHigh: g.level.data.spawn.y, outLow: g.level.data.exit.y, wide: L.widthPx };
   })()`);
-  expect(r).toEqual({ ambient: 0.8, lamp: 'headlamp', life: 30, mouths: 2, into: 'left', reach: 400, handsInTheDay: true, inHigh: 112, outLow: 296 });
+  expect(r).toEqual({ ambient: 0.8, lamp: 'headlamp', life: 20, mouths: 2, into: 'left', reach: 400, handsInTheDay: true, inHigh: 112, outLow: 296, wide: 2560 });
 });
 
-test('the lamp comes on at the door and runs down from there', async ({ page }) => {
-  // Stand in the daylight: the lamp is off and whole.
-  const before = await play(page, `const step = () => {};`, 60);
-  const lampBefore = await page.evaluate(`(() => { const g = window.__game; return { on: g.lamp, left: g.lampLeft }; })()`);
-  expect(before.state).toBe('playing');
-  expect(lampBefore).toEqual({ on: false, left: 1 });
-
-  // Through the door and stop. Half the life is gone fifteen seconds after the lamp
-  // came on; all of it at thirty.
-  const r = await play(page, `
-    let onAt = null;
-    const step = (i) => {
-      if (p.x < 260) key('ArrowRight', true); else key('ArrowRight', false);
-      if (onAt === null && g.lamp) onAt = i;
-      if (onAt !== null && i === onAt + 60 * 15) phase = 'half:' + g.lampLeft.toFixed(2);
-    };`, 60 * 34);
-  expect(r.state).toBe('playing');
-  expect(r.phase).toMatch(/^half:0\.(49|50|51)$/);
-  expect(r.left).toBe(0);
+test('the lamp is lit at the door, L puts it out and lights it again, and it only runs down while it burns', async ({ page }) => {
+  const r = (await page.evaluate(`(() => { ${DRIVER}
+    const out = {};
+    // Outside, in the daylight, the switch does nothing: there is nothing lit to put out.
+    for (let i = 0; i < 10; i++) g.tick();
+    lampKey(); g.tick();
+    out.before = { lit: g.lamp, carried: g.lampCarried };
+    // Through the door: lit.
+    key('ArrowRight', true);
+    for (let i = 0; i < 240 && !g.lampCarried; i++) g.tick();
+    key('ArrowRight', false);
+    for (let i = 0; i < 60; i++) g.tick();
+    out.lit = g.lamp;
+    const a = g.lampLeft;
+    // Out. Three seconds of standing in the dark cost nothing.
+    lampKey(); g.tick();
+    out.putOut = !g.lamp;
+    for (let i = 0; i < 180; i++) g.tick();
+    out.frozen = Math.abs(g.lampLeft - a) < 0.01;
+    // And lit again, and running down again.
+    lampKey(); g.tick();
+    out.relit = g.lamp;
+    for (let i = 0; i < 120; i++) g.tick();
+    out.running = g.lampLeft < a - 0.08;
+    // A death gives him a new battery with the switch on.
+    g.player.spawnAt(760, 400); for (let i = 0; i < 200 && g.state === 'playing'; i++) g.tick();
+    for (let i = 0; i < 200 && g.state !== 'playing'; i++) g.tick();
+    out.afterDeath = { lit: g.lamp, carried: g.lampCarried, left: g.lampLeft };
+    return out;
+  })()`)) as Record<string, unknown>;
+  expect(r.before).toEqual({ lit: false, carried: false });
+  expect(r.lit).toBe(true);
+  expect(r.putOut).toBe(true);
+  expect(r.frozen).toBe(true);
+  expect(r.relit).toBe(true);
+  expect(r.running).toBe(true);
+  expect(r.afterDeath).toEqual({ lit: false, carried: false, left: 1 });
 });
 
-test('the fastest run crosses the well with light, loses the last of it before the hands, and finishes in the dark', async ({ page }) => {
+test('the fastest run that never puts the lamp out comes to the well as the flicker starts, and finishes in the dark', async ({ page }) => {
   const r = await play(page, `const step = () => known();`);
   expect(r.state).toBe('complete');
   expect(r.total).toBe(0);
-  expect(r.secs).toBeGreaterThan(30);
-  expect(r.atWell).toBeGreaterThan(0.12);
-  expect(r.atWell).toBeLessThan(0.3);
-  expect(r.atHands).toBeLessThan(0.1);
+  // The longest level in the chapter, as the last one should be, and not by much.
+  expect(r.secs).toBeGreaterThan(24);
+  expect(r.secs).toBeLessThan(30);
+  // The last tenth of a battery flickers. He reaches the fitted path right there.
+  expect(r.atWell).toBeGreaterThan(0.04);
+  expect(r.atWell).toBeLessThan(0.16);
   expect(r.left).toBe(0);
 });
 
-test('going down into the Camarin costs the well its light', async ({ page }) => {
-  const clean = await play(page, `const step = () => known();`);
-  const r = await play(page, `const step = () => visit();`);
-  expect(r.state).toBe('complete');
-  expect(r.total).toBe(0);
-  // In, to the end of the passage, back, and out, as fast as it can be done: two and a
-  // half seconds of a thirty-second lamp, which is the light the well had.
-  expect(r.secs - clean.secs).toBeGreaterThan(2);
-  expect((clean.atWell ?? 0) - (r.atWell ?? 0)).toBeGreaterThan(0.07);
-  expect(r.atWell).toBeLessThan(0.12);
-  expect(r.left).toBe(0);
+test('putting the lamp out across the upper cave is light in hand at the well', async ({ page }) => {
+  const lit = await play(page, `const step = () => known();`);
+  const banked = await play(page, `
+    let out = false, back = false;
+    const step = () => {
+      known();
+      if (!out && g.lampCarried && p.x > 220) { lampKey(); out = true; }
+      if (out && !back && p.x > 640) { lampKey(); back = true; }
+    };`);
+  expect(banked.state).toBe('complete');
+  expect(banked.total).toBe(0);
+  expect(banked.atWell).toBeGreaterThan(0.3);
+  expect((banked.atWell ?? 0) - (lit.atWell ?? 0)).toBeGreaterThan(0.2);
 });
 
-test('the Camarin is a full jump: a tap goes in', async ({ page }) => {
+test('walked straight down, the stair takes your boot at the sixth step and then the step goes', async ({ page }) => {
+  const r = await play(page, `
+    p.spawnAt(tread(0).x + 4, tread(0).y - 16); g.camera.x = tread(0).x - 120;
+    const step = () => { key('ArrowRight', true); if (p.held && phase === 'in') phase = 'held at ' + Math.round(p.x); };`, 60 * 8);
+  // Held on the sixth tread, which runs from 832 to 864.
+  expect(r.phase).toMatch(/^held at (8[2-6]\d)$/);
+  expect(r.cause).toBe('The tunnel');
+  // And the tread that holds him is drawn like the rest: the snare draws nothing of its own.
+  const hidden = await page.evaluate(`(() => { ${DRIVER} return { hidden: snare.def.hidden, same: booted.def.skin === letsGo.def.skin }; })()`);
+  expect(hidden).toEqual({ hidden: true, same: true });
+});
+
+test('the fourth step lets go of a man who stands on it, and not of one who walks down it', async ({ page }) => {
+  const stood = await play(page, `
+    standOn(letsGo.def.rect);
+    const step = () => key('ArrowRight', false);`, 60 * 4);
+  expect(stood.cause).toBe('The tunnel');
+
+  const walked = await play(page, `
+    p.spawnAt(tread(2).x + 4, tread(2).y - 16); g.camera.x = tread(2).x - 120;
+    const step = () => {
+      if (p.onGround && onIt(tread(4))) phase = 'on the fifth';
+      key('ArrowRight', phase !== 'on the fifth');
+    };`, 60 * 4);
+  expect(walked.phase).toBe('on the fifth');
+  expect(walked.state).toBe('playing');
+});
+
+test('the ninth step tips back and pins you against the eighth, and costs you nothing but light', async ({ page }) => {
+  const r = (await page.evaluate(`(() => { ${DRIVER}
+    // Through the door first, so the lamp is burning.
+    key('ArrowRight', true);
+    for (let i = 0; i < 240 && !g.lampCarried; i++) g.tick();
+    const ninth = tread(8);
+    standOn(ninth);
+    for (let i = 0; i < 20; i++) g.tick();
+    const a = g.lampLeft;
+    let xs = [];
+    // Two seconds of walking at it, as hard as he can.
+    for (let i = 0; i < 120; i++) { g.tick(); xs.push(p.x); }
+    const pinned = { alive: g.state === 'playing', x: Math.round(Math.max(...xs)), cost: Math.round((a - g.lampLeft) * 100) / 100 };
+    // And a jump gets him off it on to the tenth.
+    key('Space', true);
+    for (let i = 0; i < 18; i++) g.tick();
+    key('Space', false);
+    for (let i = 0; i < 60 && !(p.onGround && onIt(tread(9))); i++) g.tick();
+    key('ArrowRight', false);
+    return { ...pinned, off: p.onGround && onIt(tread(9)), still: g.state };
+  })()`)) as Record<string, unknown>;
+  expect(r.alive).toBe(true);
+  // Up against the riser of the eighth, which is at 928.
+  expect(r.x).toBeLessThanOrEqual(930);
+  // Two seconds of a twenty-second lamp.
+  expect(r.cost).toBeGreaterThanOrEqual(0.09);
+  expect(r.off).toBe(true);
+  expect(r.still).toBe('playing');
+});
+
+test('the eleventh step is not there, and the handrail goes straight over the gap', async ({ page }) => {
+  const shape = (await page.evaluate(`(() => { ${DRIVER}
+    const t = tread(10), rail = D.find((d) => d.kind === 'stairRail');
+    return { gone: !L.isSolid(t.x / 16, t.y / 16) && !L.isSolid(t.x / 16 + 1, t.y / 16),
+      noTreadThere: !treads.some((e) => e.def.rect.x === t.x),
+      railOver: rail.x0 < t.x && rail.x1 > t.x + t.w };
+  })()`)) as Record<string, boolean>;
+  expect(shape).toEqual({ gone: true, noTreadThere: true, railOver: true });
+
+  const r = await play(page, `
+    standOn(tread(9));
+    const step = () => key('ArrowRight', true);`, 60 * 4);
+  expect(r.cause).toBe('The tunnel');
+});
+
+test('three patches of the hall floor are not floor, and they are drawn as the floor', async ({ page }) => {
+  const shape = (await page.evaluate(`(() => { ${DRIVER}
+    return { count: falseFloors.length,
+      atFloorLevel: falseFloors.every((e) => e.def.rect.y === 320 && e.def.rect.w === 32),
+      nothingUnder: falseFloors.every((e) => !L.isSolid(e.def.rect.x / 16, 21) && !L.isSolid(e.def.rect.x / 16, 27)),
+      holes: falseFloors.every((e) => !L.isSolid(e.def.rect.x / 16, 20)) };
+  })()`)) as Record<string, unknown>;
+  expect(shape).toEqual({ count: 3, atFloorLevel: true, nothingUnder: true, holes: true });
+
+  for (const i of [0, 1, 2]) {
+    const r = await play(page, `
+      const f = falseFloors[${i}].def.rect;
+      p.spawnAt(f.x - 30, 304); g.camera.x = f.x - 150;
+      const step = () => key('ArrowRight', true);`, 60 * 4);
+    expect(r.cause).toBe('The oubliettes');
+    expect(r.x).toBeGreaterThan(1150);
+  }
+});
+
+test('the Camarin is a full jump: a tap goes in, and the engravings are at the end of the passage', async ({ page }) => {
   const over = await play(page, `
-    p.spawnAt(1960, 304); g.camera.x = 1850;
-    const step = () => { known(); if (p.x > 2080 && p.y <= 304) phase = 'over'; };`, 60 * 4);
+    p.spawnAt(1420, 304); g.camera.x = 1310;
+    const step = () => { key('ArrowRight', true); if (canJump() && p.x + p.w >= 1466 && p.x + p.w <= 1474) jump(18); if (p.onGround && p.x > 1524 && p.y <= 304) phase = 'over'; };`, 60 * 3);
   expect(over.phase).toBe('over');
-  expect(over.state).toBe('playing');
 
   const tap = await play(page, `
-    p.spawnAt(1960, 304); g.camera.x = 1850;
-    const step = () => { key('ArrowRight', true); if (canJump() && right() >= 2012) { jump(4); hops++; } if (p.y >= 350) phase = 'in'; };`, 60 * 4);
+    p.spawnAt(1420, 304); g.camera.x = 1310;
+    const step = () => { key('ArrowRight', true); if (canJump() && p.x + p.w >= 1466 && p.x + p.w <= 1474) jump(4); if (p.y >= 350) phase = 'in'; };`, 60 * 3);
   expect(tap.phase).toBe('in');
   expect(tap.state).toBe('playing');
-  expect(tap.x).toBeGreaterThan(2016);
-  expect(tap.x).toBeLessThan(2064);
+
+  const panel = await page.evaluate(`(() => { ${DRIVER}
+    const c = D.find((d) => d.kind === 'cavePanel' && d.panel === 'camarin').rect;
+    return { underTheFloor: c.y > 320, atTheEnd: c.x < 1472 - 48 };
+  })()`);
+  expect(panel).toEqual({ underTheFloor: true, atTheEnd: true });
 });
 
-test('the well is the oubliettes, and the three slabs across it hold', async ({ page }) => {
-  const walker = await play(page, `
-    p.spawnAt(2300, 304); g.camera.x = 2190;
-    const step = () => key('ArrowRight', true);`, 60 * 6);
-  expect(walker.cause).toBe('The oubliettes');
-  expect(walker.x).toBeGreaterThan(2390);
-  expect(walker.x).toBeLessThan(2440);
+test('the fitted path over the well: the middle slab tips, and bouncing off it is the only way over', async ({ page }) => {
+  const shape = (await page.evaluate(`(() => { ${DRIVER}
+    const [a, b, c] = slabs.map((e) => e.def.rect);
+    return { slabs: slabs.length, tips: slabs.filter((e) => e.def.fake).map((e) => slabs.indexOf(e)),
+      heights: [a.y, b.y, c.y], tooFarToSkip: c.x - (a.x + a.w) };
+  })()`)) as { slabs: number; tips: number[]; heights: number[]; tooFarToSkip: number };
+  expect(shape.slabs).toBe(3);
+  expect(shape.tips).toEqual([1]);
+  expect(shape.heights).toEqual([320, 304, 320]);
+  // Further than a running jump carries, so the middle one has to be touched.
+  expect(shape.tooFarToSkip).toBeGreaterThan(70);
 
-  const r = await page.evaluate(`(() => { ${DRIVER}
-    return { slabs: slabs.length, fake: E.filter((e) => e.def.kind === 'crumble' && e.def.skin === 'walkway' && e.def.fake).length,
-      step: slabs.map((s) => s.y), gone: !L.isSolid(155, 20) && !L.isSolid(155, 27) };
-  })()`);
-  expect(r).toEqual({ slabs: 3, fake: 0, step: [320, 304, 320], gone: true });
+  // Stand on it and it goes, into the oubliettes.
+  const stood = await play(page, `
+    standOn(tipper.def.rect);
+    const step = () => { key('ArrowRight', false); if (tipper.state === 'falling') phase = 'tipping'; };`, 60 * 4);
+  expect(stood.phase).toBe('tipping');
+  expect(stood.cause).toBe('The oubliettes');
+
+  // Land on it and leave in the same breath, and it takes nobody.
+  const bounced = await play(page, `
+    p.spawnAt(1750, 304); g.camera.x = 1640;
+    const step = () => {
+      known();
+      if (p.onGround && p.x > 1940 && p.y <= 304) phase = 'across';
+      if (phase === 'across') key('ArrowRight', false);
+    };`, 60 * 6);
+  expect(bounced.phase).toBe('across');
+  expect(bounced.total).toBe(0);
 });
 
 test('the wall of hands is the last thing, and it is not a trap', async ({ page }) => {
-  const r = await page.evaluate(`(() => { ${DRIVER}
-    const D = g.level.data.decor;
+  const r = (await page.evaluate(`(() => { ${DRIVER}
     const hands = D.find((d) => d.kind === 'cavePanel' && d.panel === 'hands').rect;
     const exit = g.level.data.exit;
-    const claws = D.filter((d) => d.kind === 'clawMarks').length;
-    const cam = D.find((d) => d.kind === 'cavePanel' && d.panel === 'camarin').rect;
-    const dangerNearHands = E.some((e) => e.def.kind === 'hazard' && e.def.rect.x + e.def.rect.w > hands.x);
-    const fakes = E.filter((e) => e.def.kind === 'crumble' && e.def.fake).length;
-    return { handsBeforeExit: hands.x + hands.w <= exit.x, dangerNearHands, fakes, claws, camarinUnderTheFloor: cam.y >= 320 };
-  })()`);
-  expect(r).toEqual({ handsBeforeExit: true, dangerNearHands: false, fakes: 0, claws: 5, camarinUnderTheFloor: true });
+    const dangerAfterTheWell = E.some((e) => (e.def.kind === 'hazard' || e.def.kind === 'snare' || e.def.kind === 'conveyor' || (e.def.kind === 'crumble' && e.def.fake)) && e.def.rect.x >= 1952);
+    const floorAllTheWay = Array.from({ length: 34 }, (_, i) => L.isSolid(122 + i, 20)).every(Boolean);
+    return { handsBeforeExit: hands.x + hands.w <= exit.x, dangerAfterTheWell, floorAllTheWay, claws: D.filter((d) => d.kind === 'clawMarks').length };
+  })()`)) as Record<string, unknown>;
+  expect(r).toEqual({ handsBeforeExit: true, dangerAfterTheWell: false, floorAllTheWay: true, claws: 5 });
 });

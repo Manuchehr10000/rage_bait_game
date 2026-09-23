@@ -42,10 +42,16 @@ in the research. All five levels are built. The game starts here.
   at the edge of the floor that was dug down under the Great Ceiling, with the train
   stopping exactly where a visitor stands to look up. The one made floor in the cave is the
   one place it cannot reach.
-- **Level 5 takes the light away:** the headlamp that has been on since the first door of
-  the chapter runs down on a clock from the door of Gargas, and dies before the end. The
-  thing worth seeing, the engravings of the Camarin under the hall floor, costs the light
-  the well needs. The chapter ends on the wall of 137 hands near the lower portal, seen by
+- **Level 5 takes the light away and hands him the switch:** the headlamp that has been on
+  since the first door of the chapter runs down on a clock from the door of Gargas, and L
+  puts it out, and a lamp that is out does not run down. So the hardest level of the chapter
+  is the first one with something to spend: every stretch he can cross in the dark is light
+  he has for the well. Everything the chapter taught is there again in its worst
+  arrangement — a stair of twelve identical treads, four of them not steps, one of them the
+  snare from Rouffignac; three patches of the hall floor that are not floor; and the one
+  piece of the fitted path that tips is the slab over the deepest hole. The thing worth
+  seeing, the engravings of the Camarin under the hall floor, costs the light the well needs,
+  or costs nothing if he looks at them in the dark. The chapter ends on the wall of 137 hands near the lower portal, seen by
   the daylight from the way out, the only art in the chapter ever lit by a light the tourist
   did not bring. Half the hands are short of a finger, and the level says nothing about why.
 - **Level 5 ends on:** walls of hand stencils with missing finger segments.
