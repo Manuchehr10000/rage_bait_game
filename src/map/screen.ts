@@ -519,7 +519,7 @@ export class MapScreen {
       ctx.fillText(open ? 'Enter to visit' : 'Closed', px, 127 * s);
     } else {
       const sel = c.sites[this.site];
-      const hint = sel?.level ? (this.progress.isCleared(sel.level) ? 'Enter to visit again' : 'Enter to fall in') : 'Closed';
+      const hint = sel?.level ? (this.progress.isCleared(sel.level) ? 'Enter to visit again' : 'Enter to visit') : 'Closed';
       ctx.fillStyle = LAND_LINE;
       ctx.fillRect(px, 100 * s, pw, 0.6 * s);
       ctx.font = `bold ${5.5 * s}px ${FONT}`;

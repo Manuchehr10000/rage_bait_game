@@ -11,7 +11,9 @@ import { TILE } from '../../engine/types';
  *   B  12..40   the Avenue of Sphinxes: plinths over pits; the second and fourth rams butt
  *   C  41..48   the mud-brick ramp: stairs that pull you backward
  *      49..54   talatat blocks up the pylon face, a stair; each gives way
- *      55..58   the top of the first pylon, and the drop into the court
+ *      55..58   the top of the first pylon, and the drop into the court. Walked off,
+ *               it is 176 px and he lands; jumped off, it is 238 and he does not
+ *               (PHYS.fatalFall), which is what 'The pylon' on the label is
  *   D  59..74   the great court and the scarab, which walks at you
  *   E  75..90   the Hypostyle Hall, dark; column tops over a pit; the spotlit ones fall
  *   F  91..102  Hatshepsut's obelisks; the standing one falls ahead of you
@@ -95,6 +97,7 @@ export const KARNAK: LevelData = {
   spawn: { x: 24, y: px(GROUND) - 16 },
   cameraBottom: px(16),
   fallCause: 'The Cachette',
+  dropCause: 'The pylon',
   exit: { x: px(PEDESTAL), y: px(GROUND - 2) - 16, w: 32, h: 16 },
   exitHidden: true,
 
@@ -145,7 +148,7 @@ export const KARNAK: LevelData = {
     { kind: 'tipper', skin: 'obelisk', x: px(OBELISK), floorY: px(GROUND), height: 96, triggerX: px(OBELISK) - 130, duration: 0.5, cause: 'Obelisk' },
 
     // G. The sacred lake. You can swim in it. The stones cannot be stood on.
-    { kind: 'water', x0: px(LAKE), x1: px(BANK), startY: px(GROUND) - 8, cause: 'Lake Nasser', swimmable: true },
+    { kind: 'water', x0: px(LAKE), x1: px(BANK), startY: px(GROUND) - 8, swimmable: true },
     ...[0, 1, 2, 3, 4].map((i) => ({ kind: 'crumble' as const, skin: 'stone' as const, rect: { x: px(LAKE) + 8 + i * 48, y: px(GROUND) - 16, w: 24, h: 8 }, fake: true, delay: 0.25 })),
 
     // H. The turnstile stands on the Cachette.

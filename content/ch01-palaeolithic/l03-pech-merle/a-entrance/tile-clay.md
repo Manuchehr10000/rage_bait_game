@@ -11,7 +11,7 @@
 
 The floor of the galleries: fine cave clay, brown, soft. It is the reason there are
 footprints at Pech Merle at all — a floor that takes an impression and then gets sealed
-under calcite keeps it for twenty-five thousand years.
+under calcite keeps it from the Gravettian, c. 25,000 BP, to now.
 
 ## Must be right
 

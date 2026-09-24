@@ -4,16 +4,16 @@
 |---|---|
 | Id | `scarab` |
 | File | `scarab.png` (not painted yet: the game draws its own until this file exists) |
-| Size | 40 × 14 world px per frame, painted 160 × 56, 2 frames in a horizontal strip (320 × 56 total) |
+| Size | 40 × 24 world px per frame, painted 160 × 96, 2 frames in a horizontal strip (320 × 96 total) |
 | Beat | `d-court` |
 
 ## What it is
 
-The **giant scarab of Amenhotep III**: a granite dung beetle about 1.5 m long, which in reality sits on a tall pedestal at the north-west corner of the sacred lake. In the game it has climbed down and walks at you. Two frames of walking, side on, moving left. 40 × 14.
+The **giant scarab of Amenhotep III**: a granite dung beetle about 1.5 m long, which in reality sits on a tall pedestal at the north-west corner of the sacred lake. In the game it has climbed down and walks at you. Two frames of walking, side on, moving left. 40 × 24: the body in the top 17 rows and the legs in the 7 under it, the same as its kill box.
 
 ## Where it stands in the game
 
-Beat d, the Great Court. It steps off its plinth when you stand still and walks left until it reaches the court's edge.
+Beat d, the Great Court. It steps off its plinth the moment you land in the court and walks left until it reaches the court's edge.
 
 ## Must be right
 

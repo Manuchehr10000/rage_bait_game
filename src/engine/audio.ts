@@ -139,19 +139,25 @@ export class GameAudio {
    * Every track is always scheduled, whichever one you can hear. That is what
    * makes the switch sound like a door opening rather than a tape starting: the
    * waltz you come back to is where it would have been if you had stayed.
-   *
-   * Each step says how long it is. The two written on a grid always answer with
-   * the same number; the pipe answers with the length of the note it just
-   * played, which is how a piece with no bar lines is scheduled at all.
    */
   update(): void {
     const ctx = this.ctx;
     if (!ctx) return;
     for (const id of MUSIC_IDS) {
-      while (this.nextNote[id] < ctx.currentTime + 0.3) {
-        const gap = this.scheduleStep(id, this.nextNote[id], this.noteIndex[id]);
+      // A pause in the frame loop (a tab put in the background; the audio clock does
+      // not pause with it) leaves the next note in the past, and a note in the past
+      // plays the moment it is scheduled: after thirty seconds away, every missed
+      // note of every track, at once. So the track first walks forward, silently, to
+      // where it would have got to, and only then sounds. Nothing restarts, and the
+      // player comes back to the bar the piece is really at.
+      while (this.nextNote[id] < ctx.currentTime) {
+        this.nextNote[id] += this.stepLength(id, this.noteIndex[id]);
         this.noteIndex[id] = (this.noteIndex[id] + 1) % TRACK_LENGTH[id];
-        this.nextNote[id] += gap;
+      }
+      while (this.nextNote[id] < ctx.currentTime + LOOKAHEAD) {
+        this.scheduleStep(id, this.nextNote[id], this.noteIndex[id]);
+        this.nextNote[id] += this.stepLength(id, this.noteIndex[id]);
+        this.noteIndex[id] = (this.noteIndex[id] + 1) % TRACK_LENGTH[id];
       }
     }
   }
@@ -548,35 +554,47 @@ export class GameAudio {
     }
   }
 
-  /** Sound one step of a track, and say how long it is until the next one. */
-  private scheduleStep(id: MusicId, t: number, i: number): number {
+  /**
+   * How long step `i` of a track is, from its start to the next one's. The two
+   * written on a grid always answer with the same number; the pipe and the lyre
+   * answer with the note, which is how a piece with no bar lines is scheduled at
+   * all. Pure: the scheduler asks it once to sound a step and once to skip one.
+   */
+  private stepLength(id: MusicId, i: number): number {
+    if (id === 'ch02') return CH02_STEP;
+    if (id === 'ch03') return CH03_LYRE[i]?.gap ?? 1;
+    if (id === 'ch01') return CH01_PIPE[i]?.gap ?? 1;
+    return WALTZ_STEP;
+  }
+
+  /** Sound one step of a track. */
+  private scheduleStep(id: MusicId, t: number, i: number): void {
     if (id === 'ch02') {
       this.scheduleCh02Note(t, i);
-      return CH02_STEP;
+      return;
     }
     if (id === 'ch03') {
       const note = CH03_LYRE[i];
-      if (!note) return 1;
+      if (!note) return;
       // A pair is struck lower string first, the upper a finger's width of time after
       // it, and each is struck lighter: two strings are not twice as loud as one.
       const touch = note.also === undefined ? 1 : LYRE.dyad;
       this.lyre(t, note.string, note.hold, touch);
       if (note.also !== undefined) this.lyre(t + LYRE.spread, note.also, note.alsoHold ?? note.hold, touch);
-      return note.gap;
+      return;
     }
     if (id === 'ch01') {
       const note = CH01_PIPE[i];
-      if (!note) return 1;
+      if (!note) return;
       this.pipe(t, note);
       // The breath belongs to the phrase it starts, so it is scheduled by the note
       // before it: always forwards in time, never into a moment already gone.
       const next = CH01_PIPE[(i + 1) % CH01_PIPE.length];
       if (next?.breath) this.breath(t + note.gap - BREATH_LEAD);
-      return note.gap;
+      return;
     }
     // Anything else is a page of the brochure, and they are all the same waltz.
     this.scheduleWaltzStep(id, t, i);
-    return WALTZ_STEP;
   }
 
   /**
@@ -995,6 +1013,8 @@ const G5 = 783.99;
 export const MUSIC_IDS = ['map', 'mapCh01', 'mapCh02', 'ch01', 'ch02', 'ch03'] as const;
 /** Time constant of the fade between tracks: about six tenths of a second. */
 const CROSSFADE = 0.2;
+/** How far ahead of the clock the scheduler keeps every track, in seconds. */
+const LOOKAHEAD = 0.3;
 
 /**
  * The rooms, as the length of the generated impulse, the gap before the first

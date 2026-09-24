@@ -50,8 +50,9 @@ What must be right: coastlines, the lakes, the Nile, and nothing else. What is
 deliberately wrong: everything a brochure gets wrong: scale, the vignettes, the
 cheerful colour.
 
-Note that a chapter whose sites sit close together — chapter 1's four caves are inside
-sixty kilometres of each other — gets a map that is mostly empty, and that is correct.
+Note that a chapter whose sites sit close together — three of chapter 1's five caves are
+inside sixty kilometres of each other, and all five in the south-west of France — gets a
+map that is mostly empty, and that is correct.
 The geography there carries no information, the ribbon and the panel carry the screen,
 and an empty quiet map beats a busy confusing one.
 

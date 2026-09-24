@@ -63,6 +63,8 @@ export const PHILAE: LevelData = {
   heightTiles: H,
   rows: g.rows(),
   spawn: { x: 16, y: px(GROUND) - 16 },
+  // The boat brings him in. He starts on its stern, and it does the arriving.
+  arrival: 'appear',
   cameraBottom: px(16),
   exit: null,
 

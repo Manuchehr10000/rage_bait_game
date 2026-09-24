@@ -7,8 +7,8 @@ path is the wrong one**.
 
 The prints say so first. They run along the gallery, come to the lip of the shaft, and
 **turn back** — two of them face the way he came, and then the trail starts again down
-the far side. The boy walked to the edge, looked at the hole, and went round. Twenty-five
-thousand years later somebody poured a slab out over it.
+the far side. The boy walked to the edge, looked at the hole, and went round. In the twentieth century
+somebody poured a slab out over it.
 
 Four steps down the side of the shaft, all four the same sixty-four pixels of the same
 clay, and the prints are on the first and the last:

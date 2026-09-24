@@ -5,7 +5,7 @@ eight kilometres of dry, wide, flat-floored galleries in a limestone full of fli
 the largest decorated cave in the Périgord. About 250 figures, of which **158 are
 mammoths** — seventy per cent of the animals in the cave — with ten woolly rhinoceros,
 horses, bison, ibex, and four human figures. Nearly all of it is black manganese drawing
-and engraving, Middle Magdalenian, about 13,000 years old.
+and engraving, Middle Magdalenian, c. 13,000 BP.
 
 It has been visited for a very long time. François de Belleforest described it in the
 *Cosmographie universelle* of 1575 — "paintings in several places, and the traces of

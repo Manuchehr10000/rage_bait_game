@@ -51,7 +51,8 @@ So: at Cap Blanc the committed jump was the death and the short hop was the way 
 the short hop is what puts you in the river, and the polished figure is the one place in
 the chapter where the way on is to leave the ground the moment you touch it. The one
 dishonest thing in the dark half is not the wall either: it is a piece of the wall that
-came off seventeen thousand years ago and is leaning where it landed.
+came off some seventeen thousand calendar years ago (17.1–16.5 ka cal BP; see the dating
+note at the end) and is leaning where it landed.
 
 ## Deliberate lies
 

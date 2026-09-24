@@ -10,8 +10,6 @@ import { TILE } from '../src/engine/types';
  * him, and only show up when a player arrives the way a player arrives.
  */
 
-/** game.ts drops the tourist in from this far above the spawn when you pick a site off the map. */
-const FALL_IN_HEIGHT = 200;
 /** His hitbox, from engine/player.ts. */
 const PLAYER_W = 10;
 const PLAYER_H = 16;
@@ -20,16 +18,23 @@ const each = (fn: (data: LevelData, level: Level) => void) => {
   for (const data of LEVELS) fn(data, new Level(data));
 };
 
-test('every level can be fallen into from the map', () => {
-  // Pech Merle shipped with a roof over its own front door: the drop-in landed the
-  // tourist on top of the cave, off the level, in the dark, with nothing to do.
+test('every level he walks into has floor from its left edge to the spawn, and nothing in his way', () => {
+  // He walks in from off the left edge at the spawn's height, on no physics: the
+  // level promises the ground under that walk and the air over it (pillar 13). A level
+  // that brings him in itself, or starts him where the visit has begun, says so.
   const bad: string[] = [];
   each((data, level) => {
-    const top = data.spawn.y - FALL_IN_HEIGHT;
-    for (let y = top; y <= data.spawn.y; y += 4) {
-      for (let x = data.spawn.x; x <= data.spawn.x + PLAYER_W; x += 4) {
-        if (level.isSolid(Math.floor(x / TILE), Math.floor(y / TILE))) {
-          bad.push(`${data.id}: solid at ${Math.round(x)},${Math.round(y)}, above the spawn`);
+    if (data.arrival === 'appear') return;
+    const feet = Math.floor((data.spawn.y + PLAYER_H) / TILE);
+    for (let x = 0; x <= data.spawn.x + PLAYER_W; x += 4) {
+      const tx = Math.floor(x / TILE);
+      if (!level.isSolid(tx, feet)) {
+        bad.push(`${data.id}: no floor under the walk in at x = ${x}`);
+        return;
+      }
+      for (let y = data.spawn.y; y < data.spawn.y + PLAYER_H; y += 4) {
+        if (level.isSolid(tx, Math.floor(y / TILE))) {
+          bad.push(`${data.id}: rock in the way of the walk in at ${x},${y}`);
           return;
         }
       }

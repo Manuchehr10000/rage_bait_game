@@ -8,12 +8,16 @@ these bent, the idea is wrong, not the rule.
    (`PHYS`) and identical in every chapter. Coyote time and jump buffering stay on. The
    player must always be able to blame themselves.
    **A fall of more than `PHYS.fatalFall` (200 px, measured from the top of the arc)
-   kills you, everywhere.** Only the noun on the museum label changes per level. The
-   number is set from what the built levels already ask for — the worst fall on a clean
-   run is 62 px at Cap Blanc, 78 at Philae and 171 at Karnak, coming off the first
-   pylon — so nothing that was survivable ever stops being survivable.
+   kills you, everywhere.** Only the noun on the museum label changes per level, and
+   every level that can drop that far names it (`dropCause`). The number is set from
+   what the built levels already ask for — the worst fall on a clean run is 62 px at
+   Cap Blanc and Roc-aux-Sorciers, 78 at Philae and 176 at Karnak, walking off the
+   first pylon — so nothing that was survivable ever stops being survivable. A jump
+   off that pylon is 238 px and a death, "The pylon": the height of the jump is the
+   player's own, and the ruling is that it counts.
 2. **No text inside a level.** Reading kills tempo. History lives in the geometry and the
-   set pieces, not in captions. The only words are the death counter and the exit label.
+   set pieces, not in captions. The only words are the death counter, the site's name on
+   a museum label for two seconds on arrival, and the exit label.
 3. **Deterministic, never random.** Every trap fires from player position or a fixed
    timeline started by player position. Death one is a surprise. Death two is your fault.
 4. **Memory is the tell.** Traps are not telegraphed. Identical things behave differently
@@ -41,6 +45,13 @@ these bent, the idea is wrong, not the rule.
     atrocity are never levels. Ruins, temples of dead religions, palaces, fortifications
     and engineering are. Ambiguous sites are flagged in `content/research/arc.md` and
     need a designer ruling before any production; a level designer never decides alone.
+13. **The tourist arrives on foot.** From the map, or from the exit label of the level
+    before, he walks in from off the left edge of the screen to where the level starts
+    him, and the controls are his from there. He is never dropped in from the sky. Where
+    the level brings him in itself he starts on it (Philae: the boat), and where the
+    visit has already begun he is simply there (Rouffignac: he has stepped off the
+    train). A retry always starts on the spot, so the loop stays fast (pillar 7). The
+    choice is `arrival` in the level's data.
 
 The chapters, their sites, periods and costumes are fixed by `content/research/arc.md`.
 Read it before touching any of them.
@@ -56,8 +67,8 @@ Abu Simbel → Philae → Karnak → Dendera → Saqqara. Giza is rejected by th
 | Honest opening | none | Temple cut by Ramesses II, four 20 m colossi |
 | Colossi | three intact heads look identical; only the fourth drops; the broken statue is safe | the second colossus is shattered at the waist, in antiquity, probably by an earthquake |
 | Frieze | 22 identical baboons; one throws a date | 22 baboons on the facade face east to greet the sun |
-| Relocation | numbered blocks rise 65 m and slide back; Lake Nasser fills the pit and keeps rising | 1,036 blocks, 65 m higher, 200 m back, 1964 to 1968 |
-| Sanctuary | sun beam sweeps in; only Ptah's niche is dark | sun reaches the sanctuary on 22 Feb and 22 Oct; Ptah is never lit |
+| Relocation | numbered blocks rise and slide back; Lake Nasser fills the pit and keeps rising | 1,036 blocks, about 65 m higher and 200 m back, 1964 to 1968; the exact figures are contested (arc.md §7) |
+| Sanctuary | sun beam sweeps in; only Ptah's niche is dark | the sun reaches the sanctuary twice a year, in February and October, over a few days each time; Ptah is never lit |
 | Exit | none | visitor record: deaths by cause |
 
 Target death budget for a first clean run: 10 to 15.
@@ -71,7 +82,7 @@ rest of the level: standing still anywhere eventually drowns you.
 | Beat | Trap | The history behind it |
 |---|---|---|
 | The boat in | none; it docks, you hop the bow | Philae is reachable only by boat |
-| Two rocks | identical; the first is a crocodile that dives when touched | Lake Nasser has crocodiles |
+| Two rocks | identical; the first is a crocodile that dives when touched | Nile crocodiles lived here until the dams; whether any do now is not a fact the game claims |
 | The reliefs | four chiselled Isis figures; one steps out and shoves you back into the water | Coptic Christians defaced the reliefs |
 | Numbered blocks | cranes above, 201 to 206. They do not move. The bank after them sinks | moved to Agilkia 1972 to 1980 |
 | The cofferdam | the wall gives way; a wave comes along the floor; stumps are above it | the temple was moved inside a cofferdam |
@@ -88,7 +99,7 @@ Everything it has taught you is now the trap.
 
 | Beat | Trap | The history behind it |
 |---|---|---|
-| The ankh | the one reward in the game; hit it and the floor under it opens | the Cachette: 17,000 statues buried under the courtyard |
+| The ankh | the one reward in the game; hit it and the floor under it opens | the Cachette: some 750 stone statues and 17,000 bronzes buried under a court |
 | The Avenue | five identical ram sphinxes on plinths over pits; two turn and butt you back | the Avenue of Sphinxes, three kilometres of them |
 | The ramp | stairs that pull you backward; stop and you slide to the bottom | the mud-brick construction ramp still leaning on the first pylon |
 | The blocks | steps up the pylon face that give way a beat after you land | Akhenaten's talatat blocks reused as fill in the pylon |
@@ -96,6 +107,6 @@ Everything it has taught you is now the trap.
 | The Hall | dark; column tops over a pit; the spotlit ones fall | 134 columns; the Sound and Light show |
 | The obelisk | falls to the left, ahead of you, across where you are sprinting to | Hatshepsut's obelisk; the broken one lies by the lake |
 | The lake | the stones sink; the water holds you; you swim | the sacred lake, where the priests bathed |
-| The exit | the turnstile stands on a trapdoor; the real exit is an empty pedestal with nothing on it | Luxor's second obelisk is in Paris |
+| The exit | the turnstile stands on a trapdoor; the real exit is an empty pedestal with nothing on it | the scarab's pedestal by the sacred lake, empty because the scarab is in the court |
 
 Target death budget for a first clean run: 40 to 60.

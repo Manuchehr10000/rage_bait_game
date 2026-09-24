@@ -16,7 +16,7 @@ After the first Aswan Dam (1902) the island flooded for most of every year and t
 | d | `d-blocks-and-cofferdam` | Numbered blocks with cranes that do nothing; a bank that sinks; the cofferdam corridor, which bursts | The relocation and the cofferdam of 1972–80. The submerged years |
 | e | `e-kiosk` | Column tops of Trajan's Kiosk over rising water; some capitals give way | The Kiosk is unfinished: several capitals were never carved. Tourists photographed it half-drowned for seventy years |
 | f | `f-quay` | A quay with a scribe's scaffold; nothing happens | The Gate of Hadrian and the last hieroglyph, AD 394 |
-| g | `g-departure` | The boat leaves when it sees you coming | No history. Just the boat |
+| g | `f-quay` | The boat leaves when it sees you coming | No history. Just the boat, drawn by the game; the beat has no folder of its own |
 
 ## Details a teacher will look for
 

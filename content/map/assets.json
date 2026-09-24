@@ -10,6 +10,13 @@
       "what": "The world as a tour brochure draws it. Land, sea, paper. No badges, no route, no words: the game draws those."
     },
     {
+      "id": "map-ch01-palaeolithic",
+      "w": 208,
+      "h": 152,
+      "beat": ".",
+      "what": "South-west France from the Anglin to the Pyrenees, zoomed, as the chapter's own map. No pins, no route, no words."
+    },
+    {
       "id": "map-ch02-egypt",
       "w": 208,
       "h": 152,

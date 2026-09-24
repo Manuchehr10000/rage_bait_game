@@ -135,6 +135,8 @@ export const ROUFFIGNAC: LevelData = {
   heightTiles: H,
   rows: g.rows(),
   spawn: { x: 140, y: FLOOR - 16 },
+  // He has got off the train. The visit has begun; there is no walking in to it.
+  arrival: 'appear',
   cameraBottom: px(H),
   lampFromX: px(14),
   fallCause: 'The lower gallery',

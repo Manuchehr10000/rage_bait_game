@@ -1433,24 +1433,6 @@ const ROUFFIGNAC: Palette = {
 };
 
 /**
- * A nodule of flint, 10 x 8, out of the wall and on the floor. The walls of the
- * cave are full of them in near-horizontal bands, and the ones that have weathered
- * out lie where they fell. A hop clears it; walking into it stops you.
- */
-function flintNodule(): HTMLCanvasElement {
-  const g = new PixelGrid(10, 8);
-  g.rect(1, 1, 8, 6, 'F');
-  g.rect(2, 0, 6, 1, 'C');
-  g.rect(0, 2, 1, 3, 'C');
-  g.rect(9, 3, 1, 3, 'C');
-  g.rect(2, 7, 6, 1, 'C');
-  g.rect(3, 2, 2, 1, 'G');
-  g.px(2, 3, 'G');
-  return compile(g.outline('O').rows(), ROUFFIGNAC);
-}
-export const NODULE_SPRITE = flintNodule();
-
-/**
  * A stop board beside the track, 10 x 18: a steel post with a round plate on it,
  * painted white with a red ring, of the kind that tells a driver where to halt.
  * It stands on the track bed in the way of anybody walking up the line, and the

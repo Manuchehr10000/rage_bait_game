@@ -25,11 +25,9 @@ export type DeathCause =
   | 'The roof'
   | 'The Anglin'
   | 'The overhang'
-  | 'The horns'
   | 'The rockfall'
   | 'The lower gallery'
   | 'The bear nests'
-  | 'The discs'
   | 'The drop'
   | 'The flint'
   | 'The signal'
@@ -44,6 +42,7 @@ export type DeathCause =
   | 'Crocodile'
   | 'The cofferdam'
   | 'The Cachette'
+  | 'The pylon'
   | 'Scarab'
   | 'Obelisk'
   | 'Fall'
@@ -59,11 +58,9 @@ export const DEATH_ANIM: Record<DeathCause, DeathAnim> = {
   'The roof': 'crush',
   'The Anglin': 'drown',
   'The overhang': 'crush',
-  'The horns': 'crush',
   'The rockfall': 'flat',
   'The lower gallery': 'gone',
   'The bear nests': 'gone',
-  'The discs': 'flat',
   'The drop': 'flat',
   'The flint': 'plank',
   'The signal': 'plank',
@@ -79,6 +76,8 @@ export const DEATH_ANIM: Record<DeathCause, DeathAnim> = {
   Crocodile: 'snap',
   'The cofferdam': 'swept',
   'The Cachette': 'gone',
+  // A jump off the first pylon into the court. Walking off it is fine.
+  'The pylon': 'flat',
   Scarab: 'crush',
   Obelisk: 'crush',
   Fall: 'gone',
@@ -96,11 +95,9 @@ export const DEATH_SOUND: Record<
   'The roof': 'squish',
   'The Anglin': 'drown',
   'The overhang': 'squish',
-  'The horns': 'squish',
   'The rockfall': 'thud',
   'The lower gallery': 'fallAway',
   'The bear nests': 'fallAway',
-  'The discs': 'thud',
   'The drop': 'thud',
   'The flint': 'bonk',
   'The signal': 'bonk',
@@ -116,6 +113,7 @@ export const DEATH_SOUND: Record<
   Crocodile: 'snap',
   'The cofferdam': 'whoosh',
   'The Cachette': 'fallAway',
+  'The pylon': 'thud',
   Scarab: 'squish',
   Obelisk: 'squish',
   Fall: 'fallAway',

@@ -11,11 +11,11 @@
 
 A grown adult, lost, in a costume bought at the airport. Frames in order: **idle** (feet together), **walk1**, **walk2** (the two halves of a step), **jump** (knees up, arms out). Faces right; the game flips it to face left.
 
-The costume for Chapter 1: a striped blue-and-white **nemes** that is obviously a bath towel with the stripes printed on, a **false beard** on an elastic band that does not sit straight, a loud red shirt with a print, khaki shorts, white socks, sandals. A lanyard would not be wrong.
+The costume for Chapter 2: a striped blue-and-white **nemes** that is obviously a bath towel with the stripes printed on, a **false beard** on an elastic band that does not sit straight, a loud red shirt with a print, khaki shorts, white socks, sandals. A lanyard would not be wrong.
 
 ## Where it stands in the game
 
-Every level of every chapter. 12 × 16 with a 10 × 16 hitbox: the sprite is drawn one pixel left of the hitbox, so keep the body inside the middle 10 columns and let only the beard, nose or elbows use the outer pixel on each side.
+Every level of chapter 2; chapter 1 wears `hiker`, in `ch01-palaeolithic/shared/`. 12 × 16 with a 10 × 16 hitbox: the sprite is drawn one pixel left of the hitbox, so keep the body inside the middle 10 columns and let only the beard, nose or elbows use the outer pixel on each side.
 
 ## Must be right
 

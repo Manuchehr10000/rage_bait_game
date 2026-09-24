@@ -20,7 +20,7 @@ The temple complex of Amun-Ra at Thebes, east bank, built and rebuilt for about 
 | a | `a-cachette` | An ankh block; hit it and the floor opens | The Cachette pit, court of the seventh pylon |
 | b | `b-sphinxes` | Five plinths over pits; some rams turn and butt you | Criosphinxes of Ramesses II with the king between their paws. They do not move |
 | c | `c-pylon` | A mud-brick ramp you slide down; a stair of talatat that gives way; the top of the pylon | The construction ramp inside the first pylon; talatat in the second |
-| d | `d-court` | An empty court; a scarab walks at you if you stand still | The Great Court; the scarab of Amenhotep III, which stands by the lake |
+| d | `d-court` | An empty court; a scarab steps off its plinth as you land and walks at you | The Great Court; the scarab of Amenhotep III, which stands by the lake |
 | e | `e-hypostyle` | Darkness, a moving spotlight, column tops; the lit ones fall | The Hypostyle Hall; the 1899 collapse; the sound-and-light show |
 | f | `f-obelisk` | A standing obelisk that tips if you run at it; a broken one lying down | Hatshepsut's obelisk; the fallen top of its pair |
 | g | `g-lake` | Stepping stones that sink; the water holds you | The sacred lake. Swimmable, which no Egyptian would have approved |

@@ -11,7 +11,8 @@ the bed**. By now the player has seen each of these once, and the only new infor
 where they are this time.
 
 The second snare is the one that matters. The first one taught that a check rail can hold
-him; this one is a hundred pixels after a band of flint, so he comes at it out of a stretch
-where jumping was the thing that killed him, and the answer here is to jump.
+him; this one is a hundred pixels short of the third band of flint and four hundred past
+the second, so he comes at it out of a stretch where jumping was the thing that killed
+him, and the answer here is to jump.
 
 No new art.

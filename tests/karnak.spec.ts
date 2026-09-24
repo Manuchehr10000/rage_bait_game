@@ -142,6 +142,20 @@ test('the stones sink and the water holds you', async ({ page }) => {
   expect(r.phase).toBe('out');
 });
 
+test('the first pylon: walked off, a fall you land; jumped off, one you do not, and it has a name', async ({ page }) => {
+  // Pillar 1: fatalFall is 200 px from the top of the arc. The top of the pylon is
+  // 176 px over the court, so walking off it is the longest survivable fall in the
+  // game; a jump adds its own height and goes over the line.
+  const walk = await play(page, `p.spawnAt(PYLON_TOP_X + 4 * T - 22, 48); let landed = false; const step = () => { if (p.onGround && p.y >= 220) landed = true; key('ArrowRight', !landed); if (landed) phase = 'landed'; };`, 75);
+  expect(walk.state).toBe('playing');
+  expect(walk.phase).toBe('landed');
+  expect(walk.y).toBe(224);
+  expect(walk.total).toBe(0);
+  const jump = await play(page, `p.spawnAt(PYLON_TOP_X + 4 * T - 22, 48); const step = () => { key('ArrowRight', true); if (canJump()) jump(); };`, 120);
+  expect(jump.cause).toBe('The pylon');
+  expect(jump.total).toBe(1);
+});
+
 test('the turnstile stands on a trapdoor; the empty pedestal is the exit', async ({ page }) => {
   const trap = await play(page, `const step = () => { if (!routeUntil('exit')) return; key('ArrowRight', p.x < TRAP_X + 10); };`, 60 * 45);
   expect(trap.cause).toBe('The Cachette');

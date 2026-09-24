@@ -307,8 +307,9 @@ export class Water implements Entity {
     }
     this.rect.y = this.waterY;
     this.rect.h = Math.max(0, this.levelBottom - this.waterY);
-    if (this.def.swimmable) return;
-    if (overlaps(this.rect, p) && centerY(p) > this.waterY) w.kill(this.def.cause);
+    const d = this.def;
+    if (d.swimmable) return;
+    if (overlaps(this.rect, p) && centerY(p) > this.waterY) w.kill(d.cause);
   }
 
   /** True while the player's feet are in this water and it can be swum. Feet, so a stroke can carry you up onto a bank. */

@@ -24,7 +24,7 @@ in the research. All five levels are built. The game starts here.
 - **Level 3 makes everything untrustworthy:** two things tell you where to go — the
   concrete of the guided tour and the footprints of a boy — and they disagree. The
   concrete is wrong every time and the prints are right every time, which is the only rule
-  in the cave and is never stated. Half of its sixteen ledges do something, and what they
+  in the cave and is never stated. Ten of its eighteen ledges do something, and what they
   do contradicts each other on purpose: the shelf that walks you forward keeps you, and
   the disc that walks you back drops you, so "it moved, so get off it" is right once and
   fatal once. It is longer than the first two and has no checkpoints, which is where the

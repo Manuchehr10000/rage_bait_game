@@ -18,7 +18,7 @@ import { TILE } from '../../engine/types';
  *     he did not, it is anybody's guess. He never climbed the discs, so nothing
  *     in the Hall of the Discs is marked at all
  *   - every shelf of clay in the cave is the same clay, drawn the same way, and
- *     nine of the sixteen do something. What they do is learned by doing it
+ *     ten of the eighteen do something. What they do is learned by doing it
  *   - and the two ledges that move disagree with each other: the one in the
  *     Bear's Gallery carries you to safety and the one in the Hall of the Discs
  *     carries you off the edge, so the lesson of the second level — leave
@@ -223,7 +223,9 @@ export const PECH_MERLE: LevelData = {
     // The guided tour. Three runs of it, and every one stops somewhere useless.
     { kind: 'walkway', x0: px(4), x1: px(11), y: UPPER },
     { kind: 'walkway', x0: px(13), x1: px(22), y: UPPER },
-    { kind: 'walkway', x0: px(108), x1: px(113), y: MID },
+    // The last run: rail and all, straight across the deepest shaft, over the honest
+    // concrete and the lying run alike, so nothing marks where one becomes the other.
+    { kind: 'walkway', x0: px(108), x1: LAST_RUN.x + LAST_RUN.w, y: MID },
     // The art. None of it is ever a floor; in this cave it is all on the wall.
     { kind: 'cavePanel', panel: 'blackFrieze', rect: { x: 120, y: 36, w: 200, h: 48 } },
     { kind: 'cavePanel', panel: 'mammoths', rect: { x: 360, y: 40, w: 220, h: 54 } },

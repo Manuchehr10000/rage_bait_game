@@ -20,9 +20,11 @@ export const PHYS = {
    * How far you may fall and walk away from it, measured from the top of the arc.
    * The line is drawn from what the built levels already ask for: the worst fall
    * on a clean run is 62 px at Cap Blanc and Roc-aux-Sorciers, 78 at Philae, and
-   * 171 at Karnak, coming down off the first pylon into the court. So 200 leaves
+   * 176 at Karnak, walking off the first pylon into the court. So 200 leaves
    * every one of them free and still makes a shaft something you go down in
-   * stages. Identical in every chapter, like the rest of PHYS.
+   * stages. A jump off that pylon adds the jump's own height and is 238: that one
+   * is a death, and Karnak names it. Identical in every chapter, like the rest of
+   * PHYS. tests/karnak.spec.ts holds both numbers.
    */
   fatalFall: 200,
   coyoteTime: 0.1,
@@ -101,6 +103,30 @@ export class Player implements Rect {
   /** A conveyor pulls the ground out from under you. Applied on top of your own movement. */
   drift(vx: number): void {
     this.driftX += vx;
+  }
+
+  /**
+   * Arriving: he walks in from off the left edge of the screen to where the level
+   * starts him, and the controls are not his yet. No physics, because nothing off
+   * the left edge of a level is solid; the level promises the floor from its edge
+   * to the spawn (tests/levels.spec.ts). True once he is there.
+   */
+  walkIn(toX: number): boolean {
+    this.facing = 1;
+    this.vx = PHYS.runSpeed;
+    this.vy = 0;
+    this.onGround = true;
+    this.justJumped = false;
+    this.justStepped = false;
+    this.fellFrom = null;
+    this.fellBy = 0;
+    const before = Math.floor(this.walkPhase / 10);
+    this.x = Math.min(toX, this.x + PHYS.runSpeed * DT);
+    this.walkPhase += PHYS.runSpeed * DT;
+    if (Math.floor(this.walkPhase / 10) !== before) this.justStepped = true;
+    if (this.x < toX) return false;
+    this.vx = 0;
+    return true;
   }
 
   /** Knocked by something in the world. Controls stay honest; the world does not. */

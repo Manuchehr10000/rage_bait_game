@@ -70,15 +70,12 @@ export interface PlatformDef {
   rail?: Rect;
 }
 
-/** Water over an x range. Deadly unless swimmable. Can rise on an event or when the player reaches an x. */
-export interface WaterDef {
+/** Water over an x range. Can rise on an event or when the player reaches an x. */
+interface WaterBase {
   kind: 'water';
   x0: number;
   x1: number;
   startY: number;
-  cause: DeathCause;
-  /** The sacred lake. You can be in it. */
-  swimmable?: boolean;
   rise?: {
     onEvent?: string;
     atX?: number;
@@ -88,6 +85,11 @@ export interface WaterDef {
     slowSpeed: number;
   };
 }
+
+/** Deadly water says what it drowns you as; the sacred lake, which you can be in, says nothing. */
+export type WaterDef =
+  | (WaterBase & { swimmable?: false; cause: DeathCause })
+  | (WaterBase & { swimmable: true; cause?: undefined });
 
 /** A band of death that moves across a span after a trigger. Safe inside the safe rects, or above its top. */
 export interface SweepDef {
@@ -111,7 +113,7 @@ export interface CrumbleDef {
   kind: 'crumble';
   skin:
     | 'croc' | 'capital' | 'rock' | 'floor' | 'talatat' | 'column' | 'stone' | 'relief' | 'fallenBlock'
-    | 'horns' | 'disc' | 'walkway' | 'nodule' | 'stalagmite' | 'fallenRoof' | 'clayLedge'
+    | 'horns' | 'disc' | 'walkway' | 'stalagmite' | 'fallenRoof' | 'clayLedge'
     | 'stopSign' | 'ballast' | 'tread';
   rect: Rect;
   fake: boolean;
@@ -492,6 +494,16 @@ export interface LevelData {
   dropCause?: DeathCause;
   /** The exit has no marker. You find it. */
   exitHidden?: boolean;
+  /**
+   * How the tourist comes into the level from the map, or from the exit label of
+   * the level before. `walk`, the default: he walks in from off the left edge of
+   * the screen to the spawn, and the controls are his from there. `appear`: he
+   * starts on the spawn, because the level brings him in itself (Philae's boat) or
+   * the visit has already begun (Rouffignac: he has stepped off the train). A retry
+   * always starts on the spawn, so the loop stays fast (pillar 7). Never a drop
+   * from the sky (pillar 13).
+   */
+  arrival?: 'walk' | 'appear';
 }
 
 export class Level {

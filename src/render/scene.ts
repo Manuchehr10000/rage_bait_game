@@ -52,7 +52,7 @@ import { handStencils } from './hands';
 import { hash } from './hash';
 import { TRAIN, type Train } from '../engine/entities';
 import type { CavePanel } from '../engine/level';
-import { BEAR_STALAGMITE_SPRITE, NODULE_SPRITE, SIGNAL_LAMP_SPRITE, STOP_SIGN_SPRITE, TRAIN_CAR_SPRITE, TRAIN_ENGINE_SPRITE, TRAIN_LAST_CAR_SPRITE } from './procedural';
+import { BEAR_STALAGMITE_SPRITE, SIGNAL_LAMP_SPRITE, STOP_SIGN_SPRITE, TRAIN_CAR_SPRITE, TRAIN_ENGINE_SPRITE, TRAIN_LAST_CAR_SPRITE } from './procedural';
 
 /** Text drawn in screen space after scaling so it stays crisp. World coordinates. */
 export interface WorldText {
@@ -1334,7 +1334,7 @@ function drawDecor(ctx: CanvasRenderingContext2D, s: Scene, d: DecorDef): void {
       // foot bolted down through the concrete. Every foot is this foot.
       const posts = Math.round(dx / 32);
       for (let i = 0; i <= posts; i++) drawStanchion(ctx, Math.round(d.x0 + (dx * i) / posts), Math.round(d.y0 + (dy * i) / posts));
-      ctx.fillStyle = COLORS.railLit;
+      ctx.strokeStyle = COLORS.railLit;
       ctx.beginPath();
       ctx.moveTo(d.x0, d.y0 - 27);
       ctx.lineTo(d.x1, d.y1 - 27);
@@ -1859,9 +1859,6 @@ function drawEntityBack(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): voi
       } else if (d.skin === 'fallenRoof') {
         // The block that first joined the two caves, lying where it fell in the Middle Ages.
         blit(ctx, frameOf('roof-block', 0, ROOF_BLOCK_SPRITE), r.x, r.y);
-      } else if (d.skin === 'nodule') {
-        // A nodule of flint that has weathered out of the wall and lies on the track bed.
-        if (!paint(ctx, 'flint-nodule', r.x, r.y)) ctx.drawImage(NODULE_SPRITE, r.x, r.y);
       } else if (d.skin === 'stopSign') {
         // A stop board on the track bed. Every one of them is this board.
         if (!paint(ctx, 'stop-sign', r.x, r.y)) ctx.drawImage(STOP_SIGN_SPRITE, r.x, r.y);
@@ -1875,8 +1872,10 @@ function drawEntityBack(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): voi
           for (let j = 0; j < r.h / TILE; j++)
             drawTileAt(ctx, s.level, '%', Math.floor(r.x / TILE) + i, Math.floor(r.y / TILE) + j, j === 0, r.x + i * TILE, r.y + j * TILE);
       } else if (d.skin === 'walkway') {
-        // A run of concrete laid across a hole on two steel bearers. Most that go drop
-        // flat; one that tips goes off its bearer, the far end first.
+        // A run of concrete laid across a hole on two steel bearers. The bearers are
+        // not drawn: a run that is lying has to look exactly like the concrete beside
+        // it that is not (pillar 4), and that concrete is plain tiles. Most that go
+        // drop flat; one that tips goes off its bearer, the far end first.
         const tip = d.tips && c.state === 'falling' ? Math.min(0.9, c.fallen / 30) : 0;
         ctx.save();
         if (tip > 0) {
@@ -1885,8 +1884,6 @@ function drawEntityBack(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): voi
           ctx.translate(-r.x, -r.y);
         }
         for (let i = 0; i < r.w / TILE; i++) drawConcrete(ctx, r.x + i * TILE, r.y, true);
-        ctx.fillStyle = COLORS.rail;
-        ctx.fillRect(r.x, r.y + r.h - 3, r.w, 2);
         if (d.post) {
           // The path is railed like the stair: a stanchion at each end, each in the
           // same foot as the stair's, and the rail and knee rail between them.
@@ -2305,9 +2302,17 @@ function drawEntityFront(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): vo
       break;
     }
     case 'roof': {
-      // The block of the overhang comes down in front of whoever it lands on.
+      // The block of the overhang comes down in front of whoever it lands on. It is
+      // the size the level says, whatever the sprite's: a wide slab is the sprite
+      // tiled across its width and drawn to its height, so the whole of what comes
+      // down is on the screen and nothing that kills is invisible.
       const r = e as Roof;
-      if (r.shown) blit(ctx, frameOf('roof-block', 0, ROOF_BLOCK_SPRITE), r.rect.x, r.rect.y);
+      if (!r.shown) break;
+      const f = frameOf('roof-block', 0, ROOF_BLOCK_SPRITE);
+      for (let x = 0; x < r.rect.w; x += f.w) {
+        const w = Math.min(f.w, r.rect.w - x);
+        ctx.drawImage(f.src, f.sx, f.sy, (f.sw * w) / f.w, f.sh, r.rect.x + x, r.rect.y, w, r.rect.h);
+      }
       break;
     }
     default:

@@ -12,7 +12,7 @@ bison, horse, mammoth, aurochs — drawn in black manganese outline. The **Chape
 Mammoths**, seven metres of mammoths and bison in the upper gallery. A ceiling of lines
 drawn with the fingers in soft clay, with mammoths and a female figure somewhere in the
 tangle. The **Hall of the Discs**, where water under pressure came out of a crack in the
-rock and set into fans of calcite. And the **Spotted Horses**, about 25,000 years old:
+rock and set into fans of calcite. And the **Spotted Horses**, c. 25,000 BP:
 two horses back to back under black dots blown at the wall, with negative hands sprayed
 around them.
 
@@ -24,8 +24,8 @@ calcite, running in two different directions.**
 
 It is the third of the chapter, and the research gives level 3 one job: make everything
 untrustworthy. Two things in this cave tell the tourist where to go — the concrete of the
-guided tour, and the prints of a boy who was here twenty-five thousand years before the
-concrete — and they disagree. **The walkway is wrong every time.**
+guided tour, and the prints of a boy who was here in the Gravettian, c. 25,000 BP, long
+before the concrete — and they disagree. **The walkway is wrong every time.**
 
 It is also the first level in the game that goes anywhere but sideways. Pech Merle is a
 vertical system: an upper gallery you walk in at, a lower one under it, and shafts
@@ -80,7 +80,7 @@ who remembers cannot beat.
   They are not: a bear's nest is a bowl scraped in the clay about thirty centimetres
   deep, and falling in would cost a visitor their dignity and nothing else. They are
   drawn as what they are now, and the danger is the shafts, which are real.)*
-- **Nine of the sixteen ledges do something.** Clay shelves do not let go, lift, slide,
+- **Ten of the eighteen ledges do something.** Clay shelves do not let go, lift, slide,
   walk, take offence at being jumped on, or snap; discs are fragile and are never walked
   on, but they have been growing where they are for a very long time and are not about to
   drop, and none of them has ever moved sideways. This is the level's one big lie and it

@@ -9,7 +9,7 @@
 
 ## What it is
 
-One block of a temple that has been cut into pieces to be moved. At Abu Simbel in 1964–68 the temples were sawn into 1,036 blocks (plus rock around them), each up to about 30 tonnes, numbered, lifted and reassembled 65 m higher and 210 m back from the water. At Philae in 1972–80 about 40,000 blocks were dismantled and rebuilt on Agilkia. The game paints the number on the face; the designer paints a blank block with saw-cut edges.
+One block of a temple that has been cut into pieces to be moved. At Abu Simbel in 1964–68 the temples were sawn into 1,036 blocks (plus rock around them), each up to about 30 tonnes, numbered, lifted and reassembled about 65 m higher and 200 m back from the water (64 m and 180 m by UNESCO's figures; the numbers are contested, `research/arc.md` §7). At Philae in 1972–80 about 40,000 blocks were dismantled and rebuilt on Agilkia. The game paints the number on the face; the designer paints a blank block with saw-cut edges.
 
 ## Where it stands in the game
 

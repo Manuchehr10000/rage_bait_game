@@ -7,6 +7,11 @@ The code never has to be opened to add or replace a picture.
 ```
 content/
   README.md                  this file
+  research/                  the historical arc; outranks everything else on history
+  map/                       the tour map: its art, and the twelve chapter plates in monuments/
+  site/                      the tab icon's note
+  ch01-palaeolithic/         five levels built, laid out as below
+  ch03-aegean/               CHAPTER.md only: decided, not built
   ch02-egypt/
     CHAPTER.md               the period, the costume, the tone of the chapter
     shared/                  art used by every level of the chapter (the tourist, the ankh block)
@@ -65,7 +70,8 @@ can be half painted and still play. Nothing waits on anything.
   Screenshots of the current game are the layout guide. Where a note says "the ground
   line is at the bottom edge", the bottom row of pixels sits on the floor.
 - **Animation** is a horizontal strip: frame 0 at the left, all frames the same width.
-  `frames` in the manifest says how many. Only the tourist and the scarab animate today.
+  `frames` in the manifest says how many. The tourist in both costumes, the hiker with a
+  boot caught, and the scarab animate today.
 - Sprites that face a direction face **right**. The game flips them.
 - Backgrounds must be **transparent**, not white, not black.
 - **Tiles** (`tile-*`) must wrap seamlessly with themselves sideways and with their
@@ -77,8 +83,8 @@ can be half painted and still play. Nothing waits on anything.
   12 × 16 world pixels, so keep the shapes bold even when the rendering is painterly.
 - **Light comes from the upper right**, from the sun in the sky. Cast shadows may be
   painted onto a sprite; never onto the ground beneath it (the ground is tiles).
-- **One stone per site.** Abu Simbel and Philae and Karnak are all sandstone, warm and
-  yellow. The only grey stone in the chapter is the Aswan granite at Philae's waterline
+- **One stone per site.** In Egypt, Abu Simbel and Philae and Karnak are all sandstone,
+  warm and yellow. The only grey stone in the chapter is the Aswan granite at Philae's waterline
   and the pink granite of the Karnak obelisks and scarab.
 - **Identical things are identical.** If five sphinxes look the same and one of them is
   a trap, the trap sphinx must be pixel for pixel the other four. This is the game's
@@ -90,8 +96,8 @@ can be half painted and still play. Nothing waits on anything.
 
 ## Sources
 
-Every note lists sources. Prefer the public-domain nineteenth-century record, which is
-better than most photographs for these sites and can be studied freely:
+Every note lists sources. For Egypt, prefer the public-domain nineteenth-century record,
+which is better than most photographs for these sites and can be studied freely:
 
 - **David Roberts**, *Egypt and Nubia* (1846–49): lithographs of Abu Simbel, Philae and
   Karnak from his 1838–39 journey. The classic views.
@@ -100,6 +106,10 @@ better than most photographs for these sites and can be studied freely:
 - **Lepsius**, *Denkmäler aus Aegypten und Aethiopien* (1849–59): drawings of reliefs
   and inscriptions, the reference for anything carved on a wall.
 - **Belzoni**, *Narrative* (1820): Abu Simbel as he dug it out.
+
+Chapter 1 has no such record to prefer: its sources are the excavation reports listed in
+`ch01-palaeolithic/CHAPTER.md`, and Cartailhac and Breuil only from US-hosted scans
+(`research/arc.md`, imagery).
 
 Modern photographs are for reference on your own screen. Do not put them in the
 repository: they are someone's copyright. Do not put any image in the repository that

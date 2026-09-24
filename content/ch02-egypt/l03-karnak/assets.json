@@ -54,7 +54,7 @@
     {
       "id": "scarab",
       "w": 40,
-      "h": 14,
+      "h": 24,
       "beat": "d-court",
       "what": "The great scarab of Amenhotep III, walking. Two frames.",
       "frames": 2

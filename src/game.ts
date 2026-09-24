@@ -29,8 +29,11 @@ type Screen = 'map' | 'level';
  */
 const DEV_TOOLS = __BUILD_ENV__ !== 'prod';
 
-/** How far above the spawn the tourist appears when dropping in from the map. */
-const FALL_IN_HEIGHT = 200;
+/**
+ * How far off the left edge of the screen the tourist starts when he walks into a
+ * level: all of him, and a little more, so the first thing seen is a man arriving.
+ */
+const ARRIVE_FROM = 8;
 
 /**
  * What each level sounds like: whose music, and how much room it is played in.
@@ -71,6 +74,12 @@ export class Game {
   private screen: Screen = 'map';
   /** Escape was pressed mid-level: after the death plays, go back to the map. */
   private leaveAfterDeath = false;
+  /**
+   * Walking in from the left edge, not yet on the spawn: the level runs, the
+   * controls are not his. Only on the way in from the map or the level before
+   * (pillar 13); never on a retry.
+   */
+  private arriving = false;
   private levelIndex = 0;
   private level!: Level;
   private readonly player = new Player();
@@ -181,6 +190,11 @@ export class Game {
     if (key) key.hidden = !(this.screen === 'level' && this.lampLife !== undefined);
   }
 
+  /** True while the tourist is still walking in from the left edge. For tests. */
+  get isArriving(): boolean {
+    return this.arriving;
+  }
+
   /** Which screen is showing. For tests. */
   get currentScreen(): Screen {
     return this.screen;
@@ -253,16 +267,18 @@ export class Game {
     }
   }
 
-  /** Enter a level from the map. `fallIn` drops the tourist from the sky onto the spawn. */
-  private enterLevel(index: number, fallIn: boolean): void {
+  /**
+   * Enter a level from the map or from the level before. `arrive` brings the tourist
+   * in the way the level says: on foot from off the left edge, or already there. A
+   * URL hash enters without it, which is what the tests want.
+   */
+  private enterLevel(index: number, arrive: boolean): void {
     this.screen = 'level';
     this.leaveAfterDeath = false;
     this.loadLevel(index);
-    if (fallIn) {
-      this.player.y -= FALL_IN_HEIGHT;
-      this.player.vy = 0;
-      this.camera.y = 0;
-      this.audio.play('whoosh');
+    if (arrive && (this.level.data.arrival ?? 'walk') === 'walk') {
+      this.arriving = true;
+      this.player.x = -this.player.w - ARRIVE_FROM;
     }
   }
 
@@ -321,6 +337,7 @@ export class Game {
     this.audio.stopLoops();
     this.player.spawnAt(d.spawn.x, d.spawn.y);
     this.camera.reset();
+    this.arriving = false;
     this.lampOn = false;
     this.lampOff = false;
     this.lampT = 0;
@@ -412,6 +429,22 @@ export class Game {
         if (this.leaveAfterDeath) this.goToMap();
         else this.resetLevel();
       }
+      return;
+    }
+
+    if (this.arriving) {
+      // He is not in the level yet. The level runs, so a boat can be under way and a
+      // sun can be on its schedule, but every trap fires from where he is, and he is
+      // not there. A key pressed on the way in is not a jump owed at the spawn.
+      this.input.takeJumpPressed();
+      for (const e of this.entities) {
+        e.update(world);
+        if (this.state !== 'playing') return;
+      }
+      if (this.player.walkIn(this.level.data.spawn.x)) this.arriving = false;
+      if (this.player.justStepped) this.audio.play('step');
+      this.camera.update(this.player);
+      this.driveLoops();
       return;
     }
 

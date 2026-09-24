@@ -158,13 +158,24 @@ test('hesitating on the quay misses the boat', async ({ page }) => {
   expect(r.x).toBeGreaterThan(1400);
 });
 
-test('Enter at the Abu Simbel exit label leads to Philae', async ({ page }) => {
+test('Enter at the Abu Simbel exit label leads to Philae, and the boat brings you in alive', async ({ page }) => {
   await page.goto('/#abu-simbel');
   await page.reload();
   await page.waitForFunction(() => (window as unknown as { __game?: { levelData: { id: string } } }).__game?.levelData.id === 'abu-simbel');
-  const id = await page.evaluate(`(() => { const g = window.__game; window.requestAnimationFrame = () => 0;
+  const r = (await page.evaluate(`(() => { const g = window.__game; window.requestAnimationFrame = () => 0;
     g.state = 'complete';
     window.dispatchEvent(new KeyboardEvent('keydown', { code: 'Enter' })); window.dispatchEvent(new KeyboardEvent('keyup', { code: 'Enter' }));
-    g.tick(); return g.levelData.id; })()`);
-  expect(id).toBe('philae');
+    g.tick();
+    const id = g.levelData.id;
+    // The level is entered on the boat, not from the sky: nothing should happen to him
+    // on the way in, and he should be carried to the landing stage.
+    const arriving = g.isArriving;
+    for (let i = 0; i < 180; i++) g.tick();
+    return { id, arriving, state: g.state, total: g.stats.total, riding: g.player.riding !== null, x: Math.round(g.player.x) }; })()`)) as { id: string; arriving: boolean; state: string; total: number; riding: boolean; x: number };
+  expect(r.id).toBe('philae');
+  expect(r.arriving).toBe(false);
+  expect(r.state).toBe('playing');
+  expect(r.total).toBe(0);
+  expect(r.riding).toBe(true);
+  expect(r.x).toBeGreaterThan(100);
 });

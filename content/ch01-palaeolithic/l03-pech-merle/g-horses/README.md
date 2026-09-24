@@ -3,7 +3,7 @@
 The last chamber, and the walkway comes back for it: a run of concrete to the edge of the
 deepest shaft in the cave, and then a run of concrete straight across it, with the
 Spotted Horses on the wall beside it. Two horses back to back under black dots blown at
-the rock, with negative hands sprayed around them, about twenty-five thousand years old.
+the rock, with negative hands sprayed around them, c. 25,000 BP.
 It is the best view in the cave and it is where every visitor is taken.
 
 **It has been holding for forty seconds. It holds for six tenths of one more.**

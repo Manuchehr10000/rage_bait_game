@@ -2,7 +2,7 @@ import { expect, test, type Page } from '@playwright/test';
 
 /**
  * The tour map: the start screen. Keyboard and mouse both work; closed chapters
- * stay closed; entering a level drops the tourist in from above; Escape leaves.
+ * stay closed; entering a level walks the tourist in from the left edge; Escape leaves.
  */
 
 const key = (code: string) => `window.dispatchEvent(new KeyboardEvent('keydown', { code: '${code}' })); window.dispatchEvent(new KeyboardEvent('keyup', { code: '${code}' }));`;
@@ -20,7 +20,7 @@ async function press(page: Page, code: string): Promise<void> {
   await ticks(page, 1);
 }
 
-async function snap(page: Page): Promise<{ screen: string; view: string; chapter: number; site: number; level: string | null; y: number; onGround: boolean; state: string }> {
+async function snap(page: Page): Promise<{ screen: string; view: string; chapter: number; site: number; level: string | null; x: number; y: number; onGround: boolean; arriving: boolean; deaths: number; state: string }> {
   return page.evaluate(() => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const g = (window as unknown as { __game: any }).__game;
@@ -30,8 +30,11 @@ async function snap(page: Page): Promise<{ screen: string; view: string; chapter
       chapter: g.mapScreen.chapter,
       site: g.mapScreen.site,
       level: g.currentScreen === 'level' ? g.levelData.id : null,
+      x: Math.round(g.player.x),
       y: Math.round(g.player.y),
       onGround: g.player.onGround,
+      arriving: g.isArriving,
+      deaths: g.stats.total,
       state: g.state,
     };
   });
@@ -74,7 +77,7 @@ test('a closed chapter stays closed', async ({ page }) => {
   expect(s.chapter).toBe(11);
 });
 
-test('arrow keys walk the chapters; Enter falls into Egypt; Escape comes back', async ({ page }) => {
+test('arrow keys walk the chapters; Enter walks into Egypt from the left edge; Escape comes back', async ({ page }) => {
   await press(page, 'ArrowRight');
   let s = await snap(page);
   expect(s.chapter).toBe(1);
@@ -86,12 +89,17 @@ test('arrow keys walk the chapters; Enter falls into Egypt; Escape comes back', 
   s = await snap(page);
   expect(s.screen).toBe('level');
   expect(s.level).toBe('abu-simbel');
-  expect(s.onGround).toBe(false);
-  expect(s.y).toBeLessThan(100);
+  // Off the left edge, walking, not yet his to steer.
+  expect(s.arriving).toBe(true);
+  expect(s.x).toBeLessThan(0);
+  expect(s.y).toBe(224);
   await ticks(page, 120);
   s = await snap(page);
-  expect(s.onGround).toBe(true);
+  expect(s.arriving).toBe(false);
+  expect(s.x).toBe(24);
   expect(s.y).toBe(224);
+  expect(s.onGround).toBe(true);
+  expect(s.deaths).toBe(0);
   await press(page, 'Escape');
   s = await snap(page);
   expect(s.state).toBe('dead');

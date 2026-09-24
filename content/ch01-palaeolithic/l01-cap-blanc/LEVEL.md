@@ -6,7 +6,7 @@ A rock shelter on the north side of the valley of the Grande Beune at Marquay, i
 Dordogne, a few kilometres from Les Eyzies. Under the overhang, cut into the back wall,
 is a frieze about 13 m long of animals in **high relief**: horses above all, some of
 them close to life size, with bison and a deer among them, carved by Magdalenian people
-about 15,000 years ago and once painted with red ochre. It is the finest sculpted frieze
+c. 15,000 BP (radiocarbon years, as `research/arc.md` gives them) and once painted with red ochre. It is the finest sculpted frieze
 of the Palaeolithic that survives, and the only one a visitor can stand in front of.
 
 It was found in **1909**. Workmen employed by Dr Gaston Lalanne were digging the deposit

@@ -27,7 +27,7 @@ honest: a step up is a hop across a stride, a step down is a walk, and in this l
 edge and every shadow can be seen. How high a figure sits, and which animal it is, says
 nothing about what it does (pillar 4).
 
-Three sprites do all seventeen figures of the level: `frieze-ibex`, `frieze-horse`,
+Three sprites do all eighteen figures of the level, the seventeen of the frieze and the block leaning in Taillebourg: `frieze-ibex`, `frieze-horse`,
 `frieze-bison`. The two that move use the same sprites as the ones that hold, unchanged.
 The fourth flips to face the way it walks, which is the only visible difference and only
 once it is already going. Do not paint anything into a figure that hints at what it does.

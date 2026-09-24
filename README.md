@@ -34,7 +34,14 @@ npm run dev
 Arrows or WASD to move, Space to jump, L to switch the headlamp off and on in the one cave
 where it runs down (it only runs down while it burns), R to give up (it counts), M to mute, Enter for the
 next level at the exit label. Esc returns to the map. Open `#cap-blanc`,
-`#roc-aux-sorciers`, `#pech-merle`, `#philae` or `#karnak` in the URL to start at that level.
+`#roc-aux-sorciers`, `#pech-merle`, `#rouffignac`, `#gargas`, `#abu-simbel`, `#philae` or
+`#karnak` in the URL to start at that level.
+
+A level is entered on foot: from the map or the exit label, the tourist walks in from off
+the left edge of the screen to where the level starts him, and then the controls are his
+(pillar 13). Where the level brings him in itself he starts on it (Philae, by boat), and
+where the visit has already begun he is simply there (Rouffignac, off the train). Retries
+start on the spot.
 
 Dev tools, in every build except prod, so a point on screen can be named: a ruler on the
 edges of a level, and the exact point under the mouse as `(X, Y)`. A click copies it with
@@ -67,16 +74,22 @@ src/
     types.ts              constants (view size, tile, ART_SCALE), death causes, rects
     physics.ts            axis-separated AABB collision against tiles and moving solids
     player.ts             PHYS tuning. The one part of the game that never lies
-    entities.ts           the generic traps: falling, thrower, platform, water, sweep, crumble, pusher, conveyor, chaser, tipper
+    entities.ts           the generic traps: falling, thrower, platform, water, sweep, crumble, pusher, conveyor, chaser, tipper, hazard, horse, roof, snare, train
     level.ts              level data types and the tile grid
     camera.ts             never scrolls left
     input.ts, audio.ts    keys; every sound synthesised with Web Audio, no files
     assets.ts             loads painted art from content/ manifests; falls back to code-drawn
+    progress.ts           which levels this browser has cleared
   render/
     scene.ts              draws the world in world units; every sprite site asks for painted art first
     procedural.ts         the code-drawn sprites used until a painting exists
     frame.ts              one abstraction over painted and code-drawn frames (tourist, deaths)
     hud.ts                death counter and exit label, drawn in screen space
+  map/
+    atlas.ts              the tour: twelve chapters, sixty sites, where each is on Earth
+    screen.ts             the tour map, the start screen
+    geo.ts                coastlines, generated from Natural Earth by tools/build-coastlines.mjs
+    monuments.ts          code-drawn chapter vignettes, used until a plate is painted
   dev/                    tools for building the game: the ruler and the pointer readout. Never in prod
   levels/
     index.ts              level order and URL hash lookup
@@ -87,9 +100,16 @@ content/
   research/               the historical arc; outranks everything else on history
   ch01-palaeolithic/      CHAPTER.md, shared art, one folder per level with LEVEL.md,
   ch02-egypt/             assets.json, easter-eggs.md, and beat folders holding notes and paintings
+  ch03-aegean/            CHAPTER.md only: decided, not built
+  map/                    the tour map's art, and the twelve chapter plates in monuments/
+  site/                   the tab icon's note
 tools/
   check-assets.mjs        the manifest checker CI runs
-tests/                    Playwright playthroughs, one file per level
+  paint-monuments.mjs     paints the twelve chapter plates from tools/monument-painters/
+  build-coastlines.mjs    regenerates src/map/geo.ts from Natural Earth
+  favicon.mjs             the tab icon, generated at build time
+tests/                    Playwright playthroughs, one file per level (Abu Simbel's is smoke.spec.ts),
+                          plus the map, the audio, the dev tools and the level-data contracts
 ```
 
 Rendering: the world is 320 × 180 units, rendered onto a canvas four times that size
@@ -97,6 +117,7 @@ Rendering: the world is 320 × 180 units, rendered onto a canvas four times that
 
 ## Status
 
-Six levels playable end to end (Cap Blanc, Roc-aux-Sorciers, Pech Merle; Abu Simbel,
-Philae, Karnak) with code-drawn art and procedural sound, from a tour map start screen.
+Eight levels playable end to end, the five of chapter 1 (Cap Blanc, Roc-aux-Sorciers, Pech
+Merle, Rouffignac, Gargas) and the first three of chapter 2 (Abu Simbel, Philae, Karnak),
+with code-drawn art and procedural sound, from a tour map start screen.
 Painted art arrives per asset through `content/`. No menu yet.
