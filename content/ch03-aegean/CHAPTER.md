@@ -1,35 +1,141 @@
 # Chapter 3 · Bronze Age Aegean
 
 Source: `content/research/arc.md`, chapter 3. Dates 1900 to 1200 BC. Runs Crete to
-mainland, Minoan giving way to Mycenaean. Status: locked in the research, not yet
-designed.
+mainland, Minoan giving way to Mycenaean. Status: locked in the research. Level 1 is
+designed; nothing is built.
 
-| Level | Site | Place | Period |
-|---|---|---|---|
-| 1 | Knossos | Kephala hill, Heraklion, Crete | Palaces c. 1900–1350 BC |
-| 2 | Phaistos | Messara plain, south Crete | Old Palace c. 1900 BC; New c. 1700–1450 BC |
-| 3 | Akrotiri | Thera (Santorini) | Buried by eruption, late 17th c. BC |
-| 4 | Mycenae | Argolid | Peak c. 1350–1200 BC |
-| 5 | Tiryns | Argolid | Circuit and palace c. 1400–1200 BC |
+| Level | Site | Place | Period | Designed | Built |
+|---|---|---|---|---|---|
+| 1 | Knossos | Kephala hill, Heraklion, Crete | Palaces c. 1900–1350 BC | yes | not yet |
+| 2 | Phaistos | Messara plain, south Crete | Old Palace c. 1900 BC; New c. 1700–1450 BC | not yet | not yet |
+| 3 | Akrotiri | Thera (Santorini) | Buried by eruption, late 17th c. BC | not yet | not yet |
+| 4 | Mycenae | Argolid | Peak c. 1350–1200 BC | not yet | not yet |
+| 5 | Tiryns | Argolid | Circuit and palace c. 1400–1200 BC | not yet | not yet |
 
 - **Costume:** bull-leaper kit, badly tied and slipping.
 - **Vocabulary:** light wells, multi-storey interiors and stairs, corbelled domes and
   galleries, cyclopean gates.
-- **Level 1 teaches:** columns taper downward; light means safe; the palace is partly a
-  Victorian idea.
-- **Level 5 ends on:** an 8 m cyclopean wall entered through a corbelled gallery inside
-  its own thickness.
-- **Signature mechanic, to keep distinct from Egypt:** the light well and the
-  multi-storey collapse, not the staircase.
-- **Error dossier:** Evans's reinforced-concrete reconstitution at Knossos; the
-  Gilliéron fresco restorations (the Priest-King from three non-contiguous fragments; the
-  Saffron Gatherer restored as a boy, then as a blue monkey); the Boston "Snake Goddess"
-  forgery case; the Mask of Agamemnon, genuine but misnamed and misdated.
-- **Imagery:** Schliemann 1878 and 1886 are public domain worldwide; Evans's *Palace of
-  Minos* pre-1930 volumes are public domain in the US. Akrotiri has none; base on
-  Marinatos 1968–76 and Doumas 1992.
-- **Reserves, notes only:** Pylos, Gournia, Malia, Zakros, Ayia Triada. All fail on
-  profile: standing fabric is knee to waist height.
+- **Level 1 teaches:** columns hold floors up, and taper downward; light from above means
+  nothing is overhead; the palace is partly Evans's idea, cast in 1920s concrete.
+- **Level 5 ends on:** a cyclopean wall entered through a corbelled gallery inside its own
+  thickness.
+
+## The spine: what holds the floor up
+
+Every level of the chapter answers one question, and each answers it differently. It runs
+from the most rebuilt site in the chapter to the most original.
+
+> Knossos: Evans does. The fake parts hold.
+> Phaistos: nobody does.
+> Akrotiri: the ash did.
+> Mycenae: weight does.
+> Tiryns: the Cyclopes, said the Greeks.
+
+Knossos is almost entirely standing on Evans's concrete; Phaistos was dug and left as it was
+found; Akrotiri stood two and three storeys high for three and a half thousand years because
+volcanic ash filled it, and the excavation took the ash away; a corbelled Mycenaean stone stays
+up because of the load on its back; the walls of Tiryns are so large that later Greeks said
+giants built them, and nobody has ever had to rebuild them.
+
+## The signature, and its rules
+
+Egypt owns the staircase. The Aegean's signature is **the light well and the multi-storey
+collapse** (`arc.md`, section 5).
+
+- **Light comes from directly above.** A light well is a shaft open to the sky through every
+  storey, so a lit patch is the one place nothing is overhead, and **nothing ever comes down
+  on a lit patch.** Chapter 1's light was carried by the tourist or raked in low from the
+  side; Egypt's arrived on a schedule, swept, and at Karnak marked what would fall. This
+  chapter's light says something about the building. Because of pillar 5 it is where a jump
+  may land, never where you shelter and wait.
+- **Storeys are five tiles:** 80 px floor to floor, a slab a tile thick, 64 px clear. Under any
+  roof a full jump is cut to about 48 px of rise. The ceiling on his head is how the dark says
+  there is a floor above; the light well is the one place a jump is full. Identical in every
+  level of the chapter, because the storey is the thing the player counts.
+- **The storey count.** With `PHYS.fatalFall` at 200 px, measured from the top of the arc:
+  walk off one storey (about 75 px) or two (about 155) and he walks away; walk off three (about
+  235) and he dies; jump off one (about 142) and he lives, jump off two (about 222) and he dies.
+  A jump costs a storey. **Knossos does not teach the lethal count:** there, one storey is
+  nothing and every landing in the light is safe. The count is taught at Phaistos.
+- **Columns hold floors up and are never floors.** Standing on column tops is Egypt's (the
+  Kiosk at Philae, the Hypostyle at Karnak).
+- **Stairs are incidental:** walked, never the trap.
+
+## Level 1 · Knossos
+
+Designed; see `l01-knossos/LEVEL.md`. The mechanic under its line is **wood gives way; stone
+and concrete hold**: every column that lies is timber — once the burnt Minoan original, once
+Fyfe's first attempt of 1901 — and every one of Evans's later columns holds. What fails is fire
+and weather, never Minoan building. Its pattern, taught on purpose so a later level can break
+it: **the column that lies stands right beside the light.** Land in the light; never stop next
+to it. It has two crushes (a burnt span in the storerooms, a timber span in the Grand
+Staircase), the game's one death with no physical cause (the tourist lands in front of the
+throne and is sitting in it), and the game's first trap on a cycle (the folding doors of the
+Hall of the Double Axes). About 25 seconds clean.
+
+## What Phaistos has to turn round
+
+Knossos is written so that level 2 has something to invert. Recorded here so the Phaistos
+conversation starts from it:
+
+- There are no reconstituted roofs, so the light is everywhere and says nothing. (Check before
+  designing whether any modern protective shelter stands over part of Phaistos.)
+- The light no longer catches him: the lethal storey count is taught there.
+- The danger moves underneath. At Knossos a footfall under the original brings down what is
+  over you; at Phaistos a footfall on the original can take away what is under you. The New
+  Palace stands over the levelled Old one: the storey you cannot see.
+- Gypsum left in the rain dissolves. At Knossos the worn gypsum of the open stretches is
+  harmless; at Phaistos it can be what fails.
+- Column bases with no columns on them; nobody holds anything up.
+- The pier-and-door partitions survive only as thresholds and bases. Nothing swings; the
+  threshold may be the one safe stone, and the middle of the room, where Knossos taught him to
+  wait, may be the floor that fails.
+- The daylight a polythyron was built to let in, which Knossos keeps out on purpose, is held in
+  reserve.
+
+## Rulings
+
+Designer's rulings, recorded in `arc.md` section 4 as well:
+
+- **No bull anywhere in the chapter.** No charging bull, no bull relief or copy of one, no
+  horns of consecration, no Bull-Leaper fresco copy, no oxhide figure-of-eight shields in frame.
+  It would repeat Karnak's scarab and make a myth-shaped spectacle of the place.
+- **Graves are never traps**, as at Cap Blanc. Applies at Mycenae above all.
+- **No crush deaths at Akrotiri**, and the modern shelter there never falls. See Gate 6.
+- **The throne seat is spent once in the whole game**, at Knossos (`PILLARS.md`, pillar 8).
+- **The Tiryns entrance ramp is incidental**: a ramp against a wall is Persia's.
+- The chapter's fifth level and Egypt's fifth are both at risk of ending in a long stone gallery
+  with chambers off it (the Tiryns casemates, the Serapeum). Decide Tiryns knowing it constrains
+  Saqqara (`arc.md`, section 5).
+
+## The tone
+
+Deadpan and mean. The world lies; the controls never do. Every death looks like what caused
+it and nothing reacts. There is no text inside a level. The full rules are in `PILLARS.md` at
+the repository root; read them before drawing a trap.
+
+## The tourist
+
+Research: bull-leaper kit, badly tied and slipping. Not designed or drawn yet; that is its own
+conversation. What is fixed already: it goes over modern clothes like every other costume, it
+never changes the hitbox, nobody ever mentions it, and the slipping is cosmetic. There is no
+bull anywhere in the chapter, so he is dressed for something that never happens. Besides the
+four living frames and the dead one it needs a seated frame (for giving up) and, for Knossos
+only, a frame at rest in the throne, facing out, never triumphant, which is never the seated
+one.
+
+## What "accurate" means here
+
+- The **palaces are drawn as they stand today**, and at Knossos that means Evans's
+  reconstitution drawn as what it is: concrete, painted where he painted it to look like wood
+  or Minoan colour, standing on the original floors, bases and lower walls. The asset note for
+  every piece says which is which.
+- The **frescoes on the walls are replicas**, as they are on site; the originals are in the
+  Heraklion Museum. A replica is drawn as the replica, with the restorers' inventions in it and
+  the note saying which.
+- **Modern intrusions** are exact: Evans's bust, the barriers, the turnstile, the shelters.
+- Every asset note separates **must be right** from **deliberately wrong**. There is no third
+  category.
 
 ## The sound
 
@@ -139,7 +245,7 @@ its room is ruled again then.
 
 | Level | Room | Why |
 |---|---|---|
-| Knossos | `open` | The Central Court is open to the sky. The roofed rooms are Evans's reconstitution, so a roofed acoustic at Knossos would be his and not a Minoan one. If level 1 is built inside the reconstituted light-well rooms, rule a small room then, and call it Evans's. |
+| Knossos | `open` | The Central Court is open to the sky. The roofed rooms are Evans's reconstitution, so a roofed acoustic at Knossos would be his and not a Minoan one. If level 1 is built inside the reconstituted light-well rooms, rule a small room then, and call it Evans's. Level 1, designed 2026-09-24, spends four of its seven beats under Evans's roofs (the storerooms, the Throne Room, the Grand Staircase, the Hall of the Double Axes): rule its room before it is built. |
 | Phaistos | `open` | Excavated and conserved, never reconstructed. The most exposed of the five. |
 | Akrotiri | `hall` | The only site visited wholly under a roof: the modern shelter over the excavated town. Estimated at 1.2 to 2 s; `hall` is 1.6 s and, if anything, dry. Nothing in the sound refers to the shelter's history. Waits on the ruling for Akrotiri in `content/research/arc.md`, section 4. |
 | Mycenae | `open` | An open citadel inside its walls. If level 4 is built inside the Treasury of Atreus, use the existing `deep`. The tholos is a tomb, its name a modern identification drawing on Pausanias 2.16.6, and no published measurement of its famous echo was found: nothing may suggest it was built for sound. |
@@ -152,5 +258,67 @@ wrong note: it is string 3 tightened a semitone, and every F in the tune becomes
 The opening third turns major, the cadences brighten, and the one thing this chapter's
 music refuses to do, it does: it cheers up.
 
-Design of these levels happens in conversation, one beat at a time, before any
-folder for a level is created.
+## Error dossier
+
+In the notes; never in a level.
+
+- **Evans's reconstitution at Knossos.** Timber 1901–04 (Fyfe), rotted within a few years;
+  stone, iron girders and brick arches from 1904–05 (Doll); reinforced concrete mainly 1922–30
+  (de Jong), the west storerooms roofed in 1929 and the Throne Room in 1930. Mackenzie ran the
+  digging and kept the daybooks. Evans's reasons: the timber rotted, the gypsum dissolves in
+  rain, and the stair flights and upper-storey remains found in place could only stay up on
+  permanent supports once the fill under them came out. His concrete is now itself decaying
+  and is conserved as a monument in its own right.
+- **The palace is partly Evans's idea.** Evans was a Victorian and his frame was Victorian
+  (kings and queens, a Priest-King, a peaceful thalassocracy, a Throne Room and a Queen's
+  Megaron). The concrete a visitor sees is Edwardian and interwar, and has been read as
+  modernist (Gere 2009).
+- **Kalokairinos** dug first, in 1878–79.
+- **The Gilliéron restorations.** The Priest-King assembled from non-joining fragments (head
+  with crown, torso, leg), no face preserved, the combination contested (Coulomb 1979,
+  Niemeier 1987); the Saffron Gatherer restored as a boy and re-identified as a blue monkey
+  (Platon 1947); the Ladies in Blue largely modern paint, re-restored after damage in 1926; the
+  pair of griffins flanking the throne, of which the western one has no evidence (Galanakis,
+  Tsitsa and Günkel-Maschek 2017).
+- **The Dolphin fresco** probably a floor painting fallen from the storey above (Koehl 1986),
+  put on the wall of the Queen's Megaron; its plaster replica came off the wall in the wind on
+  16 May 2025. The Queen's bathtub probably not found in the bathroom (Mary Beard, reviewing
+  Gere).
+- **The Boston "Snake Goddess"**: Lapatin's forgery case.
+- **Evans's periods** (Early, Middle and Late Minoan) against Platon's palace periods.
+- **The Mask of Agamemnon**: genuine Mycenaean, misnamed and misdated by three centuries; the
+  forgery claim is fringe; the "gazed upon the face" quotation is apocryphal.
+- **Tourist myths to keep out of every note:** columns as upside-down cypress trunks "so they
+  would not sprout", or as earthquake shock absorbers; "the oldest throne in Europe"; "the first
+  flushing toilet"; Knossos as the Labyrinth.
+
+## Imagery
+
+- Schliemann 1878 and 1886: public domain worldwide.
+- Evans, *The Palace of Minos* I (1921), II (1928) and III (1930): US public domain, volume III
+  since 1 January 2026; IV (1935) from 1 January 2031. EU public domain for Evans's own work from
+  2012, but each plate's draughtsman decides: the Gilliérons and Fyfe are clear, Doll depends on
+  his death year (unchecked), and **de Jong's drawings and watercolours stay in copyright to the
+  end of 2037.**
+- Akrotiri has no public-domain imagery at all; base on Marinatos 1968–76 and Doumas 1992.
+- Modern photographs are for reference on your own screen only.
+
+## Reserves, notes only
+
+Pylos, Gournia, Malia, Zakros, Ayia Triada. All fail on profile: standing fabric is knee to
+waist height.
+
+## Gate 6
+
+Clear, with one flag ruled. At **Akrotiri**, part of the site's protective roof collapsed in
+September 2005, killing a British visitor and injuring six or seven people (sources differ);
+the site was closed until April 2012. A deadpan level in which a tourist is crushed by a
+falling roof at Akrotiri would restage that death. Ruling: no crush deaths at Akrotiri, and
+the modern roof never falls; every collapse there comes from the Bronze Age earthquakes and
+the eruption. Spyridon Marinatos died on the site in 1974; sources differ on whether his
+grave was later moved beyond the ruins, and it is never in frame. Nobody is known to have died
+in the eruption at Akrotiri: the town was evacuated, which is why no bodies were found, and
+the locals were, as always, competent.
+
+Design of each level happens in conversation, one beat at a time, before any folder for the
+level is created.

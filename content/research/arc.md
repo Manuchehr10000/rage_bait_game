@@ -5,7 +5,7 @@ single source of truth for site identity, period, costume and status. It does no
 contain level design; beats are decided one at a time in design conversation and
 live in each level's own asset notes.
 
-Last revised: 2026-09-24. Corrections from the monument research for the tour map: Gargas date, Persepolis imagery, Segesta, Sigiriya, Himeji, Great Zimbabwe, Registan and Martello rows, sections 6 and 7. Tikal ruled: architecture only (section 4). 2026-09-23: Great Zimbabwe ruled: walls, passage and tower only (section 4). 2026-09-15: curator mode dropped by designer ruling; facts that cannot be shown without text live in the asset notes and nowhere in the game.
+Last revised: 2026-09-24. Chapter 3 corrected and its first rulings recorded while Knossos was designed (sections 3, 4, 5, 7). Corrections from the monument research for the tour map: Gargas date, Persepolis imagery, Segesta, Sigiriya, Himeji, Great Zimbabwe, Registan and Martello rows, sections 6 and 7. Tikal ruled: architecture only (section 4). 2026-09-23: Great Zimbabwe ruled: walls, passage and tower only (section 4). 2026-09-15: curator mode dropped by designer ruling; facts that cannot be shown without text live in the asset notes and nowhere in the game.
 
 ---
 
@@ -136,13 +136,14 @@ castles, Oceania and Polynesia, the steppe and nomadic cultures.
 | 4 | Mycenae | `mycenae` | Argolid, GR | Peak c. 1350–1200 BC |
 | 5 | Tiryns | `tiryns` | Argolid, GR | Circuit and palace c. 1400–1200 BC |
 
-- **Level 1 teaches:** columns taper downward; light means safe; the palace is partly a Victorian idea.
-- **Level 5 ends on:** an 8 m cyclopean wall entered through a corbelled gallery inside its own thickness.
-- **Signature mechanic, to keep distinct from Egypt:** the light well and the multi-storey collapse, not the staircase. Stairs are incidental here.
-- **Chapter error dossier:** Evans's reinforced-concrete reconstitution at Knossos (wood to c. 1905, iron to c. 1913, ferro-concrete 1922–1930; architects Fyfe, Doll, de Jong). Gilliéron père and fils fresco restorations — the Priest-King assembled from three non-contiguous fragments with no face preserved; the Saffron Gatherer restored as a boy and later re-restored as a blue monkey; the Ladies in Blue largely modern paint. Lapatin's forgery case against the Boston "Snake Goddess". Evans's Early/Middle/Late Minoan scheme versus Platon's palace periods. Schliemann's naming of the Mask of Agamemnon (genuine but misnamed and misdated by three centuries; the forgery claim is fringe; the "gazed upon the face" quotation is apocryphal).
-- **Imagery:** Schliemann 1878 and 1886 are public domain worldwide. Evans's *Palace of Minos* is EU public domain from 2012 and US public domain for the pre-1930 volumes. Akrotiri has no public-domain imagery at all; base on Marinatos 1968–76 and Doumas 1992.
+- **Level 1 teaches:** columns hold floors up, and taper downward; light from above means nothing is overhead; the palace is partly Evans's idea, cast in 1920s concrete. (Corrected 2026-09-24 from "light means safe", which chapter 1 had already taught twice, and "a Victorian idea": Evans was a Victorian and so was his frame, but the dig began in March 1900 and the reconstitution a visitor sees is Edwardian and interwar.)
+- **Level 5 ends on:** a cyclopean wall entered through a corbelled gallery inside its own thickness. (The earlier "8 m" named no dimension. Sources give the Tiryns walls about 6 m thick, about 17 m where the galleries pass through, and up to about 7 m of surviving height, originally perhaps 9–10 m. Probable; check before designing.)
+- **Signature mechanic, to keep distinct from Egypt:** the light well and the multi-storey collapse, not the staircase. Stairs are incidental here. The chapter's light comes from directly above: a lit patch is the one place nothing is overhead.
+- **Chapter error dossier:** Evans's reconstitution at Knossos, in three campaigns: timber 1901–04 under Theodore Fyfe, rotted within a few years; stone, iron girders and brick arches from 1904–05 under Christian Doll (to 1907, 1910 or the war; sources differ); reinforced concrete mainly 1922–30 under Piet de Jong, the west storerooms VIII–XII roofed in 1929 and the Throne Room in 1930. Duncan Mackenzie ran the digging and kept the daybooks. Minos Kalokairinos, a Cretan, dug first, in 1878–79. Gilliéron père and fils fresco restorations — the Priest-King assembled from non-joining fragments with no face preserved (the combination contested: Coulomb 1979, Niemeier 1987); the Saffron Gatherer restored as a boy and re-identified as a blue monkey (Platon 1947); the Ladies in Blue largely modern paint; the pair of griffins flanking the throne, of which the western one has no evidence (Galanakis, Tsitsa and Günkel-Maschek, BSA 2017). The Dolphin fresco probably a floor painting fallen from the storey above (Koehl 1986), put on a wall by Evans. Lapatin's forgery case against the Boston "Snake Goddess". Evans's Early/Middle/Late Minoan scheme versus Platon's palace periods. Schliemann's naming of the Mask of Agamemnon (genuine but misnamed and misdated by three centuries; the forgery claim is fringe; the "gazed upon the face" quotation is apocryphal).
+- **Imagery:** Schliemann 1878 and 1886 are public domain worldwide. Evans's own work in *The Palace of Minos* is EU public domain from 2012; in the US volumes I (1921), II (1928) and III (1930) are public domain, III since 1 January 2026, and IV (1935) follows on 1 January 2031. Each plate's draughtsman decides in the EU: the Gilliérons and Fyfe are clear, Doll depends on his death year (unchecked), and Piet de Jong (d. 1967) stays in copyright to the end of 2037. Akrotiri has no public-domain imagery at all; base on Marinatos 1968–76 and Doumas 1992.
 - **Reserves, notes only:** Pylos (`pylos`), Gournia, Malia, Zakros, Ayia Triada. All fail gate 1 on profile — standing fabric is knee to waist height.
-- **Gate 6:** clear.
+- **Gate 6:** clear, with one flag ruled. At Akrotiri part of the site's protective roof collapsed in September 2005, killing a British visitor and injuring six or seven people (sources differ); the site was closed until April 2012. Ruling in section 4. Spyridon Marinatos died on the site in 1974 and was first buried in the excavation; sources differ on whether the grave was later moved beyond the ruins. Never in frame. No victims of the eruption are known at Akrotiri: the town was evacuated.
+- **Check before designing Phaistos:** whether any modern protective shelter stands over part of it. The chapter's spine assumes it was dug and left open (Halbherr and Pernier from 1900, Levi 1950–66).
 
 ### Chapter 4 — Iron Age Near East & Persia · `ch04_persia`
 
@@ -310,7 +311,7 @@ is recorded here, not in the level.
 | `kilwa_kisiwani`, `gede`, `songo_mnara` | 9 | Ruined mosques; living Islam on the coast | Secular palace, fort and house fabric only |
 | `bam` | 10 | 2003 earthquake killed at least 26,271 in the modern town | Citadel architecture only |
 | `hms_victory` | 12 | Commissioned warship; Nelson-death plaque | Ruling required before scheduling |
-| `akrotiri` | 3 | In September 2005 the site's protective roof collapsed shortly before it was finished, killing one visitor and injuring seven; the site reopened under a new roof in April 2012. The chapter's signature mechanic is the multi-storey collapse, and the protagonist is a tourist. Spyridon Marinatos, the excavator, died at the site in 1974; sources differ on whether his grave is inside the ruins or was moved beyond them | Collapse at Akrotiri comes only from the Bronze Age earthquakes and the eruption; the modern roof never falls and the 2005 death is never staged. Marinatos's grave never in frame. Verify its position before level 3 is designed |
+| `phaistos` (engine) | 3 | Pillar 1: a floor that drops with the tourist standing on it never counts as a fall today (every landing resets the fall, and riding a falling solid counts nothing), so a collapse could carry him down five storeys and he would walk away. Knossos does not need it; Phaistos and Akrotiri, where falling floors are the verb, will | Judge the fall when a falling floor stops, so the 200 px rule holds everywhere. The engine reading says no built level's outcome changes; confirm with the walk-throughs. Rule before Phaistos is built |
 
 ### Ruled
 
@@ -321,18 +322,25 @@ use of the site: levels, asset notes, and the tour map.
 |---|---|---|---|---|
 | `great_zimbabwe` | 9 | A revered locus on site | Walls, passage and tower only, as recommended. First applied to the chapter 9 vignette on the tour map; the revered locus stays out of frame there and in any level | 2026-09-23 |
 | `tikal` | 6 | Contemporary Maya ceremonies are held at the site, in the Great Plaza (found in re-verification, 2026-09-23) | Architecture only: no ceremony, modern altar, fire circle, offerings or people in frame, in the tour-map vignette or in any level | 2026-09-24 |
+| `akrotiri` | 3 | In September 2005 the site's protective roof collapsed shortly before it was finished, killing one visitor, a British tourist, and injuring six or seven (sources differ); the site reopened under a new roof in April 2012. The chapter's signature mechanic is the multi-storey collapse, and the protagonist is a tourist. Spyridon Marinatos, the excavator, died at the site in 1974; sources differ on whether his grave is inside the ruins or was moved beyond them | No crush deaths at Akrotiri. Collapse there comes only from the Bronze Age earthquakes and the eruption; the modern roof never falls and the 2005 death is never staged. Marinatos's grave never in frame; verify its position before level 3 is designed | 2026-09-23 |
+| chapter 3 | 3 | A charging bull is the obvious gag for a bull-leaper's costume, repeats Karnak's scarab, and makes a myth-shaped spectacle of the place | No bull anywhere in the chapter: no bull, no bull relief or copy, no horns of consecration, no Bull-Leaper fresco copy, no oxhide figure-of-eight shields in frame | 2026-09-23 |
+| chapter 3 | 3 | Grave circles and tholos tombs at Mycenae | Graves are never traps, as the burial at Cap Blanc | 2026-09-23 |
+| `knossos` | 3 | Landing in front of the throne seats the tourist in it and ends his visit: a death with no physical cause (pillar 8) | Allowed, once in the whole game, with its own frame, sound and label, never those of giving up. Recorded in `PILLARS.md`, pillar 8 | 2026-09-24 |
 
 ---
 
 ## 5. Vocabulary collisions
 
-Three pairs risk feeling identical across sixty levels. Each has an assigned
-minimum differentiator, which is binding on level design.
+These risk feeling identical across sixty levels. Each has an assigned minimum
+differentiator, which is binding on level design.
 
 | Collision | Chapters | Differentiator |
 |---|---|---|
 | Ceremonial and roof stairs | 2, 3 | Aegean signature is the light well and multi-storey collapse; stairs are incidental there |
-| Massive defensive walls | 3, 4, 8 | Aegean = gallery *inside* the wall's thickness; Persia = ramp *against* the wall; East Asia = un-climbable curved batter of the face |
+| Column tops | 2, 3 | Egypt stands on them (the Kiosk at Philae, the Hypostyle at Karnak). Aegean columns hold floors up and are never floors |
+| Light as a mechanic | 1, 2, 3 | Chapter 1 = light the tourist carries, museum lamps and raking sun; Egypt = light on a schedule, the sweeping beam, the spotlight that marks what falls; Aegean = light from directly above through a light well, the one place nothing is overhead |
+| Massive defensive walls | 3, 4, 8 | Aegean = gallery *inside* the wall's thickness; Persia = ramp *against* the wall (so the Tiryns entrance ramp is incidental); East Asia = un-climbable curved batter of the face |
+| A long stone gallery with chambers off it, as a chapter's finale | 2, 3 | Saqqara (the Serapeum) and Tiryns (the casemate galleries) are both fifth levels. No differentiator yet: decide it before either is designed, knowing each constrains the other |
 | Terraces | 6, 7 | Americas = ballcourt slope and solar event; Monsoon Asia = moat crossing and *descending* stepwell |
 
 ---
@@ -362,7 +370,10 @@ must not be cut first on imagery grounds alone.
 Keep these as live disputes in the asset notes, never as settled, and never in a level.
 
 - Mask of Agamemnon: genuine Mycenaean but misnamed and misdated by three-plus centuries. The forgery claim is fringe. The "gazed upon the face of Agamemnon" quotation is apocryphal.
-- Knossos: keep straight what is original (throne stone, column form, plan) and what is reconstituted (walls, ceilings, most colour).
+- Knossos: keep straight what is original (throne stone, column bases, floors, plan, many ground-floor walls) and what is reconstituted (upper walls and storeys, ceilings, column shafts and capitals, every painted wall, which are replicas, and most colour). No Minoan column shaft survives: the downward taper and the red-and-black colours are Evans's reading of frescoes, seals, bases and the Mycenaean stone columns. (Corrected 2026-09-24: "column form" was listed as original.)
+- Knossos Throne Room: its date (the painting at the start of LM II by Galanakis et al.; others argue Neopalatial) and whose seat it was (Evans's king; a priestess or an enthroned goddess, Reusch 1958, Niemeier 1986). Open.
+- Knossos: bull-leaping in the Central Court (Evans; Graham 1957) against Younger (1995) and others. Doubtful. Out of the chapter by ruling in any case.
+- Knossos tourist myths to keep out of every note: columns as upside-down cypress trunks "so they would not sprout", or as earthquake shock absorbers; "the oldest throne in Europe"; "the first flushing toilet".
 - Minoan matriarchy and peaceful thalassocracy: over-claimed popular readings; qualify.
 - Thera eruption date: c. 1600 BC radiocarbon versus a later Egyptian-synchronism chronology. Open.
 - Knossos Linear B tablet date: the Palmer–Boardman dispute. Unresolved.

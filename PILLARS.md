@@ -36,6 +36,10 @@ these bent, the idea is wrong, not the rule.
    moving through it. Crushed is a pancake, burned is ash, drowned is a towel on the
    water. The counter ticks and the level resets in under a second. The only other
    acknowledgement is the museum label at the exit, with deaths broken down by cause.
+   **One death in the whole game has no physical cause, and it is spent at Knossos:**
+   landing in front of the throne seats him in it and his visit is over. It has its own
+   pose, sound and label, never those of giving up, and nothing reacts to it either. No
+   other level seats him in anything.
 9. **The costume is cosmetic.** The tourist wears visibly fake period dress and nobody in
    the game ever mentions it. It never changes the hitbox.
 10. **False completion is spent once per player, ever.** Held in reserve. Not in level 1.
