@@ -11,10 +11,11 @@
 
 The Nile from Abu Simbel in the south to Saqqara in the north, as the chapter's own
 brochure page: the river, the desert either side, the Red Sea coast at the right edge,
-Lake Nasser behind the High Dam. No pins, no route, no words. The game draws the site
-markers where the sites really are, each numbered like its bead on the ribbon, and a
-single dotted leg from the previous site to the selected one; the order is the ribbon's
-business, not the map's, so no route is drawn through them all.
+Lake Nasser behind the High Dam. No pins, no route, no words. The game draws a pin for
+each site with a level, numbered like its bead on the ribbon, and a single dotted leg from
+the previous site to the selected one; the order is the ribbon's business, not the map's,
+so no route is drawn through them all. Dendera and Saqqara have no level yet: they are
+plain dots, and get a pin and a number only while selected.
 
 ## Where it stands in the game
 

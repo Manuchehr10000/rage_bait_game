@@ -330,8 +330,9 @@ test('the world draws no line from one chapter to the next', async ({ page }) =>
     const badges = Array.from({ length: 12 }, (_, i) => m.worldBadge(i));
     const out: string[] = [];
     // Every chapter selected in turn, with the stretch between it and the one
-    // before sampled for the route's red: clear of every badge and its pulse,
-    // and of the tourist, whose costume may be red.
+    // before sampled for the route's red: clear of every marker as it is drawn
+    // (the selected badge's pulse reaches 8.3, any other marker 5.9), and of the
+    // tourist, whose costume may be red.
     for (let c = 1; c < 12; c++) {
       m.view = 'world';
       m.chapter = c;
@@ -345,11 +346,13 @@ test('the world draws no line from one chapter to the next', async ({ page }) =>
       for (let k = 0; k <= len * 4; k++) {
         const x = a.x + ((b.x - a.x) * k) / (len * 4);
         const y = a.y + ((b.y - a.y) * k) / (len * 4);
-        if (badges.some((p) => Math.hypot(p.x - x, p.y - y) < 10)) continue;
+        if (badges.some((p, j) => Math.hypot(p.x - x, p.y - y) < (j === c ? 9 : 6.5))) continue;
         if (x > t.x - 1 && x < t.x + t.w + 1 && y > t.y - 1 && y < t.y + t.h + 1) continue;
         const i = (Math.floor(y * s) * canvas.width + Math.floor(x * s)) * 4;
         const [r, gr, bl] = [d[i]!, d[i + 1]!, d[i + 2]!];
-        if (r - gr > 40 && r - bl > 40) n++;
+        // The route's red has about as much green as blue; the browns and ochres
+        // of land, coast and any painted sheet have far more green than blue.
+        if (r - gr > 40 && Math.abs(gr - bl) < 25) n++;
       }
       if (n > 0) out.push(`chapter ${c} to ${c + 1}: ${n}`);
     }
@@ -359,6 +362,11 @@ test('the world draws no line from one chapter to the next', async ({ page }) =>
 });
 
 test('in a chapter every pin carries its number, the same as its bead on the ribbon', async ({ page }) => {
+  // Pech Merle and Philae cleared, so a pin is seen filled for being cleared as
+  // well as for being selected.
+  await page.evaluate(() => localStorage.setItem('lostTourist.cleared', JSON.stringify(['pech-merle', 'philae'])));
+  await page.reload();
+  await page.waitForFunction(() => (window as unknown as { __game?: { currentScreen: string } }).__game?.currentScreen === 'map');
   const printed = await page.evaluate(() => {
     type P = { x: number; y: number };
     const g = (
@@ -373,15 +381,20 @@ test('in a chapter every pin carries its number, the same as its bead on the rib
     const m = g.mapScreen;
     const ctx = (document.querySelector('#game') as HTMLCanvasElement).getContext('2d')!;
     const s = g.scale;
-    const out: Record<string, string> = {};
+    const cleared = ['pech-merle', 'philae'];
+    const ink: Record<string, string> = { '#f3ead4': 'card', '#8e2f2a': 'route' };
+    const got: Record<string, string> = {};
+    const want: Record<string, string> = {};
     const fillText = ctx.fillText.bind(ctx);
-    let seen: { text: string; x: number; y: number }[] = [];
+    let seen: { text: string; x: number; y: number; color: string }[] = [];
     ctx.fillText = (text: string, x: number, y: number) => {
-      seen.push({ text, x, y });
+      seen.push({ text, x, y, color: String(ctx.fillStyle) });
       fillText(text, x, y);
     };
-    // Chapters 1 and 2, each with every site selected in turn: a pin is a site
-    // with a level, or the selected one; the rest are dots with no number.
+    // Chapters 1 and 2, each with every site selected in turn. A pin is a site
+    // with a level, or the selected one, and its number is card on a filled pin
+    // (selected or cleared) and route red on an open one; the rest are dots with
+    // no number at all.
     for (const c of [0, 1]) {
       m.openChapter(c);
       for (let sel = 0; sel < m.current.sites.length; sel++) {
@@ -389,23 +402,25 @@ test('in a chapter every pin carries its number, the same as its bead on the rib
         seen = [];
         g.draw();
         m.current.sites.forEach((site, i) => {
+          const where = `ch${c + 1} sel${sel + 1} site${i + 1}`;
           const p = m.sitePin(i);
-          const here = seen.filter((w) => Math.abs(w.x - p.x * s) < 0.01 && Math.abs(w.y - (p.y + 0.3) * s) < 0.01).map((w) => w.text);
-          out[`ch${c + 1} sel${sel + 1} site${i + 1}`] = here.join(',') || (site.level || i === sel ? 'none' : 'dot');
+          const here = seen.filter((w) => Math.abs(w.x - p.x * s) < 0.01 && Math.abs(w.y - (p.y + 0.3) * s) < 0.01);
+          got[where] = here.map((w) => `${w.text}:${ink[w.color] ?? w.color}`).join(',') || 'dot';
+          const filled = i === sel || (!!site.level && cleared.includes(site.level));
+          want[where] = site.level || i === sel ? `${i + 1}:${filled ? 'card' : 'route'}` : 'dot';
         });
       }
     }
     ctx.fillText = fillText;
-    return out;
+    return { got, want };
   });
-  for (const [where, text] of Object.entries(printed)) {
-    const [, sel, site] = /sel(\d) site(\d)/.exec(where)!;
-    const isDot = text === 'dot';
-    if (isDot) expect(sel, where).not.toBe(site);
-    else expect(text, where).toBe(site);
-  }
+  expect(printed.got).toEqual(printed.want);
+  // Spelled out, so the rule above cannot drift into agreeing with a wrong screen.
+  expect(printed.got['ch1 sel1 site1']).toBe('1:card');
+  expect(printed.got['ch1 sel1 site2']).toBe('2:route');
+  expect(printed.got['ch1 sel1 site3']).toBe('3:card');
   // Chapter 2 has three levels: with Abu Simbel selected, Dendera and Saqqara are dots.
-  expect(printed['ch2 sel1 site4']).toBe('dot');
-  expect(printed['ch2 sel1 site5']).toBe('dot');
-  expect(printed['ch2 sel4 site4']).toBe('4');
+  expect(printed.got['ch2 sel1 site4']).toBe('dot');
+  expect(printed.got['ch2 sel1 site5']).toBe('dot');
+  expect(printed.got['ch2 sel4 site4']).toBe('4:card');
 });

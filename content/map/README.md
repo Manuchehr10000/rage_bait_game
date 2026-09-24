@@ -13,8 +13,8 @@ question:
   chapters, not even one leg of a route, because the tour's order is chronological and
   the map's order is geographical: France, Egypt, the Aegean, Persia, Italy, Mexico,
   Cambodia, Japan, Zimbabwe, Samarkand, England, France. Any line through those twelve,
-  over true coordinates, is a piece of a web. A chapter map is allowed one line, the leg
-  from the previous site to the selected one, and numbers each pin the way the ribbon
+  over true coordinates, is a piece of a web. A chapter map is allowed one dotted line, the
+  leg from the previous site to the selected one, and numbers each pin the way the ribbon
   numbers its bead, so the map and the ribbon name a site the same way.
 - **the panel**, right, 112 × 152: *what is there*. The chapter, its dates, and a
   vignette of one of the chapter's own monuments, the way a brochure prints one.

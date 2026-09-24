@@ -53,9 +53,9 @@ const RIBBON = { y: 152, h: VIEW_H - 152, rule: 166 };
  * Where the words sit on the map, and how much room they take. The tourist
  * stands on the selected marker and is drawn a head above it, so anything
  * printed on the map has to keep out of his way: the title used to be top left,
- * which is the North Sea, which is where chapter 1 puts him. These two boxes are
- * the reserved area, and a test walks every chapter and every site to check
- * nothing ever stands in them.
+ * which is the North Sea, which is where chapter 1 puts him. These two boxes,
+ * and the digit in every pin (PIN_DIGIT), are the reserved area, and a test
+ * walks every chapter and every site to check nothing ever stands in them.
  */
 const TITLE = { x: 6, y: 126, w: 116, h: 21 };
 const HEADER = { x: 6, y: 128, w: 152, h: 19 };

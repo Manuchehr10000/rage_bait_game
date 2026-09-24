@@ -12,7 +12,8 @@
 The whole tour on one sheet, the way a brochure draws the world: parchment paper,
 coastlines in a warm line, land a shade darker than the sea, inland water in the sea's
 colour, a compass rose in an empty ocean. Longitude −115 to 150 across the width, latitude 65 down to −40 across the
-height, equirectangular. No badges, no route, no words; the game draws those on top.
+height, equirectangular. No badges, no route, no words: the game draws the badges and the
+words on top, and no route at all.
 
 It occupies the left two thirds of the screen: the right third is the chapter panel and
 the bottom band is the itinerary ribbon, both drawn by the game. There is no fold down

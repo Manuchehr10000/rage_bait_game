@@ -28,7 +28,7 @@ export interface Chapter {
   dates: string;
   /** Which site's position stands for the chapter on the world map. */
   anchor: number;
-  /** Nudge for the number badge on the world map, so clustered chapters do not overlap. */
+  /** Nudge for the chapter's badge on the world map, so clustered chapters do not overlap; a leader line points at the true spot. */
   badge?: { dx: number; dy: number };
   /** What the tourist wears here, from the research. Unset until the chapter is designed. */
   costume?: Costume;
