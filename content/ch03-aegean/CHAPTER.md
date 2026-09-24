@@ -1,13 +1,13 @@
 # Chapter 3 · Bronze Age Aegean
 
 Source: `content/research/arc.md`, chapter 3. Dates 1900 to 1200 BC. Runs Crete to
-mainland, Minoan giving way to Mycenaean. Status: locked in the research. Level 1 is
+mainland, Minoan giving way to Mycenaean. Status: locked in the research. Levels 1 and 2 are
 designed; nothing is built.
 
 | Level | Site | Place | Period | Designed | Built |
 |---|---|---|---|---|---|
 | 1 | Knossos | Kephala hill, Heraklion, Crete | Palaces c. 1900–1350 BC | yes | not yet |
-| 2 | Phaistos | Messara plain, south Crete | Old Palace c. 1900 BC; New c. 1700–1450 BC | not yet | not yet |
+| 2 | Phaistos | Messara plain, south Crete | Old Palace c. 1900 BC; New c. 1700–1450 BC | yes | not yet |
 | 3 | Akrotiri | Thera (Santorini) | Buried by eruption, late 17th c. BC | not yet | not yet |
 | 4 | Mycenae | Argolid | Peak c. 1350–1200 BC | not yet | not yet |
 | 5 | Tiryns | Argolid | Circuit and palace c. 1400–1200 BC | not yet | not yet |
@@ -73,25 +73,55 @@ Staircase), the game's one death with no physical cause (the tourist lands in fr
 throne and is sitting in it), and the game's first trap on a cycle (the folding doors of the
 Hall of the Double Axes). About 25 seconds clean.
 
-## What Phaistos has to turn round
+## Level 2 · Phaistos
 
-Knossos is written so that level 2 has something to invert. Recorded here so the Phaistos
-conversation starts from it:
+Designed; see `l02-phaistos/LEVEL.md`.
 
-- There are no reconstituted roofs, so the light is everywhere and says nothing. (Check before
-  designing whether any modern protective shelter stands over part of Phaistos.)
-- The light no longer catches him: the lethal storey count is taught there.
-- The danger moves underneath. At Knossos a footfall under the original brings down what is
-  over you; at Phaistos a footfall on the original can take away what is under you. The New
-  Palace stands over the levelled Old one: the storey you cannot see.
-- Gypsum left in the rain dissolves. At Knossos the worn gypsum of the open stretches is
-  harmless; at Phaistos it can be what fails.
-- Column bases with no columns on them; nobody holds anything up.
-- The pier-and-door partitions survive only as thresholds and bases. Nothing swings; the
-  threshold may be the one safe stone, and the middle of the room, where Knossos taught him to
-  wait, may be the floor that fails.
-- The daylight a polythyron was built to let in, which Knossos keeps out on purpose, is held in
-  reserve.
+> Phaistos: nothing falls on you. You fall.
+
+Knossos killed from above and the light caught every landing. At Phaistos nothing is overhead
+but five 1960s metal shelters, which hold up only a roof and never fall, and every death is a
+fall onto the older palace underneath, so every death in it has one noun on the museum label:
+**The Old Palace.** It turns each Knossos lesson round:
+
+- **The count.** Knossos: one storey is nothing. Phaistos: walk off two storeys and live, jump
+  off two and die. It is taught by a pair of identical edges at the top of the level, where the
+  camera stops rising: the first, one storey down, with its ground in sight; the second, two
+  storeys down, with its ground out of sight. The rule it leaves: **if you can see the bottom
+  you may jump; if you cannot, walk.**
+- **Look down.** Knossos's danger was over his head. Phaistos draws the ground in section, and
+  the Old Palace shows under the New Palace floor: stone walls, rooms sealed with a rock-hard
+  mass, rooms the excavator dug hollow. **The old walls under the floor hold it up**, as the
+  columns over it did at Knossos; over a hollow the floor tips.
+- **Wait at the door.** Knossos's doors taught him never to stand at a door. At Phaistos only
+  the doors' bases survive, and the finale asks him to stop on one while the light well in
+  front of him goes down three storeys, then to walk, never jump, onto what is left.
+
+About 24 seconds clean. The Phaistos Disc stays out of the level: it is writing, and it is in
+Heraklion. The level does not depend on the open ruling about floors that carry him down:
+its floors tip and he falls free.
+
+## What Akrotiri has to break
+
+Level 3 makes everything untrustworthy. Notes so that conversation starts from what the first
+two levels leave it:
+
+- **Two readable tells, both honest so far.** Knossos's light from above (nothing overhead),
+  Phaistos's section (the old walls below hold). Akrotiri may make either lie.
+- **The pattern still unbroken:** at Knossos the column that lies stands beside the light.
+- **"If you cannot see the bottom, walk"** has never failed a player. Akrotiri may make it.
+- **Its verb cannot be the crush** (ruling), and the seat is spent. Floors that carry him down
+  are the obvious verb for a town held up by ash, so the open pillar-1 ruling on floors that
+  drop with him (`arc.md`, section 4) has to be settled before it is built.
+- **The ash did it.** The houses stood two and three storeys high because the ash filled them;
+  the excavation took the ash away. The casts of beds and tables poured into the voids the
+  wood left in the ash are the real objects.
+- **Everybody left in time.** No bodies were found; the locals were, as always, competent.
+- **The daylight through a door or a window** is still held in reserve. Akrotiri's houses have
+  windows; the chapter has never used light from the side, and chapter 1's raking sun is the
+  collision to avoid.
+- **Under one roof.** Akrotiri is the only site in the chapter visited wholly under a modern
+  shelter, which never falls. Whether any daylight reaches the floor through it is not checked.
 
 ## Rulings
 
@@ -102,6 +132,8 @@ Designer's rulings, recorded in `arc.md` section 4 as well:
   It would repeat Karnak's scarab and make a myth-shaped spectacle of the place.
 - **Graves are never traps**, as at Cap Blanc. Applies at Mycenae above all.
 - **No crush deaths at Akrotiri**, and the modern shelter there never falls. See Gate 6.
+- **No modern shelter ever falls, anywhere in the chapter.** Phaistos has five from the 1960s,
+  due for replacement; a falling one would restage Akrotiri's 2005 death a level early.
 - **The throne seat is spent once in the whole game**, at Knossos (`PILLARS.md`, pillar 8).
 - **The Tiryns entrance ramp is incidental**: a ramp against a wall is Persia's.
 - The chapter's fifth level and Egypt's fifth are both at risk of ending in a long stone gallery
@@ -246,7 +278,7 @@ its room is ruled again then.
 | Level | Room | Why |
 |---|---|---|
 | Knossos | `open` | The Central Court is open to the sky. The roofed rooms are Evans's reconstitution, so a roofed acoustic at Knossos would be his and not a Minoan one. If level 1 is built inside the reconstituted light-well rooms, rule a small room then, and call it Evans's. Level 1, designed 2026-09-24, spends four of its seven beats under Evans's roofs (the storerooms, the Throne Room, the Grand Staircase, the Hall of the Double Axes): rule its room before it is built. |
-| Phaistos | `open` | Excavated and conserved, never reconstructed. The most exposed of the five. |
+| Phaistos | `open` | Excavated and conserved, never reconstructed. The most exposed of the five. Level 2, designed 2026-09-24, is in the open air throughout except its finale, the hall of the Royal Apartments under a 1960s shelter, and its last few seconds under the New Palace floor: `open` stands. |
 | Akrotiri | `hall` | The only site visited wholly under a roof: the modern shelter over the excavated town. Estimated at 1.2 to 2 s; `hall` is 1.6 s and, if anything, dry. Nothing in the sound refers to the shelter's history. Waits on the ruling for Akrotiri in `content/research/arc.md`, section 4. |
 | Mycenae | `open` | An open citadel inside its walls. If level 4 is built inside the Treasury of Atreus, use the existing `deep`. The tholos is a tomb, its name a modern identification drawing on Pausanias 2.16.6, and no published measurement of its famous echo was found: nothing may suggest it was built for sound. |
 | Tiryns | `open` | The circuit is walked in the open. The corbelled gallery sets the room only if the level spends more than its last beat inside it. |

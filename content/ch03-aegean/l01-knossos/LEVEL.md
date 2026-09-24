@@ -86,7 +86,8 @@ than seven, two flights at the East Bastion rather than three, a shorter court.
 Honest. The whole beat is there to hand the player the chapter's scale and the first
 thing the chapter wants seen: before any Minoan stone, the bronze bust of the man who
 rebuilt it. The three pits are shallow in game terms, hopped or fallen into and jumped out
-of, the only place in the chapter where a hole is only a hole. Three identical honest things
+of: a hole that is only a hole. (Phaistos has four more in its old court, just as honest; the
+player who remembers these flinches at the fourth.) Three identical honest things
 open the level; three identical honest things (the catch-pits of beat g) close it.
 
 ### b · The West Magazines
