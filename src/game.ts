@@ -13,7 +13,7 @@ import { MapScreen } from './map/screen';
 import { renderWorld, type Scene, type WorldText } from './render/scene';
 import { DevTools } from './dev/tools';
 import type { RulerView } from './dev/ruler';
-import { ART_SCALE, DEATH_SOUND, DT, overlaps, TILE, VIEW_H, VIEW_W, type DeathCause } from './engine/types';
+import { ART_SCALE, DEATH_SOUND, DT, overlaps, TILE, VIEW_H, VIEW_W, type DeathCause, type Rect } from './engine/types';
 
 /** How long a death plays before the reset. The world keeps moving through it. */
 const DEATH_TIME = 0.75;
@@ -24,8 +24,9 @@ type State = 'playing' | 'dead' | 'complete';
 type Screen = 'map' | 'level';
 
 /**
- * The tools for building the game (src/dev/): a ruler, and the point under the
- * pointer. Every build has them but prod, which does not even carry the code.
+ * The tools for building the game (src/dev/): a ruler, the point under the
+ * pointer, and a way to put the tourist anywhere. Every build has them but prod,
+ * which does not even carry the code.
  */
 const DEV_TOOLS = __BUILD_ENV__ !== 'prod';
 
@@ -110,8 +111,10 @@ export class Game {
 
   private stats: Stats = { total: 0, byCause: new Map(), lifetime: readLifetime() };
 
-  /** The ruler and the pointer readout. Null in prod. */
+  /** The ruler, the pointer readout and the teleport. Null in prod. */
   private readonly dev: DevTools | null;
+  /** Where the dev tools start this level from instead of its spawn. Always null in prod. */
+  private devStart: { x: number; y: number } | null = null;
 
   private acc = 0;
   private last = 0;
@@ -132,7 +135,12 @@ export class Game {
     this.wctx = wctx;
 
     this.input = new Input(window);
-    this.dev = DEV_TOOLS ? new DevTools(canvas) : null;
+    this.dev = DEV_TOOLS
+      ? new DevTools(canvas, {
+          camera: () => (this.screen === 'level' ? this.camera : null),
+          startAt: (x, feetY) => this.startAt(x, feetY),
+        })
+      : null;
     window.addEventListener('keydown', (e) => {
       this.audio.unlock();
       if (e.code === 'KeyM' && !e.repeat) this.audio.toggleMute();
@@ -316,6 +324,7 @@ export class Game {
     this.audio.setMusic(sound.track);
     this.audio.setRoom(sound.room);
     this.camera = new Camera(this.level.widthPx, data.cameraBottom);
+    this.devStart = null;
     this.titleTimer = TITLE_TIME;
     this.showLampKey();
     try {
@@ -335,8 +344,11 @@ export class Game {
     this.coins = [];
     this.time = 0;
     this.audio.stopLoops();
-    this.player.spawnAt(d.spawn.x, d.spawn.y);
+    const start = this.devStart ?? d.spawn;
+    this.player.spawnAt(start.x, start.y);
     this.camera.reset();
+    // Started somewhere else by the dev tools: the camera settles on him before the first frame.
+    if (this.devStart) for (let i = 0; i < 200; i++) this.camera.update(this.player);
     this.arriving = false;
     this.lampOn = false;
     this.lampOff = false;
@@ -345,6 +357,27 @@ export class Game {
     // A new attempt has not died of anything yet.
     this.deathCause = 'Fall';
     this.state = 'playing';
+  }
+
+  /**
+   * The dev tools' teleport. The level starts again with the tourist's feet at a
+   * world point, and every death brings him back there until the level is left.
+   * Everything else starts the way it always does: the traps behind him never
+   * fired, and any that fire from a line he now starts past fire at once.
+   */
+  private startAt(x: number, feetY: number): void {
+    const p = this.player;
+    const at = { x: Math.min(this.level.widthPx - p.w, Math.max(0, Math.round(x - p.w / 2))), y: feetY - p.h };
+    // Put down inside rock, he stands on top of it rather than in it, however tall it is.
+    const hits: Rect[] = [];
+    for (;;) {
+      hits.length = 0;
+      this.level.solidTilesIn({ x: at.x, y: at.y, w: p.w, h: p.h }, hits);
+      if (!hits.length || at.y <= 0) break;
+      at.y = Math.min(...hits.map((r) => r.y)) - p.h;
+    }
+    this.devStart = at;
+    this.resetLevel();
   }
 
   private resetRun(): void {
@@ -386,6 +419,11 @@ export class Game {
       // Turning to another page of the brochure changes what it is playing. Cheap
       // to ask every frame: setMusic does nothing when the answer has not changed.
       this.audio.setMusic(this.mapMusic());
+      this.input.flush();
+      return;
+    }
+    // The dev tools are looking along the level: nothing moves until they stop.
+    if (this.dev?.paused) {
       this.input.flush();
       return;
     }

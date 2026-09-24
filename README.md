@@ -50,6 +50,14 @@ px from the start of the level; Y is px above the floor the tourist spawns on, n
 below it. G hides them. The world counts y downward, so `(X, Y)` is the world pixel at
 x = X, y = spawn floor − Y.
 
+To put the tourist anywhere: the mouse wheel looks along the level (Alt+wheel up and
+down it) and the game stands still while it does; Shift+click starts the level again with
+him standing on that point, and every death brings him back there until you leave the
+level. Any key stops looking and puts the view back; Escape does only that. This is for
+replaying one trap, not for judging a level: traps behind the point never fired, and one
+that fires from a line he now starts past fires at once. The playthrough tests judge a
+level.
+
 They live in `src/dev/` and never reach a player. dev and main are one history, so the
 source goes to main when dev is promoted; the code does not go to prod. The prod build
 refuses to finish if anything from `src/dev/` is in its bundle, and CI builds prod on every

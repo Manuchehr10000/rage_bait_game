@@ -5,7 +5,8 @@ export class Camera {
   x = 0;
   y = 0;
 
-  constructor(private levelW: number, private levelH: number) {}
+  /** `levelH` is the lowest world y it will show: a level's cameraBottom, not its height. */
+  constructor(readonly levelW: number, readonly levelH: number) {}
 
   reset(): void {
     this.x = 0;

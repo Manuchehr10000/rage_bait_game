@@ -341,3 +341,186 @@ test('where the clipboard refuses or is missing, the label says not copied, and 
   await page.mouse.click(at.x, at.y);
   await expect.poll(() => label(page)).toMatch(/ not copied$/);
 });
+
+/** Shift+click on a world pixel that is on screen, with a frame drawn first so the tools know the view. */
+async function shiftClick(page: Page, wx: number, wy: number): Promise<void> {
+  await hover(page, wx, wy);
+  const at = await mouseAt(page, wx, wy);
+  await page.keyboard.down('Shift');
+  await page.mouse.click(at.x, at.y);
+  await page.keyboard.up('Shift');
+}
+
+const ticks = (page: Page, n: number) =>
+  page.evaluate((n) => {
+    const g = (window as unknown as W).__game;
+    for (let i = 0; i < n; i++) g.tick();
+  }, n);
+
+const tourist = (page: Page) =>
+  page.evaluate(() => {
+    const g = (window as unknown as W).__game;
+    const p = g.player;
+    return {
+      midX: Math.round(p.x + p.w / 2),
+      feet: Math.round(p.y + p.h),
+      onGround: p.onGround as boolean,
+      camX: g.camera.ix as number,
+      camY: g.camera.iy as number,
+      deaths: g.stats.total as number,
+      time: g.time as number,
+      paused: g.dev.paused as boolean,
+      floor: g.levelData.spawn.y + p.h,
+    };
+  });
+
+test('Shift+click starts the level with him standing there, and a death brings him back there', async ({ page }) => {
+  await open(page, 'karnak');
+  const floor = (await tourist(page)).floor;
+  // A pixel of the floor he spawns on, most of a screen to the right of him.
+  await shiftClick(page, 250, floor);
+  let t = await tourist(page);
+  expect(t.midX).toBe(250);
+  expect(t.feet).toBe(floor);
+  await ticks(page, 30);
+  t = await tourist(page);
+  expect(t.onGround, 'standing, not falling').toBe(true);
+  expect(t.feet).toBe(floor);
+  expect(t.midX).toBe(250);
+
+  // R gives up: a death like any other, and back to the same spot, not the level's start.
+  await page.keyboard.press('KeyR');
+  await ticks(page, 90);
+  t = await tourist(page);
+  expect(t.deaths).toBe(1);
+  expect(t.midX).toBe(250);
+  expect(t.feet).toBe(floor);
+});
+
+test('put down inside rock he stands on top of it, however tall it is', async ({ page }) => {
+  await open(page, 'karnak');
+  const floor = (await tourist(page)).floor;
+  await shiftClick(page, 200, floor + 8); // eight pixels down into the ground
+  let t = await tourist(page);
+  expect(t.feet).toBe(floor);
+  expect(t.midX).toBe(200);
+
+  // The first pylon: solid stone from the floor up, far taller than he is (the face
+  // before it is a picture over a gap). Put down at its foot, he stands on its top.
+  // The top is read from the tiles, not the formula.
+  await page.evaluate(() => {
+    (window as unknown as W).__game.camera.x = 700;
+  });
+  const top = await page.evaluate(() => {
+    const g = (window as unknown as W).__game;
+    const L = g.level;
+    const row = Math.floor((g.levelData.spawn.y + g.player.h) / 16);
+    // Every column he would stand across, 895..904, is solid all the way up from the floor.
+    let r = row;
+    while ([895, 904].every((x) => L.isSolid(Math.floor(x / 16), r - 1))) r--;
+    return r * 16;
+  });
+  expect(floor - top, 'the pylon is taller than four tiles').toBeGreaterThan(64);
+  await shiftClick(page, 900, floor);
+  t = await tourist(page);
+  expect(t.midX).toBe(900);
+  expect(t.feet).toBe(top);
+});
+
+test('the wheel looks along the level while nothing moves, and any key puts the view back', async ({ page }) => {
+  await open(page, 'cap-blanc');
+  await hover(page, 100, 200);
+  const before = await tourist(page);
+  expect(before.camX).toBe(0);
+
+  await page.mouse.wheel(0, 400); // four notches: 200 world px along
+  let t = await tourist(page);
+  expect(t.camX).toBe(200);
+  expect(t.paused).toBe(true);
+  await page.keyboard.down('ArrowRight');
+  await page.keyboard.up('ArrowRight');
+  t = await tourist(page);
+  expect(t.paused, 'a key stops looking').toBe(false);
+  expect(t.camX, 'and the view goes back').toBe(before.camX);
+
+  // While looking the game stands still: no time passes, he does not move, the camera stays put.
+  await page.mouse.wheel(0, 400);
+  const held = await tourist(page);
+  await ticks(page, 60);
+  t = await tourist(page);
+  expect(t.time).toBe(held.time);
+  expect(t.midX).toBe(held.midX);
+  expect(t.camX).toBe(200);
+
+  // Escape only stops looking: no death, still in the level.
+  await page.keyboard.press('Escape');
+  await ticks(page, 90);
+  t = await tourist(page);
+  expect(t.paused).toBe(false);
+  expect(t.deaths).toBe(0);
+  expect(await page.evaluate(() => (window as unknown as W).__game.currentScreen)).toBe('level');
+});
+
+test('looking far along and Shift+clicking there puts him there', async ({ page }) => {
+  await open(page, 'cap-blanc');
+  const floor = (await tourist(page)).floor;
+  await hover(page, 100, 200);
+  // The far floor past the trench, beyond the first screen.
+  await page.mouse.wheel(0, 2000);
+  const t0 = await tourist(page);
+  expect(t0.camX).toBeGreaterThan(900);
+  const far = await page.evaluate(() => {
+    const g = (window as unknown as W).__game;
+    const L = g.level;
+    const row = Math.floor((g.levelData.spawn.y + g.player.h) / 16);
+    // The first ground column on screen that is solid at the spawn floor's row.
+    for (let x = g.camera.ix + 40; x < g.camera.ix + 300; x += 16) if (L.isSolid(Math.floor(x / 16), row) && !L.isSolid(Math.floor(x / 16), row - 1)) return x + 8;
+    return null;
+  });
+  expect(far).not.toBeNull();
+  await shiftClick(page, far!, floor);
+  const t = await tourist(page);
+  expect(t.paused).toBe(false);
+  expect(t.midX).toBe(far);
+  expect(t.feet).toBe(floor);
+  expect(t.camX, 'the camera is on him').toBeGreaterThan(far! - 320);
+  expect(t.camX).toBeLessThanOrEqual(far!);
+});
+
+test('Alt+wheel looks up and down a tall level', async ({ page }) => {
+  await open(page, 'pech-merle');
+  await hover(page, 100, 200);
+  const y0 = (await tourist(page)).camY;
+  await page.keyboard.down('Alt');
+  await page.mouse.wheel(0, -200);
+  await page.keyboard.up('Alt');
+  const t = await tourist(page);
+  expect(t.camY).toBe(Math.max(0, y0 - 100));
+  expect(t.camX).toBe(0);
+  expect(t.paused).toBe(true);
+});
+
+test('leaving the level forgets the spot; hidden with G, neither the wheel nor Shift+click does anything', async ({ page }) => {
+  await open(page, 'karnak');
+  const floor = (await tourist(page)).floor;
+  await shiftClick(page, 250, floor);
+  expect((await tourist(page)).midX).toBe(250);
+  const spawnMid = await page.evaluate(() => {
+    const g = (window as unknown as W).__game;
+    g.loadLevel(g.levelIndex);
+    return Math.round(g.levelData.spawn.x + g.player.w / 2);
+  });
+  expect((await tourist(page)).midX).toBe(spawnMid);
+
+  await toggle(page); // hidden
+  const at = await mouseAt(page, 250, floor);
+  await page.mouse.move(at.x, at.y);
+  await page.mouse.wheel(0, 400);
+  await page.keyboard.down('Shift');
+  await page.mouse.click(at.x, at.y);
+  await page.keyboard.up('Shift');
+  const t = await tourist(page);
+  expect(t.paused).toBe(false);
+  expect(t.camX).toBe(0);
+  expect(t.midX).toBe(spawnMid);
+});

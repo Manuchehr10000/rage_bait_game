@@ -181,3 +181,22 @@ function renderReadout(
   ctx.textBaseline = 'middle';
   ctx.fillText(text, bx + pad, by + h / 2);
 }
+
+/** A line of dev text across the top right, where nothing of the game's own is drawn but the sky. */
+export function renderBanner(ctx: CanvasRenderingContext2D, scale: number, text: string): void {
+  const s = scale;
+  ctx.save();
+  ctx.font = `${4.5 * s}px ${FONT}`;
+  const pad = 1.5 * s;
+  const w = ctx.measureText(text).width + 2 * pad;
+  const h = 6.5 * s;
+  const x = VIEW_W * s - w - 2 * s;
+  const y = 2 * s;
+  ctx.fillStyle = EDGE;
+  ctx.fillRect(x, y, w, h);
+  ctx.fillStyle = INK;
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(text, x + pad, y + h / 2);
+  ctx.restore();
+}
