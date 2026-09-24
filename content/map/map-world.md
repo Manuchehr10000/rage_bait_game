@@ -21,9 +21,9 @@ line pretending to mean something.
 
 ## Where it stands in the game
 
-The first thing every player sees. Behind the chapter markers: a numbered badge for a
-chapter that can be entered, a faint dot for one that cannot, and a single dotted leg
-from the previous chapter to the selected one. There is no route through all twelve;
+The first thing every player sees. Behind the chapter markers: a badge for a chapter
+that can be entered and a faint dot for one that cannot. No line joins one chapter to
+another, not even the leg from the previous chapter to the selected one;
 `content/map/README.md` says why.
 
 ## Must be right

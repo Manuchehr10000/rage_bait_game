@@ -310,3 +310,102 @@ test('every chapter shows its painted plate in the panel, not the flat fallback'
   // 156. 200 sits clear of both.
   for (const [i, n] of colours.entries()) expect(n, `chapter ${i + 1}`).toBeGreaterThan(200);
 });
+
+test('the world draws no line from one chapter to the next', async ({ page }) => {
+  const red = await page.evaluate(() => {
+    type P = { x: number; y: number };
+    const g = (
+      window as unknown as {
+        __game: {
+          mapScreen: { view: string; chapter: number; worldBadge(i: number): P; touristRect(): { x: number; y: number; w: number; h: number } };
+          scale: number;
+          draw(): void;
+        };
+      }
+    ).__game;
+    const m = g.mapScreen;
+    const canvas = document.querySelector('#game') as HTMLCanvasElement;
+    const ctx = canvas.getContext('2d')!;
+    const s = g.scale;
+    const badges = Array.from({ length: 12 }, (_, i) => m.worldBadge(i));
+    const out: string[] = [];
+    // Every chapter selected in turn, with the stretch between it and the one
+    // before sampled for the route's red: clear of every badge and its pulse,
+    // and of the tourist, whose costume may be red.
+    for (let c = 1; c < 12; c++) {
+      m.view = 'world';
+      m.chapter = c;
+      g.draw();
+      const d = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+      const t = m.touristRect();
+      const a = badges[c - 1]!;
+      const b = badges[c]!;
+      const len = Math.hypot(b.x - a.x, b.y - a.y);
+      let n = 0;
+      for (let k = 0; k <= len * 4; k++) {
+        const x = a.x + ((b.x - a.x) * k) / (len * 4);
+        const y = a.y + ((b.y - a.y) * k) / (len * 4);
+        if (badges.some((p) => Math.hypot(p.x - x, p.y - y) < 10)) continue;
+        if (x > t.x - 1 && x < t.x + t.w + 1 && y > t.y - 1 && y < t.y + t.h + 1) continue;
+        const i = (Math.floor(y * s) * canvas.width + Math.floor(x * s)) * 4;
+        const [r, gr, bl] = [d[i]!, d[i + 1]!, d[i + 2]!];
+        if (r - gr > 40 && r - bl > 40) n++;
+      }
+      if (n > 0) out.push(`chapter ${c} to ${c + 1}: ${n}`);
+    }
+    return out;
+  });
+  expect(red).toEqual([]);
+});
+
+test('in a chapter every pin carries its number, the same as its bead on the ribbon', async ({ page }) => {
+  const printed = await page.evaluate(() => {
+    type P = { x: number; y: number };
+    const g = (
+      window as unknown as {
+        __game: {
+          mapScreen: { current: { sites: { level?: string }[] }; site: number; openChapter(i: number): void; sitePin(i: number): P };
+          scale: number;
+          draw(): void;
+        };
+      }
+    ).__game;
+    const m = g.mapScreen;
+    const ctx = (document.querySelector('#game') as HTMLCanvasElement).getContext('2d')!;
+    const s = g.scale;
+    const out: Record<string, string> = {};
+    const fillText = ctx.fillText.bind(ctx);
+    let seen: { text: string; x: number; y: number }[] = [];
+    ctx.fillText = (text: string, x: number, y: number) => {
+      seen.push({ text, x, y });
+      fillText(text, x, y);
+    };
+    // Chapters 1 and 2, each with every site selected in turn: a pin is a site
+    // with a level, or the selected one; the rest are dots with no number.
+    for (const c of [0, 1]) {
+      m.openChapter(c);
+      for (let sel = 0; sel < m.current.sites.length; sel++) {
+        m.site = sel;
+        seen = [];
+        g.draw();
+        m.current.sites.forEach((site, i) => {
+          const p = m.sitePin(i);
+          const here = seen.filter((w) => Math.abs(w.x - p.x * s) < 0.01 && Math.abs(w.y - (p.y + 0.3) * s) < 0.01).map((w) => w.text);
+          out[`ch${c + 1} sel${sel + 1} site${i + 1}`] = here.join(',') || (site.level || i === sel ? 'none' : 'dot');
+        });
+      }
+    }
+    ctx.fillText = fillText;
+    return out;
+  });
+  for (const [where, text] of Object.entries(printed)) {
+    const [, sel, site] = /sel(\d) site(\d)/.exec(where)!;
+    const isDot = text === 'dot';
+    if (isDot) expect(sel, where).not.toBe(site);
+    else expect(text, where).toBe(site);
+  }
+  // Chapter 2 has three levels: with Abu Simbel selected, Dendera and Saqqara are dots.
+  expect(printed['ch2 sel1 site4']).toBe('dot');
+  expect(printed['ch2 sel1 site5']).toBe('dot');
+  expect(printed['ch2 sel4 site4']).toBe('4');
+});

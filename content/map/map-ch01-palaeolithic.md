@@ -13,7 +13,10 @@ The south-west of France as the chapter's own brochure page: from Roc-aux-Sorcie
 Anglin in the north to Gargas in the Pyrenean foothills in the south, with the Dordogne
 caves between them. The Atlantic coast and the Gironde at the left edge, the Pyrenees
 along the bottom. No pins, no route, no words. The game draws the site markers where the
-sites really are; their order is the ribbon's business, not the map's.
+sites really are, each numbered like its bead on the ribbon, and a single dotted leg from
+the previous site to the selected one; the order is the ribbon's business, not the map's,
+so no route is drawn through them all. Cap Blanc, Rouffignac and Pech Merle sit so close
+that their pins are nudged off their true spots, each with a leader line back to it.
 
 ## Where it stands in the game
 

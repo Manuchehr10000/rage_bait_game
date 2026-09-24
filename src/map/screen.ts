@@ -2,11 +2,13 @@
  * The tour map. One screen, three instruments, one job each:
  *
  *   - the map, left, says *where on Earth*, and nothing else. It draws the
- *     paper, the land and a marker per stop, plus at most one dotted leg: the
- *     one from the previous stop to the selected one. There is no route
- *     polyline, because the tour's order is chronological and the map's order
- *     is geographical, and drawing a line through twelve chapters in
- *     chronological order over real coordinates can only ever be a web.
+ *     paper, the land and a marker per stop. The world draws no line between
+ *     chapters at all, because the tour's order is chronological and the map's
+ *     order is geographical, and any line through twelve chapters over real
+ *     coordinates, even one leg of it, is a piece of a web. A chapter draws at
+ *     most one dotted leg, from the previous site to the selected one, and
+ *     numbers its pins the way the ribbon numbers its beads, so the two name a
+ *     site the same way.
  *   - the panel, right, says *what is there*: the chapter, its dates, and a
  *     vignette of one of its own monuments, the way a brochure prints one.
  *   - the ribbon, along the bottom, says *where in the tour you are*: every
@@ -57,6 +59,8 @@ const RIBBON = { y: 152, h: VIEW_H - 152, rule: 166 };
  */
 const TITLE = { x: 6, y: 126, w: 116, h: 21 };
 const HEADER = { x: 6, y: 128, w: 152, h: 19 };
+/** The number printed in a site's pin, centred on it: one digit, old-style figures included. */
+const PIN_DIGIT = { w: 4, h: 6 };
 
 /** The world map's frame in degrees. Equirectangular, which is what brochures use. */
 const WORLD = { lon0: -115, lon1: 150, lat0: 65, lat1: -40 };
@@ -282,8 +286,7 @@ export class MapScreen {
       // In the Indian Ocean: the bottom left corner is the title's now.
       drawCompass(ctx, 158, 112);
     }
-    // At most one leg: where you came from, to where you are standing.
-    this.drawLeg(ctx, this.chapter > 0 ? this.worldBadge(this.chapter - 1) : null, this.worldBadge(this.chapter));
+    // No leg here: from one chapter to the next is a jump in time, not a road.
     CHAPTERS.forEach((c, i) => {
       const p = this.worldBadge(i);
       const selected = i === this.chapter;
@@ -321,7 +324,7 @@ export class MapScreen {
     c.sites.forEach((s, i) => {
       const p = this.sitePin(i);
       const selected = i === this.site;
-      if (!s.level && !selected) {
+      if (!this.hasPin(i)) {
         dot(ctx, p.x, p.y, 1.4, LAND_LINE);
         return;
       }
@@ -339,7 +342,15 @@ export class MapScreen {
     this.drawTourist(ctx, this.sitePin(this.site));
   }
 
-  /** The one dotted line allowed on screen: the leg you just travelled. */
+  /**
+   * A site is a pin when it has a level, or when it is selected; otherwise it is
+   * a dot, and a dot has no room for a number.
+   */
+  private hasPin(i: number): boolean {
+    return i === this.site || !!this.current.sites[i]?.level;
+  }
+
+  /** The one dotted line allowed on screen, in a chapter only: the leg you just travelled. */
   private drawLeg(ctx: CanvasRenderingContext2D, from: { x: number; y: number } | null, to: { x: number; y: number }): void {
     if (!from) return;
     ctx.save();
@@ -373,7 +384,13 @@ export class MapScreen {
 
   /** The words printed on the map, as rectangles. For the test that keeps them apart. */
   wordRects(): { x: number; y: number; w: number; h: number }[] {
-    return [this.view === 'world' ? TITLE : HEADER];
+    if (this.view === 'world') return [TITLE];
+    const numbers = this.current.sites.flatMap((_, i) => {
+      if (!this.hasPin(i)) return [];
+      const p = this.sitePin(i);
+      return [{ x: p.x - PIN_DIGIT.w / 2, y: p.y - PIN_DIGIT.h / 2, w: PIN_DIGIT.w, h: PIN_DIGIT.h }];
+    });
+    return [HEADER, ...numbers];
   }
 
   // -------------------------------------------------------------------
@@ -499,6 +516,17 @@ export class MapScreen {
       ctx.fillStyle = INK_SOFT;
       ctx.fillText(c.dates, px, 34 * s);
     } else {
+      // A number in every pin, the same as its bead's on the ribbon. Before the
+      // header, so a pin under the label is covered whole, number and all.
+      ctx.textAlign = 'center';
+      ctx.font = `bold ${5 * s}px ${FONT}`;
+      for (let i = 0; i < c.sites.length; i++) {
+        if (!this.hasPin(i)) continue;
+        const p = this.sitePin(i);
+        ctx.fillStyle = i === this.site || this.siteCleared(i) ? CARD : ROUTE;
+        ctx.fillText(String(i + 1), p.x * s, (p.y + 0.3) * s);
+      }
+      ctx.textAlign = 'left';
       labelBox(ctx, s, HEADER.x, HEADER.y, [
         { text: `CHAPTER ${c.number} · ${c.name.toUpperCase()}`, font: `bold ${6 * s}px ${FONT}`, color: INK },
         { text: c.dates, font: `italic ${5 * s}px ${FONT}`, color: INK_SOFT },

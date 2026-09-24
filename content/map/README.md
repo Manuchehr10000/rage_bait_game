@@ -8,12 +8,14 @@ question:
   Ocean, because the tourist stands on the selected marker with his head a good deal
   above it and the top left of a world map is the North Sea, which is where chapter 1
   puts him. A test walks all twelve chapters and all sixty sites and fails if anything
-  printed on the map ends up where he is standing. Paper, land, one marker per
-  stop. Nothing else. There is no route drawn through the chapters, because the tour's
-  order is chronological and the map's order is geographical: France, Egypt, the Aegean,
-  Persia, Italy, Mexico, Cambodia, Japan, Zimbabwe, Samarkand, England, France. A line
-  through those twelve in order, over true coordinates, can only ever be a web. The one
-  line the map is allowed is the leg from the previous stop to the selected one.
+  printed on the map ends up where he is standing, the numbers in the pins included.
+  Paper, land, one marker per stop. Nothing else. The world draws no line between
+  chapters, not even one leg of a route, because the tour's order is chronological and
+  the map's order is geographical: France, Egypt, the Aegean, Persia, Italy, Mexico,
+  Cambodia, Japan, Zimbabwe, Samarkand, England, France. Any line through those twelve,
+  over true coordinates, is a piece of a web. A chapter map is allowed one line, the leg
+  from the previous site to the selected one, and numbers each pin the way the ribbon
+  numbers its bead, so the map and the ribbon name a site the same way.
 - **the panel**, right, 112 × 152: *what is there*. The chapter, its dates, and a
   vignette of one of the chapter's own monuments, the way a brochure prints one.
 - **the ribbon**, along the bottom, 320 × 28: *where in the tour you are*. Every stop on
@@ -25,7 +27,9 @@ question:
 Both views use the same grammar: the world puts the twelve chapters on the ribbon, a
 chapter puts its five sites on it in play order, with their names under the beads.
 A chapter the player cannot enter is a faint dot on the map and a hollow bead on the
-ribbon; the map only ever gets as busy as the game actually is.
+ribbon; the map only ever gets as busy as the game actually is. A site without a level
+is a dot too, and a dot carries no number; it gets its pin and its number only while
+it is selected.
 
 ## What the designer paints
 
