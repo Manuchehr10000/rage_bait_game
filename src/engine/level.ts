@@ -497,11 +497,11 @@ export interface LevelData {
   /**
    * How the tourist comes into the level from the map, or from the exit label of
    * the level before. `walk`, the default: he walks in from off the left edge of
-   * the screen to the spawn, and the controls are his from there. `appear`: he
-   * starts on the spawn, because the level brings him in itself (Philae's boat) or
-   * the visit has already begun (Rouffignac: he has stepped off the train). A retry
-   * always starts on the spawn, so the loop stays fast (pillar 7). Never a drop
-   * from the sky (pillar 13).
+   * the screen, and the controls are his the moment all of him is on it; the level
+   * promises floor from its edge to the spawn. `appear`: he starts on the spawn,
+   * because the level brings him in itself (Philae's boat) or the visit has already
+   * begun (Rouffignac: he has stepped off the train). A retry always starts on the
+   * spawn, so the loop stays fast (pillar 7). Never a drop from the sky (pillar 13).
    */
   arrival?: 'walk' | 'appear';
 }

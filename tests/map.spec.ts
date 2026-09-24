@@ -95,8 +95,9 @@ test('arrow keys walk the chapters; Enter walks into Egypt from the left edge; E
   expect(s.y).toBe(224);
   await ticks(page, 120);
   s = await snap(page);
+  // All of him on the screen, and his to steer; nobody pressed anything, so he stands at the edge.
   expect(s.arriving).toBe(false);
-  expect(s.x).toBe(24);
+  expect(s.x).toBe(0);
   expect(s.y).toBe(224);
   expect(s.onGround).toBe(true);
   expect(s.deaths).toBe(0);

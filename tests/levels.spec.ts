@@ -19,12 +19,24 @@ const each = (fn: (data: LevelData, level: Level) => void) => {
 };
 
 test('every level he walks into has floor from its left edge to the spawn, and nothing in his way', () => {
-  // He walks in from off the left edge at the spawn's height, on no physics: the
-  // level promises the ground under that walk and the air over it (pillar 13). A level
-  // that brings him in itself, or starts him where the visit has begun, says so.
+  // He walks in from off the left edge at the spawn's height and has the controls
+  // from the edge: the level promises the ground under that stretch, the air over it,
+  // and nothing in it that kills (pillar 13). A level that brings him in itself, or
+  // starts him where the visit has begun, says so.
   const bad: string[] = [];
   each((data, level) => {
     if (data.arrival === 'appear') return;
+    const right = data.spawn.x + PLAYER_W;
+    const top = data.spawn.y;
+    const bottom = data.spawn.y + PLAYER_H;
+    for (const e of data.entities) {
+      if (e.kind === 'hazard' && e.rect.x < right && e.rect.x + e.rect.w > 0 && e.rect.y < bottom && e.rect.y + e.rect.h > top) {
+        bad.push(`${data.id}: a hazard in the way in, at x = ${e.rect.x}`);
+      }
+      if (e.kind === 'water' && !e.swimmable && e.x0 < right && e.x1 > 0 && e.startY < bottom) {
+        bad.push(`${data.id}: deadly water under the way in, from x = ${e.x0}`);
+      }
+    }
     const feet = Math.floor((data.spawn.y + PLAYER_H) / TILE);
     for (let x = 0; x <= data.spawn.x + PLAYER_W; x += 4) {
       const tx = Math.floor(x / TILE);

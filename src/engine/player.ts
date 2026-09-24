@@ -106,10 +106,10 @@ export class Player implements Rect {
   }
 
   /**
-   * Arriving: he walks in from off the left edge of the screen to where the level
-   * starts him, and the controls are not his yet. No physics, because nothing off
-   * the left edge of a level is solid; the level promises the floor from its edge
-   * to the spawn (tests/levels.spec.ts). True once he is there.
+   * Arriving: he walks in from off the left edge of the screen as far as `toX`,
+   * and the controls are not his yet. No physics, because nothing off the left
+   * edge of a level is solid; the level promises the floor from its edge to the
+   * spawn (tests/levels.spec.ts). True once he is there.
    */
   walkIn(toX: number): boolean {
     this.facing = 1;

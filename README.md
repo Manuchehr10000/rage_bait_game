@@ -38,10 +38,10 @@ next level at the exit label. Esc returns to the map. Open `#cap-blanc`,
 `#karnak` in the URL to start at that level.
 
 A level is entered on foot: from the map or the exit label, the tourist walks in from off
-the left edge of the screen to where the level starts him, and then the controls are his
+the left edge of the screen, and the controls are his as soon as all of him is on it
 (pillar 13). Where the level brings him in itself he starts on it (Philae, by boat), and
 where the visit has already begun he is simply there (Rouffignac, off the train). Retries
-start on the spot.
+start on the spawn.
 
 Dev tools, in every build except prod, so a point on screen can be named: a ruler on the
 edges of a level, and the exact point under the mouse as `(X, Y)`. A click copies it with

@@ -76,8 +76,8 @@ export class Game {
   /** Escape was pressed mid-level: after the death plays, go back to the map. */
   private leaveAfterDeath = false;
   /**
-   * Walking in from the left edge, not yet on the spawn: the level runs, the
-   * controls are not his. Only on the way in from the map or the level before
+   * Walking in from off the left edge, not yet all on the screen: the level runs,
+   * the controls are not his. Only on the way in from the map or the level before
    * (pillar 13); never on a retry.
    */
   private arriving = false;
@@ -198,7 +198,7 @@ export class Game {
     if (key) key.hidden = !(this.screen === 'level' && this.lampLife !== undefined);
   }
 
-  /** True while the tourist is still walking in from the left edge. For tests. */
+  /** True while the tourist is still walking in from off the left edge. For tests. */
   get isArriving(): boolean {
     return this.arriving;
   }
@@ -471,15 +471,17 @@ export class Game {
     }
 
     if (this.arriving) {
-      // He is not in the level yet. The level runs, so a boat can be under way and a
-      // sun can be on its schedule, but every trap fires from where he is, and he is
-      // not there. A key pressed on the way in is not a jump owed at the spawn.
+      // He is not on the screen yet. The level runs, so a boat can be under way and
+      // a sun can be on its schedule, but every trap fires from where he is, and he
+      // is not there. The controls are his the moment all of him is on the screen:
+      // the spawn is where a retry starts, not a mark he has to be walked to. A key
+      // pressed on the way in is not a jump owed at the edge.
       this.input.takeJumpPressed();
       for (const e of this.entities) {
         e.update(world);
         if (this.state !== 'playing') return;
       }
-      if (this.player.walkIn(this.level.data.spawn.x)) this.arriving = false;
+      if (this.player.walkIn(0)) this.arriving = false;
       if (this.player.justStepped) this.audio.play('step');
       this.camera.update(this.player);
       this.driveLoops();

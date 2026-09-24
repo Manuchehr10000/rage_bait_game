@@ -50,12 +50,13 @@ these bent, the idea is wrong, not the rule.
     and engineering are. Ambiguous sites are flagged in `content/research/arc.md` and
     need a designer ruling before any production; a level designer never decides alone.
 13. **The tourist arrives on foot.** From the map, or from the exit label of the level
-    before, he walks in from off the left edge of the screen to where the level starts
-    him, and the controls are his from there. He is never dropped in from the sky. Where
-    the level brings him in itself he starts on it (Philae: the boat), and where the
-    visit has already begun he is simply there (Rouffignac: he has stepped off the
-    train). A retry always starts on the spot, so the loop stays fast (pillar 7). The
-    choice is `arrival` in the level's data.
+    before, he walks in from off the left edge of the screen, and the controls are his
+    the moment all of him is on it: no cutscene, and the level keeps its left edge safe
+    as far as the spawn. He is never dropped in from the sky. Where the level brings him
+    in itself he starts on it (Philae: the boat), and where the visit has already begun
+    he is simply there (Rouffignac: he has stepped off the train). A retry always starts
+    on the spawn, so the loop stays fast (pillar 7). The choice is `arrival` in the
+    level's data.
 
 The chapters, their sites, periods and costumes are fixed by `content/research/arc.md`.
 Read it before touching any of them.

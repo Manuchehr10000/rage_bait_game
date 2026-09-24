@@ -56,8 +56,7 @@ const BOTTOM = px(30);
 const EXIT_X = px(124);
 
 const g = new Grid(W, H);
-g.fill(0, 0, W, 2, '#'); // the roof
-g.fill(0, 0, 5, 2, ' '); // the mouth. The tour comes in from above, and so does he
+g.fill(0, 0, W, 2, '#'); // the roof. The way in is the door at the left, at floor level (pillar 13)
 g.fill(0, 30, W, 2, '%'); // the floor of the lower gallery, a long way down
 
 // a: the upper gallery. Clay with concrete laid on it, and one hole to hop. The
