@@ -8,7 +8,7 @@ touched the switch has no light of his own left by now; one who saved some can s
 it.
 
 The wall: rock with four cracks across it, a splinter of bone pushed into one of them.
-About a hundred negative hands on it, the wall sprayed round each hand so the hand is the
+Some eighty negative hands on it, the wall sprayed round each hand so the hand is the
 bare rock: adults' hands high, children's low; black and red, and one yellow near the
 right-hand end. About half of them are short of fingers, and none of them of the thumb: the
 commonest pattern is all four fingers short with the thumb whole. Nothing else. There is no
@@ -23,11 +23,12 @@ short the commonest pattern; no finger left standing alone or in a rude sign (a 
 finger, the V, the corna); the hand is the rock colour and the halo is the pigment; the lower
 portal is the way out.
 
-**Deliberately wrong:** the daylight reaches it. The count is about a hundred where the
-sources say 137 on this wall. The arrangement is the level's. Every short hand has all four
+**Deliberately wrong:** the daylight reaches it. The count is some eighty where the
+sources say 137 on this wall. The arrangement is the level's: staggered rows with gaps, so
+that no hand runs into another and each one reads as a hand at this size. Every short hand has all four
 fingers short alike, the commonest pattern, where the site has about ten: the others are not
 in any source the game has, and a guessed pattern risks a rude sign. On the wall as placed
-today: 66 black, 38 red, 1 yellow; 50 hands short, 17 of them children's.
+today: 82 hands, 52 black, 29 red, 1 yellow; 40 short, 11 of them children's.
 
 **Never in a pixel:** why the fingers are short. Amputation, frostbite and disease, and
 fingers folded on purpose are all live, and the research forbids stating any of them
@@ -36,5 +37,7 @@ fingers folded on purpose are all live, and the research forbids stating any of 
 No new art. The wall and its hands are a panel drawn by the game.
 
 Which hands, their colours and their fingers are in `src/render/hands.ts`, and
-`tests/hands.spec.ts` holds the wall to this note: black above red, one yellow, about half
-short, and no short hand with a finger left whole.
+`tests/hands.spec.ts` holds the wall to this note: black above red, one yellow near the
+right-hand end, about half short, no short hand with a finger left whole, children below
+adults, and no hand running into another. The yellow halo is painted after the others and
+every hand after every halo, so none is painted over.

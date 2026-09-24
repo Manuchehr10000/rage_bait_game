@@ -48,7 +48,7 @@ import {
 import { DEATH_ANIM, TILE, VIEW_H, VIEW_W, type Costume, type DeathCause, type Rect } from '../engine/types';
 import { paint } from '../engine/assets';
 import { blit, blitFacing, frameOf, silhouette, withLamp, type Frame } from './frame';
-import { handStencils } from './hands';
+import { SPLINTER, handStencils } from './hands';
 import { hash } from './hash';
 import { TRAIN, type Train } from '../engine/entities';
 import type { CavePanel } from '../engine/level';
@@ -2193,22 +2193,28 @@ function drawHands(ctx: CanvasRenderingContext2D, r: Rect): void {
   for (let y = r.y + 6; y < r.y + r.h + 6; y += 15) {
     for (let x = r.x - 6; x < r.x + r.w + 8; x += 31) ctx.fillRect(x + (hash(x, y) % 3), y + (hash(y, x) % 3), 8 + (hash(x + y, y) % 12), 1);
   }
-  // The cracks, and a splinter of bone pushed into one of them.
+  // The cracks. The splinter of bone pushed into one of them goes on after the pigment.
   ctx.fillStyle = COLORS.caveLine;
   for (let i = 0; i < 4; i++) {
     const cx0 = r.x + 20 + i * 74;
     for (let j = 0; j < 14; j++) ctx.fillRect(cx0 + ((hash(i, j) % 3) - 1) + Math.floor(j / 3), r.y + 2 + j * 3, 1, 3);
   }
-  ctx.fillStyle = COLORS.calciteLit;
-  ctx.fillRect(r.x + 21, r.y + 17, 1, 4);
-  // The hands. Adults above, children below.
+  // The hands. Adults above, children below. Every halo first, the yellow one
+  // last, and then every hand, so that no hand is painted over.
   const HALO = { black: COLORS.manganese, red: COLORS.ochreRed, yellow: '#c9a23a' };
-  for (const hand of handStencils(r)) {
-    const { x, y, w, tall } = hand;
+  const hands = handStencils(r);
+  const halos = [...hands.filter((h) => h.pigment !== 'yellow'), ...hands.filter((h) => h.pigment === 'yellow')];
+  for (const { x, y, w, tall, pigment } of halos) {
     // The halo of blown pigment.
-    ctx.fillStyle = HALO[hand.pigment];
+    ctx.fillStyle = HALO[pigment];
     ctx.fillRect(x - 3, y - 2, w + 6, tall + 8);
     ctx.fillRect(x - 4, y, w + 8, tall + 4);
+  }
+  // The splinter of bone in the first crack, beside the hands the bone was dated with.
+  ctx.fillStyle = COLORS.calciteLit;
+  ctx.fillRect(r.x + SPLINTER.dx, r.y + SPLINTER.dy, SPLINTER.w, SPLINTER.h);
+  for (const hand of hands) {
+    const { x, y, w, tall } = hand;
     // The hand, which is the rock: a palm, a whole thumb and four fingers.
     ctx.fillStyle = COLORS.cave;
     ctx.fillRect(x, y + 3, w, tall - 1); // palm
