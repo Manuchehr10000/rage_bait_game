@@ -524,3 +524,166 @@ test('leaving the level forgets the spot; hidden with G, neither the wheel nor S
   expect(t.camX).toBe(0);
   expect(t.midX).toBe(spawnMid);
 });
+
+test('the predicted running jump is the jump he actually makes', async ({ page }) => {
+  await open(page, 'karnak');
+  const result = await page.evaluate(() => {
+    const g = (window as unknown as W).__game;
+    g.dev.overlay = true;
+    g.draw();
+    const run = g.dev.arcs.find((a: { kind: string; points: { x: number }[] }) => a.kind === 'run' && a.points[1]!.x > a.points[0]!.x);
+    // The real thing: at run speed, jump held, from the same spot.
+    const p = g.player;
+    p.vx = 90;
+    const key = (code: string, down: boolean) => window.dispatchEvent(new KeyboardEvent(down ? 'keydown' : 'keyup', { code }));
+    key('ArrowRight', true);
+    key('Space', true);
+    const flown = [{ x: p.x + p.w / 2, y: p.y + p.h }];
+    for (let i = 0; i < run.points.length - 1; i++) {
+      g.tick();
+      flown.push({ x: p.x + p.w / 2, y: p.y + p.h });
+    }
+    key('ArrowRight', false);
+    key('Space', false);
+    return { predicted: run.points, flown, end: run.end };
+  });
+  expect(result.predicted.length).toBeGreaterThan(20);
+  expect(result.flown).toEqual(result.predicted);
+  expect(result.end).toBe('land');
+});
+
+test('off the first pylon at Karnak, walking down is safe and a running jump is not', async ({ page }) => {
+  // PHYS.fatalFall's own notes: the walk off the pylon into the court is 176 px and
+  // free; a jump off it adds its height, 238, and kills. The overlay must agree.
+  await open(page, 'karnak');
+  const floor = (await tourist(page)).floor;
+  await page.evaluate(() => {
+    (window as unknown as W).__game.camera.x = 700;
+  });
+  await shiftClick(page, 900, floor); // lands him on the pylon's top
+  const arcs = await page.evaluate(() => {
+    const g = (window as unknown as W).__game;
+    g.dev.overlay = true;
+    for (let i = 0; i < 5; i++) g.tick();
+    g.draw();
+    return g.dev.arcs.map((a: { kind: string; end: string; points: { x: number }[] }) => ({
+      kind: a.kind,
+      dir: Math.sign(a.points[a.points.length - 1]!.x - a.points[0]!.x),
+      end: a.end,
+    }));
+  });
+  expect(arcs).toContainEqual({ kind: 'run', dir: 1, end: 'kill' });
+  expect(arcs).toContainEqual({ kind: 'stand', dir: 0, end: 'land' });
+  // And the real walk off agrees: he comes down in the court alive. (The court's
+  // scarab walks at him the moment he is there; that is its business, not the drop's.)
+  const walked = await page.evaluate(() => {
+    const g = (window as unknown as W).__game;
+    const p = g.player;
+    window.dispatchEvent(new KeyboardEvent('keydown', { code: 'ArrowRight' }));
+    let landed = false;
+    for (let i = 0; i < 180 && !landed; i++) {
+      const wasUp = !p.onGround;
+      g.tick();
+      landed = wasUp && p.onGround && p.y + p.h > 200;
+    }
+    window.dispatchEvent(new KeyboardEvent('keyup', { code: 'ArrowRight' }));
+    return { landed, feet: Math.round(p.y + p.h), state: g.state as string };
+  });
+  expect(walked).toEqual({ landed: true, feet: floor, state: 'playing' });
+});
+
+test('H draws the liars orange and the honest green: the ten horses at Cap Blanc', async ({ page }) => {
+  await open(page, 'cap-blanc');
+  const drawn = await page.evaluate(() => {
+    const g = (window as unknown as W).__game;
+    const boxes: { x: number; y: number; color: string }[] = [];
+    const proto = CanvasRenderingContext2D.prototype;
+    const strokeRect = proto.strokeRect;
+    proto.strokeRect = function (this: CanvasRenderingContext2D, x: number, y: number, w: number, h: number) {
+      boxes.push({ x: Math.round(x), y: Math.round(y), color: String(this.strokeStyle) });
+      strokeRect.call(this, x, y, w, h);
+    };
+    const verdicts: { trick: string; color: string | undefined }[] = [];
+    try {
+      window.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyH' }));
+      for (const e of g.entities.filter((e: { def: { kind: string } }) => e.def.kind === 'horse')) {
+        const r = e.def.rect;
+        g.camera.x = Math.max(0, r.x - 100);
+        boxes.length = 0;
+        g.draw();
+        const s = g.scale;
+        const at = boxes.filter((b) => b.x === Math.round((r.x - g.camera.ix) * s + 0.5) && b.y === Math.round((r.y - g.camera.iy) * s + 0.5));
+        verdicts.push({ trick: e.def.trick, color: at[at.length - 1]?.color });
+      }
+    } finally {
+      proto.strokeRect = strokeRect;
+    }
+    return verdicts;
+  });
+  expect(drawn).toHaveLength(10);
+  for (const v of drawn) expect(v.color, v.trick).toBe(v.trick === 'none' ? '#5fd35f' : '#ff8c1a');
+});
+
+test('T runs the game at a quarter speed, and only while the tools are shown', async ({ page }) => {
+  await open(page, 'karnak');
+  const ticked = (page: Page) =>
+    page.evaluate(() => {
+      const g = (window as unknown as W).__game;
+      g.draw(); // the tools know they are over a level
+      const t0 = g.time;
+      g.last = 1000;
+      g.acc = 0;
+      g.frame(1200); // 0.2 s of real time
+      return Math.round((g.time - t0) * 60);
+    });
+  expect(await ticked(page)).toBe(12);
+  await page.keyboard.press('KeyT');
+  expect(await ticked(page)).toBe(3);
+  await page.keyboard.press('KeyG'); // hidden: the game as a player has it
+  expect(await ticked(page)).toBe(12);
+});
+
+test('P stops the game, full stop moves it on one tick, P again lets it go', async ({ page }) => {
+  await open(page, 'karnak');
+  const time = () => page.evaluate(() => Math.round((window as unknown as W).__game.time * 60));
+  await page.keyboard.press('KeyP');
+  const t0 = await time();
+  await ticks(page, 30);
+  expect(await time()).toBe(t0);
+  await page.keyboard.press('Period');
+  await ticks(page, 30);
+  expect(await time(), 'one tick for one press').toBe(t0 + 1);
+  await page.keyboard.press('Period');
+  await page.keyboard.press('Period');
+  await ticks(page, 30);
+  expect(await time()).toBe(t0 + 3);
+  // An arrow held while stepping walks him a tick at a time.
+  const x0 = (await tourist(page)).midX;
+  await page.keyboard.down('ArrowRight');
+  for (let i = 0; i < 20; i++) {
+    await page.keyboard.press('Period');
+    await ticks(page, 1);
+  }
+  await page.keyboard.up('ArrowRight');
+  expect((await tourist(page)).midX).toBeGreaterThan(x0);
+  await page.keyboard.press('KeyP');
+  const t1 = await time();
+  await ticks(page, 30);
+  expect(await time()).toBe(t1 + 30);
+});
+
+test('the dev keys do not stop looking, and hiding the tools lets a stopped game go', async ({ page }) => {
+  await open(page, 'cap-blanc');
+  await hover(page, 100, 200);
+  await page.mouse.wheel(0, 400);
+  for (const k of ['KeyH', 'KeyT', 'KeyP', 'Period', 'KeyP', 'KeyT', 'KeyH']) await page.keyboard.press(k);
+  expect((await tourist(page)).paused).toBe(true);
+  expect((await tourist(page)).camX).toBe(200);
+  await page.keyboard.press('Escape');
+  await page.keyboard.press('KeyP');
+  expect((await tourist(page)).paused).toBe(true);
+  await page.keyboard.press('KeyG');
+  const t0 = (await tourist(page)).time;
+  await ticks(page, 10);
+  expect((await tourist(page)).time).toBeGreaterThan(t0);
+});

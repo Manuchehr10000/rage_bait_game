@@ -58,6 +58,18 @@ replaying one trap, not for judging a level: traps behind the point never fired,
 that fires from a line he now starts past fires at once. The playthrough tests judge a
 level.
 
+H draws what a level hides: every line that sets a trap off (yellow), what kills (red),
+what is safe (green), which of the identical things is the liar (orange), moving solids
+(white), and the tourist's hitbox and jumps from where he stands (cyan: a running jump
+each way, and one from a standstill). A jump ends in a green square where it lands and a
+red one where the landing kills; the red line across is how far a walk off his ledge may
+drop. The jumps are flown by the game's own physics on a copy of him, so they are the
+jumps he makes, with moving things frozen as they are and water left out.
+
+T runs the game at a quarter speed. P stops it; full stop then moves it on one tick at a
+time, with whatever keys are held. G, hiding the tools, puts all of this back the way a
+player has it.
+
 They live in `src/dev/` and never reach a player. dev and main are one history, so the
 source goes to main when dev is promoted; the code does not go to prod. The prod build
 refuses to finish if anything from `src/dev/` is in its bundle, and CI builds prod on every

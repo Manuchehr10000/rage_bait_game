@@ -1,5 +1,6 @@
 import type { Camera } from '../engine/camera';
 import { VIEW_H, VIEW_W } from '../engine/types';
+import { predictJumps, renderOverlay, type Arc, type OverlayWorld } from './overlay';
 import { pointText, renderBanner, renderRuler, rulerPoint, type RulerView, type ScreenPoint } from './ruler';
 
 /** How long the label says whether a point was copied, in ms, while the mouse stays on it. */
@@ -9,6 +10,10 @@ const COPIED_FOR = 1500;
 const LOOK_PER_WHEEL_PX = 0.5;
 /** Keys that only change another key. Pressing one does not stop looking: Shift is half of Shift+click. */
 const MODIFIERS = new Set(['Shift', 'Alt', 'Control', 'Meta']);
+/** The dev tools' own keys. None of them is a game key, and none of them stops looking. */
+const DEV_KEYS = new Set(['KeyG', 'KeyH', 'KeyT', 'KeyP', 'Period']);
+/** How fast the game runs slowed down with T. */
+const SLOW = 0.25;
 
 /** What the dev tools may do to the game. The game hands one over; nothing else can reach it. */
 export interface DevHost {
@@ -19,6 +24,8 @@ export interface DevHost {
    * him back there after every death, until the level is left.
    */
   startAt(x: number, feetY: number): void;
+  /** What the overlay reads, or null on the map. */
+  world(): OverlayWorld | null;
 }
 
 /**
@@ -31,6 +38,11 @@ export interface DevHost {
  * Put him anywhere: the wheel looks along the level (Alt+wheel up and down) and
  * the game stands still while it does; Shift+click starts the level again with
  * him standing on that point; any key stops looking and puts the view back.
+ *
+ * H draws what the level hides and how far he can jump from where he stands
+ * (overlay.ts). T runs the game at a quarter speed; P stops it, and full stop
+ * then steps it on by one tick at a time. G, hiding the tools, puts every one of
+ * these back the way a player has it.
  */
 export class DevTools {
   /** G hides everything here, so the level can be seen the way a player sees it. */
@@ -44,6 +56,16 @@ export class DevTools {
   private copied: { point: string; ok: boolean; until: number } | null = null;
   /** Looking along the level: where the camera was when it began, to put it back. Null when not. */
   private looking: { x: number; y: number } | null = null;
+  /** H: triggers, hazards, liars and his jumps drawn over the level. */
+  private overlay = false;
+  /** T: a quarter speed. */
+  private slow = false;
+  /** P: stopped, until P again. Full stop moves it on a tick at a time. */
+  private frozen = false;
+  /** Ticks asked for with full stop while frozen, not yet run. */
+  private steps = 0;
+  /** His jumps as they were when he last stood on something. In the air, the ones he took off with. */
+  private arcs: Arc[] = [];
 
   constructor(
     private readonly canvas: HTMLCanvasElement,
@@ -51,10 +73,19 @@ export class DevTools {
   ) {
     window.addEventListener('keydown', (e) => {
       // Bare G only. Ctrl+G and Cmd+G belong to the browser.
-      if (e.code === 'KeyG' && !e.repeat && !e.ctrlKey && !e.metaKey && !e.altKey) {
+      if (e.repeat || e.ctrlKey || e.metaKey || e.altKey) return;
+      if (e.code === 'KeyG') {
         this.on = !this.on;
         if (!this.on) this.stopLooking();
       }
+      if (!this.on) return;
+      if (e.code === 'KeyH') this.overlay = !this.overlay;
+      if (e.code === 'KeyT') this.slow = !this.slow;
+      if (e.code === 'KeyP') {
+        this.frozen = !this.frozen;
+        this.steps = 0;
+      }
+      if (e.code === 'Period' && this.frozen) this.steps += 1;
     });
     // Ahead of the game's own keys: a key pressed while looking stops looking first.
     // Escape does only that. Anything else goes on to the game as well, so an arrow
@@ -62,7 +93,7 @@ export class DevTools {
     window.addEventListener(
       'keydown',
       (e) => {
-        if (!this.looking || e.code === 'KeyG' || MODIFIERS.has(e.key)) return;
+        if (!this.looking || DEV_KEYS.has(e.code) || MODIFIERS.has(e.key)) return;
         this.stopLooking();
         if (e.code === 'Escape') e.stopImmediatePropagation();
       },
@@ -88,9 +119,21 @@ export class DevTools {
     });
   }
 
-  /** True while looking along the level. The game does not tick. */
+  /** True while the game must not tick: looking along the level, or stopped with P. */
   get paused(): boolean {
-    return this.looking !== null;
+    return this.on && (this.looking !== null || this.frozen);
+  }
+
+  /** How fast game time runs against real time. Slowed only over a level, and only while shown. */
+  get timeScale(): number {
+    return this.on && this.slow && this.view !== null ? SLOW : 1;
+  }
+
+  /** One tick owed by full stop, while stopped with P and not looking. Taken once. */
+  takeStep(): boolean {
+    if (!this.on || !this.frozen || this.looking || this.steps === 0) return false;
+    this.steps -= 1;
+    return true;
   }
 
   /** The world pixel under the pointer, as the ruler names it. Null off a level, off the canvas, or hidden. */
@@ -108,8 +151,16 @@ export class DevTools {
     // A crosshair names a pixel better than an arrow does. Not on the map, whose pointer is for clicking.
     this.setCursor(live ? 'crosshair' : '');
     if (!live) return;
+    const world = this.overlay ? this.host.world() : null;
+    if (world) {
+      if (world.player.onGround || !this.arcs.length) this.arcs = predictJumps(world);
+      renderOverlay(ctx, scale, view.camX, view.camY, world, this.arcs);
+    }
     renderRuler(ctx, scale, view, this.pointer(), this.note(view));
-    if (this.looking) renderBanner(ctx, scale, 'paused · Shift+click: start here · any key: back');
+    const banner = this.looking
+      ? 'looking · Shift+click: start here · any key: back'
+      : [this.frozen && 'paused · . one tick · P go on', this.slow && '¼ speed'].filter(Boolean).join(' · ');
+    if (banner) renderBanner(ctx, scale, banner);
   }
 
   /** The wheel moves the view along the level, and Alt+wheel up and down it. The game stands still. */

@@ -139,6 +139,17 @@ export class Game {
       ? new DevTools(canvas, {
           camera: () => (this.screen === 'level' ? this.camera : null),
           startAt: (x, feetY) => this.startAt(x, feetY),
+          world: () =>
+            this.screen === 'level'
+              ? {
+                  level: this.level,
+                  player: this.player,
+                  entities: this.entities,
+                  exit: this.level.data.exit,
+                  lampFromX: this.level.data.lampFromX,
+                  minX: this.camera.x,
+                }
+              : null,
         })
       : null;
     window.addEventListener('keydown', (e) => {
@@ -403,7 +414,8 @@ export class Game {
   private frame(now: number): void {
     const elapsed = Math.min(0.25, (now - this.last) / 1000);
     this.last = now;
-    this.acc += elapsed;
+    // Slowed by the dev tools' T; always 1 in prod.
+    this.acc += elapsed * (this.dev?.timeScale ?? 1);
     while (this.acc >= DT) {
       this.tick();
       this.acc -= DT;
@@ -423,7 +435,9 @@ export class Game {
       return;
     }
     // The dev tools are looking along the level: nothing moves until they stop.
-    if (this.dev?.paused) {
+    // The dev tools are looking along the level, or have stopped it with P: nothing
+    // moves, unless full stop has asked for one tick.
+    if (this.dev?.paused && !this.dev.takeStep()) {
       this.input.flush();
       return;
     }
