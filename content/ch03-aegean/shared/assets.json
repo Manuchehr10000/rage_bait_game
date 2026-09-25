@@ -1,0 +1,35 @@
+{
+  "$comment": "Sizes are world pixels (320 x 180 view). Painted files are 4x. See content/README.md. The costume is provisional: see bull-leaper.md.",
+  "level": "shared",
+  "assets": [
+    {
+      "id": "bull-leaper",
+      "w": 12,
+      "h": 16,
+      "beat": "shared",
+      "what": "The tourist in chapter 3's costume. Four frames: idle, walk1, walk2, jump.",
+      "frames": 4
+    },
+    {
+      "id": "bull-leaper-dead",
+      "w": 12,
+      "h": 16,
+      "beat": "shared",
+      "what": "The same, eyes shut. Used, stretched and rotated, by every death."
+    },
+    {
+      "id": "bull-leaper-seated",
+      "w": 13,
+      "h": 14,
+      "beat": "shared",
+      "what": "Sitting on the floor: the 'Gave up' pose."
+    },
+    {
+      "id": "bull-leaper-enthroned",
+      "w": 12,
+      "h": 16,
+      "beat": "shared",
+      "what": "Sitting in the throne at Knossos, facing out, at rest. The one death in the game with no physical cause."
+    }
+  ]
+}

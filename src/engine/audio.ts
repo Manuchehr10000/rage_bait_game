@@ -49,6 +49,9 @@ export const SFX = [
   'thud',
   'click',
   'blast',
+  'sitStone',
+  'knock',
+  'clack',
 ] as const;
 
 export type Sfx = (typeof SFX)[number];
@@ -298,6 +301,22 @@ export class GameAudio {
         this.burst(t, 1800, 'lowpass', 0.06, 0.3);
         this.tone(t, 'sine', 110, 35, 0.4, 0.3);
         this.burst(t + 0.08, 700, 'lowpass', 0.3, 0.14);
+        break;
+      case 'sitStone':
+        // A man sitting down, once, on a seat of gypsum. Dry and low; no breath in it.
+        this.burst(t, 420, 'lowpass', 0.05, 0.2);
+        this.tone(t, 'sine', 130, 70, 0.09, 0.12);
+        break;
+      case 'knock':
+        // A wooden leaf into a man, then the man into the floor.
+        this.tone(t, 'sine', 520, 360, 0.05, 0.1);
+        this.burst(t, 1100, 'bandpass', 0.03, 0.14);
+        this.burst(t + 0.28, 400, 'lowpass', 0.06, 0.16);
+        break;
+      case 'clack':
+        // A door leaf turning on its pivot and coming home against its pier.
+        this.burst(t, 1600, 'bandpass', 0.025, 0.09);
+        this.tone(t, 'sine', 640, 480, 0.04, 0.04);
         break;
     }
   }

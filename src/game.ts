@@ -41,9 +41,10 @@ const ARRIVE_FROM = 8;
  * A Record over Theme on purpose — a new level cannot be added without deciding.
  * The room is a fact about the place, not about the music; Chapter 1's pipe and
  * Chapter 3's lyre are sent through it, and Egypt's three rooms are recorded and not
- * heard. Chapter 3 has no level yet, but its five sites are already decided in
- * content/ch03-aegean/CHAPTER.md: each is { track: 'ch03' } in the open, except
- * Akrotiri, which is 'hall', the roof its visitors stand under.
+ * heard. Chapter 3's five sites are decided in content/ch03-aegean/CHAPTER.md:
+ * each is { track: 'ch03' } in the open, except Akrotiri, which is 'hall', the roof
+ * its visitors stand under. Knossos is built and stays 'open' until the designer
+ * rules on a room for Evans's roofed rooms, which four of its seven beats are in.
  */
 const SOUND_OF: Record<Theme, { track: MusicId; room: Room }> = {
   capBlanc: { track: 'ch01', room: 'open' }, // a cliff shelter, open to the valley
@@ -55,6 +56,7 @@ const SOUND_OF: Record<Theme, { track: MusicId; room: Room }> = {
   philae: { track: 'ch02', room: 'open' },
   karnak: { track: 'ch02', room: 'chamber' }, // the hypostyle hall is a roofed forest
   dendera: { track: 'ch02', room: 'open' }, // up a stair in the wall, and then the roof, under the sky
+  knossos: { track: 'ch03', room: 'open' }, // the courts are open to the sky; the roofs are Evans's
 };
 
 /** The pages of the brochure that have been arranged, by chapter number. */

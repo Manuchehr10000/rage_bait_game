@@ -83,9 +83,10 @@ export const CHAPTERS: Chapter[] = [
     dates: '1900–1200 BC',
     anchor: 0,
     badge: { dx: 4, dy: 8 },
+    costume: 'bullLeaper',
     monument: { site: 3, art: 'lion-gate' },
     sites: [
-      { name: 'Knossos', lat: 35.3, lon: 25.16 },
+      { name: 'Knossos', lat: 35.3, lon: 25.16, level: 'knossos' },
       { name: 'Phaistos', lat: 35.05, lon: 24.81 },
       { name: 'Akrotiri', lat: 36.35, lon: 25.4 },
       { name: 'Mycenae', lat: 37.73, lon: 22.76 },

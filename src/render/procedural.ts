@@ -1529,3 +1529,271 @@ function bearStalagmite(): HTMLCanvasElement {
   return compile(g.outline('O').rows(), CAVE);
 }
 export const BEAR_STALAGMITE_SPRITE = bearStalagmite();
+
+// ---------------------------------------------------------------------------
+// Chapter 3. The bull-leaper kit, badly tied and slipping, over modern clothes.
+// PROVISIONAL: the costume is not designed yet (content/ch03-aegean/CHAPTER.md,
+// "The tourist"). A gift-shop wig with one long lock, the kilt and belt of the
+// fresco as a costume shop sells them, knotted over a T-shirt and shorts, and
+// trainers. 12 x 16, drawn one pixel left of the 10 px hitbox. Faces right.
+// ---------------------------------------------------------------------------
+
+const BULL_LEAPER: Palette = {
+  O: '#2b1d10', // outline
+  K: '#1d1917', // the wig
+  S: '#e6b48c', // skin
+  E: '#1c1c1c', // eye
+  T: '#f1eee6', // T-shirt
+  Y: '#d6ae45', // the belt, gold paint
+  R: '#b4392b', // the kilt
+  U: '#2f5f9a', // its blue edge
+  P: '#56708f', // shorts
+  N: '#e9e9e4', // trainers
+};
+
+// The wig sits back and to one side, the fringe over one eye, the lock down his back.
+const BULL_LEAPER_HEAD = [
+  '...OOOOOO...',
+  '..OKKKKKKO..',
+  '.OKKKKKKKKO.',
+  '.OKKKSSSSSO.',
+  'OKKOSSSSESO.',
+  'OKKOSSSSSSO.',
+  'OKKOSSSSSO..',
+  'OKKKOSSSO...',
+  '.OKKOSSO....',
+];
+
+// The belt is tied, badly: the kilt hangs lower on one side than the other.
+const BULL_LEAPER_TORSO = [
+  '.OKOTTTTTTO.',
+  '..OTTTTTTTO.',
+  '..OYYYYYYYO.',
+  '..OURRRRRUO.',
+];
+
+function bullLeaper(legs: string[]): string[] {
+  return [...BULL_LEAPER_HEAD, ...BULL_LEAPER_TORSO, ...legs];
+}
+
+export const BULL_LEAPER_FRAMES = {
+  idle: compile(bullLeaper(['...ORRRRUPO.', '...OSSOOSSO.', '...ONNOONNO.']), BULL_LEAPER),
+  walk1: compile(bullLeaper(['..ORRROUPPO.', '..OSSO..OSSO', '..ONNO..ONNO']), BULL_LEAPER),
+  walk2: compile(bullLeaper(['...ORRRRUO..', '....OSSSSO..', '....ONNNNO..']), BULL_LEAPER),
+  jump: compile(bullLeaper(['..ORRRRUPO..', '..OSSO..OSSO', '..ONNO...ONN']), BULL_LEAPER),
+  // Dead: eye shut, the wig further round. Nothing else changes.
+  dead: compile(
+    [
+      '...OOOOOO...',
+      '..OKKKKKKO..',
+      '.OKKKKKKKKO.',
+      '.OKKKKSSSSO.',
+      'OKKOSSSSSSO.',
+      'OKKOSSSOOSO.',
+      'OKKOSSSSSO..',
+      'OKKKOSSSO...',
+      '.OKKOSSO....',
+      '.OKOTTTTTTO.',
+      '..OTTTTTTTO.',
+      '..OYYYYYYYO.',
+      '..OURRRRRUO.',
+      '...ORRRRUPO.',
+      '...OSSOOSSO.',
+      '...ONNOONNO.',
+    ],
+    BULL_LEAPER,
+  ),
+};
+
+/** Sitting down on the floor, the kilt in his lap. For the one death you choose. */
+export const BULL_LEAPER_SEATED = compile(
+  [
+    '...OOOOOO...',
+    '..OKKKKKKO..',
+    '.OKKKKKKKKO.',
+    '.OKKKSSSSSO.',
+    'OKKOSSSOOSO.',
+    'OKKOSSSSSSO.',
+    'OKKOSSSSSO..',
+    'OKKKOSSSO...',
+    '.OKKOSSO....',
+    '..OTTTTTTTO.',
+    '..OYYYYYYYO.',
+    '.ORRRRRRRRUO',
+    'OSSONNOONNOSO',
+    'OOOOOOOOOOOOO',
+  ],
+  BULL_LEAPER,
+);
+
+/**
+ * In the throne, facing out, at rest: hands on his knees, feet on the floor. Never
+ * the slump of giving up and never a king. 12 x 16; the seat line is row 10.
+ */
+export const BULL_LEAPER_ENTHRONED = compile(
+  [
+    '...OOOOOO...',
+    '..OKKKKKKO..',
+    '.OKKKKKKKKO.',
+    '.OKSSSSSSKO.',
+    '.OKSESSESKO.',
+    '.OKSSSSSSKO.',
+    '.OKOSSSSOKO.',
+    '..OKOSSOKO..',
+    '.OTTTTTTTTO.',
+    'OSTTTTTTTTSO',
+    'OSOYYYYYYOSO',
+    '.ORRRRRRRRO.',
+    '.OSSUOOUSSO.',
+    '..OSSO.OSSO.',
+    '..OSSO.OSSO.',
+    '..ONNO.ONNO.',
+  ],
+  BULL_LEAPER,
+);
+
+// ---------------------------------------------------------------------------
+// Knossos.
+// ---------------------------------------------------------------------------
+
+const KNOSSOS: Palette = {
+  O: '#2b2118', // outline
+  G: '#e3ded2', // gypsum
+  H: '#c3bcae', // gypsum in shade
+  C: '#b0643a', // pithos clay
+  D: '#8a4a28', // pithos clay, shaded
+  L: '#d98a57', // pithos clay, lit
+  B: '#4a4a3c', // bronze
+  V: '#6c6a54', // bronze, lit
+  P: '#d8d2c2', // plinth
+  Q: '#aaa392', // plinth, shaded
+  W: '#f0e8d8', // off-white ground of the griffin wall
+  R: '#b4452f', // its red
+  F: '#e6d7a8', // griffin, pale
+  N: '#8c6a3a', // griffin, line
+  A: '#5f7a3a', // reeds
+};
+
+/**
+ * The throne: one block of gypsum, where it was found in April 1900. Seen from the
+ * room, against the north wall: the high back with its wavy top, the seat hollowed
+ * for a body, the front legs a pair of arched pilasters. 14 x 14. Evans's wooden copy
+ * in the anteroom is this same sprite (pillar 4). The seat's top is row 8.
+ */
+export const THRONE_SPRITE = compile(
+  [
+    '.....OO.OO....',
+    '....OGGOGGO...',
+    '...OGGGGGGGO..',
+    '...OGHGGGGHO..',
+    '...OGHGGGGHO..',
+    '...OGHGGGGHO..',
+    '...OGHGGGGHO..',
+    '...OGGGGGGGO..',
+    'OOOOOOOOOOOOOO',
+    'OGGGGGGGGGGGGO',
+    'OHOOOOOOOOOOHO',
+    'OGO.OGGGGO.OGO',
+    'OGO.OGHHGO.OGO',
+    'OOO.OO..OO.OOO',
+  ],
+  KNOSSOS,
+);
+
+/** A storage jar of the west storerooms, plain, as tall as a man's shoulder. 9 x 15. */
+export const PITHOS_SPRITE = compile(
+  [
+    '..OOOOO..',
+    '..OCCCO..',
+    '.OCLCCCO.',
+    'OCLCCCCCO',
+    'OCLCCCCDO',
+    'OCLCCCCDO',
+    'OOOOOOOOO',
+    'OCLCCCCDO',
+    'OCLCCCCDO',
+    'OCLCCCCDO',
+    '.OCCCCDO.',
+    '.OCCCCDO.',
+    '..OCCDO..',
+    '..OCCDO..',
+    '..OOOOO..',
+  ],
+  KNOSSOS,
+);
+
+/** A giant jar of the Old Palace by the East Bastion: rope bands and discs in relief, as tall as he is. 11 x 16. */
+export const GIANT_PITHOS_SPRITE = compile(
+  [
+    '...OOOOO...',
+    '...OCCCO...',
+    '..OCLCCCO..',
+    '.OCLOCOCDO.',
+    'OCLCCCCCCDO',
+    'ODODODODODO',
+    'OCLCCCCCCDO',
+    'OCLOCCCOCDO',
+    'OCLCCCCCCDO',
+    'ODODODODODO',
+    '.OCLCCCCDO.',
+    '.OCLCCCCDO.',
+    '..OCLCCDO..',
+    '..OCCCCDO..',
+    '...OCCDO...',
+    '...OOOOO...',
+  ],
+  KNOSSOS,
+);
+
+/** Sir Arthur Evans, in bronze, on his plinth by the way in. 10 x 22. */
+export const EVANS_BUST_SPRITE = compile(
+  [
+    '...OOOO...',
+    '..OBBBBO..',
+    '..OBVBBO..',
+    '..OBVBBO..',
+    '...OBBO...',
+    '.OOBBBBOO.',
+    'OBBVBBBBBO',
+    'OBVBBBBBBO',
+    'OOOOOOOOOO',
+    '.OPPPPPPO.',
+    '.OPPPPPQO.',
+    '.OPPPPPQO.',
+    '.OPPPPPQO.',
+    '.OPPPPPQO.',
+    '.OPPPPPQO.',
+    '.OPPPPPQO.',
+    '.OPPPPPQO.',
+    '.OPPPPPQO.',
+    '.OPPPPPQO.',
+    'OPPPPPPPQO',
+    'OPPPPPPPQO',
+    'OOOOOOOOOO',
+  ],
+  KNOSSOS,
+);
+
+/**
+ * A griffin of the Throne Room wall, as the Gilliérons painted it: wingless, crested,
+ * couchant, among reeds on bands of red and off-white. Faces right. 24 x 14.
+ */
+export const GRIFFIN_SPRITE = compile(
+  [
+    'WWWWWWWWWWWWWWWWWWWWWWWW',
+    'WWWAWWWWWWWWWWWWWWONWWWW',
+    'WWWAWWWWWWWWWWWWWONNWWWW',
+    'WWAAWWWWWWWWWWWWONFFOWWW',
+    'WWWAWWWWWWWWWWWONFFFFOWW',
+    'RRRARRRRRRRRRRRONFFOOOOR',
+    'RRRARRRONNNNNNNFFFFORRRR',
+    'RRRAROFFFFFFFFFFFFFORRRR',
+    'RRAAOFFNFFFFNFFFFFFORRRR',
+    'WWWAOFFFFFFFFFFFFFFOWWWW',
+    'WWWWOFONFFFFFFFONFOWWWWW',
+    'WWWWOOOONOOOOOONOOOWWWWW',
+    'WWWWWWWWWWWWWWWWWWWWWWWW',
+    'RRRRRRRRRRRRRRRRRRRRRRRR',
+  ],
+  KNOSSOS,
+);

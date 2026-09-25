@@ -1,6 +1,6 @@
 import type { Camera } from '../engine/camera';
-import type { Chaser, Crumble, Entity, Falling, Horse, Platform, Pusher, Roof, Sweep, Thrower, Tipper, Water } from '../engine/entities';
-import type { DecorDef, Level } from '../engine/level';
+import type { Chaser, Crumble, Door, Entity, Falling, Horse, Platform, Pusher, Roof, Seat, Span, Sweep, Thrower, Tipper, Water } from '../engine/entities';
+import type { DecorDef, DoorDef, Level, SpanDef } from '../engine/level';
 import type { Player } from '../engine/player';
 import {
   BABOON_SPRITE,
@@ -53,6 +53,16 @@ import { hash } from './hash';
 import { TRAIN, type Train } from '../engine/entities';
 import type { CavePanel } from '../engine/level';
 import { BEAR_STALAGMITE_SPRITE, SIGNAL_LAMP_SPRITE, STOP_SIGN_SPRITE, TRAIN_CAR_SPRITE, TRAIN_ENGINE_SPRITE, TRAIN_LAST_CAR_SPRITE } from './procedural';
+import {
+  BULL_LEAPER_ENTHRONED,
+  BULL_LEAPER_FRAMES,
+  BULL_LEAPER_SEATED,
+  EVANS_BUST_SPRITE,
+  GIANT_PITHOS_SPRITE,
+  GRIFFIN_SPRITE,
+  PITHOS_SPRITE,
+  THRONE_SPRITE,
+} from './procedural';
 
 /** Text drawn in screen space after scaling so it stays crisp. World coordinates. */
 export interface WorldText {
@@ -234,6 +244,7 @@ export function renderWorld(ctx: CanvasRenderingContext2D, s: Scene): void {
   const theme = level.data.theme;
 
   if (theme === 'dendera') drawDenderaSky(ctx, s, cy);
+  else if (theme === 'knossos') drawKnossosSky(ctx, cy);
   else drawSky(ctx, cy, theme);
   if (theme === 'capBlanc') drawFarBeune(ctx, cx, cy);
   else if (theme === 'rocAuxSorciers') drawFarAnglin(ctx, cx, cy);
@@ -241,6 +252,7 @@ export function renderWorld(ctx: CanvasRenderingContext2D, s: Scene): void {
   else if (theme === 'abuSimbel') drawFarCliffs(ctx, cx, cy);
   else if (theme === 'philae') drawFarIsland(ctx, cx, cy);
   else if (theme === 'dendera') drawFarDendera(ctx, cx, cy);
+  else if (theme === 'knossos') drawFarKnossos(ctx, cx, cy);
   else drawFarKarnak(ctx, cx, cy);
 
   ctx.save();
@@ -248,7 +260,7 @@ export function renderWorld(ctx: CanvasRenderingContext2D, s: Scene): void {
 
   if (theme === 'abuSimbel') drawRock(ctx, s, cx, cy);
   else if (theme === 'philae') drawRiverbed(ctx, s, cx, cy);
-  else if (theme !== 'dendera') drawKarnakGround(ctx, s, cx, cy);
+  else if (theme !== 'dendera' && theme !== 'knossos') drawKarnakGround(ctx, s, cx, cy);
   for (const d of level.data.decor) drawDecor(ctx, s, d);
   drawTiles(ctx, level, cx, cy);
   for (const e of s.entities) drawEntityBack(ctx, s, e);
@@ -534,26 +546,47 @@ const darkLayer = document.createElement('canvas');
 darkLayer.width = VIEW_W;
 darkLayer.height = VIEW_H;
 
-/** The Hypostyle Hall at night. You see a little around you, and what the show lights. */
+type DarkDecor = Extract<DecorDef, { kind: 'dark' }>;
+
+/**
+ * The Hypostyle Hall at night, a cave, the rooms of a palace. You see a little around
+ * you, and what the show lights. A level may have several dark stretches; one bounded
+ * in height is the inside of a room, with a hard edge at its floor and its ceiling,
+ * and the sky over its roof as bright as anywhere.
+ */
 function drawDarkness(ctx: CanvasRenderingContext2D, s: Scene, cx: number, cy: number): void {
-  const dark = s.level.data.decor.find((d) => d.kind === 'dark');
-  if (!dark || dark.kind !== 'dark') return;
-  const x0 = dark.x0 - cx;
-  const x1 = dark.x1 - cx;
-  if (x1 < 0 || x0 > VIEW_W) return;
+  const darks = s.level.data.decor.filter((z): z is DarkDecor => z.kind === 'dark');
+  const dark = darks[0];
+  if (!dark) return;
+  const shown = darks.filter(
+    (z) => z.x1 - cx >= 0 && z.x0 - cx <= VIEW_W && (z.y1 === undefined || z.y1 - cy >= 0) && (z.y0 === undefined || z.y0 - cy <= VIEW_H),
+  );
+  if (shown.length === 0) return;
   const d = darkLayer.getContext('2d');
   if (!d) return;
   d.clearRect(0, 0, VIEW_W, VIEW_H);
-  const ambient = dark.ambient ?? 0.94;
   d.fillStyle = COLORS.night;
-  d.globalAlpha = ambient;
-  // Soft edges: the dark fades in over 24px at each end of the hall.
-  const feather = 24;
-  d.fillRect(x0 + feather, 0, x1 - x0 - feather * 2, VIEW_H);
-  for (let i = 0; i < feather; i += 2) {
-    d.globalAlpha = ambient * (i / feather);
-    d.fillRect(x0 + i, 0, 2, VIEW_H);
-    d.fillRect(x1 - i - 2, 0, 2, VIEW_H);
+  for (const z of shown) {
+    const x0 = z.x0 - cx;
+    const x1 = z.x1 - cx;
+    const ambient = z.ambient ?? 0.94;
+    if (z.y0 !== undefined || z.y1 !== undefined) {
+      // A room: dark exactly as far as its walls, floor and ceiling.
+      const y0 = z.y0 === undefined ? 0 : z.y0 - cy;
+      const y1 = z.y1 === undefined ? VIEW_H : z.y1 - cy;
+      d.globalAlpha = ambient;
+      d.fillRect(x0, y0, x1 - x0, y1 - y0);
+      continue;
+    }
+    d.globalAlpha = ambient;
+    // Soft edges: the dark fades in over 24px at each end of the hall.
+    const feather = 24;
+    d.fillRect(x0 + feather, 0, x1 - x0 - feather * 2, VIEW_H);
+    for (let i = 0; i < feather; i += 2) {
+      d.globalAlpha = ambient * (i / feather);
+      d.fillRect(x0 + i, 0, 2, VIEW_H);
+      d.fillRect(x1 - i - 2, 0, 2, VIEW_H);
+    }
   }
   d.globalAlpha = 1;
   d.globalCompositeOperation = 'destination-out';
@@ -667,8 +700,38 @@ function drawDarkness(ctx: CanvasRenderingContext2D, s: Scene, cx: number, cy: n
     g.fill();
   };
   for (const sp of s.level.data.decor) if (sp.kind === 'spotlight') beam(d, sp);
+  // Daylight from straight above: a light well, and the hole a fallen span leaves in a
+  // roof with sky on it. Nothing is over either, and the dark is simply not there.
+  d.globalAlpha = 1;
+  d.fillStyle = '#000';
+  for (const r of daylightShafts(s)) d.fillRect(r.x - cx, r.y - cy, r.w, r.h);
   d.globalCompositeOperation = 'source-over';
   ctx.drawImage(darkLayer, 0, 0);
+}
+
+/**
+ * Every shaft of daylight from straight above: the light wells, and the hole any
+ * fallen span has left in a roof with nothing over it but sky.
+ */
+function daylightShafts(s: Scene): Rect[] {
+  const out: Rect[] = [];
+  for (const w of s.level.data.decor) if (w.kind === 'lightWell') out.push({ x: w.x0, y: w.top, w: w.x1 - w.x0, h: w.bottom - w.top });
+  for (const e of s.entities) {
+    if (e.def.kind !== 'span') continue;
+    const sp = e as Span;
+    if (sp.state !== 'falling' && sp.state !== 'landed') continue;
+    const r = e.def.rect;
+    if (!skyOver(s.level, r)) continue;
+    out.push({ x: r.x, y: r.y, w: r.w, h: e.def.floorY - r.y });
+  }
+  return out;
+}
+
+/** Nothing solid between the top of this rect and the top of the level. */
+function skyOver(level: Level, r: Rect): boolean {
+  const ty = Math.floor(r.y / TILE);
+  for (let tx = Math.floor(r.x / TILE); tx < Math.ceil((r.x + r.w) / TILE); tx++) for (let y = 0; y < ty; y++) if (level.isSolid(tx, y)) return false;
+  return true;
 }
 
 /**
@@ -677,6 +740,7 @@ function drawDarkness(ctx: CanvasRenderingContext2D, s: Scene, cx: number, cy: n
  * being a lamp when the dark end of the room leaves the screen.
  */
 function drawBeams(ctx: CanvasRenderingContext2D, s: Scene, cx: number, cy: number): void {
+  drawDaylight(ctx, s, cx, cy);
   const dark = s.level.data.decor.find((d) => d.kind === 'dark');
   if (!dark) return;
   ctx.save();
@@ -1390,6 +1454,22 @@ function drawDecor(ctx: CanvasRenderingContext2D, s: Scene, d: DecorDef): void {
     case 'bisonRelief':
       if (!paint(ctx, 'bison-relief', d.x, d.y)) ctx.drawImage(BISON_SPRITE, d.x, d.y);
       break;
+    case 'lightWell':
+    case 'backWall':
+    case 'evansBust':
+    case 'kouloura':
+    case 'causeway':
+    case 'pithos':
+    case 'minoanColumn':
+    case 'columnBase':
+    case 'griffin':
+    case 'bench':
+    case 'basin':
+    case 'doubleAxes':
+    case 'runnel':
+    case 'catchPit':
+      drawKnossosDecor(ctx, s, d);
+      break;
     case 'landing': {
       // Mooring posts on the landing stage.
       ctx.fillStyle = COLORS.wood;
@@ -1520,6 +1600,10 @@ function drawTileAt(
 ): void {
   const theme = level.data.theme;
   if (paint(ctx, tileArtId(theme, c, open), x, y)) return;
+  if (theme === 'knossos' && (c === '=' || c === '#' || c === '%')) {
+    drawKnossosTile(ctx, c, tx, ty, x, y, open);
+    return;
+  }
   if (c === '=') {
     if (theme === 'pechMerle' || theme === 'gargas') drawConcrete(ctx, x, y, open);
     else if (theme === 'rouffignac') drawBallast(ctx, tx, ty, x, y, open);
@@ -1569,6 +1653,10 @@ function tileArtId(theme: Level['data']['theme'], c: string, open: boolean): str
     : theme === 'rouffignac' ? 'flint-rock'
     : theme === 'capBlanc' || theme === 'rocAuxSorciers' ? 'rock' : theme === 'abuSimbel' ? 'cliff' : theme === 'philae' ? 'column-drum' : theme === 'dendera' ? 'dendera-sandstone' : 'sandstone';
   if (c === '?' || c === 'x') return name;
+  if (theme === 'knossos') {
+    const k = c === '=' ? 'knossos-paving' : c === '%' ? 'knossos-slab' : 'knossos-ashlar';
+    return open ? `tile-${k}-top` : `tile-${k}`;
+  }
   return open ? `tile-${name}-top` : `tile-${name}`;
 }
 
@@ -1934,6 +2022,13 @@ function drawEntityBack(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): voi
         }
         if (!paint(ctx, 'fallen-block', r.x, r.y)) ctx.drawImage(FALLEN_BLOCK_SPRITE, r.x, r.y);
         ctx.restore();
+      } else if (d.skin === 'barrier') {
+        // The barrier visitors stand behind at the door of the Throne Room: a post, waist high.
+        ctx.fillStyle = KN.steel;
+        ctx.fillRect(r.x, r.y, r.w, r.h);
+        ctx.fillStyle = KN.steelLight;
+        ctx.fillRect(r.x, r.y, r.w, 1);
+        ctx.fillRect(r.x + 1, r.y + 1, 1, r.h - 1);
       } else if (d.skin === 'roofSlab') {
         // Nothing to draw. It is tiles of the roof until it goes off, and the tiles draw
         // themselves: from above there is nothing to tell (pillar 4).
@@ -2002,6 +2097,18 @@ function drawEntityBack(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): voi
       drawHorse(ctx, e as Horse);
       break;
     }
+    case 'span':
+      drawSpanBack(ctx, s, e as Span);
+      break;
+    case 'seat': {
+      // The throne and Evans's copy of it: the same sprite at the same place on its footprint.
+      const x = d.x + d.w / 2 - 7;
+      if (!paint(ctx, 'throne', x, d.floorY - 14)) ctx.drawImage(THRONE_SPRITE, x, d.floorY - 14);
+      break;
+    }
+    case 'door':
+      drawDoorLeaf(ctx, d, (e as Door).k);
+      break;
     default:
       break;
   }
@@ -2341,6 +2448,12 @@ function drawEntityFront(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): vo
       }
       break;
     }
+    case 'span': {
+      // Coming down, and down: in front of whoever it came down on.
+      const sp = e as Span;
+      if (sp.state === 'falling' || sp.state === 'landed') drawFallenSpan(ctx, sp.rect, d.skin);
+      break;
+    }
     default:
       break;
   }
@@ -2519,11 +2632,14 @@ const COSTUMES: Record<
     lamp?: { x: number; y: number };
     /** Held by the boot: the pull, and the boot not coming. Only the chapter with snares in it has them. */
     held?: [HTMLCanvasElement, HTMLCanvasElement];
+    /** In the throne, facing out, at rest. Only the chapter with the throne in it has one. */
+    enthroned?: HTMLCanvasElement;
   }
 > = {
   // The lens sits at sprite column 10, row 4, of the right-facing hiker.
   hiker: { id: 'hiker', frames: HIKER_FRAMES, seated: HIKER_SEATED, lamp: { x: 10, y: 4 }, held: HIKER_HELD },
   pharaoh: { id: 'tourist', frames: TOURIST_FRAMES, seated: TOURIST_SEATED },
+  bullLeaper: { id: 'bull-leaper', frames: BULL_LEAPER_FRAMES, seated: BULL_LEAPER_SEATED, enthroned: BULL_LEAPER_ENTHRONED },
 };
 
 /** Light the lamp on a frame, if this costume has one and it is switched on. */
@@ -2636,6 +2752,14 @@ function drawDeath(ctx: CanvasRenderingContext2D, s: Scene, death: { cause: Deat
     case 'sit': {
       const seated = lit(costume, frameOf(`${c.id}-seated`, 0, c.seated), lampLit(s));
       blitFacing(ctx, seated, x, feetY - seated.h, p.facing);
+      break;
+    }
+    case 'enthroned': {
+      // In the seat he landed in front of, facing out, and at rest. Nothing else moves for it.
+      const seat = s.entities.find((e) => e.def.kind === 'seat' && (e as Seat).sat);
+      const f = c.enthroned ? frameOf(`${c.id}-enthroned`, 0, c.enthroned) : frameOf(`${c.id}-seated`, 0, c.seated);
+      if (seat && seat.def.kind === 'seat') blit(ctx, f, seat.def.x + seat.def.w / 2 - Math.floor(f.w / 2), seat.def.floorY - f.h);
+      else blitFacing(ctx, f, x, feetY - f.h, p.facing);
       break;
     }
   }
@@ -2983,4 +3107,509 @@ function mix(a: string, b: string, t: number): string {
   const pb = parseInt(b.slice(1), 16);
   const ch = (shift: number) => Math.round(((pa >> shift) & 255) * (1 - t) + ((pb >> shift) & 255) * t);
   return `rgb(${ch(16)}, ${ch(8)}, ${ch(0)})`;
+}
+
+// ---------------------------------------------------------------------------
+// Knossos: Evans's palace in the sun, and its rooms in the dark.
+// ---------------------------------------------------------------------------
+
+const KN = {
+  skyTop: '#5d8ec2',
+  skyBottom: '#d3e3ea',
+  sun: '#fffbe6',
+  juktas: '#9ba3a6',
+  hill: '#9aa378',
+  hillShade: '#808b62',
+  valley: '#8b9566',
+  cypress: '#3d5132',
+  olive: '#7c8a5b',
+  paving: '#ddd3bd',
+  pavingLine: '#b3a78c',
+  pavingTop: '#efe8d8',
+  ashlar: '#cbbb97',
+  ashlarJoint: '#9f8f6c',
+  ashlarLight: '#dccfae',
+  /** Evans's slab: concrete, the face plastered, and the timber it stands for painted on. */
+  slab: '#e6ddca',
+  slabShade: '#c7bca6',
+  timber: '#6b4a2e',
+  timberDark: '#4c331f',
+  concrete: '#a19d93',
+  concreteLight: '#bdb9ae',
+  /** The walls of rooms, seen from inside: always a little behind the stone he stands on. */
+  wall: '#a8987a',
+  wallJoint: '#8b7c60',
+  /** The far wall of a light well, top and foot. */
+  wellTop: '#c9cbc6',
+  wellDeep: '#6f716e',
+  plaster: '#8f3a2a',
+  plasterDark: '#6e2b1f',
+  gypsum: '#e3ded2',
+  gypsumShade: '#c3bcae',
+  gypsumWall: '#b7b0a0',
+  gypsumWallLine: '#9a9383',
+  column: '#b4452f',
+  columnShade: '#8a3222',
+  columnLight: '#cc5a40',
+  capital: '#1f1a17',
+  capitalLight: '#3b332c',
+  base: '#cfc6b0',
+  baseShade: '#a79e88',
+  /** The core of the last Minoan column: burnt through. */
+  char: '#16100c',
+  /** The core of Fyfe's timber: weathered, rotten. */
+  rot: '#5a4632',
+  earth: '#5b4a35',
+  /** Inside a pit in the court: the sun does not get down there. */
+  pit: '#3a3024',
+  pitStone: '#4a3e2f',
+  pitStoneLit: '#65573f',
+  leaf: '#7a5430',
+  leafDark: '#4d3319',
+  leafLight: '#936740',
+  steel: '#5c6166',
+  steelLight: '#8a9095',
+  silt: '#8a7a5c',
+};
+
+function drawKnossosSky(ctx: CanvasRenderingContext2D, cy: number): void {
+  const bands = 6;
+  for (let i = 0; i < bands; i++) {
+    ctx.fillStyle = mix(KN.skyTop, KN.skyBottom, i / (bands - 1));
+    ctx.fillRect(0, (i * VIEW_H) / bands, VIEW_W, VIEW_H / bands + 1);
+  }
+  const sx = 262;
+  const sy = 26 - Math.round(cy * 0.2);
+  ctx.fillStyle = KN.sun;
+  ctx.fillRect(sx - 6, sy - 2, 12, 5);
+  ctx.fillRect(sx - 4, sy - 4, 8, 9);
+  ctx.fillRect(sx - 2, sy - 6, 4, 13);
+}
+
+/** Juktas far off to the south, and nearer, the hills over the Kairatos with their cypress and olive. */
+function drawFarKnossos(ctx: CanvasRenderingContext2D, cx: number, cy: number): void {
+  // The palace stands on its hill: the horizon is about the height of the courts.
+  const horizon = 92 - Math.round(cy * 0.35);
+  const far = Math.round(cx * 0.08);
+  ctx.fillStyle = KN.juktas;
+  for (let x = 0; x < VIEW_W; x += 2) {
+    const wx = x + far;
+    const h = 26 + Math.round(9 * Math.sin(wx / 83) + 5 * Math.sin(wx / 31 + 1));
+    ctx.fillRect(x, horizon - h, 2, h);
+  }
+  const near = Math.round(cx * 0.2);
+  for (let x = 0; x < VIEW_W; x += 2) {
+    const wx = x + near;
+    const h = 12 + Math.round(5 * Math.sin(wx / 47) + 3 * Math.sin(wx / 17 + 2));
+    ctx.fillStyle = KN.hill;
+    ctx.fillRect(x, horizon - h, 2, h);
+    ctx.fillStyle = KN.hillShade;
+    ctx.fillRect(x, horizon - h, 2, 1);
+  }
+  for (let wx = Math.floor(near / 22) * 22; wx < near + VIEW_W + 22; wx += 22) {
+    const hh = hash(wx, 7);
+    const x = wx - near + (hh % 9);
+    const top = horizon - (12 + Math.round(5 * Math.sin(wx / 47) + 3 * Math.sin(wx / 17 + 2)));
+    if (hh % 3 === 0) {
+      ctx.fillStyle = KN.cypress;
+      ctx.fillRect(x, top - 9, 2, 10);
+      ctx.fillRect(x - 1, top - 5, 4, 5);
+    } else {
+      ctx.fillStyle = KN.olive;
+      ctx.fillRect(x - 3, top - 4, 7, 3);
+      ctx.fillRect(x - 1, top - 5, 3, 1);
+    }
+  }
+  ctx.fillStyle = KN.valley;
+  ctx.fillRect(0, horizon, VIEW_W, VIEW_H - horizon);
+}
+
+/**
+ * The palace's three stones. '=' paving, gypsum and limestone slabs; '#' limestone
+ * ashlar and the fill it stands on; '%' Evans's slab, reinforced concrete with its face
+ * plastered and a timber beam painted along it, and round beam ends under the beam.
+ */
+function drawKnossosTile(ctx: CanvasRenderingContext2D, c: string, tx: number, ty: number, x: number, y: number, open: boolean): void {
+  if (c === '=') {
+    ctx.fillStyle = KN.paving;
+    ctx.fillRect(x, y, TILE, TILE);
+    ctx.fillStyle = KN.pavingLine;
+    ctx.fillRect(x + ((tx * 5 + ty * 3) % 3) * 5 + 1, y, 1, TILE);
+    ctx.fillRect(x, y + 9, TILE, 1);
+    if (open) {
+      ctx.fillStyle = KN.pavingTop;
+      ctx.fillRect(x, y, TILE, 2);
+      ctx.fillStyle = KN.pavingLine;
+      ctx.fillRect(x, y + 2, TILE, 1);
+    }
+  } else if (c === '%') {
+    ctx.fillStyle = KN.slab;
+    ctx.fillRect(x, y, TILE, TILE);
+    ctx.fillStyle = KN.timber;
+    ctx.fillRect(x, y + 4, TILE, 5);
+    ctx.fillStyle = KN.timberDark;
+    ctx.fillRect(x, y + 8, TILE, 1);
+    ctx.fillStyle = KN.timber;
+    ctx.fillRect(x + 5, y + 10, 5, 4);
+    ctx.fillStyle = KN.timberDark;
+    ctx.fillRect(x + 5, y + 13, 5, 1);
+    ctx.fillStyle = KN.slabShade;
+    ctx.fillRect(x, y + TILE - 1, TILE, 1);
+    if (open) {
+      ctx.fillStyle = KN.concrete;
+      ctx.fillRect(x, y, TILE, 3);
+      ctx.fillStyle = KN.concreteLight;
+      ctx.fillRect(x, y, TILE, 1);
+    } else {
+      ctx.fillStyle = KN.slabShade;
+      ctx.fillRect(x, y, TILE, 1);
+    }
+  } else {
+    ctx.fillStyle = KN.ashlar;
+    ctx.fillRect(x, y, TILE, TILE);
+    ctx.fillStyle = KN.ashlarJoint;
+    ctx.fillRect(x, y + 7, TILE, 1);
+    ctx.fillRect(x, y + TILE - 1, TILE, 1);
+    ctx.fillRect(x + (ty % 2 === 0 ? 4 : 11), y, 1, 7);
+    ctx.fillRect(x + (ty % 2 === 0 ? 11 : 4), y + 8, 1, 7);
+    if (open) {
+      ctx.fillStyle = KN.ashlarLight;
+      ctx.fillRect(x, y, TILE, 2);
+    }
+  }
+}
+
+type KnossosDecor = Extract<
+  DecorDef,
+  {
+    kind:
+      | 'lightWell'
+      | 'backWall'
+      | 'evansBust'
+      | 'kouloura'
+      | 'causeway'
+      | 'pithos'
+      | 'minoanColumn'
+      | 'columnBase'
+      | 'griffin'
+      | 'bench'
+      | 'basin'
+      | 'doubleAxes'
+      | 'runnel'
+      | 'catchPit';
+  }
+>;
+
+function drawKnossosDecor(ctx: CanvasRenderingContext2D, s: Scene, d: KnossosDecor): void {
+  switch (d.kind) {
+    case 'backWall': {
+      const w = d.x1 - d.x0;
+      const h = d.bottom - d.top;
+      if (d.stone === 'plaster') {
+        // The Throne Room: red plaster, a darker dado.
+        ctx.fillStyle = KN.plaster;
+        ctx.fillRect(d.x0, d.top, w, h);
+        ctx.fillStyle = KN.plasterDark;
+        ctx.fillRect(d.x0, d.bottom - 14, w, 14);
+        ctx.fillRect(d.x0, d.top + 6, w, 1);
+      } else if (d.stone === 'gypsum') {
+        // Plaster over a dado of gypsum slabs set on edge.
+        ctx.fillStyle = KN.wall;
+        ctx.fillRect(d.x0, d.top, w, h);
+        ctx.fillStyle = KN.gypsumWall;
+        const dado = Math.min(h, 20);
+        ctx.fillRect(d.x0, d.bottom - dado, w, dado);
+        ctx.fillStyle = KN.gypsumWallLine;
+        ctx.fillRect(d.x0, d.bottom - dado, w, 1);
+        for (let x = d.x0 + 11; x < d.x1; x += 24) ctx.fillRect(x, d.bottom - dado, 1, dado);
+      } else if (d.stone === 'well') {
+        // The far wall of a light well: grey limestone, the sun on its upper courses and
+        // the shaft getting deeper toward the floor, so it reads as a hole and not a wall.
+        for (let y = d.top; y < d.bottom; y += 4) {
+          ctx.fillStyle = mix(KN.wellTop, KN.wellDeep, Math.min(1, (y - d.top) / Math.max(1, h)));
+          ctx.fillRect(d.x0, y, w, Math.min(4, d.bottom - y));
+        }
+        ctx.fillStyle = 'rgba(40, 36, 30, 0.22)';
+        for (let y = d.top + 11; y < d.bottom; y += 12) {
+          ctx.fillRect(d.x0, y, w, 1);
+          const off = Math.floor((y - d.top) / 12) % 2 === 0 ? 7 : 19;
+          for (let x = d.x0 + off; x < d.x1; x += 24) ctx.fillRect(x, y - 11, 1, 11);
+        }
+      } else {
+        ctx.fillStyle = KN.wall;
+        ctx.fillRect(d.x0, d.top, w, h);
+        ctx.fillStyle = KN.wallJoint;
+        for (let y = d.top + 7; y < d.bottom; y += 8) {
+          ctx.fillRect(d.x0, y, w, 1);
+          const off = Math.floor((y - d.top) / 8) % 2 === 0 ? 5 : 15;
+          for (let x = d.x0 + off; x < d.x1; x += 20) ctx.fillRect(x, y - 7, 1, 7);
+        }
+      }
+      break;
+    }
+    case 'lightWell':
+      // The light itself is drawn over everything (drawDaylight); here only the drain in its floor.
+      if (d.drain) {
+        const mx = Math.round((d.x0 + d.x1) / 2);
+        ctx.fillStyle = KN.earth;
+        ctx.fillRect(mx - 4, d.bottom - 2, 8, 2);
+        ctx.fillStyle = KN.ashlarJoint;
+        ctx.fillRect(mx - 3, d.bottom - 2, 1, 2);
+        ctx.fillRect(mx, d.bottom - 2, 1, 2);
+        ctx.fillRect(mx + 2, d.bottom - 2, 1, 2);
+      }
+      break;
+    case 'evansBust':
+      if (!paint(ctx, 'evans-bust', d.x, d.floorY - 22)) ctx.drawImage(EVANS_BUST_SPRITE, d.x, d.floorY - 22);
+      break;
+    case 'kouloura': {
+      // A round pit, emptied by the dig: in shadow, its rubble lining showing round the
+      // far side, and lit only along the rim. The tiles cut the hole; this is inside it.
+      ctx.fillStyle = KN.pit;
+      ctx.fillRect(d.x, d.floorY, d.w, d.depth);
+      for (let y = d.floorY + 2; y < d.floorY + d.depth - 2; y += 5) {
+        for (let x = d.x + 1 + (Math.floor(y / 5) % 2) * 3; x < d.x + d.w - 4; x += 7) {
+          ctx.fillStyle = hash(x, y) % 3 === 0 ? KN.pitStoneLit : KN.pitStone;
+          ctx.fillRect(x, y, 5, 3);
+        }
+      }
+      ctx.fillStyle = KN.pitStoneLit;
+      ctx.fillRect(d.x, d.floorY, d.w, 1);
+      break;
+    }
+    case 'causeway': {
+      // A raised walkway across the court. Two fingers high; never a step.
+      const ty = Math.floor(d.floorY / TILE);
+      for (let x = d.x0; x < d.x1; x += TILE) {
+        if (!s.level.isSolid(Math.floor(x / TILE), ty)) continue;
+        ctx.fillStyle = KN.pavingTop;
+        ctx.fillRect(x, d.floorY - 2, TILE, 2);
+        ctx.fillStyle = KN.pavingLine;
+        ctx.fillRect(x + 7, d.floorY - 2, 1, 2);
+      }
+      break;
+    }
+    case 'pithos':
+      if (d.giant) {
+        if (!paint(ctx, 'giant-pithos', d.x, d.floorY - 16)) ctx.drawImage(GIANT_PITHOS_SPRITE, d.x, d.floorY - 16);
+      } else if (!paint(ctx, 'pithos', d.x, d.floorY - 15)) ctx.drawImage(PITHOS_SPRITE, d.x, d.floorY - 15);
+      break;
+    case 'minoanColumn':
+      drawMinoanColumn(ctx, d.x, d.floorY, d.topY, 0, KN.char);
+      break;
+    case 'columnBase':
+      drawColumnBase(ctx, d.x, d.floorY);
+      break;
+    case 'griffin': {
+      const y = d.floorY - 14;
+      if (paint(ctx, 'griffin', d.x, y)) break;
+      if (d.face === 1) ctx.drawImage(GRIFFIN_SPRITE, d.x, y);
+      else {
+        ctx.save();
+        ctx.translate(d.x + GRIFFIN_SPRITE.width, y);
+        ctx.scale(-1, 1);
+        ctx.drawImage(GRIFFIN_SPRITE, 0, 0);
+        ctx.restore();
+      }
+      break;
+    }
+    case 'bench':
+      ctx.fillStyle = KN.gypsumShade;
+      ctx.fillRect(d.x0, d.floorY - 7, d.x1 - d.x0, 7);
+      ctx.fillStyle = KN.gypsum;
+      ctx.fillRect(d.x0, d.floorY - 8, d.x1 - d.x0, 2);
+      break;
+    case 'basin': {
+      // The lining of gypsum slabs, and the dog-leg of steps down into it along its wall.
+      ctx.fillStyle = KN.gypsumWall;
+      ctx.fillRect(d.x, d.floorY, d.w, d.depth);
+      ctx.fillStyle = KN.gypsumWallLine;
+      for (let x = d.x + 7; x < d.x + d.w; x += 16) ctx.fillRect(x, d.floorY, 1, d.depth);
+      ctx.fillStyle = KN.gypsumShade;
+      for (let i = 0; i < 4; i++) ctx.fillRect(d.x + i * 6, d.floorY + 4 + i * 7, d.w - i * 6, 1);
+      break;
+    }
+    case 'doubleAxes': {
+      // A mason's mark cut in a block: the double axe, a haft and two blades.
+      ctx.fillStyle = KN.ashlarJoint;
+      ctx.fillRect(d.x + 3, d.y, 1, 9);
+      for (let i = 0; i < 3; i++) {
+        ctx.fillRect(d.x + 2 - i, d.y + 2 - i, 1, 1 + i * 2);
+        ctx.fillRect(d.x + 4 + i, d.y + 2 - i, 1, 1 + i * 2);
+      }
+      break;
+    }
+    case 'runnel': {
+      // The stepped water channel beside the stair: a stone gutter just above the treads,
+      // dropping a step where the stair does.
+      for (let x = d.x0; x < d.x1; x += 2) {
+        const tx = Math.floor(x / TILE);
+        let ty = Math.floor(d.y0 / TILE) - 1;
+        while (ty < s.level.heightTiles && !s.level.isSolid(tx, ty)) ty++;
+        const top = ty * TILE;
+        ctx.fillStyle = KN.wall;
+        ctx.fillRect(x, top - 7, 2, 7);
+        ctx.fillStyle = KN.ashlarLight;
+        ctx.fillRect(x, top - 7, 2, 1);
+        ctx.fillStyle = KN.earth;
+        ctx.fillRect(x, top - 5, 2, 2);
+      }
+      break;
+    }
+    case 'catchPit':
+      // A square pit in the channel where the water slows and drops its silt.
+      ctx.fillStyle = KN.ashlarJoint;
+      ctx.fillRect(d.x, d.floorY - 10, 12, 10);
+      ctx.fillStyle = KN.earth;
+      ctx.fillRect(d.x + 1, d.floorY - 9, 10, 8);
+      ctx.fillStyle = KN.silt;
+      ctx.fillRect(d.x + 1, d.floorY - 4, 10, 3);
+      break;
+  }
+}
+
+/** A stone base on the floor, a little wider than the column it carries. */
+function drawColumnBase(ctx: CanvasRenderingContext2D, x: number, floorY: number): void {
+  ctx.fillStyle = KN.baseShade;
+  ctx.fillRect(x - 6, floorY - 3, 12, 3);
+  ctx.fillStyle = KN.base;
+  ctx.fillRect(x - 6, floorY - 3, 12, 1);
+}
+
+/**
+ * A Minoan column as Evans rebuilt it, on axis x: a stone base, a red shaft tapering
+ * downward, a black cushion capital and its abacus under the beam. Every column in
+ * the level is drawn by this, the ones that hold and the ones that do not (pillar 4).
+ * `fold` from 0 to 1: the plaster splits down the shaft and its core shows, then the
+ * shaft goes down into its base. At 1 there is a stump on the base and nothing else.
+ */
+function drawMinoanColumn(ctx: CanvasRenderingContext2D, x: number, floorY: number, topY: number, fold: number, core: string): void {
+  if (fold <= 0 && floorY - topY === 64 && paint(ctx, 'minoan-column', x - 6, topY)) return;
+  drawColumnBase(ctx, x, floorY);
+  if (fold >= 1) {
+    ctx.fillStyle = core;
+    ctx.fillRect(x - 3, floorY - 6, 6, 3);
+    ctx.fillRect(x - 1, floorY - 8, 3, 2);
+    return;
+  }
+  const h = floorY - topY;
+  const drop = fold <= 0.35 ? 0 : Math.round(((fold - 0.35) / 0.65) * (h - 12));
+  const top = topY + drop;
+  ctx.fillStyle = KN.capital;
+  ctx.fillRect(x - 6, top, 12, 2);
+  ctx.fillRect(x - 5, top + 2, 10, 4);
+  ctx.fillRect(x - 4, top + 6, 8, 1);
+  ctx.fillStyle = KN.capitalLight;
+  ctx.fillRect(x - 4, top + 3, 3, 1);
+  const s0 = top + 7;
+  const s1 = floorY - 3;
+  for (let y = s0; y < s1; y++) {
+    const hw = (y - s0) * 2 < s1 - s0 ? 4 : 3;
+    ctx.fillStyle = KN.column;
+    ctx.fillRect(x - hw, y, hw * 2, 1);
+    ctx.fillStyle = KN.columnShade;
+    ctx.fillRect(x + hw - 1, y, 1, 1);
+    ctx.fillStyle = KN.columnLight;
+    ctx.fillRect(x - hw + 1, y, 1, 1);
+  }
+  if (fold > 0) {
+    const open = Math.min(3, Math.ceil(fold * 9));
+    ctx.fillStyle = core;
+    ctx.fillRect(x - Math.floor(open / 2), s0, open, s1 - s0);
+  }
+}
+
+/**
+ * A span while it holds: tiles of Evans's slab like the ones either side, drawn by the
+ * code that draws them (pillar 4), and the column under it. Once it has gone, the cut
+ * ends of the slab either side show grey: the one place his painted timber is seen to
+ * be concrete.
+ */
+function drawSpanBack(ctx: CanvasRenderingContext2D, s: Scene, sp: Span): void {
+  const d = sp.def;
+  const r = d.rect;
+  const tx0 = Math.floor(r.x / TILE);
+  const ty = Math.floor(r.y / TILE);
+  if (sp.state === 'idle' || sp.state === 'armed') {
+    for (let i = 0; i < r.w / TILE; i++) drawTileAt(ctx, s.level, '%', tx0 + i, ty, !s.level.isSolid(tx0 + i, ty - 1));
+  } else {
+    ctx.fillStyle = KN.concrete;
+    if (s.level.isSolid(tx0 - 1, ty)) ctx.fillRect(r.x - 2, r.y, 2, r.h);
+    if (s.level.isSolid(tx0 + r.w / TILE, ty)) ctx.fillRect(r.x + r.w, r.y, 2, r.h);
+  }
+  drawMinoanColumn(ctx, d.column.x, d.column.floorY, r.y + r.h, sp.fold, d.skin === 'upperStorey' ? KN.char : KN.rot);
+}
+
+/**
+ * What comes down, and lies as a step. The burnt storey: fill, plaster, charred beams
+ * and a stone column base from the floor above. Evans's floor on Fyfe's timber: the
+ * slab in pieces, and the posts.
+ */
+function drawFallenSpan(ctx: CanvasRenderingContext2D, r: Rect, skin: SpanDef['skin']): void {
+  if (skin === 'upperStorey') {
+    ctx.fillStyle = KN.earth;
+    ctx.fillRect(r.x, r.y + 3, r.w, r.h - 3);
+    ctx.fillStyle = KN.slab;
+    ctx.fillRect(r.x + 1, r.y + 2, 9, 5);
+    ctx.fillRect(r.x + r.w - 9, r.y + 6, 8, 4);
+    ctx.fillStyle = KN.char;
+    ctx.fillRect(r.x, r.y + 8, r.w, 3);
+    ctx.fillRect(r.x + 10, r.y + 1, 3, r.h - 1);
+    ctx.fillStyle = KN.base;
+    ctx.fillRect(r.x + 16, r.y, 10, 4);
+    ctx.fillStyle = KN.baseShade;
+    ctx.fillRect(r.x + 16, r.y + 3, 10, 1);
+  } else {
+    ctx.fillStyle = KN.slab;
+    ctx.fillRect(r.x, r.y + 2, Math.floor(r.w / 2) - 1, r.h - 2);
+    ctx.fillRect(r.x + Math.floor(r.w / 2) + 1, r.y + 4, Math.ceil(r.w / 2) - 1, r.h - 4);
+    ctx.fillStyle = KN.timber;
+    ctx.fillRect(r.x, r.y + 6, Math.floor(r.w / 2) - 1, 4);
+    ctx.fillRect(r.x + Math.floor(r.w / 2) + 1, r.y + 8, Math.ceil(r.w / 2) - 1, 4);
+    ctx.fillStyle = KN.rot;
+    ctx.fillRect(r.x + 4, r.y, r.w - 8, 2);
+    ctx.fillRect(r.x + Math.floor(r.w / 2) - 1, r.y, 2, r.h);
+  }
+  ctx.fillStyle = COLORS.outline;
+  ctx.fillRect(r.x, r.y + r.h - 1, r.w, 1);
+}
+
+/**
+ * One leaf of a pier-and-door partition. Shut, it is seen on edge: a bar the height of
+ * the doorway. Turning, and folded back against its pier, it is seen face on, boards and
+ * frame, as wide as it has turned. Every leaf is drawn by this (pillar 4).
+ */
+function drawDoorLeaf(ctx: CanvasRenderingContext2D, d: DoorDef, k: number): void {
+  const top = d.floorY - d.height;
+  const w = Math.round(d.leafW * k);
+  if (w < 2) {
+    ctx.fillStyle = KN.leafDark;
+    ctx.fillRect(d.planeX - 2, top, 4, d.height);
+    ctx.fillStyle = KN.leaf;
+    ctx.fillRect(d.planeX - 1, top + 1, 2, d.height - 2);
+    return;
+  }
+  const x0 = d.fold === 1 ? d.planeX : d.planeX - w;
+  ctx.fillStyle = KN.leaf;
+  ctx.fillRect(x0, top, w, d.height);
+  ctx.fillStyle = KN.leafDark;
+  ctx.fillRect(x0, top, w, 2);
+  ctx.fillRect(x0, d.floorY - 2, w, 2);
+  ctx.fillRect(x0, top + Math.round(d.height / 2), w, 1);
+  for (let i = 3; i < w - 1; i += 4) ctx.fillRect(x0 + (d.fold === 1 ? i : w - 1 - i), top + 2, 1, d.height - 4);
+  ctx.fillRect(d.fold === 1 ? x0 + w - 1 : x0, top, 1, d.height);
+  ctx.fillStyle = KN.leafLight;
+  ctx.fillRect(d.fold === 1 ? x0 : x0 + w - 1, top, 1, d.height);
+}
+
+/** Daylight from straight above, faintly, so a light well reads as light and not as a hole. */
+function drawDaylight(ctx: CanvasRenderingContext2D, s: Scene, cx: number, cy: number): void {
+  for (const r of daylightShafts(s)) {
+    const x = r.x - cx;
+    if (x > VIEW_W || x + r.w < 0) continue;
+    ctx.fillStyle = 'rgba(255, 247, 222, 0.14)';
+    ctx.fillRect(x, r.y - cy, r.w, r.h);
+    ctx.fillStyle = 'rgba(255, 251, 234, 0.3)';
+    ctx.fillRect(x, r.y + r.h - 3 - cy, r.w, 3);
+  }
 }

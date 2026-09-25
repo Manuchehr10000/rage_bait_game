@@ -2,11 +2,11 @@
 
 Source: `content/research/arc.md`, chapter 3. Dates 1900 to 1200 BC. Runs Crete to
 mainland, Minoan giving way to Mycenaean. Status: locked in the research. Levels 1 and 2 are
-designed; nothing is built.
+designed; level 1 is built, rough, drawn by code.
 
 | Level | Site | Place | Period | Designed | Built |
 |---|---|---|---|---|---|
-| 1 | Knossos | Kephala hill, Heraklion, Crete | Palaces c. 1900–1350 BC | yes | not yet |
+| 1 | Knossos | Kephala hill, Heraklion, Crete | Palaces c. 1900–1350 BC | yes | rough |
 | 2 | Phaistos | Messara plain, south Crete | Old Palace c. 1900 BC; New c. 1700–1450 BC | yes | not yet |
 | 3 | Akrotiri | Thera (Santorini) | Buried by eruption, late 17th c. BC | not yet | not yet |
 | 4 | Mycenae | Argolid | Peak c. 1350–1200 BC | not yet | not yet |
@@ -71,7 +71,8 @@ it: **the column that lies stands right beside the light.** Land in the light; n
 to it. It has two crushes (a burnt span in the storerooms, a timber span in the Grand
 Staircase), the game's one death with no physical cause (the tourist lands in front of the
 throne and is sitting in it), and the game's first trap on a cycle (the folding doors of the
-Hall of the Double Axes). About 25 seconds clean.
+Hall of the Double Axes). About 25 seconds clean; built rough, the knowing run is 27.3 s, 1.85
+s of it standing at the doors (`tests/knossos.spec.ts`).
 
 ## Level 2 · Phaistos
 
@@ -277,7 +278,7 @@ its room is ruled again then.
 
 | Level | Room | Why |
 |---|---|---|
-| Knossos | `open` | The Central Court is open to the sky. The roofed rooms are Evans's reconstitution, so a roofed acoustic at Knossos would be his and not a Minoan one. If level 1 is built inside the reconstituted light-well rooms, rule a small room then, and call it Evans's. Level 1, designed 2026-09-24, spends four of its seven beats under Evans's roofs (the storerooms, the Throne Room, the Grand Staircase, the Hall of the Double Axes): rule its room before it is built. |
+| Knossos | `open` | The Central Court is open to the sky. The roofed rooms are Evans's reconstitution, so a roofed acoustic at Knossos would be his and not a Minoan one. If level 1 is built inside the reconstituted light-well rooms, rule a small room then, and call it Evans's. Level 1, designed 2026-09-24, spends four of its seven beats under Evans's roofs (the storerooms, the Throne Room, the Grand Staircase, the Hall of the Double Axes): rule its room before it is built. Built rough 2026-09-25 on `open`, which is the room it had: **not ruled**, and still the designer's call. |
 | Phaistos | `open` | Excavated and conserved, never reconstructed. The most exposed of the five. Level 2, designed 2026-09-24, is in the open air throughout except its finale, the hall of the Royal Apartments under a 1960s shelter, and its last few seconds under the New Palace floor: `open` stands. |
 | Akrotiri | `hall` | The only site visited wholly under a roof: the modern shelter over the excavated town. Estimated at 1.2 to 2 s; `hall` is 1.6 s and, if anything, dry. Nothing in the sound refers to the shelter's history. Waits on the ruling for Akrotiri in `content/research/arc.md`, section 4. |
 | Mycenae | `open` | An open citadel inside its walls. If level 4 is built inside the Treasury of Atreus, use the existing `deep`. The tholos is a tomb, its name a modern identification drawing on Pausanias 2.16.6, and no published measurement of its famous echo was found: nothing may suggest it was built for sound. |

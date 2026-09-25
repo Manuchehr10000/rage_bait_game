@@ -24,6 +24,13 @@
       "what": "The Nile from Abu Simbel to Saqqara, zoomed, as the chapter's own map. No pins, no route, no words."
     },
     {
+      "id": "map-ch03-aegean",
+      "w": 208,
+      "h": 152,
+      "beat": ".",
+      "what": "Crete, the Cyclades and the Argolid, zoomed, as the chapter's own map. No pins, no route, no words."
+    },
+    {
       "id": "map-monument-ch01-palaeolithic",
       "w": 92,
       "h": 70,

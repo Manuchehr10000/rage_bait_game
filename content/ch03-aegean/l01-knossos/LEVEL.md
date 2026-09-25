@@ -67,7 +67,8 @@ Phaistos's, where the light no longer cares how far you fall.
 
 About **25 seconds clean**. It was drafted at about 34 and cut, because the hardest trap
 is the last one and a death there replays the level: five columns in the storerooms rather
-than seven, two flights at the East Bastion rather than three, a shorter court.
+than seven, two flights at the East Bastion rather than three, a shorter court. Built, the
+knowing run is 27.3 s from the spawn, 1.85 s of it standing at the doors.
 
 ## The beats
 
@@ -107,9 +108,13 @@ it and the level after it is the same for all.
 - **Second attempt.** He jumps from under the fourth span, the roof cuts the jump flat, and
   he comes down in the light with the span falling behind him. He never stops.
 - The trigger is a footfall under the span, not a line crossed, because nothing triggered by
-  a line can be outrun at full speed and pillar 5 forbids asking him to slow down. The fold
-  delay is widened from the first draft's 0.2 s so the jump is not frame-tight; pin it with
-  the spec.
+  a line can be outrun at full speed and pillar 5 forbids asking him to slow down. **As built:**
+  the footfall is his centre over the floor under the span, and the span lets go 0.2 s after
+  it, the column folding in that fifth of a second. Because the trigger is his centre on the
+  ground, the jump is not frame-tight at 0.2 s: a full jump from anywhere under the fourth span
+  (32 px of take-off, about a third of a second) gets him out, the late ones straight into the
+  light, the early ones late in the fifth bay and running out. Running in, the span arrives with
+  him about 6 px short of the light. `tests/knossos.spec.ts` pins both.
 - The storage jars stand against the back wall and do nothing. They are never solid: a jar
   plus a full jump would reach Evans's floor in the open stretches.
 
@@ -135,7 +140,11 @@ The chapter's second verb: not what falls on you, but where you land.
   nothing. The flinch costs him nothing, and the original and the copy side by side are the
   chapter's line for this level in one picture.
 - The room's ceiling is declared higher than a storey, so full jumps in it are not cut and
-  the landing on the throne is a clean arc. Re-measure every arc against the spec.
+  the landing on the throne is a clean arc. **As built:** six tiles clear. Every full jump out
+  of the basin, from a run or from against its wall, comes down with his centre within 20 px
+  under the throne (the seat's 14 and three either side), which is the footprint; a hop out
+  lands short of it. A full jump over the barrier, from a run or from against it, comes down on
+  the copy's footprint, the same 20 px. `tests/knossos.spec.ts` checks all of it.
 - Four steps up and out through the pier-and-door openings of the anteroom into the court.
 
 ### d · Central Court
@@ -151,7 +160,9 @@ other, and a collapse happening one storey above the tourist and stopping there.
 
 - From the court into shade under Evans's upper storey, which is only ever a ceiling, then
   one storey down the stair. The steps are walked and never the trap (stairs are Egypt's).
-  The columns on the stair's balustrade are all identical and all hold.
+  One column stands at the head of the stair and holds. (Built with one, not a balustrade of
+  them: every column in the level is a storey high and the same to the pixel, and a column on
+  each step would have been taller than a storey.)
 - At the edge of the upper hall stands column A, and past it the light well: three tiles of
   daylight from the sky to sunlit gypsum paving one storey down, with a drain in it.
 - Across the shaft the hall carries on under columns B and C, pixel-identical to A. They carry
@@ -193,7 +204,9 @@ always allowed for a last trap and nobody had used.
   about every 1.6 s, each swing taking 0.2 s, so exactly one doorway is open at a time. Each
   turn is one dry wooden clack, heard only while the hall is on screen. Anyone in the area a
   leaf has still to sweep, floor to lintel, while it swings, dies. The shut bar is solid only
-  once the leaf is fully shut. Retune all of it against the spec.
+  once the leaf is fully shut. **As built:** the doorways are three tiles high under a lintel;
+  a leaf reaches 14 px; the first turn is 1.55 s after the clock starts, then every 1.6 s,
+  each taking 0.2 s. The one clack is the first door's. The knowing run stands 1.85 s in all.
 - **First attempt.** He reaches the first door shut and stands against it. It folds away from
   him, safely, and the same turn shuts the second ahead of him. He walks on and stands against
   the second, exactly as the first has just taught him, and it opens into his face. He goes
@@ -320,7 +333,8 @@ No jump in the beat can kill.
 
 ## New in the engine
 
-Nothing here is exotic, and none of it exists yet.
+Nothing here is exotic. All of it is built (2026-09-25), rough and drawn by code; the anteroom's
+pier-and-door openings onto the court are not drawn yet.
 
 - Darkness in more than one stretch of a level, bounded in height, and a `lightWell` shaft of
   daylight cut out of it with no fixture. Never the `spotlight` decor: at Karnak, spotlit

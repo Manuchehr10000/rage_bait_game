@@ -11,7 +11,7 @@ import { TILE, type Costume, type DeathCause, type Rect } from './types';
  */
 export type TileChar = ' ' | '#' | '=' | '%' | '?' | 'x';
 
-export type Theme = 'capBlanc' | 'rocAuxSorciers' | 'pechMerle' | 'rouffignac' | 'gargas' | 'abuSimbel' | 'philae' | 'karnak' | 'dendera';
+export type Theme = 'capBlanc' | 'rocAuxSorciers' | 'pechMerle' | 'rouffignac' | 'gargas' | 'abuSimbel' | 'philae' | 'karnak' | 'dendera' | 'knossos';
 
 // ---------------------------------------------------------------------------
 // Entities. Every trap in the game is one of these, with a skin for the renderer.
@@ -127,7 +127,7 @@ export interface CrumbleDef {
   skin:
     | 'croc' | 'capital' | 'rock' | 'floor' | 'talatat' | 'column' | 'stone' | 'relief' | 'fallenBlock'
     | 'horns' | 'disc' | 'walkway' | 'stalagmite' | 'fallenRoof' | 'clayLedge'
-    | 'stopSign' | 'ballast' | 'tread' | 'roofSlab';
+    | 'stopSign' | 'ballast' | 'tread' | 'roofSlab' | 'barrier';
   rect: Rect;
   fake: boolean;
   delay: number;
@@ -361,7 +361,82 @@ export interface TipperDef {
   cause: DeathCause;
 }
 
+/**
+ * A stretch of the floor over his head, carried by one column. While the column
+ * stands it is part of the ceiling: solid, and drawn exactly like the ceiling on
+ * either side of it (pillar 4). When the column fails it comes down faster than
+ * he can get out from under it, and once it is down it is a step.
+ */
+export interface SpanDef {
+  kind: 'span';
+  /**
+   * What it is. The burnt Minoan storey of the west wing, drawn like Evans's slab
+   * until it goes; or a stretch of Evans's own floor, on Fyfe's timber of 1901.
+   */
+  skin: 'upperStorey' | 'timber';
+  /** Where it hangs: the piece of ceiling it is. */
+  rect: Rect;
+  /** Where its bottom lands. */
+  floorY: number;
+  /** The column that carries it: its axis, and the floor it stands on. It goes first. */
+  column: { x: number; floorY: number };
+  /** Set off by his feet on this strip of floor: his centre over it, on the ground... */
+  footfall?: Rect;
+  /** ...or by his centre crossing this x, whichever comes first. */
+  atX?: number;
+  /** Seconds from the trigger to the span letting go. The column folds in the last fifth of a second. */
+  delay: number;
+  cause: DeathCause;
+}
+
+/**
+ * A seat. The one at Knossos is the throne: land in front of it and he is sitting in
+ * it, and his visit is over. Walked past, it is a chair. `active: false` is Evans's
+ * copy in the anteroom, the same chair, which does nothing to anybody. Not solid.
+ */
+export interface SeatDef {
+  kind: 'seat';
+  /** The seat's footprint on the floor: the whole width of the seat. */
+  x: number;
+  w: number;
+  floorY: number;
+  active: boolean;
+  cause: DeathCause;
+}
+
+/**
+ * One leaf of a pier-and-door partition, turning on its pivots on one clock with
+ * the other partitions of its hall. Shut, it is a bar across the doorway, floor to
+ * lintel; open, it lies folded against its pier on one side. While it swings,
+ * whoever is where it has still to go is where it goes.
+ */
+export interface DoorDef {
+  kind: 'door';
+  /** The pivot's line: where the leaf stands when it is shut. */
+  planeX: number;
+  floorY: number;
+  /** Floor to lintel. */
+  height: number;
+  /** How far the leaf reaches, lying open against its pier. */
+  leafW: number;
+  /** Which way it folds: 1 east, -1 west. */
+  fold: 1 | -1;
+  /** Shut before the clock starts. */
+  startShut: boolean;
+  /**
+   * The hall's clock: it starts when his centre crosses `triggerX`, turns first at
+   * `first` seconds and every `period` after, and a turn takes `swing` seconds.
+   */
+  clock: { triggerX: number; first: number; period: number; swing: number };
+  /** Turns without a clack of its own: the leaves turn together, and the hall's clock is heard once, from the other. */
+  quiet?: boolean;
+  cause: DeathCause;
+}
+
 export type EntityDef =
+  | SpanDef
+  | SeatDef
+  | DoorDef
   | FallingDef
   | ThrowerDef
   | PlatformDef
@@ -420,6 +495,9 @@ export type DecorDef =
        * it never does this. Only the level whose lamp runs down has one.
        */
       deadlyUntil?: number;
+      /** The dark only between these heights: the inside of a room, not the sky over its roof. */
+      y0?: number;
+      y1?: number;
     }
   | { kind: 'spotlight'; x: number; floorY: number; top?: number }
   | { kind: 'museumWall'; x: number; w: number; doorX: number; top: number; floorY: number }
@@ -488,7 +566,43 @@ export type DecorDef =
   | { kind: 'brokenObelisk'; x: number; floorY: number }
   | { kind: 'pedestal'; x: number; floorY: number }
   | { kind: 'turnstile'; x: number; floorY: number }
-  | { kind: 'landing'; x: number; floorY: number };
+  | { kind: 'landing'; x: number; floorY: number }
+  // Knossos.
+  /**
+   * A light well: a shaft open to the sky through every storey. Nothing is over it,
+   * so it is cut out of the dark and drawn in daylight, with no fixture. Nothing ever
+   * comes down on a lit patch.
+   */
+  | { kind: 'lightWell'; x0: number; x1: number; top: number; bottom: number; drain?: boolean }
+  /**
+   * The back wall of a room: ashlar, plaster, or the gypsum dado of a state room; or the
+   * far wall of a light well, pale at the top where the sun is and deeper toward its floor.
+   */
+  | { kind: 'backWall'; x0: number; x1: number; top: number; bottom: number; stone: 'ashlar' | 'plaster' | 'gypsum' | 'well' }
+  /** Evans, in bronze, on his plinth by the way in. */
+  | { kind: 'evansBust'; x: number; floorY: number }
+  /** One of the round pits of the West Court: the stone lining of a hole the tiles cut. */
+  | { kind: 'kouloura'; x: number; w: number; floorY: number; depth: number }
+  /** A raised walkway across a paved court. Two fingers high; never a step. */
+  | { kind: 'causeway'; x0: number; x1: number; floorY: number }
+  /** A storage jar standing against the back wall. Not solid. `giant`: the Old Palace's, with rope bands. */
+  | { kind: 'pithos'; x: number; floorY: number; giant?: boolean }
+  /** A Minoan column as Evans rebuilt it: tapering downward, red, a black cushion capital. */
+  | { kind: 'minoanColumn'; x: number; floorY: number; topY: number }
+  /** A stone column base with nothing on it. */
+  | { kind: 'columnBase'; x: number; floorY: number }
+  /** A griffin of the Throne Room wall, as the Gilliérons painted it. */
+  | { kind: 'griffin'; x: number; floorY: number; face: 1 | -1 }
+  /** A low gypsum bench along a wall. */
+  | { kind: 'bench'; x0: number; x1: number; floorY: number }
+  /** The lining and the dog-leg of steps of a sunken basin the tiles cut. */
+  | { kind: 'basin'; x: number; w: number; floorY: number; depth: number }
+  /** Double axes cut in the blocks of a wall: masons' marks. */
+  | { kind: 'doubleAxes'; x: number; y: number }
+  /** The stepped rainwater channel beside a stair, from its head to its foot. */
+  | { kind: 'runnel'; x0: number; y0: number; x1: number; y1: number }
+  /** A square catch-pit in the runnel, with silt in it. */
+  | { kind: 'catchPit'; x: number; floorY: number };
 
 /** The painted panels the game draws on cave rock, by site. */
 export type CavePanel =
