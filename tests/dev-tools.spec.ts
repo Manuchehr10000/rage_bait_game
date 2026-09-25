@@ -10,6 +10,9 @@ import { expect, test, type Page } from '@playwright/test';
  * level, Y up from the floor the tourist spawns on, so that world y = floor - Y.
  */
 
+// Tall enough that the screen still draws at 4x with the dev tools' buttons under it.
+test.use({ viewport: { width: 1280, height: 820 } });
+
 type Point = { x: number; y: number } | null;
 
 /** Inside page.evaluate: the type is erased, so it survives the trip into the page. */
@@ -205,7 +208,7 @@ test('each tick sits on the top edge of the pixel the readout names with its num
     return { s, ink, zero, limit };
   }, at.y);
 
-  expect(col.s, 'the default viewport draws at 4x, where ticks are crisp').toBe(4);
+  expect(col.s, 'this viewport draws at 4x, where ticks are crisp').toBe(4);
   // A tick every 10 world px, two canvas rows thick, straddling the top edge of its pixel.
   const expected: number[] = [];
   for (let row = col.zero % 40; row <= col.limit; row += 40) {
@@ -258,7 +261,7 @@ test('a resize under a still mouse names what is under the mouse after it', asyn
   await open(page, 'cap-blanc');
   const before = await hover(page, 200, 180);
   const at = await mouseAt(page, 200, 180);
-  await page.setViewportSize({ width: 1000, height: 600 });
+  await page.setViewportSize({ width: 1000, height: 640 });
   await page.waitForFunction(() => (window as unknown as W).__game.scale === 3);
   const afterResize = await page.evaluate(() => (window as unknown as W).__game.devPoint as Point);
   // The same place on the page, arrived at by moving there: what a fresh reading says.
@@ -686,4 +689,61 @@ test('the dev keys do not stop looking, and hiding the tools lets a stopped game
   const t0 = (await tourist(page)).time;
   await ticks(page, 10);
   expect((await tourist(page)).time).toBeGreaterThan(t0);
+});
+
+test('the buttons under the screen do what their keys do, light up with them, and leave Space a jump', async ({ page }) => {
+  await open(page, 'karnak');
+  const button = (label: string) => page.locator('.dev-bar button', { hasText: label });
+  const lit = async (label: string) => (await button(label).getAttribute('class'))?.includes('on') ?? false;
+  const drawn = () => page.evaluate(() => (window as unknown as W).__game.draw());
+
+  await drawn();
+  expect(await lit('tools')).toBe(true);
+  expect(await lit('overlay')).toBe(false);
+  expect(await button('step').isDisabled(), 'nothing to step until paused').toBe(true);
+
+  // A click and a key are the same thing: each undoes the other.
+  await button('overlay').click();
+  await drawn();
+  expect(await page.evaluate(() => (window as unknown as W).__game.dev.overlay)).toBe(true);
+  expect(await lit('overlay')).toBe(true);
+  await page.keyboard.press('KeyH');
+  await drawn();
+  expect(await lit('overlay')).toBe(false);
+
+  await button('pause').click();
+  await drawn();
+  expect(await lit('pause')).toBe(true);
+  expect(await button('step').isDisabled()).toBe(false);
+  const t0 = await page.evaluate(() => Math.round((window as unknown as W).__game.time * 60));
+  await button('step').click();
+  await ticks(page, 10);
+  expect(await page.evaluate(() => Math.round((window as unknown as W).__game.time * 60))).toBe(t0 + 1);
+  await button('pause').click();
+
+  await button('¼ speed').click();
+  await drawn();
+  expect(await page.evaluate(() => (window as unknown as W).__game.dev.timeScale)).toBe(0.25);
+  await button('¼ speed').click();
+
+  // Clicking did not give a button the keyboard: Space is still his jump.
+  expect(await page.evaluate(() => document.activeElement?.tagName)).toBe('BODY');
+  await page.keyboard.down('Space');
+  await ticks(page, 4);
+  await page.keyboard.up('Space');
+  expect(await page.evaluate(() => (window as unknown as W).__game.player.onGround)).toBe(false);
+
+  // The tools button hides them all; the others go grey until it is pressed again.
+  await button('tools').click();
+  await drawn();
+  expect(await lit('tools')).toBe(false);
+  expect(await button('overlay').isDisabled()).toBe(true);
+  await button('tools').click();
+
+  // The row has room: the page never scrolls, even where the screen only just fits
+  // (760 px tall is 4x without the row, and has to give it up for 3x to keep the row).
+  expect(await page.evaluate(() => document.documentElement.scrollHeight <= innerHeight)).toBe(true);
+  await page.setViewportSize({ width: 1280, height: 760 });
+  await page.waitForFunction(() => (window as unknown as W).__game.scale === 3);
+  expect(await page.evaluate(() => document.documentElement.scrollHeight <= innerHeight)).toBe(true);
 });

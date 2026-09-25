@@ -1,5 +1,6 @@
 import type { Camera } from '../engine/camera';
 import { VIEW_H, VIEW_W } from '../engine/types';
+import { DevBar } from './bar';
 import { predictJumps, renderOverlay, type Arc, type OverlayWorld } from './overlay';
 import { pointText, renderBanner, renderRuler, rulerPoint, type RulerView, type ScreenPoint } from './ruler';
 
@@ -66,27 +67,19 @@ export class DevTools {
   private steps = 0;
   /** His jumps as they were when he last stood on something. In the air, the ones he took off with. */
   private arcs: Arc[] = [];
+  /** The same tools as buttons, under the screen. */
+  private readonly bar: DevBar;
 
   constructor(
     private readonly canvas: HTMLCanvasElement,
     private readonly host: DevHost,
   ) {
     window.addEventListener('keydown', (e) => {
-      // Bare G only. Ctrl+G and Cmd+G belong to the browser.
+      // Bare keys only. Ctrl+G and Cmd+G belong to the browser.
       if (e.repeat || e.ctrlKey || e.metaKey || e.altKey) return;
-      if (e.code === 'KeyG') {
-        this.on = !this.on;
-        if (!this.on) this.stopLooking();
-      }
-      if (!this.on) return;
-      if (e.code === 'KeyH') this.overlay = !this.overlay;
-      if (e.code === 'KeyT') this.slow = !this.slow;
-      if (e.code === 'KeyP') {
-        this.frozen = !this.frozen;
-        this.steps = 0;
-      }
-      if (e.code === 'Period' && this.frozen) this.steps += 1;
+      this.press(e.code);
     });
+    this.bar = new DevBar(canvas, (code) => this.press(code));
     // Ahead of the game's own keys: a key pressed while looking stops looking first.
     // Escape does only that. Anything else goes on to the game as well, so an arrow
     // that ends the look is also the first step.
@@ -119,6 +112,27 @@ export class DevTools {
     });
   }
 
+  /** A dev key, from the keyboard or its button under the screen. Anything else is not ours. */
+  private press(code: string): void {
+    if (code === 'KeyG') {
+      this.on = !this.on;
+      if (!this.on) this.stopLooking();
+    }
+    if (!this.on) return;
+    if (code === 'KeyH') this.overlay = !this.overlay;
+    if (code === 'KeyT') this.slow = !this.slow;
+    if (code === 'KeyP') {
+      this.frozen = !this.frozen;
+      this.steps = 0;
+    }
+    if (code === 'Period' && this.frozen) this.steps += 1;
+  }
+
+  /** Height the button row takes under the screen, with the gap above it. The game leaves it free. */
+  get reserve(): number {
+    return this.bar.el.offsetHeight + 10;
+  }
+
   /** True while the game must not tick: looking along the level, or stopped with P. */
   get paused(): boolean {
     return this.on && (this.looking !== null || this.frozen);
@@ -146,6 +160,13 @@ export class DevTools {
   draw(ctx: CanvasRenderingContext2D, scale: number, view: RulerView | null): void {
     const live = this.on && view !== null;
     this.view = live ? view : null;
+    this.bar.show({
+      KeyG: { on: this.on, enabled: true },
+      KeyH: { on: this.on && this.overlay, enabled: this.on },
+      KeyT: { on: this.on && this.slow, enabled: this.on },
+      KeyP: { on: this.on && this.frozen, enabled: this.on },
+      Period: { on: false, enabled: this.on && this.frozen },
+    });
     // Off the level it was looking along (to the map, say), there is nothing to put back.
     if (!live) this.looking = null;
     // A crosshair names a pixel better than an arrow does. Not on the map, whose pointer is for clicking.

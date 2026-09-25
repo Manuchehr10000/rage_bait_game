@@ -70,6 +70,10 @@ T runs the game at a quarter speed. P stops it; full stop then moves it on one t
 time, with whatever keys are held. G, hiding the tools, puts all of this back the way a
 player has it.
 
+Every one of these is also a button in a row under the screen, with its key on it, lit
+while its tool is on. The game leaves the row room, so a window that only just fits the
+screen at 4x without it draws at 3x with it.
+
 They live in `src/dev/` and never reach a player. dev and main are one history, so the
 source goes to main when dev is promoted; the code does not go to prod. The prod build
 refuses to finish if anything from `src/dev/` is in its bundle, and CI builds prod on every

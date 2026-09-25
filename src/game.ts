@@ -321,7 +321,9 @@ export class Game {
   // ---------------------------------------------------------------------
 
   private resize(): void {
-    const s = Math.max(1, Math.floor(Math.min(window.innerWidth / VIEW_W, (window.innerHeight - 40) / VIEW_H)));
+    // Room under the screen for the controls line, and for the dev tools' buttons where there are any.
+    const below = 40 + (this.dev?.reserve ?? 0);
+    const s = Math.max(1, Math.floor(Math.min(window.innerWidth / VIEW_W, (window.innerHeight - below) / VIEW_H)));
     this.scale = s;
     this.canvas.width = VIEW_W * s;
     this.canvas.height = VIEW_H * s;
