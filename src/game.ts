@@ -43,8 +43,9 @@ const ARRIVE_FROM = 8;
  * Chapter 3's lyre are sent through it, and Egypt's three rooms are recorded and not
  * heard. Chapter 3's five sites are decided in content/ch03-aegean/CHAPTER.md:
  * each is { track: 'ch03' } in the open, except Akrotiri, which is 'hall', the roof
- * its visitors stand under. Knossos is built and stays 'open' until the designer
- * rules on a room for Evans's roofed rooms, which four of its seven beats are in.
+ * its visitors stand under. Knossos is ruled 'open' for the whole level, Evans's
+ * roofed rooms included: visitors stand outside them, and the first roof the lyre is
+ * heard under is Akrotiri's.
  */
 const SOUND_OF: Record<Theme, { track: MusicId; room: Room }> = {
   capBlanc: { track: 'ch01', room: 'open' }, // a cliff shelter, open to the valley
@@ -56,7 +57,7 @@ const SOUND_OF: Record<Theme, { track: MusicId; room: Room }> = {
   philae: { track: 'ch02', room: 'open' },
   karnak: { track: 'ch02', room: 'chamber' }, // the hypostyle hall is a roofed forest
   dendera: { track: 'ch02', room: 'open' }, // up a stair in the wall, and then the roof, under the sky
-  knossos: { track: 'ch03', room: 'open' }, // the courts are open to the sky; the roofs are Evans's
+  knossos: { track: 'ch03', room: 'open' }, // ruled: visitors look into Evans's rooms from outside
 };
 
 /** The pages of the brochure that have been arranged, by chapter number. */
