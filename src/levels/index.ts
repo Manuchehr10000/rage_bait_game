@@ -6,10 +6,11 @@ import { GARGAS } from './ch01-palaeolithic/l05-gargas';
 import { ROC_AUX_SORCIERS } from './ch01-palaeolithic/l02-roc-aux-sorciers';
 import { ABU_SIMBEL } from './ch02-egypt/l01-abu-simbel';
 import { KARNAK } from './ch02-egypt/l03-karnak';
+import { DENDERA } from './ch02-egypt/l04-dendera';
 import { PHILAE } from './ch02-egypt/l02-philae';
 
 /** Every level in tour order: chapter 1, then chapter 2 south to north along the Nile. */
-export const LEVELS: LevelData[] = [CAP_BLANC, ROC_AUX_SORCIERS, PECH_MERLE, ROUFFIGNAC, GARGAS, ABU_SIMBEL, PHILAE, KARNAK];
+export const LEVELS: LevelData[] = [CAP_BLANC, ROC_AUX_SORCIERS, PECH_MERLE, ROUFFIGNAC, GARGAS, ABU_SIMBEL, PHILAE, KARNAK, DENDERA];
 
 export function levelIndexFromHash(hash: string): number {
   const key = hash.replace(/^#/, '').trim();

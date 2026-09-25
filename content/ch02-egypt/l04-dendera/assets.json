@@ -1,0 +1,63 @@
+{
+  "$comment": "Sizes are world pixels (320 x 180 view). Painted files are 4x. See content/README.md. The ankh block in the stair ceiling, and the block it becomes when it falls, are ankh-block and ankh-block-used in ch02-egypt/shared. The zodiac slab is two tiles of tile-dendera-sandstone-top in the grid like every other roof slab, which the game takes out when the charge goes off (pillar 4). The chapels, the stair head and the screen walls of the kiosk are tiles. The sky, the far layer, the pre-dawn blue and the dawn are drawn by the game.",
+  "level": "l04-dendera",
+  "assets": [
+    {
+      "id": "tile-dendera-sandstone",
+      "w": 16,
+      "h": 16,
+      "beat": "a-east-gate",
+      "what": "Dressed sandstone of the temple walls and the body under the roof, coursed, fine-jointed, no surface."
+    },
+    {
+      "id": "tile-dendera-sandstone-top",
+      "w": 16,
+      "h": 16,
+      "beat": "a-east-gate",
+      "what": "The same with a top course: the roof, the chapel roofs, the treads of the stair, the paving of the wabet's court. The zodiac slab is two of these."
+    },
+    {
+      "id": "tile-dendera-ground",
+      "w": 16,
+      "h": 16,
+      "beat": "a-east-gate",
+      "what": "The ground inside the enclosure: sand and packed earth, no surface."
+    },
+    {
+      "id": "tile-dendera-ground-top",
+      "w": 16,
+      "h": 16,
+      "beat": "a-east-gate",
+      "what": "The same with the walking surface: the approach from the east gate to the side door."
+    },
+    {
+      "id": "enclosure-gate",
+      "w": 76,
+      "h": 80,
+      "beat": "a-east-gate",
+      "what": "The east gate of the enclosure: two stone jambs and a lintel with its cornice and winged disc, walked through. The mud-brick wall either side is drawn by the game."
+    },
+    {
+      "id": "procession-figure",
+      "w": 12,
+      "h": 26,
+      "frames": 2,
+      "beat": "b-east-stair",
+      "what": "One figure of the procession carved on the east stair, in sunk relief, facing left: down the stair. Frame 0 a priest, frame 1 a standard-bearer."
+    },
+    {
+      "id": "wabet-chapel",
+      "w": 48,
+      "h": 56,
+      "beat": "d-west-chapels",
+      "what": "The wabet, seen at the foot of its court from the roof: a small chapel raised on steps, two columns and a cornice at the front."
+    },
+    {
+      "id": "hathor-column",
+      "w": 16,
+      "h": 80,
+      "beat": "e-kiosk",
+      "what": "One column of the roof kiosk: the shaft and the sistrum capital, Hathor's face with cow's ears and a little shrine on her head."
+    }
+  ]
+}

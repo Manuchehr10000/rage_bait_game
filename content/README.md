@@ -27,6 +27,7 @@ content/
       ...
     l02-philae/
     l03-karnak/
+    l04-dendera/
 ```
 
 ## Where the history comes from

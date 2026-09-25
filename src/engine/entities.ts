@@ -109,8 +109,12 @@ export class Falling implements Entity {
     if (!this.def.active) return;
     const p = w.player;
     if (this.state === 'idle') {
-      if (centerX(p) >= this.def.triggerX) {
+      const go = this.def.onEvent ? w.events.has(this.def.onEvent) : centerX(p) >= this.def.triggerX;
+      if (go) {
         this.state = 'falling';
+        this.vy = this.def.push ?? 0;
+        // A block of the ceiling leaves the ceiling. The next attempt puts it back.
+        if (this.def.fromTile) w.level.setTile(Math.floor(this.rect.x / TILE), Math.floor(this.rect.y / TILE), ' ');
         w.sound('headCrack');
       }
       return;
@@ -459,6 +463,17 @@ export class Crumble implements Entity {
     if (this.state === 'armed') {
       this.timer -= DT;
       if (this.timer <= 0) {
+        if (this.def.blast) {
+          // Not a slab giving way: a charge going off under it. Nothing is left to fall.
+          this.state = 'gone';
+          if (this.def.fromTiles) {
+            for (let tx = Math.floor(r.x / TILE); tx < Math.ceil((r.x + r.w) / TILE); tx++)
+              for (let ty = Math.floor(r.y / TILE); ty < Math.ceil((r.y + r.h) / TILE); ty++) w.level.setTile(tx, ty, ' ');
+          }
+          if (standing) w.kill(this.def.cause ?? 'The zodiac');
+          else w.sound('blast');
+          return;
+        }
         if (this.def.walk) {
           // It turns round and goes.
           this.state = 'walking';

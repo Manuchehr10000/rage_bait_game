@@ -72,7 +72,7 @@ export const CHAPTERS: Chapter[] = [
       { name: 'Abu Simbel', lat: 22.34, lon: 31.63, level: 'abu-simbel' },
       { name: 'Philae', lat: 24.02, lon: 32.88, level: 'philae', pin: { dx: 12, dy: 2 }, label: 'right' },
       { name: 'Karnak', lat: 25.72, lon: 32.66, level: 'karnak', pin: { dx: -12, dy: 0 }, label: 'left' },
-      { name: 'Dendera', lat: 26.14, lon: 32.67, pin: { dx: 10, dy: -8 }, label: 'right' },
+      { name: 'Dendera', lat: 26.14, lon: 32.67, level: 'dendera', pin: { dx: 10, dy: -8 }, label: 'right' },
       { name: 'Saqqara', lat: 29.87, lon: 31.22 },
     ],
   },

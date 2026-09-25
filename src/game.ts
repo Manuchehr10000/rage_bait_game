@@ -54,6 +54,7 @@ const SOUND_OF: Record<Theme, { track: MusicId; room: Room }> = {
   abuSimbel: { track: 'ch02', room: 'open' }, // the facade; the sanctuary is cut into it
   philae: { track: 'ch02', room: 'open' },
   karnak: { track: 'ch02', room: 'chamber' }, // the hypostyle hall is a roofed forest
+  dendera: { track: 'ch02', room: 'open' }, // up a stair in the wall, and then the roof, under the sky
 };
 
 /** The pages of the brochure that have been arranged, by chapter number. */
@@ -448,6 +449,9 @@ export class Game {
     const lampSwitch = this.input.takePressed('KeyL');
     this.input.flush();
     if (this.state === 'complete') {
+      // A dawn does not stop because he got there. It comes up on him where he stands,
+      // which is the end of Dendera. Nothing else in the world is asked to carry on.
+      for (const e of this.entities) if (e.def.kind === 'sweep' && e.def.skin === 'dawn') e.update(this.worldView());
       const nextIndex = this.nextLevelIndex();
       if (escape) this.goToMap();
       else if (next && nextIndex !== null) this.enterLevel(nextIndex, true);
@@ -462,15 +466,7 @@ export class Game {
     if (restart && this.state === 'playing') this.kill('Gave up');
 
     this.time += DT;
-    const world: World = {
-      level: this.level,
-      player: this.player,
-      cameraX: this.camera.x,
-      events: this.events,
-      alive: this.state === 'playing',
-      kill: (c) => this.kill(c),
-      sound: (n) => this.audio.play(n),
-    };
+    const world = this.worldView();
 
     if (this.state === 'dead') {
       // The tourist is done. The head still lands, the water still rises, the sun still sweeps.
@@ -574,6 +570,19 @@ export class Game {
       this.audio.stopLoops();
       this.audio.play('turnstile');
     }
+  }
+
+  /** What the traps see of the game this frame. */
+  private worldView(): World {
+    return {
+      level: this.level,
+      player: this.player,
+      cameraX: this.camera.x,
+      events: this.events,
+      alive: this.state === 'playing',
+      kill: (c) => this.kill(c),
+      sound: (n) => this.audio.play(n),
+    };
   }
 
   /** Continuous sounds follow entity state; they stop on their own when it changes. */

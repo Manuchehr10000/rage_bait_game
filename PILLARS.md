@@ -115,3 +115,20 @@ Everything it has taught you is now the trap.
 | The exit | the turnstile stands on a trapdoor; the real exit is an empty pedestal with nothing on it | the scarab's pedestal by the sacred lake, empty because the scarab is in the court |
 
 Target death budget for a first clean run: 40 to 60.
+
+## Level 4: Dendera, Temple of Hathor
+
+Level 4 takes the ground away. The roof is on, and he spends most of the level standing on
+it: every fall off it is longer than `PHYS.fatalFall`. He walks the New Year route backwards,
+and the last trap is the dawn.
+
+| Beat | Trap | The history behind it |
+|---|---|---|
+| The east gate | none; the flank of the temple rises out of the top of the screen | the mud-brick enclosure and its stone gates |
+| The east stair | a ceiling over every step; one block of it is the ankh, and a full jump off that step brings it down on him | the straight east stair, down which the procession carried the goddess; its reliefs walk down at him |
+| The east chapels | a roof slab like its neighbours; a charge goes off under it | the zodiac, half a ceiling in the east Osiris suite, cut out in 1821 with gunpowder among other tools |
+| The west chapels | the same slab holds; the jump that cleared it in the east lands in the wabet's court | the west suite never had a zodiac; the wabet's court is open to the sky |
+| The kiosk | crossing the court starts the dawn; be in the statue's place before the first light, or burn | the kiosk in the south-west corner, where the statue waited for the first light of the year |
+
+Target death budget for a first clean run: to be set by playing it. The rough version's
+clean run is 17 seconds.

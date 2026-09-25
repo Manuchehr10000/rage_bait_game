@@ -45,6 +45,10 @@ export type DeathCause =
   | 'The pylon'
   | 'Scarab'
   | 'Obelisk'
+  | 'Ankh'
+  | 'The zodiac'
+  | 'The wabet'
+  | 'The New Year'
   | 'Fall'
   | 'Gave up';
 
@@ -80,6 +84,10 @@ export const DEATH_ANIM: Record<DeathCause, DeathAnim> = {
   'The pylon': 'flat',
   Scarab: 'crush',
   Obelisk: 'crush',
+  Ankh: 'crush',
+  'The zodiac': 'burn',
+  'The wabet': 'flat',
+  'The New Year': 'burn',
   Fall: 'gone',
   'Gave up': 'sit',
 };
@@ -87,7 +95,7 @@ export const DEATH_ANIM: Record<DeathCause, DeathAnim> = {
 /** What each death sounds like. Material, never musical. */
 export const DEATH_SOUND: Record<
   DeathCause,
-  'squish' | 'bonk' | 'drown' | 'burn' | 'snap' | 'whoosh' | 'fallAway' | 'sigh' | 'thud' | 'click'
+  'squish' | 'bonk' | 'drown' | 'burn' | 'snap' | 'whoosh' | 'fallAway' | 'sigh' | 'thud' | 'click' | 'blast'
 > = {
   'The Beune': 'drown',
   'The cast': 'thud',
@@ -116,6 +124,10 @@ export const DEATH_SOUND: Record<
   'The pylon': 'thud',
   Scarab: 'squish',
   Obelisk: 'squish',
+  Ankh: 'squish',
+  'The zodiac': 'blast',
+  'The wabet': 'thud',
+  'The New Year': 'burn',
   Fall: 'fallAway',
   'Gave up': 'sigh',
 };

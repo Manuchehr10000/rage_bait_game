@@ -8,7 +8,7 @@ north along the Nile. Status: locked.
 | 1 | Great Temple of Abu Simbel | Nubia | c. 1250 BC, Ramesses II; relocated 1964–68 | yes |
 | 2 | Philae, Temple of Isis | Agilkia island, Aswan | Ptolemaic to Roman; last hieroglyphs AD 394; moved 1972–80 | yes |
 | 3 | Karnak | Luxor | c. 2000–300 BC, thirty-plus builders | yes |
-| 4 | Dendera, Temple of Hathor | Qena | Ptolemy XII to Tiberius | not yet |
+| 4 | Dendera, Temple of Hathor | Qena | Ptolemy XII to Tiberius | rough version, to be played |
 | 5 | Saqqara | Memphis necropolis | Step Pyramid c. 2667 BC; Serapeum to Ptolemaic | not yet |
 
 Reserves that pass both gates: Kom Ombo and Edfu, held out only because they lie south
@@ -16,6 +16,15 @@ of Karnak and would reverse the walk. Rejected: Giza (three triangles and a plai
 Deir el-Medina (knee-high foundations).
 
 - **Level 1 teaches:** a monument can be in the wrong place; light arrives on a schedule.
+- **Level 4 takes the ground away:** Dendera is the one temple in Egypt with its roof still
+  on, and he spends most of the level on it, higher than a fall he can walk away from. He
+  walks the New Year procession's route backwards — up the straight east stair the goddess
+  was carried down, with the procession on its walls coming down at him — past the chapel
+  where the zodiac was cut out of the ceiling with gunpowder and its twin where there was
+  never a zodiac to cut, to the kiosk in the south-west corner, where he has to be standing
+  in the statue's place before the first light of the year arrives. Seen from the north, so
+  the sun comes up behind him and its light comes at him from in front. No crypts: the
+  chapter's underground belongs to the Serapeum.
 - **Level 5 ends on:** Djoser's stepped terraces and the Serapeum's sarcophagus gallery.
   The chapter closes by leaping back to the beginning of monumental stone.
 - **Chapter gag:** Abu Simbel and Philae were both cut up and moved in the 1960s–70s.
@@ -26,6 +35,7 @@ Deir el-Medina (knee-high foundations).
 - **Keep distinct from chapter 3:** stairs are Egypt's. The Aegean's signature is the
   light well and the multi-storey collapse.
 - **Fringe claims excluded entirely:** the Dendera "light", Serapeum precision machining.
+  Dendera never goes into its crypts, and has no lamp anywhere in the dark.
 
 ## The tone
 

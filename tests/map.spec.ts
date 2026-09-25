@@ -420,8 +420,8 @@ test('in a chapter every pin carries its number, the same as its bead on the rib
   expect(printed.got['ch1 sel1 site1']).toBe('1:card');
   expect(printed.got['ch1 sel1 site2']).toBe('2:route');
   expect(printed.got['ch1 sel1 site3']).toBe('3:card');
-  // Chapter 2 has three levels: with Abu Simbel selected, Dendera and Saqqara are dots.
-  expect(printed.got['ch2 sel1 site4']).toBe('dot');
+  // Chapter 2 has four levels: with Abu Simbel selected, Dendera is an open pin and Saqqara a dot.
+  expect(printed.got['ch2 sel1 site4']).toBe('4:route');
   expect(printed.got['ch2 sel1 site5']).toBe('dot');
   expect(printed.got['ch2 sel4 site4']).toBe('4:card');
 });

@@ -48,6 +48,7 @@ export const SFX = [
   'motorStart',
   'thud',
   'click',
+  'blast',
 ] as const;
 
 export type Sfx = (typeof SFX)[number];
@@ -291,6 +292,12 @@ export class GameAudio {
         // A switch on the side of a lamp.
         this.burst(t, 4000, 'highpass', 0.012, 0.12);
         this.burst(t + 0.03, 3000, 'highpass', 0.01, 0.08);
+        break;
+      case 'blast':
+        // A charge of black powder under a slab of sandstone: a flat bang, then the stone.
+        this.burst(t, 1800, 'lowpass', 0.06, 0.3);
+        this.tone(t, 'sine', 110, 35, 0.4, 0.3);
+        this.burst(t + 0.08, 700, 'lowpass', 0.3, 0.14);
         break;
     }
   }

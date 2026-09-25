@@ -11,7 +11,7 @@ import { TILE, type Costume, type DeathCause, type Rect } from './types';
  */
 export type TileChar = ' ' | '#' | '=' | '%' | '?' | 'x';
 
-export type Theme = 'capBlanc' | 'rocAuxSorciers' | 'pechMerle' | 'rouffignac' | 'gargas' | 'abuSimbel' | 'philae' | 'karnak';
+export type Theme = 'capBlanc' | 'rocAuxSorciers' | 'pechMerle' | 'rouffignac' | 'gargas' | 'abuSimbel' | 'philae' | 'karnak' | 'dendera';
 
 // ---------------------------------------------------------------------------
 // Entities. Every trap in the game is one of these, with a skin for the renderer.
@@ -20,9 +20,18 @@ export type Theme = 'capBlanc' | 'rocAuxSorciers' | 'pechMerle' | 'rouffignac' |
 /** Drops from where it is when the player's centre passes triggerX. */
 export interface FallingDef {
   kind: 'falling';
-  skin: 'colossusHead' | 'block';
+  skin: 'colossusHead' | 'block' | 'ankh';
   rect: Rect;
   triggerX: number;
+  /** Drops when this event fires instead of at triggerX. */
+  onEvent?: string;
+  /**
+   * It is a tile of the level until it drops: the tile under its rect is taken
+   * out of the grid when it goes, and put back on the next attempt.
+   */
+  fromTile?: boolean;
+  /** px/s downward it leaves with. A block knocked out of a ceiling does not wait for gravity. */
+  push?: number;
   /** Height of the pile it becomes on landing. It is solid afterwards. */
   landedH: number;
   cause: DeathCause;
@@ -91,10 +100,14 @@ export type WaterDef =
   | (WaterBase & { swimmable?: false; cause: DeathCause })
   | (WaterBase & { swimmable: true; cause?: undefined });
 
-/** A band of death that moves across a span after a trigger. Safe inside the safe rects, or above its top. */
+/**
+ * A band of death that moves across a span after a trigger. Safe inside the safe rects, or above its top.
+ * A dawn is a beam that comes up where the sun is aimed and spreads back from there: it fills
+ * everything between startX and its front, and it does not go away again.
+ */
 export interface SweepDef {
   kind: 'sweep';
-  skin: 'beam' | 'wave' | 'signal';
+  skin: 'beam' | 'wave' | 'signal' | 'dawn';
   triggerX: number;
   delay: number;
   startX: number;
@@ -114,10 +127,22 @@ export interface CrumbleDef {
   skin:
     | 'croc' | 'capital' | 'rock' | 'floor' | 'talatat' | 'column' | 'stone' | 'relief' | 'fallenBlock'
     | 'horns' | 'disc' | 'walkway' | 'stalagmite' | 'fallenRoof' | 'clayLedge'
-    | 'stopSign' | 'ballast' | 'tread';
+    | 'stopSign' | 'ballast' | 'tread' | 'roofSlab';
   rect: Rect;
   fake: boolean;
   delay: number;
+  /**
+   * It does not give way, it goes off: the moment it has been stood on for `delay`,
+   * whoever is on it dies of `cause`, and the slab is gone. Black powder under the
+   * roof of a chapel.
+   */
+  blast?: boolean;
+  /**
+   * It is tiles of the level until it goes: the tiles under its rect are drawn and
+   * stood on like every other, and are taken out of the grid when it goes (and put
+   * back on the next attempt). Nothing about it can differ from the tiles beside it.
+   */
+  fromTiles?: boolean;
   /** Which animal of the frieze this one is carved as. Says nothing about whether it holds. */
   figure?: 'bison' | 'horse' | 'ibex';
   /** Which way it faces. A frieze faces both ways; the confronting pair face each other. */
@@ -447,6 +472,19 @@ export type DecorDef =
   | { kind: 'steelDoor'; x: number; floorY: number }
   /** The handrail down a flight of fitted steps, from the top of the first to the foot of the last. */
   | { kind: 'stairRail'; x0: number; y0: number; x1: number; y1: number }
+  /** A stone gateway standing in a mud-brick enclosure wall. The wall is the far layer; the gate is walked through. */
+  | { kind: 'enclosureGate'; x: number; floorY: number }
+  /**
+   * The inside of a straight stair in the thickness of a wall: the back wall of the
+   * flight, and the procession carved on it, one figure to a step, walking down.
+   * `x` is the left edge of the first step, which rises from `floorY`; every step is
+   * a tile wide and a tile high, with `clear` px of head room over its tread.
+   */
+  | { kind: 'stairWell'; x: number; steps: number; floorY: number; clear: number }
+  /** A court open to the sky inside a temple, seen from above: its walls, and at its foot the chapel it serves. */
+  | { kind: 'wabetCourt'; x0: number; x1: number; top: number; floorY: number }
+  /** A roof kiosk of Hathor columns: screen walls between them, architraves on top, no roof. */
+  | { kind: 'kiosk'; x: number; w: number; floorY: number; top: number }
   | { kind: 'brokenObelisk'; x: number; floorY: number }
   | { kind: 'pedestal'; x: number; floorY: number }
   | { kind: 'turnstile'; x: number; floorY: number }

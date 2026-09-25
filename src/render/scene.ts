@@ -233,12 +233,14 @@ export function renderWorld(ctx: CanvasRenderingContext2D, s: Scene): void {
   const cy = camera.iy;
   const theme = level.data.theme;
 
-  drawSky(ctx, cy, theme);
+  if (theme === 'dendera') drawDenderaSky(ctx, s, cy);
+  else drawSky(ctx, cy, theme);
   if (theme === 'capBlanc') drawFarBeune(ctx, cx, cy);
   else if (theme === 'rocAuxSorciers') drawFarAnglin(ctx, cx, cy);
   else if (theme === 'pechMerle' || theme === 'rouffignac' || theme === 'gargas') drawCaveDepth(ctx, cx, cy);
   else if (theme === 'abuSimbel') drawFarCliffs(ctx, cx, cy);
   else if (theme === 'philae') drawFarIsland(ctx, cx, cy);
+  else if (theme === 'dendera') drawFarDendera(ctx, cx, cy);
   else drawFarKarnak(ctx, cx, cy);
 
   ctx.save();
@@ -246,7 +248,7 @@ export function renderWorld(ctx: CanvasRenderingContext2D, s: Scene): void {
 
   if (theme === 'abuSimbel') drawRock(ctx, s, cx, cy);
   else if (theme === 'philae') drawRiverbed(ctx, s, cx, cy);
-  else drawKarnakGround(ctx, s, cx, cy);
+  else if (theme !== 'dendera') drawKarnakGround(ctx, s, cx, cy);
   for (const d of level.data.decor) drawDecor(ctx, s, d);
   drawTiles(ctx, level, cx, cy);
   for (const e of s.entities) drawEntityBack(ctx, s, e);
@@ -260,6 +262,7 @@ export function renderWorld(ctx: CanvasRenderingContext2D, s: Scene): void {
   if (s.death && (DEATH_ANIM[s.death.cause] === 'drown' || DEATH_ANIM[s.death.cause] === 'snap')) drawDrownSurface(ctx, s, s.death.t);
 
   ctx.restore();
+  if (theme === 'dendera') drawPreDawn(ctx, s, cx, cy);
   drawDarkness(ctx, s, cx, cy);
   drawBeams(ctx, s, cx, cy);
 }
@@ -939,6 +942,18 @@ function drawDecor(ctx: CanvasRenderingContext2D, s: Scene, d: DecorDef): void {
       ctx.fillRect(d.x - 3, top + 5, 6, 2);
       break;
     }
+    case 'enclosureGate':
+      drawEnclosureGate(ctx, d.x, d.floorY);
+      break;
+    case 'stairWell':
+      drawStairWell(ctx, d.x, d.steps, d.floorY, d.clear);
+      break;
+    case 'wabetCourt':
+      drawWabetCourt(ctx, d.x0, d.x1, d.top, d.floorY);
+      break;
+    case 'kiosk':
+      drawKiosk(ctx, d.x, d.w, d.floorY, d.top);
+      break;
     case 'brokenObelisk': {
       // The one that cracked in the quarry. Lies where it fell.
       const f = d.floorY;
@@ -1511,6 +1526,7 @@ function drawTileAt(
     else if (theme === 'capBlanc' || theme === 'rocAuxSorciers') drawMeadowPath(ctx, tx, ty, x, y, open);
     else if (theme === 'abuSimbel') drawSand(ctx, level, tx, ty, x, y, open);
     else if (theme === 'philae') drawGranite(ctx, tx, ty, x, y, open);
+    else if (theme === 'dendera') drawSand(ctx, level, tx, ty, x, y, open);
     else drawPaving(ctx, tx, ty, x, y, open);
   } else if (c === '%' && (theme === 'pechMerle' || theme === 'rouffignac' || theme === 'gargas')) {
     drawClay(ctx, tx, ty, x, y, open);
@@ -1537,11 +1553,7 @@ function drawTileAt(
     ctx.fillRect(x + 5, y + 4, 1, 2);
     ctx.fillRect(x + 10, y + 4, 1, 2);
   } else if (c === 'x') {
-    ctx.fillStyle = COLORS.statueShade;
-    ctx.fillRect(x, y, TILE, TILE);
-    ctx.fillStyle = COLORS.outline;
-    ctx.fillRect(x, y, TILE, 1);
-    ctx.fillRect(x, y, 1, TILE);
+    drawUsedAnkh(ctx, x, y);
   }
 }
 
@@ -1550,12 +1562,12 @@ function tileArtId(theme: Level['data']['theme'], c: string, open: boolean): str
   const name =
     c === '?' ? 'ankh-block'
     : c === 'x' ? 'ankh-block-used'
-    : c === '=' ? (theme === 'pechMerle' || theme === 'gargas' ? 'concrete' : theme === 'rouffignac' ? 'ballast' : theme === 'capBlanc' || theme === 'rocAuxSorciers' ? 'limestone' : theme === 'abuSimbel' ? 'sand' : theme === 'philae' ? 'granite' : 'paving')
+    : c === '=' ? (theme === 'pechMerle' || theme === 'gargas' ? 'concrete' : theme === 'rouffignac' ? 'ballast' : theme === 'capBlanc' || theme === 'rocAuxSorciers' ? 'limestone' : theme === 'abuSimbel' ? 'sand' : theme === 'philae' ? 'granite' : theme === 'dendera' ? 'dendera-ground' : 'paving')
     : c === '%' && (theme === 'pechMerle' || theme === 'rouffignac' || theme === 'gargas') ? 'clay'
     : c === '%' && (theme === 'capBlanc' || theme === 'rocAuxSorciers') ? 'sediment'
     : theme === 'pechMerle' || theme === 'gargas' ? 'cave-rock'
     : theme === 'rouffignac' ? 'flint-rock'
-    : theme === 'capBlanc' || theme === 'rocAuxSorciers' ? 'rock' : theme === 'abuSimbel' ? 'cliff' : theme === 'philae' ? 'column-drum' : 'sandstone';
+    : theme === 'capBlanc' || theme === 'rocAuxSorciers' ? 'rock' : theme === 'abuSimbel' ? 'cliff' : theme === 'philae' ? 'column-drum' : theme === 'dendera' ? 'dendera-sandstone' : 'sandstone';
   if (c === '?' || c === 'x') return name;
   return open ? `tile-${name}-top` : `tile-${name}`;
 }
@@ -1922,6 +1934,9 @@ function drawEntityBack(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): voi
         }
         if (!paint(ctx, 'fallen-block', r.x, r.y)) ctx.drawImage(FALLEN_BLOCK_SPRITE, r.x, r.y);
         ctx.restore();
+      } else if (d.skin === 'roofSlab') {
+        // Nothing to draw. It is tiles of the roof until it goes off, and the tiles draw
+        // themselves: from above there is nothing to tell (pillar 4).
       } else if (d.skin === 'talatat') {
         for (let i = 0; i < r.w / TILE; i++) if (!paint(ctx, 'talatat', r.x + i * TILE, r.y)) ctx.drawImage(TALATAT_SPRITE, r.x + i * TILE, r.y);
       } else if (d.skin === 'floor') {
@@ -2298,6 +2313,11 @@ function drawEntityFront(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): vo
   switch (d.kind) {
     case 'falling': {
       const f = e as Falling;
+      if (d.skin === 'ankh') {
+        // Until it goes it is a tile of the ceiling, and the tiles draw it.
+        if (f.state !== 'idle' && !paint(ctx, 'ankh-block-used', f.rect.x, f.rect.y)) drawUsedAnkh(ctx, f.rect.x, f.rect.y);
+        break;
+      }
       if (f.state === 'landed') drawRubble(ctx, f.rect);
       else if (!paint(ctx, 'colossus-head', f.rect.x, f.rect.y - HEAD_CROWN)) ctx.drawImage(COLOSSUS.head, f.rect.x, f.rect.y - HEAD_CROWN);
       break;
@@ -2343,6 +2363,7 @@ function drawEntityOverlay(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): 
     const sw = e as Sweep;
     if (d.skin === 'beam') drawBeam(ctx, s, sw);
     else if (d.skin === 'signal') drawSignal(ctx, sw);
+    else if (d.skin === 'dawn') return; // drawn over the pre-dawn, in drawPreDawn
     else drawWave(ctx, s, sw);
   }
 }
@@ -2655,6 +2676,301 @@ function drawDrownSurface(ctx: CanvasRenderingContext2D, s: Scene, t: number): v
       ctx.fillRect(x + drift, surface - 4 + i, 10, 1);
     }
   }
+}
+
+// ---------------------------------------------------------------------------
+// Dendera: the eve of the New Year, before the light.
+// ---------------------------------------------------------------------------
+
+const DENDERA = {
+  skyTop: '#1c2340',
+  skyMid: '#3d4668',
+  skyLow: '#8e7f95',
+  star: '#c9cfe6',
+  far: '#353a55',
+  farLow: '#2c3047',
+  palm: '#262a3e',
+  /** The blue before dawn, laid over everything the first light has not reached. */
+  night: [24, 30, 70] as const,
+  /** A wall out of the light: the back of the stair, the sides of the court. */
+  wall: '#7d6645',
+  wallLine: '#5e4c33',
+  relief: '#a88d5f',
+  reliefShade: '#6d5838',
+  sun: '#ffe2a8',
+};
+
+/** The level's dawn, if it has one. */
+function dawnOf(s: Scene): Sweep | null {
+  for (const e of s.entities) if (e.def.kind === 'sweep' && e.def.skin === 'dawn') return e as Sweep;
+  return null;
+}
+
+/**
+ * 0 until the court is crossed, rising to 1 as the first light arrives. The east
+ * gets ready on the same clock the light does, so the glow behind him is the
+ * warning, and it is the only one.
+ */
+function dawnK(s: Scene): number {
+  const d = dawnOf(s);
+  if (!d || d.t < 0) return 0;
+  return Math.min(1, d.t / Math.max(0.01, d.def.delay));
+}
+
+/** The sky before dawn. East is on the left, behind him. */
+function drawDenderaSky(ctx: CanvasRenderingContext2D, s: Scene, cy: number): void {
+  const k = dawnK(s);
+  const bands = 8;
+  for (let i = 0; i < bands; i++) {
+    const f = i / (bands - 1);
+    ctx.fillStyle = f < 0.6 ? mix(DENDERA.skyTop, DENDERA.skyMid, f / 0.6) : mix(DENDERA.skyMid, DENDERA.skyLow, (f - 0.6) / 0.4);
+    ctx.fillRect(0, (i * VIEW_H) / bands, VIEW_W, VIEW_H / bands + 1);
+  }
+  // A few stars, always the same ones, going as the east gets light.
+  ctx.fillStyle = DENDERA.star;
+  ctx.globalAlpha = 0.8 * (1 - k);
+  for (let i = 0; i < 26; i++) {
+    const h = hash(i, 11);
+    const y = ((h >>> 9) % 80) - Math.round(cy * 0.1);
+    if (y >= 0) ctx.fillRect(h % VIEW_W, y, 1, 1);
+  }
+  ctx.globalAlpha = 1;
+  const horizon = 150 - Math.round(cy * 0.55);
+  const glow = ctx.createLinearGradient(0, 0, 160, 0);
+  glow.addColorStop(0, `rgba(232, 160, 113, ${0.15 + 0.55 * k})`);
+  glow.addColorStop(1, 'rgba(232, 160, 113, 0)');
+  ctx.fillStyle = glow;
+  ctx.fillRect(0, 0, 160, Math.max(0, horizon));
+  // And once the light has come, the rim of the sun on the horizon behind him.
+  const d = dawnOf(s);
+  if (d && (d.band || d.fade > 0)) {
+    const up = Math.min(8, (d.t - d.def.delay) * 5);
+    ctx.fillStyle = DENDERA.sun;
+    ctx.beginPath();
+    ctx.arc(22, horizon - up, 9, Math.PI, 0);
+    ctx.fill();
+  }
+}
+
+/** Beyond the enclosure, to the south: the desert edge, low and flat, and palms. */
+function drawFarDendera(ctx: CanvasRenderingContext2D, cx: number, cy: number): void {
+  const horizon = 150 - Math.round(cy * 0.55);
+  const off = Math.round(cx * 0.2) % 220;
+  for (let base = -220; base < VIEW_W + 220; base += 220) {
+    const x = base - off;
+    ctx.fillStyle = DENDERA.far;
+    ctx.fillRect(x, horizon - 14, 120, 14);
+    ctx.fillRect(x + 110, horizon - 9, 110, 9);
+    ctx.fillStyle = DENDERA.palm;
+    for (const p of [x + 40, x + 150, x + 172]) {
+      ctx.fillRect(p, horizon - 22, 2, 22);
+      ctx.fillRect(p - 6, horizon - 24, 14, 3);
+      ctx.fillRect(p - 4, horizon - 27, 10, 3);
+      ctx.fillRect(p - 7, horizon - 21, 4, 2);
+      ctx.fillRect(p + 5, horizon - 21, 4, 2);
+    }
+  }
+  ctx.fillStyle = DENDERA.farLow;
+  ctx.fillRect(0, horizon, VIEW_W, VIEW_H - horizon);
+}
+
+/**
+ * The blue before dawn over everything, except where the first light has got to.
+ * Where it has, the stone is its own colour and there is gold on it.
+ */
+function drawPreDawn(ctx: CanvasRenderingContext2D, s: Scene, cx: number, cy: number): void {
+  const d = dawnOf(s);
+  const band = d?.band ?? null;
+  const [r, g, b] = DENDERA.night;
+  // The light is aimed at the kiosk, and the rest of the world west of it is lit
+  // when it is: the deadly band stops at the kiosk, the daylight does not.
+  const lit = band ? { x: band.x - cx, y: band.y - cy, w: VIEW_W - (band.x - cx), h: band.h } : null;
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(0, 0, VIEW_W, VIEW_H);
+  if (lit) ctx.rect(lit.x, lit.y, lit.w, lit.h);
+  ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${0.42 - 0.12 * dawnK(s)})`;
+  ctx.fill('evenodd');
+  if (d && lit) {
+    ctx.fillStyle = 'rgba(255, 196, 120, 0.22)';
+    ctx.fillRect(lit.x, lit.y, lit.w, lit.h);
+    ctx.fillStyle = 'rgba(255, 226, 170, 0.7)';
+    ctx.fillRect(Math.round(d.front - cx), lit.y, 1, lit.h);
+  }
+  ctx.restore();
+}
+
+/** Coursed sandstone out of the light: the back wall of a flight, the side of a court. */
+function fillCoursed(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number): void {
+  ctx.fillStyle = DENDERA.wall;
+  ctx.fillRect(x, y, w, h);
+  ctx.fillStyle = DENDERA.wallLine;
+  for (let cy = Math.ceil(y / 8) * 8; cy < y + h; cy += 8) {
+    ctx.fillRect(x, cy, w, 1);
+    const shift = (cy / 8) % 2 === 0 ? 0 : 12;
+    for (let jx = Math.floor((x - shift) / 24) * 24 + shift; jx < x + w; jx += 24) if (jx >= x) ctx.fillRect(jx, cy, 1, Math.min(8, y + h - cy));
+  }
+}
+
+/**
+ * The east gate: a stone gateway standing in the mud-brick enclosure wall. The
+ * wall has come down to a ragged top over two thousand years; the gate has not.
+ */
+function drawEnclosureGate(ctx: CanvasRenderingContext2D, x: number, floorY: number): void {
+  const wing = (x0: number, x1: number) => {
+    for (let wx = x0; wx < x1; wx += 8) {
+      const top = floorY - 64 + (hash(wx, 7) % 12);
+      ctx.fillStyle = COLORS.mudbrick;
+      ctx.fillRect(wx, top, 8, floorY - top);
+      ctx.fillStyle = COLORS.mudbrickLine;
+      for (let y = top + 3; y < floorY; y += 4) ctx.fillRect(wx, y, 8, 1);
+    }
+  };
+  wing(x - 72, x);
+  wing(x + 64, x + 136);
+  // The painting includes the flare of the cornice, 6 px either side of the jambs.
+  if (paint(ctx, 'enclosure-gate', x - 6, floorY - 80)) return;
+  // Two jambs, a lintel, and a cornice with the winged disc on it.
+  ctx.fillStyle = COLORS.sandstone;
+  ctx.fillRect(x, floorY - 64, 16, 64);
+  ctx.fillRect(x + 48, floorY - 64, 16, 64);
+  ctx.fillRect(x, floorY - 72, 64, 8);
+  ctx.fillStyle = COLORS.sandstoneJoint;
+  for (let y = floorY - 64; y < floorY; y += 12) {
+    ctx.fillRect(x, y, 16, 1);
+    ctx.fillRect(x + 48, y, 16, 1);
+  }
+  ctx.fillStyle = COLORS.outline;
+  ctx.fillRect(x + 15, floorY - 64, 1, 64);
+  ctx.fillRect(x + 48, floorY - 64, 1, 64);
+  drawCornice(ctx, x, floorY - 72, 64);
+  // The winged sun disc over every door: the disc, and a wing either side.
+  ctx.fillStyle = '#b5523a';
+  ctx.fillRect(x + 30, floorY - 70, 4, 4);
+  ctx.fillStyle = COLORS.facadeDark;
+  ctx.fillRect(x + 18, floorY - 69, 12, 2);
+  ctx.fillRect(x + 34, floorY - 69, 12, 2);
+}
+
+/**
+ * The inside of the straight stair: the back wall of each step's flight, and the
+ * procession carved on it, one figure to a step, walking down toward him. In the
+ * relief the king, priests, singers and standard-bearers carry the goddess's
+ * shrine down; the code draws priests, and every third one a standard.
+ */
+function drawStairWell(ctx: CanvasRenderingContext2D, x: number, steps: number, floorY: number, clear: number): void {
+  // The side door and the passage in to the first step.
+  fillCoursed(ctx, x - 2 * TILE, floorY - 3 * TILE, 2 * TILE, 3 * TILE);
+  for (let i = 1; i <= steps; i++) {
+    const sx = x + (i - 1) * TILE;
+    const tread = floorY - i * TILE;
+    fillCoursed(ctx, sx, tread - clear, TILE, clear);
+    // Each figure stands on its own step of the register, a little above the tread.
+    ctx.fillStyle = DENDERA.reliefShade;
+    ctx.fillRect(sx, tread - 4, TILE, 1);
+    // The painting is 12 x 26 standing on the register line, with room above the head for a standard.
+    const standard = i % 3 === 0;
+    if (!paint(ctx, 'procession-figure', sx + 2, tread - 30, standard ? 1 : 0)) drawProcessionFigure(ctx, sx + 2, tread - 22, standard);
+  }
+}
+
+/** One figure of the descending procession, in sunk relief, facing left: down the stair. 12 x 18. */
+function drawProcessionFigure(ctx: CanvasRenderingContext2D, x: number, y: number, standard: boolean): void {
+  ctx.fillStyle = DENDERA.reliefShade;
+  // The cut edge of the sunk relief, on the side away from the light.
+  ctx.fillRect(x + 9, y, 1, 18);
+  ctx.fillStyle = DENDERA.relief;
+  ctx.fillRect(x + 5, y, 4, 4); // shaved head
+  ctx.fillRect(x + 4, y + 1, 1, 2); // face, to the left
+  ctx.fillRect(x + 5, y + 4, 4, 6); // body
+  ctx.fillRect(x + 4, y + 10, 6, 5); // the long kilt
+  ctx.fillRect(x + 4, y + 15, 1, 3); // striding: the forward leg
+  ctx.fillRect(x + 8, y + 15, 1, 3);
+  ctx.fillRect(x + 2, y + 6, 3, 1); // arms forward
+  if (standard) {
+    ctx.fillRect(x + 2, y - 4, 1, 14); // the pole
+    ctx.fillRect(x + 1, y - 7, 3, 3); // the emblem on it
+  }
+}
+
+/**
+ * The wabet's court, seen from the roof: open to the sky, fourteen tiles deep, and
+ * at the bottom of it the little chapel where the statue was dressed for the roof.
+ */
+function drawWabetCourt(ctx: CanvasRenderingContext2D, x0: number, x1: number, top: number, floorY: number): void {
+  fillCoursed(ctx, x0, top, x1 - x0, floorY - top);
+  for (let y = top; y < floorY; y += 8) {
+    ctx.fillStyle = `rgba(8, 6, 10, ${(0.55 * (y - top)) / (floorY - top)})`;
+    ctx.fillRect(x0, y, x1 - x0, 8);
+  }
+  const cx = Math.round((x0 + x1) / 2) - 24;
+  if (paint(ctx, 'wabet-chapel', cx, floorY - 56)) return;
+  // Raised on steps, two columns and a cornice at the front, a dark door between.
+  ctx.fillStyle = COLORS.sandstone;
+  for (let i = 0; i < 3; i++) ctx.fillRect(cx + i * 3, floorY - 4 * (i + 1), 48 - i * 6, 4);
+  ctx.fillRect(cx + 6, floorY - 48, 6, 36);
+  ctx.fillRect(cx + 36, floorY - 48, 6, 36);
+  ctx.fillStyle = COLORS.doorway;
+  ctx.fillRect(cx + 16, floorY - 40, 16, 28);
+  drawCornice(ctx, cx + 6, floorY - 48, 36);
+}
+
+/**
+ * The kiosk in the south-west corner of the roof: twelve Hathor columns, of which
+ * the back row is seen here, with screen walls between them and the architraves on
+ * top. The sockets in the architraves held a timber roof that is not there.
+ */
+function drawKiosk(ctx: CanvasRenderingContext2D, x: number, w: number, floorY: number, top: number): void {
+  fillCoursed(ctx, x, floorY - 2 * TILE, w, 2 * TILE);
+  const n = 4;
+  for (let i = 0; i < n; i++) {
+    const cx = x + Math.round((i * (w - TILE)) / (n - 1));
+    if (!paint(ctx, 'hathor-column', cx, top)) drawHathorColumn(ctx, cx, top, floorY);
+  }
+  ctx.fillStyle = COLORS.sandstone;
+  ctx.fillRect(x - 2, top - 6, w + 4, 6);
+  ctx.fillStyle = COLORS.outline;
+  ctx.fillRect(x - 2, top - 6, w + 4, 1);
+  ctx.fillRect(x - 2, top - 1, w + 4, 1);
+  // The sockets the roof beams sat in.
+  ctx.fillStyle = COLORS.doorway;
+  for (let sx = x + 4; sx < x + w - 2; sx += 12) ctx.fillRect(sx, top - 6, 3, 2);
+}
+
+/**
+ * A Hathor column, 16 wide, from `top` to the floor: the shaft, and the sistrum
+ * capital — the goddess's face with cow's ears, and a little shrine above it.
+ * The face is left plain here; whether these faces were hacked out is not yet
+ * checked, so the code draws no features to be wrong about.
+ */
+function drawHathorColumn(ctx: CanvasRenderingContext2D, x: number, top: number, floorY: number): void {
+  ctx.fillStyle = COLORS.sandstone;
+  ctx.fillRect(x + 3, top + 20, 10, floorY - top - 20);
+  ctx.fillStyle = COLORS.sandstoneJoint;
+  ctx.fillRect(x + 3, top + 20, 1, floorY - top - 20);
+  ctx.fillStyle = COLORS.sandstoneLight;
+  ctx.fillRect(x + 10, top + 20, 1, floorY - top - 20);
+  // The shrine on top of the head, then the face, then the ears.
+  ctx.fillStyle = COLORS.sandstoneLight;
+  ctx.fillRect(x + 2, top, 12, 6);
+  ctx.fillStyle = COLORS.doorway;
+  ctx.fillRect(x + 6, top + 2, 4, 4);
+  ctx.fillStyle = COLORS.sandstone;
+  ctx.fillRect(x + 3, top + 6, 10, 14);
+  ctx.fillRect(x, top + 7, 3, 4);
+  ctx.fillRect(x + 13, top + 7, 3, 4);
+  ctx.fillStyle = COLORS.outline;
+  ctx.fillRect(x + 3, top + 6, 10, 1);
+  ctx.fillRect(x + 3, top + 19, 10, 1);
+}
+
+/** An ankh block that has been hit: the stone of it, with the ankh gone flat. */
+function drawUsedAnkh(ctx: CanvasRenderingContext2D, x: number, y: number): void {
+  ctx.fillStyle = COLORS.statueShade;
+  ctx.fillRect(x, y, TILE, TILE);
+  ctx.fillStyle = COLORS.outline;
+  ctx.fillRect(x, y, TILE, 1);
+  ctx.fillRect(x, y, 1, TILE);
 }
 
 // ---------------------------------------------------------------------------
