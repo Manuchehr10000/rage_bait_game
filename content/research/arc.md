@@ -5,7 +5,7 @@ single source of truth for site identity, period, costume and status. It does no
 contain level design; beats are decided one at a time in design conversation and
 live in each level's own asset notes.
 
-Last revised: 2026-09-24. Chapter 3 corrected and its first rulings recorded while Knossos and Phaistos were designed (sections 3, 4, 5, 7). Corrections from the monument research for the tour map: Gargas date, Persepolis imagery, Segesta, Sigiriya, Himeji, Great Zimbabwe, Registan and Martello rows, sections 6 and 7. Tikal ruled: architecture only (section 4). 2026-09-23: Great Zimbabwe ruled: walls, passage and tower only (section 4). 2026-09-15: curator mode dropped by designer ruling; facts that cannot be shown without text live in the asset notes and nowhere in the game.
+Last revised: 2026-09-26. Level length and the second attempt follow the new pillars 4 and 7 (section 1), and the scope is re-counted (section 8). 2026-09-24: Chapter 3 corrected and its first rulings recorded while Knossos and Phaistos were designed (sections 3, 4, 5, 7). Corrections from the monument research for the tour map: Gargas date, Persepolis imagery, Segesta, Sigiriya, Himeji, Great Zimbabwe, Registan and Martello rows, sections 6 and 7. Tikal ruled: architecture only (section 4). 2026-09-23: Great Zimbabwe ruled: walls, passage and tower only (section 4). 2026-09-15: curator mode dropped by designer ruling; facts that cannot be shown without text live in the asset notes and nowhere in the game.
 
 ---
 
@@ -26,17 +26,18 @@ behaviour, with no text, or it stays in the asset notes for the designer and nev
 reaches the player. A site with no facts of the first kind is not a level, however good
 its written material.
 
-**Level shape.** One real site. Walked left to right. About 45 seconds of clean
-play. Five to eight beats. A beat is one real feature of the site turned into one
-mechanic; the trap must come from something true about the place.
+**Level shape.** One real site. Walked left to right. Clean play grows through the
+chapter, from about 15 seconds at level 1 to about 45 at level 5 and never more
+(`PILLARS.md`, pillar 7). Five to eight beats. A beat is one real feature of the site
+turned into one mechanic; the trap must come from something true about the place.
 
 **Chapter shape.** Five levels, one costume. Level 1 is honest and teaches the
 chapter's vocabulary. Level 2 turns those lessons around. Level 3 makes everything
 untrustworthy. Levels 4 and 5 escalate. Level 5 ends on a grand feature.
 
 **Death.** Infinite lives, no checkpoints, a visible death counter. The level never
-changes, so the second attempt is about memory. Nothing in the game reacts to a
-death.
+changes, so the second attempt knows where; beating what it knows takes the hands,
+not only the memory (`PILLARS.md`, pillar 4). Nothing in the game reacts to a death.
 
 **Punching direction.** The tourist is always the idiot. The locals are always
 competent and busy. No level may make the culture the joke.
@@ -398,7 +399,7 @@ Keep these as live disputes in the asset notes, never as settled, and never in a
 
 ## 8. Scope
 
-Twelve chapters of five levels is sixty levels, roughly forty-five minutes of clean
+Twelve chapters of five levels is sixty levels, roughly half an hour of clean
 play. The recommended build order is Chapters 1 and 2 to finished quality before
 any Chapter 4-and-beyond production begins. Chapter 11 and the Chapter 3 error
 dossier are the two assets most likely to be cut for budget and the two least

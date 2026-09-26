@@ -1,8 +1,8 @@
 # Lost Tourist
 
 A deadpan, mean, browser-based 2D platformer for desktop. Chapters are historical places,
-drawn as exactly as we can manage. No text, no hints. The level is always the same. You
-learn by dying.
+drawn as exactly as we can manage. No text. The level is always the same. You learn by
+dying.
 
 Design rules are in [PILLARS.md](PILLARS.md). Read them before adding a trap.
 Art and history live in [content/](content/README.md). Read that before drawing anything.

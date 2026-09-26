@@ -20,22 +20,33 @@ these bent, the idea is wrong, not the rule.
    a museum label for two seconds on arrival, and the exit label.
 3. **Deterministic, never random.** Every trap fires from player position or a fixed
    timeline started by player position. Death one is a surprise. Death two is your fault.
-4. **Memory is the tell.** Traps are not telegraphed. Identical things behave differently
-   and only one of them is lying. The level is always the same, so the second attempt
-   knows exactly where. Never punish a player for something they could not have memorised.
+4. **Set up, then subvert.** Every trap is a joke: a setup, then a punchline the player
+   did not see coming. The setup is something true they can see or have lived through,
+   such as a crack, a pattern or an earlier trap, and the punchline turns it against them.
+   A trick is used once in the whole game; one the player has met may come back only as
+   the setup for a new one. The death could only happen at this site: a trick that could
+   move to another site and lose nothing is generic, and it is out. A trap is a surprise
+   the first time and a test of the hands after. Once known, it still takes timing or
+   precision to beat, never only the memory of where. Identical things stay identical,
+   pixel for pixel.
 5. **No waiting before the finale.** A player who knows the level runs it without standing
    still. Only the last trap in a level may run on a cycle, because nothing comes after it.
 6. **The camera never scrolls left.** Tells are absorbed on the way in or not at all.
    It does follow you up and down, so a level is allowed to be taller than the window
    and should be: the first three were 288 px tall and kept the tourist inside a 45 px
    band, which made them read as corridors. Use the other axis.
-7. **No checkpoints. Infinite lives. Big visible death counter.** Levels stay short
-   (about 45 seconds clean) so the retry loop stays fast.
+7. **No checkpoints. Infinite lives. Big visible death counter.** Levels grow through a
+   chapter: about 15, 22, 30, 37 and 45 seconds of clean play for levels 1 to 5, and never
+   more than 45. The reset takes under a second, but a death costs the clean run before
+   it, so the known part of a level must stay worth running (pillar 4).
 8. **Deadpan.** A death looks and sounds like what caused it, and nothing else reacts: no
    jingle, no shake, no pity message, the wind and music do not flinch, the world keeps
    moving through it. Crushed is a pancake, burned is ash, drowned is a towel on the
    water. The counter ticks and the level resets in under a second. The only other
-   acknowledgement is the museum label at the exit, with deaths broken down by cause.
+   acknowledgement is the museum label at the exit: this visit's deaths by cause, and how
+   many of the level's tricks (pillar 4) this visitor has ever been killed by, as "7 of
+   9". A plain missed jump, a fall or a drowning in honest water is not a trick and does
+   not count. Finding a new one makes no sound and no show; the label is where it counts.
    **One death in the whole game has no physical cause, and it is spent at Knossos:**
    landing in front of the throne seats him in it and his visit is over. It has its own
    pose, sound and label, never those of giving up, and nothing reacts to it either. No
@@ -57,6 +68,12 @@ these bent, the idea is wrong, not the rule.
     he is simply there (Rouffignac: he has stepped off the train). A retry always starts
     on the spawn, so the loop stays fast (pillar 7). The choice is `arrival` in the
     level's data.
+
+Pillars 4, 7 and 8 took this form on 2026-09-26. Every level built or designed before
+then predates them: its notes describe it as it is, it is rebuilt one level at a time,
+and until it is, it is not a model for new work. An audit of the eight levels then built
+found 67 tricks, 29 of them a trick the player had already met, and 9 that could only
+happen at their site.
 
 The chapters, their sites, periods and costumes are fixed by `content/research/arc.md`.
 Read it before touching any of them.
