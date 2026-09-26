@@ -40,6 +40,9 @@ async function snap(page: Page): Promise<{ screen: string; view: string; chapter
   });
 }
 
+/** The chapters the game shows: SHOWN_CHAPTERS in src/map/atlas.ts. */
+const SHOWN = 4;
+
 /** The tour is played in order, so a test that visits a later site clears the ones before it. */
 const CHAPTER_1 = ['cap-blanc', 'roc-aux-sorciers', 'pech-merle', 'rouffignac', 'gargas'];
 
@@ -83,14 +86,36 @@ test('the map opens on chapter 1; Enter opens it on Cap Blanc', async ({ page })
   expect(s.level).toBe('cap-blanc');
 });
 
+test('the game shows chapters 1 to 4 and nothing beyond them', async ({ page }) => {
+  const seen = await page.evaluate(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const m = (window as unknown as { __game: any }).__game.mapScreen;
+    m.openWorld();
+    const names: string[] = [];
+    for (let i = 0; i < 12; i++) {
+      m.chapter = i;
+      names.push(m.current.name);
+    }
+    m.chapter = 0;
+    return { stops: m.stops as number, names };
+  });
+  expect(seen.stops).toBe(SHOWN);
+  // Walking past the last shown chapter comes back round to the first.
+  await press(page, 'ArrowLeft');
+  expect((await snap(page)).chapter).toBe(SHOWN - 1);
+  await press(page, 'ArrowRight');
+  expect((await snap(page)).chapter).toBe(0);
+  expect(seen.names.slice(0, SHOWN)).toEqual(['Palaeolithic Europe', 'Egypt', 'Bronze Age Aegean', 'Iron Age Near East & Persia']);
+});
+
 test('a closed chapter stays closed', async ({ page }) => {
   await press(page, 'ArrowLeft');
   let s = await snap(page);
-  expect(s.chapter).toBe(11);
+  expect(s.chapter).toBe(SHOWN - 1);
   await press(page, 'Enter');
   s = await snap(page);
   expect(s.view).toBe('world');
-  expect(s.chapter).toBe(11);
+  expect(s.chapter).toBe(SHOWN - 1);
 });
 
 test('arrow keys walk the chapters; Enter walks into Egypt from the left edge; Escape comes back', async ({ page }) => {
@@ -231,18 +256,18 @@ test('a deep link still opens a level directly, and the exit leads to the next s
 });
 
 test('the itinerary ribbon is one straight rule, left to right, with every stop on it', async ({ page }) => {
-  const stops = await page.evaluate(() => {
+  const stops = await page.evaluate((n) => {
     const m = (window as unknown as { __game: { mapScreen: { ribbonStop(i: number): { x: number; y: number } } } }).__game.mapScreen;
-    return Array.from({ length: 12 }, (_, i) => m.ribbonStop(i));
-  });
-  expect(stops).toHaveLength(12);
+    return Array.from({ length: n }, (_, i) => m.ribbonStop(i));
+  }, SHOWN);
+  expect(stops).toHaveLength(SHOWN);
   for (let i = 1; i < stops.length; i++) {
     expect(stops[i]!.x).toBeGreaterThan(stops[i - 1]!.x);
     expect(stops[i]!.y).toBe(stops[0]!.y);
   }
   // Below the map, and inside the sheet.
   expect(stops[0]!.y).toBeGreaterThan(152);
-  expect(stops[11]!.x).toBeLessThan(320);
+  expect(stops[SHOWN - 1]!.x).toBeLessThan(320);
 });
 
 test('the ribbon picks a chapter and then a site, the same as the map does', async ({ page }) => {
@@ -313,7 +338,7 @@ test('a chapter whose every built level is cleared opens on its first site', asy
 });
 
 test('nothing printed on the map is ever standing where the tourist is', async ({ page }) => {
-  const clashes = await page.evaluate(() => {
+  const clashes = await page.evaluate((shown) => {
     type Rect = { x: number; y: number; w: number; h: number };
     const g = (
       window as unknown as {
@@ -339,11 +364,11 @@ test('nothing printed on the map is ever standing where the tourist is', async (
       for (const r of m.wordRects()) if (hits(t, r)) bad.push(where);
     };
     m.openWorld();
-    for (let c = 0; c < 12; c++) {
+    for (let c = 0; c < shown; c++) {
       m.chapter = c;
       check(`world, chapter ${c + 1}`);
     }
-    for (let c = 0; c < 12; c++) {
+    for (let c = 0; c < shown; c++) {
       m.openChapter(c);
       m.view = 'chapter';
       m.chapter = c;
@@ -355,17 +380,17 @@ test('nothing printed on the map is ever standing where the tourist is', async (
     m.openWorld();
     m.chapter = 0;
     return bad;
-  });
+  }, SHOWN);
   expect(clashes).toEqual([]);
 });
 
 test('every chapter shows its painted plate in the panel, not the flat fallback', async ({ page }) => {
-  const colours = await page.evaluate(() => {
+  const colours = await page.evaluate((shown) => {
     const g = (window as unknown as { __game: { mapScreen: { view: string; chapter: number }; scale: number; draw(): void } }).__game;
     const canvas = document.querySelector('#game') as HTMLCanvasElement;
     const ctx = canvas.getContext('2d')!;
     const out: number[] = [];
-    for (let c = 0; c < 12; c++) {
+    for (let c = 0; c < shown; c++) {
       g.mapScreen.view = 'world';
       g.mapScreen.chapter = c;
       g.draw();
@@ -377,7 +402,7 @@ test('every chapter shows its painted plate in the panel, not the flat fallback'
       out.push(seen.size);
     }
     return out;
-  });
+  }, SHOWN);
   // Measured: a painted plate shows 239 to 255 colours here (its palette is
   // capped at 255); the code-drawn silhouette, antialiased at this scale, about
   // 156. 200 sits clear of both.
@@ -385,7 +410,7 @@ test('every chapter shows its painted plate in the panel, not the flat fallback'
 });
 
 test('the world draws no line from one chapter to the next', async ({ page }) => {
-  const red = await page.evaluate(() => {
+  const red = await page.evaluate((shown) => {
     type P = { x: number; y: number };
     const g = (
       window as unknown as {
@@ -400,13 +425,13 @@ test('the world draws no line from one chapter to the next', async ({ page }) =>
     const canvas = document.querySelector('#game') as HTMLCanvasElement;
     const ctx = canvas.getContext('2d')!;
     const s = g.scale;
-    const badges = Array.from({ length: 12 }, (_, i) => m.worldBadge(i));
+    const badges = Array.from({ length: shown }, (_, i) => m.worldBadge(i));
     const out: string[] = [];
     // Every chapter selected in turn, with the stretch between it and the one
     // before sampled for the route's red: clear of every marker as it is drawn
     // (the selected badge's pulse reaches 8.3, any other marker 5.9), and of the
     // tourist, whose costume may be red.
-    for (let c = 1; c < 12; c++) {
+    for (let c = 1; c < shown; c++) {
       m.view = 'world';
       m.chapter = c;
       g.draw();
@@ -430,7 +455,7 @@ test('the world draws no line from one chapter to the next', async ({ page }) =>
       if (n > 0) out.push(`chapter ${c} to ${c + 1}: ${n}`);
     }
     return out;
-  });
+  }, SHOWN);
   expect(red).toEqual([]);
 });
 

@@ -37,7 +37,7 @@ these bent, the idea is wrong, not the rule.
    band, which made them read as corridors. Use the other axis.
 7. **No checkpoints. Infinite lives. Big visible death counter.** Levels grow through a
    chapter: about 15, 22, 30, 37 and 45 seconds of clean play for levels 1 to 5, and never
-   more than 45. The reset takes under a second, but a death costs the clean run before
+   more than 45; the legend, level 6, is never more than 45 either. The reset takes under a second, but a death costs the clean run before
    it, so the known part of a level must stay worth running (pillar 4).
 8. **Deadpan.** A death looks and sounds like what caused it, and nothing else reacts: no
    jingle, no shake, no pity message, the wind and music do not flinch, the world keeps
@@ -55,11 +55,14 @@ these bent, the idea is wrong, not the rule.
    the game ever mentions it. It never changes the hitbox.
 10. **False completion is spent once per player, ever.** Held in reserve. Not in level 1.
 11. **The tourist is always the idiot.** The locals are always competent and busy. No level
-    may make the culture the joke. The costume mocks the tourist, never the place.
+    may make the culture the joke. The costume mocks the tourist, never the place. In a
+    legend (level 6) he is never the hero: it is beaten the way its own story beats it.
 12. **Respect gate.** Places of active worship, graves of the recently dead, and sites of
     atrocity are never levels. Ruins, temples of dead religions, palaces, fortifications
     and engineering are. Ambiguous sites are flagged in `content/research/arc.md` and
     need a designer ruling before any production; a level designer never decides alone.
+    A legend passes its own gate (`content/research/arc.md`, section 1): never a story of a
+    living tradition, always in the public domain, never an outsider's slur on the culture.
 13. **The tourist arrives on foot.** From the map, or from the exit label of the level
     before, he walks in from off the left edge of the screen, and the controls are his
     the moment all of him is on it: no cutscene, and the level keeps its left edge safe

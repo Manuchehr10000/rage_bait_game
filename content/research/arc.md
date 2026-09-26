@@ -5,7 +5,7 @@ single source of truth for site identity, period, costume and status. It does no
 contain level design; beats are decided one at a time in design conversation and
 live in each level's own asset notes.
 
-Last revised: 2026-09-26. Level length and the second attempt follow the new pillars 4 and 7 (section 1), and the scope is re-counted (section 8). 2026-09-24: Chapter 3 corrected and its first rulings recorded while Knossos and Phaistos were designed (sections 3, 4, 5, 7). Corrections from the monument research for the tour map: Gargas date, Persepolis imagery, Segesta, Sigiriya, Himeji, Great Zimbabwe, Registan and Martello rows, sections 6 and 7. Tikal ruled: architecture only (section 4). 2026-09-23: Great Zimbabwe ruled: walls, passage and tower only (section 4). 2026-09-15: curator mode dropped by designer ruling; facts that cannot be shown without text live in the asset notes and nowhere in the game.
+Last revised: 2026-09-26. Chapter 4 locked; chapters 5–12 hidden in the game while it is being found (sections 2, 8). The chapter shape is rewritten, level 6 (the legend) and its gate are added (section 1), with a legend for each locked chapter (section 3) and the chapter 3 exemption (section 4). Earlier the same day: level length and the second attempt follow the new pillars 4 and 7 (section 1), and the scope is re-counted (section 8). 2026-09-24: Chapter 3 corrected and its first rulings recorded while Knossos and Phaistos were designed (sections 3, 4, 5, 7). Corrections from the monument research for the tour map: Gargas date, Persepolis imagery, Segesta, Sigiriya, Himeji, Great Zimbabwe, Registan and Martello rows, sections 6 and 7. Tikal ruled: architecture only (section 4). 2026-09-23: Great Zimbabwe ruled: walls, passage and tower only (section 4). 2026-09-15: curator mode dropped by designer ruling; facts that cannot be shown without text live in the asset notes and nowhere in the game.
 
 ---
 
@@ -26,14 +26,35 @@ behaviour, with no text, or it stays in the asset notes for the designer and nev
 reaches the player. A site with no facts of the first kind is not a level, however good
 its written material.
 
-**Level shape.** One real site. Walked left to right. Clean play grows through the
+**Level shape.** Levels 1 to 5: one real site. Walked left to right. Clean play grows through the
 chapter, from about 15 seconds at level 1 to about 45 at level 5 and never more
 (`PILLARS.md`, pillar 7). Five to eight beats. A beat is one real feature of the site
 turned into one mechanic; the trap must come from something true about the place.
 
-**Chapter shape.** Five levels, one costume. Level 1 is honest and teaches the
-chapter's vocabulary. Level 2 turns those lessons around. Level 3 makes everything
-untrustworthy. Levels 4 and 5 escalate. Level 5 ends on a grand feature.
+**Chapter shape.** Six levels, one costume, played in order: a level opens once every
+level before it is cleared, so the chapters open in order and so do the levels inside
+each. What grows through a chapter is how deep the setups go and how much the hands must
+do, never how many things lie. Level 1 plants the site's truths and spends one or two
+tricks set up inside itself. Level 2 turns what level 1 taught into the weapon. Level 3
+makes two things the player trusts disagree. Level 4 changes what the tourist is doing,
+and a clock alone is not a change. Level 5 sets up its tricks with the whole chapter and
+ends on a grand feature. Level 6 is the legend. A chapter has at most one joke on the game
+itself (its exit, its label, its counter, its map), and never in level 1.
+
+**Level 6, the legend.** Entered on foot through level 5's grand feature. It is not a
+site: it is a story people told about the chapter's places, a myth, a folk tale or a work
+of fiction, and it is accurate to that story's own sources rather than to the past. The
+chapter's own rulings do not bind it. It is beaten the way the story beats it, never by
+the tourist's strength: he is never the hero (`PILLARS.md`, pillar 11). Its way of winning
+is used once in the game (pillar 4). No health bar; damage shows on the body (pillar 2).
+One screen wide, or a forward chase (pillar 6). Never more than 45 seconds clean (pillar 7).
+
+**The legend gate.** A story from a religion with a continuous living tradition is never
+a legend; the dead religions of gate 6 are fair, whatever modern revivals exist. The story
+is in the public domain. A story told by outsiders whose point is a slur on the culture is
+out: the foreign-builder myths of Great Zimbabwe are the example (section 7). Ambiguous
+cases are flagged here for a designer ruling. Every chapter has a level 6: a chapter with
+no story that passes is changed until it has one.
 
 **Death.** Infinite lives, no checkpoints, a visible death counter. The level never
 changes, so the second attempt knows where; beating what it knows takes the hands,
@@ -52,16 +73,17 @@ call.
 
 ## 2. The arc
 
-Twelve chapters on a chronological spine, ordered by start date. Chapters 1–3 are
-locked. Chapters 4–12 hold researched candidate sites, gate-screened but not
-design-committed.
+Twelve chapters on a chronological spine, ordered by start date. Chapters 1–4 are
+locked. Chapters 5–12 hold researched candidate sites, gate-screened but not
+design-committed, and are hidden in the game while it is being found (ruled 2026-09-26,
+section 8).
 
 | # | Chapter | Slug | Dates | Status |
 |---|---|---|---|---|
 | 1 | Palaeolithic Europe | `ch01_palaeolithic` | 27,000–13,000 BP | LOCKED |
 | 2 | Egypt | `ch02_egypt` | 2667 BC – AD 30 | LOCKED |
 | 3 | Bronze Age Aegean | `ch03_aegean` | 1900–1200 BC | LOCKED |
-| 4 | Iron Age Near East & Persia | `ch04_persia` | 900–330 BC | CANDIDATE |
+| 4 | Iron Age Near East & Persia | `ch04_persia` | 900–330 BC | LOCKED |
 | 5 | Classical Mediterranean | `ch05_classical` | 450 BC – AD 200 | CANDIDATE |
 | 6 | The Americas | `ch06_americas` | AD 200–1500 | CANDIDATE |
 | 7 | Monsoon Asia | `ch07_monsoon` | AD 400–1300 | CANDIDATE |
@@ -95,6 +117,7 @@ castles, Oceania and Polynesia, the steppe and nomadic cultures.
 
 - **Level 1 teaches:** a relief ledge is a floor; light is a resource; what you see may be a cast.
 - **Level 5 ends on:** walls of hand stencils with missing finger segments.
+- **Level 6, the legend:** a mammoth hunt with spears, as the twentieth century's "hunting magic" told it: the idea, from Reinach (1903) and then Breuil, that the animals were painted so that the hunt would succeed. A theory long out of favour, which is what makes it a story told about these caves. Designer's choice, 2026-09-26; to be designed.
 - **Gargas date:** "c. 27,000 BP" is 26,860 ± 460 BP (GifA-92369; Clottes), an uncalibrated radiocarbon age on a splinter of bone in a crack of a hand panel. It dates the bone, associated with the hands, not the pigment. In calendar years it is older than 27,000 (compare Foucher et al. 2019: child remains at 24,930 ± 220 BP = 29,500–28,532 cal BP). Popular articles say 30,000 to 35,000 years; do not repeat that either.
 - **Chapter error dossier:** Henri Breuil's copies. Altamira Great Ceiling boar/bison reidentification (Breuil 1906 → Freeman 1987 → Rice 1992); a hind printed mirror-reversed in the 1906 plates; stratigraphic order wrong in several panels, corrected 1935. The Trois-Frères "Sorcerer" drawing contested by Ucko & Rosenfeld and Hutton, defended by Clottes. Font-de-Gaume figure numbering corrected by Reiche et al. 2023.
 - **Imagery:** thin. Most decorated caves are sealed or their photography is in copyright. Base on excavation reports plus Cartailhac & Breuil 1906 from US-hosted scans only (EU copyright in the plates runs to end of 2031).
@@ -117,6 +140,7 @@ castles, Oceania and Polynesia, the steppe and nomadic cultures.
 
 - **Level 1 teaches:** a monument can be in the wrong place; light arrives on a schedule.
 - **Level 5 ends on:** Djoser's stepped terraces and the Serapeum's sarcophagus gallery. The chapter closes by leaping back to the beginning of monumental stone.
+- **Level 6, the legend:** a fight from Egyptian myth, to be chosen. Candidates: Ra's nightly fight with the serpent Apep, whom the Great Cat beheads under the persea tree; or Sekhmet, sent to destroy mankind and stopped not by fighting but with beer dyed red (the Book of the Heavenly Cow). She is Hathor, the goddess of Dendera.
 - **Chapter gag:** Abu Simbel and Philae were both cut up and moved in the 1960s–70s. The coordinates are right and the monuments are not there. Reveal on the chapter end card.
 - **Imagery:** strong. *Description de l'Égypte* (1809–1828), Denon 1802, Lepsius 1849–59, Mariette 1856. All public domain.
 - **Reserves, tested and passing both gates:** Kom Ombo (`kom_ombo`), Edfu (`edfu`). Held out only because they sit south of Karnak and would reverse the south-to-north walk.
@@ -138,6 +162,7 @@ castles, Oceania and Polynesia, the steppe and nomadic cultures.
 | 5 | Tiryns | `tiryns` | Argolid, GR | Circuit and palace c. 1400–1200 BC |
 
 - **Level 1 teaches:** columns hold floors up, and taper downward; light from above means nothing is overhead; the palace is partly Evans's idea, cast in 1920s concrete. (Corrected 2026-09-24 from "light means safe", which chapter 1 had already taught twice, and "a Victorian idea": Evans was a Victorian and so was his frame, but the dig began in March 1900 and the reconstitution a visitor sees is Edwardian and interwar.)
+- **Level 6, the legend:** the Minotaur, as Greek myth tells it; Theseus gets out by Ariadne's thread. Level 6 is exempt from the chapter's rulings, the no-bull ruling included (section 4).
 - **Level 5 ends on:** a cyclopean wall entered through a corbelled gallery inside its own thickness. (The earlier "8 m" named no dimension. Sources give the Tiryns walls about 6 m thick, about 17 m where the galleries pass through, and up to about 7 m of surviving height, originally perhaps 9–10 m. Probable; check before designing.)
 - **Signature mechanic, to keep distinct from Egypt:** the light well and the multi-storey collapse, not the staircase. Stairs are incidental here. The chapter's light comes from directly above: a lit patch is the one place nothing is overhead.
 - **Chapter error dossier:** Evans's reconstitution at Knossos, in three campaigns: timber 1901–04 under Theodore Fyfe, rotted within a few years; stone, iron girders and brick arches from 1904–05 under Christian Doll (to 1907, 1910 or the war; sources differ); reinforced concrete mainly 1922–30 under Piet de Jong, the west storerooms VIII–XII roofed in 1929 and the Throne Room in 1930. Duncan Mackenzie ran the digging and kept the daybooks. Minos Kalokairinos, a Cretan, dug first, in 1878–79. Gilliéron père and fils fresco restorations — the Priest-King assembled from non-joining fragments with no face preserved (the combination contested: Coulomb 1979, Niemeier 1987); the Saffron Gatherer restored as a boy and re-identified as a blue monkey (Platon 1947); the Ladies in Blue largely modern paint; the pair of griffins flanking the throne, of which the western one has no evidence (Galanakis, Tsitsa and Günkel-Maschek, BSA 2017). The Dolphin fresco probably a floor painting fallen from the storey above (Koehl 1986), put on a wall by Evans. Lapatin's forgery case against the Boston "Snake Goddess". Evans's Early/Middle/Late Minoan scheme versus Platon's palace periods. Schliemann's naming of the Mask of Agamemnon (genuine but misnamed and misdated by three centuries; the forgery claim is fringe; the "gazed upon the face" quotation is apocryphal).
@@ -151,7 +176,8 @@ castles, Oceania and Polynesia, the steppe and nomadic cultures.
 - **Dates:** 900–330 BC
 - **Costume:** false Assyrian beard, curled and clipped on.
 - **Vocabulary:** palace terraces, siege ramps against walls, rock-cut cliff reliefs, aqueduct channels.
-- **Status:** CANDIDATE
+- **Status:** LOCKED (2026-09-26), on the five sites below. Their order, and whether Pasargadae, the weakest on beats, stays, are for the design of the chapter.
+- **Level 6, the legend:** to be ruled. Farhad, who carved Mount Behistun for love of Shirin (Nizami, *Khosrow and Shirin*, twelfth century), where a great smoothed rock face, left unfinished, is traditionally called his work (Farhad Tarash; verify before designing); or Rostam of the *Shahnameh*, after whom later Persians named Naqsh-e Rustam, taking its reliefs for his. Both are literature, not scripture.
 
 | # | Site | Slug | Place | Period | Gate notes |
 |---|---|---|---|---|---|
@@ -325,6 +351,7 @@ use of the site: levels, asset notes, and the tour map.
 | `tikal` | 6 | Contemporary Maya ceremonies are held at the site, in the Great Plaza (found in re-verification, 2026-09-23) | Architecture only: no ceremony, modern altar, fire circle, offerings or people in frame, in the tour-map vignette or in any level | 2026-09-24 |
 | `akrotiri` | 3 | In September 2005 the site's protective roof collapsed shortly before it was finished, killing one visitor, a British tourist, and injuring six or seven (sources differ); the site reopened under a new roof in April 2012. The chapter's signature mechanic is the multi-storey collapse, and the protagonist is a tourist. Spyridon Marinatos, the excavator, died at the site in 1974; sources differ on whether his grave is inside the ruins or was moved beyond them | No crush deaths at Akrotiri. Collapse there comes only from the Bronze Age earthquakes and the eruption; the modern roof never falls and the 2005 death is never staged. Marinatos's grave never in frame; verify its position before level 3 is designed | 2026-09-23 |
 | chapter 3 | 3 | A charging bull is the obvious gag for a bull-leaper's costume, repeats Karnak's scarab, and makes a myth-shaped spectacle of the place | No bull anywhere in the chapter: no bull, no bull relief or copy, no horns of consecration, no Bull-Leaper fresco copy, no oxhide figure-of-eight shields in frame | 2026-09-23 |
+| chapter 3 | 3 | The Minotaur is wanted for level 6, the legend, against the ruling of no bull anywhere in the chapter | Level 6 is exempt from the chapter's rulings. The no-bull ruling governs levels 1 to 5, so the chapter's refusal of the bull is the setup and the Minotaur the punchline. Pillar 4 still applies: a Minotaur that charges repeats Karnak's scarab | 2026-09-26 |
 | chapter 3 | 3 | Grave circles and tholos tombs at Mycenae | Graves are never traps, as the burial at Cap Blanc | 2026-09-23 |
 | `knossos` | 3 | Landing in front of the throne seats the tourist in it and ends his visit: a death with no physical cause (pillar 8) | Allowed, once in the whole game, with its own frame, sound and label, never those of giving up. Recorded in `PILLARS.md`, pillar 8 | 2026-09-24 |
 | chapter 3 | 3 | Phaistos has five 1960s metal shelters due for replacement, and Akrotiri's protective roof collapsed in 2005 | No modern shelter ever falls, anywhere in the chapter | 2026-09-24 |
@@ -399,8 +426,10 @@ Keep these as live disputes in the asset notes, never as settled, and never in a
 
 ## 8. Scope
 
-Twelve chapters of five levels is sixty levels, roughly half an hour of clean
-play. The recommended build order is Chapters 1 and 2 to finished quality before
+Twelve chapters of six levels is seventy-two levels, roughly forty minutes of clean
+play. For now the game is chapters 1 to 4: the other eight are hidden in it until the
+game has been found, and are thought about then (designer's ruling, 2026-09-26;
+`SHOWN_CHAPTERS` in `src/map/atlas.ts`). The recommended build order is Chapters 1 and 2 to finished quality before
 any Chapter 4-and-beyond production begins. Chapter 11 and the Chapter 3 error
 dossier are the two assets most likely to be cut for budget and the two least
 replaceable.

@@ -42,7 +42,8 @@ export interface Chapter {
   sites: Site[];
 }
 
-export const CHAPTERS: Chapter[] = [
+/** Every chapter of the research's arc, in order. The game shows only `CHAPTERS`. */
+const TOUR: Chapter[] = [
   {
     number: 1,
     slug: 'palaeolithic',
@@ -232,6 +233,16 @@ export const CHAPTERS: Chapter[] = [
     ],
   },
 ];
+
+/**
+ * How many chapters the game shows. Chapters 1 to 4 are locked in the research; the
+ * rest are held back, not dropped, while the game is being found (designer's ruling,
+ * 2026-09-26). Raise it to show more: the world page, the ribbon and the lock follow.
+ */
+export const SHOWN_CHAPTERS = 4;
+
+/** The chapters the game shows, in tour order. */
+export const CHAPTERS: Chapter[] = TOUR.slice(0, SHOWN_CHAPTERS);
 
 /** True if any level of the chapter exists in the game. */
 export function chapterOpen(c: Chapter): boolean {

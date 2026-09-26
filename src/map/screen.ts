@@ -15,7 +15,7 @@
  *     stop on one straight rule, left to right, departure marked at the left
  *     end. Cleared stops are stamped solid, so progress fills from the left.
  *
- * Both views share that grammar: the world has twelve chapters on the ribbon,
+ * Both views share that grammar: the world has its chapters on the ribbon,
  * a chapter has its five sites in play order. Painted art replaces the drawn
  * map when it exists (`map-world`, `map-chNN-slug`, `map-monument-chNN-slug`);
  * the markers, the ribbon, the vignette and the tourist are always drawn on
@@ -29,6 +29,9 @@ import { VIEW_H, VIEW_W } from '../engine/types';
 import { blitFacing } from '../render/frame';
 import { tourist } from '../render/scene';
 import { CHAPTERS, chapterMonumentSite, chapterOpen, monumentArtId, type Chapter } from './atlas';
+
+/** The title card counts the chapters the game shows, in words. */
+const COUNT: Record<number, string> = { 1: 'one', 2: 'two', 3: 'three', 4: 'four', 5: 'five', 6: 'six', 7: 'seven', 8: 'eight', 9: 'nine', 10: 'ten', 11: 'eleven', 12: 'twelve' };
 import { LAKES, LAND, RIVERS, type Polygon } from './geo';
 import { ART_H, ART_W, drawMonument } from './monuments';
 
@@ -499,7 +502,7 @@ export class MapScreen {
     if (this.view === 'world') {
       labelBox(ctx, s, TITLE.x, TITLE.y, [
         { text: 'LOST TOURIST', font: `bold ${7 * s}px ${FONT}`, color: INK },
-        { text: 'A guided tour in twelve chapters', font: `italic ${5 * s}px ${FONT}`, color: INK_SOFT },
+        { text: `A guided tour in ${COUNT[CHAPTERS.length] ?? CHAPTERS.length} chapters`, font: `italic ${5 * s}px ${FONT}`, color: INK_SOFT },
       ]);
       // The panel names the chapter; the map and the ribbon do not.
       ctx.font = `${4.5 * s}px ${FONT}`;

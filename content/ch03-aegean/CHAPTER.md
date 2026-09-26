@@ -130,7 +130,9 @@ Designer's rulings, recorded in `arc.md` section 4 as well:
 
 - **No bull anywhere in the chapter.** No charging bull, no bull relief or copy of one, no
   horns of consecration, no Bull-Leaper fresco copy, no oxhide figure-of-eight shields in frame.
-  It would repeat Karnak's scarab and make a myth-shaped spectacle of the place.
+  It would repeat Karnak's scarab and make a myth-shaped spectacle of the place. Level 6,
+  the legend, is exempt: the Minotaur is allowed there, and the chapter's refusal of the
+  bull is its setup (ruled 2026-09-26, `arc.md` section 4).
 - **Graves are never traps**, as at Cap Blanc. Applies at Mycenae above all.
 - **No crush deaths at Akrotiri**, and the modern shelter there never falls. See Gate 6.
 - **No modern shelter ever falls, anywhere in the chapter.** Phaistos has five from the 1960s,

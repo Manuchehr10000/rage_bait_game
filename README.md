@@ -115,7 +115,7 @@ src/
     frame.ts              one abstraction over painted and code-drawn frames (tourist, deaths)
     hud.ts                death counter and exit label, drawn in screen space
   map/
-    atlas.ts              the tour: twelve chapters, sixty sites, where each is on Earth
+    atlas.ts              the tour: twelve chapters, sixty sites, where each is on Earth; the game shows the first four
     screen.ts             the tour map, the start screen
     geo.ts                coastlines, generated from Natural Earth by tools/build-coastlines.mjs
     monuments.ts          code-drawn chapter vignettes, used until a plate is painted
