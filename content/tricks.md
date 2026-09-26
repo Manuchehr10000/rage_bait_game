@@ -32,12 +32,14 @@ the second, never only the memory of where; and it could only happen at this sit
 
 ## Claimed
 
-Tricks in levels built or rebuilt under the pillars of 2026-09-26, and ways of winning
-reserved by a legend (level 6). One row per trick.
+Tricks in levels built or rebuilt under the pillars of 2026-09-26, tricks a pillar
+reserves, and ways of winning reserved by a legend (level 6). One row per trick.
 
 | Trick: setup, then punchline | Level | Beat | Claimed |
 |---|---|---|---|
 | Throwing spears: the only way to win, a move that exists in this level alone | ch1 level 6, the mammoth | the fight | reserved 2026-09-26, so Egypt's Apep cannot be Set's spear |
+| The throne: a chair he lands in front of seats him, and his visit is over. The one death in the game with no physical cause | ch3 level 1, Knossos | the Throne Room | reserved 2026-09-24 by pillar 8. Knossos predates the pillars; its rebuild keeps the seat, and no other level seats him in anything |
+| False completion: the level looks finished, and it is not | none yet; never a level 1 | — | reserved by pillar 10: once per player, ever. It is also a joke on the game itself, so it spends its chapter's one (`arc.md` section 1) |
 
 ## Spent by the levels built before 2026-09-26
 
@@ -66,4 +68,7 @@ each trick here may then be claimed once, by one level.
 rebuild starts from these: Roc-aux-Sorciers' figure that throws no shadow; Pech Merle's
 disc that snaps; Rouffignac's train, and its end of the line; Abu Simbel's fourth head, the
 lake that floods the pit, and the sun with Ptah's dark niche; Philae's cofferdam wave;
-Karnak's obelisk.
+Karnak's obelisk. What is kept of the obelisk is the site, Hatshepsut's, with its pair lying
+broken by the lake, not the trap as built: that one falls ahead of the runner and is the
+fourth "something comes down" above. The version to build is the touchstone: it cracks as
+he comes up, does not fall, and comes down behind him.
