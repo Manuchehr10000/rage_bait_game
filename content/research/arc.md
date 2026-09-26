@@ -194,6 +194,7 @@ castles, Oceania and Polynesia, the steppe and nomadic cultures.
 
 - **Dates:** 450 BC – AD 200
 - **Costume:** tunic with socks and sandals.
+- **Level 6 candidates, not ruled:** Polyphemus by Etna, escaped by clinging under a sheep (*Odyssey* 9; Euripides' *Cyclops* sets him on Sicily). Greek myth, a dead religion.
 - **Vocabulary:** stepped theatre seating, stepping-stone streets, insula storeys, harbour moles.
 - **Status:** CANDIDATE. The most over-supplied chapter; cut rather than pad.
 
@@ -208,7 +209,8 @@ castles, Oceania and Polynesia, the steppe and nomadic cultures.
 ### Chapter 6 — The Americas · `ch06_americas`
 
 - **Dates:** AD 200–1500
-- **Costume:** gift-shop feather headdress.
+- **Costume:** gift-shop feather headdress. Flagged, section 4.
+- **Level 6 candidates, not ruled:** *Ollantay*, a colonial-era Quechua drama about the general Ollantaytambo is named for: secular and public domain. Maya and Andean religion are living traditions, so their myths fail the legend gate.
 - **Vocabulary:** pyramid stairways, ballcourt slopes, cliff paths, agricultural terraces.
 - **Status:** CANDIDATE
 
@@ -227,6 +229,7 @@ castles, Oceania and Polynesia, the steppe and nomadic cultures.
 
 - **Dates:** AD 400–1300
 - **Costume:** rented sarong, worn wrong.
+- **Level 6 candidates, not ruled, unverified:** the local tale that ghosts built Chand Baori in one night; King Kashyapa at Sigiriya, from the royal chronicle. The heaviest gate load in the arc.
 - **Vocabulary:** moat crossings, galleries, stupa terraces, descending stepwells, cliff-cut caves.
 - **Status:** CANDIDATE. Heaviest gate 6 load after Chapter 12.
 
@@ -244,6 +247,7 @@ castles, Oceania and Polynesia, the steppe and nomadic cultures.
 
 - **Dates:** AD 600–1600
 - **Costume:** costume-shop kimono, obi tied backwards.
+- **Level 6 candidates, not ruled:** Okiku's well at Himeji (*Banshū Sarayashiki*), a ghost not fought but ended, in one telling, by someone calling "ten" at the end of her count; she is a murdered servant, so the tone needs a ruling. Meng Jiangnü, whose weeping brought down the Great Wall. Folk tales, not scripture.
 - **Vocabulary:** timber bracket tiers, sloped un-climbable castle bases, wall ridgelines, garden bridges.
 - **Status:** CANDIDATE
 
@@ -261,6 +265,7 @@ castles, Oceania and Polynesia, the steppe and nomadic cultures.
 
 - **Dates:** AD 1000–1600
 - **Costume:** unwanted safari outfit, tags still on.
+- **Level 6 candidates, not ruled:** the weakest in the arc. Great Zimbabwe's own traditions belong to the revered hill, ruled out of frame; the foreign-builder myths are banned; the coast's stories are tied to living Islam. Kilwa's founding tale (the island bought for as much cloth as would go round it) is left, and is thin for a legend. Flagged, section 4.
 - **Vocabulary:** drystone enclosure walls, coral-rag ruins, rock-hewn trenches, dune burial.
 - **Status:** CANDIDATE. Thinnest imagery bench in the game.
 
@@ -278,6 +283,7 @@ castles, Oceania and Polynesia, the steppe and nomadic cultures.
 
 - **Dates:** AD 1200–1600
 - **Costume:** bazaar robe with the price label still on.
+- **Level 6 candidates, not ruled:** Washington Irving's *Tales of the Alhambra* (1832), written while he lived in the palace: the Arabian Astrologer and his bronze horseman that turns to point at the enemy. Public domain, and orientalist, so the joke lands on Irving and never on the place.
 - **Vocabulary:** iwan portals, citadel mounds, caravanserai courtyards, observatory arcs.
 - **Status:** CANDIDATE. Build from ruins, citadels, palaces and observatories, never working mosques.
 
@@ -293,6 +299,7 @@ castles, Oceania and Polynesia, the steppe and nomadic cultures.
 
 - **Dates:** 1700–1800
 - **Costume:** frock coat and hard hat.
+- **Level 6 candidates, not ruled:** the knockers, the spirits Cornish miners said knocked in the rock before a collapse.
 - **Vocabulary:** cast-iron spans, mill floors, engine houses on cliffs, canal locks, hoists.
 - **Status:** CANDIDATE. This is the deliberately non-monumental chapter — vernacular, industrial and engineering only, no temples or palaces. Protect it in scheduling: it is the only chapter whose structures were built to be climbed on by workers, so its geometry is genuinely different rather than differently decorated.
 
@@ -308,6 +315,7 @@ castles, Oceania and Polynesia, the steppe and nomadic cultures.
 
 - **Dates:** 1796–1815
 - **Costume:** bicorne hat, hand thrust into the jacket.
+- **Level 6 candidates, not ruled:** "Boney", the Napoleon British nurses said would eat naughty children; and the invasion the period prints showed coming by giant raft, by balloon and by tunnel under the Channel, which the Martello towers were built against.
 - **Vocabulary:** rigging and stacked gun decks, bastion ditches, tower rooftops, mountain road galleries, semaphore masts.
 - **Status:** CANDIDATE. **Build from ships, forts, roads, arsenals, canals, telegraphs and commemorative architecture. Never battlefields — battlefields are graves.**
 
@@ -338,6 +346,8 @@ is recorded here, not in the level.
 | `kilwa_kisiwani`, `gede`, `songo_mnara` | 9 | Ruined mosques; living Islam on the coast | Secular palace, fort and house fabric only |
 | `bam` | 10 | 2003 earthquake killed at least 26,271 in the modern town | Citadel architecture only |
 | `hms_victory` | 12 | Commissioned warship; Nelson-death plaque | Ruling required before scheduling |
+| chapter 6 | 6 | The costume is a gift-shop feather headdress. A feather war bonnet is sacred regalia for Plains nations, and wearing one as a costume is widely seen as disrespectful; that it is the wrong continent for these sites may be the joke, but the joke may land on the wrong people | Rule before chapter 6 is designed (raised 2026-09-26) |
+| chapter 9 | 9 | No level 6 candidate clearly passes the legend gate (section 3) | Every chapter has a level 6, so the chapter changes if none is found; change sites within it before the chapter, which section 6 protects (raised 2026-09-26) |
 | `akrotiri` (engine) | 3 | Pillar 1: a floor that drops with the tourist standing on it never counts as a fall today (every landing resets the fall, and riding a falling solid counts nothing), so a collapse could carry him down five storeys and he would walk away. Knossos does not need it, and Phaistos was designed without it (its floors tip and he falls free). Akrotiri, where the crush is ruled out and falling floors are the obvious verb, will | Judge the fall when a falling floor stops, so the 200 px rule holds everywhere. Three definitions: the fall is not reset while he stands on a descending solid; it is not reset by a jump off one (his vertical speed does not inherit the floor's, so a jump just before the floor lands would otherwise wipe the fall); and "stops" means the solid has landed for good, not one frame without moving. The engine reading says no built level's outcome changes; confirm with the walk-throughs. Rule before Akrotiri is designed |
 
 ### Ruled

@@ -1,5 +1,13 @@
 # Chapter 1 · Palaeolithic Europe
 
+> **Read first (2026-09-26).** The rules changed after this chapter was written: pillars 4,
+> 7, 8, 11 and 12, and the chapter shape in `content/research/arc.md` section 1. A chapter
+> now has six levels, the sixth a legend. Where this file and those disagree, those win;
+> what follows describes the chapter as it was built, and each level is to be rebuilt.
+> Tricks already spent are in `content/tricks.md`. The summary is in `CLAUDE.md`.
+
+> Level 6, the legend: a mammoth hunt with spears, as "hunting magic" told it (`arc.md`).
+
 Source: `content/research/arc.md`, chapter 1. Dates 27,000 to 13,000 BP, in radiocarbon years:
 never "years ago". Status: locked
 in the research. All five levels are built. The game starts here.

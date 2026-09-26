@@ -3,6 +3,9 @@
 Rules the game never breaks. Every level, every chapter. If a trap idea needs one of
 these bent, the idea is wrong, not the rule.
 
+The fun is curiosity: the player keeps going to find out how else the game will kill him.
+Every rule below serves that. What has already been spent is in `content/tricks.md`.
+
 1. **The world lies. The controls never do.** Jump height, run speed, acceleration,
    collision and the fall you can walk away from are fixed in `src/engine/player.ts`
    (`PHYS`) and identical in every chapter. Coyote time and jump buffering stay on. The

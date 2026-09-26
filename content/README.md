@@ -8,6 +8,7 @@ The code never has to be opened to add or replace a picture.
 content/
   README.md                  this file
   research/                  the historical arc; outranks everything else on history
+  tricks.md                  every trick the game has spent; a trick is used once (pillar 4)
   map/                       the tour map: its art, and the twelve chapter plates in monuments/
   site/                      the tab icon's note
   ch01-palaeolithic/         five levels built, laid out as below
