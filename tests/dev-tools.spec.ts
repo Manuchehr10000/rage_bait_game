@@ -301,6 +301,10 @@ test('on the map a click copies nothing, nor does a double-click on a pin in the
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
   // Arrive on the map from a level, so a level's view has been drawn and left behind.
   // The loop is left running: frames are drawn between the clicks, as they are for a person.
+  // The tour is played in order, so everything before Karnak is cleared.
+  await page.addInitScript(() =>
+    localStorage.setItem('lostTourist.cleared', JSON.stringify(['cap-blanc', 'roc-aux-sorciers', 'pech-merle', 'rouffignac', 'gargas', 'abu-simbel', 'philae'])),
+  );
   await page.goto('/#cap-blanc');
   await page.waitForFunction(() => (window as unknown as Partial<W>).__game?.currentScreen === 'level');
   await page.waitForTimeout(150);

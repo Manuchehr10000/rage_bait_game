@@ -40,6 +40,22 @@ async function snap(page: Page): Promise<{ screen: string; view: string; chapter
   });
 }
 
+/** The tour is played in order, so a test that visits a later site clears the ones before it. */
+const CHAPTER_1 = ['cap-blanc', 'roc-aux-sorciers', 'pech-merle', 'rouffignac', 'gargas'];
+
+async function seed(page: Page, cleared: string[]): Promise<void> {
+  // Entering a level puts it in the URL; take it out, or the reload goes back into it.
+  await page.evaluate((c) => {
+    localStorage.setItem('lostTourist.cleared', JSON.stringify(c));
+    history.replaceState(null, '', location.pathname);
+  }, cleared);
+  await page.reload();
+  await page.waitForFunction(() => (window as unknown as { __game?: { currentScreen: string } }).__game?.currentScreen === 'map');
+  await page.evaluate(() => {
+    window.requestAnimationFrame = () => 0;
+  });
+}
+
 test.beforeEach(async ({ page }) => {
   const errors: string[] = [];
   page.on('pageerror', (e) => errors.push(String(e)));
@@ -78,6 +94,7 @@ test('a closed chapter stays closed', async ({ page }) => {
 });
 
 test('arrow keys walk the chapters; Enter walks into Egypt from the left edge; Escape comes back', async ({ page }) => {
+  await seed(page, CHAPTER_1);
   await press(page, 'ArrowRight');
   let s = await snap(page);
   expect(s.chapter).toBe(1);
@@ -127,6 +144,7 @@ test('a closed site stays closed; the chapter wraps around', async ({ page }) =>
 });
 
 test('the mouse picks a chapter and a site', async ({ page }) => {
+  await seed(page, [...CHAPTER_1, 'abu-simbel', 'philae']);
   const box = await page.locator('#game').boundingBox();
   if (!box) throw new Error('no canvas');
   const at = async (p: { x: number; y: number }) => ({ x: box.x + (p.x / 320) * box.width, y: box.y + (p.y / 180) * box.height });
@@ -144,6 +162,59 @@ test('the mouse picks a chapter and a site', async ({ page }) => {
   s = await snap(page);
   expect(s.screen).toBe('level');
   expect(s.level).toBe('karnak');
+});
+
+test('the tour is played in order: a site opens once every level before it is cleared', async ({ page }) => {
+  // Nothing cleared. Chapter 1 opens on Cap Blanc, and Roc-aux-Sorciers is not yet open.
+  await press(page, 'Enter');
+  await press(page, 'ArrowRight');
+  let s = await snap(page);
+  expect(s.site).toBe(1);
+  await press(page, 'Enter');
+  s = await snap(page);
+  expect(s.screen).toBe('map');
+
+  // Egypt can be looked at, but not entered, before chapter 1 is done.
+  await press(page, 'Escape');
+  await press(page, 'ArrowRight');
+  await press(page, 'Enter');
+  s = await snap(page);
+  expect(s.view).toBe('chapter');
+  expect(s.chapter).toBe(1);
+  expect(s.site).toBe(0);
+  await press(page, 'Enter');
+  s = await snap(page);
+  expect(s.screen).toBe('map');
+
+  // Cap Blanc cleared: the chapter opens on Roc-aux-Sorciers, which is open, and
+  // nothing after it is.
+  await seed(page, ['cap-blanc']);
+  await press(page, 'Enter');
+  s = await snap(page);
+  expect(s.site).toBe(1);
+  await press(page, 'ArrowRight');
+  await press(page, 'Enter');
+  s = await snap(page);
+  expect(s.screen).toBe('map');
+  await press(page, 'ArrowLeft');
+  await press(page, 'Enter');
+  s = await snap(page);
+  expect(s.screen).toBe('level');
+  expect(s.level).toBe('roc-aux-sorciers');
+
+  // Chapter 1 cleared: Abu Simbel opens, and Philae waits for it.
+  await seed(page, CHAPTER_1);
+  await press(page, 'ArrowRight');
+  await press(page, 'Enter');
+  await press(page, 'ArrowRight');
+  await press(page, 'Enter');
+  s = await snap(page);
+  expect(s.screen).toBe('map');
+  await press(page, 'ArrowLeft');
+  await press(page, 'Enter');
+  s = await snap(page);
+  expect(s.screen).toBe('level');
+  expect(s.level).toBe('abu-simbel');
 });
 
 test('a deep link still opens a level directly, and the exit leads to the next site', async ({ page }) => {
@@ -175,6 +246,7 @@ test('the itinerary ribbon is one straight rule, left to right, with every stop 
 });
 
 test('the ribbon picks a chapter and then a site, the same as the map does', async ({ page }) => {
+  await seed(page, [...CHAPTER_1, 'abu-simbel', 'philae']);
   const box = await page.locator('#game').boundingBox();
   if (!box) throw new Error('no canvas');
   const at = async (p: { x: number; y: number }) => ({ x: box.x + (p.x / 320) * box.width, y: box.y + (p.y / 180) * box.height });

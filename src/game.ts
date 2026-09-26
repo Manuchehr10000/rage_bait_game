@@ -74,7 +74,7 @@ export class Game {
 
   private readonly input: Input;
   private readonly audio = new GameAudio();
-  private readonly progress = new Progress();
+  private readonly progress = new Progress(LEVELS.map((l) => l.id));
   private readonly map = new MapScreen(this.progress);
   private screen: Screen = 'map';
   /** Escape was pressed mid-level: after the death plays, go back to the map. */
@@ -167,8 +167,12 @@ export class Game {
       this.audio.unlock();
       this.pointer(e, true);
     });
+    // A deep link opens any level where there are dev tools, which is what the tests and
+    // the designer want. In prod it opens only a level the tour has reached, so a link
+    // cannot skip a player past the levels that set up this one.
     const hash = location.hash.replace(/^#/, '').trim();
-    if (hash && hash !== 'map') this.enterLevel(levelIndexFromHash(location.hash), false);
+    const linked = hash && hash !== 'map' ? levelIndexFromHash(location.hash) : -1;
+    if (linked >= 0 && (DEV_TOOLS || this.progress.isOpen(LEVELS[linked]!.id))) this.enterLevel(linked, false);
     else this.goToMap();
   }
 

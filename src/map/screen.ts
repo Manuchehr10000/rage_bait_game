@@ -265,7 +265,7 @@ export class MapScreen {
 
   private enterSite(i: number): MapAction {
     const s = this.current.sites[i];
-    if (!s?.level) return { kind: 'closed' };
+    if (!s?.level || !this.progress.isOpen(s.level)) return { kind: 'closed' };
     return { kind: 'enter', level: s.level };
   }
 
@@ -547,14 +547,16 @@ export class MapScreen {
       ctx.fillText(open ? 'Enter to visit' : 'Closed', px, 127 * s);
     } else {
       const sel = c.sites[this.site];
-      const hint = sel?.level ? (this.progress.isCleared(sel.level) ? 'Enter to visit again' : 'Enter to visit') : 'Closed';
+      // Built but not reached yet is 'Not yet'; never built is 'Closed'.
+      const reached = !!sel?.level && this.progress.isOpen(sel.level);
+      const hint = !sel?.level ? 'Closed' : this.progress.isCleared(sel.level) ? 'Enter to visit again' : reached ? 'Enter to visit' : 'Not yet';
       ctx.fillStyle = LAND_LINE;
       ctx.fillRect(px, 100 * s, pw, 0.6 * s);
       ctx.font = `bold ${5.5 * s}px ${FONT}`;
       ctx.fillStyle = INK;
       ctx.fillText(`${this.site + 1}. ${sel?.name ?? ''}`, px, 108 * s);
       ctx.font = `${5 * s}px ${FONT}`;
-      ctx.fillStyle = sel?.level ? ROUTE : INK_SOFT;
+      ctx.fillStyle = reached ? ROUTE : INK_SOFT;
       ctx.fillText(hint, px, 118 * s);
       ctx.font = `italic ${4.5 * s}px ${FONT}`;
       ctx.fillStyle = INK_SOFT;

@@ -43,6 +43,11 @@ the left edge of the screen, and the controls are his as soon as all of him is o
 where the visit has already begun he is simply there (Rouffignac, off the train). Retries
 start on the spawn.
 
+The tour is played in order. On the map a level opens once every level before it is
+cleared, so the chapters open in order and so do the levels inside each; anything cleared
+can be visited again. A deep link opens any level in dev and local builds, and in prod only
+one the tour has reached.
+
 Dev tools, in every build except prod, so a point on screen can be named: a ruler on the
 edges of a level, and the exact point under the mouse as `(X, Y)`. A click copies it with
 the level in front, `karnak (96, 64)`, since Y = 0 differs from level to level. X is world
