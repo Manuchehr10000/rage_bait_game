@@ -39,7 +39,7 @@ reserves, and ways of winning reserved by a legend (level 6). One row per trick.
 |---|---|---|---|
 | Throwing spears: the only way to win, a move that exists in this level alone | ch1 level 6, the mammoth | the fight | reserved 2026-09-26, so Egypt's Apep cannot be Set's spear |
 | The throne: a chair he lands in front of seats him, and his visit is over. The one death in the game with no physical cause | ch3 level 1, Knossos | the Throne Room | reserved 2026-09-24 by pillar 8. Knossos predates the pillars; its rebuild keeps the seat, and no other level seats him in anything |
-| False completion: the level looks finished, and it is not | none yet; never a level 1 | — | reserved by pillar 10: once per player, ever. It is also a joke on the game itself, so it spends its chapter's one (`arc.md` section 1) |
+| False completion: the level looks finished, and it is not | none yet; never a level 1 | — | reserved by pillar 10: once per player, ever. It is also a joke on the game itself, so it spends its chapter's one (`arc.md` section 1). Open, for the designer: whether Karnak's exit, a turnstile on a trapdoor with the real exit elsewhere, has already spent it |
 
 ## Spent by the levels built before 2026-09-26
 
@@ -72,3 +72,26 @@ Karnak's obelisk. What is kept of the obelisk is the site, Hatshepsut's, with it
 broken by the lake, not the trap as built: that one falls ahead of the runner and is the
 fourth "something comes down" above. The version to build is the touchstone: it cracks as
 he comes up, does not fall, and comes down behind him.
+
+### Dendera and Knossos, built after the audit
+
+The audit never saw these two, so their tricks are listed here one by one. One reviewer
+judged them, on 2026-09-26, against the table above; the audit used three, so treat each
+"new" as a claim to check, not a ruling. "Same as" names the trick a player who has met it
+would recognise. "Only here" is the site test. When either level is rebuilt its rows leave
+this table, as the rest do.
+
+| Trick | Level, beat | Same as | Only here |
+|---|---|---|---|
+| The ankh in the stair's ceiling: every full jump up the stair bumps the ceiling and nothing happens, until the eighth step, where the block he bumps is the ankh, and it comes down on him. A 2-to-5-frame hop goes under it | Dendera, the east stair | Karnak's ankh, met as the setup; a new punchline on it | no: the ankh is the chapter's anachronism, and any low ceiling would do |
+| The zodiac: a roof slab like its neighbours blows up the moment he lands on it | Dendera, the east chapels | the ledge that takes no weight; ash is only the body. Once known, it asks for nothing but a jump over it | yes: the zodiac was cut out of that ceiling in 1821, gunpowder among the tools |
+| The west chapels: the same slab holds, and the jump that cleared it in the east lands short, in the wabet's court. Walk the slab and jump the court from its far edge, with half a tile to spare | Dendera, the west chapels | new: the zodiac is its setup, the cows' shape | yes: the west suite never had a zodiac, and the wabet's court is open to the sky |
+| The dawn: crossing the court starts it; he must be in the statue's place in the kiosk before the first light lands there, or it spreads back over the roof and burns him. The clean run arrives 0.23 s early | Dendera, the kiosk | new, narrowly: Abu Simbel's sun is the setup, and the safe place is now where the light lands first, not the one niche it never reaches | yes: the New Year statue received the first light in that kiosk |
+| The burnt column: five identical columns hold the roof; the fifth, beside the light, folds once his feet are under its span, and the span comes down on him. Jump from under the fourth span into the light | Knossos, the West Magazines | something comes down where a runner is going; Cap Blanc's roof block most of all | no: the upper storey did fall into these storerooms in the fire, but a roof that comes down on a runner fits any roofed site |
+| The throne: a full jump out of the basin seats him in the throne and ends his visit. A hop out lands short. Evans's copy beyond the barrier, the same chair, does nothing | Knossos, the Throne Room | new; claimed above | yes |
+| The timber: jump the light well to the far hall, and the column across it, the same as the one beside him, lets its span down on the far hall. Walk off into the well instead and walk on under the far hall | Knossos, the Grand Staircase | the burnt column, two beats earlier in the same level: the same setup and the same punchline, with a different answer (down, not across) | yes: Fyfe's timber rotted in the Grand Staircase |
+| The doors: two identical folding doors on one clock. The first folds away from him, so he stands against the second, and it folds into his face. Wait in the middle of the hall, then walk through | Knossos, the Hall of the Double Axes | new: the first door is its setup, the cows' shape | yes: the pier-and-door partitions are this hall's |
+
+Not tricks, because nothing kills: Knossos's turnstile, honest, where Karnak's stood on a
+trapdoor, and Evans's copy of the throne. Both are flinches set up by a trick met earlier.
+If Karnak's exit loses its trapdoor when it is rebuilt, Knossos's turnstile loses its setup.

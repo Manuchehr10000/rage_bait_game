@@ -48,7 +48,8 @@ notes describe the levels as they were built.
 - **Chapters 1 to 4 are the game for now.** 5 to 12 are hidden (`SHOWN_CHAPTERS` in
   `src/map/atlas.ts`) and are thought about later.
 - **Open:** Apep or Sekhmet for chapter 2's legend; Farhad or Rostam for chapter 4's; the
-  order of chapter 4's sites.
+  order of chapter 4's sites; whether Karnak's exit has already spent the false completion
+  (pillar 10, `content/tricks.md`).
 
 Conventions:
 
