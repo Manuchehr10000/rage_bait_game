@@ -1531,45 +1531,50 @@ function bearStalagmite(): HTMLCanvasElement {
 export const BEAR_STALAGMITE_SPRITE = bearStalagmite();
 
 // ---------------------------------------------------------------------------
-// Chapter 3. The bull-leaper kit, badly tied and slipping, over modern clothes.
-// PROVISIONAL: the costume is not designed yet (content/ch03-aegean/CHAPTER.md,
-// "The tourist"). A gift-shop wig with one long lock, the kilt and belt of the
-// fresco as a costume shop sells them, knotted over a T-shirt and shorts, and
-// trainers. 12 x 16, drawn one pixel left of the 10 px hitbox. Faces right.
+// Chapter 3. The bull-leaper kit, badly tied and slipping, over his running kit
+// (content/ch03-aegean/shared/bull-leaper.md). A costume-shop wig, black, with its
+// long lock down his back, held on by a white sweatband; a gold plastic belt that
+// has slid from his waist to his hips; a short red kilt that hangs lower on one
+// side; a gold band round the upper arm. Under it, a lime running vest, running
+// shorts and trainers. Nothing holds the belt up, so it is the thing that slips;
+// the sweatband is why the wig does not. No skin paint, ever. 12 x 16, drawn one
+// pixel left of the 10 px hitbox. Faces right.
 // ---------------------------------------------------------------------------
 
 const BULL_LEAPER: Palette = {
   O: '#2b1d10', // outline
   K: '#1d1917', // the wig
+  H: '#b08850', // his own hair, where it shows
+  W: '#f4f1ea', // the sweatband
   S: '#e6b48c', // skin
   E: '#1c1c1c', // eye
-  T: '#f1eee6', // T-shirt
-  Y: '#d6ae45', // the belt, gold paint
+  V: '#b5d93b', // running vest, lime
+  A: '#d6ae45', // the belt and the armband, gold paint on plastic
   R: '#b4392b', // the kilt
   U: '#2f5f9a', // its blue edge
-  P: '#56708f', // shorts
-  N: '#e9e9e4', // trainers
+  P: '#2d3a66', // running shorts
+  N: '#ecebe6', // trainers
 };
 
-// The wig sits back and to one side, the fringe over one eye, the lock down his back.
+// The lock hangs down his back; a tuft of his own hair shows in front of it.
 const BULL_LEAPER_HEAD = [
   '...OOOOOO...',
   '..OKKKKKKO..',
   '.OKKKKKKKKO.',
-  '.OKKKSSSSSO.',
-  'OKKOSSSSESO.',
+  '.OKWWWWWWWO.',
+  'OKKHSSSSESO.',
   'OKKOSSSSSSO.',
   'OKKOSSSSSO..',
   'OKKKOSSSO...',
   '.OKKOSSO....',
 ];
 
-// The belt is tied, badly: the kilt hangs lower on one side than the other.
+// The vest, the bare arm with its band, and the belt down on his hips.
 const BULL_LEAPER_TORSO = [
-  '.OKOTTTTTTO.',
-  '..OTTTTTTTO.',
-  '..OYYYYYYYO.',
-  '..OURRRRRUO.',
+  '.OKOVVVVVVO.',
+  '..OVVVVVVAO.',
+  '..OVVVVVVSO.',
+  '..OAAAAAAAO.',
 ];
 
 function bullLeaper(legs: string[]): string[] {
@@ -1577,49 +1582,59 @@ function bullLeaper(legs: string[]): string[] {
 }
 
 export const BULL_LEAPER_FRAMES = {
-  idle: compile(bullLeaper(['...ORRRRUPO.', '...OSSOOSSO.', '...ONNOONNO.']), BULL_LEAPER),
-  walk1: compile(bullLeaper(['..ORRROUPPO.', '..OSSO..OSSO', '..ONNO..ONNO']), BULL_LEAPER),
-  walk2: compile(bullLeaper(['...ORRRRUO..', '....OSSSSO..', '....ONNNNO..']), BULL_LEAPER),
-  jump: compile(bullLeaper(['..ORRRRUPO..', '..OSSO..OSSO', '..ONNO...ONN']), BULL_LEAPER),
-  // Dead: eye shut, the wig further round. Nothing else changes.
+  // The kilt hangs a pixel lower at the back, where the knot is not.
+  idle: compile(bullLeaper(['..ORRRRRRUO.', '...ORSOOSSO.', '...ONNOONNO.']), BULL_LEAPER),
+  walk1: compile(bullLeaper(['..ORRRRRRUO.', '..ORSO..OSSO', '..ONNO..ONNO']), BULL_LEAPER),
+  walk2: compile(bullLeaper(['..ORRRRRRUO.', '....ORSSSO..', '....ONNNNO..']), BULL_LEAPER),
+  // In the air the kilt goes up and the running shorts show.
+  jump: compile(
+    [...BULL_LEAPER_HEAD, '.OKOVVVVVVO.', '..OVVVVVVAO.', '..ORRRRRRUO.', '..OAAAAAAAO.', '..OPPO.OPPO.', '..OSSO..OSSO', '..ONNO...ONN'],
+    BULL_LEAPER,
+  ),
+  // Dead: the wig has come down over his eyes, sweatband and all, and his own hair
+  // shows on top. Nothing else changes.
   dead: compile(
     [
       '...OOOOOO...',
-      '..OKKKKKKO..',
+      '..OHHHHHHO..',
+      '.OHHKKKKKKO.',
       '.OKKKKKKKKO.',
-      '.OKKKKSSSSO.',
+      'OKKKWWWWWWO.',
       'OKKOSSSSSSO.',
-      'OKKOSSSOOSO.',
       'OKKOSSSSSO..',
       'OKKKOSSSO...',
       '.OKKOSSO....',
-      '.OKOTTTTTTO.',
-      '..OTTTTTTTO.',
-      '..OYYYYYYYO.',
-      '..OURRRRRUO.',
-      '...ORRRRUPO.',
-      '...OSSOOSSO.',
+      '.OKOVVVVVVO.',
+      '..OVVVVVVAO.',
+      '..OVVVVVVSO.',
+      '..OAAAAAAAO.',
+      '..ORRRRRRUO.',
+      '...ORSOOSSO.',
       '...ONNOONNO.',
     ],
     BULL_LEAPER,
   ),
 };
 
-/** Sitting down on the floor, the kilt in his lap. For the one death you choose. */
+/**
+ * Sitting down on the floor, having given up: the wig off and in his lap, his own
+ * hair under the sweatband. Never to be mistaken for the throne, where the wig is on
+ * and he sits up facing out.
+ */
 export const BULL_LEAPER_SEATED = compile(
   [
     '...OOOOOO...',
-    '..OKKKKKKO..',
-    '.OKKKKKKKKO.',
-    '.OKKKSSSSSO.',
-    'OKKOSSSOOSO.',
-    'OKKOSSSSSSO.',
-    'OKKOSSSSSO..',
-    'OKKKOSSSO...',
-    '.OKKOSSO....',
-    '..OTTTTTTTO.',
-    '..OYYYYYYYO.',
-    '.ORRRRRRRRUO',
+    '..OHHHHHHO..',
+    '.OHHHHHHHHO.',
+    '.OHWWWWWWWO.',
+    'OHHHSSSSESO.',
+    'OHHOSSSSSSO.',
+    '.OHOSSSSSO..',
+    '..OOOSSSO...',
+    '....OSSO....',
+    '..OVVVVVVVO.',
+    '..OAAAAAAAO.',
+    '.ORRKKKKRRUO',
     'OSSONNOONNOSO',
     'OOOOOOOOOOOOO',
   ],
@@ -1627,22 +1642,23 @@ export const BULL_LEAPER_SEATED = compile(
 );
 
 /**
- * In the throne, facing out, at rest: hands on his knees, feet on the floor. Never
- * the slump of giving up and never a king. 12 x 16; the seat line is row 10.
+ * In the throne, facing out, at rest: wig on and straight, hands on his knees, feet
+ * on the floor. Never the slump of giving up and never a king. 12 x 16; the seat
+ * line is row 10.
  */
 export const BULL_LEAPER_ENTHRONED = compile(
   [
     '...OOOOOO...',
     '..OKKKKKKO..',
     '.OKKKKKKKKO.',
-    '.OKSSSSSSKO.',
+    '.OKWWWWWWKO.',
     '.OKSESSESKO.',
     '.OKSSSSSSKO.',
     '.OKOSSSSOKO.',
     '..OKOSSOKO..',
-    '.OTTTTTTTTO.',
-    'OSTTTTTTTTSO',
-    'OSOYYYYYYOSO',
+    '.OVVVVVVVVO.',
+    'OAVVVVVVVVAO',
+    'OSOAAAAAAOSO',
     '.ORRRRRRRRO.',
     '.OSSUOOUSSO.',
     '..OSSO.OSSO.',

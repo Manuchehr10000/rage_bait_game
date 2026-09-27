@@ -159,13 +159,16 @@ the repository root; read them before drawing a trap.
 
 ## The tourist
 
-Research: bull-leaper kit, badly tied and slipping. Not designed or drawn yet; that is its own
-conversation. What is fixed already: it goes over modern clothes like every other costume, it
-never changes the hitbox, nobody ever mentions it, and the slipping is cosmetic. There is no
-bull anywhere in the chapter, so he is dressed for something that never happens. Besides the
-four living frames and the dead one it needs a seated frame (for giving up) and, for Knossos
-only, a frame at rest in the throne, facing out, never triumphant, which is never the seated
-one.
+Research: bull-leaper kit, badly tied and slipping. Designed and drawn 2026-09-27; the full
+note is `shared/bull-leaper.md`. *Kit* in the sporting sense: a costume-shop wig with its long
+lock, held on by a white sweatband, a gold plastic belt, a short red kilt and a gold armband,
+over his own lime running vest, running shorts and trainers. The one thing that slips is the
+belt: worn high and tight in Minoan pictures, his has slid to his hips. It never changes the
+hitbox, nobody ever mentions it, and it never carries a bull. Levels 1 to 5 have no bull, so
+he is dressed for something that does not happen, until the Minotaur of level 6. Besides the
+four living frames: the dead one (the wig down over his eyes), the seated one for giving up
+(the wig off, in his lap) and, for Knossos only, the one in the throne (the wig on, facing
+out, at rest), which the seated one is never mistaken for.
 
 ## What "accurate" means here
 

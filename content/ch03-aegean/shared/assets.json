@@ -1,5 +1,5 @@
 {
-  "$comment": "Sizes are world pixels (320 x 180 view). Painted files are 4x. See content/README.md. The costume is provisional: see bull-leaper.md.",
+  "$comment": "Sizes are world pixels (320 x 180 view). Painted files are 4x. See content/README.md. The costume was designed on 2026-09-27: see bull-leaper.md.",
   "level": "shared",
   "assets": [
     {
@@ -7,7 +7,7 @@
       "w": 12,
       "h": 16,
       "beat": "shared",
-      "what": "The tourist in chapter 3's costume. Four frames: idle, walk1, walk2, jump.",
+      "what": "The tourist in chapter 3's costume: a costume-shop bull-leaper kit (wig held on by a sweatband, a belt slipped to his hips, a kilt) over his running kit. Four frames: idle, walk1, walk2, jump.",
       "frames": 4
     },
     {
@@ -15,14 +15,14 @@
       "w": 12,
       "h": 16,
       "beat": "shared",
-      "what": "The same, eyes shut. Used, stretched and rotated, by every death."
+      "what": "The same, the wig knocked down over his eyes. Used, stretched and rotated, by every death but the throne."
     },
     {
       "id": "bull-leaper-seated",
       "w": 13,
       "h": 14,
       "beat": "shared",
-      "what": "Sitting on the floor: the 'Gave up' pose."
+      "what": "Sitting on the floor with the wig off in his lap: the 'Gave up' pose."
     },
     {
       "id": "bull-leaper-enthroned",

@@ -9,14 +9,15 @@
 
 ## What it is
 
-Sat on the floor, knees up, the kilt in his lap, looking at nothing: the 'Gave up' pose, what R
-does. Bottom edge on the floor.
+The 'Gave up' pose, what R does: sat on the floor, the wig off and in his lap on the kilt, the
+sweatband still on round his own sandy hair, looking at nothing. Bottom edge on the floor.
 
 ## Must be right
 
 - Resignation, not rest.
 - **It must never be mistaken for `bull-leaper-enthroned`**, or a player seated in the throne
-  will think they pressed R.
+  will think they pressed R. The wig is the difference, and it must read at a glance: off and in
+  his lap here; on, straight, framing his face in the throne.
 
 ## Deliberately wrong
 
