@@ -64,6 +64,25 @@ each trick here may then be claimed once, by one level.
 | The chaser at your own speed that collects whoever stops | 2 | Rouffignac: the train, and the end of the line |
 | The boat leaves as you drop on to it | 2 | Philae: in, and out |
 
+### What the audit missed in chapter 1
+
+The audit's table above describes some chapter 1 levels as they were before their last
+changes. The conversation that made those changes (2026-09-23, before the audit) lists here
+what they spent, judged by that conversation alone, one reviewer and no panel: treat each
+row as a claim to check, as with Dendera and Knossos below. None of it is a model; the
+levels are to be rebuilt, and when one is, its rows leave this table too.
+
+| Trick | Level, beat | Same as |
+|---|---|---|
+| The collapse is six blocks now, not five settling ones: 1 settles, 2 turns over the moment he is on it, 3 is wet and drags him back, 4 holds, 5 is shy, 6 creeps back into 5 and breaks under him | Roc-aux-Sorciers, the collapse | 1: the floor that settles. 2: the ledge that goes. 3: the slippery ledge. 6: carried back and let go over the drop. 5: the shy one, the next row |
+| The shy one: jumped at from the one before it, it hops out of reach, once, and then stays; the answer is to set it off, wait, and go | Cap Blanc, the seventh horse. Roc-aux-Sorciers, the fifth collapse block | not in the audit's table at all; spent twice, the second time in stone |
+| The deposit gives way a few strides short of the exit | Cap Blanc, the far floor | the trapdoor in plain floor |
+| The middle slab over the well tips a sixth of a second after he lands | Gargas, the well | the ledge that goes |
+| The ninth tread rocks back and pins him against the eighth while the lamp burns | Gargas, the tunnel | the slippery ledge, turned into a clock |
+| The last slab's foot keeps a boot while he pulls and frees it when he stops | Gargas, the well | the boot snare, met at the sixth tread and at Rouffignac, as the setup; the punchline, do nothing, is new |
+| The lamp that runs out while it burns sits him down in the dark; L stops it | Gargas, the whole level | the chaser that collects whoever stops: a clock, where Rouffignac's is a train |
+| The roof low over the fifth tread: only a jump from the lip clears the boot | Gargas, the tunnel | the flint lip, the other way round: here the low roof shortens the jump rather than killing it |
+
 **Worth keeping.** The audit found nine tricks that could only happen at their site. A
 rebuild starts from these: Roc-aux-Sorciers' figure that throws no shadow; Pech Merle's
 disc that snaps; Rouffignac's train, and its end of the line; Abu Simbel's fourth head, the
