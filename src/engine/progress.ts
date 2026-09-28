@@ -1,13 +1,17 @@
 /**
- * Which levels this browser has cleared. Nothing else is remembered. The tour is
+ * Which levels this browser has cleared, and which of each level's tricks have
+ * killed this visitor (pillar 8). Nothing else is remembered. The tour is
  * played in order: a level is open once every level before it in `order` is cleared,
  * which locks the chapters in order and the levels inside each one with one rule.
  */
 
 const KEY = 'lostTourist.cleared';
+const TRICKS_KEY = 'lostTourist.tricks';
 
 export class Progress {
   private cleared = new Set<string>();
+  /** By level id, the nouns of the tricks that have killed this visitor there. */
+  private tricks = new Map<string, Set<string>>();
 
   /** `order` is every built level's id in tour order. */
   constructor(private readonly order: readonly string[]) {
@@ -16,6 +20,36 @@ export class Progress {
       if (raw) for (const id of JSON.parse(raw) as unknown[]) if (typeof id === 'string') this.cleared.add(id);
     } catch {
       /* nothing remembered */
+    }
+    try {
+      const raw = localStorage.getItem(TRICKS_KEY);
+      const saved = raw ? (JSON.parse(raw) as unknown) : null;
+      if (saved && typeof saved === 'object') {
+        for (const [id, list] of Object.entries(saved as Record<string, unknown>)) {
+          if (Array.isArray(list)) this.tricks.set(id, new Set(list.filter((t): t is string => typeof t === 'string')));
+        }
+      }
+    } catch {
+      /* nothing remembered */
+    }
+  }
+
+  /** How many of `tricks` have ever killed this visitor in this level. */
+  tricksMet(levelId: string, tricks: readonly string[]): number {
+    const met = this.tricks.get(levelId);
+    return met ? tricks.filter((t) => met.has(t)).length : 0;
+  }
+
+  /** A trick has killed him. The first time is written down; nothing else happens. */
+  markTrick(levelId: string, trick: string): void {
+    const met = this.tricks.get(levelId) ?? new Set<string>();
+    if (met.has(trick)) return;
+    met.add(trick);
+    this.tricks.set(levelId, met);
+    try {
+      localStorage.setItem(TRICKS_KEY, JSON.stringify(Object.fromEntries([...this.tricks].map(([id, t]) => [id, [...t]]))));
+    } catch {
+      /* private mode */
     }
   }
 

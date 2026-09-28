@@ -9,11 +9,13 @@
 
 ## What it is
 
-A plaster cast of the skeleton found in 1911 at the foot of the frieze: lying on its left side, knees drawn up, skull to the left, in a shallow hollow. 24 × 8, on the floor of the trench. White plaster, a little grey in the hollows.
+A plaster cast of the skeleton found in 1911 at the foot of the frieze: lying on its left side, knees drawn up, skull to the left, in a shallow hollow. 24 × 8, in its own hollow under the first horse, a tile above the floor of the trench. White plaster, a little grey in the hollows.
 
 ## Where it stands in the game
 
-Beat c, in the trench under the lit horses. Decor: it does nothing.
+Beat c, under the first horse. Decor: it does nothing, and nothing happens near it. The
+floor of the trench that kills begins past its hollow, and the first place anyone can come
+off the frieze is past it too. Graves are never traps (`research/arc.md`).
 
 ## Must be right
 
@@ -22,7 +24,7 @@ Beat c, in the trench under the lit horses. Decor: it does nothing.
 
 ## Deliberately wrong
 
-It lies in the killing floor of the trench. The real cast is in a protected hollow.
+None that matters: it lies where the burial was found, and a cast is what is there.
 
 ## Easter eggs
 

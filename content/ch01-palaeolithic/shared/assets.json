@@ -31,6 +31,13 @@
       "h": 14,
       "beat": "shared",
       "what": "The hiker sitting down. The 'Gave up' pose, and 'The dark' at Gargas, lamp dead."
+    },
+    {
+      "id": "roof-block",
+      "w": 24,
+      "h": 18,
+      "beat": "shared",
+      "what": "A block of the overhang: limestone, one fresh face where it parted. Pech Merle's slab that comes down in the passage, drawn to its size, and the block on its side at the foot of Gargas's tunnel."
     }
   ]
 }

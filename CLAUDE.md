@@ -28,12 +28,13 @@ notes describe the levels as they were built.
 - **Pillar 7.** Clean runs of about 15, 22, 30, 37 and 45 seconds for levels 1 to 5, never
   more than 45; level 6 too.
 - **Pillar 8.** The exit label shows how many of the level's tricks this visitor has ever
-  been killed by, as "7 of 9"; plain falls and drownings do not count. Not built yet. It
-  needs each level to declare its tricks and each trap to claim the deaths it causes,
-  even when water or a pit finishes him (today most traps only move him, and the water
-  or the pit gets the noun). Build it into each level as that level is rebuilt.
+  been killed by, as "7 of 9"; plain falls and drownings do not count. Built with Cap
+  Blanc (2026-09-28): a level declares its tricks (`tricks` in its data, each the noun
+  its trap claims a death under), and a trap claims the death it sets up with
+  `World.claim`, even when water or a pit finishes him; the claim lapses when he stands
+  on something or jumps. Build it into each level as that level is rebuilt.
 - **Every level built or designed before 2026-09-26 is to be rebuilt**, one at a time, and
-  until then is not a model. Suggested first: Cap Blanc, the first two minutes.
+  until then is not a model. Cap Blanc was rebuilt first (2026-09-28).
 - **The chapter** (`arc.md` section 1): six levels, played in order. Plant, harvest,
   contradict, change the job (a clock alone is not a change), everything and the grand
   feature, then the legend. What grows is how deep the setups go and how much the hands

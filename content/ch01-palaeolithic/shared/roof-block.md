@@ -5,7 +5,7 @@
 | Id | `roof-block` |
 | File | `roof-block.png` (not painted yet: the game draws its own until this file exists) |
 | Size | 24 × 18 world px, painted 96 × 72 |
-| Beat | `e-dig` |
+| Beat | `shared` |
 
 ## What it is
 
@@ -15,10 +15,10 @@ one **weathered** face that used to be the ceiling. 24 × 18.
 
 ## Where it stands in the game
 
-Beat e, over the near end of the far floor, a stride in from its edge. It starts just
-under the overhang and lets go the moment the tourist is over the edge of the platform. It
-lands on the floor and stays there, as the one thing in the level you climb rather than
-cross.
+Two levels use it. At **Pech Merle** it is the slab that comes down in the passage as he
+enters it, drawn tiled to the slab's size. At **Gargas** it lies on its side at the foot of
+the tunnel, a step. It was drawn first for Cap Blanc's far floor, which lost it when the
+level was rebuilt on 2026-09-28.
 
 ## Must be right
 
@@ -29,14 +29,12 @@ cross.
 
 ## Deliberately wrong
 
-It waits for you. Roof fall does not take an interest in visitors, and a block that size
-would have come down in the Magdalenian and been part of the deposit ever since.
+Where it falls, it waits for him. Roof fall does not take an interest in visitors.
 
 ## Easter eggs
 
-Roof fall is what sealed the archaeology of Cap Blanc: the frieze was under a deposit of
-it until 1909. The one thing in the dark half of the level that is telling the truth is
-the thing that kills you.
+Roof fall is what sealed the archaeology of the painted shelters and cave mouths of the
+chapter: Cap Blanc's frieze lay under a deposit of it until 1909.
 
 ## Sources
 

@@ -1,92 +1,103 @@
-import { Grid, type HorseTrick, type LevelData } from '../../engine/level';
-import { TILE, type DeathCause } from '../../engine/types';
+import { Grid, type HorseDef, type LevelData } from '../../engine/level';
+import { TILE } from '../../engine/types';
 
 /**
  * Chapter 1, Level 1 — The Abri de Cap Blanc, Marquay, Dordogne.
  *
- * The first level of the game. It teaches the chapter's three words: a relief
- * ledge is a floor; light is a resource; what you see may be a cast.
+ * The first level of the game. It plants the chapter's three words: a relief
+ * ledge is a floor (the horses); light is a resource (the headlamp at the door, the
+ * museum's lamps); what you see may be a cast (the burial, which is one, and says
+ * so). It spends two tricks, the second set up by the first (content/tricks.md).
  * History: content/ch01-palaeolithic/l01-cap-blanc/LEVEL.md.
  *
- * Ground on the valley floor is row 15. Inside the shelter the excavation
+ * Ground on the valley floor is row 13. Inside the shelter the excavation
  * trench opens below that, and the frieze is the way across.
  *
- *   0..20   the Beune valley: one honest stream
- *  21       the wall of 1911, and its door
- *  21..25   the shelter floor, lit
- *  26..68   the trench. Ten horses in high relief; their backs are the floor.
- *             All ten are the same sprite. Four hold: three in the light and the
- *             last one across. The third is a cast that gives way if you stand on it,
- *             the fifth walks out from under you. Then the lamps stop, and none of
- *             the last five is honest. The sixth holds for six seconds and is the
- *             only place to stand; the seventh jumps when you jump at it from the
- *             sixth, once, and comes back down to stay; the eighth comes up and
- *             throws you back; the ninth breaks in the middle; the tenth holds.
- *  69..73   the far floor, lit end to end with no lamp over it. Land at its very
- *             edge and stay there: a stride in, the overhang lets go of a block,
- *             and it comes down where a full jump would have put you.
- *  74..     the deposit the excavation left in place. Two tiles of it, a few
- *             strides short of the way out, are sediment and nothing under it:
- *             stand on them and they go down into the dig, and so does he
- *  81       exit
+ *   0..36   the Beune valley: one honest stream
+ *  37       the wall across the mouth of the shelter, and its door
+ *  37..42   the shelter floor, lit. The headlamp comes on through the door
+ *  43..68   the trench. Five horses in high relief, every one the same sprite: a
+ *             back, and a step down, the neck and head. Their backs and heads are
+ *             the floor. Under the first, in a hollow of its own above the floor
+ *             of the trench, the cast of the burial. Nothing dies near it.
+ *             The first three teach the rhythm: land on the back, run out along
+ *             the neck, jump from the muzzle.
+ *             The fourth has no muzzle: the first blow of the pick took it off in
+ *             1909, and the fresh stone shows where. Jump where the muzzle was
+ *             and there is nothing to jump from ('The muzzle'). Jump from the break.
+ *             The fifth hangs lower, close under the break, with its muzzle whole.
+ *             The full jump that the fourth has just taught carries him over its
+ *             back and down on its head, and a muzzle does not take a blow: it
+ *             comes off, and he goes down with it ('The second blow'). A short
+ *             hop from the break lands on its back, and he walks out on to the
+ *             head, which holds a man who walks.
+ *  69..72   the far floor
+ *  73..     the deposit the excavation left in place, and the way out over it
  */
-const W = 84;
-/**
- * Where the deposit gives way, named from the dev ruler as cap-blanc (1250, 16): two
- * tiles of it that are not holding anything up any more, least of all a man. The
- * whole column of sediment, top to bottom, drawn exactly as the deposit around it
- * (pillar 4), and it goes a sixth of a second after he stands on it.
- */
-const SLUMP_X = 77;
-const H = 18;
-const GROUND = 15;
+const W = 83;
+const H = 17;
+const GROUND = 13;
 const px = (t: number) => t * TILE;
 
-const WALL_X = px(21);
-const CEILING = px(7);
-const TRENCH_X0 = px(26);
-const TRENCH_X1 = px(69);
-const LEDGE_Y = px(14);
-/** The trench floor. Falling this far is the death called 'The trench'. */
-const TRENCH_FLOOR = px(GROUND) + 12;
-
-const g = new Grid(W, H);
-g.fill(0, GROUND, 22, H - GROUND, '=');
-g.fill(9, GROUND, 2, H - GROUND, ' '); // the Beune
-g.fill(21, GROUND, 5, H - GROUND, '#'); // bedrock under the wall and the shelter floor
-g.fill(21, 0, W - 21, 7, '#'); // the overhang
-g.fill(69, GROUND, 5, H - GROUND, '#'); // the far floor
-g.fill(74, GROUND - 1, W - 74, H - GROUND + 1, '%'); // the deposit
-g.fill(SLUMP_X, GROUND - 1, 2, H - GROUND + 1, ' '); // where it gives way: drawn as the deposit by the entity
+/** The valley floor, the shelter floor, and the backs of the first four horses. */
+const FLOOR = px(GROUND);
+const WALL_X = px(37);
+/** The underside of the overhang, and the top of the wall built against it. */
+const CEILING = px(6);
+const TRENCH_X0 = px(43);
+/** The cast lies in its own hollow, a tile deep, under the first horse. The trench proper begins past it. */
+const HOLLOW_X1 = px(45);
+const HOLLOW_Y = px(15);
+const FAR_FLOOR_X = px(69);
+const DEPOSIT_Y = px(GROUND - 1);
+/** The floor of the trench. Down here is the death called 'The trench', unless a trick claims it. */
+const TRENCH_FLOOR = px(16);
 
 /**
- * The frieze. Sprite x of each horse; the ledge is the back, 28 px from x + 4.
- * Five under the lamps at an even 68 px, five in the dark at uneven gaps.
- * Every one of the ten is drawn from the same sprite (pillar 4), and what any
- * one of them does is learned the way everything here is learned.
+ * The frieze. Sprite top-left of each horse (HORSE_SHAPE has the ledges). The
+ * first four are carved level, their backs flush with the shelter floor, 96 px
+ * apart: 40 px from one muzzle to the next back, which a full jump from the
+ * muzzle clears with its whole length to spare. The fifth is a head lower, and
+ * its back begins 22 px past the fourth's break: too far to step, and a jump held
+ * for anything from a tap to a sixth of a second lands on it. A full jump from the
+ * break comes down past it, on its muzzle.
  */
-const HORSES: { x: number; trick: HorseTrick }[] = [
-  { x: 440, trick: 'none' },
-  { x: 508, trick: 'none' },
-  { x: 576, trick: 'cast' }, // plaster, and lit: stand about on it and it goes
-  { x: 644, trick: 'none' },
-  { x: 712, trick: 'walk' }, // walks forward out from under you, still in the light
-  { x: 788, trick: 'crack' }, // holds for six seconds. The only place to stand in the dark
-  { x: 848, trick: 'shy' }, // jumps when you jump at it from the sixth, once, then stays
-  { x: 920, trick: 'rear' }, // comes up on its front legs and throws you back
-  { x: 988, trick: 'split' }, // breaks in the middle
-  { x: 1052, trick: 'none' }, // the last step across, and the only honest thing in the dark
-];
-/** How long you may stand on one before it decides. Crossing at a run takes 0.31 s. */
-const DELAY: Record<HorseTrick, number> = { none: 0, cast: 0.45, crack: 6, walk: 0.12, shy: 0, rear: 0.5, split: 0.5 };
-/** What each one kills you with, when it does. */
-const CAUSE: Partial<Record<HorseTrick, DeathCause>> = { cast: 'The cast' };
-/** The back of one horse: the 28 px of ledge you stand on. */
-const ledge = (i: number) => ({ x: (HORSES[i]?.x ?? 0) + 4, y: LEDGE_Y, w: 28, h: 6 });
-const LIT = 5;
+const HORSE_Y = FLOOR - 2;
+const HORSE_X = TRENCH_X0 - 6;
+const SPACING = 96;
+const BREAK_X = HORSE_X + 3 * SPACING + 38;
+const FIFTH = { x: BREAK_X + 22 - 6, y: HORSE_Y + 10 };
 
-const FAR_FLOOR = TRENCH_X1;
-const EXIT_X = px(81);
+const horse = (x: number, y: number, broken = false): HorseDef => ({
+  kind: 'horse',
+  x,
+  y,
+  broken,
+  floorY: TRENCH_FLOOR,
+  // Pillar 8: off the end of a broken head is the fourth horse's trick; down with a
+  // muzzle he knocked off is the fifth's, wherever it happens, because it is the same rule.
+  overTheBreak: broken ? 'The muzzle' : undefined,
+  blow: 'The second blow',
+});
+
+const HORSES: HorseDef[] = [
+  horse(HORSE_X, HORSE_Y),
+  horse(HORSE_X + SPACING, HORSE_Y),
+  horse(HORSE_X + 2 * SPACING, HORSE_Y),
+  horse(HORSE_X + 3 * SPACING, HORSE_Y, true), // the first blow, 1909
+  horse(FIFTH.x, FIFTH.y), // whole, a head lower, and close
+];
+
+const EXIT_X = px(80);
+
+const g = new Grid(W, H);
+g.fill(0, GROUND, 37, H - GROUND, '=');
+g.fill(17, GROUND, 2, H - GROUND, ' '); // the Beune
+g.fill(37, GROUND, 6, H - GROUND, '#'); // bedrock under the wall and the shelter floor
+g.fill(37, 0, W - 37, 6, '#'); // the overhang
+g.fill(43, 15, 2, H - 15, '#'); // the hollow the cast lies in
+g.fill(69, GROUND, 4, H - GROUND, '#'); // the far floor
+g.fill(73, GROUND - 1, W - 73, H - GROUND + 1, '%'); // the deposit
 
 export const CAP_BLANC: LevelData = {
   id: 'cap-blanc',
@@ -96,68 +107,34 @@ export const CAP_BLANC: LevelData = {
   widthTiles: W,
   heightTiles: H,
   rows: g.rows(),
-  spawn: { x: 24, y: px(GROUND) - 16 },
-  cameraBottom: px(16),
+  spawn: { x: 24, y: FLOOR - 16 },
+  cameraBottom: TRENCH_FLOOR + 8,
   lampFromX: WALL_X + 26,
   fallCause: 'The trench',
-  exit: { x: EXIT_X, y: LEDGE_Y - 24, w: 12, h: 24 },
+  tricks: ['The muzzle', 'The second blow'],
+  exit: { x: EXIT_X, y: DEPOSIT_Y - 24, w: 12, h: 24 },
 
   decor: [
-    { kind: 'shelter', x0: WALL_X + 16, x1: px(W), ceilingY: CEILING, floorY: px(GROUND) },
-    { kind: 'museumWall', x: WALL_X, w: 32, doorX: WALL_X + 8, top: CEILING, floorY: px(GROUND) },
-    { kind: 'trench', rect: { x: TRENCH_X0, y: px(GROUND), w: TRENCH_X1 - TRENCH_X0, h: TRENCH_FLOOR + 4 - px(GROUND) } },
-    { kind: 'skeletonCast', x: 576, floorY: TRENCH_FLOOR },
-    { kind: 'bisonRelief', x: 470, y: 150 },
-    { kind: 'bisonRelief', x: 606, y: 160 },
-    // The dark ends where the far floor begins. You can see the lit platform from
-    // halfway down the frieze, which is exactly why you jump for it too hard.
-    { kind: 'dark', x0: WALL_X + 36, x1: FAR_FLOOR, lamp: 'headlamp' },
-    // The museum's lamps, over the first five horses and nowhere else. The far
-    // floor is lit because the dark ends at its edge, not because anything hangs
-    // over it: daylight from the mouth of the shelter, and no fixture to read by.
-    ...HORSES.slice(0, LIT).map((h) => ({ kind: 'spotlight' as const, x: h.x + 20, floorY: px(GROUND), top: CEILING })),
+    // The back wall of the shelter, down past the frieze to where the trench was dug.
+    { kind: 'shelter', x0: WALL_X + 16, x1: px(W), ceilingY: CEILING, floorY: HOLLOW_Y },
+    { kind: 'museumWall', x: WALL_X, w: 32, doorX: WALL_X + 8, top: CEILING, floorY: FLOOR },
+    // The trench: the excavation took the floor down more than a metre below the frieze.
+    { kind: 'trench', rect: { x: TRENCH_X0, y: HOLLOW_Y, w: FAR_FLOOR_X - TRENCH_X0, h: TRENCH_FLOOR + 8 - HOLLOW_Y } },
+    // The cast, where the burial was found in 1911, at the foot of the frieze, in a
+    // hollow of its own. It is a cast and it is drawn as one. Nobody dies near it.
+    { kind: 'skeletonCast', x: TRENCH_X0, floorY: HOLLOW_Y },
+    // Bison, in lower relief than the horses: lines in the wall, not ledges.
+    { kind: 'bisonRelief', x: HORSE_X + SPACING + 30, y: CEILING + 44 },
+    { kind: 'bisonRelief', x: HORSE_X + 3 * SPACING + 20, y: CEILING + 50 },
+    // The museum's lamps, one over each horse, hung from the overhang.
+    ...HORSES.map((h) => ({ kind: 'spotlight' as const, x: h.x + 30, floorY: FLOOR, top: CEILING })),
   ],
 
   entities: [
     // The stream in the valley. A metre deep.
-    { kind: 'water', x0: px(9), x1: px(11), startY: px(GROUND) + 6, cause: 'The Beune' },
-    // Ten horses. Four hold. The other six look exactly like them.
-    ...HORSES.map((h, i) => ({
-      kind: 'horse' as const,
-      rect: ledge(i),
-      trick: h.trick,
-      delay: DELAY[h.trick],
-      floorY: TRENCH_FLOOR,
-      // The shy one takes offence at one thing only: a jump made from the horse before it.
-      wakeFrom: h.trick === 'shy' ? ledge(i - 1) : undefined,
-      cause: CAUSE[h.trick] ?? ('The trench' as const),
-    })),
-    // The roof. It lets go over the near end of the platform, and it lets go the
-    // moment you are over the edge: a full jump lands under it, and two strides
-    // off a short hop walk into it. Standing still at the very edge is the only
-    // thing that works.
-    {
-      kind: 'roof',
-      x: FAR_FLOOR + 24,
-      w: 24,
-      h: 18,
-      fromY: CEILING + 4,
-      floorY: px(GROUND),
-      triggerX: FAR_FLOOR,
-      delay: 0.2,
-      cause: 'The roof',
-    },
-    // The deposit, giving way. It takes him down with it, out of the bottom of the dig.
-    {
-      kind: 'crumble',
-      skin: 'clayLedge',
-      rect: { x: px(SLUMP_X), y: px(GROUND - 1), w: px(2), h: px(H - GROUND + 1) },
-      fake: true,
-      delay: 0.15,
-      // It does not sink under him like a lift he can jump off: it is not under him.
-      tips: true,
-    },
-    // The floor of the trench.
-    { kind: 'hazard', rect: { x: TRENCH_X0, y: TRENCH_FLOOR - 2, w: TRENCH_X1 - TRENCH_X0, h: 8 }, cause: 'The trench' },
+    { kind: 'water', x0: px(17), x1: px(19), startY: FLOOR + 6, cause: 'The Beune' },
+    ...HORSES,
+    // The floor of the trench, past the cast's hollow.
+    { kind: 'hazard', rect: { x: HOLLOW_X1, y: TRENCH_FLOOR - 2, w: FAR_FLOOR_X - HOLLOW_X1, h: 8 }, cause: 'The trench' },
   ],
 };

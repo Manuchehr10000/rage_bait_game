@@ -24,65 +24,95 @@ the ruined castle of **Commarque**.
 
 ## What the level shows, in order
 
+Rebuilt on 2026-09-28 under the pillars of 2026-09-26. A clean run is about 14 seconds.
+
 | Beat | Folder | What you see | What is true |
 |---|---|---|---|
 | a | `a-valley` | A meadow, the Beune, the wooded slope and Commarque opposite | The valley as it is; the stream is a metre deep and cold |
 | b | `b-shelter` | The wall with its door; through it, he switches the headlamp on; the lit floor | The protective wall and door, the modern lighting |
-| c | `c-frieze` | Five horses under museum lamps; their backs are the floor. The third is plaster and goes if you stand about on it; the fifth walks out from under you | Ten is the count of horses on the frieze; the backs are relief deep enough to stand on in the game's scale; none is plaster, and none has ever moved |
-| d | `d-dark` | The lamps end, and not one of the last five is honest. The sixth holds for six seconds and is the only place to stand. The seventh jumps when you jump at it from the sixth, once, then comes back down to stay. The eighth comes up and throws you back. The ninth breaks in the middle. The tenth holds, which by then nobody believes | The far end of the frieze is less well lit for a visitor; the darkness is the level's. Roof fall is the one true thing here: shelters are made and unmade by the overhang letting go, and the Magdalenian layers at Cap Blanc were sealed under it |
-| e | `e-dig` | The far floor, lit end to end and with no lamp over it. Land at its very edge and stand still: a stride in, the overhang lets go of a block, and it comes down where a full jump would have put you. It stays as a step | Roof fall is what seals the archaeology of a shelter, and the Cap Blanc frieze lay under it until 1909. The deposit at the far end is what the excavation left in place |
-| f | `f-exit` | The deposit and the way out over it. Two tiles of the deposit, a few strides short of the exit, give way a sixth of a second after he stands on them, and he goes down with them into the dig. They are drawn as the deposit. The whole jump anybody makes up the step of the deposit comes down on them; a short hop up and a jump over is the way out | The deposit is what the excavation left in place: unexcavated sediment, the same layers the trench section shows. The visitor leaves by the same door; the game lets you leave at the far end |
+| c | `c-frieze` | The shelter floor runs straight on to the back of the first horse. Three horses under the museum's lamps, backs level, heads lowered; their backs and heads are the floor. Under the first, in its own hollow, the cast of the burial | The attitude of the frieze's horses; the burial found at the foot of the frieze in 1911, and the cast that lies where it was |
+| d | `d-break` | The fourth horse, with no muzzle: pale fresh stone where it broke off. **The first trick: 'The muzzle'** | The story at the site is that the pick that found the frieze in 1909 took a muzzle off with its first blow |
+| e | `e-blow` | The fifth horse, a head lower, close under the fourth's break, its muzzle whole. **The second trick: 'The second blow'** | Nothing. No visitor stands on the frieze, and nobody has ever knocked a muzzle off with his boots |
+| f | `f-exit` | The far floor, the deposit the excavation left in place, and the way out over it | The deposit is what the excavators left: the same layered sediment as the trench section |
+
+## The two tricks
+
+Both are in `content/tricks.md`. The second is set up by the first, the cows' shape: the
+lesson of the fourth horse is what kills at the fifth.
+
+**'The muzzle'** (beat d). The first three horses teach a rhythm: land on the back, run
+out along the neck and head, jump from the tip of the muzzle, and every jump lands on the
+next back with room to spare. The fourth horse has no muzzle, and its head ends at a pale
+break. A man jumping where the muzzle was is jumping from air: the break is 24 px short of
+where the tip was, farther than the tenth of a second the edge forgives, and he runs off
+it into the trench. Once known: jump from the break, from the neck he lands on after
+stepping down off the back.
+
+**'The second blow'** (beat e). A muzzle takes a man who walks out on to it and not one who
+comes down on it: a landing on a muzzle from a fall of more than 32 px knocks it off, and
+him with it, into the trench. That is true of every horse, and a run that follows the
+rhythm never lands on a head, so the first three never show it. The fifth horse is hung a
+head lower than the fourth, and its back begins 22 px past the fourth's break. The jump
+that the fourth has just taught, a full jump from the break, carries him over the fifth's
+back and down on its muzzle. It comes off, and leaves the same break the fourth has: he
+has dealt the second blow. Once known: a short jump from the break, anything from a tap to
+a jump held about a sixth of a second, lands on the fifth's back; he walks down on to the
+head, which holds a man who walks, and jumps from the muzzle as at the first three.
+
+Two rules keep it honest. A blow on the neck, the thick of it, breaks nothing, so nobody is
+ever left standing on a neck with no muzzle and no way on. And a man who is more than half
+over the muzzle when it goes goes with it, all of him.
+
+Both traps claim their deaths (pillar 8): the trench finishes him, and the label names the
+trick. A plain fall off a whole muzzle, or short of a back, is 'The trench' and counts for
+nothing. A jump he makes, even in the tenth of a second after he has run off the break, is
+his own, and the fourth horse does not claim what comes after it.
 
 ## What the level teaches
 
-The chapter's three words, in order: **a relief ledge is a floor** (the horses), **light
-is a resource** (the lamp goes on at the door, the museum's lamps stop half way, the
-headlamp is all you have), **what you see may be a cast** (the third horse; the burial
-at your feet).
-
-And the rule the whole game runs on: ten identical horses, three of which hold, and all
-three of those are in the light. In the dark, standing still is what kills you, except at
-the one place where standing still is the only way through: the sixth holds for a count of
-six, and the seventh will not let you past until you have jumped at it from the sixth and
-let it settle. Six seconds is enough to do that twice and not much more.
+The chapter's three words (`research/arc.md`). **A relief ledge is a floor**: the horses'
+backs and heads, from the first step off the shelter floor. **Light is a resource**: the
+headlamp goes on at the door, and the museum lights the frieze and nothing else. **What
+you see may be a cast**: the burial, which is one and is drawn as one. It is planted here
+and never lies here; the chapter harvests it later.
 
 ## Details a teacher will look for
 
-- The horses face **right**, heads lowered, in the attitude of the real frieze; the
-  best-preserved horse is over 2 m long. The relief is deep: up to about 30 cm.
-- **Red ochre** survives in patches. It is on every horse in the game, in the same
-  places, because they are one sprite.
+- The horses face **right**, heads lowered, in the attitude of the real frieze. The relief
+  is deep: up to about 30 cm.
+- **Red ochre** survives in patches. It is on every horse in the game, in the same places,
+  because they are one sprite.
+- The **break** on the fourth horse is pale: fresh limestone, not the weathered and ochred
+  face of the rest of the horse.
 - The **bison** are in lower relief than the horses and read as lines.
 - The **burial** lay on its left side with the knees drawn up, at the foot of the frieze,
-  under the horses. The cast is a cast; it says so at the site.
+  under the horses. The cast is a cast; it says so at the site. It lies under the first
+  horse, in a hollow a tile above the floor of the trench, and no death in the level can
+  happen on it or beside it: the floor of the trench that kills begins past its hollow,
+  and the first place anyone can come off the frieze, the first horse's muzzle, is past it
+  too (`tests/cap-blanc.spec.ts`). Graves are never traps (`research/arc.md`).
 - The **wall** is rubble limestone with a plain door. The shelter is not a cave; the
   overhang is open to the valley behind the wall.
-- The **trench** section shows layered sediment. The excavators left the deposit at
-  the far end in place, and the level ends by climbing it.
-- The far floor is **lit end to end**, and nothing hangs over it. The museum's lamps are
-  over the frieze, where the thing worth lighting is; the platform is daylit from the
-  mouth of the shelter. The dark is the frieze's; the platform is the part of the shelter
-  a visitor is allowed to stand on.
-- **Roof fall**: blocks off the overhang are in the deposit of every shelter, and at Cap
-  Blanc the sculpted frieze was buried under such a deposit until 1909. One block comes
-  down on the far floor, a stride in from its edge, and stays there as a step.
+- The **trench**: the excavation lowered the floor by more than a metre, and the visitor
+  looks up at the frieze from it. The back wall of the shelter runs down behind the horses
+  to where the trench was dug.
 - **Commarque** across the valley: a tall square keep on a spur, the curtain wall and
   the roofless chapel below it. It is 12th to 14th century and has nothing to do with
   the frieze, which is the point of drawing it.
 
 ## Deliberate lies
 
-- The third horse is plaster. No horse of the frieze is a cast.
-- The fifth walks, the sixth collapses, the seventh jumps, the eighth rears and the ninth
-  breaks in two. They are carved in high relief into a limestone wall and have not moved
-  since the Magdalenian.
-- Two tiles of the deposit at the far end give way under him. The deposit left in place
-  is loose sediment, but it is not walked on and it has never opened under anybody.
-- The overhang lets a block go on cue, on the far floor. Roof fall is real and is what
-  seals the archaeology of every shelter; it does not wait for a visitor to arrive.
+- He walks on the frieze. Visitors stand in the trench and look up at it.
+- The horses are far bigger than a man, so that a back and a head are floors. The real
+  best-preserved horse is a little over 2 m long.
+- Five horses in a row, one sprite, evenly carved. The real frieze has about ten, of
+  different sizes and states, overlapping and interrupted by bison.
+- The fourth horse's broken muzzle: the story at the site says the first blow took a
+  muzzle off; which horse, and whether it was the muzzle, is tradition, not record.
+- A muzzle comes off under a man's landing. None ever has; nobody has landed on one.
 - The floor of the trench kills. It is a metre and a half down.
-- The far half of the frieze is dark. The visitor's tour lights the whole thing.
 - The stream drowns you.
+- He leaves at the far end, over the deposit. The real visitor leaves by the door he came in.
 
 ## Sources
 

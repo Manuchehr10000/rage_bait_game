@@ -19,7 +19,7 @@ export const PHYS = {
   /**
    * How far you may fall and walk away from it, measured from the top of the arc.
    * The line is drawn from what the built levels already ask for: the worst fall
-   * on a clean run is 62 px at Cap Blanc and Roc-aux-Sorciers, 78 at Philae, and
+   * on a clean run is 55 px at Cap Blanc, 62 at Roc-aux-Sorciers, 78 at Philae, and
    * 176 at Karnak, walking off the first pylon into the court. So 200 leaves
    * every one of them free and still makes a shaft something you go down in
    * stages. A jump off that pylon adds the jump's own height and is 238: that one
@@ -137,6 +137,16 @@ export class Player implements Rect {
     this.riding = null;
     this.coyote = 0;
     this.jumping = false;
+  }
+
+  /**
+   * What he was standing on has gone out from under him, all at once: no coyote
+   * time off it, because there is nothing left to push on.
+   */
+  loseFooting(): void {
+    this.onGround = false;
+    this.riding = null;
+    this.coyote = 0;
   }
 
   /** The sacred lake. The same keys, a different medium. */

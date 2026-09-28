@@ -111,6 +111,12 @@ export class Game {
   private state: State = 'playing';
   private deathTimer = 0;
   private deathCause: DeathCause = 'Fall';
+  /**
+   * The trap that has taken the credit for the death he is falling into (pillar 8),
+   * until he stands on something or jumps. The trench or the water finishes him;
+   * the label names the trick.
+   */
+  private claimed: DeathCause | null = null;
   private titleTimer = 0;
 
   private stats: Stats = { total: 0, byCause: new Map(), lifetime: readLifetime() };
@@ -377,6 +383,7 @@ export class Game {
     this.lampSpent = false;
     // A new attempt has not died of anything yet.
     this.deathCause = 'Fall';
+    this.claimed = null;
     this.state = 'playing';
   }
 
@@ -409,6 +416,10 @@ export class Game {
 
   private kill(cause: DeathCause): void {
     if (this.state !== 'playing') return;
+    // Whatever finished him, a trap that set it up takes the death. Not giving up:
+    // that one is his.
+    if (this.claimed && cause !== 'Gave up') cause = this.claimed;
+    if (this.level.data.tricks?.includes(cause)) this.progress.markTrick(this.level.data.id, cause);
     this.state = 'dead';
     this.deathTimer = DEATH_TIME;
     this.deathCause = cause;
@@ -528,6 +539,8 @@ export class Game {
       this.kill(this.level.data.dropCause ?? 'The drop');
       return;
     }
+    // Stood on something, or jumped: whatever happens next is not the last trap's doing.
+    if (this.player.onGround || this.player.justJumped) this.claimed = null;
     this.bumpBlocks();
     // Through the door, and he remembers what the lamp is for.
     const lampFrom = this.level.data.lampFromX;
@@ -581,6 +594,13 @@ export class Game {
     }
   }
 
+  /** Pillar 8's count for the exit label: how many of the level's tricks have ever killed this visitor. */
+  private tricksCount(): { met: number; of: number } | null {
+    const t = this.level.data.tricks;
+    if (!t?.length) return null;
+    return { met: this.progress.tricksMet(this.level.data.id, t), of: t.length };
+  }
+
   /** What the traps see of the game this frame. */
   private worldView(): World {
     return {
@@ -590,6 +610,9 @@ export class Game {
       events: this.events,
       alive: this.state === 'playing',
       kill: (c) => this.kill(c),
+      claim: (c) => {
+        if (this.state === 'playing') this.claimed = c;
+      },
       sound: (n) => this.audio.play(n),
     };
   }
@@ -670,6 +693,7 @@ export class Game {
       complete: this.state === 'complete',
       hasNext: this.nextLevelIndex() !== null,
       levelName: this.level.data.name,
+      tricks: this.tricksCount(),
       title: this.titleTimer > 0 ? Math.min(1, this.titleTimer / 0.4, (TITLE_TIME - this.titleTimer) / 0.4) : 0,
     });
     this.dev?.draw(this.ctx, this.scale, this.rulerView());
