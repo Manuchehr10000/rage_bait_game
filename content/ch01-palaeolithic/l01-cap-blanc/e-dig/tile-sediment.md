@@ -1,23 +1,23 @@
-# Deposit tile, cut top
+# Deposit tile
 
 | | |
 |---|---|
-| Id | `tile-sediment-top` |
-| File | `tile-sediment-top.png` (not painted yet: the game draws its own until this file exists) |
+| Id | `tile-sediment` |
+| File | `tile-sediment.png` (not painted yet: the game draws its own until this file exists) |
 | Size | 16 × 16 world px per frame, painted 64 × 64 |
-| Beat | `f-exit` |
+| Beat | `e-dig` |
 
 ## What it is
 
-The deposit with its cut, trowelled top surface.
+The Magdalenian deposit the excavators left in place: layered brown sediment with bands of ash and stone, darker toward the bottom, no surface. 16 × 16, repeats.
 
 ## Where it stands in the game
 
-The top of the deposit at the far end: the floor of the way out.
+Beat e and f: the block at the far end that the pick works.
 
 ## Must be right
 
-Tiles seamlessly with `tile-sediment`.
+Layered, brown, with visible bands. Not soil, not sand: an archaeological deposit.
 
 ## Deliberately wrong
 

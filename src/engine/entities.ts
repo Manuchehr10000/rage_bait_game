@@ -21,7 +21,6 @@ import type {
   TrainDef,
   WaterDef,
 } from './level';
-import { HORSE_SHAPE } from './level';
 import type { MovingSolid, Player } from './player';
 import { PHYS } from './player';
 import { centerX, centerY, DT, overlaps, TILE, VIEW_W, type DeathCause, type Rect } from './types';
@@ -35,12 +34,6 @@ export interface World {
   /** False while a death plays out. The world keeps moving; a body sets nothing off. */
   alive: boolean;
   kill(cause: DeathCause): void;
-  /**
-   * A trap takes the credit for the death he is now falling into, whatever
-   * finishes him: the trench, the water, the bottom of the level (pillar 8). It
-   * stands until he stands on something or jumps.
-   */
-  claim(cause: DeathCause): void;
   sound(name: Sfx): void;
 }
 
@@ -576,109 +569,167 @@ function roofAbove(level: Level, r: Rect): number {
 
 // ---------------------------------------------------------------------------
 
-/**
- * The muzzle comes off under a man who lands on it from further up than this, in
- * px: two of him. Stepping down from the back onto the head is a fall of ten.
- */
-export const BLOW = 32;
-/** How the muzzle falls once it is off: like a stone, turning a little. */
-const MUZZLE = { spin: 2.4, depth: 10 } as const;
+/** How a horse of the frieze behaves once it has decided to. */
+const HORSE = {
+  /** Forward, in px per second, and how far it goes. Far enough to leave nobody standing. */
+  walkSpeed: 80,
+  walkDistance: 32,
+  /** Its own hop: slow gravity and a lazy push, so it is away longer than you are. */
+  shyPush: 160,
+  shyGravity: 260,
+  /** How far the front comes up, in radians, and how fast. */
+  rearAngle: 0.62,
+  rearSpeed: 3.2,
+  /** Back the way you came, and up. */
+  rearPushX: -250,
+  rearPushY: -190,
+  /** How fast the two halves part, in fractions of the break per second. */
+  splitSpeed: 2.2,
+} as const;
 
 /**
- * A horse of the frieze: its back, and a step down, its neck and head. Stone, and
- * it holds, all of it, except the muzzle under a blow. A man who comes down on a
- * muzzle from higher than BLOW knocks it off, which is how the frieze was found in
- * 1909, and he goes down with it. One horse lost its muzzle to the pick before he
- * came, and its head ends at the break.
+ * A horse of the frieze. Its back is a one-way ledge: you land on it from above
+ * and it never blocks you from the side. Nine of the ten hold. The others hold
+ * exactly as long as you keep moving.
  */
 export class Horse implements Entity {
-  /** The back: the ledge a man lands on from the horse before. */
   readonly rect: Rect;
-  /** The neck and the head behind the break: what stays when the muzzle goes. */
-  readonly neck: Rect;
-  /** The muzzle, from the break to the tip. */
-  readonly muzzle: Rect;
-  /** Whole, or broken off: before he came, or by him. */
-  state: 'whole' | 'broken' = 'whole';
-  /** Where the muzzle is, once it is off and on its way down, and how far it has turned. */
-  fragment: { x: number; y: number; angle: number; down: boolean } | null = null;
-  private fragmentVy = 0;
-  /** He was standing on the head at the last look, and had not jumped. */
-  private wasOnHead = false;
-  private readonly solidBack: MovingSolid;
-  private readonly solidNeck: MovingSolid;
-  private readonly solidMuzzle: MovingSolid;
+  state: 'idle' | 'armed' | 'acting' | 'done' = 'idle';
+  /** How far it has walked forward, in px. */
+  walked = 0;
+  /** How far the front has come up, in radians. */
+  angle = 0;
+  /** How far apart the two halves are, 0 to 1. */
+  broken = 0;
+  private timer = 0;
+  private vy = 0;
+  private readonly solid: MovingSolid;
 
   constructor(readonly def: HorseDef) {
-    const S = HORSE_SHAPE;
-    this.rect = { x: def.x + S.back.x, y: def.y + S.back.y, w: S.back.w, h: S.thick };
-    this.neck = { x: def.x + S.head.x, y: def.y + S.head.y, w: S.breakX - S.head.x, h: S.thick };
-    this.muzzle = { x: def.x + S.breakX, y: def.y + S.head.y, w: S.head.x + S.head.w - S.breakX, h: S.thick };
-    this.solidBack = { rect: this.rect, dx: 0, dy: 0 };
-    this.solidNeck = { rect: this.neck, dx: 0, dy: 0 };
-    this.solidMuzzle = { rect: this.muzzle, dx: 0, dy: 0 };
-    if (def.broken) this.state = 'broken';
+    this.rect = { ...def.rect };
+    this.solid = { rect: this.rect, dx: 0, dy: 0, oneWay: true };
   }
 
-  /** Where the head ends now: the tip, or the break. */
-  get headEnd(): number {
-    return this.state === 'whole' ? this.muzzle.x + this.muzzle.w : this.neck.x + this.neck.w;
+  /** True while the back is still something to stand on. */
+  get standable(): boolean {
+    switch (this.def.trick) {
+      case 'rear':
+      case 'split':
+        return this.state === 'idle' || this.state === 'armed';
+      // The shy one is only gone while it is in the air. It comes back to stay.
+      case 'shy':
+        return this.state !== 'acting';
+      // While it falls you ride it. Where it lands is the floor of a trench, not a floor.
+      case 'cast':
+      case 'crack':
+        return this.state !== 'done';
+      default:
+        return true;
+    }
   }
 
-  private onHead(p: Player): boolean {
+  /**
+   * A jump made from the ledge behind it, which is the only thing it minds.
+   * Entities update before the player, so this is last frame's jump; nobody will notice.
+   */
+  private jumpedAt(p: Player): boolean {
+    const from = this.def.wakeFrom;
+    if (!from || !p.justJumped) return false;
     const feet = p.y + p.h;
-    return p.onGround && Math.abs(feet - this.neck.y) <= 1 && p.x + p.w > this.neck.x && p.x < this.headEnd;
+    return p.x + p.w > from.x && p.x < from.x + from.w && feet <= from.y + 6 && feet >= from.y - 28;
+  }
+
+  /** How far it has dropped from where it was carved. */
+  get fallen(): number {
+    return this.rect.y - this.def.rect.y;
   }
 
   update(w: World): void {
     const d = this.def;
     const p = w.player;
-    this.fall();
-    if (!w.alive) {
-      this.wasOnHead = false;
-      return;
-    }
-    const onHead = this.onHead(p);
+    const r = this.rect;
+    this.solid.dx = 0;
+    this.solid.dy = 0;
+    if (d.trick === 'none' || this.state === 'done') return;
+    const standing = p.x + p.w > r.x && p.x < r.x + r.w && Math.abs(p.y + p.h - r.y) <= 2;
 
-    // A blow. He came down on the muzzle from higher than a man steps, and it comes
-    // off, and he goes down with it. The neck is thick and takes a blow; that is also
-    // why nobody is ever left on a neck with no muzzle and no way on.
-    if (onHead && this.state === 'whole' && p.fellBy > BLOW && p.x + p.w / 2 > this.muzzle.x) {
-      this.state = 'broken';
-      this.fragment = { x: this.muzzle.x, y: this.muzzle.y, angle: 0, down: false };
-      this.fragmentVy = 0;
-      w.sound('crumble');
-      // More than half of him was over it: the stone takes all of him.
-      p.x = Math.max(p.x, this.muzzle.x);
-      p.loseFooting();
-      w.claim(d.blow);
-      this.wasOnHead = false;
+    if (this.state === 'idle') {
+      // The shy one watches the air in front of it. Everything else waits to be stood on.
+      if (d.trick === 'shy' ? this.jumpedAt(p) : standing) {
+        this.state = 'armed';
+        this.timer = d.delay;
+      }
       return;
     }
 
-    // Off the end of a broken head without jumping: where the muzzle was is air.
-    if (this.wasOnHead && !onHead && !p.onGround && !p.justJumped && p.vy >= 0 && d.overTheBreak && p.x + p.w > this.headEnd) {
-      w.claim(d.overTheBreak);
+    if (this.state === 'armed') {
+      // It has decided. Leaving now does not stop it; it only stops it mattering.
+      this.timer -= DT;
+      if (this.timer > 0) return;
+      this.state = 'acting';
+      if (d.trick === 'cast' || d.trick === 'crack') w.sound('crumble');
+      else if (d.trick === 'split') w.sound('snap');
+      else w.sound('grind');
+      if (d.trick === 'rear' && standing) p.shove(HORSE.rearPushX, HORSE.rearPushY);
+      if (d.trick === 'shy') this.vy = -HORSE.shyPush;
+      return;
     }
-    this.wasOnHead = onHead;
-  }
 
-  /** The muzzle, once it is off: down to the floor of the trench, and it stays there. */
-  private fall(): void {
-    const f = this.fragment;
-    if (!f || f.down) return;
-    this.fragmentVy = Math.min(PHYS.maxFall, this.fragmentVy + PHYS.gravity * DT);
-    f.y += this.fragmentVy * DT;
-    f.angle += MUZZLE.spin * DT;
-    // Down, on its side, where it hit: the head is ten deep from the top of the ledge.
-    if (f.y + MUZZLE.depth >= this.def.floorY) {
-      f.y = this.def.floorY - MUZZLE.depth;
-      f.down = true;
+    switch (d.trick) {
+      case 'crack':
+      case 'cast': {
+        // One is plaster and one is patient. Either takes whoever is still on it down.
+        this.vy = Math.min(PHYS.maxFall, this.vy + PHYS.gravity * DT);
+        const before = r.y;
+        r.y += this.vy * DT;
+        if (r.y + r.h >= d.floorY) {
+          r.y = d.floorY - r.h;
+          this.state = 'done';
+          w.sound('thud');
+          if (standing) w.kill(d.cause);
+        }
+        this.solid.dy = r.y - before;
+        break;
+      }
+      case 'walk': {
+        // It walks out from under you. Stone is smooth: it carries nobody.
+        const step = Math.min(HORSE.walkSpeed * DT, HORSE.walkDistance - this.walked);
+        this.walked += step;
+        r.x += step;
+        if (this.walked >= HORSE.walkDistance) this.state = 'done';
+        break;
+      }
+      case 'shy': {
+        // Its own slow hop. Nothing to land on until it is back where it was carved.
+        this.vy += HORSE.shyGravity * DT;
+        const before = r.y;
+        r.y += this.vy * DT;
+        if (this.vy > 0 && r.y >= d.rect.y) {
+          r.y = d.rect.y;
+          this.vy = 0;
+          this.state = 'done';
+          w.sound('thud');
+        }
+        this.solid.dy = r.y - before;
+        break;
+      }
+      case 'rear': {
+        this.angle = Math.min(HORSE.rearAngle, this.angle + HORSE.rearSpeed * DT);
+        if (this.angle >= HORSE.rearAngle) this.state = 'done';
+        break;
+      }
+      case 'split': {
+        this.broken = Math.min(1, this.broken + HORSE.splitSpeed * DT);
+        if (this.broken >= 1) this.state = 'done';
+        break;
+      }
+      default:
+        break;
     }
   }
 
   solids(): MovingSolid[] {
-    return this.state === 'whole' ? [this.solidBack, this.solidNeck, this.solidMuzzle] : [this.solidBack, this.solidNeck];
+    return this.standable ? [this.solid] : [];
   }
 }
 
@@ -1016,7 +1067,7 @@ export const COLUMN_FOLD = 0.2;
 
 /**
  * A stretch of the floor over his head, on one column. Solid and drawn as ceiling
- * until the column goes; then it comes down as hard as a block of a shelter's roof, and
+ * until the column goes; then it comes down as hard as the roof at Cap Blanc, and
  * whoever is under it is under it. Down, it is a step.
  */
 export class Span implements Entity {

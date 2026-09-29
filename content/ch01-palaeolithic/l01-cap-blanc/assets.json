@@ -19,7 +19,7 @@
     {
       "id": "cap-blanc-wall",
       "w": 32,
-      "h": 112,
+      "h": 128,
       "beat": "b-shelter",
       "what": "The wall built across the mouth of the shelter, with its door. The way in."
     },
@@ -39,10 +39,10 @@
     },
     {
       "id": "horse-relief",
-      "w": 64,
-      "h": 24,
+      "w": 40,
+      "h": 20,
       "beat": "c-frieze",
-      "what": "One horse of the frieze in high relief: the back, and a step down, the neck and head. Both are floors. All five are this sprite; one without its muzzle is this sprite cut at x 38."
+      "what": "One horse of the frieze in high relief. Its back is the ledge. All ten are this sprite, and so is the cast."
     },
     {
       "id": "bison-relief",
@@ -56,21 +56,28 @@
       "w": 24,
       "h": 8,
       "beat": "c-frieze",
-      "what": "The cast of the 1911 burial, lying in its own hollow under the first horse."
+      "what": "The cast of the 1911 burial, lying at the foot of the frieze."
     },
     {
       "id": "tile-sediment",
       "w": 16,
       "h": 16,
-      "beat": "f-exit",
+      "beat": "e-dig",
       "what": "The deposit the excavation left in place: layered sediment, no surface."
     },
     {
       "id": "tile-sediment-top",
       "w": 16,
       "h": 16,
-      "beat": "f-exit",
+      "beat": "e-dig",
       "what": "The deposit with its cut top."
+    },
+    {
+      "id": "roof-block",
+      "w": 24,
+      "h": 18,
+      "beat": "e-dig",
+      "what": "A block of the overhang, on its way down onto the far floor. Limestone, one fresh face where it parted."
     }
   ]
 }

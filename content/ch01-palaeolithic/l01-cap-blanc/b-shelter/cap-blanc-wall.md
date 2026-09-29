@@ -4,12 +4,12 @@
 |---|---|
 | Id | `cap-blanc-wall` |
 | File | `cap-blanc-wall.png` (not painted yet: the game draws its own until this file exists) |
-| Size | 32 × 112 world px per frame, painted 128 × 448 |
+| Size | 32 × 128 world px per frame, painted 128 × 512 |
 | Beat | `b-shelter` |
 
 ## What it is
 
-The wall built across the mouth of the shelter to close it, seen from the valley side: rubble limestone laid in rough courses and mortared, 32 world px wide and 112 tall from the underside of the overhang to the ground, with a plain wooden-framed **door** 16 wide and 40 tall, its left edge 8 px in from the wall's left edge. The door is open and dark. The way into the level.
+The wall built across the mouth of the shelter to close it, seen from the valley side: rubble limestone laid in rough courses and mortared, 32 world px wide and 128 tall from the underside of the overhang to the ground, with a plain wooden-framed **door** 16 wide and 40 tall, its left edge 8 px in from the wall's left edge. The door is open and dark. The way into the level.
 
 ## Where it stands in the game
 

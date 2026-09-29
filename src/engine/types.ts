@@ -20,8 +20,7 @@ export function centerY(r: Rect): number {
 /** Death causes are museum-label nouns: they end up printed on the exit label. */
 export type DeathCause =
   | 'The Beune'
-  | 'The muzzle'
-  | 'The second blow'
+  | 'The cast'
   | 'The trench'
   | 'The roof'
   | 'The Anglin'
@@ -62,10 +61,7 @@ export type DeathAnim = 'crush' | 'plank' | 'drown' | 'burn' | 'snap' | 'swept' 
 
 export const DEATH_ANIM: Record<DeathCause, DeathAnim> = {
   'The Beune': 'drown',
-  // Cap Blanc. Off the end of the fourth horse's head, where the muzzle was until 1909.
-  'The muzzle': 'flat',
-  // Down with the muzzle he knocked off the fifth, on to the floor of the trench.
-  'The second blow': 'flat',
+  'The cast': 'flat',
   'The trench': 'flat',
   'The roof': 'crush',
   'The Anglin': 'drown',
@@ -115,8 +111,7 @@ export const DEATH_SOUND: Record<
   'squish' | 'bonk' | 'drown' | 'burn' | 'snap' | 'whoosh' | 'fallAway' | 'sigh' | 'thud' | 'click' | 'blast' | 'sitStone' | 'knock'
 > = {
   'The Beune': 'drown',
-  'The muzzle': 'thud',
-  'The second blow': 'thud',
+  'The cast': 'thud',
   'The trench': 'thud',
   'The roof': 'squish',
   'The Anglin': 'drown',

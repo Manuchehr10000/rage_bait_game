@@ -18,15 +18,13 @@ export interface HudState {
   complete: boolean;
   hasNext: boolean;
   levelName: string;
-  /** How many of the level's tricks have ever killed this visitor, of how many; null where the level declares none. */
-  tricks: { met: number; of: number } | null;
   /** 0 hidden, 1 fully shown. */
   title: number;
 }
 
 /** Everything textual is drawn on the scaled canvas so it stays legible. */
 export function renderHud(ctx: CanvasRenderingContext2D, scale: number, h: HudState): void {
-  const { stats, texts: worldTexts, camX, camY, complete, hasNext, levelName, title, tricks } = h;
+  const { stats, texts: worldTexts, camX, camY, complete, hasNext, levelName, title } = h;
   const W = VIEW_W * scale;
   const H = VIEW_H * scale;
 
@@ -55,7 +53,7 @@ export function renderHud(ctx: CanvasRenderingContext2D, scale: number, h: HudSt
   ctx.fillText(String(stats.total), 6 * scale, 11 * scale);
 
   if (title > 0 && !complete) drawTitle(ctx, scale, levelName, W, title);
-  if (complete) drawExitLabel(ctx, scale, stats, W, H, levelName, hasNext, tricks);
+  if (complete) drawExitLabel(ctx, scale, stats, W, H, levelName, hasNext);
 }
 
 /** A museum label, briefly, when you arrive. Not on retries. */
@@ -87,7 +85,6 @@ function drawExitLabel(
   H: number,
   levelName: string,
   hasNext: boolean,
-  tricks: { met: number; of: number } | null,
 ): void {
   const rows: [string, string][] = [];
   for (const [cause, n] of [...stats.byCause.entries()].sort((a, b) => b[1] - a[1])) {
@@ -95,7 +92,7 @@ function drawExitLabel(
   }
   const lineH = 8 * scale;
   const boxW = 180 * scale;
-  const boxH = (rows.length + (tricks ? 7 : 6)) * lineH + 14 * scale;
+  const boxH = (rows.length + 6) * lineH + 14 * scale;
   const x = (W - boxW) / 2;
   const y = (H - boxH) / 2;
 
@@ -139,14 +136,6 @@ function drawExitLabel(
   ctx.fillText('All visits', x + 8 * scale, ty);
   ctx.textAlign = 'right';
   ctx.fillText(String(stats.lifetime), x + boxW - 8 * scale, ty);
-  if (tricks) {
-    // Pillar 8: how many of this site's tricks have ever had him, in every visit.
-    ty += lineH;
-    ctx.textAlign = 'left';
-    ctx.fillText('Tricks met', x + 8 * scale, ty);
-    ctx.textAlign = 'right';
-    ctx.fillText(`${tricks.met} of ${tricks.of}`, x + boxW - 8 * scale, ty);
-  }
   ty += lineH * 1.4;
   ctx.textAlign = 'center';
   ctx.font = `italic ${5.5 * scale}px ${LABEL_FONT}`;

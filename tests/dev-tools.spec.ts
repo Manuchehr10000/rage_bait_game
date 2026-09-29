@@ -599,7 +599,7 @@ test('off the first pylon at Karnak, walking down is safe and a running jump is 
   expect(walked).toEqual({ landed: true, feet: floor, state: 'playing' });
 });
 
-test('H draws the liars orange and the honest green: the horses at Cap Blanc', async ({ page }) => {
+test('H draws the liars orange and the honest green: the ten horses at Cap Blanc', async ({ page }) => {
   await open(page, 'cap-blanc');
   const drawn = await page.evaluate(() => {
     const g = (window as unknown as W).__game;
@@ -610,33 +610,25 @@ test('H draws the liars orange and the honest green: the horses at Cap Blanc', a
       boxes.push({ x: Math.round(x), y: Math.round(y), color: String(this.strokeStyle) });
       strokeRect.call(this, x, y, w, h);
     };
-    type R = { x: number; y: number };
-    const verdicts: { broken: boolean; back?: string; neck?: string; muzzle?: string }[] = [];
+    const verdicts: { trick: string; color: string | undefined }[] = [];
     try {
       window.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyH' }));
       for (const e of g.entities.filter((e: { def: { kind: string } }) => e.def.kind === 'horse')) {
-        const h = e as unknown as { rect: R; neck: R; muzzle: R; state: string };
-        g.camera.x = Math.max(0, h.rect.x - 100);
+        const r = e.def.rect;
+        g.camera.x = Math.max(0, r.x - 100);
         boxes.length = 0;
         g.draw();
         const s = g.scale;
-        const at = (r: R) => boxes.filter((b) => b.x === Math.round((r.x - g.camera.ix) * s + 0.5) && b.y === Math.round((r.y - g.camera.iy) * s + 0.5)).pop()?.color;
-        verdicts.push({ broken: h.state === 'broken', back: at(h.rect), neck: at(h.neck), muzzle: at(h.muzzle) });
+        const at = boxes.filter((b) => b.x === Math.round((r.x - g.camera.ix) * s + 0.5) && b.y === Math.round((r.y - g.camera.iy) * s + 0.5));
+        verdicts.push({ trick: e.def.trick, color: at[at.length - 1]?.color });
       }
     } finally {
       proto.strokeRect = strokeRect;
     }
     return verdicts;
   });
-  expect(drawn).toHaveLength(5);
-  // The back and neck hold anything. A whole muzzle holds a walker and not a blow, so
-  // it is drawn as a liar; a broken one is not there to draw.
-  for (const v of drawn) {
-    expect(v.back).toBe('#5fd35f');
-    expect(v.neck).toBe('#5fd35f');
-    expect(v.muzzle).toBe(v.broken ? undefined : '#ff8c1a');
-  }
-  expect(drawn.map((v) => v.broken)).toEqual([false, false, false, true, false]);
+  expect(drawn).toHaveLength(10);
+  for (const v of drawn) expect(v.color, v.trick).toBe(v.trick === 'none' ? '#5fd35f' : '#ff8c1a');
 });
 
 test('T runs the game at a quarter speed, and only while the tools are shown', async ({ page }) => {

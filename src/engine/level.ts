@@ -209,44 +209,39 @@ export interface CrumbleDef {
 }
 
 /**
- * A horse of the frieze, carved facing right with its head lowered, and where on
- * it a man can stand, measured from the top-left of its sprite. Two ledges: the
- * back, and a step down, the neck and head. The head's fore part is the muzzle,
- * which comes off where the fourth horse's came off in 1909: at `breakX`.
- * Every horse at Cap Blanc is this one shape (pillar 4).
+ * What a horse of the frieze does when you stand on its back. Nine of the ten at
+ * Cap Blanc are limestone and one is plaster; in the game four of them move,
+ * which no relief can do. All ten are the same sprite (pillar 4).
  */
-export const HORSE_SHAPE = {
-  w: 64,
-  h: 24,
-  /** The back: the long level line the light catches. */
-  back: { x: 6, y: 2, w: 24 },
-  /** The neck and head, a step down from the back, out to the tip of the muzzle. */
-  head: { x: 30, y: 12, w: 32 },
-  /** Where the muzzle begins: the line the fourth horse broke along. */
-  breakX: 38,
-  /** How thick each ledge is. Nobody is ever under one. */
-  thick: 6,
-} as const;
+export type HorseTrick =
+  /** Limestone. It holds. */
+  | 'none'
+  /** Plaster. It gives way and takes you down to the floor of the trench. */
+  | 'cast'
+  /** Limestone, and patient. It holds for a long count and then goes. */
+  | 'crack'
+  /** It walks forward out from under you. It carries nobody: smooth stone. */
+  | 'walk'
+  /** Jump at it from the horse before it and it jumps too, once, then comes back to stay. */
+  | 'shy'
+  /** The front comes up and the back throws you back the way you came. */
+  | 'rear'
+  /** It breaks in the middle and the two halves fall apart. */
+  | 'split';
 
-/**
- * One horse of the frieze. The muzzle takes a man who walks out onto it and not
- * one who comes down on it: a landing on it from a fall of more than a blow (the
- * entity's BLOW) takes it off, and him with it. That is true of every horse, and
- * only a jump that comes down on a muzzle finds it out.
- */
+/** One horse of the frieze. The rect is the back: the ledge you stand on. */
 export interface HorseDef {
   kind: 'horse';
-  /** Top-left of the sprite. The ledges are HORSE_SHAPE's, from here. */
-  x: number;
-  y: number;
-  /** Its muzzle was taken off before he came, by the first blow of a pick in 1909. */
-  broken?: boolean;
-  /** Where a muzzle that comes off lands: the floor of the trench. */
+  rect: Rect;
+  trick: HorseTrick;
+  /** Seconds of standing on it before the trick fires. */
+  delay: number;
+  /** Where a falling one lands, for `cast` and `crack`. */
   floorY: number;
-  /** The trick that claims him if he walks off the broken end (pillar 8). Only a broken one has it. */
-  overTheBreak?: DeathCause;
-  /** The trick that claims him if he goes down with the muzzle he knocked off. */
-  blow: DeathCause;
+  /** The ledge a jump must start from to wake it, for `shy`. */
+  wakeFrom?: Rect;
+  /** What this one kills you with, if it kills you. */
+  cause: DeathCause;
 }
 
 /**
@@ -649,14 +644,6 @@ export interface LevelData {
    * in every level; this is only the noun that ends up on the exit label.
    */
   dropCause?: DeathCause;
-  /**
-   * The level's tricks (pillar 4), each named by the noun its trap claims a death
-   * under (pillar 8), whatever finishes him. The exit label counts how many of them
-   * this visitor has ever been killed by, as "1 of 2". A plain fall, a missed jump or
-   * honest water is not one. Only a level rebuilt under the pillars of 2026-09-26
-   * declares them; a level that has none shows no count.
-   */
-  tricks?: readonly DeathCause[];
   /** The exit has no marker. You find it. */
   exitHidden?: boolean;
   /**

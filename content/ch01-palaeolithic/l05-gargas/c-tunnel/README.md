@@ -35,7 +35,7 @@ drawn standing on the same rock (pillar 4). Four of them are not steps:
 Under each of the three that drop him is a shaft, and the bottom of it is `The tunnel`.
 
 At the foot of the stair, the block that first joined the two caves, if the mediaeval
-rockfall is true: `roof-block` (chapter 1's `shared`), on its side. A hop.
+rockfall is true: `roof-block` from Cap Blanc, on its side. A hop.
 
 **Must be right:** the tunnel is artificial and nineteenth-century; the stairs are fitted
 and railed; the lower cave is lower.

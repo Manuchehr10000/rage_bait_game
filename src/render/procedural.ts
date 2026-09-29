@@ -1088,45 +1088,30 @@ const LIMESTONE: Palette = {
 };
 
 /**
- * A horse of the frieze in high relief, 64 x 24, facing right, head lowered. Two
- * ledges, as HORSE_SHAPE has them: the back, from x 6 to x 30 at y 2, and a step
- * down, the neck and head, from x 30 to the tip of the muzzle at x 62, at y 12.
- * The muzzle is everything of the head from x 38: the line the fourth horse broke
- * along. Nothing else of the horse crosses that line, so a horse drawn without
- * it is this sprite clipped there. Every horse is this sprite.
+ * A horse of the frieze in high relief, 40 x 20, facing right, head lowered.
+ * The back is the ledge: a 28 px run from x 4 at y 3. All ten are this sprite.
+ * The cast is this sprite too. That is the point.
  */
 function horseRelief(): HTMLCanvasElement {
-  const g = new PixelGrid(64, 24);
-  g.rect(1, 4, 3, 2, 'S'); // tail, hanging
-  g.rect(0, 6, 4, 9, 'S');
-  g.rect(1, 7, 1, 7, 'D');
-  g.rect(4, 2, 26, 14, 'S'); // body
-  g.px(4, 2, '.'); // the rump, rounded
-  g.rect(6, 3, 23, 1, 'L'); // the back catches the light, under its edge: this is the floor
-  g.rect(7, 14, 20, 2, 'D'); // belly, undercut
-  // The neck goes down from the withers, steeply: the head is lowered, grazing.
-  [2, 4, 7, 9, 12].forEach((top, i) => g.rect(29 + i, top, 1, 19 - top, 'S'));
-  [4, 7, 9].forEach((top, i) => g.px(30 + i, top + 1, 'D')); // mane, down the neck
-  g.rect(30, 12, 11, 7, 'S'); // the neck, forward and low
-  g.rect(33, 13, 5, 1, 'D'); // mane, along it
-  g.rect(40, 12, 18, 8, 'S'); // head
-  g.rect(46, 19, 11, 2, 'S'); // jaw
-  g.rect(56, 12, 6, 10, 'S'); // muzzle, down to the grass
-  g.px(61, 21, '.');
-  g.rect(40, 13, 16, 1, 'L'); // the top of the head catches the light: the floor again
-  g.rect(40, 13, 2, 1, 'D'); // ear, laid back
-  g.px(45, 14, 'K'); // eye
-  g.px(60, 17, 'D'); // nostril
-  g.rect(57, 20, 4, 1, 'D'); // mouth
-  g.rect(47, 20, 8, 1, 'D'); // the line of the jaw
-  for (const x of [7, 12, 21, 25]) {
-    g.rect(x, 16, 3, 8, 'S'); // legs, in lower relief
-    g.rect(x, 23, 3, 1, 'D');
+  const g = new PixelGrid(40, 20);
+  g.rect(0, 5, 4, 9, 'S'); // tail
+  g.rect(1, 6, 1, 7, 'D');
+  g.rect(3, 3, 29, 11, 'S'); // body
+  g.rect(4, 3, 28, 1, 'L'); // the back catches the light: this is the floor
+  g.rect(5, 12, 26, 2, 'D'); // belly, undercut
+  g.rect(29, 5, 6, 7, 'S'); // neck, going forward and down
+  g.rect(28, 4, 7, 2, 'D'); // mane
+  g.rect(33, 8, 7, 6, 'S'); // head
+  g.rect(37, 11, 3, 3, 'D'); // muzzle
+  g.px(34, 7, 'S'); // ear
+  g.px(35, 9, 'K'); // eye
+  for (const x of [7, 12, 23, 28]) {
+    g.rect(x, 14, 3, 6, 'S');
+    g.rect(x, 19, 3, 1, 'D');
   }
-  g.rect(10, 6, 4, 2, 'R'); // ochre, the same patches on every horse
+  g.rect(9, 7, 4, 2, 'R'); // ochre, the same three patches on every horse
   g.rect(18, 9, 3, 1, 'R');
-  g.rect(22, 5, 2, 2, 'R');
-  g.rect(33, 15, 3, 1, 'R');
+  g.rect(20, 5, 2, 2, 'R');
   return compile(g.outline('O').rows(), LIMESTONE);
 }
 export const HORSE_SPRITE = horseRelief();

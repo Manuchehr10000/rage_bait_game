@@ -1,4 +1,4 @@
-import { Horse, Sweep, Thrower, Water, type Entity } from '../engine/entities';
+import { Sweep, Thrower, Water, type Entity } from '../engine/entities';
 import type { Level } from '../engine/level';
 import { PHYS, Player, type MovingSolid } from '../engine/player';
 import type { Input } from '../engine/input';
@@ -179,12 +179,8 @@ export function renderOverlay(
         box(d.rect, d.fake ? LIAR : SAFE, { dash: d.fake });
         break;
       case 'horse':
-        // Back and neck hold. The muzzle holds a walker and not a blow.
-        if (e instanceof Horse) {
-          box(e.rect, SAFE);
-          box(e.neck, SAFE);
-          if (e.state === 'whole') box(e.muzzle, LIAR, { dash: true });
-        }
+        box(d.rect, d.trick === 'none' ? SAFE : LIAR, { dash: d.trick !== 'none' });
+        if (d.wakeFrom) box(d.wakeFrom, LIAR, { dash: true });
         break;
       case 'roof':
         trigger(d.triggerX);

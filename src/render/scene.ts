@@ -1,6 +1,6 @@
 import type { Camera } from '../engine/camera';
 import type { Chaser, Crumble, Door, Entity, Falling, Horse, Platform, Pusher, Roof, Seat, Span, Sweep, Thrower, Tipper, Water } from '../engine/entities';
-import { HORSE_SHAPE, type DecorDef, type DoorDef, type Level, type SpanDef } from '../engine/level';
+import type { DecorDef, DoorDef, Level, SpanDef } from '../engine/level';
 import type { Player } from '../engine/player';
 import {
   BABOON_SPRITE,
@@ -157,9 +157,8 @@ export const COLORS = {
   masonryJoint: '#9d9174',
   trenchWall: '#5a4a34',
   trenchFloor: '#3f3324',
-  // The inside of the limestone, where a muzzle came off: never weathered, never ochred.
-  freshStone: '#fbf5e4',
-  freshStoneShade: '#cbbd9c',
+  plaster: '#f4f1ea',
+  plasterShade: '#b8b0a0',
   // Roc-aux-Sorciers: the same limestone, in the sun, over the Anglin.
   anglin: '#4d7f7a',
   anglinDeep: '#2f5a58',
@@ -2366,53 +2365,53 @@ function drawFigure(ctx: CanvasRenderingContext2D, figure: 'bison' | 'horse' | '
   ctx.restore();
 }
 
-/**
- * One horse of the frieze. Every horse is the one sprite; a horse without its
- * muzzle is that sprite cut at the break, with the stone the break left: pale,
- * the colour limestone is inside, not the colour fifteen thousand years made its
- * face. The fourth horse, broken in 1909, and any horse he breaks himself are
- * drawn by these same lines, so the two breaks are the same break (pillar 4).
- */
 function drawHorse(ctx: CanvasRenderingContext2D, h: Horse): void {
-  const sx = h.def.x;
-  const sy = h.def.y;
+  const r = h.rect;
+  const sx = r.x - 4;
+  const sy = r.y - 3;
   const f = frameOf('horse-relief', 0, HORSE_SPRITE);
-  if (h.state === 'whole') {
-    blit(ctx, f, sx, sy);
+  const acting = h.state === 'acting' || h.state === 'done';
+  if (h.def.trick === 'cast' && acting) {
+    // Plaster, and once it has gone you can see what it was made of.
+    blit(ctx, silhouette(f, COLORS.plaster), sx, sy);
+    ctx.fillStyle = COLORS.plasterShade;
+    ctx.fillRect(sx + 8, sy + 12, 20, 1);
+    ctx.fillRect(sx + 14, sy + 7, 1, 4);
+    ctx.fillRect(sx + 26, sy + 9, 1, 3);
     return;
   }
-  const cut = HORSE_SHAPE.breakX;
-  drawPart(ctx, f, 0, cut, sx, sy);
-  drawBreak(ctx, sx + cut, sy + HORSE_SHAPE.head.y);
-  const m = h.fragment;
-  if (m) {
-    // The muzzle, on its way down to the floor of the trench, or lying there.
+  if (h.def.trick === 'rear' && h.angle > 0) {
+    // Up on the front legs, pivoting on the hind feet. The back goes out from under you.
     ctx.save();
-    ctx.translate(m.x + 12, m.y + 5);
-    ctx.rotate(m.angle);
-    drawPart(ctx, f, cut, f.w - cut, -12, -5 - HORSE_SHAPE.head.y);
-    drawBreak(ctx, -12 + 1, -5);
+    ctx.translate(sx + 9, sy + 20);
+    ctx.rotate(-h.angle);
+    blit(ctx, f, -9, -20);
     ctx.restore();
+    return;
   }
+  if (h.def.trick === 'split' && h.broken > 0) {
+    // Broken in the middle. The ends stay in the rock; the middle goes down, and so do you.
+    const k = h.broken;
+    drawHalf(ctx, f, sx, sy, 0, 20, 0, 0.55 * k);
+    drawHalf(ctx, f, sx, sy, 20, 20, 40, -0.55 * k);
+    return;
+  }
+  blit(ctx, f, sx, sy);
 }
 
-/** Columns `x0` to `x0 + w` of a horse frame, all of its height, drawn with their left edge at `dx`. */
-function drawPart(ctx: CanvasRenderingContext2D, f: Frame, x0: number, w: number, dx: number, dy: number): void {
-  const k = f.sw / f.w;
-  ctx.drawImage(f.src, f.sx + x0 * k, f.sy, w * k, f.sh, dx, dy, w, f.h);
-}
-
-/** How far into the stone the break's face goes, row by row down the head: a pick's break, not a saw's. */
-const BREAK_FACE = [2, 1, 2, 2, 1, 2, 1];
-
-/** The face a muzzle leaves when it comes off, and takes with it: fresh stone, down the head from `top`, left of `x`. */
-function drawBreak(ctx: CanvasRenderingContext2D, x: number, top: number): void {
-  BREAK_FACE.forEach((w, i) => {
-    ctx.fillStyle = COLORS.freshStone;
-    ctx.fillRect(x - w, top + i, w, 1);
-    ctx.fillStyle = COLORS.freshStoneShade;
-    ctx.fillRect(x - w - 1, top + i, 1, 1);
-  });
+/**
+ * One clipped half of the horse sprite, hinged about its outer end: the two
+ * halves of a broken one go down in the middle and stay in the rock at the ends.
+ */
+function drawHalf(ctx: CanvasRenderingContext2D, f: Frame, sx: number, sy: number, x0: number, w: number, pivotX: number, rot: number): void {
+  ctx.save();
+  ctx.translate(sx + pivotX, sy + 20);
+  ctx.rotate(rot);
+  ctx.beginPath();
+  ctx.rect(x0 - pivotX, -20, w, 20);
+  ctx.clip();
+  blit(ctx, f, -pivotX, -20);
+  ctx.restore();
 }
 
 function drawEntityFront(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): void {
