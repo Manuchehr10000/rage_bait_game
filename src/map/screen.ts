@@ -550,7 +550,7 @@ export class MapScreen {
       ctx.fillText(open ? 'Enter to visit' : 'Closed', px, 127 * s);
     } else {
       const sel = c.sites[this.site];
-      // Built but not reached yet is 'Not yet'; never built is 'Closed'.
+      // Built but not reached yet is 'Not yet' (only with IN_ORDER in engine/progress.ts); never built is 'Closed'.
       const reached = !!sel?.level && this.progress.isOpen(sel.level);
       const hint = !sel?.level ? 'Closed' : this.progress.isCleared(sel.level) ? 'Enter to visit again' : reached ? 'Enter to visit' : 'Not yet';
       ctx.fillStyle = LAND_LINE;

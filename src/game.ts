@@ -168,8 +168,8 @@ export class Game {
       this.pointer(e, true);
     });
     // A deep link opens any level where there are dev tools, which is what the tests and
-    // the designer want. In prod it opens only a level the tour has reached, so a link
-    // cannot skip a player past the levels that set up this one.
+    // the designer want. In prod it opens a level the map would open (engine/progress.ts:
+    // today every built one).
     const hash = location.hash.replace(/^#/, '').trim();
     const linked = hash && hash !== 'map' ? levelIndexFromHash(location.hash) : -1;
     if (linked >= 0 && (DEV_TOOLS || this.progress.isOpen(LEVELS[linked]!.id))) this.enterLevel(linked, false);

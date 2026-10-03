@@ -1,4 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
+import { Progress } from '../src/engine/progress';
+import { LEVELS } from '../src/levels';
 
 /**
  * The tour map: the start screen. Keyboard and mouse both work; closed chapters
@@ -43,7 +45,7 @@ async function snap(page: Page): Promise<{ screen: string; view: string; chapter
 /** The chapters the game shows: SHOWN_CHAPTERS in src/map/atlas.ts. */
 const SHOWN = 4;
 
-/** The tour is played in order, so a test that visits a later site clears the ones before it. */
+/** Chapter 1's levels, for tests that need a chapter cleared. */
 const CHAPTER_1 = ['cap-blanc', 'roc-aux-sorciers', 'pech-merle', 'rouffignac', 'gargas'];
 
 async function seed(page: Page, cleared: string[]): Promise<void> {
@@ -189,57 +191,37 @@ test('the mouse picks a chapter and a site', async ({ page }) => {
   expect(s.level).toBe('karnak');
 });
 
-test('the tour is played in order: a site opens once every level before it is cleared', async ({ page }) => {
-  // Nothing cleared. Chapter 1 opens on Cap Blanc, and Roc-aux-Sorciers is not yet open.
+test('every built level is open from the start, with nothing cleared', async ({ page }) => {
+  // Nothing cleared. Roc-aux-Sorciers, second in chapter 1, can be entered.
   await press(page, 'Enter');
   await press(page, 'ArrowRight');
   let s = await snap(page);
   expect(s.site).toBe(1);
   await press(page, 'Enter');
   s = await snap(page);
-  expect(s.screen).toBe('map');
+  expect(s.screen).toBe('level');
+  expect(s.level).toBe('roc-aux-sorciers');
 
-  // Egypt can be looked at, but not entered, before chapter 1 is done.
-  await press(page, 'Escape');
+  // And so can Philae, second in Egypt, with chapter 1 not done.
+  await seed(page, []);
   await press(page, 'ArrowRight');
   await press(page, 'Enter');
   s = await snap(page);
   expect(s.view).toBe('chapter');
   expect(s.chapter).toBe(1);
   expect(s.site).toBe(0);
-  await press(page, 'Enter');
-  s = await snap(page);
-  expect(s.screen).toBe('map');
-
-  // Cap Blanc cleared: the chapter opens on Roc-aux-Sorciers, which is open, and
-  // nothing after it is.
-  await seed(page, ['cap-blanc']);
-  await press(page, 'Enter');
-  s = await snap(page);
-  expect(s.site).toBe(1);
   await press(page, 'ArrowRight');
-  await press(page, 'Enter');
-  s = await snap(page);
-  expect(s.screen).toBe('map');
-  await press(page, 'ArrowLeft');
   await press(page, 'Enter');
   s = await snap(page);
   expect(s.screen).toBe('level');
-  expect(s.level).toBe('roc-aux-sorciers');
+  expect(s.level).toBe('philae');
+});
 
-  // Chapter 1 cleared: Abu Simbel opens, and Philae waits for it.
-  await seed(page, CHAPTER_1);
-  await press(page, 'ArrowRight');
-  await press(page, 'Enter');
-  await press(page, 'ArrowRight');
-  await press(page, 'Enter');
-  s = await snap(page);
-  expect(s.screen).toBe('map');
-  await press(page, 'ArrowLeft');
-  await press(page, 'Enter');
-  s = await snap(page);
-  expect(s.screen).toBe('level');
-  expect(s.level).toBe('abu-simbel');
+test('every built level is open by the rule the map and deep links both use', () => {
+  const ids = LEVELS.map((l) => l.id);
+  const progress = new Progress(ids);
+  expect(ids.filter((id) => !progress.isOpen(id))).toEqual([]);
+  expect(progress.isOpen('not-a-level')).toBe(false);
 });
 
 test('a deep link still opens a level directly, and the exit leads to the next site', async ({ page }) => {
