@@ -191,7 +191,7 @@ test('the mouse picks a chapter and a site', async ({ page }) => {
   expect(s.level).toBe('karnak');
 });
 
-test('every built level is open from the start, with nothing cleared', async ({ page }) => {
+test('outside prod every built level is open from the start, with nothing cleared', async ({ page }) => {
   // Nothing cleared. Roc-aux-Sorciers, second in chapter 1, can be entered.
   await press(page, 'Enter');
   await press(page, 'ArrowRight');
@@ -217,11 +217,22 @@ test('every built level is open from the start, with nothing cleared', async ({ 
   expect(s.level).toBe('philae');
 });
 
-test('every built level is open by the rule the map and deep links both use', () => {
+test('outside prod every built level is open by the rule the map and deep links both use', () => {
   const ids = LEVELS.map((l) => l.id);
-  const progress = new Progress(ids);
+  const progress = new Progress(ids, false);
   expect(ids.filter((id) => !progress.isOpen(id))).toEqual([]);
   expect(progress.isOpen('not-a-level')).toBe(false);
+});
+
+test('in prod the tour is played in order: a level opens once every level before it is cleared', () => {
+  const ids = LEVELS.map((l) => l.id);
+  const progress = new Progress(ids, true);
+  expect(ids.filter((id) => progress.isOpen(id))).toEqual([ids[0]]);
+  progress.markCleared(ids[0]!);
+  expect(ids.filter((id) => progress.isOpen(id))).toEqual(ids.slice(0, 2));
+  // Clearing a later level out of turn opens nothing past the gap.
+  progress.markCleared(ids[3]!);
+  expect(ids.filter((id) => progress.isOpen(id))).toEqual(ids.slice(0, 2));
 });
 
 test('a deep link still opens a level directly, and the exit leads to the next site', async ({ page }) => {

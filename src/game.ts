@@ -74,7 +74,11 @@ export class Game {
 
   private readonly input: Input;
   private readonly audio = new GameAudio();
-  private readonly progress = new Progress(LEVELS.map((l) => l.id));
+  /** In order for players (the prod build, from main); every built level open in every other build. */
+  private readonly progress = new Progress(
+    LEVELS.map((l) => l.id),
+    __BUILD_ENV__ === 'prod',
+  );
   private readonly map = new MapScreen(this.progress);
   private screen: Screen = 'map';
   /** Escape was pressed mid-level: after the death plays, go back to the map. */
@@ -168,8 +172,8 @@ export class Game {
       this.pointer(e, true);
     });
     // A deep link opens any level where there are dev tools, which is what the tests and
-    // the designer want. In prod it opens a level the map would open (engine/progress.ts:
-    // today every built one).
+    // the designer want. In prod it opens only a level the tour has reached, so a link
+    // cannot skip a player past the levels that set up this one.
     const hash = location.hash.replace(/^#/, '').trim();
     const linked = hash && hash !== 'map' ? levelIndexFromHash(location.hash) : -1;
     if (linked >= 0 && (DEV_TOOLS || this.progress.isOpen(LEVELS[linked]!.id))) this.enterLevel(linked, false);

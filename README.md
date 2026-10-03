@@ -43,11 +43,12 @@ the left edge of the screen, and the controls are his as soon as all of him is o
 where the visit has already begun he is simply there (Rouffignac, off the train). Retries
 start on the spawn.
 
-Every built level is open on the map from the start, in every build; a cleared one is
-stamped, and the chapter opens on its first level not yet cleared. (The tour used to be
-played in order, each level waiting for every one before it; `IN_ORDER` in
-`src/engine/progress.ts` brings that back.) A deep link opens any level in dev and local
-builds, and in prod any level the map would open.
+For players the tour is played in order: in the prod build, which main deploys, a level
+opens on the map once every level before it is cleared, so the chapters open in order and
+so do the levels inside each. Every other build, dev included, opens every built level from
+the start. Either way a cleared level is stamped and can be visited again, and a chapter
+opens on its first level not yet cleared. A deep link opens any level in dev and local
+builds, and in prod only one the tour has reached.
 
 Dev tools, in every build except prod, so a point on screen can be named: a ruler on the
 edges of a level, and the exact point under the mouse as `(X, Y)`. A click copies it with
