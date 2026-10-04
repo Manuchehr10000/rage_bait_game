@@ -160,3 +160,21 @@ test('every slope meets its floors at their tile tops, lies over its tiles, is n
   });
   expect(bad).toEqual([]);
 });
+
+test('a declared trick is a noun one of the level\'s traps kills under, never a fall, a drop, water or giving up', () => {
+  const bad: string[] = [];
+  for (const data of LEVELS) {
+    if (!data.tricks) continue;
+    const plain = new Set<string>(['Fall', 'Gave up']);
+    if (data.fallCause) plain.add(data.fallCause);
+    if (data.dropCause) plain.add(data.dropCause);
+    for (const e of data.entities) if (e.kind === 'water' && e.cause) plain.add(e.cause);
+    const traps = JSON.stringify(data.entities.filter((e) => e.kind !== 'water'));
+    if (new Set(data.tricks).size !== data.tricks.length) bad.push(`${data.id}: a trick declared twice`);
+    for (const t of data.tricks) {
+      if (plain.has(t)) bad.push(`${data.id}: '${t}' is a plain death, not a trick`);
+      else if (!traps.includes(JSON.stringify(t))) bad.push(`${data.id}: no trap kills under '${t}'`);
+    }
+  }
+  expect(bad).toEqual([]);
+});

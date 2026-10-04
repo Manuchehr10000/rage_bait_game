@@ -117,6 +117,8 @@ export const PERSEPOLIS: LevelData = {
   spawn: { x: 24, y: px(PLAIN) - 16 },
   cameraBottom: px(H),
   slopes: [FLIGHT_1, FLIGHT_2, TACHARA_UP_STAIR, TACHARA_DOWN_STAIR],
+  // One trick (pillar 8): the guards kill him themselves, so no claim is needed.
+  tricks: ['The audience'],
   // Past the north end of the façade. No turnstile at the Apadana: the plain exit.
   exit: { x: px(EXIT), y: px(TERRACE) - 24, w: 12, h: 24 },
 

@@ -365,11 +365,14 @@ All of it is built (2026-10-03), rough and drawn by code.
   `open`. The wind stays.
 - **The map.** Chapter 4's sites in the ruled order, Persepolis as its level 1, its costume, and
   the three Fars pins nudged apart.
-- **Tests.** `tests/persepolis.spec.ts`, twelve of them: the guards as one body, the death, no
+- **Tests.** `tests/persepolis.spec.ts`, thirteen of them: the guards as one body, the death, no
   fatal fall, the stairs run, walked and jumped in Node with the real player, the walk-in, the
-  teleport, the runner, the release spread, the crossing spread, the grind and the clean run.
-- **Not yet:** pillar 8's count. When it is built, Persepolis declares `tricks: ['The
-  audience']`.
+  teleport, the runner, the release spread, the crossing spread, the grind, the clean run and
+  the count.
+- **Pillar 8's count**, built with this level: it declares `tricks: ['The audience']`, and the
+  exit label's last row is "Tricks met", 0 of 1 until the guards have killed this visitor once
+  and 1 of 1 from then on, in this browser. The guards kill him themselves, so nothing needs
+  to claim the death.
 
 ## Sources
 

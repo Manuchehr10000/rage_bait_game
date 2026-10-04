@@ -425,3 +425,26 @@ test('the knowing route: no deaths, about fifteen seconds, under a second standi
   expect(r.ticks / 60).toBeLessThan(17);
   expect(r.still / 60).toBeLessThan(1.2);
 });
+
+test('pillar 8: the exit label counts the audience once it has killed him, and the browser remembers', async ({ page }) => {
+  type Count = { met: number; of: number } | null;
+  const count = (): Promise<Count> => page.evaluate(() => (window as unknown as { __game: { tricksCount(): Count } }).__game.tricksCount());
+  const stored = (): Promise<unknown> => page.evaluate(() => JSON.parse(localStorage.getItem('lostTourist.tricks') ?? 'null'));
+  const runThrough = `const step = () => { if (!routeUntil('court')) return; key('ArrowRight', true); };`;
+
+  // Never killed by it: the label says none of the one.
+  expect((await play(page, `const step = () => { routeUntil('done'); };`, 60 * 45)).state).toBe('complete');
+  expect(await count()).toEqual({ met: 0, of: 1 });
+  expect(await stored()).toBeNull();
+
+  // Killed by it: written down, once, however often it happens.
+  expect((await play(page, runThrough)).cause).toBe('The audience');
+  expect((await play(page, runThrough)).cause).toBe('The audience');
+  expect(await stored()).toEqual({ persepolis: ['The audience'] });
+  expect(await count()).toEqual({ met: 1, of: 1 });
+
+  // Another visit, the same browser.
+  await page.reload();
+  await page.waitForFunction(() => (window as unknown as { __game?: { levelData: { id: string } } }).__game?.levelData.id === 'persepolis');
+  expect(await count()).toEqual({ met: 1, of: 1 });
+});

@@ -765,6 +765,14 @@ export interface LevelData {
    * in every level; this is only the noun that ends up on the exit label.
    */
   dropCause?: DeathCause;
+  /**
+   * The level's tricks (pillar 4), each named by the noun its trap kills him
+   * under (pillar 8). The exit label counts how many of them this visitor has
+   * ever been killed by, as "1 of 2". A plain fall, a missed jump or honest water
+   * is not one. Only a level rebuilt under the pillars of 2026-09-26 declares
+   * them; a level that has none shows no count.
+   */
+  tricks?: readonly DeathCause[];
   /** The exit has no marker. You find it. */
   exitHidden?: boolean;
   /**

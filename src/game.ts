@@ -423,6 +423,7 @@ export class Game {
 
   private kill(cause: DeathCause): void {
     if (this.state !== 'playing') return;
+    if (this.level.data.tricks?.includes(cause)) this.progress.markTrick(this.level.data.id, cause);
     this.state = 'dead';
     this.deathTimer = DEATH_TIME;
     this.deathCause = cause;
@@ -595,6 +596,13 @@ export class Game {
     }
   }
 
+  /** Pillar 8's count for the exit label: how many of the level's tricks have ever killed this visitor. */
+  private tricksCount(): { met: number; of: number } | null {
+    const t = this.level.data.tricks;
+    if (!t?.length) return null;
+    return { met: this.progress.tricksMet(this.level.data.id, t), of: t.length };
+  }
+
   /** What the traps see of the game this frame. */
   private worldView(): World {
     return {
@@ -684,6 +692,7 @@ export class Game {
       complete: this.state === 'complete',
       hasNext: this.nextLevelIndex() !== null,
       levelName: this.level.data.name,
+      tricks: this.tricksCount(),
       title: this.titleTimer > 0 ? Math.min(1, this.titleTimer / 0.4, (TITLE_TIME - this.titleTimer) / 0.4) : 0,
     });
     this.dev?.draw(this.ctx, this.scale, this.rulerView());
