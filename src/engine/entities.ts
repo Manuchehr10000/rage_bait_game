@@ -6,6 +6,7 @@ import type {
   DoorDef,
   EntityDef,
   FallingDef,
+  GuardsDef,
   HazardDef,
   HorseDef,
   Level,
@@ -84,6 +85,8 @@ export function createEntity(def: EntityDef, level: Level): Entity {
       return new Seat(def);
     case 'door':
       return new Door(def);
+    case 'guards':
+      return new Guards(def);
   }
 }
 
@@ -1226,5 +1229,88 @@ export class Door implements Entity {
   /** A shut leaf is a wall; a moving or open one is not something to stand against. */
   solids(): MovingSolid[] {
     return this.k === 0 ? [this.solid] : [];
+  }
+}
+
+/**
+ * Two files of guards carved in a wall either side of a blank, on the court's clock:
+ * they step out of the wall into the court where they are carved, stand, and step back.
+ * Nobody moves sideways and nobody steps into the blank. From the middle of stepping
+ * out to the middle of stepping back, a guard's body in the court is deadly to touch.
+ * Never solid: a solid coming out at him would lift him onto its head.
+ */
+export class Guards implements Entity {
+  /** Seconds since the court's clock started, or -1 before it has. */
+  t = -1;
+  /** Where they are: in the wall, stepping out, standing out in the court, stepping back. */
+  phase: 'wall' | 'stepOut' | 'out' | 'stepBack' = 'wall';
+  /** How far out of the wall they are: 0 carved in it, 1 standing in the court. */
+  depth = 0;
+  /** True while a guard's body in the court kills. */
+  deadly = false;
+  /**
+   * The guards from left to right: the left file, then the right. `x` is a
+   * body's left edge; `face` the way it looks: in, toward the blank.
+   */
+  readonly guards: readonly { x: number; face: 1 | -1 }[];
+  /** Their bodies in the court, in the same order. They never move: only `depth` does. */
+  readonly rects: readonly Rect[];
+  /** Step-outs begun, so each one grinds once. */
+  private steps = 0;
+
+  constructor(readonly def: GuardsDef) {
+    const half = def.gap / 2;
+    const guards: { x: number; face: 1 | -1 }[] = [];
+    for (let i = def.perFile - 1; i >= 0; i--) guards.push({ x: def.centreX - half - (i + 1) * def.guardW, face: 1 });
+    for (let i = 0; i < def.perFile; i++) guards.push({ x: def.centreX + half + i * def.guardW, face: -1 });
+    this.guards = guards;
+    this.rects = guards.map((g) => ({ x: g.x, y: def.floorY - def.guardH, w: def.guardW, h: def.guardH }));
+  }
+
+  /** The king's place: the blank between the inner guards. */
+  get gapRect(): Rect {
+    const d = this.def;
+    return { x: d.centreX - d.gap / 2, y: d.floorY - d.guardH, w: d.gap, h: d.guardH };
+  }
+
+  update(w: World): void {
+    const d = this.def;
+    const c = d.clock;
+    if (this.t < 0) {
+      if (centerX(w.player) < c.triggerX) return;
+      this.t = 0;
+    }
+    this.t += DT;
+    const since = this.t - c.first;
+    if (since < 0) return;
+    const n = Math.floor(since / c.period);
+    const into = since - n * c.period;
+    const back = c.step + c.stand;
+    if (into < c.step) {
+      this.phase = 'stepOut';
+      this.depth = into / c.step;
+    } else if (into < back) {
+      this.phase = 'out';
+      this.depth = 1;
+    } else if (into < back + c.step) {
+      this.phase = 'stepBack';
+      this.depth = 1 - (into - back) / c.step;
+    } else {
+      this.phase = 'wall';
+      this.depth = 0;
+    }
+    this.deadly = into >= c.step / 2 && into < back + c.step / 2;
+    // One clock, one sound: the eight step out together and are heard once.
+    if (this.steps <= n) {
+      this.steps = n + 1;
+      if (d.centreX > w.cameraX - 16 && d.centreX < w.cameraX + VIEW_W + 16) w.sound('grind');
+    }
+    if (!w.alive || !this.deadly) return;
+    for (const r of this.rects) {
+      if (overlaps(r, w.player)) {
+        w.kill(d.cause);
+        return;
+      }
+    }
   }
 }

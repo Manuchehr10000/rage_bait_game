@@ -12,6 +12,8 @@
  * died. Switching cross-fades between them and nothing restarts: whichever track
  * you were not listening to kept playing, and comes back exactly where it would
  * have got to. `ch03` is a plucked lyre with seven strings, one pitch each.
+ * Chapter 4 is not scored yet: its levels ask for no track (`setMusic(null)`), every
+ * track fades out, and the wind is all there is.
  *
  * Chapters 1 and 3 also have a room. The reverb is generated, not loaded — a burst
  * of noise with a decay on it, which is what an impulse response is — and the
@@ -86,7 +88,7 @@ export class GameAudio {
   /** How far each track has got: when its next step falls, and which step it is. */
   private nextNote: Record<MusicId, number> = { map: 0, mapCh01: 0, mapCh02: 0, ch01: 0, ch02: 0, ch03: 0 };
   private noteIndex: Record<MusicId, number> = { map: 0, mapCh01: 0, mapCh02: 0, ch01: 0, ch02: 0, ch03: 0 };
-  private track: MusicId = 'ch02';
+  private track: MusicId | null = 'ch02';
   /** The cave. Only Chapter 1 is routed through it. */
   private reverb: ConvolverNode | null = null;
   private wet: GainNode | null = null;
@@ -166,8 +168,11 @@ export class GameAudio {
     }
   }
 
-  /** Cross-fade to another track. Nothing stops; only the gains move. */
-  setMusic(id: MusicId): void {
+  /**
+   * Cross-fade to another track. Nothing stops; only the gains move. Null fades every
+   * track out, for a level nobody has scored yet; the wind goes on.
+   */
+  setMusic(id: MusicId | null): void {
     if (this.track === id) return;
     this.track = id;
     const ctx = this.ctx;

@@ -34,8 +34,8 @@ npm run dev
 Arrows or WASD to move, Space to jump, L to switch the headlamp off and on in the one cave
 where it runs down (it only runs down while it burns), R to give up (it counts), M to mute, Enter for the
 next level at the exit label. Esc returns to the map. Open `#cap-blanc`,
-`#roc-aux-sorciers`, `#pech-merle`, `#rouffignac`, `#gargas`, `#abu-simbel`, `#philae` or
-`#karnak` in the URL to start at that level.
+`#roc-aux-sorciers`, `#pech-merle`, `#rouffignac`, `#gargas`, `#abu-simbel`, `#philae`,
+`#karnak`, `#dendera`, `#knossos` or `#persepolis` in the URL to start at that level.
 
 A level is entered on foot: from the map or the exit label, the tourist walks in from off
 the left edge of the screen, and the controls are his as soon as all of him is on it
@@ -126,12 +126,16 @@ src/
     index.ts              level order and URL hash lookup
     ch01-palaeolithic/    one file per level: geometry, decor, entity list
     ch02-egypt/
+    ch03-aegean/
+    ch04-persia/
 content/
   README.md               the designer's guide
   research/               the historical arc; outranks everything else on history
-  ch01-palaeolithic/      CHAPTER.md, shared art, one folder per level with LEVEL.md,
-  ch02-egypt/             assets.json, easter-eggs.md, and beat folders holding notes and paintings
-  ch03-aegean/            CHAPTER.md only: decided, not built
+  tricks.md               every trick the game has spent; a trick is used once
+  ch01-palaeolithic/      CHAPTER.md, shared art, one folder per built level with LEVEL.md,
+  ch02-egypt/             assets.json, easter-eggs.md, and beat folders holding notes and
+  ch03-aegean/            paintings; a level designed and not yet built has its LEVEL.md
+  ch04-persia/            only (Phaistos)
   map/                    the tour map's art, and the twelve chapter plates in monuments/
   site/                   the tab icon's note
 tools/
@@ -148,7 +152,9 @@ Rendering: the world is 320 × 180 units, rendered onto a canvas four times that
 
 ## Status
 
-Eight levels playable end to end, the five of chapter 1 (Cap Blanc, Roc-aux-Sorciers, Pech
-Merle, Rouffignac, Gargas) and the first three of chapter 2 (Abu Simbel, Philae, Karnak),
-with code-drawn art and procedural sound, from a tour map start screen.
+Eleven levels playable end to end: the five of chapter 1 (Cap Blanc, Roc-aux-Sorciers, Pech
+Merle, Rouffignac, Gargas), the first four of chapter 2 (Abu Simbel, Philae, Karnak,
+Dendera), the first of chapter 3 (Knossos) and the first of chapter 4 (Persepolis), with
+code-drawn art and procedural sound, from a tour map start screen. Chapter 4 has no music
+yet: Persepolis is heard with the wind alone.
 Painted art arrives per asset through `content/`. No menu yet.

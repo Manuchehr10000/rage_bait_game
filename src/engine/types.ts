@@ -54,10 +54,11 @@ export type DeathCause =
   | 'The throne'
   | 'The timber'
   | 'The door'
+  | 'The audience'
   | 'Gave up';
 
 /** How each death is drawn. */
-export type DeathAnim = 'crush' | 'plank' | 'drown' | 'burn' | 'snap' | 'swept' | 'gone' | 'sit' | 'flat' | 'enthroned';
+export type DeathAnim = 'crush' | 'plank' | 'drown' | 'burn' | 'snap' | 'swept' | 'gone' | 'sit' | 'flat' | 'enthroned' | 'carved';
 
 export const DEATH_ANIM: Record<DeathCause, DeathAnim> = {
   'The Beune': 'drown',
@@ -102,6 +103,9 @@ export const DEATH_ANIM: Record<DeathCause, DeathAnim> = {
   'The timber': 'crush',
   // The leaf of a pier-and-door partition, opening into him. Over like a plank.
   'The door': 'plank',
+  // Persepolis. Where the guards stepped out, he is pressed flat into the wall where he
+  // stood: upright, in profile, facing the centre like the guards round him, in stone.
+  'The audience': 'carved',
   'Gave up': 'sit',
 };
 
@@ -148,6 +152,8 @@ export const DEATH_SOUND: Record<
   'The timber': 'squish',
   // Wood, not the Rouffignac board's bonk.
   'The door': 'knock',
+  // A body against a stone wall, once.
+  'The audience': 'thud',
   'Gave up': 'sigh',
 };
 
@@ -155,7 +161,7 @@ export const DEATH_SOUND: Record<
  * What the tourist wears. One per chapter, fixed by content/research/arc.md.
  * Cosmetic (pillar 9): it picks the sprites and nothing else.
  */
-export type Costume = 'hiker' | 'pharaoh' | 'bullLeaper';
+export type Costume = 'hiker' | 'pharaoh' | 'bullLeaper' | 'falseBeard';
 
 export const VIEW_W = 320;
 export const VIEW_H = 180;

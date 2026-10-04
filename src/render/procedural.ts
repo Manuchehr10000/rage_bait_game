@@ -1813,3 +1813,387 @@ export const GRIFFIN_SPRITE = compile(
   ],
   KNOSSOS,
 );
+
+// ---------------------------------------------------------------------------
+// Chapter 4. The tourist in a false beard (content/ch04-persia/shared/false-beard.md):
+// a clip-on Assyrian beard from a costume shop, long, squared off at the bottom, dark,
+// in horizontal bands of tight curls, hung from his ears by a clip that catches the
+// light. Under it his own clothes: a pale short-sleeved shirt, khaki trousers, white
+// trainers, and his own brown hair, no hat. A different outline from chapter 1's
+// bucket hat and boots, and a different beard from chapter 2's: that one is a narrow
+// strip of cardboard on elastic under a towel; this is a block of curls on a clip, on
+// a bare head. 12 x 16, drawn one pixel left of the 10 px hitbox. Faces right.
+// ---------------------------------------------------------------------------
+
+const FALSE_BEARD: Palette = {
+  O: '#2b1d10', // outline
+  H: '#7a5232', // his own hair
+  S: '#e6b48c', // skin
+  E: '#1c1c1c', // eye
+  Q: '#f4f4f0', // the clip, at the ear
+  K: '#241a14', // the beard
+  C: '#5e4836', // its curls, in rows
+  W: '#d9e6ee', // shirt, pale
+  T: '#b8a06c', // khaki trousers
+  N: '#f2f1ec', // trainers
+};
+
+// The beard covers his jaw from the clip forward and hangs to the middle of his chest.
+const FALSE_BEARD_HEAD = [
+  '...OOOOOO...',
+  '..OHHHHHHO..',
+  '.OHHHHHHHHO.',
+  '.OHHSSSSSSO.',
+  '.OHSSSSSESO.',
+  '.OHQSSSSSSSO',
+  '.OHKKKKKKKO.',
+  '..OCKCKCKCO.',
+  '..OKKKKKKKO.',
+];
+
+// Shirt behind the beard, the near arm out of its short sleeve, the beard's square foot.
+const FALSE_BEARD_TORSO = [
+  '.OWWCKCKCKO.',
+  '.OWSKKKKKKO.',
+  '.OWSWWWWWWO.',
+  '..OTTTTTTTO.',
+];
+
+function falseBeard(legs: string[]): string[] {
+  return [...FALSE_BEARD_HEAD, ...FALSE_BEARD_TORSO, ...legs];
+}
+
+export const FALSE_BEARD_FRAMES = {
+  idle: compile(falseBeard(['...OTTOOTTO.', '...OTTOOTTO.', '...ONNOONNO.']), FALSE_BEARD),
+  walk1: compile(falseBeard(['..OTTO..OTTO', '..OTTO..OTTO', '..ONNO..ONNO']), FALSE_BEARD),
+  walk2: compile(falseBeard(['....OTTTTO..', '....OTTTTO..', '....ONNNNO..']), FALSE_BEARD),
+  jump: compile(falseBeard(['..OTTO.OTTO.', '..OTTO..OTTO', '..ONNO...ONN']), FALSE_BEARD),
+  // Dead: eyes shut, and the beard knocked askew: off the ear on the clip side, hanging
+  // from the other, its foot slewed. Nothing else changes.
+  dead: compile(
+    [
+      '...OOOOOO...',
+      '..OHHHHHHO..',
+      '.OHHHHHHHHO.',
+      '.OHHSSSSSSO.',
+      '.OHSSSSOOSO.',
+      '.OHSSSSSSSSO',
+      '.OHSQKKKKKKO',
+      '..OSKCKCKCKO',
+      '..OOKKKKKKKO',
+      '.OWWKKCKCKCO',
+      '.OWSWKKKKKKO',
+      '.OWSWWWWWWO.',
+      '..OTTTTTTTO.',
+      '...OTTOOTTO.',
+      '...OTTOOTTO.',
+      '...ONNOONNO.',
+    ],
+    FALSE_BEARD,
+  ),
+};
+
+/**
+ * Sitting down on the ground, having given up: the beard unclipped and in his lap,
+ * his own chin out. Never to be mistaken for anything carved.
+ */
+export const FALSE_BEARD_SEATED = compile(
+  [
+    '...OOOOOO....',
+    '..OHHHHHHO...',
+    '.OHHHHHHHHO..',
+    '.OHHSSSSSSO..',
+    '.OHSSSSSESO..',
+    '.OHSSSSSSSSO.',
+    '..OSSSSSKSO..',
+    '...OOSSSSO...',
+    '..OWWWWWWWO..',
+    '..OWSWWWWWO..',
+    '.OTKCKCKCKTO.',
+    '.OTKKKKKKKTTO',
+    'OTTONNOONNOTO',
+    'OOOOOOOOOOOOO',
+  ],
+  FALSE_BEARD,
+);
+
+// ---------------------------------------------------------------------------
+// Persepolis: the carvings. Drawn in three plain tones, 1 dark (the cut lines), 2 middle
+// (what lies further back), 3 light (the raised surface), and cut into the stone by the
+// renderer (`relief` in frame.ts), which lights them from the upper right whichever way
+// they face. Each faces right; the game flips them. Every copy of a figure is this one
+// figure (pillar 4).
+// ---------------------------------------------------------------------------
+
+const CARVE: Palette = { '1': '#303030', '2': '#7a7a7a', '3': '#d0d0d0' };
+
+/** A sprite built of filled rectangles [x, y, w, h, tone], in order. */
+function shapes(w: number, h: number, rects: [number, number, number, number, '1' | '2' | '3'][]): HTMLCanvasElement {
+  const c = document.createElement('canvas');
+  c.width = w;
+  c.height = h;
+  const ctx = c.getContext('2d');
+  if (!ctx) throw new Error('2d context unavailable');
+  for (const [x, y, rw, rh, t] of rects) {
+    ctx.fillStyle = CARVE[t] ?? '#000';
+    ctx.fillRect(x, y, rw, rh);
+  }
+  return c;
+}
+
+/**
+ * A guard of the Apadana's east stair: fluted hat, curled beard, long pleated robe,
+ * his spear upright in front of him in both hands. One stamp for all eight, as the map
+ * plate does: the real files mix Persian and Median dress, in an order not yet checked.
+ * 9 x 28: the body is the bottom 22 rows, the spear rises six more.
+ */
+export const GUARD_SPRITE = compile(
+  [
+    '........1',
+    '.......31',
+    '.......31',
+    '........1',
+    '........1',
+    '........1',
+    '..1111..1',
+    '..3232..1',
+    '..3232..1',
+    '..11111.1',
+    '..13333.1',
+    '..1313331',
+    '.12333311',
+    '.12121211',
+    '.11212121',
+    '.13333331',
+    '.13333331',
+    '.13232331',
+    '.13333331',
+    '.13323331',
+    '.13323231',
+    '.13323231',
+    '.13323231',
+    '.13323231',
+    '.13323231',
+    '.13323231',
+    '.11111111',
+    '..11.11.1',
+  ],
+  CARVE,
+);
+
+/**
+ * A sphinx of the central projection, seated, a forepaw raised toward the winged disc:
+ * a lion's body, a man's bearded head under a crown, a wing curving up from the
+ * shoulder. 16 x 16.
+ */
+export const SPHINX_SEATED_SPRITE = shapes(16, 16, [
+  [0, 9, 1, 4, '1'],
+  [1, 8, 6, 6, '3'],
+  [1, 14, 7, 2, '2'],
+  [4, 7, 8, 7, '3'],
+  [9, 9, 2, 7, '2'],
+  [11, 9, 2, 7, '3'],
+  [13, 9, 2, 1, '3'],
+  [14, 8, 1, 1, '3'],
+  [1, 2, 6, 2, '3'],
+  [0, 4, 9, 2, '2'],
+  [2, 6, 7, 1, '3'],
+  [1, 4, 7, 1, '1'],
+  [10, 0, 4, 2, '2'],
+  [10, 0, 4, 1, '1'],
+  [10, 2, 5, 4, '3'],
+  [13, 3, 1, 1, '1'],
+  [10, 6, 4, 3, '2'],
+  [10, 7, 1, 1, '1'],
+  [12, 7, 1, 1, '1'],
+  [5, 12, 1, 2, '1'],
+]);
+
+/**
+ * A lion leaping onto a bull from behind, his forepaws on its back and his jaws in its
+ * flank, the bull's forelegs giving: the panel in the angle under each flight. 24 x 16.
+ */
+export const LION_BULL_SPRITE = shapes(24, 16, [
+  [23, 2, 1, 3, '3'],
+  [22, 1, 1, 2, '3'],
+  [20, 4, 4, 5, '2'],
+  [22, 5, 1, 1, '1'],
+  [9, 6, 13, 6, '2'],
+  [19, 11, 2, 5, '2'],
+  [16, 12, 2, 3, '2'],
+  [11, 11, 2, 5, '2'],
+  [9, 7, 1, 4, '1'],
+  [11, 2, 3, 6, '1'],
+  [12, 3, 4, 4, '3'],
+  [15, 5, 1, 1, '1'],
+  [4, 2, 8, 5, '3'],
+  [14, 7, 2, 3, '3'],
+  [3, 6, 3, 9, '3'],
+  [6, 7, 2, 6, '3'],
+  [1, 3, 3, 1, '3'],
+  [1, 1, 1, 3, '3'],
+  [2, 15, 4, 1, '1'],
+]);
+
+/** A bull of the west portal of the Gate of All Nations, in profile. Four legs. 30 x 28. */
+export const GATE_BULL_SPRITE = shapes(30, 28, [
+  [1, 8, 1, 10, '1'],
+  [0, 17, 2, 2, '1'],
+  [2, 7, 21, 12, '3'],
+  [3, 16, 18, 3, '2'],
+  [8, 19, 3, 7, '2'],
+  [16, 19, 3, 7, '2'],
+  [3, 19, 4, 7, '3'],
+  [19, 19, 4, 7, '3'],
+  [8, 26, 3, 2, '1'],
+  [16, 26, 3, 2, '1'],
+  [3, 26, 4, 2, '1'],
+  [19, 26, 4, 2, '1'],
+  [18, 5, 5, 4, '3'],
+  [20, 4, 6, 13, '3'],
+  [24, 3, 5, 7, '3'],
+  [26, 8, 4, 4, '3'],
+  [26, 5, 1, 1, '1'],
+  [29, 10, 1, 1, '1'],
+  [22, 3, 2, 2, '2'],
+  [25, 0, 1, 3, '3'],
+  [26, 0, 2, 1, '3'],
+  [23, 1, 1, 2, '2'],
+  [21, 9, 1, 1, '1'],
+  [23, 9, 1, 1, '1'],
+  [22, 11, 1, 1, '1'],
+  [24, 11, 1, 1, '1'],
+  [21, 13, 1, 1, '1'],
+  [23, 13, 1, 1, '1'],
+  [22, 15, 1, 1, '1'],
+  [6, 10, 1, 6, '1'],
+  [17, 9, 1, 7, '1'],
+]);
+
+/**
+ * A human-headed winged bull of the east portal, in profile: a tall cylindrical crown, a
+ * long curled beard, the wing swept back and up over the body. Four legs, as at
+ * Persepolis (Assyria's have five). 30 x 40.
+ */
+export const GATE_LAMASSU_SPRITE = shapes(30, 40, [
+  [1, 18, 1, 10, '1'],
+  [0, 27, 2, 2, '1'],
+  [2, 17, 21, 12, '3'],
+  [3, 26, 18, 3, '2'],
+  [8, 29, 3, 8, '2'],
+  [16, 29, 3, 8, '2'],
+  [3, 29, 4, 8, '3'],
+  [19, 29, 4, 8, '3'],
+  [8, 37, 3, 3, '1'],
+  [16, 37, 3, 3, '1'],
+  [3, 37, 4, 3, '1'],
+  [19, 37, 4, 3, '1'],
+  [19, 12, 7, 16, '3'],
+  [3, 6, 12, 1, '3'],
+  [2, 7, 16, 2, '3'],
+  [2, 9, 1, 1, '1'],
+  [2, 10, 18, 2, '2'],
+  [3, 12, 17, 2, '3'],
+  [4, 14, 16, 2, '2'],
+  [6, 16, 14, 1, '3'],
+  [2, 9, 17, 1, '1'],
+  [3, 12, 16, 1, '1'],
+  [4, 14, 15, 1, '1'],
+  [19, 6, 3, 7, '2'],
+  [21, 5, 6, 7, '3'],
+  [27, 8, 1, 2, '3'],
+  [25, 7, 1, 1, '1'],
+  [21, 0, 6, 5, '2'],
+  [21, 0, 6, 1, '3'],
+  [21, 2, 6, 1, '1'],
+  [21, 4, 6, 1, '1'],
+  [20, 11, 7, 8, '2'],
+  [20, 12, 1, 1, '1'],
+  [22, 12, 1, 1, '1'],
+  [24, 12, 1, 1, '1'],
+  [26, 12, 1, 1, '1'],
+  [21, 14, 1, 1, '1'],
+  [23, 14, 1, 1, '1'],
+  [25, 14, 1, 1, '1'],
+  [20, 16, 1, 1, '1'],
+  [22, 16, 1, 1, '1'],
+  [24, 16, 1, 1, '1'],
+  [26, 16, 1, 1, '1'],
+  [20, 18, 7, 1, '1'],
+  [6, 20, 1, 6, '1'],
+]);
+
+/**
+ * The king on a doorjamb of the Tachara, walking out of the hall, and behind him an
+ * attendant, drawn smaller, holding the parasol over him. 16 x 34.
+ */
+export const JAMB_KING_SPRITE = shapes(16, 34, [
+  [8, 0, 6, 1, '3'],
+  [6, 1, 10, 2, '3'],
+  [6, 3, 10, 1, '1'],
+  [7, 4, 1, 10, '1'],
+  [2, 11, 3, 2, '2'],
+  [2, 13, 3, 3, '3'],
+  [4, 13, 1, 1, '1'],
+  [5, 13, 2, 2, '3'],
+  [1, 16, 5, 14, '2'],
+  [3, 18, 1, 11, '1'],
+  [1, 30, 5, 2, '1'],
+  [11, 6, 4, 3, '2'],
+  [11, 6, 1, 1, '1'],
+  [13, 6, 1, 1, '1'],
+  [11, 9, 4, 4, '3'],
+  [14, 10, 1, 1, '1'],
+  [15, 11, 1, 1, '3'],
+  [10, 9, 1, 6, '2'],
+  [11, 13, 4, 4, '2'],
+  [11, 14, 1, 1, '1'],
+  [13, 14, 1, 1, '1'],
+  [12, 16, 1, 1, '1'],
+  [14, 16, 1, 1, '1'],
+  [9, 17, 6, 14, '3'],
+  [8, 28, 8, 3, '3'],
+  [11, 20, 1, 10, '1'],
+  [13, 21, 1, 9, '1'],
+  [15, 18, 1, 14, '1'],
+  [8, 31, 8, 2, '1'],
+]);
+
+/**
+ * A delegate of the south wing, walking right, his gift held out before him. One stamp
+ * for every delegate: the real twenty-three delegations each wear their own dress. 5 x 11.
+ */
+export const DELEGATE_SPRITE = compile(
+  ['.111.', '.133.', '.1331', '.133.', '13333', '13333', '1333.', '1323.', '1323.', '1323.', '11.11'],
+  CARVE,
+);
+
+/** The usher who leads each delegation, holding its leader's hand behind him. 6 x 11. */
+export const USHER_SPRITE = compile(
+  ['..11..', '..131.', '..1331', '..133.', '.1333.', '33333.', '..333.', '..323.', '..323.', '..323.', '..11.1'],
+  CARVE,
+);
+
+/** A Persian noble of the north wing, fluted hat and long robe. 5 x 11. */
+export const NOBLE_PERSIAN_SPRITE = compile(
+  ['.111.', '.121.', '.133.', '.1331', '.133.', '1333.', '13333', '1323.', '1323.', '1323.', '11111'],
+  CARVE,
+);
+
+/** A Median noble of the north wing, rounded cap, belted tunic and trousers. 5 x 11. */
+export const NOBLE_MEDIAN_SPRITE = compile(
+  ['.11..', '.131.', '.1331', '.133.', '1333.', '13333', '1111.', '1333.', '13.3.', '13.3.', '11.11'],
+  CARVE,
+);
+
+/** A cypress, set between the delegations and up the flights. 3 x 11. */
+export const CYPRESS_SPRITE = compile(
+  ['.3.', '.3.', '333', '323', '333', '323', '333', '323', '333', '.1.', '.1.'],
+  CARVE,
+);
+
+/** The winged disc at the head of the central projection: small and plain, a disc and two wings, a tail below. 13 x 5. */
+export const WINGED_DISC_SPRITE = compile(
+  ['.....111.....', '1111113311111', '.22221112222.', '...2221222...', '.....222.....'],
+  CARVE,
+);

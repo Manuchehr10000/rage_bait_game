@@ -7,6 +7,7 @@ import { Input } from './engine/input';
 import { Level, type LevelData, type Theme } from './engine/level';
 import { LEVELS, levelIndexFromHash } from './levels/index';
 import { PHYS, Player, type MovingSolid } from './engine/player';
+import { slopeTop } from './engine/physics';
 import { Progress } from './engine/progress';
 import { locate } from './map/atlas';
 import { MapScreen } from './map/screen';
@@ -45,9 +46,12 @@ const ARRIVE_FROM = 8;
  * each is { track: 'ch03' } in the open, except Akrotiri, which is 'hall', the roof
  * its visitors stand under. Knossos is ruled 'open' for the whole level, Evans's
  * roofed rooms included: visitors stand outside them, and the first roof the lyre is
- * heard under is Akrotiri's.
+ * heard under is Akrotiri's. Chapter 4 is not scored yet: no instrument has been
+ * researched for it, so its levels have no music (track null: every track fades out)
+ * and the wind alone, and no other chapter's music is borrowed. Its room is recorded
+ * as the place all the same (content/ch04-persia/CHAPTER.md).
  */
-const SOUND_OF: Record<Theme, { track: MusicId; room: Room }> = {
+const SOUND_OF: Record<Theme, { track: MusicId | null; room: Room }> = {
   capBlanc: { track: 'ch01', room: 'open' }, // a cliff shelter, open to the valley
   rocAuxSorciers: { track: 'ch01', room: 'open' }, // the same, above the Anglin
   pechMerle: { track: 'ch01', room: 'chamber' },
@@ -58,6 +62,7 @@ const SOUND_OF: Record<Theme, { track: MusicId; room: Room }> = {
   karnak: { track: 'ch02', room: 'chamber' }, // the hypostyle hall is a roofed forest
   dendera: { track: 'ch02', room: 'open' }, // up a stair in the wall, and then the roof, under the sky
   knossos: { track: 'ch03', room: 'open' }, // ruled: visitors look into Evans's rooms from outside
+  persepolis: { track: null, room: 'open' }, // not scored yet; a terrace under the sky
 };
 
 /** The pages of the brochure that have been arranged, by chapter number. */
@@ -400,6 +405,11 @@ export class Game {
       this.level.solidTilesIn({ x: at.x, y: at.y, w: p.w, h: p.h }, hits);
       if (!hits.length || at.y <= 0) break;
       at.y = Math.min(...hits.map((r) => r.y)) - p.h;
+    }
+    // Put down under a slope's line, in the fill under a stair, he stands on the stair.
+    for (const sl of this.level.slopes) {
+      const sy = slopeTop(sl, { x: at.x, y: at.y, w: p.w, h: p.h });
+      if (sy !== null && at.y + p.h > sy) at.y = sy - p.h;
     }
     this.devStart = at;
     this.resetLevel();

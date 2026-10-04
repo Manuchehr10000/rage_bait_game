@@ -1,7 +1,9 @@
 import { expect, test } from '@playwright/test';
 import { Level, type LevelData } from '../src/engine/level';
 import { LEVELS } from '../src/levels';
-import { TILE } from '../src/engine/types';
+import { DT, TILE } from '../src/engine/types';
+import { SLOPE_CATCH } from '../src/engine/physics';
+import { PHYS } from '../src/engine/player';
 
 /**
  * Contracts every level has to keep, checked against the level data itself
@@ -113,4 +115,48 @@ test('every level id is unique and reachable from the tour map', async () => {
   const { CHAPTERS } = await import('../src/map/atlas');
   const pinned = CHAPTERS.flatMap((c) => c.sites.map((s) => s.level)).filter(Boolean);
   for (const id of ids) expect(pinned).toContain(id);
+});
+
+test('every slope meets its floors at their tile tops, lies over its tiles, is not too steep, and has headroom', () => {
+  // The rules in engine/level.ts SlopeDef. A tile edge standing over the line stops him
+  // dead halfway up; a ceiling within his height of it is one the lift puts him into;
+  // and a slope is never part of the walk-in, which promises flat floor.
+  const bad: string[] = [];
+  each((data, level) => {
+    for (const s of data.slopes ?? []) {
+      const at = `${data.id}: the slope from ${s.x0},${s.y0} to ${s.x1},${s.y1}`;
+      if (!(s.x0 < s.x1)) bad.push(`${at} runs backwards`);
+      if ([s.x0, s.y0, s.x1, s.y1].some((v) => v % TILE !== 0)) bad.push(`${at} does not end on tile corners`);
+      // Each end on a floor at its tile top: the tile beyond the end is solid, with air over it.
+      const ends: [number, number][] = [
+        [s.x0 / TILE - 1, s.y0 / TILE],
+        [s.x1 / TILE, s.y1 / TILE],
+      ];
+      for (const [tx, ty] of ends) {
+        if (!level.isSolid(tx, ty) || level.isSolid(tx, ty - 1)) bad.push(`${at} does not meet a floor top at tile ${tx},${ty}`);
+      }
+      const g = Math.abs(s.y1 - s.y0) / (s.x1 - s.x0);
+      // The lift catches him only within SLOPE_CATCH of the line: a steeper slope rises
+      // past his foot in a frame at run speed, and he walks into the fill under it.
+      if (g * PHYS.runSpeed * DT > SLOPE_CATCH) bad.push(`${at} is too steep: it rises more than SLOPE_CATCH in a frame at run speed`);
+      const line = (x: number) => s.y0 + ((s.y1 - s.y0) * (x - s.x0)) / (s.x1 - s.x0);
+      for (let tx = s.x0 / TILE; tx < s.x1 / TILE; tx++) {
+        const a = line(tx * TILE);
+        const b = line((tx + 1) * TILE);
+        const low = Math.max(a, b);
+        const high = Math.min(a, b);
+        for (let ty = 0; ty < level.heightTiles; ty++) {
+          if (!level.isSolid(tx, ty)) continue;
+          const top = ty * TILE;
+          // Under the line all the way across, or clear over it by his height and his
+          // width's worth of the gradient (he stands on the line by his uphill foot).
+          if (top >= low) continue;
+          if (top + TILE <= high - PLAYER_H - PLAYER_W * g) continue;
+          bad.push(`${at}: tile ${tx},${ty} is in the way`);
+        }
+      }
+      if (s.x0 < data.spawn.x + PLAYER_W && data.arrival !== 'appear') bad.push(`${at} is in the walk-in`);
+    }
+  });
+  expect(bad).toEqual([]);
 });

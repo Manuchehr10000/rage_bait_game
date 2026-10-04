@@ -1,4 +1,4 @@
-import type { Level } from './level';
+import type { Level, SlopeDef } from './level';
 import { overlaps, type Rect } from './types';
 
 export interface Contacts {
@@ -34,6 +34,12 @@ export function moveAndCollide(
   const oldX = body.x;
   const oldBottom = body.y + body.h;
   body.x += dx;
+  // A slope under him rises with him: lift him onto it before the walls are tested, or
+  // the tile edge at the head of a climb would stop him for a frame.
+  for (const s of level.slopes) {
+    const sy = slopeTop(s, body);
+    if (sy !== null && body.y + body.h > sy && oldBottom <= sy + SLOPE_CATCH) body.y = sy - body.h;
+  }
   tiles.length = 0;
   level.solidTilesIn(body, tiles);
   for (const s of tiles) resolveX(body, s, dx, c, oldX);
@@ -47,6 +53,14 @@ export function moveAndCollide(
     if (s.oneWay && (dy < 0 || oldBottom > s.rect.y + 0.5)) continue;
     resolveY(body, s.rect, dy, c, true);
   }
+  // Coming down onto a slope, or walking down one: stand on it. Solid from above only.
+  if (dy >= 0)
+    for (const s of level.slopes) {
+      const sy = slopeTop(s, body);
+      if (sy === null || body.y + body.h < sy || oldBottom > sy + SLOPE_CATCH) continue;
+      body.y = sy - body.h;
+      c.down = true;
+    }
   return c;
 }
 
@@ -87,5 +101,32 @@ export function groundBelow(body: Rect, level: Level, dynamicSolids: readonly Dy
     if (s.oneWay && body.y + body.h > s.rect.y + 0.5) continue;
     if (overlaps(probe, s.rect)) return s.rect;
   }
+  for (const s of level.slopes) {
+    const sy = slopeTop(s, body);
+    if (sy !== null && Math.abs(body.y + body.h - sy) <= 0.01) return SLOPE_GROUND;
+  }
   return null;
+}
+
+/**
+ * How far below a slope's line his feet may have been last frame and still be put on
+ * it. Covers the rise of a frame at run speed on anything up to about 1.33 in 1; the
+ * slopes in the game are 1 in 3, half a pixel a frame.
+ */
+export const SLOPE_CATCH = 2;
+
+/** What groundBelow returns for a slope. Never any moving solid's rect, so he rides nothing. */
+const SLOPE_GROUND: Rect = { x: 0, y: 0, w: 0, h: 0 };
+
+/**
+ * The highest point of the slope under the body's width, or null if the body is not
+ * over it. The highest, not the middle: his uphill foot is on the line, so the head
+ * and the foot of a slope meet their floors without a step.
+ */
+export function slopeTop(s: SlopeDef, body: Rect): number | null {
+  const a = Math.max(body.x, s.x0);
+  const b = Math.min(body.x + body.w, s.x1);
+  if (a > b) return null;
+  const at = (x: number) => s.y0 + ((s.y1 - s.y0) * (x - s.x0)) / (s.x1 - s.x0);
+  return Math.min(at(a), at(b));
 }

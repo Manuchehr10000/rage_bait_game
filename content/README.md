@@ -13,6 +13,7 @@ content/
   site/                      the tab icon's note
   ch01-palaeolithic/         five levels built, laid out as below
   ch03-aegean/               Knossos built rough; Phaistos designed; the rest decided
+  ch04-persia/               Persepolis built rough; the rest in its ruled order, not designed
   ch02-egypt/
     CHAPTER.md               the period, the costume, the tone of the chapter
     shared/                  art used by every level of the chapter (the tourist, the ankh block)

@@ -100,13 +100,17 @@ const TOUR: Chapter[] = [
     name: 'Iron Age Near East & Persia',
     dates: '900–330 BC',
     anchor: 0,
+    costume: 'falseBeard',
     monument: { site: 0, art: 'apadana' },
+    // Ruled 2026-10-03: the three Fars sites, then west to Susa on the Khuzestan plain,
+    // then up the Zagros road to Behistun. The Fars pins sit a few pixels apart, so two
+    // are nudged off Persepolis, with leader lines back to where they are.
     sites: [
-      { name: 'Persepolis', lat: 29.93, lon: 52.89 },
-      { name: 'Behistun', lat: 34.39, lon: 47.44 },
-      { name: 'Naqsh-e Rustam', lat: 29.99, lon: 52.87 },
+      { name: 'Persepolis', lat: 29.93, lon: 52.89, level: 'persepolis' },
+      { name: 'Naqsh-e Rustam', lat: 29.99, lon: 52.87, pin: { dx: -12, dy: 2 } },
+      { name: 'Pasargadae', lat: 30.2, lon: 53.18, pin: { dx: 10, dy: -8 } },
       { name: 'Susa', lat: 32.19, lon: 48.26 },
-      { name: 'Pasargadae', lat: 30.2, lon: 53.18 },
+      { name: 'Behistun', lat: 34.39, lon: 47.44 },
     ],
   },
   {

@@ -1,0 +1,157 @@
+{
+  "$comment": "Sizes are world pixels (320 x 180 view). Painted files are 4x. See content/README.md. Every carving is listed one world pixel wider and taller than its figure, for the one-pixel shadow it throws down and to the left; the game blits it one pixel left of the figure's place. A carving with two frames has frame 0 facing right and frame 1 facing left, each lit from the upper right; one with one frame is painted the way it stands. Drawn by the game and not listed: the sky and the sun; the Marvdasht plain and its far hills; the treads, risers and side masonry of every stair, drawn by the code that draws the ashlar tiles so the two are one masonry; the Gate's piers (their blocks, broken tops and plinths); the columns of the Gate and of the Apadana, one drawing (fluted shaft, square double plinth or bell base, broken top, no capital); the polished benches; the Tachara's door jambs and the cavetto cornices on its lintels; the Apadana façade's wall, merlons, registers, mouldings, the flights' slopes, the plain band and the blank; the shelter and its posts; the dark edge each guard has standing out in the court; the tourist turned to stone (the 'carved' death), drawn in front of the guards where he died, which the game makes from his own frame; the visitors' names (the game's own nameScratch). The exit is the game's own plain exit.",
+  "level": "l01-persepolis",
+  "assets": [
+    {
+      "id": "tile-persepolis-earth",
+      "w": 16,
+      "h": 16,
+      "beat": "a-stairs",
+      "what": "The Marvdasht plain's earth, dry and dusty, under the plain and under the foot of the stair."
+    },
+    {
+      "id": "tile-persepolis-earth-top",
+      "w": 16,
+      "h": 16,
+      "beat": "a-stairs",
+      "what": "The same with sky over it: the plain's trodden surface where he walks in."
+    },
+    {
+      "id": "tile-persepolis-ashlar",
+      "w": 16,
+      "h": 16,
+      "beat": "a-stairs",
+      "what": "The terrace's masonry: big grey limestone blocks, unmortared, in courses, an empty dovetail clamp socket at some joints. Everything under a floor, under every stair and under the landing."
+    },
+    {
+      "id": "tile-persepolis-ashlar-top",
+      "w": 16,
+      "h": 16,
+      "beat": "a-stairs",
+      "what": "The same with sky over it: the bare top of a course, on the landing. Under a stair the game uses the plain tile, because the stair is over it."
+    },
+    {
+      "id": "tile-persepolis-court",
+      "w": 16,
+      "h": 16,
+      "beat": "b-gate",
+      "what": "The terrace's top course with something on it. Not used in the level as built; listed because the code can ask for it."
+    },
+    {
+      "id": "tile-persepolis-court-top",
+      "w": 16,
+      "h": 16,
+      "beat": "b-gate",
+      "what": "The terrace's surface, dusty grey-buff over the top course: the Gate, the Tachara's platform and the Apadana's court."
+    },
+    {
+      "id": "gate-bull",
+      "w": 31,
+      "h": 29,
+      "beat": "b-gate",
+      "what": "A bull of the west portal of the Gate of All Nations, in profile, four legs, on the passage wall. Faces left, out of the gate, as it stands; not flipped."
+    },
+    {
+      "id": "gate-lamassu",
+      "w": 31,
+      "h": 41,
+      "beat": "b-gate",
+      "what": "A human-headed winged bull of the east portal, in profile: tall cylindrical crown, curled beard, wing swept back, four legs. Faces right, out of the gate, as it stands; not flipped."
+    },
+    {
+      "id": "tile-persepolis-polished",
+      "w": 16,
+      "h": 16,
+      "beat": "c-tachara",
+      "what": "A lintel of the Tachara in its dark polished limestone, with something on top of it. Not used in the level as built; listed because the code can ask for it."
+    },
+    {
+      "id": "tile-persepolis-polished-top",
+      "w": 16,
+      "h": 16,
+      "beat": "c-tachara",
+      "what": "A lintel of the Tachara, one tile, dark polished limestone with a soft highlight, sky over it. Solid: he bumps his head on it in the doorway."
+    },
+    {
+      "id": "tachara-window",
+      "w": 29,
+      "h": 30,
+      "beat": "c-tachara",
+      "what": "A window or niche block of the Tachara standing alone, one stone of the dark polished limestone, a stepped frame round a dark opening, a cavetto cornice on top. Windows and niches are the same from outside: one painting for both."
+    },
+    {
+      "id": "tachara-jamb-king",
+      "w": 17,
+      "h": 35,
+      "beat": "c-tachara",
+      "what": "The carving on the far jamb of a Tachara doorway: the king walking out of the hall, an attendant behind him, drawn smaller, holding the parasol over him. In the polished stone. Two frames: walking right, walking left.",
+      "frames": 2
+    },
+    {
+      "id": "apadana-guard",
+      "w": 10,
+      "h": 29,
+      "beat": "d-apadana",
+      "what": "A guard of the east stair's central projection: fluted hat, curled beard, long robe, spear upright in front of him. All eight are this one figure, in the wall and standing out in the court. Two frames: facing right (the left file), facing left (the right file).",
+      "frames": 2
+    },
+    {
+      "id": "apadana-sphinx",
+      "w": 17,
+      "h": 17,
+      "beat": "d-apadana",
+      "what": "A sphinx seated under the winged disc, a lion's body, a crowned and bearded man's head, a wing curving up, facing the disc. Two frames: facing right, facing left.",
+      "frames": 2
+    },
+    {
+      "id": "winged-disc",
+      "w": 14,
+      "h": 6,
+      "beat": "d-apadana",
+      "what": "The winged disc at the head of the central projection: small and plain, a disc, two wings, a tail. Never animated."
+    },
+    {
+      "id": "apadana-lion-bull",
+      "w": 25,
+      "h": 17,
+      "beat": "d-apadana",
+      "what": "The lion leaping on the bull, in the angle under each flight by the central projection. Two frames: as on the left flight, and mirrored for the right.",
+      "frames": 2
+    },
+    {
+      "id": "apadana-delegate",
+      "w": 6,
+      "h": 12,
+      "beat": "d-apadana",
+      "what": "A delegate of the south wing walking right with his gift. Every delegate in the three registers is this one figure. Faces right as it stands."
+    },
+    {
+      "id": "apadana-usher",
+      "w": 7,
+      "h": 12,
+      "beat": "d-apadana",
+      "what": "The usher at the head of each delegation, walking right and holding the leader's hand behind him. Faces right as it stands."
+    },
+    {
+      "id": "apadana-noble-persian",
+      "w": 6,
+      "h": 12,
+      "beat": "d-apadana",
+      "what": "A Persian noble of the north wing, fluted hat and long robe, walking left. Faces left as it stands; not flipped."
+    },
+    {
+      "id": "apadana-noble-median",
+      "w": 6,
+      "h": 12,
+      "beat": "d-apadana",
+      "what": "A Median noble of the north wing, rounded cap, belted tunic and trousers, walking left. Faces left as it stands; not flipped."
+    },
+    {
+      "id": "apadana-cypress",
+      "w": 4,
+      "h": 12,
+      "beat": "d-apadana",
+      "what": "A cypress, carved between the delegations of the south wing and in a row up each flight."
+    }
+  ]
+}

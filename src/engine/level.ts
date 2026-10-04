@@ -11,7 +11,33 @@ import { TILE, type Costume, type DeathCause, type Rect } from './types';
  */
 export type TileChar = ' ' | '#' | '=' | '%' | '?' | 'x';
 
-export type Theme = 'capBlanc' | 'rocAuxSorciers' | 'pechMerle' | 'rouffignac' | 'gargas' | 'abuSimbel' | 'philae' | 'karnak' | 'dendera' | 'knossos';
+export type Theme =
+  | 'capBlanc'
+  | 'rocAuxSorciers'
+  | 'pechMerle'
+  | 'rouffignac'
+  | 'gargas'
+  | 'abuSimbel'
+  | 'philae'
+  | 'karnak'
+  | 'dendera'
+  | 'knossos'
+  | 'persepolis';
+
+/**
+ * A floor that is a straight line from (x0, y0) to (x1, y1), x0 < x1: a stair of risers
+ * too low to step over one by one, walked up and down as a ramp. Solid from above only.
+ * The rules for placing one (tests/levels.spec.ts holds them): each end meets a floor
+ * at its tile top, every solid tile under it lies wholly on or below the line, it rises
+ * no more than SLOPE_CATCH in a frame at run speed (about 4 in 3), there is a
+ * tourist's height of headroom over it, and it is never part of the walk-in.
+ */
+export interface SlopeDef {
+  x0: number;
+  y0: number;
+  x1: number;
+  y1: number;
+}
 
 // ---------------------------------------------------------------------------
 // Entities. Every trap in the game is one of these, with a skin for the renderer.
@@ -433,7 +459,37 @@ export interface DoorDef {
   cause: DeathCause;
 }
 
+/**
+ * Two files of guards carved either side of a blank, facing in. On the clock they step
+ * out of the wall into the court where they are carved, stand there, and step back.
+ * They never move sideways and never step into the blank between them: that is the
+ * king's place. While they are out, a guard's body in the court is not a place to be.
+ * Never solid. The eight are one body, drawn from one sprite (pillar 4).
+ */
+export interface GuardsDef {
+  kind: 'guards';
+  /** The court's floor, where they stand when they are out. */
+  floorY: number;
+  /** The centre of the blank between the files. */
+  centreX: number;
+  /** The width of the king's place, between the inner guards. */
+  gap: number;
+  /** Guards in each file, shoulder to shoulder. */
+  perFile: number;
+  /** One guard's body. The spear is drawn taller and is not part of it. */
+  guardW: number;
+  guardH: number;
+  /**
+   * The court's clock: it starts when his centre crosses `triggerX`. They first begin
+   * to step out at `first` seconds and every `period` after; stepping out or back takes
+   * `step` seconds, and they stand out in the court for `stand`.
+   */
+  clock: { triggerX: number; first: number; period: number; step: number; stand: number };
+  cause: DeathCause;
+}
+
 export type EntityDef =
+  | GuardsDef
   | SpanDef
   | SeatDef
   | DoorDef
@@ -602,7 +658,70 @@ export type DecorDef =
   /** The stepped rainwater channel beside a stair, from its head to its foot. */
   | { kind: 'runnel'; x0: number; y0: number; x1: number; y1: number }
   /** A square catch-pit in the runnel, with silt in it. */
-  | { kind: 'catchPit'; x: number; floorY: number };
+  | { kind: 'catchPit'; x: number; floorY: number }
+  // Persepolis.
+  /**
+   * A flight of the terrace's stairs, drawn over a slope with the same ends: the step
+   * lines along it, one riser to a pixel of rise, and the masonry face under it.
+   * `steps` is the real flight's count where it is known, for the notes; the drawing
+   * does not count them.
+   */
+  | { kind: 'persepolisStair'; x0: number; y0: number; x1: number; y1: number; steps?: number }
+  /**
+   * One pier of a portal of the Gate of All Nations, on the wall of the passage, in
+   * depth: he walks between the pair. The figure is carved on it in profile, facing
+   * out of the gate: plain bulls on the west portal, human-headed winged bulls on the east.
+   */
+  | { kind: 'gatePier'; x: number; w: number; floorY: number; top: number; figure: 'bull' | 'lamassu'; face: 1 | -1 }
+  /**
+   * A column of the Gate's hall: a fluted shaft on its base, `x` its axis, broken off at
+   * `height` over the floor, no capital, nothing on it. Drawn by the same function as the Apadana's.
+   */
+  | { kind: 'gateColumn'; x: number; floorY: number; height: number }
+  /**
+   * A column of the Apadana, standing on its platform behind the east stair: a fluted
+   * shaft, `x` its axis, broken off at `height`, no capital, nothing on it. The same
+   * drawing as the Gate's.
+   */
+  | { kind: 'apadanaColumn'; x: number; floorY: number; height: number }
+  /** A bench of polished black stone along the back wall of the Gate's hall, where delegations waited. */
+  | { kind: 'polishedBench'; x0: number; x1: number; floorY: number }
+  /**
+   * A stone frame of the Tachara standing alone where its mud-brick wall has gone. A
+   * window and a niche are the same block from outside, cut from one stone with a
+   * cavetto cornice on top, `x` its left edge. A door is drawn in section: the far jamb
+   * of the doorway between `x` and `x + 16`, under the lintel the tile above it is.
+   */
+  | { kind: 'tacharaFrame'; x: number; floorY: number; form: 'window' | 'niche' | 'door' }
+  /**
+   * The carving on the far jamb of a Tachara doorway: the king walking out of the hall,
+   * under a parasol held by an attendant. `face` is the way he walks: out of the hall.
+   */
+  | { kind: 'jambRelief'; x: number; floorY: number; face: 1 | -1 }
+  /**
+   * The east stair of the Apadana, seen from the court: the back wall. Left to right, a
+   * stretch of the south wing (delegations walking right), the left flight's triangle,
+   * the central projection centred on `centreX` and `projectionW` wide (the winged disc,
+   * the two sphinxes, the plain band, four guards each side facing in, the blank), the
+   * right flight's triangle mirrored, a stretch of the north wing (nobles walking left),
+   * the north end at `x1`. Each triangle is `flightW` wide. `top` is the head of the
+   * projection; the wings and the flights stop at `platformY`, the Apadana's platform,
+   * which runs back behind the façade. The guards themselves are the `guards` entity,
+   * which draws them in the wall and out of it.
+   */
+  | {
+      kind: 'apadanaFacade';
+      x0: number;
+      x1: number;
+      floorY: number;
+      top: number;
+      platformY: number;
+      centreX: number;
+      projectionW: number;
+      flightW: number;
+    }
+  /** The shelter over the east stair since the mid-1990s: a flat roof on steel posts, its underside at `y`. */
+  | { kind: 'apadanaShelter'; x0: number; x1: number; y: number; floorY: number };
 
 /** The painted panels the game draws on cave rock, by site. */
 export type CavePanel =
@@ -635,6 +754,8 @@ export interface LevelData {
   exit: Rect | null;
   /** Lowest world y the camera will show. */
   cameraBottom: number;
+  /** Floors that are ramps: stairs whose risers are too low to step over one by one. */
+  slopes?: readonly SlopeDef[];
   /** Where the hill begins for the Abu Simbel backdrop, in px. */
   rockFromX?: number;
   /** What falling off the bottom is called here. */
@@ -663,9 +784,12 @@ export class Level {
   readonly heightTiles: number;
   readonly widthPx: number;
   readonly heightPx: number;
+  /** The level's slopes. None in most levels, and then nothing about collision changes. */
+  readonly slopes: readonly SlopeDef[];
   private tiles: TileChar[];
 
   constructor(readonly data: LevelData) {
+    this.slopes = data.slopes ?? [];
     this.widthTiles = data.widthTiles;
     this.heightTiles = data.heightTiles;
     this.widthPx = this.widthTiles * TILE;

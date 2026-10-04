@@ -60,14 +60,16 @@ line runs round the façade and round each column.
 The chapter 4 panel on the tour map: the plate that stands for the chapter. The panel is
 the right-hand strip of the start screen, and the game prints this plate in it, 92 × 70,
 whenever chapter 4 is the chapter in view. The game lays paper under it, draws a thin
-keyline round it, and sets the site's name, Persepolis, beneath. Chapter 4 has no built
-level yet, so it has no chapter map, and the plate appears on the world map only. Until
-the painting is listed and loaded, the game draws the flat silhouette `apadana` in
-`src/map/monuments.ts` in its place.
+keyline round it, and sets the site's name, Persepolis, beneath. Since Persepolis was
+built as the chapter's level 1 (2026-10-03), chapter 4 has its own map
+(`content/map/map-ch04-persia.md`), and the plate is printed in the panel on the world map
+and on the chapter's map alike. Until the painting is listed and loaded, the game draws the
+flat silhouette `apadana` in `src/map/monuments.ts` in its place.
 
-Persepolis is one of chapter 4's five candidate sites in `content/research/arc.md`, as
-the map README requires. The chapter is a candidate, not locked, and the site has no
-level number yet. This plate does not give it one.
+Persepolis is one of chapter 4's five sites in `content/research/arc.md`, as the map
+README requires. The chapter was locked on 2026-09-26, and Persepolis is its level 1 by the
+order ruled on 2026-10-03 (`arc.md`, section 4). The plate's site, `monument: { site: 0 }`
+in `src/map/atlas.ts`, is that level's.
 
 The research file names the vignette `map-monument-ch04-persepolis`. The game builds the
 id from the chapter's slug, so the file is `map-monument-ch04-persia`.
@@ -76,9 +78,11 @@ id from the chapter's slug, so the file is `map-monument-ch04-persia`.
 
 - No column carries a capital. No bulls, lions or griffins on any column top, and no
   horns left off because there are no heads to leave them off. Every Apadana capital is
-  fallen, in fragments on the ground, or in a museum. The code silhouette and the
-  chapter 4 row in `content/map/README.md` still crown every column with double bulls;
-  the research marks that as an accidental error. Neither has been corrected yet.
+  fallen, in fragments on the ground, or in a museum. The code silhouette `apadana` in
+  `src/map/monuments.ts`, drawn until the plate loads, still crowns every column with
+  double bulls; the research marks that as an accidental error, and it has not been
+  corrected yet. The chapter 4 row in `content/map/README.md` has been: it names the
+  Apadana and its eastern stair, and crowns nothing.
 - The columns stand free, at irregular gaps. They are survivors from a grid of 72, not a
   colonnade.
 - No roof, no beam and no wall between or behind the columns. The mud-brick walls are
@@ -96,12 +100,13 @@ id from the chapter's slug, so the file is `map-monument-ch04-persia`.
   sandstone of chapter 2: one stone per site. No paint on the reliefs; the original
   colour is lost, and showing it would be a reconstruction.
 - The winged disc is small and plain, and never a gag. The winged symbol is a living
-  community's emblem today (pillar 11).
+  community's emblem today (pillar 11; ruled 2026-10-03, `arc.md` section 4).
 - The repeated figures are the same pixels: every bearer, cypress, guard, merlon and
   sphinx on one side is one stamp (pillar 4). Figures facing the other way are one second
   stamp, lit from the same side.
 - No mountain behind the stair or the columns. Kuh-e Rahmat is east, behind the viewer.
-  The royal tombs cut into it are out of frame with it.
+  The royal tombs cut into it are out of frame with it, as the chapter's graves rule keeps
+  them (`arc.md` section 4, 2026-10-03).
 - No lamassu and no human-headed bull anywhere. They belong to the Gate of All Nations,
   and at this size they read as Assyria, whose Nimrud and Nineveh are excluded from the
   chapter.
@@ -123,8 +128,13 @@ id from the chapter's slug, so the file is `map-monument-ch04-persia`.
 - The stair's shadow on the court. The research's lighting note asks for no cast shadow
   on the ground, after `content/README.md`. That rule is for sprites standing on tiles;
   this plate has no tiles, and the Abu Simbel plate carries its shadows the same way.
-- Modern intrusions are left out: the barrier in front of the reliefs, scaffolding on the
-  columns, signs, ropes and visitors. At 92 × 70 they would read as parts of the monument.
+- Modern intrusions are left out: the permanent shelter over the east stair, a flat roof
+  on steel posts over the façade and a strip of the court, there since the mid-1990s
+  (Lonely Planet; a folding wooden roof of 1950 before it, *Science of the Total
+  Environment* 2016); the barrier in front of the reliefs, scaffolding on the columns,
+  signs, ropes and visitors. At 92 × 70 they would read as parts of the monument. The
+  level, which is not a brochure, draws the shelter
+  (`content/ch04-persia/l01-persepolis/LEVEL.md`).
 - The registers are a rhythm of one small figure, not the twenty-three delegations. At
   this size a delegation is a few pixels, and inventing identifiable costumes would be
   making things up. The cypresses between groups, and the walking direction on each wing,
@@ -165,8 +175,8 @@ Keep these as disputes. None is settled by the plate.
   one intact double-griffin capital's building is unproven. Popular claims of lamassu
   capitals in the Apadana are unsupported.
 - Flandin & Coste's date: issued in parts 1843–1854 (Bibliorare, Gallica, HathiTrust),
-  1881–82 according to Drawing Matter, 1851 in `arc.md`, probably the date of the *Perse
-  ancienne* volumes.
+  which `arc.md` now gives; 1881–82 according to Drawing Matter; 1851, which `arc.md` gave
+  until 2026-09-24, probably the date of the *Perse ancienne* volumes.
 - The northern wing's figures and the exact profile of the flights: standard
   descriptions, not re-checked.
 

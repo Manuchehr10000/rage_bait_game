@@ -111,13 +111,29 @@ test('the game shows chapters 1 to 4 and nothing beyond them', async ({ page }) 
 });
 
 test('a closed chapter stays closed', async ({ page }) => {
+  // Every shown chapter has a level now, so the last one is closed for this test by
+  // taking its levels away, in this page only: a chapter with nothing built in it is
+  // what "closed" means (chapterOpen in src/map/atlas.ts).
   await press(page, 'ArrowLeft');
   let s = await snap(page);
   expect(s.chapter).toBe(SHOWN - 1);
+  await page.evaluate(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const m = (window as unknown as { __game: any }).__game.mapScreen;
+    for (const site of m.current.sites) delete site.level;
+  });
   await press(page, 'Enter');
   s = await snap(page);
   expect(s.view).toBe('world');
   expect(s.chapter).toBe(SHOWN - 1);
+});
+
+test('a chapter with nothing built in it is closed; one level opens it', async () => {
+  const { CHAPTERS, chapterOpen } = await import('../src/map/atlas');
+  for (const c of CHAPTERS) {
+    expect(chapterOpen({ ...c, sites: c.sites.map(({ level: _level, ...site }) => site) }), c.name).toBe(false);
+    expect(chapterOpen(c), c.name).toBe(c.sites.some((site) => site.level));
+  }
 });
 
 test('arrow keys walk the chapters; Enter walks into Egypt from the left edge; Escape comes back', async ({ page }) => {
@@ -482,11 +498,11 @@ test('in a chapter every pin carries its number, the same as its bead on the rib
       seen.push({ text, x, y, color: String(ctx.fillStyle) });
       fillText(text, x, y);
     };
-    // Chapters 1 and 2, each with every site selected in turn. A pin is a site
+    // Chapters 1 to 4, each with every site selected in turn. A pin is a site
     // with a level, or the selected one, and its number is card on a filled pin
     // (selected or cleared) and route red on an open one; the rest are dots with
     // no number at all.
-    for (const c of [0, 1]) {
+    for (const c of [0, 1, 2, 3]) {
       m.openChapter(c);
       for (let sel = 0; sel < m.current.sites.length; sel++) {
         m.site = sel;
@@ -514,4 +530,10 @@ test('in a chapter every pin carries its number, the same as its bead on the rib
   expect(printed.got['ch2 sel1 site4']).toBe('4:route');
   expect(printed.got['ch2 sel1 site5']).toBe('dot');
   expect(printed.got['ch2 sel4 site4']).toBe('4:card');
+  // Chapter 4 has one level: Persepolis is a pin, and its neighbours in Fars, nudged off
+  // it, are dots until they are selected.
+  expect(printed.got['ch4 sel1 site1']).toBe('1:card');
+  expect(printed.got['ch4 sel1 site2']).toBe('dot');
+  expect(printed.got['ch4 sel2 site1']).toBe('1:route');
+  expect(printed.got['ch4 sel2 site2']).toBe('2:card');
 });

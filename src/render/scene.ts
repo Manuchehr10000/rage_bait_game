@@ -1,5 +1,5 @@
 import type { Camera } from '../engine/camera';
-import type { Chaser, Crumble, Door, Entity, Falling, Horse, Platform, Pusher, Roof, Seat, Span, Sweep, Thrower, Tipper, Water } from '../engine/entities';
+import type { Chaser, Crumble, Door, Entity, Falling, Guards, Horse, Platform, Pusher, Roof, Seat, Span, Sweep, Thrower, Tipper, Water } from '../engine/entities';
 import type { DecorDef, DoorDef, Level, SpanDef } from '../engine/level';
 import type { Player } from '../engine/player';
 import {
@@ -47,7 +47,7 @@ import {
 } from './procedural';
 import { DEATH_ANIM, TILE, VIEW_H, VIEW_W, type Costume, type DeathCause, type Rect } from '../engine/types';
 import { paint } from '../engine/assets';
-import { blit, blitFacing, frameOf, silhouette, withLamp, type Frame } from './frame';
+import { blit, blitFacing, frameOf, relief, silhouette, withLamp, type Frame, type ReliefTones } from './frame';
 import { SPLINTER, handStencils } from './hands';
 import { hash } from './hash';
 import { TRAIN, type Train } from '../engine/entities';
@@ -57,7 +57,21 @@ import {
   BULL_LEAPER_ENTHRONED,
   BULL_LEAPER_FRAMES,
   BULL_LEAPER_SEATED,
+  CYPRESS_SPRITE,
+  DELEGATE_SPRITE,
   EVANS_BUST_SPRITE,
+  FALSE_BEARD_FRAMES,
+  FALSE_BEARD_SEATED,
+  GATE_BULL_SPRITE,
+  GATE_LAMASSU_SPRITE,
+  GUARD_SPRITE,
+  JAMB_KING_SPRITE,
+  LION_BULL_SPRITE,
+  NOBLE_MEDIAN_SPRITE,
+  NOBLE_PERSIAN_SPRITE,
+  SPHINX_SEATED_SPRITE,
+  USHER_SPRITE,
+  WINGED_DISC_SPRITE,
   GIANT_PITHOS_SPRITE,
   GRIFFIN_SPRITE,
   PITHOS_SPRITE,
@@ -245,6 +259,7 @@ export function renderWorld(ctx: CanvasRenderingContext2D, s: Scene): void {
 
   if (theme === 'dendera') drawDenderaSky(ctx, s, cy);
   else if (theme === 'knossos') drawKnossosSky(ctx, cy);
+  else if (theme === 'persepolis') drawPersepolisSky(ctx, cy);
   else drawSky(ctx, cy, theme);
   if (theme === 'capBlanc') drawFarBeune(ctx, cx, cy);
   else if (theme === 'rocAuxSorciers') drawFarAnglin(ctx, cx, cy);
@@ -253,6 +268,7 @@ export function renderWorld(ctx: CanvasRenderingContext2D, s: Scene): void {
   else if (theme === 'philae') drawFarIsland(ctx, cx, cy);
   else if (theme === 'dendera') drawFarDendera(ctx, cx, cy);
   else if (theme === 'knossos') drawFarKnossos(ctx, cx, cy);
+  else if (theme === 'persepolis') drawFarPersepolis(ctx, cx, cy);
   else drawFarKarnak(ctx, cx, cy);
 
   ctx.save();
@@ -260,7 +276,7 @@ export function renderWorld(ctx: CanvasRenderingContext2D, s: Scene): void {
 
   if (theme === 'abuSimbel') drawRock(ctx, s, cx, cy);
   else if (theme === 'philae') drawRiverbed(ctx, s, cx, cy);
-  else if (theme !== 'dendera' && theme !== 'knossos') drawKarnakGround(ctx, s, cx, cy);
+  else if (theme !== 'dendera' && theme !== 'knossos' && theme !== 'persepolis') drawKarnakGround(ctx, s, cx, cy);
   for (const d of level.data.decor) drawDecor(ctx, s, d);
   drawTiles(ctx, level, cx, cy);
   for (const e of s.entities) drawEntityBack(ctx, s, e);
@@ -1470,6 +1486,17 @@ function drawDecor(ctx: CanvasRenderingContext2D, s: Scene, d: DecorDef): void {
     case 'catchPit':
       drawKnossosDecor(ctx, s, d);
       break;
+    case 'persepolisStair':
+    case 'gatePier':
+    case 'gateColumn':
+    case 'apadanaColumn':
+    case 'polishedBench':
+    case 'tacharaFrame':
+    case 'jambRelief':
+    case 'apadanaFacade':
+    case 'apadanaShelter':
+      drawPersepolisDecor(ctx, s, d);
+      break;
     case 'landing': {
       // Mooring posts on the landing stage.
       ctx.fillStyle = COLORS.wood;
@@ -1599,6 +1626,13 @@ function drawTileAt(
   y = ty * TILE,
 ): void {
   const theme = level.data.theme;
+  if (theme === 'persepolis' && (c === '=' || c === '#' || c === '%')) {
+    // A tile a stair stands on is under the stair, not the sky.
+    const under = open && underSlope(level, tx * TILE, ty * TILE);
+    const stone = persepolisStone(level, c, tx, ty);
+    if (!paint(ctx, persepolisTileId(stone, open && !under), x, y)) drawPersepolisTile(ctx, stone, tx, ty, x, y, open && !under);
+    return;
+  }
   if (paint(ctx, tileArtId(theme, c, open), x, y)) return;
   if (theme === 'knossos' && (c === '=' || c === '#' || c === '%')) {
     drawKnossosTile(ctx, c, tx, ty, x, y, open);
@@ -2108,6 +2142,9 @@ function drawEntityBack(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): voi
     }
     case 'door':
       drawDoorLeaf(ctx, d, (e as Door).k);
+      break;
+    case 'guards':
+      drawGuards(ctx, e as Guards);
       break;
     default:
       break;
@@ -2640,6 +2677,7 @@ const COSTUMES: Record<
   hiker: { id: 'hiker', frames: HIKER_FRAMES, seated: HIKER_SEATED, lamp: { x: 10, y: 4 }, held: HIKER_HELD },
   pharaoh: { id: 'tourist', frames: TOURIST_FRAMES, seated: TOURIST_SEATED },
   bullLeaper: { id: 'bull-leaper', frames: BULL_LEAPER_FRAMES, seated: BULL_LEAPER_SEATED, enthroned: BULL_LEAPER_ENTHRONED },
+  falseBeard: { id: 'false-beard', frames: FALSE_BEARD_FRAMES, seated: FALSE_BEARD_SEATED },
 };
 
 /** Light the lamp on a frame, if this costume has one and it is switched on. */
@@ -2762,6 +2800,9 @@ function drawDeath(ctx: CanvasRenderingContext2D, s: Scene, death: { cause: Deat
       else blitFacing(ctx, f, x, feetY - f.h, p.facing);
       break;
     }
+    case 'carved':
+      drawCarved(ctx, s, death);
+      break;
   }
 }
 
@@ -3612,4 +3653,740 @@ function drawDaylight(ctx: CanvasRenderingContext2D, s: Scene, cx: number, cy: n
     ctx.fillStyle = 'rgba(255, 251, 234, 0.3)';
     ctx.fillRect(x, r.y + r.h - 3 - cy, r.w, 3);
   }
+}
+
+// ---------------------------------------------------------------------------
+// Persepolis: one grey limestone for the terrace, its stairs and its carvings; the
+// Tachara's darker, polished stone; the Marvdasht plain under a dry, cloudless sky.
+// Light from the upper right, shadows down and to the left. No green and no water.
+// ---------------------------------------------------------------------------
+
+const PS = {
+  skyTop: '#6f9dca',
+  skyBottom: '#e6e5da',
+  sun: '#fffbea',
+  hills: '#adaeaa',
+  hillsShade: '#9c9d99',
+  plainFar: '#d2bf98',
+  plain: '#c6ab7e',
+  plainLine: '#b79c6f',
+  /** The plain's earth. */
+  dust: '#c4a87a',
+  dustDark: '#a88d61',
+  dustLight: '#d8c49a',
+  /** The limestone: sun, body, deep (apadana.js), and the carved field, stains and fresh breaks. */
+  lit: '#d4c8b0',
+  body: '#b2a895',
+  deep: '#7f7a73',
+  relief: '#8e8b85',
+  stain: '#a67a52',
+  fresh: '#e2d9c6',
+  court: '#d6c39c',
+  courtLine: '#c3b088',
+  /** The ground a figure stands out from: cut back a little, so a little darker than the wall. */
+  field: '#a59e8f',
+  blank: '#bdb4a2',
+  /** The Tachara's dark polished limestone, the Hall of Mirrors. */
+  polished: '#383533',
+  polishedDeep: '#211f1e',
+  polishedSheen: '#4b4844',
+  polishedLit: '#76716a',
+  /** The shelter over the east stair. */
+  steel: '#62676b',
+  steelLit: '#979da1',
+  steelDark: '#45494c',
+};
+
+/** The terrace's carvings, cut in its limestone. */
+const STONE_RELIEF: ReliefTones = { name: 'persepolis', lit: '#e4dac4', light: '#c6bdaa', mid: '#9c968b', dark: '#6c675f', shadow: '#736e66' };
+/** The Tachara's carvings, cut in its polished stone. */
+const POLISHED_RELIEF: ReliefTones = { name: 'tachara', lit: '#8e887f', light: '#625e58', mid: '#4b4843', dark: '#262422', shadow: '#1f1d1c' };
+
+function drawPersepolisSky(ctx: CanvasRenderingContext2D, cy: number): void {
+  const bands = 7;
+  for (let i = 0; i < bands; i++) {
+    ctx.fillStyle = mix(PS.skyTop, PS.skyBottom, (i / (bands - 1)) ** 1.4);
+    ctx.fillRect(0, (i * VIEW_H) / bands, VIEW_W, VIEW_H / bands + 1);
+  }
+  const sx = 268;
+  const sy = 24 - Math.round(cy * 0.2);
+  ctx.fillStyle = PS.sun;
+  ctx.fillRect(sx - 6, sy - 2, 12, 5);
+  ctx.fillRect(sx - 4, sy - 4, 8, 9);
+  ctx.fillRect(sx - 2, sy - 6, 4, 13);
+}
+
+/**
+ * The Marvdasht plain to the north: flat, dusty, farmed in strips, and a low line of far
+ * hills on its horizon. Nothing on it stands up: no mountain behind, so no tomb.
+ */
+function drawFarPersepolis(ctx: CanvasRenderingContext2D, cx: number, cy: number): void {
+  const horizon = 126 - Math.round(cy * 0.12);
+  const far = Math.round(cx * 0.05);
+  for (let x = 0; x < VIEW_W; x += 2) {
+    const wx = x + far;
+    const h = 5 + Math.round(3 * Math.sin(wx / 61) + 2 * Math.sin(wx / 29 + 1));
+    const near = 2 + Math.round(2 * Math.sin(wx / 37 + 2));
+    ctx.fillStyle = PS.hills;
+    ctx.fillRect(x, horizon - h, 2, h);
+    ctx.fillStyle = PS.hillsShade;
+    ctx.fillRect(x, horizon - near, 2, near);
+  }
+  ctx.fillStyle = PS.plainFar;
+  ctx.fillRect(0, horizon, VIEW_W, 6);
+  ctx.fillStyle = PS.plain;
+  ctx.fillRect(0, horizon + 6, VIEW_W, VIEW_H - horizon - 6);
+  // The fields, in strips that open out toward him.
+  const near = Math.round(cx * 0.15);
+  ctx.fillStyle = PS.plainLine;
+  for (let i = 0; i < 6; i++) {
+    const y = horizon + 2 + i * i + i * 2;
+    if (y >= VIEW_H) break;
+    const step = 40 + i * 18;
+    for (let wx = Math.floor(near / step) * step; wx < near + VIEW_W + step; wx += step) {
+      const len = 10 + (hash(wx, i) % (step / 2));
+      ctx.fillRect(wx - near + (hash(i, wx) % 9), y, len, 1);
+    }
+  }
+}
+
+/** True where a slope's line passes over the top of this tile: the stair stands on it. */
+function underSlope(level: Level, x: number, y: number): boolean {
+  for (const s of level.slopes) {
+    if (s.x1 <= x || s.x0 >= x + TILE) continue;
+    const at = (px: number) => s.y0 + ((s.y1 - s.y0) * (px - s.x0)) / (s.x1 - s.x0);
+    if (Math.min(at(Math.max(x, s.x0)), at(Math.min(x + TILE, s.x1))) <= y + 0.01) return true;
+  }
+  return false;
+}
+
+/** Which stone a Persepolis tile is: a block with nothing under it is a lintel, of the Tachara's polished stone. */
+function persepolisStone(level: Level, c: string, tx: number, ty: number): 'earth' | 'ashlar' | 'court' | 'polished' {
+  if (c === '%') return 'earth';
+  if (c === '=') return 'court';
+  return level.isSolid(tx, ty + 1) ? 'ashlar' : 'polished';
+}
+
+/** The courses of the terrace's masonry, world-aligned, so every block of it meets every other. */
+const COURSE = 8;
+const BLOCK = 24;
+const courseOffset = (course: number) => (((course * 11) % BLOCK) + BLOCK) % BLOCK;
+
+/**
+ * Grey limestone ashlar over a rectangle: big unmortared blocks in courses, the joints
+ * where they fall in the world, so a tile, a stair's face and a pier are one masonry.
+ * Here and there an empty dovetail socket at a joint, where the iron clamp was robbed
+ * out, and an orange-brown streak.
+ */
+function ashlarRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number): void {
+  ctx.fillStyle = PS.body;
+  ctx.fillRect(x, y, w, h);
+  const c0 = Math.floor(y / COURSE);
+  const c1 = Math.floor((y + h - 1) / COURSE);
+  for (let c = c0; c <= c1; c++) {
+    const top = c * COURSE;
+    const yA = Math.max(y, top);
+    const yB = Math.min(y + h, top + COURSE - 1);
+    ctx.fillStyle = PS.deep;
+    if (top + COURSE - 1 >= y && top + COURSE - 1 < y + h) ctx.fillRect(x, top + COURSE - 1, w, 1);
+    const off = courseOffset(c);
+    let jx = x + ((BLOCK - ((x + off) % BLOCK)) % BLOCK);
+    for (; jx < x + w; jx += BLOCK) {
+      if (yB > yA) {
+        ctx.fillStyle = PS.deep;
+        ctx.fillRect(jx, yA, 1, yB - yA);
+      }
+      const hh = hash(jx, c);
+      // An empty clamp socket across the joint, at the top of the course.
+      if (hh % 6 === 0 && jx - 2 >= x && jx + 3 <= x + w && top >= y && top + 2 <= y + h) {
+        ctx.fillStyle = PS.deep;
+        ctx.fillRect(jx - 2, top, 5, 1);
+        ctx.fillRect(jx - 1, top + 1, 3, 1);
+      }
+      // A rust-coloured stain run down from a joint, now and then.
+      if (hh % 17 === 3 && jx + 4 < x + w && yB - yA > 4) {
+        ctx.fillStyle = PS.stain;
+        ctx.fillRect(jx + 3, yA + 1, 1, Math.min(5, yB - yA - 1));
+      }
+    }
+  }
+}
+
+/**
+ * The site's three stones and its lintels. '%' the plain's earth; '#' the terrace's
+ * masonry, and a block with nothing under it, which is a lintel of the Tachara, in its
+ * dark polished stone; '=' the terrace's top course with its dusty surface. A tile a
+ * stair stands on has the stair over it, not sky, however open it looks.
+ */
+function drawPersepolisTile(ctx: CanvasRenderingContext2D, stone: ReturnType<typeof persepolisStone>, tx: number, ty: number, x: number, y: number, open: boolean): void {
+  if (stone === 'earth') {
+    ctx.fillStyle = PS.dust;
+    ctx.fillRect(x, y, TILE, TILE);
+    const h = hash(tx, ty);
+    ctx.fillStyle = PS.dustDark;
+    ctx.fillRect(x + (h % 7), y + 5 + (h % 4), 5, 1);
+    ctx.fillRect(x + 8 + ((h >> 3) % 5), y + 11 + ((h >> 2) % 3), 4, 1);
+    ctx.fillRect(x + ((h >> 4) % 13), y + 14, 2, 1);
+    ctx.fillStyle = PS.dustLight;
+    ctx.fillRect(x + ((h >> 5) % 14), y + 8, 1, 1);
+    if (open) {
+      ctx.fillStyle = PS.dustLight;
+      ctx.fillRect(x, y, TILE, 2);
+      ctx.fillStyle = PS.dustDark;
+      ctx.fillRect(x + (h % 11), y + 2, 3, 1);
+      ctx.fillRect(x + ((h >> 2) % 9) + 5, y, 1, 1);
+    }
+    return;
+  }
+  if (stone === 'polished') {
+    ctx.fillStyle = PS.polished;
+    ctx.fillRect(x, y, TILE, TILE);
+    ctx.fillStyle = PS.polishedSheen;
+    for (let i = 0; i < 6; i++) ctx.fillRect(x + 9 - i, y + 4 + i, 2, 1);
+    ctx.fillStyle = PS.polishedDeep;
+    ctx.fillRect(x, y + TILE - 1, TILE, 1);
+    ctx.fillRect(x, y, 1, TILE);
+    ctx.fillStyle = PS.polishedLit;
+    ctx.fillRect(x + TILE - 1, y, 1, TILE - 1);
+    if (open) ctx.fillRect(x, y, TILE, 1);
+    return;
+  }
+  ashlarRect(ctx, x, y, TILE, TILE);
+  if (!open) return;
+  if (stone === 'court') {
+    // The terrace's surface: dust over the stone, trodden pale.
+    ctx.fillStyle = PS.court;
+    ctx.fillRect(x, y, TILE, 3);
+    ctx.fillStyle = PS.fresh;
+    ctx.fillRect(x, y, TILE, 1);
+    ctx.fillStyle = PS.courtLine;
+    const h = hash(tx, ty);
+    ctx.fillRect(x + (h % 12), y + 1, 3, 1);
+    ctx.fillStyle = PS.deep;
+    ctx.fillRect(x, y + 3, TILE, 1);
+  } else {
+    ctx.fillStyle = PS.lit;
+    ctx.fillRect(x, y, TILE, 1);
+  }
+}
+
+function persepolisTileId(stone: ReturnType<typeof persepolisStone>, open: boolean): string {
+  return open ? `tile-persepolis-${stone}-top` : `tile-persepolis-${stone}`;
+}
+
+/**
+ * A carving: the painted figure if there is one, else the code-drawn one cut into the
+ * stone. `faces` 2: the painting has a frame for each way (0 right, 1 left), each lit
+ * from the upper right; 1: one frame, painted the way it stands. Either way it is one
+ * world pixel wider and taller than the sprite, for its shadow, and blits one pixel
+ * left of the sprite's place.
+ */
+function carving(id: string, sprite: HTMLCanvasElement, facing: 1 | -1, tones: ReliefTones, faces: 1 | 2): Frame {
+  const f = frameOf(id, faces === 2 && facing === -1 ? 1 : 0, sprite);
+  return f.key.startsWith('art:') ? f : relief(f, facing, tones);
+}
+
+type PersepolisDecor = Extract<
+  DecorDef,
+  {
+    kind:
+      | 'persepolisStair'
+      | 'gatePier'
+      | 'gateColumn'
+      | 'apadanaColumn'
+      | 'polishedBench'
+      | 'tacharaFrame'
+      | 'jambRelief'
+      | 'apadanaFacade'
+      | 'apadanaShelter';
+  }
+>;
+
+function drawPersepolisDecor(ctx: CanvasRenderingContext2D, s: Scene, d: PersepolisDecor): void {
+  switch (d.kind) {
+    case 'persepolisStair':
+      drawPersepolisStair(ctx, d.x0, d.y0, d.x1, d.y1);
+      break;
+    case 'gatePier':
+      drawGatePier(ctx, d);
+      break;
+    case 'gateColumn':
+      // The Gate's hall: square double plinths.
+      drawPersianColumn(ctx, d.x, d.floorY, d.height, 'square');
+      break;
+    case 'apadanaColumn':
+      // The east portico, behind the stair: bell bases.
+      drawPersianColumn(ctx, d.x, d.floorY, d.height, 'bell');
+      break;
+    case 'polishedBench': {
+      // Polished black stone, knee high, where the delegations waited.
+      const w = d.x1 - d.x0;
+      ctx.fillStyle = PS.polished;
+      ctx.fillRect(d.x0, d.floorY - 5, w, 5);
+      ctx.fillStyle = PS.polishedLit;
+      ctx.fillRect(d.x0, d.floorY - 5, w, 1);
+      ctx.fillStyle = PS.polishedSheen;
+      for (let x = d.x0 + 5; x < d.x1 - 4; x += 19) ctx.fillRect(x, d.floorY - 3, 3, 1);
+      ctx.fillStyle = PS.polishedDeep;
+      ctx.fillRect(d.x0, d.floorY - 1, w, 1);
+      for (let x = d.x0 + 18; x < d.x1; x += 18) ctx.fillRect(x, d.floorY - 4, 1, 3);
+      break;
+    }
+    case 'tacharaFrame':
+      if (d.form === 'door') drawTacharaDoor(ctx, s, d.x, d.floorY);
+      else drawTacharaBlock(ctx, d.x, d.floorY);
+      break;
+    case 'jambRelief': {
+      const f = carving('tachara-jamb-king', JAMB_KING_SPRITE, d.face, POLISHED_RELIEF, 2);
+      blit(ctx, f, d.x - 1, d.floorY - 2 - JAMB_KING_SPRITE.height);
+      break;
+    }
+    case 'apadanaFacade':
+      drawApadanaFacade(ctx, s, d);
+      break;
+    case 'apadanaShelter':
+      drawApadanaShelter(ctx, s, d);
+      break;
+  }
+}
+
+/**
+ * A flight of the terrace's stairs, over the slope it is: the treads along the line,
+ * one riser to a pixel of rise, so a step is three pixels deep and one high, and the
+ * masonry of the flight's side under them, coursed like the terrace (the tiles under it
+ * carry on the same courses). The risers of a flight that climbs to the right face away
+ * from the sun and are dark; those of one that climbs to the left catch it.
+ */
+function drawPersepolisStair(ctx: CanvasRenderingContext2D, x0: number, y0: number, x1: number, y1: number): void {
+  const foot = Math.max(y0, y1);
+  const top = (x: number) => Math.round(y0 + ((y1 - y0) * (x + 0.5 - x0)) / (x1 - x0));
+  const rising = y1 < y0;
+  for (let x = x0; x < x1; x++) {
+    const t = top(x);
+    if (foot > t) ashlarRect(ctx, x, t, 1, foot - t);
+  }
+  for (let x = x0; x < x1; x++) {
+    const t = top(x);
+    ctx.fillStyle = PS.fresh;
+    ctx.fillRect(x, t, 1, 1);
+    ctx.fillStyle = PS.lit;
+    ctx.fillRect(x, t + 1, 1, 1);
+    // A riser: where this tread is a pixel higher than the one on its left (climbing
+    // right), or lower (climbing left).
+    if (x > x0 && top(x - 1) !== t) {
+      ctx.fillStyle = rising ? PS.deep : PS.fresh;
+      const rx = rising ? x : x - 1;
+      ctx.fillRect(rx, Math.min(t, top(x - 1)) + 1, 1, 2);
+    }
+  }
+}
+
+/**
+ * One pier of a portal of the Gate of All Nations: the passage wall, big blocks, its top
+ * broken off, and on it, standing on a plinth, the figure in profile facing out of the
+ * gate. The west portal's bulls and the east portal's winged bulls are each one figure.
+ */
+function drawGatePier(ctx: CanvasRenderingContext2D, d: Extract<DecorDef, { kind: 'gatePier' }>): void {
+  const h = d.floorY - d.top;
+  ashlarRect(ctx, d.x, d.top + 4, d.w, h - 4);
+  // The broken top: each pixel column ends where the stone broke, paler where it is fresh.
+  for (let i = 0; i < d.w; i++) {
+    const brk = d.top + ((hash(d.x + (i >> 1), d.top) % 4) + (i % 7 === 3 ? 1 : 0));
+    if (brk < d.top + 4) {
+      ctx.fillStyle = PS.body;
+      ctx.fillRect(d.x + i, brk, 1, d.top + 4 - brk);
+    }
+    ctx.fillStyle = PS.fresh;
+    ctx.fillRect(d.x + i, brk, 1, 1);
+  }
+  ctx.fillStyle = PS.deep;
+  ctx.fillRect(d.x, d.top + 4, 1, h - 4);
+  ctx.fillStyle = PS.lit;
+  ctx.fillRect(d.x + d.w - 1, d.top + 4, 1, h - 4);
+  // The plinth the figure stands on.
+  const plinth = 6;
+  ctx.fillStyle = PS.body;
+  ctx.fillRect(d.x, d.floorY - plinth, d.w, plinth);
+  ctx.fillStyle = PS.lit;
+  ctx.fillRect(d.x, d.floorY - plinth, d.w, 1);
+  ctx.fillStyle = PS.deep;
+  ctx.fillRect(d.x, d.floorY - 1, d.w, 1);
+  const sprite = d.figure === 'bull' ? GATE_BULL_SPRITE : GATE_LAMASSU_SPRITE;
+  const f = carving(d.figure === 'bull' ? 'gate-bull' : 'gate-lamassu', sprite, d.face, STONE_RELIEF, 1);
+  blit(ctx, f, d.x + Math.floor((d.w - sprite.width) / 2) - 1, d.floorY - plinth - sprite.height);
+}
+
+/**
+ * A column of Persepolis as it stands now: a tall, thin, fluted shaft on its base, broken
+ * off at `height` in paler stone, with no capital and nothing on it. Every column on the
+ * site is drawn by this (pillar 4); the Gate's hall has square double plinths, the
+ * Apadana's portico bell bases. Lit on its right flank.
+ */
+function drawPersianColumn(ctx: CanvasRenderingContext2D, x: number, floorY: number, height: number, base: 'square' | 'bell'): void {
+  const topY = floorY - height;
+  let shaftFoot = floorY;
+  if (base === 'square') {
+    ctx.fillStyle = PS.body;
+    ctx.fillRect(x - 8, floorY - 3, 16, 3);
+    ctx.fillRect(x - 6, floorY - 6, 12, 3);
+    ctx.fillStyle = PS.lit;
+    ctx.fillRect(x - 8, floorY - 3, 16, 1);
+    ctx.fillRect(x - 6, floorY - 6, 12, 1);
+    ctx.fillRect(x + 7, floorY - 3, 1, 3);
+    ctx.fillRect(x + 5, floorY - 6, 1, 3);
+    ctx.fillStyle = PS.deep;
+    ctx.fillRect(x - 8, floorY - 1, 16, 1);
+    ctx.fillRect(x - 6, floorY - 4, 12, 1);
+    ctx.fillStyle = PS.body;
+    ctx.fillRect(x - 5, floorY - 8, 10, 2);
+    ctx.fillStyle = PS.lit;
+    ctx.fillRect(x - 5, floorY - 8, 10, 1);
+    shaftFoot = floorY - 8;
+  } else {
+    // A bell, its lip on the floor, carved with petals hanging down, and a torus on it.
+    for (let i = 0; i < 8; i++) {
+      const hw = 5 + Math.round((i * i) / 14);
+      ctx.fillStyle = PS.body;
+      ctx.fillRect(x - hw, floorY - 8 + i, hw * 2, 1);
+      ctx.fillStyle = PS.lit;
+      ctx.fillRect(x + hw - 2, floorY - 8 + i, 2, 1);
+      ctx.fillStyle = PS.deep;
+      ctx.fillRect(x - hw, floorY - 8 + i, 1, 1);
+      if (i > 2) for (let px = x - hw + 2; px < x + hw - 2; px += 3) ctx.fillRect(px, floorY - 8 + i, 1, 1);
+    }
+    ctx.fillStyle = PS.body;
+    ctx.fillRect(x - 5, floorY - 10, 10, 2);
+    ctx.fillStyle = PS.lit;
+    ctx.fillRect(x - 5, floorY - 10, 10, 1);
+    shaftFoot = floorY - 10;
+  }
+  // The shaft: flutes in a row, the right flank in the sun, the left in shade.
+  const top = topY + 3;
+  ctx.fillStyle = PS.body;
+  ctx.fillRect(x - 4, top, 8, shaftFoot - top);
+  ctx.fillStyle = PS.relief;
+  for (let i = -3; i < 2; i += 2) ctx.fillRect(x + i, top, 1, shaftFoot - top);
+  ctx.fillStyle = PS.lit;
+  ctx.fillRect(x + 2, top, 2, shaftFoot - top);
+  ctx.fillStyle = PS.deep;
+  ctx.fillRect(x - 4, top, 1, shaftFoot - top);
+  // No streak on a column: one on some and not others would read as a mark (pillar 4).
+  // The terrace's blocks carry the stains.
+  // The broken top, ragged and paler.
+  for (let i = 0; i < 8; i++) {
+    const brk = topY + (hash(x + i, topY) % 4);
+    ctx.fillStyle = i < 2 ? PS.body : PS.lit;
+    if (top > brk) ctx.fillRect(x - 4 + i, brk, 1, top - brk);
+    ctx.fillStyle = PS.fresh;
+    ctx.fillRect(x - 4 + i, brk, 1, 1);
+  }
+}
+
+/** The cavetto cornice over a Tachara frame: a torus, then the gorge flaring out, `w` wide at its foot. */
+function drawCavetto(ctx: CanvasRenderingContext2D, x: number, footY: number, w: number): void {
+  ctx.fillStyle = PS.polishedSheen;
+  ctx.fillRect(x, footY - 1, w, 1);
+  ctx.fillStyle = PS.polished;
+  ctx.fillRect(x, footY - 2, w, 1);
+  ctx.fillRect(x - 1, footY - 3, w + 2, 1);
+  ctx.fillRect(x - 2, footY - 4, w + 4, 1);
+  ctx.fillStyle = PS.polishedLit;
+  ctx.fillRect(x - 2, footY - 5, w + 4, 1);
+  ctx.fillRect(x + w + 1, footY - 4, 1, 1);
+}
+
+/**
+ * A window or a niche of the Tachara, standing alone where its mud-brick wall has gone:
+ * one block of the dark polished stone, a stepped frame round a dark opening, a cavetto
+ * cornice on top. From outside a window and a niche are the same block, so they are
+ * the same drawing (pillar 4).
+ */
+function drawTacharaBlock(ctx: CanvasRenderingContext2D, x: number, floorY: number): void {
+  const W = 25;
+  const H = 25;
+  if (paint(ctx, 'tachara-window', x - 2, floorY - H - 5)) return;
+  const y = floorY - H;
+  ctx.fillStyle = PS.polished;
+  ctx.fillRect(x, y, W, H);
+  ctx.fillStyle = PS.polishedSheen;
+  ctx.fillRect(x + 3, y + 3, W - 6, H - 3);
+  ctx.fillStyle = PS.polished;
+  ctx.fillRect(x + 4, y + 4, W - 8, H - 4);
+  ctx.fillRect(x + 4, floorY - 4, W - 8, 4);
+  ctx.fillStyle = PS.polishedDeep;
+  ctx.fillRect(x + 7, y + 7, W - 14, H - 13);
+  ctx.fillStyle = PS.polishedSheen;
+  ctx.fillRect(x + 7, floorY - 6, W - 14, 1);
+  // The polish: a soft highlight down the block's right side, and its edges.
+  ctx.fillStyle = PS.polishedSheen;
+  ctx.fillRect(x + W - 3, y + 2, 1, H - 4);
+  ctx.fillStyle = PS.polishedLit;
+  ctx.fillRect(x + W - 1, y, 1, H);
+  ctx.fillStyle = PS.polishedDeep;
+  ctx.fillRect(x, y, 1, H);
+  drawCavetto(ctx, x, y, W);
+}
+
+/**
+ * A doorway of the Tachara, in section: the far jamb, one block of the polished stone
+ * from the floor to the lintel (the tile over it), its frame stepped like the windows',
+ * and the cornice on the lintel. The king on it is the `jambRelief`.
+ */
+function drawTacharaDoor(ctx: CanvasRenderingContext2D, s: Scene, x: number, floorY: number): void {
+  const tx = Math.floor(x / TILE);
+  let ty = Math.floor((floorY - 1) / TILE);
+  while (ty > 0 && !s.level.isSolid(tx, ty)) ty--;
+  const lintelFoot = s.level.isSolid(tx, ty) ? (ty + 1) * TILE : floorY - 48;
+  const h = floorY - lintelFoot;
+  ctx.fillStyle = PS.polished;
+  ctx.fillRect(x, lintelFoot, TILE, h);
+  ctx.fillStyle = PS.polishedSheen;
+  ctx.fillRect(x + 1, lintelFoot, 1, h);
+  ctx.fillStyle = PS.polishedDeep;
+  ctx.fillRect(x, lintelFoot, 1, h);
+  ctx.fillRect(x, lintelFoot, TILE, 1);
+  ctx.fillStyle = PS.polishedLit;
+  ctx.fillRect(x + TILE - 1, lintelFoot, 1, h);
+  if (s.level.isSolid(tx, ty)) drawCavetto(ctx, x, ty * TILE, TILE);
+}
+
+/**
+ * The east stair of the Apadana, seen from its court: the back wall. The south wing's
+ * delegations walk right in three registers, a cypress between each, every one led by an
+ * usher holding its leader's hand; each flight's side has a cypress row up its slope
+ * and, in the angle under it, a lion leaping on a bull; the central projection has the
+ * winged disc between two seated sphinxes, a plain band, and under it the blank, which
+ * is the king's place. The guards either side of the blank are the `guards` entity.
+ * The north wing's nobles walk left. Stepped merlons along the top.
+ */
+function drawApadanaFacade(ctx: CanvasRenderingContext2D, s: Scene, d: Extract<DecorDef, { kind: 'apadanaFacade' }>): void {
+  const half = d.projectionW / 2;
+  const pL = d.centreX - half;
+  const pR = d.centreX + half;
+  const fL = pL - d.flightW;
+  const fR = pR + d.flightW;
+  const base = d.floorY - 2;
+  const top = d.platformY;
+  // The wall, wings and flights, and the merlons along their top.
+  ctx.fillStyle = PS.body;
+  ctx.fillRect(d.x0, top, d.x1 - d.x0, d.floorY - top);
+  for (let x = d.x0 + 1; x + 5 <= d.x1; x += 7) {
+    if (x + 6 > pL && x < pR) continue;
+    ctx.fillStyle = PS.body;
+    ctx.fillRect(x, top - 1, 5, 1);
+    ctx.fillRect(x + 1, top - 2, 3, 1);
+    ctx.fillRect(x + 2, top - 3, 1, 1);
+    ctx.fillStyle = PS.lit;
+    ctx.fillRect(x + 2, top - 3, 1, 1);
+    ctx.fillRect(x + 3, top - 2, 1, 1);
+    ctx.fillRect(x + 4, top - 1, 1, 1);
+  }
+  ctx.fillStyle = PS.lit;
+  ctx.fillRect(d.x0, top, d.x1 - d.x0, 1);
+  // The base moulding the figures stand on.
+  ctx.fillStyle = PS.lit;
+  ctx.fillRect(d.x0, base, d.x1 - d.x0, 1);
+  ctx.fillStyle = PS.deep;
+  ctx.fillRect(d.x0, base - 1, d.x1 - d.x0, 1);
+  // The wings: three registers each.
+  // Each register is 12 rows: an 11-row field, as tall as the figures, and its floor line.
+  const regTop = top + 1;
+  const regH = Math.floor((base - 1 - regTop) / 3);
+  const wing = (x0: number, x1: number, south: boolean) => {
+    for (let r = 0; r < 3; r++) {
+      const y0 = regTop + r * regH;
+      const floor = y0 + regH - 1;
+      ctx.fillStyle = PS.field;
+      ctx.fillRect(x0 + 1, y0, x1 - x0 - 2, regH - 1);
+      ctx.fillStyle = PS.lit;
+      ctx.fillRect(x0 + 1, floor, x1 - x0 - 2, 1);
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(x0 + 1, y0, x1 - x0 - 2, regH);
+      ctx.clip();
+      if (south) {
+        // Delegation after delegation walking right: a cypress, two delegates, the usher
+        // ahead of them, holding the leader by the hand.
+        const group = 24;
+        const off = (r * 9) % group;
+        for (let gx = x0 - group + off; gx < x1; gx += group) {
+          blit(ctx, carving('apadana-cypress', CYPRESS_SPRITE, 1, STONE_RELIEF, 1), gx - 1, floor - CYPRESS_SPRITE.height);
+          const del = carving('apadana-delegate', DELEGATE_SPRITE, 1, STONE_RELIEF, 1);
+          blit(ctx, del, gx + 4 - 1, floor - DELEGATE_SPRITE.height);
+          blit(ctx, del, gx + 10 - 1, floor - DELEGATE_SPRITE.height);
+          blit(ctx, carving('apadana-usher', USHER_SPRITE, 1, STONE_RELIEF, 1), gx + 15 - 1, floor - USHER_SPRITE.height);
+        }
+      } else {
+        // Persian and Median nobles walking left, one after the other.
+        const off = (r * 5) % 16;
+        let i = r;
+        for (let gx = x0 - 16 + off; gx < x1; gx += 8, i++) {
+          const persian = i % 2 === 0;
+          const f = persian
+            ? carving('apadana-noble-persian', NOBLE_PERSIAN_SPRITE, -1, STONE_RELIEF, 1)
+            : carving('apadana-noble-median', NOBLE_MEDIAN_SPRITE, -1, STONE_RELIEF, 1);
+          blit(ctx, f, gx - 1, floor - NOBLE_PERSIAN_SPRITE.height);
+        }
+      }
+      ctx.restore();
+    }
+  };
+  wing(d.x0, fL, true);
+  wing(fR, d.x1, false);
+  // The flights' sides: the slope of the stair from the court to the platform, a row of
+  // cypresses above it, and the lion and the bull in the angle under it by the projection.
+  const flight = (outer: number, inner: number) => {
+    const dir = inner > outer ? 1 : -1;
+    const lineY = (x: number) => base - ((x - outer) * dir * (base - top - 2)) / d.flightW;
+    const xa = Math.min(outer, inner);
+    const xb = Math.max(outer, inner);
+    for (let x = xa; x < xb; x++) {
+      const ly = Math.round(lineY(x + 0.5));
+      ctx.fillStyle = PS.field;
+      ctx.fillRect(x, ly + 2, 1, base - 1 - ly - 2);
+      ctx.fillStyle = PS.lit;
+      ctx.fillRect(x, ly, 1, 1);
+      ctx.fillStyle = PS.deep;
+      ctx.fillRect(x, ly + 1, 1, 1);
+    }
+    for (let k = 0; k < 9; k++) {
+      const cx0 = outer + dir * (4 + k * 7) - (dir === 1 ? 0 : CYPRESS_SPRITE.width);
+      const ly = Math.round(lineY(cx0 + 1.5));
+      if (ly - (top + 2) < CYPRESS_SPRITE.height + 1) break;
+      blit(ctx, carving('apadana-cypress', CYPRESS_SPRITE, 1, STONE_RELIEF, 1), cx0 - 1, ly - CYPRESS_SPRITE.height);
+    }
+    const lb = carving('apadana-lion-bull', LION_BULL_SPRITE, dir === 1 ? 1 : -1, STONE_RELIEF, 2);
+    const lx = dir === 1 ? inner - LION_BULL_SPRITE.width - 2 : inner + 2;
+    blit(ctx, lb, lx - 1, base - 1 - LION_BULL_SPRITE.height);
+  };
+  flight(fL, pL);
+  flight(fR, pR);
+  // The central projection, standing forward of the flights.
+  const pTop = d.top;
+  ctx.fillStyle = PS.body;
+  ctx.fillRect(pL, pTop, pR - pL, d.floorY - pTop);
+  ctx.fillStyle = PS.lit;
+  ctx.fillRect(pL, pTop, pR - pL, 1);
+  ctx.fillRect(pR - 1, pTop, 1, d.floorY - pTop);
+  ctx.fillStyle = PS.deep;
+  ctx.fillRect(pL, pTop, 1, d.floorY - pTop);
+  ctx.fillRect(pL + 1, pTop + 2, pR - pL - 2, 1);
+  const band = d.floorY - 34;
+  ctx.fillStyle = PS.field;
+  ctx.fillRect(pL + 2, pTop + 3, pR - pL - 4, band - pTop - 3);
+  ctx.fillRect(pL + 2, band + 4, pR - pL - 4, base - 1 - band - 4);
+  // The plain band.
+  ctx.fillStyle = PS.lit;
+  ctx.fillRect(pL + 2, band, pR - pL - 4, 1);
+  ctx.fillStyle = PS.deep;
+  ctx.fillRect(pL + 2, band + 3, pR - pL - 4, 1);
+  ctx.fillStyle = PS.lit;
+  ctx.fillRect(pL + 2, base, pR - pL - 4, 1);
+  // The winged disc, small and plain, and the two sphinxes seated facing it.
+  const disc = carving('winged-disc', WINGED_DISC_SPRITE, 1, STONE_RELIEF, 1);
+  blit(ctx, disc, d.centreX - Math.floor(WINGED_DISC_SPRITE.width / 2) - 1, pTop + 5);
+  const sw = SPHINX_SEATED_SPRITE.width;
+  blit(ctx, carving('apadana-sphinx', SPHINX_SEATED_SPRITE, 1, STONE_RELIEF, 2), d.centreX - 7 - sw - 1, band - SPHINX_SEATED_SPRITE.height);
+  blit(ctx, carving('apadana-sphinx', SPHINX_SEATED_SPRITE, -1, STONE_RELIEF, 2), d.centreX + 7 - 1, band - SPHINX_SEATED_SPRITE.height);
+  // The blank, where the audience was: a smooth sunk field between the inner guards.
+  const guards = s.entities.find((e) => e.def.kind === 'guards' && e.def.centreX === d.centreX);
+  const gap = guards && guards.def.kind === 'guards' ? guards.def.gap : 16;
+  const bx = d.centreX - gap / 2;
+  const by = band + 4;
+  ctx.fillStyle = PS.blank;
+  ctx.fillRect(bx, by, gap, base - 1 - by);
+  ctx.fillStyle = PS.deep;
+  ctx.fillRect(bx, by, gap, 1);
+  ctx.fillRect(bx + gap - 1, by, 1, base - 1 - by);
+  ctx.fillStyle = PS.lit;
+  ctx.fillRect(bx, by + 1, 1, base - 2 - by);
+  // The north end: the wall's return, in shade.
+  ctx.fillStyle = PS.deep;
+  ctx.fillRect(d.x1 - 1, top, 1, d.floorY - top);
+  ctx.fillStyle = PS.lit;
+  ctx.fillRect(d.x0, top, 1, d.floorY - top);
+}
+
+/**
+ * The shelter over the east stair since the mid-1990s: a flat roof on steel posts, its
+ * underside far over any jump. The posts stand at the ends and where the flights meet
+ * the wings, never in front of the central projection.
+ */
+function drawApadanaShelter(ctx: CanvasRenderingContext2D, s: Scene, d: Extract<DecorDef, { kind: 'apadanaShelter' }>): void {
+  const facade = s.level.data.decor.find((z): z is Extract<DecorDef, { kind: 'apadanaFacade' }> => z.kind === 'apadanaFacade');
+  const posts = [d.x0 + 2, d.x1 - 4];
+  if (facade) posts.push(facade.centreX - facade.projectionW / 2 - facade.flightW - 1, facade.centreX + facade.projectionW / 2 + facade.flightW - 1);
+  for (const x of posts) {
+    ctx.fillStyle = PS.steel;
+    ctx.fillRect(x, d.y, 2, d.floorY - d.y);
+    ctx.fillStyle = PS.steelLit;
+    ctx.fillRect(x + 1, d.y, 1, d.floorY - d.y);
+  }
+  const w = d.x1 - d.x0;
+  ctx.fillStyle = PS.steel;
+  ctx.fillRect(d.x0, d.y - 5, w, 5);
+  ctx.fillStyle = PS.steelLit;
+  ctx.fillRect(d.x0, d.y - 5, w, 1);
+  ctx.fillStyle = PS.steelDark;
+  ctx.fillRect(d.x0, d.y - 1, w, 1);
+  for (let x = d.x0 + 6; x < d.x1; x += 24) ctx.fillRect(x, d.y - 4, 1, 3);
+}
+
+/**
+ * The guards of the central projection. In the wall they are its carving, on the base
+ * moulding. Stepping out, they come forward and down onto the court, two pixels, and
+ * from halfway out, the moment they become deadly, with a dark edge. Nothing fades.
+ * All eight are one figure in two facings (pillar 4), the same as the façade's.
+ */
+function drawGuards(ctx: CanvasRenderingContext2D, g: Guards): void {
+  const d = g.def;
+  const sh = GUARD_SPRITE.height;
+  const k = g.depth;
+  const drop = Math.round(2 * k);
+  for (const gd of g.guards) {
+    const f = carving('apadana-guard', GUARD_SPRITE, gd.face, STONE_RELIEF, 2);
+    const wallTop = d.floorY - 2 - sh;
+    if (k <= 0) {
+      blit(ctx, f, gd.x - 1, wallTop);
+      continue;
+    }
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(gd.x - 4, 0, d.guardW + 8, d.floorY);
+    ctx.clip();
+    const y = wallTop + drop;
+    if (k >= 0.5) {
+      const edge = silhouette(f, '#3d3a36');
+      blit(ctx, edge, gd.x - 2, y);
+      blit(ctx, edge, gd.x, y);
+      blit(ctx, edge, gd.x - 1, y - 1);
+      blit(ctx, edge, gd.x - 1, y + 1);
+    }
+    blit(ctx, f, gd.x - 1, y);
+    ctx.restore();
+  }
+}
+
+/**
+ * Pressed flat where he stood, against the guard who caught him: the tourist turned to
+ * stone as a relief, upright, in profile, facing the centre of the audience as the
+ * guards round him do, lit as they are. Drawn in front of the guards, so that it is
+ * seen. No flash and no shake; nothing else moves for it.
+ */
+function drawCarved(ctx: CanvasRenderingContext2D, s: Scene, death: { cause: DeathCause; t: number }): void {
+  void death;
+  const p = s.player;
+  const x = Math.round(p.x) - 1;
+  const y = Math.round(p.y);
+  const costume = s.level.data.costume;
+  const idle = tourist(costume, 'idle');
+  const court = s.entities.find((e) => e.def.kind === 'guards');
+  const centre = court && court.def.kind === 'guards' ? court.def.centreX : x + 6;
+  const face: 1 | -1 = x + 6 <= centre ? 1 : -1;
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(x - 2, y - 4, idle.w + 4, idle.h + 4);
+  ctx.clip();
+  blit(ctx, relief(idle, face, STONE_RELIEF), x - 1, y);
+  ctx.restore();
 }

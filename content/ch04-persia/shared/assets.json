@@ -1,0 +1,28 @@
+{
+  "$comment": "Sizes are world pixels (320 x 180 view). Painted files are 4x. See content/README.md. The costume was designed on 2026-10-03: see false-beard.md. The 'carved' death at Persepolis is made by the game from the living idle frame and has no art of its own.",
+  "level": "shared",
+  "assets": [
+    {
+      "id": "false-beard",
+      "w": 12,
+      "h": 16,
+      "beat": "shared",
+      "what": "The tourist in chapter 4's costume: a costume-shop Assyrian beard, long, squared off, dark, in bands of tight curls, clipped to his ears, over his own pale short-sleeved shirt, khaki trousers and trainers. Four frames: idle, walk1, walk2, jump.",
+      "frames": 4
+    },
+    {
+      "id": "false-beard-dead",
+      "w": 12,
+      "h": 16,
+      "beat": "shared",
+      "what": "The same, eyes shut and the beard knocked askew, off the clip on one side. Used, stretched and rotated, by every death but the audience, which cuts him in stone from the idle frame."
+    },
+    {
+      "id": "false-beard-seated",
+      "w": 13,
+      "h": 14,
+      "beat": "shared",
+      "what": "Sitting on the ground with the beard unclipped and in his lap: the 'Gave up' pose."
+    }
+  ]
+}

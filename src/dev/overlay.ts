@@ -1,4 +1,4 @@
-import { Sweep, Thrower, Water, type Entity } from '../engine/entities';
+import { Guards, Sweep, Thrower, Water, type Entity } from '../engine/entities';
 import type { Level } from '../engine/level';
 import { PHYS, Player, type MovingSolid } from '../engine/player';
 import type { Input } from '../engine/input';
@@ -209,6 +209,15 @@ export function renderOverlay(
       case 'train':
         trigger(d.triggerX);
         trigger(d.stopX, DEADLY);
+        break;
+      case 'guards':
+        // The court's clock; the king's place, which nobody steps into; the two files,
+        // filled while a guard's body in the court kills.
+        trigger(d.clock.triggerX);
+        if (e instanceof Guards) {
+          box(e.gapRect, SAFE, { fill: 0.25 });
+          for (const r of e.rects) box(r, DEADLY, e.deadly ? { fill: 0.5 } : { dash: true });
+        }
         break;
     }
   }
