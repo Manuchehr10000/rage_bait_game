@@ -146,7 +146,9 @@ Designer's rulings, recorded in `arc.md` section 4 as well:
 - **No modern shelter ever falls, anywhere in the chapter.** Phaistos has five from the 1960s,
   due for replacement; a falling one would restage Akrotiri's 2005 death a level early.
 - **The throne seat is spent once in the whole game**, at Knossos (`PILLARS.md`, pillar 8).
-- **The Tiryns entrance ramp is incidental**: a ramp against a wall is Persia's.
+- **The Tiryns entrance ramp is incidental**: the way up to a high place is Persia's
+  signature (ruled 2026-10-03 on the designer's delegation, `arc.md` section 5). Until then
+  this line gave Persia the ramp against a wall, which none of its sites has.
 - The chapter's fifth level and Egypt's fifth are both at risk of ending in a long stone gallery
   with chambers off it (the Tiryns casemates, the Serapeum). Decide Tiryns knowing it constrains
   Saqqara (`arc.md`, section 5).

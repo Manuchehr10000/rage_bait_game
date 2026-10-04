@@ -47,9 +47,14 @@ notes describe the levels as they were built.
   Deep links still open any level in dev and local builds.
 - **Chapters 1 to 4 are the game for now.** 5 to 12 are hidden (`SHOWN_CHAPTERS` in
   `src/map/atlas.ts`) and are thought about later.
-- **Open:** Apep or Sekhmet for chapter 2's legend; Farhad or Rostam for chapter 4's; the
-  order of chapter 4's sites; whether Karnak's exit has already spent the false completion
-  (pillar 10, `content/tricks.md`).
+- **Chapter 4** (ruled 2026-10-03, on the designer's delegation, `arc.md` sections 3 and 4):
+  the order is Persepolis, Naqsh-e Rustam, Pasargadae, Susa, Behistun, with 3 and 4
+  provisional; the legend is Farhad, and it never stages his death; the signature is the
+  way up. Persepolis is built, rough.
+- **Open:** Apep or Sekhmet for chapter 2's legend; the Susa flag, whether chapter 4 may
+  build beside the Tomb of Daniel, an active shrine (recommended: the tell only, the shrine
+  never in frame; `arc.md` section 4); whether Karnak's exit has already spent the false
+  completion (pillar 10, `content/tricks.md`).
 
 Conventions:
 

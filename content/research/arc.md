@@ -5,7 +5,7 @@ single source of truth for site identity, period, costume and status. It does no
 contain level design; beats are decided one at a time in design conversation and
 live in each level's own asset notes.
 
-Last revised: 2026-09-26. Chapter 4 locked; chapters 5–12 hidden in the game while it is being found (sections 2, 8). The chapter shape is rewritten, level 6 (the legend) and its gate are added (section 1), with a legend for each locked chapter (section 3) and the chapter 3 exemption (section 4). Earlier the same day: level length and the second attempt follow the new pillars 4 and 7 (section 1), and the scope is re-counted (section 8). 2026-09-24: Chapter 3 corrected and its first rulings recorded while Knossos and Phaistos were designed (sections 3, 4, 5, 7). Corrections from the monument research for the tour map: Gargas date, Persepolis imagery, Segesta, Sigiriya, Himeji, Great Zimbabwe, Registan and Martello rows, sections 6 and 7. Tikal ruled: architecture only (section 4). 2026-09-23: Great Zimbabwe ruled: walls, passage and tower only (section 4). 2026-09-15: curator mode dropped by designer ruling; facts that cannot be shown without text live in the asset notes and nowhere in the game.
+Last revised: 2026-10-03. Chapter 4 ruled while Persepolis was designed and built as its level 1, the calls made on the designer's delegation: the order of its sites, its legend (Farhad), its signature (the way up, replacing the ramp against the wall) and vocabulary, a working rule for its graves and the winged disc; the Susa flag raised, and "Gate 6: clear throughout" corrected (sections 3, 4, 5). The beat count amended for a level 1 (section 1); Persepolis's disputes listed (section 7); the build order note (section 8). 2026-09-26: Chapter 4 locked; chapters 5–12 hidden in the game while it is being found (sections 2, 8). The chapter shape is rewritten, level 6 (the legend) and its gate are added (section 1), with a legend for each locked chapter (section 3) and the chapter 3 exemption (section 4). Earlier the same day: level length and the second attempt follow the new pillars 4 and 7 (section 1), and the scope is re-counted (section 8). 2026-09-24: Chapter 3 corrected and its first rulings recorded while Knossos and Phaistos were designed (sections 3, 4, 5, 7). Corrections from the monument research for the tour map: Gargas date, Persepolis imagery, Segesta, Sigiriya, Himeji, Great Zimbabwe, Registan and Martello rows, sections 6 and 7. Tikal ruled: architecture only (section 4). 2026-09-23: Great Zimbabwe ruled: walls, passage and tower only (section 4). 2026-09-15: curator mode dropped by designer ruling; facts that cannot be shown without text live in the asset notes and nowhere in the game.
 
 ---
 
@@ -28,8 +28,11 @@ its written material.
 
 **Level shape.** Levels 1 to 5: one real site. Walked left to right. Clean play grows through the
 chapter, from about 15 seconds at level 1 to about 45 at level 5 and never more
-(`PILLARS.md`, pillar 7). Five to eight beats. A beat is one real feature of the site
-turned into one mechanic; the trap must come from something true about the place.
+(`PILLARS.md`, pillar 7). Four to eight beats, and a level 1 has four or five (amended
+2026-10-03: "five to eight" did not fit a level 1 of about 15 seconds; Persepolis has five,
+one of them the exit, and one trick, which the designer accepted for a level 1 on
+2026-09-28: "One trick is fine"). A beat is one real feature of the site turned into one mechanic; the trap must
+come from something true about the place.
 
 **Chapter shape.** Six levels, one costume, played in order: a level opens once every
 level before it is cleared, so the chapters open in order and so do the levels inside
@@ -175,20 +178,22 @@ castles, Oceania and Polynesia, the steppe and nomadic cultures.
 
 - **Dates:** 900–330 BC
 - **Costume:** false Assyrian beard, curled and clipped on.
-- **Vocabulary:** palace terraces, siege ramps against walls, rock-cut cliff reliefs, aqueduct channels.
-- **Status:** LOCKED (2026-09-26), on the five sites below. Their order, and whether Pasargadae, the weakest on beats, stays, are for the design of the chapter.
-- **Level 6, the legend:** to be ruled. Farhad, who carved Mount Behistun for love of Shirin (Nizami, *Khosrow and Shirin*, twelfth century), where a great smoothed rock face, left unfinished, is traditionally called his work (Farhad Tarash; verify before designing); or Rostam of the *Shahnameh*, after whom later Persians named Naqsh-e Rustam, taking its reliefs for his. Both are literature, not scripture.
+- **Vocabulary:** palace terraces and their stairs, free-standing stone frames and columns, rock-cut cliff façades and reliefs, water channels. (Changed 2026-10-03 with the signature, below, from "palace terraces, siege ramps against walls, rock-cut cliff reliefs, aqueduct channels": none of the five sites has a siege ramp.)
+- **Status:** LOCKED (2026-09-26). The order below was ruled on 2026-10-03, on the designer's delegation (section 4): the three Fars sites first, then west to Susa on the Khuzestan plain, then up the Zagros road to Behistun. Pasargadae, the weakest on beats, stays. Levels 3 and 4 are provisional: their jobs (contradict; change the job) are not designed. Level 1 is built, rough (2026-10-03).
 
-| # | Site | Slug | Place | Period | Gate notes |
+| Lvl | Site | Slug | Place | Period | Gate notes |
 |---|---|---|---|---|---|
-| — | Persepolis | `persepolis` | Fars, IR | c. 518–330 BC | Apadana double stairways, columns, terrace. Flandin & Coste, *Voyage en Perse*, issued in parts 1843–54, PD. The eastern stairway with its reliefs was excavated only in 1931–34, so no nineteenth-century plate shows it; base it on the excavation reports |
-| — | Behistun | `behistun` | Kermanshah, IR | c. 520 BC | Cliff face, relief band, cut-away access ledge. Rawlinson drawings, PD |
-| — | Naqsh-e Rustam | `naqsh_e_rustam` | Fars, IR | 5th c. BC + Sassanian | Cruciform rock tombs, Ka'ba tower. Flandin & Coste, PD |
-| — | Susa | `susa` | Khuzestan, IR | Elamite–Achaemenid | Tell, excavation "château". Dieulafoy 1890–92, PD |
-| — | Pasargadae | `pasargadae` | Fars, IR | c. 546 BC | Stepped tomb plinth. Weak on beats — reserve |
+| 1 | Persepolis | `persepolis` | Fars, IR | c. 518–330 BC | Apadana double stairways, columns, terrace. Flandin & Coste, *Voyage en Perse*, issued in parts 1843–54, PD. The eastern stairway with its reliefs was excavated only in 1931–34, so no nineteenth-century plate shows it; base it on the excavation reports. The Achaemenid royal tombs cut into Kuh-e Rahmat above the terrace stay out of frame (graves, section 4). The winged disc on the east stair is never a gag (section 4) |
+| 2 | Naqsh-e Rustam | `naqsh_e_rustam` | Fars, IR | 5th c. BC + Sassanian | Cruciform rock tombs, Ka'ba tower. Flandin & Coste, PD. Graves: the carved fronts may carry a trap, the chambers and cists never (section 4) |
+| 3 | Pasargadae | `pasargadae` | Fars, IR | c. 546 BC | Stepped tomb plinth. Weak on beats; kept, provisional (section 4). Graves as at Naqsh-e Rustam |
+| 4 | Susa | `susa` | Khuzestan, IR | Elamite–Achaemenid | Tell, excavation "château". Dieulafoy 1890–92, PD. Provisional. **GATE 6 FLAG** — the Tomb of Daniel, an active pilgrimage shrine, stands beside the tell and can be seen from the château. Recommended: build on the tell only, the shrine never in frame. Open (section 4) |
+| 5 | Behistun | `behistun` | Kermanshah, IR | c. 520 BC | Cliff face, relief band, cut-away access ledge. Rawlinson drawings, PD |
 
-- **Signature mechanic, to keep distinct:** the ramp *against* the wall.
-- **Gate 6:** clear throughout. Note Nimrud and Nineveh were dynamited 2014–15 and are excluded.
+- **Level 1 teaches:** the stair is the only way up, and it is a ramp; stone stood and mud brick went, so frames and columns stand alone, carrying nothing; the delegations and the guards face the empty centre.
+- **Level 5 ends on:** Behistun's relief and the unfinished smoothed face beside it, called Farhad Tarash, through which level 6 is entered on foot.
+- **Level 6, the legend:** Farhad, from Nizami's *Khosrow and Shirin* (c. 1180s): public domain, literature, not scripture. Ruled 2026-10-03 on the designer's delegation (section 4). Entered on foot through Behistun's grand feature, the smoothed face called Farhad Tarash. The story happens at Bisotun. Tradition calls the smoothed face Farhad's work; it was most likely cut for Khosrow II, Farhad's rival in the poem, and left unfinished (Sasanika, "Tarash-e Farhad"), and its date is contested: one paper revises it (section 7). Farhad is undone by a lie, Khosrow's false news of Shirin's death, in a game whose first pillar is that the world lies; and the story breaks the run of monster legends (the mammoth, Apep or Sekhmet, the Minotaur). **The legend never stages Farhad's death.** Its proposed way of winning is Farhad's first labour in Nizami: the channel he cut down the mountain so that milk from the far pastures would flow to Shirin's pool (the Metropolitan Museum has a folio of it). The tourist is carried by the channel, never by his own strength (pillar 11), and "carried along a channel by its flow" is reserved for it in `content/tricks.md`. The legend is designed in its own conversation. The other candidate, Rostam of the *Shahnameh*, after whom later Persians named Naqsh-e Rustam, taking its reliefs for his, was not chosen.
+- **Signature mechanic, to keep distinct:** the way up (ruled 2026-10-03 on the designer's delegation, section 5). It replaces "the ramp *against* the wall", which no locked site of the chapter has: that vocabulary came from the cut Assyrian half, and Karnak already has a mud-brick ramp against its first pylon, built as a beat. The Persian kings built high and put what mattered out of reach: Persepolis's terrace is reached only by its stair; Darius's tomb at Naqsh-e Rustam is cut high in a cliff; Cyrus's tomb at Pasargadae stands on a plinth of steps taller than a man; Darius had the ledge under the Behistun relief cut away. Persepolis's stairs have risers of 10 cm, so to the tourist they are ramps: the chapter's ramp is the stair, and it is the way up (section 5).
+- **Gate 6:** clear, with one flag open. (Corrected 2026-10-03 from "clear throughout".) Persepolis is a palace ruin; the royal tombs above it stay out of frame. **Susa: FLAG, open** — the Tomb of Daniel, above. Graves, a working rule for the chapter: a tomb's carved front is architecture and may carry a trap; burial chambers and cists never (section 4). The winged disc is a living community's emblem and never a gag (section 4). Nimrud and Nineveh were dynamited 2014–15 and are excluded.
 
 ### Chapter 5 — Classical Mediterranean · `ch05_classical`
 
@@ -341,6 +346,7 @@ is recorded here, not in the level.
 | `pompeii` | 5 | Body casts are graves of a mass-casualty event | Architecture only; casts never in frame |
 | `angkor_wat` | 7 | Active Buddhist temple, resident monks | Outer galleries, moat and causeway only, or substitute Ta Prohm / Beng Mealea |
 | `borobudur` | 7 | Active pilgrimage site | Frame as ruined-restored monument |
+| `susa` | 4 | The Tomb of Daniel, an active pilgrimage shrine, stands beside the tell and can be seen from the excavators' château on it (raised 2026-10-03) | Build on the tell only; the shrine never in frame. It does not block Persepolis |
 | `chand_baori` | 7 | Adjoining temple is a functioning shrine | Build in the stepwell only |
 | `foguang` | 8 | Monastic use, statues in situ | Substitute a museum-managed timber hall if refused |
 | `kilwa_kisiwani`, `gede`, `songo_mnara` | 9 | Ruined mosques; living Islam on the coast | Secular palace, fort and house fabric only |
@@ -365,6 +371,10 @@ use of the site: levels, asset notes, and the tour map.
 | chapter 3 | 3 | Grave circles and tholos tombs at Mycenae | Graves are never traps, as the burial at Cap Blanc | 2026-09-23 |
 | `knossos` | 3 | Landing in front of the throne seats the tourist in it and ends his visit: a death with no physical cause (pillar 8) | Allowed, once in the whole game, with its own frame, sound and label, never those of giving up. Recorded in `PILLARS.md`, pillar 8 | 2026-09-24 |
 | chapter 3 | 3 | Phaistos has five 1960s metal shelters due for replacement, and Akrotiri's protective roof collapsed in 2005 | No modern shelter ever falls, anywhere in the chapter | 2026-09-24 |
+| chapter 4 | 4 | The order of the five sites, and whether Pasargadae, weak on beats, stays | 1 Persepolis, 2 Naqsh-e Rustam, 3 Pasargadae, 4 Susa, 5 Behistun, then the legend: the three Fars sites first, then west to Susa on the Khuzestan plain, then up the Zagros road to Behistun, through whose grand feature level 6 is entered. Pasargadae stays. Levels 3 and 4 are provisional: their jobs (contradict; change the job) are not designed | 2026-10-03, made on the designer's delegation |
+| chapter 4 | 4 | The legend: Farhad or Rostam | Farhad, from Nizami's *Khosrow and Shirin* (section 3). The legend never stages Farhad's death. Its proposed way of winning is his first labour, the channel cut down the mountain for milk to flow to Shirin's pool: the tourist is carried by its flow, never by his own strength, and that way of winning is reserved in `content/tricks.md`. Designed in its own conversation | 2026-10-03, made on the designer's delegation |
+| chapter 4 | 4 | Naqsh-e Rustam and Pasargadae are tombs, and the Achaemenid royal tombs are cut into Kuh-e Rahmat above Persepolis | A working rule for the chapter: a tomb's carved front is architecture and may carry a trap; burial chambers and cists never. The royal tombs above Persepolis stay out of frame | 2026-10-03, made on the designer's delegation |
+| `persepolis` | 4 | The winged disc at the top of the central panel of the Apadana's east stair: the winged symbol is a living community's emblem today | Never a gag. It stays carved where it is; the audience happens below it, and its joke is on the tourist. Binds the tour-map plate as well | 2026-10-03 (designer: "go on"), made on the designer's delegation |
 
 ---
 
@@ -375,10 +385,10 @@ differentiator, which is binding on level design.
 
 | Collision | Chapters | Differentiator |
 |---|---|---|
-| Ceremonial and roof stairs | 2, 3 | Aegean signature is the light well and multi-storey collapse; stairs are incidental there |
-| Column tops | 2, 3 | Egypt stands on them (the Kiosk at Philae, the Hypostyle at Karnak). Aegean columns hold floors up and are never floors |
+| Ceremonial and roof stairs | 2, 3, 4 | Aegean signature is the light well and multi-storey collapse; stairs are incidental there. Persia's stair is a ramp: its risers are 10 cm, so the tourist runs it as a slope of 1 in 3 and never hops a step, where Egypt's stairs are climbed a hop a step (Dendera's east stair); and it is the only way up (added 2026-10-03) |
+| Columns and column tops | 2, 3, 4 | Egypt stands on them (the Kiosk at Philae, the Hypostyle at Karnak). Aegean columns hold floors up and are never floors. Persian columns stand alone and carry nothing: no capital, no roof, never a floor and never holding one up; at Persepolis they are background (added 2026-10-03) |
 | Light as a mechanic | 1, 2, 3 | Chapter 1 = light the tourist carries, museum lamps and raking sun; Egypt = light on a schedule, the sweeping beam, the spotlight that marks what falls; Aegean = light from directly above through a light well, the one place nothing is overhead |
-| Massive defensive walls | 3, 4, 8 | Aegean = gallery *inside* the wall's thickness; Persia = ramp *against* the wall (so the Tiryns entrance ramp is incidental); East Asia = un-climbable curved batter of the face |
+| Massive walls, and the ways up them | 3, 4, 8 | Aegean = gallery *inside* the wall's thickness; Persia = the way up: one stair, or none, to a terrace, a tomb or a relief put out of reach (ruled 2026-10-03; it replaced the ramp *against* the wall, which no Persian site has), so the Tiryns entrance ramp stays incidental; East Asia = un-climbable curved batter of the face |
 | A long stone gallery with chambers off it, as a chapter's finale | 2, 3 | Saqqara (the Serapeum) and Tiryns (the casemate galleries) are both fifth levels. No differentiator yet: decide it before either is designed, knowing each constrains the other |
 | Terraces | 6, 7 | Americas = ballcourt slope and solar event; Monsoon Asia = moat crossing and *descending* stepwell |
 
@@ -424,6 +434,9 @@ Keep these as live disputes in the asset notes, never as settled, and never in a
 - Gargas hands: the colour counts differ (143 black, 80 red, 2 bistre, 5 ochre, 1 white of 231, against more than 100 black, 85 red, 4 white, 1 ochre) but both put black in the majority; the black is manganese in most sources, charcoal in one. How many hands are incomplete: 114, 144, or "almost never complete". The commonest pattern is all four fingers short with the thumb whole (55 of the 112 Leroi-Gourhan characterised), and every incomplete hand keeps its thumb; that the fourth and fifth fingers are the ones most often short is a weaker popular claim.
 - Abu Simbel relocation figures: 64 m higher and 180 m inland (UNESCO), 65 m and 200 m (common), more than 60 m (Britannica). Facade 30 × 35 m or about 33 × 38 m; colossi 20–22 m. Whether the move shifted the sun days by one, and which way: UNESCO says the temple was rebuilt in the same orientation; the illumination is a window of days, not one day. When and why the second colossus fell: soon after completion, or 27 BC, probably an earthquake; say "in antiquity". Which family figure stands at which colossus: the secondary summaries conflict.
 - Persepolis: Apadana column height (from about 16.5 m to 25 m in the sources) and capital height (5.8 m or about 8 m); when the fourteenth column was re-erected (1965 or the 1970s); the animal on the east portico's capitals (double lions, or Schmidt's unspecified "addorsed animals").
+- Persepolis, found while level 1 was designed (2026-10-03, at search-extract level): the terrace's height above the plain along its length (9 m to 17 or 18 m); the treads of the Stairs of All Nations (31 cm on most, 38 or 40 cm on some); the Tachara platform's height above the terrace (2.2 to 3.0 m); how many of the Gate of All Nations' four columns stand (two or three), and the stone capital IsMEO set on a re-erected one, hurried for 1971, which is questioned (Motamedmanesh, *Arts* 2016); whether the fire was fought locally (freshwater diatoms, Amadori et al. 2025, tentative); whether the human-headed bulls of the Gate's east portal have four legs where Assyria's have five (probable); why the central audience reliefs of both Apadana stairs were taken to the Treasury in antiquity (unknown); the north stair's carvers making the Ionians' wool bales into globes (Livius, a single source); whether storks still nest on the columns (de Bruijn saw them in 1704, and nineteenth-century visitors wrote of a nest on every column; not confirmed today); Flandin & Coste's date (issued in parts 1843–54; 1851 and 1881–82 also given).
+- Persepolis myths to keep out of every note: that the stairs were made low so that horsemen could ride up them (Livius reads the low steps as making a visitor climb at a dignified pace); that the fire of 330 BC baked the Fortification tablets (they were kept by the collapse of the wall they were stored in: Iranica).
+- Farhad Tarash at Behistun: who cut the smoothed face, and when. Most likely for Khosrow II, and left unfinished (Sasanika); one paper revises its date ("Revising the dating of the Farhad Tarash", academia.edu). Tradition calls it Farhad's work, and the legend uses the tradition, never a date.
 - Segesta temple: whether a cella was ever intended (Mertens's cella trenches against a roofless colonnade built on purpose round an open-air cult place); why work stopped; its deity. Exclude the popular story that it was a sham built to fool the Athenian envoys (Thucydides 6.46 has them fooled with borrowed silver).
 - Sigiriya: what the rock is (magma plug, granite, red gneiss, a residual hill); its height (about 180 m or nearly 200 m); what the lion above the paws looked like (a reconstruction; nothing above the paws survives).
 - Himeji: the Akamatsu founding of 1333/1346 rests on later chronicles; the Meiji sale for 23 yen 50 sen; the unexploded bomb of 1945. Whether the curve of the stone face is defensive or structural.
@@ -440,6 +453,8 @@ Twelve chapters of six levels is seventy-two levels, roughly forty minutes of cl
 play. For now the game is chapters 1 to 4: the other eight are hidden in it until the
 game has been found, and are thought about then (designer's ruling, 2026-09-26;
 `SHOWN_CHAPTERS` in `src/map/atlas.ts`). The recommended build order is Chapters 1 and 2 to finished quality before
-any Chapter 4-and-beyond production begins. Chapter 11 and the Chapter 3 error
+any Chapter 4-and-beyond production begins. The designer asked for chapter 4's level 1 on
+2026-10-03, and Persepolis was built that day, rough, ahead of that order; the request
+covered that level only. Chapter 11 and the Chapter 3 error
 dossier are the two assets most likely to be cut for budget and the two least
 replaceable.
