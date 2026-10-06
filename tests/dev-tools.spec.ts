@@ -518,8 +518,12 @@ test('looking far along and Shift+clicking there puts him there', async ({ page 
 
 test('Alt+wheel looks up and down a tall level', async ({ page }) => {
   await open(page, 'pech-merle');
-  await hover(page, 100, 200);
   const y0 = (await tourist(page)).camY;
+  // Over the middle of the view, wherever the camera stopped. It is still rising from the
+  // bottom of the level when open() stops the loop, and how far it has got depends on the
+  // machine: on CI a fixed world point could be above the view, the mouse off the page, and
+  // its wheel delivered to nothing, so the wait for it never ended.
+  await hover(page, 100, y0 + 90);
   await page.keyboard.down('Alt');
   await wheel(page, 0, -200);
   await page.keyboard.up('Alt');
