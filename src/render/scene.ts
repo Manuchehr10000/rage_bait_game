@@ -1,5 +1,5 @@
 import type { Camera } from '../engine/camera';
-import type { Chaser, CrackedColumn, Crumble, Door, Entity, Falling, Guards, Horse, Platform, Pusher, Roof, Seat, Span, Sweep, Thrower, Tipper, Water } from '../engine/entities';
+import type { Chaser, Crumble, Door, Entity, Falling, Guards, Horse, Platform, Pusher, Roof, Seat, Span, Sweep, Thrower, Tipper, TrapColumn, Water } from '../engine/entities';
 import type { DecorDef, DoorDef, Level, SpanDef } from '../engine/level';
 import type { Player } from '../engine/player';
 import {
@@ -2491,9 +2491,9 @@ function drawEntityFront(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): vo
       if (sp.state === 'falling' || sp.state === 'landed') drawFallenSpan(ctx, sp.rect, d.skin);
       break;
     }
-    case 'crackedColumn':
+    case 'trapColumn':
       // Behind him, in front of the crush he is flattened in.
-      drawCrackedColumn(ctx, e as CrackedColumn);
+      drawTrapColumn(ctx, e as TrapColumn);
       break;
     default:
       break;
@@ -2709,6 +2709,22 @@ function waterSurfaceAt(s: Scene, x: number): number | null {
  * Deaths. Each looks like what caused it. Nothing else in the frame reacts.
  * t runs 0..1 over the death time; the level resets at 1.
  */
+/**
+ * How far above `feetY` the underside of a falling or fallen Gate column is at `x`, or
+ * null where no such column is over that x.
+ */
+function columnGap(s: Scene, x: number, feetY: number): number | null {
+  for (const e of s.entities) {
+    if (e.def.kind !== 'trapColumn' || !e.def.fall) continue;
+    const c = e as TrapColumn;
+    const sin = Math.sin(c.angle);
+    const along = x - c.pivotX;
+    if (c.angle <= 0 || along <= 0 || along > c.length * sin) continue;
+    return feetY - (c.pivotY - (along * Math.cos(c.angle)) / sin);
+  }
+  return null;
+}
+
 function drawDeath(ctx: CanvasRenderingContext2D, s: Scene, death: { cause: DeathCause; t: number }): void {
   const p = s.player;
   const x = Math.round(p.x) - 1;
@@ -2723,9 +2739,12 @@ function drawDeath(ctx: CanvasRenderingContext2D, s: Scene, death: { cause: Deat
 
   switch (DEATH_ANIM[death.cause]) {
     case 'crush': {
+      // Under a falling column he is pressed down as far as the shaft over him has come,
+      // and no further: where it rests on its plinth or on a stair, there is a gap under it.
+      const gap = columnGap(s, p.x + p.w / 2, feetY);
       const k = Math.min(1, t / 0.12);
-      const h = Math.max(4, Math.round(16 - 12 * k));
-      const w = Math.round(12 + 16 * k);
+      const h = gap === null ? Math.max(4, Math.round(16 - 12 * k)) : Math.min(16, Math.max(4, Math.round(gap)));
+      const w = gap === null ? Math.round(12 + 16 * k) : Math.round(12 + (16 - h) * (16 / 12));
       blit(ctx, dead, midX - w * 0.7, feetY - h, w, h);
       break;
     }
@@ -4097,18 +4116,18 @@ function drawPersianShaft(ctx: CanvasRenderingContext2D, x: number, shaftFoot: n
   }
 }
 
-/** How far up the shaft, from the plinth, the falling column cracks, in px. */
+/** How far up the shaft, from the plinth, a column cracks, in px. */
 const COLUMN_CRACK_AT = 35;
 
 /**
- * The Gate's column that falls. Standing, it is the honest column, pixel for pixel.
- * Cracked, its shaft leans and a crack runs across it at the height of his head and
- * above, and a few chips drop from it; falling and fallen, the shaft turns on the east
- * edge of its foot and the plinth stays where it was.
+ * A column of the Gate's hall that cracks, or falls. Until either happens it is the
+ * column decor, pixel for pixel. Cracked, its shaft leans and a crack runs across it at
+ * the height of his head and above, and a few chips drop from it. Falling and fallen, the
+ * shaft turns on the east edge of its foot and the plinth stays where it was.
  */
-function drawCrackedColumn(ctx: CanvasRenderingContext2D, c: CrackedColumn): void {
+function drawTrapColumn(ctx: CanvasRenderingContext2D, c: TrapColumn): void {
   const d = c.def;
-  if (c.state === 'standing') {
+  if (!c.cracked && c.angle === 0) {
     drawPersianColumn(ctx, d.x, d.floorY, d.height, 'square');
     return;
   }
@@ -4119,15 +4138,18 @@ function drawCrackedColumn(ctx: CanvasRenderingContext2D, c: CrackedColumn): voi
   // In the shaft's own frame: the pivot at the origin, the shaft up -y, west of it.
   const half = PERSIAN_COLUMN.half;
   drawPersianShaft(ctx, -half, 0, -c.length, d.x, d.floorY - d.height);
-  const crack = [0, 1, 1, 2, 3, 3, 4, 5];
-  for (let i = 0; i < half * 2; i++) {
-    const y = -COLUMN_CRACK_AT - crack[i]!;
-    ctx.fillStyle = PS.deep;
-    ctx.fillRect(-half * 2 + i, y, 1, 1);
-    ctx.fillStyle = PS.fresh;
-    ctx.fillRect(-half * 2 + i, y + 1, 1, 1);
+  if (c.cracked) {
+    const crack = [0, 1, 1, 2, 3, 3, 4, 5];
+    for (let i = 0; i < half * 2; i++) {
+      const y = -COLUMN_CRACK_AT - crack[i]!;
+      ctx.fillStyle = PS.deep;
+      ctx.fillRect(-half * 2 + i, y, 1, 1);
+      ctx.fillStyle = PS.fresh;
+      ctx.fillRect(-half * 2 + i, y + 1, 1, 1);
+    }
   }
   ctx.restore();
+  if (!c.cracked) return;
   // The chips, out of the crack's sunny end and down to the floor, where they stay.
   const t = c.sinceCrack;
   const fromX = c.pivotX - 1;

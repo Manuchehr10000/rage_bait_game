@@ -22,8 +22,8 @@ drawn by code. Levels 3 and 4 are provisional.
 - **Vocabulary:** palace terraces and their stairs, free-standing stone frames and columns,
   rock-cut cliff façades and reliefs, water channels.
 - **Level 1 teaches:** the stair is the only way up, and it is a ramp; stone stood and mud
-  brick went, so frames and columns stand alone, carrying nothing, though one of the Gate's
-  columns cracks and comes down behind him; the delegations and the
+  brick went, so frames and columns stand alone, carrying nothing, though in the Gate the
+  cracked column holds and its whole twin comes down behind him; the delegations and the
   guards face the empty centre.
 - **Level 5 ends on:** Behistun's relief and the unfinished smoothed face beside it, Farhad
   Tarash, through which level 6 is entered on foot.
@@ -65,8 +65,9 @@ and Karnak already has a mud-brick ramp against its first pylon.
 - **Stone stands alone and carries nothing.** The palaces were mud brick round a frame of
   stone. The mud brick went; the columns, the door and window frames and the stairs stand on
   their own, holding nothing up. In this chapter a column is never a floor (Egypt's) and never
-  holds a floor (the Aegean's). At Persepolis every one of them is background but one: the
-  Gate's west column cracks and falls (designer, 2026-10-06). It falls; it never carries.
+  holds a floor (the Aegean's). At Persepolis every one of them is background but the Gate's
+  two: the west one cracks and holds, the east one falls (designer, 2026-10-06). A column may
+  fall; it never carries.
 - **In the engine a stair is a slope** (`slopes` in a level's data): its ends meet floor tops at
   tile corners, the masonry under it lies wholly under the line, and it has headroom
   (`tests/levels.spec.ts`).
@@ -82,9 +83,10 @@ runs up the Stairs of All Nations, 63 steps, a landing and 48 more, as if they w
 which to him they are; walks through the Gate of All Nations between its bulls; goes up over the
 Tachara's platform, under two lintels, past the king walking out of his hall on the far
 jambs; and comes down into the Apadana's east court, where the east stair's façade is the back
-wall. In the Gate the west column cracks as he comes up to it and holds; once he is past it, it
-comes down on him from behind. **The column.** The answer is to run on without a check. Nothing
-else lies until the court. In the centre of the façade four guards a side face a blank,
+wall. In the Gate the west column cracks as he comes up to it, and holds; the east column,
+uncracked, comes down on him from behind once he is past it, too quickly to outrun. **The
+column.** The answer is to step past it and straight back behind its foot, and let it fall.
+Nothing else lies until the court. In the centre of the façade four guards a side face a blank,
 in the middle of the panel that replaced the king's audience. A man who keeps running is in that
 place as they step out of the wall into the court, runs on, and dies in the right-hand file.
 **The audience.** The answer is to stop where nobody may stand. No fall in the level can kill;
@@ -99,8 +101,8 @@ Level 2 turns what level 1 taught into the weapon (`arc.md`, section 1). Notes s
 conversation starts from what Persepolis leaves it:
 
 - **What level 1 leaves the player believing.** The stair is a ramp and has never lied.
-  Columns stand, except the one that cracked, and a crack means it comes down once you are past
-  it. Carvings are carvings, except the guards. The one safe place in the audience was the middle,
+  A crack is a lie: the cracked column held, and its whole twin came down behind him; behind a
+  falling column's foot is safe. Carvings are carvings, except the guards. The one safe place in the audience was the middle,
   where nobody may stand.
 - **The tomb is the Tachara's front again.** Darius's tomb front at Naqsh-e Rustam is a palace
   front carved into the cliff at almost the size of the Tachara's, with its capitals intact,
@@ -113,9 +115,9 @@ conversation starts from what Persepolis leaves it:
   is the way up; the tomb has none.
 - **The graves rule** (below): the carved front may carry a trap; the burial chambers and their
   cists never.
-- **Spent.** A column that cracks and comes down behind him is Persepolis's: the touchstone
-  obelisk is spent, and may come back only as a setup. A carving that steps out of a wall has
-  now been the fuse at Philae, at Karnak and
+- **Spent.** A column that comes down behind him once he has passed it, beaten by stepping
+  back behind its foot, is Persepolis's, and may come back only as a setup. A carving that steps
+  out of a wall has now been the fuse at Philae, at Karnak and
   at Persepolis. At Naqsh-e Rustam it may only be a setup (pillar 4).
 - **Rostam.** Later Persians named the site after him, taking its reliefs for his (`arc.md`). He was the other candidate for the legend and was not chosen. His name on the
   map is not a beat.
@@ -160,7 +162,7 @@ recorded in `arc.md` as well; the sound is recorded here only, as chapter 3's wa
    Persepolis has five, one of them the exit, and the invariant is amended: a level 1 may have
    four or five beats, four to eight in general. A level 1 gets one trick (designer,
    2026-09-28: "One trick is fine"). On 2026-10-06 the designer gave Persepolis a second, the
-   Gate's west column.
+   Gate's columns.
 8. **Build order.** `arc.md` section 8 recommends finishing chapters 1 and 2 before any
    chapter 4 production. The designer asked for chapter 4's level 1 on 2026-10-03, and it was
    built then.

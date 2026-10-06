@@ -202,10 +202,14 @@ export function renderOverlay(
         trigger(d.triggerX);
         box(d.rect, DEADLY, { dash: true });
         break;
-      case 'crackedColumn':
-        // The crack, and where it comes down: from its foot to its length, his height.
-        trigger(d.crackX);
-        box({ x: d.x + PERSIAN_COLUMN.half, y: d.floorY - 16, w: d.height - PERSIAN_COLUMN.plinth, h: 16 }, DEADLY, { dash: true });
+      case 'trapColumn':
+        // The crack's line; past the shaft, the line that sets off its fall, and where it
+        // comes down: from its foot to its length, his height.
+        if (d.crack) trigger(d.crack.x);
+        if (d.fall) {
+          trigger(d.x + PERSIAN_COLUMN.half + 2);
+          box({ x: d.x + PERSIAN_COLUMN.half, y: d.floorY - 16, w: d.height - PERSIAN_COLUMN.plinth, h: 16 }, DEADLY, { dash: true });
+        }
         break;
       case 'tipper':
         trigger(d.triggerX);

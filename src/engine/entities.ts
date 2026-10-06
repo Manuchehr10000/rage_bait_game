@@ -2,7 +2,6 @@ import type { Sfx } from './audio';
 import type {
   ChaserDef,
   ConveyorDef,
-  CrackedColumnDef,
   CrumbleDef,
   DoorDef,
   EntityDef,
@@ -20,6 +19,7 @@ import type {
   SweepDef,
   ThrowerDef,
   TipperDef,
+  TrapColumnDef,
   TrainDef,
   WaterDef,
 } from './level';
@@ -70,8 +70,8 @@ export function createEntity(def: EntityDef, level: Level): Entity {
       return new Chaser(def);
     case 'tipper':
       return new Tipper(def);
-    case 'crackedColumn':
-      return new CrackedColumn(def);
+    case 'trapColumn':
+      return new TrapColumn(def);
     case 'snare':
       return new Snare(def);
     case 'hazard':
@@ -1331,29 +1331,33 @@ export const PERSIAN_COLUMN = { plinth: 8, half: 4 } as const;
 const PAST = 2;
 
 /**
- * A column that cracks as he comes up to it, holds, and comes down on him once he is
- * past it (`CrackedColumnDef`). The plinth stays; the shaft pivots on the east edge of
- * its foot and falls as a rod of its length falls under the game's gravity, from the
- * lean the crack gave it. It kills on any touch while it falls, so a man who turns back
- * walks into it. Where it comes to rest, on the floor or on a stair, it lies, solid.
+ * A column of the Gate's hall (`TrapColumnDef`). If it cracks, a line cracks it: it leans
+ * and holds, for good. If it falls, it waits `delay` once he is past its shaft, then the
+ * shaft pivots on the east edge of its foot and falls as a rod of its length falls under
+ * the game's gravity, from the spin it starts with. It comes down on him where his centre
+ * is: if that is east of its foot and the shaft, reaching that far, is at the height of
+ * his body there. Behind its foot he is safe. Down, it lies in depth, like a standing
+ * column: neither solid nor deadly.
  */
-export class CrackedColumn implements Entity {
-  state: 'standing' | 'cracked' | 'falling' | 'down' = 'standing';
-  /** Radians from upright, the top toward +x. */
-  angle = 0;
+export class TrapColumn implements Entity {
+  /** Whether the crack has run across it yet. */
+  cracked = false;
   /** Seconds since it cracked, or -1. */
   sinceCrack = -1;
-  /** Seconds since it began to fall, or -1. */
-  sinceFall = -1;
+  /** Standing; waiting, once he is past it; falling; down. */
+  state: 'standing' | 'waiting' | 'falling' | 'down' = 'standing';
+  /** Seconds since he went past it, or -1. */
+  sincePast = -1;
+  /** Radians from upright, the top toward +x. */
+  angle = 0;
   /** Where the shaft pivots: the east edge of its foot, on top of the plinth. */
   readonly pivotX: number;
   readonly pivotY: number;
   /** The shaft's length, from the plinth to its broken top. */
   readonly length: number;
   private spin = 0;
-  private lying: MovingSolid[] = [];
 
-  constructor(readonly def: CrackedColumnDef) {
+  constructor(readonly def: TrapColumnDef) {
     this.pivotX = def.x + PERSIAN_COLUMN.half;
     this.pivotY = def.floorY - PERSIAN_COLUMN.plinth;
     this.length = def.height - PERSIAN_COLUMN.plinth;
@@ -1390,98 +1394,60 @@ export class CrackedColumn implements Entity {
     return false;
   }
 
-  /** Whether the shaft, as it stands now, overlaps him: separating axes, strictly. */
-  hits(r: Rect): boolean {
-    const pts = this.corners();
-    const box = [
-      { x: r.x, y: r.y },
-      { x: r.x + r.w, y: r.y },
-      { x: r.x + r.w, y: r.y + r.h },
-      { x: r.x, y: r.y + r.h },
-    ];
-    const c = Math.cos(this.angle);
-    const s = Math.sin(this.angle);
-    for (const [ax, ay] of [
-      [1, 0],
-      [0, 1],
-      [c, s],
-      [-s, c],
-    ] as const) {
-      const span = (q: { x: number; y: number }[]) => {
-        const v = q.map((p) => p.x * ax + p.y * ay);
-        return [Math.min(...v), Math.max(...v)] as const;
-      };
-      const [a0, a1] = span(pts);
-      const [b0, b1] = span(box);
-      if (a1 <= b0 || b1 <= a0) return false;
-    }
-    return true;
+  /**
+   * Whether the falling shaft is on him: at his centre, east of its foot and within its
+   * reach, the shaft's thickness there overlaps his height.
+   */
+  crushes(r: Rect): boolean {
+    if (this.angle <= 0) return false;
+    const s = centerX(r) - this.pivotX;
+    const sin = Math.sin(this.angle);
+    const cos = Math.cos(this.angle);
+    if (s <= 0 || s > this.length * sin) return false;
+    // The east face over his centre, and the west face, a shaft's width above it there.
+    const under = this.pivotY - (s * cos) / sin;
+    const over = under - (PERSIAN_COLUMN.half * 2) / sin;
+    return under > r.y && over < r.y + r.h;
   }
 
   update(w: World): void {
     const p = w.player;
     const d = this.def;
+    if (d.crack && !this.cracked && w.alive && centerX(p) >= d.crack.x) {
+      this.cracked = true;
+      this.sinceCrack = 0;
+      this.angle = d.crack.lean;
+      w.sound('headCrack');
+    } else if (this.cracked) this.sinceCrack += DT;
+    const f = d.fall;
+    if (!f || this.state === 'down') return;
     if (this.state === 'standing') {
-      if (w.alive && centerX(p) >= d.crackX) {
-        this.state = 'cracked';
-        this.sinceCrack = 0;
-        this.angle = d.lean;
-        w.sound('headCrack');
-      }
-      return;
-    }
-    if (this.sinceCrack >= 0) this.sinceCrack += DT;
-    if (this.state === 'cracked') {
-      if (!(w.alive && this.sinceCrack >= d.hold && p.x >= this.pivotX + PAST)) return;
+      if (!(w.alive && p.x >= this.pivotX + PAST)) return;
+      this.state = 'waiting';
+      this.sincePast = 0;
+    } else this.sincePast += DT;
+    if (this.state === 'waiting') {
+      if (this.sincePast < f.delay) return;
       this.state = 'falling';
-      this.sinceFall = 0;
+      this.spin = f.spin;
+      w.sound('crumble');
     }
-    if (this.state === 'falling') {
-      this.sinceFall += DT;
-      // A rod pivoting on its end: angular acceleration 3g sin(angle) / 2L.
-      this.spin += ((3 * PHYS.gravity) / (2 * this.length)) * Math.sin(this.angle) * DT;
-      const next = this.angle + this.spin * DT;
-      if (this.grounded(w.level, next)) {
-        // Where it meets the ground, to a hundredth of a degree.
-        let lo = this.angle;
-        let hi = next;
-        for (let i = 0; i < 16; i++) {
-          const mid = (lo + hi) / 2;
-          if (this.grounded(w.level, mid)) hi = mid;
-          else lo = mid;
-        }
-        this.angle = lo;
-        this.state = 'down';
-        w.sound('headThud');
-        this.lying = this.restingSolids();
-      } else this.angle = next;
-      if (this.hits(p)) w.kill(d.cause);
-    }
-  }
-
-  /** The shaft at rest, as solids: a box round each length of it, so a gentle slant stays a slant. */
-  private restingSolids(): MovingSolid[] {
-    const out: MovingSolid[] = [];
-    const c = Math.cos(this.angle);
-    const s = Math.sin(this.angle);
-    const w = PERSIAN_COLUMN.half * 2;
-    const piece = 16;
-    for (let t0 = 0; t0 < this.length; t0 += piece) {
-      const t1 = Math.min(this.length, t0 + piece);
-      const pts = [
-        [0, -t0],
-        [-w, -t0],
-        [0, -t1],
-        [-w, -t1],
-      ].map(([lx, ly]) => ({ x: this.pivotX + lx! * c - ly! * s, y: this.pivotY + lx! * s + ly! * c }));
-      const x0 = Math.min(...pts.map((q) => q.x));
-      const y0 = Math.min(...pts.map((q) => q.y));
-      out.push({ rect: { x: x0, y: y0, w: Math.max(...pts.map((q) => q.x)) - x0, h: Math.max(...pts.map((q) => q.y)) - y0 }, dx: 0, dy: 0 });
-    }
-    return out;
-  }
-
-  solids(): MovingSolid[] {
-    return this.lying;
+    // A rod pivoting on its end: angular acceleration 3g sin(angle) / 2L.
+    this.spin += ((3 * PHYS.gravity) / (2 * this.length)) * Math.sin(this.angle) * DT;
+    const next = this.angle + this.spin * DT;
+    if (this.grounded(w.level, next)) {
+      // Where it meets the ground, to a hundredth of a degree.
+      let lo = this.angle;
+      let hi = next;
+      for (let i = 0; i < 16; i++) {
+        const mid = (lo + hi) / 2;
+        if (this.grounded(w.level, mid)) hi = mid;
+        else lo = mid;
+      }
+      this.angle = lo;
+      this.state = 'down';
+      w.sound('headThud');
+    } else this.angle = next;
+    if (w.alive && this.crushes(p)) w.kill(f.cause);
   }
 }

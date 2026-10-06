@@ -388,33 +388,31 @@ export interface TipperDef {
 }
 
 /**
- * A column like its neighbours, a fluted shaft on a square double plinth, that cracks
- * as he comes up to it and holds. Once he is past it, and not before `hold` has run
- * since the crack, the shaft topples off its plinth the way he is going, falling the
- * way a shaft of its length falls under the game's gravity: slowly at first, fast at
- * the end. It kills him if it comes down on him, and once down it lies where it came
- * to rest, on the floor or a stair, and is solid. The touchstone obelisk of
- * `content/tricks.md`: the setup is honest, the punchline is when, and once known he
- * has to outrun its length.
+ * A Persian column, a fluted shaft on a square double plinth, drawn exactly like the
+ * column decor, that may crack and may fall: two different things, and at Persepolis
+ * two different columns. A crack is a crack running across the shaft, a few chips and a
+ * lean, and nothing more. A fall waits a moment once all of him is past the shaft, then
+ * the shaft topples off its plinth the way he is going, as a rod of its length falls
+ * under the game's gravity from the spin it starts with. It comes down on him only if he
+ * is on the side it falls to: behind its foot he is safe. Once down it lies where it came
+ * to rest, on the floor or a stair, in depth like every column in the hall, and is
+ * neither solid nor deadly.
  */
-export interface CrackedColumnDef {
-  kind: 'crackedColumn';
+export interface TrapColumnDef {
+  kind: 'trapColumn';
   /** The shaft's centre line, as for the column decor it is drawn like. */
   x: number;
   floorY: number;
   /** Plinth and shaft, to the broken top: the same as the honest columns'. */
   height: number;
-  /** His centre crossing this cracks it. */
-  crackX: number;
+  /** His centre crossing `x` cracks it, and it leans `lean` radians east. Omitted: it never cracks. */
+  crack?: { x: number; lean: number };
   /**
-   * Seconds after the crack before it may fall. It falls then, if he is past it, or the
-   * moment he is past it, whichever comes later: so a man who stops at the crack has
-   * lost his start, and a man who never passes it is never fallen on.
+   * Seconds it waits once all of him is past its shaft, the spin it starts its fall
+   * with, in radians a second, and what the label calls it. Omitted: it never falls. A
+   * man who never passes it is never fallen on.
    */
-  hold: number;
-  /** Radians it leans east when it cracks, and falls from. With its length and gravity, this sets how long the fall takes. */
-  lean: number;
-  cause: DeathCause;
+  fall?: { delay: number; spin: number; cause: DeathCause };
 }
 
 /**
@@ -533,7 +531,7 @@ export type EntityDef =
   | ConveyorDef
   | ChaserDef
   | TipperDef
-  | CrackedColumnDef
+  | TrapColumnDef
   | HazardDef
   | HorseDef
   | RoofDef

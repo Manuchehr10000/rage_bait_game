@@ -6,12 +6,12 @@ through the hall past two columns running off the top of the screen and the poli
 benches along its back wall, and out between the human-headed winged bulls of the east portal,
 facing east. A few names are scratched high on the piers, never legible. About 2.3 s.
 
-**'The column'** (added at the designer's request, 2026-10-06). As he comes through the west
-portal the west column cracks across its shaft, drops three chips and leans; it holds. Once he is
-past it, and not before 0.75 s after the crack, it comes down the way he is going and lies across
-the hall and in front of the east portal, its broken top on the Tachara's stair. A man who
-stopped at the crack is under it; a man who runs on without a check is clear by 8 frames. The
-whole of it is in `../LEVEL.md`, beat b.
+**'The column'** (the designer's, 2026-10-06). As he comes through the west portal the west
+column cracks across its shaft, drops three chips and leans; it holds, and never falls. The east
+column, uncracked, waits until he is past it, 0.4 s more, and comes down the way he is going in
+half a second, to lie across the hall and in front of the east portal, its broken top on the
+Tachara's stair. Nobody outruns it. Step past it and straight back behind its foot, let it fall,
+and walk on in front of it. The whole of it is in `../LEVEL.md`, beat b.
 
 The portals are about 10 m high, and so are the game's. The delegations waited on the benches
 (Iranica). More than two hundred foreign visitors cut their names at Persepolis from the
@@ -27,11 +27,11 @@ and the winged bull have notes here. The column is drawn by the game, every colu
 the Gate's two and the Apadana's eight, by one function at different heights; so are the
 benches, the piers and the scratched names.
 
-**The falling column, for whoever paints the columns.** Must be right: until it cracks, the west
-column is the east one pixel for pixel (pillar 4; a browser test holds it), so a painted column
-is one painting for both; the crack runs across the shaft from about the height of his head up,
-on the drawing's own line; the plinth stays where it stood when the shaft goes. Deliberately
+**The two columns, for whoever paints them.** Must be right: until the west one cracks, the two
+are one column pixel for pixel (pillar 4; a browser test holds it), so a painted column is one
+painting for both; the crack runs across the west shaft from about the height of his head up, on
+the drawing's own line; when the east shaft falls, its plinth stays where it stood. Deliberately
 wrong: the shaft falls whole, where a column of drums would come apart; it falls under the game's
-gravity; and whether a column stands in its place today is not checked (`../LEVEL.md`, Not
-verified). If the columns are ever painted, the cracked and fallen shaft needs the same painting,
-turned, and the crack drawn over it, with a note here before it is.
+gravity; and whether columns stand in the game's two places today is not checked (`../LEVEL.md`,
+Not verified). If the columns are ever painted, the leaning and the fallen shafts need the same
+painting, turned, and the crack drawn over the west one, with a note here before it is.
