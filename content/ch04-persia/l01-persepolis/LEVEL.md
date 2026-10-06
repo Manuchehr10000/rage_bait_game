@@ -39,7 +39,7 @@ toward a blank. Every delegation on the stair walks toward that blank.
 
 ## What this level is for
 
-It opens the chapter, so it plants the chapter's truths and spends one trick set up inside
+It opens the chapter, so it plants the chapter's truths and spends two tricks set up inside
 itself (`arc.md`, section 1). It teaches three things:
 
 - **The stair is the only way up, and it is a ramp.** The terrace and the Tachara's platform
@@ -48,19 +48,22 @@ itself (`arc.md`, section 1). It teaches three things:
   hop, nothing to time. It is the chapter's signature (`../CHAPTER.md`).
 - **Stone stood; mud brick went.** The Gate's two columns, the Tachara's window and niche blocks
   and door frames, the Apadana's columns: all stand alone and carry nothing. They are background,
-  like the bulls on the Gate's piers. He walks past them and through them, and none of them does
-  anything.
+  like the bulls on the Gate's piers, and he walks past them and through them, all but one: the
+  Gate's west column cracks as he comes up to it and, once he is past it, comes down on him (the
+  first trick). Of the hall's four columns, two or three still stand; the rest fell.
 - **The delegations and the guards face the empty centre.** On the east stair the delegations
   walk toward it and the guards face the blank. The game turns the lions on the flights the same
   way (Deliberately wrong), and the sphinxes face the disc above it.
 
 > Persepolis: the stair is the only way up, and it is a ramp.
 
-Nothing lies in beats a to c, and nothing moves. Then one trick, the last trap, on a cycle, as
-pillar 5 allows. No fall anywhere in the level can kill.
+Nothing lies in beats a and c, and nothing there moves. Two tricks: the Gate's west column in
+beat b, and the audience in beat d, the last trap, on a cycle, as pillar 5 allows. No fall
+anywhere in the level can kill.
 
-About **15 seconds clean** (pillar 7). Five beats, one of them the exit, and one trick (ruling
-7, `../CHAPTER.md`). Built, the knowing run is 15.83 s from the spawn, 0.83 s of it standing in
+About **15 seconds clean** (pillar 7). Five beats, one of them the exit, and two tricks: the
+level was built with one (ruling 7, `../CHAPTER.md`), and the designer added the column on
+2026-10-06. Built, the knowing run is 15.83 s from the spawn, 0.83 s of it standing in
 the king's place (`tests/persepolis.spec.ts`). By beat, from a run of the real player in Node:
 the plain and the stair about 4.9 s, the Gate 2.3, the Tachara 3.6, the court 5.0 with the
 standing in it, the exit a tenth of a second.
@@ -70,7 +73,7 @@ standing in it, the exit a tenth of a second.
 | Beat | Folder | What the player meets | Death label | What is true |
 |---|---|---|---|---|
 | a | `a-stairs` | He walks in off the left edge onto the plain. The Stairs of All Nations: 63 low steps up, a landing, 48 more, run like a ramp without a jump. Nothing lies | — | The terrace's one way up; 63 steps to a landing, 48 more; risers of 10 cm, treads of 31 |
-| b | `b-gate` | The terrace. The Gate of All Nations: between the plain bulls of the west portal, through the hall past two broken columns and the black benches, out between the human-headed winged bulls of the east portal. Names scratched high on the piers. Nothing lies | — | Xerxes' gate: bulls facing west, winged bulls facing east, the benches where delegations waited, more than 200 visitors' names cut since the seventeenth century |
+| b | `b-gate` | The terrace. The Gate of All Nations: between the plain bulls of the west portal, through the hall past two broken columns and the black benches, out between the human-headed winged bulls of the east portal. Names scratched high on the piers. The west column cracks as he comes up to it and holds; once he is past it, it comes down the way he is going. **The trick: 'The column'** | "The column" (crushed) | Xerxes' gate: bulls facing west, winged bulls facing east, the benches where delegations waited, more than 200 visitors' names cut since the seventeenth century; of the hall's four columns, two or three stand |
 | c | `c-tachara` | A low stair up onto a platform. Two doorways in section, their frames in dark, polished stone, a lintel over him in each, the king walking out of his hall on each far jamb. A window block and a niche block standing alone, the same from outside. A stair down. Nothing lies | — | Darius's palace, the "Hall of Mirrors": the mud brick gone, the stone frames standing alone, each window or niche one block; the king with his parasol bearer on the jambs |
 | d | `d-apadana` | The east court under the shelter, the east stair's façade the back wall. In its centre, four guards a side facing a blank. Run across, and as he passes the blank they step out of the wall into the court and stand; he runs into the right-hand file. **The trick: 'The audience'** | "The audience" (carved) | The central panel of the Apadana's east stair: guards facing a blank where the audience relief was, taken out in antiquity |
 | e | `e-exit` | Past the north end of the façade, the game's own exit | — | The façade ends; the exit is the game's, not the site's |
@@ -97,13 +100,39 @@ on the plain at x 24. The stair begins at x 96.
 
 ### b · the Gate of All Nations
 
-Honest, and all of it in depth. Nothing here is solid and nothing moves.
+The level's first trick. Everything else here is in depth: nothing else is solid, nothing else
+moves.
 
 - **The west portal** (tiles 31–32): its piers about 10 m high (94 px), the plain bulls carved
   on the passage walls facing west, toward the stair he has come up. He walks between them.
 - **The hall** (tiles 33–39): two columns standing at their real height, about 16.5 m (155 px),
-  running off the top of the screen like the Apadana's; along the back wall the polished black
-  benches where the delegations waited.
+  running off the top of the screen like the Apadana's, the west one at x 564 and the east at
+  610; along the back wall the polished black benches where the delegations waited. The two
+  columns are one drawing, and until it cracks the west one is the east one pixel for pixel.
+- **The column.** As his centre crosses x 524, in the west portal between the bulls, the west
+  column cracks: a crack runs across its shaft at the height of his head and above, three chips
+  drop out of it, it leans 1.15° east, and the stone cracks once. It holds. Once all of him is
+  2 px past its shaft, and not before 0.75 s after the crack, the shaft comes down the way he is
+  going. The plinth stays; the shaft turns on the east edge of its foot and falls as a rod of
+  its length falls under the game's gravity, slowly at first and fast at the end: 1.57 s from
+  the lean to the ground. It kills at any touch while it falls, so a man who turns back walks
+  into it. It comes to rest at 87.6°, across the hall and in front of the east portal's winged
+  bull, its broken top on the Tachara's stair at about x 715, with a thud, and lies there,
+  solid. A man who never passes it is never fallen on, however long he waits.
+- **First attempt.** It cracks as he comes up to it, and he stops to see which way it falls. It
+  does not fall. He goes on past it, and it comes down on him from behind: a man who stood
+  still at the crack has lost his start, and is under the shaft when it lands. Label: **The
+  column.**
+- **Second attempt.** Run on, and do not check: the knowing run is clear of it with 8 frames to
+  spare. A stop of up to 7 frames anywhere between the crack and getting clear is survived;
+  8 is not. A jump keeps his speed and changes nothing. He sees it fall only at the
+  left edge of the screen, because the camera does not scroll back.
+- **As built:** `tests/persepolis.spec.ts` runs the real player through the Gate in Node: the
+  knowing run clear, its slack between 6 and 10 frames at the crack and past the column, every
+  stop at the crack from 12 frames to 2 s crushed, a stop of 15 frames past it crushed, turning
+  back into it fatal, a man who waits short of it never fallen on, the fallen shaft solid, its
+  top on the stair to within half a pixel, one crack and one thud; and in the browser, that the
+  standing west column is drawn pixel for pixel as the east.
 - **The east portal** (tiles 40–41): the human-headed winged bulls, facing east, the way he is
   going. Never animated.
 - **The names.** Three visitors' names scratched high on the piers, never legible (pillar 2).
@@ -127,7 +156,7 @@ have gone.
 
 ### d · the Apadana's east court
 
-The level's one trick and its last trap. Down the Tachara's stair into the court; the clock
+The level's second trick and its last trap. Down the Tachara's stair into the court; the clock
 starts as his centre crosses x 992, the foot of that stair.
 
 - **The back wall** is the east stair's façade, from x 1008 to 1360, under the shelter: a short
@@ -180,11 +209,31 @@ Honest. Past the north end of the façade, on the terrace, the game's own exit a
 posts and bars that end every level. There is no turnstile at the Apadana, and the exit does not
 pretend to be one.
 
-## The trick
+## The tricks
 
-It is claimed in `content/tricks.md`. Its shape is nearer the obelisk's than the cows': the setup
-is honest and the punchline is *where*. At the moment it fires he is standing in the one safe
-place, and he runs out of it.
+Both are claimed in `content/tricks.md`.
+
+**'The column'** (beat b). It is the designer's touchstone obelisk (`content/tricks.md`), built
+here at the designer's request (2026-10-06), knowing that the register kept it for Karnak's
+rebuild. It cracks as he comes up to it; he braces for it to fall on him, and it does not; he
+passes it, and it comes down on him from behind. Once known, he has to outrun its length.
+
+- **A surprise the first time.** Nothing in the level has moved before it. The crack is honest:
+  it is a column cracking, and it does fall. The punchline is *when*: not as he comes up, while
+  he watches it, but after he has gone by.
+- **Timing the second time.** Knowing that it falls is not enough: any check of more than about
+  an eighth of a second, at the crack or after, puts him under it. It is a test of not flinching.
+- **Only here: weakly.** A column that falls fits any columned site, and Knossos's burnt column
+  and Karnak's obelisk are already falling shafts. What ties it to Persepolis is the Gate's own
+  hall: four columns once, two or three standing now. The designer accepted this.
+- **The closest spent tricks.** "Something comes down where a runner is going" (four times in
+  the levels built before 2026-09-26, Karnak's obelisk among them, which tips over ahead of him):
+  this one comes down behind him, which is the inversion the touchstone was named for. Knossos's
+  burnt column folds and lets its span down on whoever is under it; here nothing is overhead.
+
+**'The audience'** (beat d). Its shape is nearer the obelisk's than the cows': the setup is honest
+and the punchline is *where*. At the moment it fires he is standing in the one safe place, and he
+runs out of it.
 
 **'The audience'** (beat d). Everything carved in the level so far is a carving and stays one:
 the bulls on the Gate's piers, the king on the Tachara's jambs, the delegations along the wings
@@ -226,9 +275,9 @@ together. The precision: a 16 px gap and a release window of about four frames, 
 Knossos's 68 px of hall. Whether that is enough to make the trick new is for the designer to
 confirm (Confidence).
 
-**Pillar 8.** The guards kill him themselves: no water, no pit and no fall finishes him, and no
-fall in the level can kill at all. When the count is built, Persepolis declares one trick, 'The
-audience', and every death in the level but giving up is claimed by it.
+**Pillar 8.** The column and the guards kill him themselves: no water, no pit and no fall
+finishes him, and no fall in the level can kill at all. Persepolis declares two tricks, 'The
+column' and 'The audience', and every death in the level but giving up is one of the two.
 
 ## Deliberately wrong
 
@@ -266,6 +315,11 @@ audience', and every death in the level but giving up is claimed by it.
 - **Every figure faces the centre.** The game turns every figure, the lions and the bulls too,
   toward the centre. The real lion and bull directions are not checked, and some nobles turn back
   to talk.
+- **The Gate's west column falls,** on a clock he starts: it cracks as he comes up, holds, and
+  comes down once he is past it. Which of the hall's columns stand today, and whether the one
+  in the game's west place is one of them, is not checked. Its shaft falls whole, as a rod
+  turning on its foot, under the game's gravity, which is about eleven times the earth's at his
+  scale; the plinth stays where it stood. A real column of drums would come apart as it fell.
 - **The guards are one figure, eight times.** The sources say Persian and Median guards. Which
   stands where is not verified, so all eight are one stamp (pillar 4), as on the map plate.
 - **The guards step out of the wall, stand in the court and step back, on a clock.** They are
@@ -360,19 +414,27 @@ All of it is built (2026-10-03), rough and drawn by code.
 - **The death 'carved'**, new: he is drawn as a stone figure of his own idle frame, in the
   stone's colours, upright and facing the centre, at the place he died: in front of the guards,
   pressed flat against the inner guard who caught him. Its sound is the thud.
-- Theme `persepolis`, the costume `falseBeard`, the cause 'The audience'.
+- **The cracked column**, one entity: a column drawn like the decor column until it cracks,
+  cracked by a line, falling once he is past it and the hold has run, as a rod pivoting on its
+  foot under `PHYS.gravity`, deadly at any touch while it falls (separating axes against his
+  box), coming to rest on whatever floor, stair or tile it meets first, and solid where it lies.
+  The dev overlay shows its crack line and, dashed, where it comes down.
+- Theme `persepolis`, the costume `falseBeard`, the causes 'The column' (crushed, a squish) and
+  'The audience'.
 - **Sound.** Chapter 4 is not scored: Persepolis loads no music, and every track fades out. Room
   `open`. The wind stays.
 - **The map.** Chapter 4's sites in the ruled order, Persepolis as its level 1, its costume, and
   the three Fars pins nudged apart.
-- **Tests.** `tests/persepolis.spec.ts`, thirteen of them: the guards as one body, the death, no
-  fatal fall, the stairs run, walked and jumped in Node with the real player, the walk-in, the
-  teleport, the runner, the release spread, the crossing spread, the grind, the clean run and
-  the count.
-- **Pillar 8's count**, built with this level: it declares `tricks: ['The audience']`, and the
-  exit label's last row is "Tricks met", 0 of 1 until the guards have killed this visitor once
-  and 1 of 1 from then on, in this browser. The guards kill him themselves, so nothing needs
-  to claim the death.
+- **Tests.** `tests/persepolis.spec.ts`, twenty-one of them: the guards as one body, the death,
+  no fatal fall, the stairs run, walked and jumped in Node with the real player; the column in
+  Node with the real player (its twin, the knowing run and its slack, the stop at the crack, the
+  stop past it and the jump, turning back, never passing it, the fallen shaft solid) and in the
+  browser (pixel for pixel its twin); the walk-in, the teleport, the runner, the release spread,
+  the crossing spread, the grind, the clean run and the count.
+- **Pillar 8's count**, built with this level: it declares `tricks: ['The column', 'The
+  audience']`, and the exit label's last row is "Tricks met", 0 of 2 until one of them has
+  killed this visitor, in this browser. Both kill him themselves, so nothing needs to claim a
+  death.
 
 ## Sources
 
@@ -432,7 +494,8 @@ Coste's date (issued 1843–54, other dates given).
 
 **For the designer to confirm.** That 'The audience' is new on its punchline and its precision
 alone. Its first answer overlaps Knossos's doors and its second is the ordinary pass on a clock
-(The trick).
+(The tricks). 'The column' is ruled (2026-10-06): it spends the touchstone obelisk here, and passes
+the site test only weakly.
 
 **Not verified, so ask before painting:**
 - the guards' height, and which are Persian and which Median, in what order;
@@ -443,6 +506,7 @@ alone. Its first answer overlaps Knossos's doors and its second is the ordinary 
 - the treads: 31 cm on most, 38 or 40 on some, and which;
 - whether wooden treads or boards cover parts of the Stairs of All Nations today;
 - the Gate's columns: two or three standing, and the one IsMEO re-erected with its reset capital;
+  and whether a column stands in the place of the game's west column, the one that falls;
 - the height of the east stair's façade and of the Apadana's platform behind it;
 - the Tachara's door frames: the height of a doorway under its lintel, and the proportions of a
   frame;

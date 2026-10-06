@@ -13,7 +13,7 @@ upright, in profile, facing the centre, drawn in front of the guards and pressed
 the one who caught him. **Death label: "The audience".** Let go of the key at the blank, inside
 about four frames, and he stops in the king's place, the one place nobody steps into: they stand
 round him, step back, and he walks on. Or stop short of the left-hand file, watch them go out
-and back, and cross at once. The level's one trick and its last trap, on a cycle (pillar 5).
+and back, and cross at once. The level's second trick and its last trap, on a cycle (pillar 5).
 About 5 s, 0.83 of them standing.
 
 The audience relief, the king on his throne giving audience, was taken out of the centre of this

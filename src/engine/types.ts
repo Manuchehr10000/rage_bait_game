@@ -54,6 +54,7 @@ export type DeathCause =
   | 'The throne'
   | 'The timber'
   | 'The door'
+  | 'The column'
   | 'The audience'
   | 'Gave up';
 
@@ -103,6 +104,8 @@ export const DEATH_ANIM: Record<DeathCause, DeathAnim> = {
   'The timber': 'crush',
   // The leaf of a pier-and-door partition, opening into him. Over like a plank.
   'The door': 'plank',
+  // Persepolis. The Gate's west column, come down on him.
+  'The column': 'crush',
   // Persepolis. Where the guards stepped out, he is pressed flat into the wall where he
   // stood: upright, in profile, facing the centre like the guards round him, in stone.
   'The audience': 'carved',
@@ -152,6 +155,8 @@ export const DEATH_SOUND: Record<
   'The timber': 'squish',
   // Wood, not the Rouffignac board's bonk.
   'The door': 'knock',
+  // Under a shaft of stone, as under a colossus's head.
+  'The column': 'squish',
   // A body against a stone wall, once.
   'The audience': 'thud',
   'Gave up': 'sigh',

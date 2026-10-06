@@ -20,7 +20,7 @@ right-hand file), each lit from the upper right, so frame 1 is not frame 0 flipp
 
 ## Where it stands in the game
 
-The guards are the level's one trick, 'The audience' (`../LEVEL.md`, "The trick").
+The guards are the level's second trick, 'The audience' (`../LEVEL.md`, "The tricks").
 
 - **In the wall.** On the central projection's lower panel, under the plain band: at x 1140, 1149,
   1158 and 1167 facing right, and at 1192, 1201, 1210 and 1219 facing left, shoulder to shoulder,

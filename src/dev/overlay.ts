@@ -1,4 +1,4 @@
-import { Guards, Sweep, Thrower, Water, type Entity } from '../engine/entities';
+import { Guards, PERSIAN_COLUMN, Sweep, Thrower, Water, type Entity } from '../engine/entities';
 import type { Level } from '../engine/level';
 import { PHYS, Player, type MovingSolid } from '../engine/player';
 import type { Input } from '../engine/input';
@@ -201,6 +201,11 @@ export function renderOverlay(
       case 'chaser':
         trigger(d.triggerX);
         box(d.rect, DEADLY, { dash: true });
+        break;
+      case 'crackedColumn':
+        // The crack, and where it comes down: from its foot to its length, his height.
+        trigger(d.crackX);
+        box({ x: d.x + PERSIAN_COLUMN.half, y: d.floorY - 16, w: d.height - PERSIAN_COLUMN.plinth, h: 16 }, DEADLY, { dash: true });
         break;
       case 'tipper':
         trigger(d.triggerX);

@@ -2,6 +2,7 @@ import type { Sfx } from './audio';
 import type {
   ChaserDef,
   ConveyorDef,
+  CrackedColumnDef,
   CrumbleDef,
   DoorDef,
   EntityDef,
@@ -69,6 +70,8 @@ export function createEntity(def: EntityDef, level: Level): Entity {
       return new Chaser(def);
     case 'tipper':
       return new Tipper(def);
+    case 'crackedColumn':
+      return new CrackedColumn(def);
     case 'snare':
       return new Snare(def);
     case 'hazard':
@@ -1312,5 +1315,173 @@ export class Guards implements Entity {
         return;
       }
     }
+  }
+}
+
+// ---------------------------------------------------------------------------
+
+/**
+ * The parts of a Persian column the falling one is made of, in px, as the renderer
+ * draws every column of the kind: a square double plinth `plinth` high, and a shaft
+ * `2 * half` wide standing on it.
+ */
+export const PERSIAN_COLUMN = { plinth: 8, half: 4 } as const;
+
+/** How far all of him must be east of the shaft before he counts as past it, in px. */
+const PAST = 2;
+
+/**
+ * A column that cracks as he comes up to it, holds, and comes down on him once he is
+ * past it (`CrackedColumnDef`). The plinth stays; the shaft pivots on the east edge of
+ * its foot and falls as a rod of its length falls under the game's gravity, from the
+ * lean the crack gave it. It kills on any touch while it falls, so a man who turns back
+ * walks into it. Where it comes to rest, on the floor or on a stair, it lies, solid.
+ */
+export class CrackedColumn implements Entity {
+  state: 'standing' | 'cracked' | 'falling' | 'down' = 'standing';
+  /** Radians from upright, the top toward +x. */
+  angle = 0;
+  /** Seconds since it cracked, or -1. */
+  sinceCrack = -1;
+  /** Seconds since it began to fall, or -1. */
+  sinceFall = -1;
+  /** Where the shaft pivots: the east edge of its foot, on top of the plinth. */
+  readonly pivotX: number;
+  readonly pivotY: number;
+  /** The shaft's length, from the plinth to its broken top. */
+  readonly length: number;
+  private spin = 0;
+  private lying: MovingSolid[] = [];
+
+  constructor(readonly def: CrackedColumnDef) {
+    this.pivotX = def.x + PERSIAN_COLUMN.half;
+    this.pivotY = def.floorY - PERSIAN_COLUMN.plinth;
+    this.length = def.height - PERSIAN_COLUMN.plinth;
+  }
+
+  /** The shaft's four corners, in the world: foot west, foot east, top east, top west. */
+  corners(angle = this.angle): { x: number; y: number }[] {
+    const c = Math.cos(angle);
+    const s = Math.sin(angle);
+    const w = PERSIAN_COLUMN.half * 2;
+    // In the shaft's own frame the pivot is the origin, the shaft runs up -y and lies west of it.
+    return [
+      [-w, 0],
+      [0, 0],
+      [0, -this.length],
+      [-w, -this.length],
+    ].map(([lx, ly]) => ({ x: this.pivotX + lx! * c - ly! * s, y: this.pivotY + lx! * s + ly! * c }));
+  }
+
+  /** Whether the shaft, at this angle, has come down on anything the level has: its floor, a stair, a wall. */
+  private grounded(level: Level, angle: number): boolean {
+    const c = Math.cos(angle);
+    const s = Math.sin(angle);
+    // Along the shaft's underside as it falls east: the east face, from the foot to the top.
+    for (let t = 0; t <= this.length; t += 1) {
+      const x = this.pivotX + t * s;
+      const y = this.pivotY - t * c;
+      if (level.isSolid(Math.floor(x / TILE), Math.floor(y / TILE))) return true;
+      for (const sl of level.slopes) {
+        if (x < sl.x0 || x > sl.x1) continue;
+        if (y >= sl.y0 + ((sl.y1 - sl.y0) * (x - sl.x0)) / (sl.x1 - sl.x0)) return true;
+      }
+    }
+    return false;
+  }
+
+  /** Whether the shaft, as it stands now, overlaps him: separating axes, strictly. */
+  hits(r: Rect): boolean {
+    const pts = this.corners();
+    const box = [
+      { x: r.x, y: r.y },
+      { x: r.x + r.w, y: r.y },
+      { x: r.x + r.w, y: r.y + r.h },
+      { x: r.x, y: r.y + r.h },
+    ];
+    const c = Math.cos(this.angle);
+    const s = Math.sin(this.angle);
+    for (const [ax, ay] of [
+      [1, 0],
+      [0, 1],
+      [c, s],
+      [-s, c],
+    ] as const) {
+      const span = (q: { x: number; y: number }[]) => {
+        const v = q.map((p) => p.x * ax + p.y * ay);
+        return [Math.min(...v), Math.max(...v)] as const;
+      };
+      const [a0, a1] = span(pts);
+      const [b0, b1] = span(box);
+      if (a1 <= b0 || b1 <= a0) return false;
+    }
+    return true;
+  }
+
+  update(w: World): void {
+    const p = w.player;
+    const d = this.def;
+    if (this.state === 'standing') {
+      if (w.alive && centerX(p) >= d.crackX) {
+        this.state = 'cracked';
+        this.sinceCrack = 0;
+        this.angle = d.lean;
+        w.sound('headCrack');
+      }
+      return;
+    }
+    if (this.sinceCrack >= 0) this.sinceCrack += DT;
+    if (this.state === 'cracked') {
+      if (!(w.alive && this.sinceCrack >= d.hold && p.x >= this.pivotX + PAST)) return;
+      this.state = 'falling';
+      this.sinceFall = 0;
+    }
+    if (this.state === 'falling') {
+      this.sinceFall += DT;
+      // A rod pivoting on its end: angular acceleration 3g sin(angle) / 2L.
+      this.spin += ((3 * PHYS.gravity) / (2 * this.length)) * Math.sin(this.angle) * DT;
+      const next = this.angle + this.spin * DT;
+      if (this.grounded(w.level, next)) {
+        // Where it meets the ground, to a hundredth of a degree.
+        let lo = this.angle;
+        let hi = next;
+        for (let i = 0; i < 16; i++) {
+          const mid = (lo + hi) / 2;
+          if (this.grounded(w.level, mid)) hi = mid;
+          else lo = mid;
+        }
+        this.angle = lo;
+        this.state = 'down';
+        w.sound('headThud');
+        this.lying = this.restingSolids();
+      } else this.angle = next;
+      if (this.hits(p)) w.kill(d.cause);
+    }
+  }
+
+  /** The shaft at rest, as solids: a box round each length of it, so a gentle slant stays a slant. */
+  private restingSolids(): MovingSolid[] {
+    const out: MovingSolid[] = [];
+    const c = Math.cos(this.angle);
+    const s = Math.sin(this.angle);
+    const w = PERSIAN_COLUMN.half * 2;
+    const piece = 16;
+    for (let t0 = 0; t0 < this.length; t0 += piece) {
+      const t1 = Math.min(this.length, t0 + piece);
+      const pts = [
+        [0, -t0],
+        [-w, -t0],
+        [0, -t1],
+        [-w, -t1],
+      ].map(([lx, ly]) => ({ x: this.pivotX + lx! * c - ly! * s, y: this.pivotY + lx! * s + ly! * c }));
+      const x0 = Math.min(...pts.map((q) => q.x));
+      const y0 = Math.min(...pts.map((q) => q.y));
+      out.push({ rect: { x: x0, y: y0, w: Math.max(...pts.map((q) => q.x)) - x0, h: Math.max(...pts.map((q) => q.y)) - y0 }, dx: 0, dy: 0 });
+    }
+    return out;
+  }
+
+  solids(): MovingSolid[] {
+    return this.lying;
   }
 }

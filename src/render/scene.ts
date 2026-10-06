@@ -1,5 +1,5 @@
 import type { Camera } from '../engine/camera';
-import type { Chaser, Crumble, Door, Entity, Falling, Guards, Horse, Platform, Pusher, Roof, Seat, Span, Sweep, Thrower, Tipper, Water } from '../engine/entities';
+import type { Chaser, CrackedColumn, Crumble, Door, Entity, Falling, Guards, Horse, Platform, Pusher, Roof, Seat, Span, Sweep, Thrower, Tipper, Water } from '../engine/entities';
 import type { DecorDef, DoorDef, Level, SpanDef } from '../engine/level';
 import type { Player } from '../engine/player';
 import {
@@ -50,7 +50,7 @@ import { paint } from '../engine/assets';
 import { blit, blitFacing, frameOf, relief, silhouette, withLamp, type Frame, type ReliefTones } from './frame';
 import { SPLINTER, handStencils } from './hands';
 import { hash } from './hash';
-import { TRAIN, type Train } from '../engine/entities';
+import { PERSIAN_COLUMN, TRAIN, type Train } from '../engine/entities';
 import type { CavePanel } from '../engine/level';
 import { BEAR_STALAGMITE_SPRITE, SIGNAL_LAMP_SPRITE, STOP_SIGN_SPRITE, TRAIN_CAR_SPRITE, TRAIN_ENGINE_SPRITE, TRAIN_LAST_CAR_SPRITE } from './procedural';
 import {
@@ -2491,6 +2491,10 @@ function drawEntityFront(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): vo
       if (sp.state === 'falling' || sp.state === 'landed') drawFallenSpan(ctx, sp.rect, d.skin);
       break;
     }
+    case 'crackedColumn':
+      // Behind him, in front of the crush he is flattened in.
+      drawCrackedColumn(ctx, e as CrackedColumn);
+      break;
     default:
       break;
   }
@@ -4023,8 +4027,12 @@ function drawGatePier(ctx: CanvasRenderingContext2D, d: Extract<DecorDef, { kind
  * Apadana's portico bell bases. Lit on its right flank.
  */
 function drawPersianColumn(ctx: CanvasRenderingContext2D, x: number, floorY: number, height: number, base: 'square' | 'bell'): void {
-  const topY = floorY - height;
-  let shaftFoot = floorY;
+  const shaftFoot = drawPersianBase(ctx, x, floorY, base);
+  drawPersianShaft(ctx, x, shaftFoot, floorY - height, x, floorY - height);
+}
+
+/** A Persian column's base, standing on the floor. Returns the y its shaft stands on. */
+function drawPersianBase(ctx: CanvasRenderingContext2D, x: number, floorY: number, base: 'square' | 'bell'): number {
   if (base === 'square') {
     ctx.fillStyle = PS.body;
     ctx.fillRect(x - 8, floorY - 3, 16, 3);
@@ -4041,25 +4049,32 @@ function drawPersianColumn(ctx: CanvasRenderingContext2D, x: number, floorY: num
     ctx.fillRect(x - 5, floorY - 8, 10, 2);
     ctx.fillStyle = PS.lit;
     ctx.fillRect(x - 5, floorY - 8, 10, 1);
-    shaftFoot = floorY - 8;
-  } else {
-    // A bell, its lip on the floor, carved with petals hanging down, and a torus on it.
-    for (let i = 0; i < 8; i++) {
-      const hw = 5 + Math.round((i * i) / 14);
-      ctx.fillStyle = PS.body;
-      ctx.fillRect(x - hw, floorY - 8 + i, hw * 2, 1);
-      ctx.fillStyle = PS.lit;
-      ctx.fillRect(x + hw - 2, floorY - 8 + i, 2, 1);
-      ctx.fillStyle = PS.deep;
-      ctx.fillRect(x - hw, floorY - 8 + i, 1, 1);
-      if (i > 2) for (let px = x - hw + 2; px < x + hw - 2; px += 3) ctx.fillRect(px, floorY - 8 + i, 1, 1);
-    }
-    ctx.fillStyle = PS.body;
-    ctx.fillRect(x - 5, floorY - 10, 10, 2);
-    ctx.fillStyle = PS.lit;
-    ctx.fillRect(x - 5, floorY - 10, 10, 1);
-    shaftFoot = floorY - 10;
+    return floorY - 8;
   }
+  // A bell, its lip on the floor, carved with petals hanging down, and a torus on it.
+  for (let i = 0; i < 8; i++) {
+    const hw = 5 + Math.round((i * i) / 14);
+    ctx.fillStyle = PS.body;
+    ctx.fillRect(x - hw, floorY - 8 + i, hw * 2, 1);
+    ctx.fillStyle = PS.lit;
+    ctx.fillRect(x + hw - 2, floorY - 8 + i, 2, 1);
+    ctx.fillStyle = PS.deep;
+    ctx.fillRect(x - hw, floorY - 8 + i, 1, 1);
+    if (i > 2) for (let px = x - hw + 2; px < x + hw - 2; px += 3) ctx.fillRect(px, floorY - 8 + i, 1, 1);
+  }
+  ctx.fillStyle = PS.body;
+  ctx.fillRect(x - 5, floorY - 10, 10, 2);
+  ctx.fillStyle = PS.lit;
+  ctx.fillRect(x - 5, floorY - 10, 10, 1);
+  return floorY - 10;
+}
+
+/**
+ * A Persian column's shaft, centred on `x`, from its foot up to its broken top at `topY`.
+ * The ragged top is chosen by (`seedX`, `seedY`), the column's own place, so a shaft
+ * drawn somewhere else, as a fallen one is, keeps its own break.
+ */
+function drawPersianShaft(ctx: CanvasRenderingContext2D, x: number, shaftFoot: number, topY: number, seedX: number, seedY: number): void {
   // The shaft: flutes in a row, the right flank in the sun, the left in shade.
   const top = topY + 3;
   ctx.fillStyle = PS.body;
@@ -4074,11 +4089,56 @@ function drawPersianColumn(ctx: CanvasRenderingContext2D, x: number, floorY: num
   // The terrace's blocks carry the stains.
   // The broken top, ragged and paler.
   for (let i = 0; i < 8; i++) {
-    const brk = topY + (hash(x + i, topY) % 4);
+    const brk = topY + (hash(seedX + i, seedY) % 4);
     ctx.fillStyle = i < 2 ? PS.body : PS.lit;
     if (top > brk) ctx.fillRect(x - 4 + i, brk, 1, top - brk);
     ctx.fillStyle = PS.fresh;
     ctx.fillRect(x - 4 + i, brk, 1, 1);
+  }
+}
+
+/** How far up the shaft, from the plinth, the falling column cracks, in px. */
+const COLUMN_CRACK_AT = 35;
+
+/**
+ * The Gate's column that falls. Standing, it is the honest column, pixel for pixel.
+ * Cracked, its shaft leans and a crack runs across it at the height of his head and
+ * above, and a few chips drop from it; falling and fallen, the shaft turns on the east
+ * edge of its foot and the plinth stays where it was.
+ */
+function drawCrackedColumn(ctx: CanvasRenderingContext2D, c: CrackedColumn): void {
+  const d = c.def;
+  if (c.state === 'standing') {
+    drawPersianColumn(ctx, d.x, d.floorY, d.height, 'square');
+    return;
+  }
+  drawPersianBase(ctx, d.x, d.floorY, 'square');
+  ctx.save();
+  ctx.translate(c.pivotX, c.pivotY);
+  ctx.rotate(c.angle);
+  // In the shaft's own frame: the pivot at the origin, the shaft up -y, west of it.
+  const half = PERSIAN_COLUMN.half;
+  drawPersianShaft(ctx, -half, 0, -c.length, d.x, d.floorY - d.height);
+  const crack = [0, 1, 1, 2, 3, 3, 4, 5];
+  for (let i = 0; i < half * 2; i++) {
+    const y = -COLUMN_CRACK_AT - crack[i]!;
+    ctx.fillStyle = PS.deep;
+    ctx.fillRect(-half * 2 + i, y, 1, 1);
+    ctx.fillStyle = PS.fresh;
+    ctx.fillRect(-half * 2 + i, y + 1, 1, 1);
+  }
+  ctx.restore();
+  // The chips, out of the crack's sunny end and down to the floor, where they stay.
+  const t = c.sinceCrack;
+  const fromX = c.pivotX - 1;
+  const fromY = c.pivotY - COLUMN_CRACK_AT - 5;
+  ctx.fillStyle = PS.fresh;
+  for (let i = 0; i < 3; i++) {
+    const dt = t - i * 0.07;
+    if (dt < 0) continue;
+    const x = Math.round(fromX + 2 + i * 2 + dt * (6 + i * 5));
+    const y = Math.min(d.floorY - 1, Math.round(fromY + 0.5 * 600 * dt * dt));
+    ctx.fillRect(x, y, 1, 1);
   }
 }
 

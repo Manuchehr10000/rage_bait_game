@@ -38,7 +38,7 @@ drawn by the game.
 - Cut in the pier, in the same grey limestone, unpainted (one stone per site).
 - As carved as every other figure in the level. The bulls, the king on the Tachara's jambs and the
   figures of the east stair are all carvings that stay carvings, and that is the setup of the
-  level's one trick (`../LEVEL.md`, "The trick").
+  level's second trick, the audience (`../LEVEL.md`, "The tricks").
 - Painted as it stands today, worn and broken where it is (`../../CHAPTER.md`, What "accurate"
   means here), once that has been checked (Confidence). The game's own drawing shows the head
   whole, horn and all, which is not checked against how it stands. That is a stand-in, not a

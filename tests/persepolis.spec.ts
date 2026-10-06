@@ -1,8 +1,8 @@
 import { expect, test, type Page } from '@playwright/test';
 import { PERSEPOLIS } from '../src/levels/ch04-persia/l01-persepolis';
 import { LEVELS } from '../src/levels';
-import { Level, type GuardsDef, type SlopeDef } from '../src/engine/level';
-import { Guards } from '../src/engine/entities';
+import { Level, type CrackedColumnDef, type GuardsDef, type SlopeDef } from '../src/engine/level';
+import { CrackedColumn, Guards, type World } from '../src/engine/entities';
 import { PHYS, Player } from '../src/engine/player';
 import { slopeTop } from '../src/engine/physics';
 import type { Input } from '../src/engine/input';
@@ -140,13 +140,14 @@ test('the audience is its own death: never the pose or the sound of giving up', 
   expect(DEATH_ANIM['The audience']).not.toBe(DEATH_ANIM['Gave up']);
 });
 
-test('nowhere in the level is a fall that kills, and the only trap is the audience', () => {
+test('nowhere in the level is a fall that kills, and the only traps are the column and the audience', () => {
   // Nothing names a fall, because nothing needs to: no two floors within a running jump
   // of each other are a fatal fall apart, jump and all. The floor at each x is the stair
   // over it, or the top of the masonry standing up from the earth (not a lintel).
   expect(PERSEPOLIS.dropCause).toBeUndefined();
   expect(PERSEPOLIS.fallCause).toBeUndefined();
-  expect(PERSEPOLIS.entities.map((e) => e.kind)).toEqual(['guards']);
+  expect(PERSEPOLIS.entities.map((e) => e.kind)).toEqual(['crackedColumn', 'guards']);
+  expect(PERSEPOLIS.tricks).toEqual(['The column', 'The audience']);
   const level = new Level(PERSEPOLIS);
   const floor = (x: number): number => {
     for (const s of PERSEPOLIS.slopes ?? []) {
@@ -287,6 +288,169 @@ test('a full jump on any stair is a full jump, and comes down on the stair or a 
 });
 
 // ---------------------------------------------------------------------------
+// The Gate's west column: the real physics, on the real level, in Node.
+// ---------------------------------------------------------------------------
+
+const columnDef = (): CrackedColumnDef => {
+  const e = PERSEPOLIS.entities.find((d) => d.kind === 'crackedColumn');
+  if (e?.kind !== 'crackedColumn') throw new Error('no column');
+  return e;
+};
+
+type Plan = (p: Player, c: CrackedColumn, i: number) => { right: boolean; left?: boolean; jump?: boolean };
+
+/**
+ * Him, running east off the top of the stair into the Gate, and the column, ticked
+ * together the way the game ticks them: the column sees him, then he moves among its
+ * solids. Stops at his death, at `frames`, or once he is well past the column's top.
+ */
+function throughTheGate(plan: Plan, frames = 60 * 6) {
+  const d = columnDef();
+  const level = new Level(PERSEPOLIS);
+  const p = new Player();
+  p.spawnAt(470, d.floorY - 16);
+  const keys = { left: false, right: false, jumpHeld: false, pressed: false };
+  const input = {
+    get left() {
+      return keys.left;
+    },
+    get right() {
+      return keys.right;
+    },
+    get jumpHeld() {
+      return keys.jumpHeld;
+    },
+    takeJumpPressed: () => {
+      const was = keys.pressed;
+      keys.pressed = false;
+      return was;
+    },
+  } as unknown as Input;
+  const c = new CrackedColumn(d);
+  const heard: string[] = [];
+  let cause: string | null = null;
+  const w = {
+    level,
+    player: p,
+    cameraX: 0,
+    events: new Set<string>(),
+    get alive() {
+      return cause === null;
+    },
+    kill: (k: string) => {
+      cause ??= k;
+    },
+    sound: (n: string) => heard.push(n),
+  } as unknown as World;
+  let i = 0;
+  let downAt = -1;
+  for (; i < frames && cause === null; i++) {
+    const k = plan(p, c, i);
+    keys.right = k.right;
+    keys.left = k.left ?? false;
+    if (k.jump && p.onGround) {
+      keys.pressed = true;
+      keys.jumpHeld = true;
+    } else keys.jumpHeld = false;
+    c.update(w);
+    if (c.state === 'down' && downAt < 0) downAt = i;
+    p.update(input, level, c.solids(), 0);
+    if (downAt >= 0 && i > downAt + 30) break;
+  }
+  return { p, c, cause, heard, frames: i, downAt };
+}
+
+/** Run east, except for `n` frames standing still once `when` comes. */
+const stopFor =
+  (n: number, when: (p: Player, c: CrackedColumn) => boolean): Plan =>
+  (() => {
+    let stood = 0;
+    return (p, c) => {
+      if (stood < n && when(p, c)) {
+        stood++;
+        return { right: false };
+      }
+      return { right: true };
+    };
+  })();
+
+const atCrack = (_p: Player, c: CrackedColumn) => c.state !== 'standing';
+const pastIt = (p: Player, c: CrackedColumn) => p.x >= c.pivotX + 2;
+
+test('the west column is the east column until it cracks: the same column at the same height on the same floor', () => {
+  const d = columnDef();
+  const east = PERSEPOLIS.decor.filter((x) => x.kind === 'gateColumn');
+  expect(east).toHaveLength(1);
+  const e = east[0]!;
+  if (e.kind !== 'gateColumn') throw new Error('no column');
+  expect({ floorY: d.floorY, height: d.height }).toEqual({ floorY: e.floorY, height: e.height });
+  // In the hall, west of its twin, and it cracks while he is still coming up to it.
+  expect(d.x).toBeLessThan(e.x);
+  expect(d.crackX).toBeLessThan(d.x - 16);
+});
+
+test('running on without a check, the column comes down behind him with frames to spare, its top on the Tachara\'s stair', () => {
+  const r = throughTheGate(() => ({ right: true }));
+  expect(r.cause).toBeNull();
+  expect(r.c.state).toBe('down');
+  expect(r.heard.filter((h) => h === 'headCrack')).toHaveLength(1);
+  expect(r.heard.filter((h) => h === 'headThud')).toHaveLength(1);
+  // Where it lies: across the hall and the east portal, its broken top resting on the stair.
+  const top = r.c.corners()[2]!;
+  const stair = PERSEPOLIS.slopes![2]!;
+  expect(top.x).toBeGreaterThan(stair.x0);
+  const line = stair.y0 + ((stair.y1 - stair.y0) * (top.x - stair.x0)) / (stair.x1 - stair.x0);
+  expect(Math.abs(top.y - line)).toBeLessThan(0.5);
+  // A test of the hands: a stop of a few frames anywhere between the crack and getting
+  // clear is survivable, and a little more is not.
+  const slack = (when: (p: Player, c: CrackedColumn) => boolean) => {
+    let n = 0;
+    while (n < 60 && throughTheGate(stopFor(n, when)).cause === null) n++;
+    return n;
+  };
+  for (const when of [atCrack, pastIt]) {
+    const n = slack(when);
+    expect(n).toBeGreaterThanOrEqual(6);
+    expect(n).toBeLessThanOrEqual(10);
+  }
+});
+
+test('stopping at the crack, for anything from a fifth of a second to two seconds, puts him under it', () => {
+  for (const n of [12, 20, 30, 45, 60, 90, 120]) {
+    const r = throughTheGate(stopFor(n, atCrack));
+    expect(r.cause, `stood ${n} frames`).toBe('The column');
+  }
+});
+
+test('stopping once past it, or jumping, gains nothing: still under it', () => {
+  expect(throughTheGate(stopFor(15, pastIt)).cause).toBe('The column');
+  // A jump keeps his speed: it neither saves him nor costs him.
+  expect(throughTheGate((_p, c) => ({ right: true, jump: c.state === 'cracked' })).cause).toBeNull();
+});
+
+test('turning back once it falls walks into it', () => {
+  const r = throughTheGate((_p, c) => (c.state === 'falling' ? { right: false, left: true } : { right: true }));
+  expect(r.cause).toBe('The column');
+});
+
+test('a man who never passes it is never fallen on, however long he waits', () => {
+  const d = columnDef();
+  const r = throughTheGate((p) => ({ right: p.x + p.w < d.x - 8 }), 60 * 8);
+  expect(r.cause).toBeNull();
+  expect(r.c.state).toBe('cracked');
+});
+
+test('once down it is solid: walking back west from the stair, he never passes through it', () => {
+  const r = throughTheGate((_p, c) => (c.state === 'down' ? { right: false, left: true } : { right: true }), 60 * 8);
+  expect(r.cause).toBeNull();
+  expect(r.c.solids().length).toBeGreaterThan(0);
+  // He ends against the fallen top, never inside the shaft.
+  expect(r.c.hits(r.p)).toBe(false);
+  expect(r.p.lastContacts.left).toBe(true);
+  expect(r.p.x).toBeGreaterThan(r.c.corners()[2]!.x - 2);
+});
+
+// ---------------------------------------------------------------------------
 // In the browser: the court.
 // ---------------------------------------------------------------------------
 
@@ -406,6 +570,19 @@ test('waiting short of the left-hand file and crossing while they are in the wal
   }
 });
 
+test('standing, the west column is drawn pixel for pixel as its twin, from its plinth to the top of the screen', async ({ page }) => {
+  const r = (await page.evaluate(`(() => { ${DRIVER}
+    const W = g.wctx, ART = 4, col = E.find((e) => e.def.kind === 'crackedColumn').def;
+    const twin = L.decor.find((d) => d.kind === 'gateColumn');
+    p.x = 470; p.y = col.floorY - 16; g.tick();
+    g.camera.x = col.x - 60; g.camera.y = col.floorY - 150; g.draw();
+    // The shaft, the whole width it covers on its own, from the top of the screen to its foot.
+    const grab = (x) => Array.from(W.getImageData((x - 4 - g.camera.ix) * ART, 0, 8 * ART, (col.floorY - 8 - g.camera.iy) * ART).data).join(',');
+    return { same: grab(col.x) === grab(twin.x), standing: E.find((e) => e.def.kind === 'crackedColumn').state, apart: twin.x - col.x };
+  })()`)) as Record<string, unknown>;
+  expect(r).toEqual({ same: true, standing: 'standing', apart: 46 });
+});
+
 test('one grind each time they step out, while the court is on screen; the death is a thud', async ({ page }) => {
   const r = await play(
     page,
@@ -426,7 +603,7 @@ test('the knowing route: no deaths, about fifteen seconds, under a second standi
   expect(r.still / 60).toBeLessThan(1.2);
 });
 
-test('pillar 8: the exit label counts the audience once it has killed him, and the browser remembers', async ({ page }) => {
+test('pillar 8: the exit label counts the audience once it has killed him, of the level\'s two tricks, and the browser remembers', async ({ page }) => {
   type Count = { met: number; of: number } | null;
   const count = (): Promise<Count> => page.evaluate(() => (window as unknown as { __game: { tricksCount(): Count } }).__game.tricksCount());
   const stored = (): Promise<unknown> => page.evaluate(() => JSON.parse(localStorage.getItem('lostTourist.tricks') ?? 'null'));
@@ -434,17 +611,23 @@ test('pillar 8: the exit label counts the audience once it has killed him, and t
 
   // Never killed by it: the label says none of the one.
   expect((await play(page, `const step = () => { routeUntil('done'); };`, 60 * 45)).state).toBe('complete');
-  expect(await count()).toEqual({ met: 0, of: 1 });
+  expect(await count()).toEqual({ met: 0, of: 2 });
   expect(await stored()).toBeNull();
 
   // Killed by it: written down, once, however often it happens.
   expect((await play(page, runThrough)).cause).toBe('The audience');
   expect((await play(page, runThrough)).cause).toBe('The audience');
   expect(await stored()).toEqual({ persepolis: ['The audience'] });
-  expect(await count()).toEqual({ met: 1, of: 1 });
+  expect(await count()).toEqual({ met: 1, of: 2 });
+
+  // And the column: stop at its crack.
+  const underTheColumn = `const col = E.find((e) => e.def.kind === 'crackedColumn'); let stood = 0; const step = () => { if (col.state !== 'standing' && stood < 40) { stood++; key('ArrowRight', false); return; } key('ArrowRight', true); };`;
+  expect((await play(page, underTheColumn)).cause).toBe('The column');
+  expect(await stored()).toEqual({ persepolis: ['The audience', 'The column'] });
+  expect(await count()).toEqual({ met: 2, of: 2 });
 
   // Another visit, the same browser.
   await page.reload();
   await page.waitForFunction(() => (window as unknown as { __game?: { levelData: { id: string } } }).__game?.levelData.id === 'persepolis');
-  expect(await count()).toEqual({ met: 1, of: 1 });
+  expect(await count()).toEqual({ met: 2, of: 2 });
 });

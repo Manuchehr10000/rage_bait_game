@@ -34,7 +34,7 @@ to the pixel** (pillar 4).
 - The king walks out of the hall, in profile, in the long Persian court robe, crowned and bearded.
 - Cut in the polished stone of the jamb, unpainted, lit from the upper right.
 - As carved as everything else in the level: a carving that stays a carving
-  (`../LEVEL.md`, "The trick").
+  (`../LEVEL.md`, "The tricks").
 
 ## Deliberately wrong
 

@@ -77,6 +77,9 @@ const EAST_PORTAL = 40;
 const PORTAL_H = 94;
 /** The hall's columns stood about 16.5 m: they run off the top of the screen, as the Apadana's do. */
 const GATE_COLUMN_H = 155;
+/** The hall's two columns: the west one falls, the east one stands. */
+const WEST_COLUMN = px(HALL) + 36;
+const EAST_COLUMN = px(HALL) + 82;
 
 // ---------------------------------------------------------------------------
 // c. The Tachara: up its stair, across its platform, down the other side.
@@ -117,8 +120,8 @@ export const PERSEPOLIS: LevelData = {
   spawn: { x: 24, y: px(PLAIN) - 16 },
   cameraBottom: px(H),
   slopes: [FLIGHT_1, FLIGHT_2, TACHARA_UP_STAIR, TACHARA_DOWN_STAIR],
-  // One trick (pillar 8): the guards kill him themselves, so no claim is needed.
-  tricks: ['The audience'],
+  // Two tricks (pillar 8). The column and the guards kill him themselves, so nothing needs to claim a death.
+  tricks: ['The column', 'The audience'],
   // Past the north end of the façade. No turnstile at the Apadana: the plain exit.
   exit: { x: px(EXIT), y: px(TERRACE) - 24, w: 12, h: 24 },
 
@@ -132,8 +135,8 @@ export const PERSEPOLIS: LevelData = {
     // its walls, and names cut high on the piers by the visitors of three centuries.
     { kind: 'gatePier', x: px(WEST_PORTAL), w: 2 * TILE, floorY: px(TERRACE), top: px(TERRACE) - PORTAL_H, figure: 'bull', face: -1 },
     { kind: 'polishedBench', x0: px(HALL) + 2, x1: px(EAST_PORTAL) - 2, floorY: px(TERRACE) },
-    { kind: 'gateColumn', x: px(HALL) + 36, floorY: px(TERRACE), height: GATE_COLUMN_H },
-    { kind: 'gateColumn', x: px(HALL) + 82, floorY: px(TERRACE), height: GATE_COLUMN_H },
+    // The west column is an entity, below: the same column until it cracks.
+    { kind: 'gateColumn', x: EAST_COLUMN, floorY: px(TERRACE), height: GATE_COLUMN_H },
     { kind: 'gatePier', x: px(EAST_PORTAL), w: 2 * TILE, floorY: px(TERRACE), top: px(TERRACE) - PORTAL_H, figure: 'lamassu', face: 1 },
     { kind: 'nameScratch', x: px(WEST_PORTAL) + 6, y: px(TERRACE) - 72, w: 12 },
     { kind: 'nameScratch', x: px(EAST_PORTAL) + 4, y: px(TERRACE) - 78, w: 14 },
@@ -169,6 +172,20 @@ export const PERSEPOLIS: LevelData = {
   ],
 
   entities: [
+    // b. The Gate's west column. It cracks as he comes through the west portal and holds;
+    // once he is past it, and not before 0.75 s after the crack, it comes down the way he is
+    // going and its top comes to rest on the Tachara's stair. Running on without a check
+    // he is clear with 8 frames to spare; stop at the crack and he is under it.
+    {
+      kind: 'crackedColumn',
+      x: WEST_COLUMN,
+      floorY: px(TERRACE),
+      height: GATE_COLUMN_H,
+      crackX: px(WEST_PORTAL) + 28,
+      hold: 0.75,
+      lean: 0.02,
+      cause: 'The column',
+    },
     // d. The guards of the central projection: four a side, facing in, the blank between
     // them. The clock starts as he comes down into the court; a man who keeps running
     // is in the king's place as they step out, and runs on into the right-hand file.

@@ -388,6 +388,36 @@ export interface TipperDef {
 }
 
 /**
+ * A column like its neighbours, a fluted shaft on a square double plinth, that cracks
+ * as he comes up to it and holds. Once he is past it, and not before `hold` has run
+ * since the crack, the shaft topples off its plinth the way he is going, falling the
+ * way a shaft of its length falls under the game's gravity: slowly at first, fast at
+ * the end. It kills him if it comes down on him, and once down it lies where it came
+ * to rest, on the floor or a stair, and is solid. The touchstone obelisk of
+ * `content/tricks.md`: the setup is honest, the punchline is when, and once known he
+ * has to outrun its length.
+ */
+export interface CrackedColumnDef {
+  kind: 'crackedColumn';
+  /** The shaft's centre line, as for the column decor it is drawn like. */
+  x: number;
+  floorY: number;
+  /** Plinth and shaft, to the broken top: the same as the honest columns'. */
+  height: number;
+  /** His centre crossing this cracks it. */
+  crackX: number;
+  /**
+   * Seconds after the crack before it may fall. It falls then, if he is past it, or the
+   * moment he is past it, whichever comes later: so a man who stops at the crack has
+   * lost his start, and a man who never passes it is never fallen on.
+   */
+  hold: number;
+  /** Radians it leans east when it cracks, and falls from. With its length and gravity, this sets how long the fall takes. */
+  lean: number;
+  cause: DeathCause;
+}
+
+/**
  * A stretch of the floor over his head, carried by one column. While the column
  * stands it is part of the ceiling: solid, and drawn exactly like the ceiling on
  * either side of it (pillar 4). When the column fails it comes down faster than
@@ -503,6 +533,7 @@ export type EntityDef =
   | ConveyorDef
   | ChaserDef
   | TipperDef
+  | CrackedColumnDef
   | HazardDef
   | HorseDef
   | RoofDef
