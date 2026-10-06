@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { Level, type LevelData } from '../src/engine/level';
-import { LEVELS } from '../src/levels';
+import { LEVELS, STAGES } from '../src/levels';
 import { DT, TILE } from '../src/engine/types';
 import { SLOPE_CATCH } from '../src/engine/physics';
 import { PHYS } from '../src/engine/player';
@@ -16,8 +16,9 @@ import { PHYS } from '../src/engine/player';
 const PLAYER_W = 10;
 const PLAYER_H = 16;
 
+/** The stages keep the same contracts as the levels: they are the same ground, with no traps yet. */
 const each = (fn: (data: LevelData, level: Level) => void) => {
-  for (const data of LEVELS) fn(data, new Level(data));
+  for (const data of [...LEVELS, ...STAGES]) fn(data, new Level(data));
 };
 
 test('every level he walks into has floor from its left edge to the spawn, and nothing in his way', () => {

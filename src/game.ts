@@ -5,7 +5,7 @@ import type { Stats } from './render/hud';
 import { renderHud } from './render/hud';
 import { Input } from './engine/input';
 import { Level, type LevelData, type Theme } from './engine/level';
-import { LEVELS, levelIndexFromHash } from './levels/index';
+import { LEVELS, STAGES, levelIndexFromHash } from './levels/index';
 import { PHYS, Player, type MovingSolid } from './engine/player';
 import { slopeTop } from './engine/physics';
 import { Progress } from './engine/progress';
@@ -30,6 +30,9 @@ type Screen = 'map' | 'level';
  * which does not even carry the code.
  */
 const DEV_TOOLS = __BUILD_ENV__ !== 'prod';
+
+/** What the game can enter: the tour, and where there are dev tools the stages after it (deep link only). */
+const PLAYABLE: readonly LevelData[] = DEV_TOOLS ? [...LEVELS, ...STAGES] : LEVELS;
 
 /**
  * How far off the left edge of the screen the tourist starts when he walks into a
@@ -180,8 +183,8 @@ export class Game {
     // the designer want. In prod it opens only a level the tour has reached, so a link
     // cannot skip a player past the levels that set up this one.
     const hash = location.hash.replace(/^#/, '').trim();
-    const linked = hash && hash !== 'map' ? levelIndexFromHash(location.hash) : -1;
-    if (linked >= 0 && (DEV_TOOLS || this.progress.isOpen(LEVELS[linked]!.id))) this.enterLevel(linked, false);
+    const linked = hash && hash !== 'map' ? levelIndexFromHash(location.hash, PLAYABLE) : -1;
+    if (linked >= 0 && (DEV_TOOLS || this.progress.isOpen(PLAYABLE[linked]!.id))) this.enterLevel(linked, false);
     else this.goToMap();
   }
 
@@ -271,7 +274,7 @@ export class Game {
     if (action.kind === 'move') this.audio.play('step');
     else if (action.kind === 'closed') this.audio.play('bonk');
     else {
-      const i = LEVELS.findIndex((l) => l.id === action.level);
+      const i = PLAYABLE.findIndex((l) => l.id === action.level);
       if (i >= 0) this.enterLevel(i, true);
     }
   }
@@ -321,11 +324,12 @@ export class Game {
   /** The next site of this chapter that has a level, or null at the end of the chapter. */
   private nextLevelIndex(): number | null {
     const here = locate(this.level.data.id);
+    // A stage is on no map: its exit leads back to the map.
     if (!here) return this.levelIndex + 1 < LEVELS.length ? this.levelIndex + 1 : null;
     for (let i = here.site + 1; i < here.chapter.sites.length; i++) {
       const id = here.chapter.sites[i]?.level;
       if (!id) continue;
-      const idx = LEVELS.findIndex((l) => l.id === id);
+      const idx = PLAYABLE.findIndex((l) => l.id === id);
       if (idx >= 0) return idx;
     }
     return null;
@@ -346,9 +350,9 @@ export class Game {
 
   /** Enter a level fresh: new stats, the title card, first attempt. */
   loadLevel(index: number): void {
-    const data = LEVELS[index] ?? LEVELS[0];
+    const data = PLAYABLE[index] ?? PLAYABLE[0];
     if (!data) throw new Error('no levels');
-    this.levelIndex = LEVELS.indexOf(data);
+    this.levelIndex = PLAYABLE.indexOf(data);
     this.level = new Level(data);
     const sound = SOUND_OF[data.theme];
     this.audio.setMusic(sound.track);

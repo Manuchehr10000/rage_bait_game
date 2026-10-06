@@ -14,11 +14,20 @@ import { PERSEPOLIS } from './ch04-persia/l01-persepolis';
 /** Every level in tour order: chapter 1, then chapter 2 south to north along the Nile, then the Aegean, then Persia. */
 export const LEVELS: LevelData[] = [CAP_BLANC, ROC_AUX_SORCIERS, PECH_MERLE, ROUFFIGNAC, GARGAS, ABU_SIMBEL, PHILAE, KARNAK, DENDERA, KNOSSOS, PERSEPOLIS];
 
-export function levelIndexFromHash(hash: string): number {
+/**
+ * Stages: a site built as it is, with its artifacts in place and no traps, for the
+ * designer to place and calibrate every trap by hand (designer's ruling, 2026-10-06).
+ * Not on the map and not in prod: the dev and local builds open one by its deep link,
+ * `#<id>`. When its traps are in, it takes its level's place in LEVELS.
+ */
+export const STAGES: LevelData[] = [];
+
+/** `list` is what the game can enter: LEVELS, and the stages too where there are dev tools. */
+export function levelIndexFromHash(hash: string, list: readonly LevelData[] = LEVELS): number {
   const key = hash.replace(/^#/, '').trim();
   if (!key) return 0;
   const n = Number(key);
-  if (Number.isInteger(n) && n >= 1 && n <= LEVELS.length) return n - 1;
-  const i = LEVELS.findIndex((l) => l.id === key);
+  if (Number.isInteger(n) && n >= 1 && n <= list.length) return n - 1;
+  const i = list.findIndex((l) => l.id === key);
   return i >= 0 ? i : 0;
 }
