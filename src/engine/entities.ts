@@ -469,11 +469,15 @@ export class Crumble implements Entity {
       const arrived = standing && (!this.def.fromAir || this.wasAirborne);
       const go = this.def.onEvent ? w.events.has(this.def.onEvent) : arrived;
       this.wasAirborne = !p.onGround;
-      if (go) {
+      if (!go) return;
+      if (this.def.opens === undefined) {
         this.state = 'armed';
         this.timer = this.def.delay;
+        return;
       }
-      return;
+      // A trapdoor: gone this frame, under whoever is on it.
+      this.state = 'falling';
+      w.sound('crumble');
     }
     if (this.state === 'armed') {
       this.timer -= DT;
@@ -538,6 +542,7 @@ export class Crumble implements Entity {
     if (this.state === 'landed') return;
     if (this.def.skin === 'croc') this.vy = 55;
     else if (this.def.sinkSpeed !== undefined) this.vy = this.def.sinkSpeed;
+    else if (this.def.opens !== undefined) this.vy = this.def.opens;
     else this.vy = Math.min(PHYS.maxFall, this.vy + PHYS.gravity * DT);
     const before = r.y;
     r.y += this.vy * DT;

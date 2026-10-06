@@ -52,16 +52,18 @@ const g = new Grid(W, H);
 // ---------------------------------------------------------------------------
 g.fill(0, WEST, 20, H - WEST, '#');
 g.fill(0, WEST, 18, 1, '=');
-const KOULOURES = [4, 9, 13];
+const KOULOURES = [5, 9, 13];
 for (const k of KOULOURES) g.fill(k, WEST, 2, 2, ' ');
 /**
- * Between the first two pits, a fourth the dig never emptied: one slab of the court's
- * paving over a shaft thirteen tiles deep, with a slab of solid court either side of it.
- * It goes the moment he is on it and takes him to the bottom. Not in the grid; the slab is.
+ * The court between the first two pits is a block of paving and fill standing over a pit the
+ * dig never emptied, with no bottom the level reaches. Stood on, it goes at once, as fast as
+ * anything falls, and takes him with it. The way past is down into the first pit and straight
+ * across into the second. Not in the grid; the block is.
  */
-const PAVED_OVER = 7;
-const PAVED_DEPTH = 13;
-g.fill(PAVED_OVER, WEST, 1, PAVED_DEPTH, ' ');
+const BLOCK = 7;
+const BLOCK_W = 2;
+const BLOCK_H = 2;
+g.fill(BLOCK, WEST, BLOCK_W, H - WEST, ' ');
 
 // ---------------------------------------------------------------------------
 // b. The West Magazine. He comes in over the stump of the west façade.
@@ -220,9 +222,8 @@ export const KNOSSOS: LevelData = {
   rows: g.rows(),
   spawn: { x: 24, y: px(WEST) - 16 },
   cameraBottom: px(H),
-  // The only drop in the level a fall can be fatal from is the shaft under the paved-over
-  // pit: jump off the slab on its way down and the bottom is still the bottom.
-  dropCause: 'The kouloura',
+  // The one way off the bottom of the level is the pit under the court between the first two.
+  fallCause: 'The kouloura',
   // The turnstile at the foot of the stair: the same turnstile as Karnak's, and only a turnstile.
   exit: { x: px(TURNSTILE), y: px(FOOT) - 24, w: 12, h: 24 },
 
@@ -253,10 +254,10 @@ export const KNOSSOS: LevelData = {
     { kind: 'dark', x0: px(HDA), x1: px(PORTICO + 1), y0: px(HALL + 1), y1: px(LOWER), ambient: 0.82 },
 
     // a. The West Court.
-    { kind: 'evansBust', x: 40, floorY: px(WEST) },
+    { kind: 'evansBust', x: 58, floorY: px(WEST) },
     { kind: 'causeway', x0: 0, x1: px(FACADE), floorY: px(WEST) },
     ...KOULOURES.map((k) => ({ kind: 'kouloura' as const, x: px(k), w: 2 * TILE, floorY: px(WEST), depth: 2 * TILE })),
-    { kind: 'kouloura', x: px(PAVED_OVER), w: TILE, floorY: px(WEST), depth: px(PAVED_DEPTH) },
+    { kind: 'kouloura', x: px(BLOCK), w: px(BLOCK_W), floorY: px(WEST), depth: px(H - WEST) },
 
     // b. The storeroom: its jars against the wall, and Evans's four columns. The fifth is the span's.
     ...[px(MAG) + 20, px(MAG) + 56, px(MAG) + 92, px(ROOF_FROM) + 2, px(ROOF_FROM) + 66, px(ROOF_FROM) + 130, px(ROOF_TO) + 20].map((x) => ({
@@ -293,19 +294,17 @@ export const KNOSSOS: LevelData = {
   ],
 
   entities: [
-    // a. The paving over the pit the dig never emptied: drawn like every other slab of the
-    // court, with the court's fill under it, until it goes. It goes the frame he is on it,
-    // and whoever rides it to the bottom stays there. A jump off it the instant it goes is
-    // the only way out.
+    // a. The court between the first two pits, standing over the pit: drawn like the rest of the
+    // court, paving on fill, with the fill under it, until it goes. It opens under him the frame
+    // he is on it, a tile a frame, so he goes with it.
     {
       kind: 'crumble',
       skin: 'floor',
-      rect: { x: px(PAVED_OVER), y: px(WEST), w: TILE, h: TILE },
+      rect: { x: px(BLOCK), y: px(WEST), w: px(BLOCK_W), h: px(BLOCK_H) },
       fake: true,
       delay: 0,
+      opens: 960,
       solidBelow: true,
-      floorY: px(WEST + PAVED_DEPTH),
-      cause: 'The kouloura',
     },
 
     // b. The last Minoan column, burnt through, and the span of the burnt storey it carries.

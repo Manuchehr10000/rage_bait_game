@@ -2069,12 +2069,12 @@ function drawEntityBack(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): voi
       } else if (d.skin === 'talatat') {
         for (let i = 0; i < r.w / TILE; i++) if (!paint(ctx, 'talatat', r.x + i * TILE, r.y)) ctx.drawImage(TALATAT_SPRITE, r.x + i * TILE, r.y);
       } else if (d.skin === 'floor' && s.level.data.theme === 'knossos') {
-        // A slab of the court's paving, drawn by the code that draws the rest of it, with the
-        // grain of the place it was laid, wherever it is now (pillar 4).
+        // A block of the court, paving on fill, drawn by the code that draws the rest of it, with
+        // the grain of the place it was laid, wherever it is now (pillar 4).
         const tx0 = Math.floor(d.rect.x / TILE);
         const ty0 = Math.floor(d.rect.y / TILE);
         for (let j = 0; j < r.h / TILE; j++)
-          for (let i = 0; i < r.w / TILE; i++) drawTileAt(ctx, s.level, '=', tx0 + i, ty0 + j, j === 0, r.x + i * TILE, r.y + j * TILE);
+          for (let i = 0; i < r.w / TILE; i++) drawTileAt(ctx, s.level, j === 0 ? '=' : '#', tx0 + i, ty0 + j, j === 0, r.x + i * TILE, r.y + j * TILE);
       } else if (d.skin === 'floor') {
         // Looks exactly like the paving around it, all the way down. That is the point.
         for (let j = 0; j < r.h / TILE; j++) {
@@ -2820,19 +2820,6 @@ function drawDeath(ctx: CanvasRenderingContext2D, s: Scene, death: { cause: Deat
     case 'sit': {
       const seated = lit(costume, frameOf(`${c.id}-seated`, 0, c.seated), lampLit(s));
       blitFacing(ctx, seated, x, feetY - seated.h, p.facing);
-      break;
-    }
-    case 'crumple': {
-      // At the bottom of something too narrow to fall over in: he folds where he lands.
-      const k = Math.min(1, t / 0.08);
-      const h = Math.round(16 - 7 * k);
-      ctx.save();
-      if (p.facing === -1) {
-        ctx.translate(x + 12, 0);
-        ctx.scale(-1, 1);
-        blit(ctx, dead, 0, feetY - h, 12, h);
-      } else blit(ctx, dead, x, feetY - h, 12, h);
-      ctx.restore();
       break;
     }
     case 'enthroned': {

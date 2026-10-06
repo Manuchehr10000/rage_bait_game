@@ -51,8 +51,10 @@ const DRIVER = `
   /** The Hall of the Double Axes: from its well's dark east edge to the sun. */
   const HALL = doors[0].def.clock.triggerX;
   const TERRACE = doors[1].def.planeX + 2 * T;
-  const pits = L.decor.filter((d) => d.kind === 'kouloura').map((d) => d.x);
-  const paving = E.find((e) => e.def.kind === 'crumble' && e.def.skin === 'floor');
+  /** The three open pits of the West Court, west to east. The fourth is under the court between the first two. */
+  const pits = L.decor.filter((d) => d.kind === 'kouloura' && d.depth === 2 * T).map((d) => d.x);
+  const block = E.find((e) => e.def.kind === 'crumble' && e.def.skin === 'floor');
+  const COURT_Y = L.spawn.y + 16;
   let phase = 'start';
   let done = false;
   let still = 0;
@@ -70,9 +72,14 @@ const DRIVER = `
   /** Over anything a step high in his way. */
   const climb = (h = 12) => { key('ArrowRight', true); if (p.onGround && hold === 0 && p.lastContacts.right) jump(h); };
   const ROUTE = {
-    // A short hop over each pit, the paved-over one included: short enough over the first
-    // to come down on the solid slab before the one that goes, and off again at once.
-    court: () => { key('ArrowRight', true); if (hold === 0 && p.onGround && pits.some((k) => cx() >= k - 12 && cx() < k)) jump(8); climb(14); },
+    // Never onto the court between the first two pits: walk down into the first, jump from it
+    // into the second, out of that onto the court, and hop the third.
+    court: () => {
+      key('ArrowRight', true);
+      if (hold === 0 && p.onGround && feet() > COURT_Y + 8) jump(14);
+      else if (hold === 0 && p.onGround && cx() >= pits[2] - 12 && cx() < pits[2]) jump(8);
+      climb(14);
+    },
     // From under the fourth span, a full jump: the roof cuts it flat and it lands in the light.
     magazine: () => { key('ArrowRight', true); if (hold === 0 && p.onGround && cx() >= LIGHT - 43 && cx() < LIGHT - 32) jump(18); },
     // Into the basin; a hop out, short of the throne; a hop over the barrier; up the steps.
@@ -161,33 +168,30 @@ test.beforeEach(async ({ page }) => {
   expect(errors).toEqual([]);
 });
 
-test('the paving between the first two pits goes the moment he steps on it, and takes him to the bottom', async ({ page }) => {
-  // Over the first pit, onto the court, and on: the next slab is over a pit the dig never
-  // emptied, thirteen tiles deep. It goes at once, and he rides it down.
-  const r = await play(
-    page,
-    `let hopped = false; const step = () => { key('ArrowRight', true); if (!hopped && p.onGround && cx() >= pits[0] - 12) { jump(8); hopped = true; } };`,
-    60 * 5,
-  );
-  expect(r.cause).toBe('The kouloura');
-  expect(r.total).toBe(1);
+test('the court between the first two pits opens under a hop over the first, and he goes down with it', async ({ page }) => {
+  for (const f of [6, 8, 10, 12]) {
+    const r = await play(
+      page,
+      `let hopped = false; const step = () => { key('ArrowRight', true); if (!hopped && p.onGround && cx() >= pits[0] - 14) { jump(${f}); hopped = true; } };`,
+      60 * 5,
+    );
+    expect(r.cause, `a hop of ${f} frames`).toBe('The kouloura');
+    expect(r.total).toBe(1);
+  }
 });
 
-test('a jump the instant the paving goes gets him back out of its pit', async ({ page }) => {
-  // The one way out once he is on it: off it before it has gone far. A few frames late is fine.
-  const r = await play(
-    page,
-    `let hopped = false; let off = -1; const step = (i) => { key('ArrowRight', true); if (!hopped && p.onGround && cx() >= pits[0] - 12) { jump(8); hopped = true; } if (off < 0 && paving.state !== 'idle') off = i; if (off >= 0 && i === off + 4) jump(18); if (cx() > pits[1] + 2 * T + 8 && p.onGround) { phase = 'out'; done = true; } };`,
-    60 * 5,
-  );
-  expect(r.state).toBe('playing');
-  expect(r.phase).toBe('out');
-});
-
-test('a hop straight off the solid slab before it leaves the paving where it is', async ({ page }) => {
-  const r = await play(page, `const step = () => { if (!routeUntil('magazine')) return; phase = paving.state; done = true; };`, 60 * 10);
-  expect(r.state).toBe('playing');
-  expect(r.phase).toBe('idle');
+test('down into the first pit and straight across into the second is the way past', async ({ page }) => {
+  // From anywhere in the first pit, any jump held 10 frames or more ends in the second pit:
+  // over the court, or onto its far end as it opens, and down into the second pit with it gone.
+  for (const f of [10, 14, 18]) {
+    const r = await play(
+      page,
+      `let jumped = false; const step = () => { key('ArrowRight', true); if (!jumped && p.onGround && feet() > COURT_Y + 8) { jump(${f}); jumped = true; } if (jumped && p.onGround && feet() > COURT_Y + 8 && p.x > pits[1]) { phase = 'second pit'; done = true; } };`,
+      60 * 5,
+    );
+    expect(r.state, `a jump of ${f} frames`).toBe('playing');
+    expect(r.phase).toBe('second pit');
+  }
 });
 
 test('running into the storeroom brings the burnt storey down on him a stride short of the light', async ({ page }) => {

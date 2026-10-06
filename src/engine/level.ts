@@ -175,6 +175,12 @@ export interface CrumbleDef {
   face?: 1 | -1;
   /** Constant px/s instead of gravity: a block settling into the river, not a capital dropping. */
   sinkSpeed?: number;
+  /**
+   * It opens under him: the frame he is on it, it is already dropping away at this many px/s,
+   * with him on it, and keeps on at that speed. No delay, no settling: a trapdoor, not a slab
+   * that gives. Nothing standing on it can walk off it before it has gone.
+   */
+  opens?: number;
   /** Gives way when this event fires, instead of when stood on. */
   onEvent?: string;
   /** Stops falling with its bottom here, instead of leaving the level. */

@@ -60,7 +60,7 @@ export type DeathCause =
   | 'Gave up';
 
 /** How each death is drawn. */
-export type DeathAnim = 'crush' | 'plank' | 'drown' | 'burn' | 'snap' | 'swept' | 'gone' | 'sit' | 'flat' | 'enthroned' | 'carved' | 'crumple';
+export type DeathAnim = 'crush' | 'plank' | 'drown' | 'burn' | 'snap' | 'swept' | 'gone' | 'sit' | 'flat' | 'enthroned' | 'carved';
 
 export const DEATH_ANIM: Record<DeathCause, DeathAnim> = {
   'The Beune': 'drown',
@@ -105,9 +105,8 @@ export const DEATH_ANIM: Record<DeathCause, DeathAnim> = {
   'The timber': 'crush',
   // The leaf of a pier-and-door partition, opening into him. Over like a plank.
   'The door': 'plank',
-  // The paving over the pit the dig never emptied, and him on it, at the bottom of a shaft
-  // a tile wide: no room to lie down in, so he folds where he stands.
-  'The kouloura': 'crumple',
+  // The court between the first two pits, and him on it, down a pit with no bottom.
+  'The kouloura': 'gone',
   // Persepolis. The Gate's west column, come down on him.
   'The column': 'crush',
   // Persepolis. Where the guards stepped out, he is pressed flat into the wall where he
@@ -159,7 +158,7 @@ export const DEATH_SOUND: Record<
   'The timber': 'squish',
   // Wood, not the Rouffignac board's bonk.
   'The door': 'knock',
-  'The kouloura': 'thud',
+  'The kouloura': 'fallAway',
   // Under a shaft of stone, as under a colossus's head.
   'The column': 'squish',
   // A body against a stone wall, once.
