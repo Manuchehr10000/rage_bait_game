@@ -115,16 +115,9 @@ this table, as the rest do.
 | The burnt column: five identical columns hold the roof; the fifth, beside the light, folds once his feet are under its span, and the span comes down on him. Jump from under the fourth span into the light | Knossos, the West Magazines | something comes down where a runner is going; Cap Blanc's roof block most of all | no: the upper storey did fall into these storerooms in the fire, but a roof that comes down on a runner fits any roofed site |
 | The throne: a full jump out of the basin seats him in the throne and ends his visit. A hop out lands short. Evans's copy beyond the barrier, the same chair, does nothing | Knossos, the Throne Room | new; claimed above | yes |
 | The timber: jump the light well to the far hall, and the column across it, the same as the one beside him, lets its span down on the far hall. Walk off into the well instead and walk on under the far hall | Knossos, the Grand Staircase | the burnt column, two beats earlier in the same level: the same setup and the same punchline, with a different answer (down, not across) | yes: Fyfe's timber rotted in the Grand Staircase |
+| The paved-over pit: three open pits, honest; between the first two, one slab of the court's paving goes the frame he is on it and takes him down a shaft. A short hop over the first pit and straight off again leaves it; caught on it, a jump within 11 frames. Designer's call, 2026-10-06 | Knossos, the West Court | the trapdoor in plain floor, a fifth time, met in the open court of the level that opens the chapter | half: the West Court's *kouloures* were Old Palace pits the Minoans filled and paved over; a paved-over pit fits any court with pits in it |
 | The doors: two identical folding doors on one clock. The first folds away from him, so he stands against the second, and it folds into his face. Wait in the middle of the hall, then walk through | Knossos, the Hall of the Double Axes | new: the first door is its setup, the cows' shape | yes: the pier-and-door partitions are this hall's |
 
 Not tricks, because nothing kills: Knossos's turnstile, honest, where Karnak's stood on a
 trapdoor, and Evans's copy of the throne. Both are flinches set up by a trick met earlier.
 If Karnak's exit loses its trapdoor when it is rebuilt, Knossos's turnstile loses its setup.
-
-Not a trick either, because nothing kills, but it spends a shape: Knossos's paved-over pit in
-the West Court (designer's call, 2026-10-06). Between the first two open pits, one slab of the
-court's paving goes the frame he is on it and drops him a tile into a pit like the others; a
-short hop over the first pit and straight off again leaves it. From the player's seat it is
-the trapdoor in plain floor, with no death on the end. The site's part: the West Court's
-*kouloures* were Old Palace pits the Minoans filled and paved over. If it is ever made to kill,
-it is that trick again and has to be judged as one.

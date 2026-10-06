@@ -161,21 +161,27 @@ test.beforeEach(async ({ page }) => {
   expect(errors).toEqual([]);
 });
 
-test('the paving between the first two pits goes the moment he steps on it, and drops him into its pit', async ({ page }) => {
+test('the paving between the first two pits goes the moment he steps on it, and takes him to the bottom', async ({ page }) => {
   // Over the first pit, onto the court, and on: the next slab is over a pit the dig never
-  // emptied. It goes at once, and he is at the bottom of it with the slab, alive.
+  // emptied, thirteen tiles deep. It goes at once, and he rides it down.
   const r = await play(
     page,
-    `let hopped = false; const step = () => { key('ArrowRight', true); if (!hopped && p.onGround && cx() >= pits[0] - 12) { jump(8); hopped = true; } if (paving.state === 'landed' && p.onGround) { phase = 'in'; done = true; } };`,
+    `let hopped = false; const step = () => { key('ArrowRight', true); if (!hopped && p.onGround && cx() >= pits[0] - 12) { jump(8); hopped = true; } };`,
+    60 * 5,
+  );
+  expect(r.cause).toBe('The kouloura');
+  expect(r.total).toBe(1);
+});
+
+test('a jump the instant the paving goes gets him back out of its pit', async ({ page }) => {
+  // The one way out once he is on it: off it before it has gone far. A few frames late is fine.
+  const r = await play(
+    page,
+    `let hopped = false; let off = -1; const step = (i) => { key('ArrowRight', true); if (!hopped && p.onGround && cx() >= pits[0] - 12) { jump(8); hopped = true; } if (off < 0 && paving.state !== 'idle') off = i; if (off >= 0 && i === off + 4) jump(18); if (cx() > pits[1] + 2 * T + 8 && p.onGround) { phase = 'out'; done = true; } };`,
     60 * 5,
   );
   expect(r.state).toBe('playing');
-  expect(r.phase).toBe('in');
-  expect(r.total).toBe(0);
-  const slab = KNOSSOS.entities.find((e) => e.kind === 'crumble' && e.skin === 'floor');
-  if (slab?.kind !== 'crumble') throw new Error('no slab');
-  // Standing on the slab at the bottom of its pit, a tile under the court.
-  expect(r.y + 16).toBe(slab.rect.y + 16);
+  expect(r.phase).toBe('out');
 });
 
 test('a hop straight off the solid slab before it leaves the paving where it is', async ({ page }) => {

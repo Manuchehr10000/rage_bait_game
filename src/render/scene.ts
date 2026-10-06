@@ -2822,6 +2822,19 @@ function drawDeath(ctx: CanvasRenderingContext2D, s: Scene, death: { cause: Deat
       blitFacing(ctx, seated, x, feetY - seated.h, p.facing);
       break;
     }
+    case 'crumple': {
+      // At the bottom of something too narrow to fall over in: he folds where he lands.
+      const k = Math.min(1, t / 0.08);
+      const h = Math.round(16 - 7 * k);
+      ctx.save();
+      if (p.facing === -1) {
+        ctx.translate(x + 12, 0);
+        ctx.scale(-1, 1);
+        blit(ctx, dead, 0, feetY - h, 12, h);
+      } else blit(ctx, dead, x, feetY - h, 12, h);
+      ctx.restore();
+      break;
+    }
     case 'enthroned': {
       // In the seat he landed in front of, facing out, and at rest. Nothing else moves for it.
       const seat = s.entities.find((e) => e.def.kind === 'seat' && (e as Seat).sat);

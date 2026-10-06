@@ -56,11 +56,12 @@ const KOULOURES = [4, 9, 13];
 for (const k of KOULOURES) g.fill(k, WEST, 2, 2, ' ');
 /**
  * Between the first two pits, a fourth the dig never emptied: one slab of the court's
- * paving over a hole as deep as the others, with a slab of solid court either side of it.
- * It goes the moment he is on it. Not in the grid; the slab is.
+ * paving over a shaft thirteen tiles deep, with a slab of solid court either side of it.
+ * It goes the moment he is on it and takes him to the bottom. Not in the grid; the slab is.
  */
 const PAVED_OVER = 7;
-g.fill(PAVED_OVER, WEST, 1, 2, ' ');
+const PAVED_DEPTH = 13;
+g.fill(PAVED_OVER, WEST, 1, PAVED_DEPTH, ' ');
 
 // ---------------------------------------------------------------------------
 // b. The West Magazine. He comes in over the stump of the west façade.
@@ -219,6 +220,9 @@ export const KNOSSOS: LevelData = {
   rows: g.rows(),
   spawn: { x: 24, y: px(WEST) - 16 },
   cameraBottom: px(H),
+  // The only drop in the level a fall can be fatal from is the shaft under the paved-over
+  // pit: jump off the slab on its way down and the bottom is still the bottom.
+  dropCause: 'The kouloura',
   // The turnstile at the foot of the stair: the same turnstile as Karnak's, and only a turnstile.
   exit: { x: px(TURNSTILE), y: px(FOOT) - 24, w: 12, h: 24 },
 
@@ -252,7 +256,7 @@ export const KNOSSOS: LevelData = {
     { kind: 'evansBust', x: 40, floorY: px(WEST) },
     { kind: 'causeway', x0: 0, x1: px(FACADE), floorY: px(WEST) },
     ...KOULOURES.map((k) => ({ kind: 'kouloura' as const, x: px(k), w: 2 * TILE, floorY: px(WEST), depth: 2 * TILE })),
-    { kind: 'kouloura', x: px(PAVED_OVER), w: TILE, floorY: px(WEST), depth: 2 * TILE },
+    { kind: 'kouloura', x: px(PAVED_OVER), w: TILE, floorY: px(WEST), depth: px(PAVED_DEPTH) },
 
     // b. The storeroom: its jars against the wall, and Evans's four columns. The fifth is the span's.
     ...[px(MAG) + 20, px(MAG) + 56, px(MAG) + 92, px(ROOF_FROM) + 2, px(ROOF_FROM) + 66, px(ROOF_FROM) + 130, px(ROOF_TO) + 20].map((x) => ({
@@ -291,7 +295,8 @@ export const KNOSSOS: LevelData = {
   entities: [
     // a. The paving over the pit the dig never emptied: drawn like every other slab of the
     // court, with the court's fill under it, until it goes. It goes the frame he is on it,
-    // and lies at the bottom of its pit.
+    // and whoever rides it to the bottom stays there. A jump off it the instant it goes is
+    // the only way out.
     {
       kind: 'crumble',
       skin: 'floor',
@@ -299,7 +304,8 @@ export const KNOSSOS: LevelData = {
       fake: true,
       delay: 0,
       solidBelow: true,
-      floorY: px(WEST + 2),
+      floorY: px(WEST + PAVED_DEPTH),
+      cause: 'The kouloura',
     },
 
     // b. The last Minoan column, burnt through, and the span of the burnt storey it carries.

@@ -74,7 +74,7 @@ knowing run is 27.3 s from the spawn, 1.85 s of it standing at the doors.
 
 | Beat | Folder | What the player meets | The history it comes from |
 |---|---|---|---|
-| a | `a-west-court` | Evans's bronze bust by the way in. The paved court, the raised walkways crossing it, three open round pits to hop. Between the first two, one slab of the paving goes the moment he is on it, into a pit as deep as the others. Nothing kills | The West Court, its causeways and its three *kouloures*: Old Palace pits the Minoans filled and paved over when they enlarged the court, emptied again by the dig |
+| a | `a-west-court` | Evans's bronze bust by the way in. The paved court, the raised walkways crossing it, three open round pits to hop. Between the first two, one slab of the paving goes the moment he is on it, and takes him to the bottom of a pit the dig never emptied | The West Court, its causeways and its three *kouloures*: Old Palace pits the Minoans filled and paved over when they enlarged the court, emptied again by the dig |
 | b | `b-magazines` | A long storeroom with a row of storage jars: open sky, then dark under a roof on five identical red columns, then open sky. Four columns are Evans's and hold. The fifth, standing against the light, is the last Minoan column, burnt through: set foot under its span and it folds, and the burnt storey comes down. Cross the last span in the air and land in the light | The West Magazines: long, narrow, dead-end storerooms. Evans roofed only VIII–XII, in concrete, in 1929; the rest are open. In the final fire the upper storey fell into them, and Evans rebuilt his upper floor from what fell |
 | c | `c-throne-room` | A dark room, Evans's all the way up, where nothing comes down. The only light falls into a sunken basin in his path. A full jump out of the basin lands him in front of the gypsum throne, and he is sitting in it. His visit is over. Walked past, it does nothing. Over the barrier, in the anteroom, Evans's copy of the throne, the same chair, where a full jump lands, and it does nothing | The Throne Room, found April 1900: the gypsum throne where it was found, the benches, the lustral basin and its light well; Evans's 1930 roof and upper storey; the wooden seat he put in the anteroom; the barrier visitors stand behind |
 | d | `d-central-court` | Full sun, nothing above and nothing below. The eastern half steps down. Nothing happens | The Central Court, crossed across its width; its east part found eroded at least 2 m below the original floor |
@@ -84,22 +84,26 @@ knowing run is 27.3 s from the spawn, 1.85 s of it standing at the doors.
 
 ### a · West Court
 
-Nothing kills here. The beat is there to hand the player the chapter's scale and the first
-thing the chapter wants seen: before any Minoan stone, the bronze bust of the man who
+The beat is there to hand the player the chapter's scale and the first thing the chapter
+wants seen: before any Minoan stone, the bronze bust of the man who
 rebuilt it. The three pits are shallow in game terms, hopped or fallen into and jumped out
 of: a hole that is only a hole.
 
-**The paved-over pit** (designer's call, 2026-10-06, at `knossos (127, 2)`). Between the first
-two open pits there are three slabs of court. The middle one is the paving over a fourth pit
-the dig never emptied, and it goes the frame he is on it, onto the floor of its pit, a tile
-under the court, with him on it. It is drawn as the court is, the walkway running over it and
-the court's fill under it, until it goes (pillar 4). Nothing kills; it costs a hop out.
+**The paved-over pit** (designer's calls, 2026-10-06, at `knossos (127, 2)`: make it fall the
+moment it is stepped on; make it kill). Between the first two open pits there are three slabs
+of court. The middle one is the paving over a fourth pit the dig never emptied, a shaft a tile
+wide and thirteen deep, and it goes the frame he is on it and takes him to the bottom. Label:
+**The kouloura.** He is found folded where he landed: the shaft is too narrow to fall over in.
+It is drawn as the court is, the walkway running over it and the court's fill under it, until
+it goes (pillar 4).
 
 - **First attempt.** A hop over the first pit comes down on the solid slab before it, he
   walks on, and the paving goes.
 - **Second attempt.** A short hop over the first pit (6 to 10 frames of jump) and straight off
   again from the solid slab, over the paving onto the slab after it, and over the second pit.
-  A full jump over the first pit comes down on the paving. (Phaistos has four more in its old court, just as honest; the
+  A full jump over the first pit comes down on the paving.
+- **Caught on it,** a jump within about a fifth of a second of its going (11 frames) still gets
+  him out. Jump off it later and the fall is the level's one fatal drop, under the same noun. (Phaistos has four more in its old court, just as honest; the
 player who remembers these flinches at the fourth.) Three identical honest things
 open the level; three identical honest things (the catch-pits of beat g) close it.
 
@@ -247,9 +251,10 @@ No jump in the beat can kill.
 
 ## Deliberate lies
 
-- **A fourth pit, paved over, between the first two.** The West Court has three *kouloures*.
-  The Minoans did fill and pave them when they enlarged the court; the dig emptied all three.
-  This one it left, and the paving over it holds nobody.
+- **A fourth pit, paved over, between the first two, a tile wide and thirteen deep.** The West
+  Court has three *kouloures*, round and broad and a few metres deep at most. The Minoans did
+  fill and pave them when they enlarged the court; the dig emptied all three. This one it left,
+  and the paving over it holds nobody.
 - **He walks the storeroom floor, and he gets into it over the west façade.** The storerooms
   open only eastward onto the Long Corridor; visitors look down into them from Evans's upper
   floor and nobody walks their floors.
