@@ -55,6 +55,28 @@ async function hover(page: Page, wx: number, wy: number): Promise<Point> {
   });
 }
 
+/**
+ * Turn the wheel, and wait until the page has had the event. Playwright's wheel returns
+ * before the page has seen it, so a reading taken straight after can come too soon, and a
+ * key let go straight after can arrive first: Alt released before the wheel lands turns
+ * Alt+wheel into a plain one. That is how "Alt+wheel looks up and down" failed on CI.
+ */
+async function wheel(page: Page, dx: number, dy: number): Promise<void> {
+  const seen = () =>
+    page.evaluate(() => {
+      const w = window as unknown as { __wheels?: number };
+      if (w.__wheels === undefined) {
+        w.__wheels = 0;
+        // On the window, bubbling: it runs after the canvas has handled the same event.
+        window.addEventListener('wheel', () => (w.__wheels = (w.__wheels ?? 0) + 1));
+      }
+      return w.__wheels;
+    });
+  const before = await seen();
+  await page.mouse.wheel(dx, dy);
+  await page.waitForFunction((n) => ((window as unknown as { __wheels?: number }).__wheels ?? 0) > n, before);
+}
+
 /** The colour on the game canvas at a page position, and one world pixel away from it. */
 async function drawnAt(page: Page, at: { x: number; y: number }, dx: number, dy: number): Promise<[string, string]> {
   return page.evaluate(
@@ -440,7 +462,7 @@ test('the wheel looks along the level while nothing moves, and any key puts the 
   const before = await tourist(page);
   expect(before.camX).toBe(0);
 
-  await page.mouse.wheel(0, 400); // four notches: 200 world px along
+  await wheel(page, 0, 400); // four notches: 200 world px along
   let t = await tourist(page);
   expect(t.camX).toBe(200);
   expect(t.paused).toBe(true);
@@ -451,7 +473,7 @@ test('the wheel looks along the level while nothing moves, and any key puts the 
   expect(t.camX, 'and the view goes back').toBe(before.camX);
 
   // While looking the game stands still: no time passes, he does not move, the camera stays put.
-  await page.mouse.wheel(0, 400);
+  await wheel(page, 0, 400);
   const held = await tourist(page);
   await ticks(page, 60);
   t = await tourist(page);
@@ -473,7 +495,7 @@ test('looking far along and Shift+clicking there puts him there', async ({ page 
   const floor = (await tourist(page)).floor;
   await hover(page, 100, 200);
   // The far floor past the trench, beyond the first screen.
-  await page.mouse.wheel(0, 2000);
+  await wheel(page, 0, 2000);
   const t0 = await tourist(page);
   expect(t0.camX).toBeGreaterThan(900);
   const far = await page.evaluate(() => {
@@ -499,7 +521,7 @@ test('Alt+wheel looks up and down a tall level', async ({ page }) => {
   await hover(page, 100, 200);
   const y0 = (await tourist(page)).camY;
   await page.keyboard.down('Alt');
-  await page.mouse.wheel(0, -200);
+  await wheel(page, 0, -200);
   await page.keyboard.up('Alt');
   const t = await tourist(page);
   expect(t.camY).toBe(Math.max(0, y0 - 100));
@@ -522,7 +544,7 @@ test('leaving the level forgets the spot; hidden with G, neither the wheel nor S
   await toggle(page); // hidden
   const at = await mouseAt(page, 250, floor);
   await page.mouse.move(at.x, at.y);
-  await page.mouse.wheel(0, 400);
+  await wheel(page, 0, 400);
   await page.keyboard.down('Shift');
   await page.mouse.click(at.x, at.y);
   await page.keyboard.up('Shift');
@@ -682,7 +704,7 @@ test('P stops the game, full stop moves it on one tick, P again lets it go', asy
 test('the dev keys do not stop looking, and hiding the tools lets a stopped game go', async ({ page }) => {
   await open(page, 'cap-blanc');
   await hover(page, 100, 200);
-  await page.mouse.wheel(0, 400);
+  await wheel(page, 0, 400);
   for (const k of ['KeyH', 'KeyT', 'KeyP', 'Period', 'KeyP', 'KeyT', 'KeyH']) await page.keyboard.press(k);
   expect((await tourist(page)).paused).toBe(true);
   expect((await tourist(page)).camX).toBe(200);
