@@ -16,6 +16,8 @@ interface Snap {
   lamp: boolean;
   /** Left edge of the block the overhang drops, so the far-floor tests can measure against it. */
   roofX: number;
+  /** Whether the block was down on the floor when the run ended. */
+  roofLanded: boolean;
 }
 
 const DRIVER = `
@@ -69,7 +71,7 @@ const DRIVER = `
       if (g.state !== 'playing') break;
     }
     key('ArrowRight', false); key('Space', false);
-    return { state: g.state, cause: g.deathCause, x: Math.round(p.x), y: Math.round(p.y), total: g.stats.total, phase, lamp: g.lamp, roofX };
+    return { state: g.state, cause: g.deathCause, x: Math.round(p.x), y: Math.round(p.y), total: g.stats.total, phase, lamp: g.lamp, roofX, roofLanded: roof.state === 'landed' };
   };
   // The valley: one stream to jump.
   const valley = () => { key('ArrowRight', true); if (canJump() && right() >= streamX - 8 && right() < streamX + 10) jump(); };
@@ -236,8 +238,20 @@ test('a full jump off the tenth lands where the overhang lets go', async ({ page
     };`, 60 * 6);
   expect(long.phase).toBe('falling');
   expect(long.cause).toBe('The roof');
-  // Crushed on the far floor, feet on it, wherever in the jump the block met him.
+  // Crushed on the far floor, feet on it, wherever in the jump the block met him, and
+  // only once the block is down on it.
   expect(long.y + 16).toBe(240);
+  expect(long.roofLanded).toBe(true);
+});
+
+test('standing under it, he is crushed when the block reaches the floor, not when it first touches his head', async ({ page }) => {
+  const r = await play(page, `
+    const step = () => {
+      if (phase === 'valley') { p.spawnAt(roofX + 6, 240 - 16); g.camera.x = roofX - 150; phase = 'under'; }
+    };`, 60 * 4);
+  expect(r.cause).toBe('The roof');
+  expect(r.y + 16).toBe(240);
+  expect(r.roofLanded).toBe(true);
 });
 
 test('caught in the air, he goes down under the block and is crushed on the floor, never in mid-air', async ({ page }) => {
@@ -256,6 +270,7 @@ test('caught in the air, he goes down under the block and is crushed on the floo
       };`, 60 * 3);
     expect(r.cause, 'lifted ' + lift).toBe('The roof');
     expect(r.y + 16, 'lifted ' + lift).toBe(240);
+    expect(r.roofLanded, 'the block is on the floor when he dies').toBe(true);
     expect(r.x).toBeGreaterThanOrEqual(r.roofX - 10);
     expect(r.x).toBeLessThanOrEqual(r.roofX + 24);
   }

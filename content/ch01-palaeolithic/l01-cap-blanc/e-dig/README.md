@@ -12,9 +12,11 @@ lets go the moment you are over the edge, so a full jump off the tenth horse put
 exactly where it lands, and two strides off a short hop walk into it. The way through is
 to hop short, stand still at the very edge, and let the roof have its moment.
 
-When the block meets him in the air, it does not crush him there: from the first touch he
-is pinned under it, nothing he presses gets him out, and it drives him down and crushes him
-on the far floor (cap-blanc (1141, 10), ruled by the designer 2026-10-06). The same is true
+It crushes him on the far floor, when it lands there, and never before (cap-blanc
+(1141, 10), ruled by the designer 2026-10-06). From the first touch he is pinned under it
+and nothing he presses gets him out. Caught in the air, he goes down under it to the floor;
+standing, he goes under it as it comes down, and it is the floor it lands on that flattens
+him, not the first touch on his head. The same is true
 of every block of a shelter's roof in the game, Pech Merle's slab included.
 
 Beyond it is the deposit the excavation left in place (`tile-sediment`), and the way out
