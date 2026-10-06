@@ -236,6 +236,29 @@ test('a full jump off the tenth lands where the overhang lets go', async ({ page
     };`, 60 * 6);
   expect(long.phase).toBe('falling');
   expect(long.cause).toBe('The roof');
+  // Crushed on the far floor, feet on it, wherever in the jump the block met him.
+  expect(long.y + 16).toBe(240);
+});
+
+test('caught in the air, he goes down under the block and is crushed on the floor, never in mid-air', async ({ page }) => {
+  // Put him in the air under the falling block at several heights, running and jumping
+  // to get out from under it: the stone has him from the first touch.
+  for (const lift of [10, 30, 50]) {
+    const r = await play(page, `
+      const step = () => {
+        if (phase === 'valley') {
+          p.spawnAt(roofX + 6, 240 - 16 - ${lift}); g.camera.x = roofX - 150;
+          roof.state = 'falling'; roof.rect.y = 240 - 16 - ${lift} - roof.rect.h - 2;
+          phase = 'air';
+        }
+        key('ArrowRight', true);
+        jump(1);
+      };`, 60 * 3);
+    expect(r.cause, 'lifted ' + lift).toBe('The roof');
+    expect(r.y + 16, 'lifted ' + lift).toBe(240);
+    expect(r.x).toBeGreaterThanOrEqual(r.roofX - 10);
+    expect(r.x).toBeLessThanOrEqual(r.roofX + 24);
+  }
 });
 
 test('hop short to the very edge of the far floor and the block comes down in front of you', async ({ page }) => {

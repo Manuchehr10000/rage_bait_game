@@ -753,6 +753,8 @@ export class Roof implements Entity {
   state: 'idle' | 'armed' | 'falling' | 'landed' = 'idle';
   private timer = 0;
   private vy = 0;
+  /** It has touched him, and he is going down under it. */
+  private pinning = false;
   private readonly solid: MovingSolid;
 
   constructor(readonly def: RoofDef) {
@@ -791,7 +793,25 @@ export class Roof implements Entity {
       this.state = 'landed';
       w.sound('thud');
     }
-    if (overlaps(this.rect, p)) w.kill(d.cause);
+    if (!w.alive) return;
+    // It has him. Caught in the air, he is not crushed in the air: he goes down under
+    // it, with nothing to say about it, and it crushes him on the floor.
+    if (this.pinning || overlaps(this.rect, p)) {
+      this.pinning = true;
+      p.pinned = true;
+      const under = this.rect.y + this.rect.h;
+      // Standing, he is crushed where he stands. In the air, he is crushed when it has
+      // driven him to the floor: there is no room left under it for anything else.
+      if (p.onGround || under + p.h >= d.floorY - 0.5) {
+        // On the floor it comes down on, flat on it, not a hair above where a hard landing left him.
+        if (!p.onGround || Math.abs(p.y + p.h - d.floorY) < 2) p.y = d.floorY - p.h;
+        p.vy = 0;
+        w.kill(d.cause);
+        return;
+      }
+      p.y = Math.max(p.y, under);
+      p.vy = Math.max(p.vy, this.vy);
+    }
   }
 
   solids(): MovingSolid[] {

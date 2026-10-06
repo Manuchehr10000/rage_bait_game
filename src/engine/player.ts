@@ -77,6 +77,11 @@ export class Player implements Rect {
    */
   tugging = false;
   private tug = 0;
+  /**
+   * Pinned under something coming down on him: driven down with it to the floor, and
+   * nothing the controls do moves him out from under it. Drawn as he was; not held.
+   */
+  pinned = false;
   private strokeTimer = 0;
   /** Horizontal drag applied this frame by a conveyor. */
   private driftX = 0;
@@ -98,6 +103,7 @@ export class Player implements Rect {
     this.held = false;
     this.tugging = false;
     this.tug = 0;
+    this.pinned = false;
   }
 
   /** A conveyor pulls the ground out from under you. Applied on top of your own movement. */
@@ -197,8 +203,9 @@ export class Player implements Rect {
     // to pull at.
     this.tugging = this.held && (input.left || input.right || input.jumpHeld);
     this.tug = this.tugging ? this.tug + 1 : 0;
-    const want = this.held ? 0 : (input.right ? 1 : 0) - (input.left ? 1 : 0);
-    if (this.held) {
+    const stuck = this.held || this.pinned;
+    const want = stuck ? 0 : (input.right ? 1 : 0) - (input.left ? 1 : 0);
+    if (stuck) {
       // Held is held: no run-out, no slide.
       this.vx = 0;
     } else if (want !== 0) {
@@ -217,7 +224,7 @@ export class Player implements Rect {
 
     this.justJumped = false;
     this.justStepped = false;
-    if (this.buffer > 0 && this.coyote > 0 && !this.held) {
+    if (this.buffer > 0 && this.coyote > 0 && !stuck) {
       this.justJumped = true;
       this.jumping = true;
       this.vy = -PHYS.jumpVelocity;
