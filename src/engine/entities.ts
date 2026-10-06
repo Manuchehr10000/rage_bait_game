@@ -746,6 +746,31 @@ export class Horse implements Entity {
 
 // ---------------------------------------------------------------------------
 
+/**
+ * Something heavy coming down, and him under it: a block of a shelter's roof, a span
+ * of a burnt storey. From the first touch he is pinned: nothing he presses gets him
+ * out from under it. Caught in the air, he goes down under it to the floor. It crushes
+ * him when it lands, on the floor, and not before: never in the air, and never while it
+ * is still coming down on a man standing under it. Returns whether it has him.
+ */
+function crushUnder(w: World, rect: Rect, vy: number, landed: boolean, floorY: number, cause: DeathCause, pinning: boolean): boolean {
+  const p = w.player;
+  if (!w.alive) return pinning;
+  if (!pinning && !overlaps(rect, p)) return false;
+  p.pinned = true;
+  if (!p.onGround) {
+    p.y = Math.min(Math.max(p.y, rect.y + rect.h), floorY - p.h);
+    p.vy = Math.max(p.vy, vy);
+  }
+  if (landed) {
+    // On the floor it came down on, flat on it, not a hair above where a hard landing left him.
+    if (!p.onGround || Math.abs(p.y + p.h - floorY) < 2) p.y = floorY - p.h;
+    p.vy = 0;
+    w.kill(cause);
+  }
+  return true;
+}
+
 /** A block of the overhang comes down harder than anything the player does. */
 const ROOF = { push: 240, gravity: 3000 } as const;
 
@@ -798,25 +823,7 @@ export class Roof implements Entity {
       this.state = 'landed';
       w.sound('thud');
     }
-    if (!w.alive) return;
-    // It has him. From the first touch he is pinned: nothing he presses gets him out
-    // from under it. Caught in the air, he goes down under it to the floor. It crushes
-    // him when it lands, on the floor, and not before: never in the air, and never
-    // while it is still coming down on a man standing under it.
-    if (this.pinning || overlaps(this.rect, p)) {
-      this.pinning = true;
-      p.pinned = true;
-      if (!p.onGround) {
-        p.y = Math.min(Math.max(p.y, this.rect.y + this.rect.h), d.floorY - p.h);
-        p.vy = Math.max(p.vy, this.vy);
-      }
-      if (this.state === 'landed') {
-        // On the floor it came down on, flat on it, not a hair above where a hard landing left him.
-        if (!p.onGround || Math.abs(p.y + p.h - d.floorY) < 2) p.y = d.floorY - p.h;
-        p.vy = 0;
-        w.kill(d.cause);
-      }
-    }
+    this.pinning = crushUnder(w, this.rect, this.vy, this.state === 'landed', d.floorY, d.cause, this.pinning);
   }
 
   solids(): MovingSolid[] {
@@ -1107,6 +1114,8 @@ export class Span implements Entity {
   /** Seconds since it was set off. */
   t = 0;
   private vy = 0;
+  /** It has touched him, and he is going down under it. */
+  private pinning = false;
   private readonly solid: MovingSolid;
 
   constructor(readonly def: SpanDef) {
@@ -1153,7 +1162,7 @@ export class Span implements Entity {
       this.state = 'landed';
       w.sound('thud');
     }
-    if (overlaps(this.rect, p)) w.kill(d.cause);
+    this.pinning = crushUnder(w, this.rect, this.vy, this.state === 'landed', d.floorY, d.cause, this.pinning);
   }
 
   /** Ceiling while it hangs, nothing while it falls, a step once it is down. */

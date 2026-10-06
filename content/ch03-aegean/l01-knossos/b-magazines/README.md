@@ -11,3 +11,10 @@ It also comes down, harmlessly, once he has passed it, so it is down for everybo
 Evans roofed storerooms VIII–XII in concrete in 1929 and left the rest open; the level lays
 open, roofed, open along one room. The column, the slab, the jars have notes here. The column
 folding, the burnt storey on the floor and the daylight through the hole are drawn by the game.
+
+**It crushes him on the floor, when it lands.** Caught under the span as it comes down, in
+the air or standing, he is pinned from the first touch, and nothing he presses gets him
+out: it is the landing that flattens him, on the storeroom floor, never the air and never
+the first touch on his head (knossos (590, 71), ruled by the designer 2026-10-06). The
+same rule as Cap Blanc's block of the overhang, and the timber's span at the Grand
+Staircase keeps it too.

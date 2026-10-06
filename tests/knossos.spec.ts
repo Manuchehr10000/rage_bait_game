@@ -194,6 +194,31 @@ test('down into the first pit and straight across into the second is the way pas
   }
 });
 
+test('the burnt storey crushes him on the storeroom floor when it lands, never in the air (knossos (590, 71))', async ({ page }) => {
+  // Standing under it, and caught at three heights in a jump, running and jumping to get
+  // out: from the first touch it has him, and it is the landing that flattens him.
+  for (const lift of [0, 20, 40]) {
+    const r = await play(
+      page,
+      `const step = () => {
+        if (phase === 'start') {
+          const floor = storey.def.floorY;
+          p.spawnAt(storey.rect.x + 8, floor - 16 - ${lift}); g.camera.x = storey.rect.x - 150;
+          storey.state = 'falling'; storey.rect.y = floor - 16 - ${lift} - storey.rect.h - 2;
+          phase = 'under';
+        }
+        key('ArrowRight', true);
+        jump(1);
+      };`,
+      60 * 3,
+    );
+    const after = await page.evaluate(`(() => { const s = window.__game.entities.find((e) => e.def.kind === 'span' && e.def.skin === 'upperStorey'); return { landed: s.state === 'landed', floor: s.def.floorY }; })()`) as { landed: boolean; floor: number };
+    expect(r.cause, `lifted ${lift}`).toBe('The upper storey');
+    expect(r.y + 16, `lifted ${lift}: feet on the floor`).toBe(after.floor);
+    expect(after.landed, `lifted ${lift}: the span is down when he dies`).toBe(true);
+  }
+});
+
 test('running into the storeroom brings the burnt storey down on him a stride short of the light', async ({ page }) => {
   const r = await play(page, `const step = () => { if (!routeUntil('magazine')) return; key('ArrowRight', true); };`, 60 * 20);
   expect(r.cause).toBe('The upper storey');
