@@ -14,7 +14,7 @@ drawn by code. Levels 3 and 4 are provisional.
 | 1 | Persepolis | Marvdasht plain, Fars | c. 518–330 BC | yes | rough |
 | 2 | Naqsh-e Rustam | Fars | 5th c. BC + Sassanian | not yet | not yet |
 | 3 | Pasargadae | Fars | c. 546 BC | not yet (provisional) | not yet |
-| 4 | Susa | Khuzestan | Elamite–Achaemenid | not yet (provisional; gate 6 flag open) | not yet |
+| 4 | Susa | Khuzestan | Elamite–Achaemenid | not yet (provisional; gate 6 ruled) | not yet |
 | 5 | Behistun | Kermanshah | c. 520 BC | not yet | not yet |
 | 6 | The legend: Farhad | Bisotun (Behistun), in Nizami's *Khosrow and Shirin* | the poem c. 1180s | not yet | not yet |
 
@@ -144,7 +144,8 @@ recorded in `arc.md` as well; the sound is recorded here only, as chapter 3's wa
 4. **Graves, a working rule for the chapter.** A tomb's carved front is architecture and may
    carry a trap; burial chambers and cists never. The royal tombs on Kuh-e Rahmat above
    Persepolis stay out of frame. Needed for Naqsh-e Rustam and Pasargadae.
-5. **Susa, a gate 6 flag, open.** See Gate 6. It does not block Persepolis.
+5. **Susa, a gate 6 flag, ruled by the designer 2026-10-06:** Susa may be built beside the Tomb
+   of Daniel. See Gate 6.
 6. **The winged disc** at the top of the central panel of the Apadana's east stair is a living
    community's emblem today and is never a gag. It stays carved where it is; the audience
    happens below it and its joke is on the tourist. Ruled 2026-10-03 (designer: "go on").
@@ -281,10 +282,11 @@ both were dynamited in 2014–15 (`arc.md`).
 **Persepolis: clear.** A palace ruin. The Achaemenid royal tombs cut into Kuh-e Rahmat above the
 terrace stay out of frame. The winged disc is never a gag (ruling 6).
 
-**Susa: flagged, open.** The Tomb of Daniel, an active pilgrimage shrine, stands beside the tell
-and can be seen from the excavators' château on it. Recommendation: build on the tell only, the
-shrine never in frame. Open until the designer rules; no production on Susa until then (pillar
-12). `arc.md`'s "clear throughout" for this chapter is corrected.
+**Susa: ruled 2026-10-06, by the designer.** The Tomb of Daniel, an active pilgrimage shrine,
+stands beside the tell and can be seen from the excavators' château on it. Susa may be built
+beside it. The shrine is never part of the level (pillar 12): no trap, death, joke or tourist on
+it or at it. Whether it is seen at all, in the backdrop, is decided when Susa is designed;
+recommended not, as at Great Zimbabwe and Tikal (`arc.md` section 4).
 
 **Graves.** A tomb's carved front is architecture and may carry a trap; burial chambers and cists
 never (ruling 4). It governs Naqsh-e Rustam and Pasargadae.

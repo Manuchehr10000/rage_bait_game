@@ -52,11 +52,11 @@ notes describe the levels as they were built.
 - **Chapter 4** (ruled 2026-10-03, on the designer's delegation, `arc.md` sections 3 and 4):
   the order is Persepolis, Naqsh-e Rustam, Pasargadae, Susa, Behistun, with 3 and 4
   provisional; the legend is Farhad, and it never stages his death; the signature is the
-  way up. Persepolis is built, rough.
-- **Open:** Apep or Sekhmet for chapter 2's legend; the Susa flag, whether chapter 4 may
-  build beside the Tomb of Daniel, an active shrine (recommended: the tell only, the shrine
-  never in frame; `arc.md` section 4); whether Karnak's exit has already spent the false
-  completion (pillar 10, `content/tricks.md`).
+  way up. Persepolis is built, rough. Susa may be built beside the Tomb of Daniel (designer,
+  2026-10-06); the shrine is never part of the level, and whether it is seen is decided
+  when Susa is designed (`arc.md` section 4).
+- **Open:** Apep or Sekhmet for chapter 2's legend; whether Karnak's exit has already spent
+  the false completion (pillar 10, `content/tricks.md`).
 
 Conventions:
 
