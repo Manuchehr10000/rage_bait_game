@@ -2068,6 +2068,13 @@ function drawEntityBack(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): voi
         // themselves: from above there is nothing to tell (pillar 4).
       } else if (d.skin === 'talatat') {
         for (let i = 0; i < r.w / TILE; i++) if (!paint(ctx, 'talatat', r.x + i * TILE, r.y)) ctx.drawImage(TALATAT_SPRITE, r.x + i * TILE, r.y);
+      } else if (d.skin === 'floor' && s.level.data.theme === 'knossos') {
+        // A slab of the court's paving, drawn by the code that draws the rest of it, with the
+        // grain of the place it was laid, wherever it is now (pillar 4).
+        const tx0 = Math.floor(d.rect.x / TILE);
+        const ty0 = Math.floor(d.rect.y / TILE);
+        for (let j = 0; j < r.h / TILE; j++)
+          for (let i = 0; i < r.w / TILE; i++) drawTileAt(ctx, s.level, '=', tx0 + i, ty0 + j, j === 0, r.x + i * TILE, r.y + j * TILE);
       } else if (d.skin === 'floor') {
         // Looks exactly like the paving around it, all the way down. That is the point.
         for (let j = 0; j < r.h / TILE; j++) {
@@ -3444,8 +3451,11 @@ function drawKnossosDecor(ctx: CanvasRenderingContext2D, s: Scene, d: KnossosDec
     case 'causeway': {
       // A raised walkway across the court. Two fingers high; never a step.
       const ty = Math.floor(d.floorY / TILE);
+      // It runs over every slab that is still there, the one that is not going to be included.
+      const laid = (x: number) =>
+        s.entities.some((e) => e.def.kind === 'crumble' && e.def.rect.y === d.floorY && x >= e.def.rect.x && x < e.def.rect.x + e.def.rect.w && ((e as Crumble).state === 'idle' || (e as Crumble).state === 'armed'));
       for (let x = d.x0; x < d.x1; x += TILE) {
-        if (!s.level.isSolid(Math.floor(x / TILE), ty)) continue;
+        if (!s.level.isSolid(Math.floor(x / TILE), ty) && !laid(x)) continue;
         ctx.fillStyle = KN.pavingTop;
         ctx.fillRect(x, d.floorY - 2, TILE, 2);
         ctx.fillStyle = KN.pavingLine;

@@ -120,3 +120,11 @@ this table, as the rest do.
 Not tricks, because nothing kills: Knossos's turnstile, honest, where Karnak's stood on a
 trapdoor, and Evans's copy of the throne. Both are flinches set up by a trick met earlier.
 If Karnak's exit loses its trapdoor when it is rebuilt, Knossos's turnstile loses its setup.
+
+Not a trick either, because nothing kills, but it spends a shape: Knossos's paved-over pit in
+the West Court (designer's call, 2026-10-06). Between the first two open pits, one slab of the
+court's paving goes the frame he is on it and drops him a tile into a pit like the others; a
+short hop over the first pit and straight off again leaves it. From the player's seat it is
+the trapdoor in plain floor, with no death on the end. The site's part: the West Court's
+*kouloures* were Old Palace pits the Minoans filled and paved over. If it is ever made to kill,
+it is that trick again and has to be judged as one.

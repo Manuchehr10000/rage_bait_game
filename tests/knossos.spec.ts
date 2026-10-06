@@ -52,6 +52,7 @@ const DRIVER = `
   const HALL = doors[0].def.clock.triggerX;
   const TERRACE = doors[1].def.planeX + 2 * T;
   const pits = L.decor.filter((d) => d.kind === 'kouloura').map((d) => d.x);
+  const paving = E.find((e) => e.def.kind === 'crumble' && e.def.skin === 'floor');
   let phase = 'start';
   let done = false;
   let still = 0;
@@ -69,7 +70,9 @@ const DRIVER = `
   /** Over anything a step high in his way. */
   const climb = (h = 12) => { key('ArrowRight', true); if (p.onGround && hold === 0 && p.lastContacts.right) jump(h); };
   const ROUTE = {
-    court: () => { key('ArrowRight', true); if (hold === 0 && p.onGround && pits.some((k) => cx() >= k - 12 && cx() < k)) jump(10); climb(14); },
+    // A short hop over each pit, the paved-over one included: short enough over the first
+    // to come down on the solid slab before the one that goes, and off again at once.
+    court: () => { key('ArrowRight', true); if (hold === 0 && p.onGround && pits.some((k) => cx() >= k - 12 && cx() < k)) jump(8); climb(14); },
     // From under the fourth span, a full jump: the roof cuts it flat and it lands in the light.
     magazine: () => { key('ArrowRight', true); if (hold === 0 && p.onGround && cx() >= LIGHT - 43 && cx() < LIGHT - 32) jump(18); },
     // Into the basin; a hop out, short of the throne; a hop over the barrier; up the steps.
@@ -156,6 +159,29 @@ test.beforeEach(async ({ page }) => {
     window.requestAnimationFrame = () => 0;
   });
   expect(errors).toEqual([]);
+});
+
+test('the paving between the first two pits goes the moment he steps on it, and drops him into its pit', async ({ page }) => {
+  // Over the first pit, onto the court, and on: the next slab is over a pit the dig never
+  // emptied. It goes at once, and he is at the bottom of it with the slab, alive.
+  const r = await play(
+    page,
+    `let hopped = false; const step = () => { key('ArrowRight', true); if (!hopped && p.onGround && cx() >= pits[0] - 12) { jump(8); hopped = true; } if (paving.state === 'landed' && p.onGround) { phase = 'in'; done = true; } };`,
+    60 * 5,
+  );
+  expect(r.state).toBe('playing');
+  expect(r.phase).toBe('in');
+  expect(r.total).toBe(0);
+  const slab = KNOSSOS.entities.find((e) => e.kind === 'crumble' && e.skin === 'floor');
+  if (slab?.kind !== 'crumble') throw new Error('no slab');
+  // Standing on the slab at the bottom of its pit, a tile under the court.
+  expect(r.y + 16).toBe(slab.rect.y + 16);
+});
+
+test('a hop straight off the solid slab before it leaves the paving where it is', async ({ page }) => {
+  const r = await play(page, `const step = () => { if (!routeUntil('magazine')) return; phase = paving.state; done = true; };`, 60 * 10);
+  expect(r.state).toBe('playing');
+  expect(r.phase).toBe('idle');
 });
 
 test('running into the storeroom brings the burnt storey down on him a stride short of the light', async ({ page }) => {
