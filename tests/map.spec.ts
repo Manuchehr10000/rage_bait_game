@@ -1,6 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 import { Progress } from '../src/engine/progress';
 import { LEVELS } from '../src/levels';
+import { CHAPTERS } from '../src/map/atlas';
 
 /**
  * The tour map: the start screen. Keyboard and mouse both work; closed chapters
@@ -175,8 +176,16 @@ test('arrow keys walk the chapters; Enter walks into Egypt from the left edge; E
 test('a closed site stays closed; the chapter wraps around', async ({ page }) => {
   await press(page, 'ArrowRight');
   await press(page, 'Enter');
+  // Left from Abu Simbel wraps to the last stop, the legend, which is not built.
   await press(page, 'ArrowLeft');
   let s = await snap(page);
+  expect(s.site).toBe(5);
+  await press(page, 'Enter');
+  s = await snap(page);
+  expect(s.screen).toBe('map');
+  // And Saqqara, not built either.
+  await press(page, 'ArrowLeft');
+  s = await snap(page);
   expect(s.site).toBe(4);
   await press(page, 'Enter');
   s = await snap(page);
@@ -231,6 +240,18 @@ test('outside prod every built level is open from the start, with nothing cleare
   s = await snap(page);
   expect(s.screen).toBe('level');
   expect(s.level).toBe('philae');
+});
+
+test('every chapter the game shows ends on its legend, level 6, standing where level 5 stands', () => {
+  for (const c of CHAPTERS) {
+    expect(c.sites.length, `chapter ${c.number}`).toBe(6);
+    expect(c.sites.map((s) => !!s.legend), `chapter ${c.number}`).toEqual([false, false, false, false, false, true]);
+    const [five, legend] = [c.sites[4]!, c.sites[5]!];
+    // Entered on foot through level 5's grand feature: the same spot, the pin nudged off it.
+    expect([legend.lat, legend.lon], `chapter ${c.number}`).toEqual([five.lat, five.lon]);
+    expect(legend.pin, `chapter ${c.number}`).toBeDefined();
+    expect(c.monument.site, `chapter ${c.number}`).toBeLessThan(5);
+  }
 });
 
 test('outside prod every built level is open by the rule the map and deep links both use', () => {

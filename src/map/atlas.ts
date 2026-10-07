@@ -18,6 +18,13 @@ export interface Site {
   pin?: { dx: number; dy: number };
   /** Which side the name goes. Default alternates. */
   label?: 'left' | 'right';
+  /**
+   * Level 6, the legend (`content/research/arc.md`, section 1). Not a site but a
+   * story told about the chapter's places, entered on foot through level 5's grand
+   * feature: so it stands where level 5 stands, its pin nudged beside level 5's with
+   * a leader line back to the spot, and the map draws it as a diamond.
+   */
+  legend?: true;
 }
 
 export interface Chapter {
@@ -34,11 +41,12 @@ export interface Chapter {
   costume?: Costume;
   /**
    * The vignette that stands for the chapter on the tour map: which of the
-   * chapter's own five sites it shows, and how the game draws it. Never a
+   * chapter's own five sites it shows (never the legend), and how the game draws it. Never a
    * monument borrowed from another chapter. `content/map/README.md` says what
    * must be right about each outline.
    */
   monument: { site: number; art: MonumentId };
+  /** The stops in play order: the five sites, then, in a chapter the game shows, the legend. */
   sites: Site[];
 }
 
@@ -59,6 +67,8 @@ const TOUR: Chapter[] = [
       { name: 'Pech Merle', lat: 44.51, lon: 1.64, level: 'pech-merle', pin: { dx: 10, dy: 10 }, label: 'right' },
       { name: 'Rouffignac', lat: 45.01, lon: 0.99, level: 'rouffignac', pin: { dx: -14, dy: -6 }, label: 'left' },
       { name: 'Gargas', lat: 43.05, lon: 0.52, level: 'gargas', label: 'left' },
+      // The hunt with spears, as the twentieth century's "hunting magic" told it. Designer's choice, 2026-09-26.
+      { name: 'Hunting Magic', lat: 43.05, lon: 0.52, pin: { dx: 17, dy: 3 }, legend: true },
     ],
   },
   {
@@ -75,6 +85,8 @@ const TOUR: Chapter[] = [
       { name: 'Karnak', lat: 25.72, lon: 32.66, level: 'karnak', pin: { dx: -12, dy: 0 }, label: 'left' },
       { name: 'Dendera', lat: 26.14, lon: 32.67, level: 'dendera', pin: { dx: 10, dy: -8 }, label: 'right' },
       { name: 'Saqqara', lat: 29.87, lon: 31.22 },
+      // Apep or Sekhmet: not ruled yet (arc.md, chapter 2). Named once it is.
+      { name: 'The Legend', lat: 29.87, lon: 31.22, pin: { dx: 14, dy: 0 }, legend: true },
     ],
   },
   {
@@ -92,6 +104,8 @@ const TOUR: Chapter[] = [
       { name: 'Akrotiri', lat: 36.35, lon: 25.4 },
       { name: 'Mycenae', lat: 37.73, lon: 22.76 },
       { name: 'Tiryns', lat: 37.6, lon: 22.8 },
+      // Greek myth; Theseus gets out by Ariadne's thread. Exempt from the chapter's no-bull ruling (arc.md, section 4).
+      { name: 'The Minotaur', lat: 37.6, lon: 22.8, pin: { dx: -14, dy: 6 }, legend: true },
     ],
   },
   {
@@ -111,6 +125,8 @@ const TOUR: Chapter[] = [
       { name: 'Pasargadae', lat: 30.2, lon: 53.18, pin: { dx: 10, dy: -8 } },
       { name: 'Susa', lat: 32.19, lon: 48.26 },
       { name: 'Behistun', lat: 34.39, lon: 47.44 },
+      // From Nizami's Khosrow and Shirin, entered through the face called Farhad Tarash. Ruled 2026-10-03.
+      { name: 'Farhad', lat: 34.39, lon: 47.44, pin: { dx: 14, dy: 0 }, legend: true },
     ],
   },
   {

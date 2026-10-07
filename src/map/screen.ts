@@ -16,7 +16,8 @@
  *     end. Cleared stops are stamped solid, so progress fills from the left.
  *
  * Both views share that grammar: the world has its chapters on the ribbon,
- * a chapter has its five sites in play order. Painted art replaces the drawn
+ * a chapter has its five sites in play order and then its legend, level 6,
+ * which is drawn as a diamond wherever a site is drawn as a disc. Painted art replaces the drawn
  * map when it exists (`map-world`, `map-chNN-slug`, `map-monument-chNN-slug`);
  * the markers, the ribbon, the vignette and the tourist are always drawn on
  * top, and every word is drawn in screen space so it stays crisp.
@@ -324,22 +325,27 @@ export class MapScreen {
     }
     // The sites in play order are the ribbon's business. The map shows one leg.
     this.drawLeg(ctx, this.site > 0 ? this.sitePin(this.site - 1) : null, this.sitePin(this.site));
+    // Every leader line first, then every marker over them: the legend's leader
+    // runs back to level 5's spot, under level 5's own pin.
+    c.sites.forEach((s, i) => {
+      if (!s.pin || !this.hasPin(i)) return;
+      const p = this.sitePin(i);
+      const t = this.siteSpot(i);
+      ctx.strokeStyle = INK_SOFT;
+      ctx.lineWidth = 0.5;
+      line(ctx, t.x, t.y, p.x, p.y);
+      dot(ctx, t.x, t.y, 1, INK_SOFT);
+    });
     c.sites.forEach((s, i) => {
       const p = this.sitePin(i);
       const selected = i === this.site;
       if (!this.hasPin(i)) {
-        dot(ctx, p.x, p.y, 1.4, LAND_LINE);
+        if (s.legend) diamond(ctx, p.x, p.y, 2.2, PAPER, LAND_LINE);
+        else dot(ctx, p.x, p.y, 1.4, LAND_LINE);
         return;
       }
-      if (s.pin) {
-        const t = this.siteSpot(i);
-        ctx.strokeStyle = INK_SOFT;
-        ctx.lineWidth = 0.5;
-        line(ctx, t.x, t.y, p.x, p.y);
-        dot(ctx, t.x, t.y, 1, INK_SOFT);
-      }
       const cleared = !!s.level && this.progress.isCleared(s.level);
-      badge(ctx, p.x, p.y, 4.5, cleared ? INK : selected ? ROUTE : CARD, selected || cleared ? CARD : s.level ? ROUTE : LAND_LINE);
+      marker(ctx, p.x, p.y, 4.5, cleared ? INK : selected ? ROUTE : CARD, selected || cleared ? CARD : s.level ? ROUTE : LAND_LINE, !!s.legend);
       if (selected) this.pulse(ctx, p.x, p.y, 7);
     });
     this.drawTourist(ctx, this.sitePin(this.site));
@@ -450,16 +456,19 @@ export class MapScreen {
       [first.x - 8, RIBBON.rule],
       [first.x - 14, RIBBON.rule + 3.5],
     ]);
+    // Past the last marker, which is wider when it is the legend's diamond.
+    const lastIsLegend = this.view === 'chapter' && !!this.current.sites[n - 1]?.legend;
     ctx.fillStyle = INK_SOFT;
-    ctx.fillRect(last.x + 8, RIBBON.rule - 3, 3, 6);
+    ctx.fillRect(last.x + (lastIsLegend ? 10 : 8), RIBBON.rule - 3, 3, 6);
     for (let i = 0; i < n; i++) {
       const p = this.ribbonStop(i);
       const selected = i === this.selected;
       const stamped = this.stampedAt(i);
       const open = this.view === 'world' ? chapterOpen(CHAPTERS[i]!) : !!this.current.sites[i]?.level;
-      if (stamped) badge(ctx, p.x, p.y, 5.5, INK, INK);
-      else if (open) badge(ctx, p.x, p.y, 5.5, CARD, ROUTE);
-      else badge(ctx, p.x, p.y, 4.5, BAND, LAND_LINE);
+      const legend = this.view === 'chapter' && !!this.current.sites[i]?.legend;
+      if (stamped) marker(ctx, p.x, p.y, 5.5, INK, INK, legend);
+      else if (open) marker(ctx, p.x, p.y, 5.5, CARD, ROUTE, legend);
+      else marker(ctx, p.x, p.y, 4.5, BAND, LAND_LINE, legend);
       if (selected) this.pulse(ctx, p.x, p.y, 8);
     }
   }
@@ -724,6 +733,26 @@ function dot(ctx: CanvasRenderingContext2D, x: number, y: number, r: number, col
 function ring(ctx: CanvasRenderingContext2D, x: number, y: number, r: number): void {
   ctx.beginPath();
   ctx.arc(x, y, r, 0, Math.PI * 2);
+  ctx.stroke();
+}
+
+/** A stop's marker: a disc for a site, a diamond for the legend, the same size to the eye and room for one digit. */
+function marker(ctx: CanvasRenderingContext2D, x: number, y: number, r: number, fill: string, stroke: string, legend: boolean): void {
+  if (legend) diamond(ctx, x, y, r * 1.3, fill, stroke);
+  else badge(ctx, x, y, r, fill, stroke);
+}
+
+function diamond(ctx: CanvasRenderingContext2D, x: number, y: number, r: number, fill: string, stroke: string): void {
+  ctx.fillStyle = fill;
+  ctx.strokeStyle = stroke;
+  ctx.lineWidth = 0.8;
+  ctx.beginPath();
+  ctx.moveTo(x, y - r);
+  ctx.lineTo(x + r, y);
+  ctx.lineTo(x, y + r);
+  ctx.lineTo(x - r, y);
+  ctx.closePath();
+  ctx.fill();
   ctx.stroke();
 }
 

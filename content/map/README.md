@@ -25,7 +25,13 @@ question:
   stamps its bead and does not move the rule.
 
 Both views use the same grammar: the world puts the twelve chapters on the ribbon, a
-chapter puts its five sites on it in play order, with their names under the beads.
+chapter puts its five sites on it in play order, with their names under the beads, and
+then its legend, level 6 (`content/research/arc.md`, section 1). The legend is a story,
+not a site, entered on foot through level 5's grand feature, so its pin stands beside level
+5's with a leader line back to the same spot, and it is a diamond wherever a site is a disc:
+on the map, on the ribbon, and as a small hollow diamond while it is closed. A legend not
+yet ruled is called "The Legend" (chapter 2 today) until it is. Leader lines are drawn
+under every marker.
 A chapter the player cannot enter is a faint dot on the map and a hollow bead on the
 ribbon; the map only ever gets as busy as the game actually is. A site without a level
 is a dot too, and a dot carries no number; it gets its pin and its number only while
