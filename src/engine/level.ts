@@ -181,6 +181,12 @@ export interface CrumbleDef {
    * that gives. Nothing standing on it can walk off it before it has gone.
    */
   opens?: number;
+  /**
+   * The level's own tiles it stands in for, a row of characters to a row of tiles, drawn by
+   * the code that draws the level's tiles. Where a skin draws the ground it is part of, this
+   * says which ground: paving on fill, or the stone floor of a pit.
+   */
+  asTiles?: string[];
   /** Gives way when this event fires, instead of when stood on. */
   onEvent?: string;
   /** Stops falling with its bottom here, instead of leaving the level. */

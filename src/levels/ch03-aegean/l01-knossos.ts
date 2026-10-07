@@ -64,6 +64,12 @@ const BLOCK = 7;
 const BLOCK_W = 2;
 const BLOCK_H = 2;
 g.fill(BLOCK, WEST, BLOCK_W, H - WEST, ' ');
+/**
+ * The third pit is the same pit with a floor that is not one: the stone at its bottom is a
+ * lid on the same kind of hole, and opens under whoever comes down on it. It is hopped.
+ */
+const THIRD = KOULOURES[2] ?? 13;
+g.fill(THIRD, WEST + 2, 2, H - WEST - 2, ' ');
 
 // ---------------------------------------------------------------------------
 // b. The West Magazine. He comes in over the stump of the west façade.
@@ -258,6 +264,7 @@ export const KNOSSOS: LevelData = {
     { kind: 'causeway', x0: 0, x1: px(FACADE), floorY: px(WEST) },
     ...KOULOURES.map((k) => ({ kind: 'kouloura' as const, x: px(k), w: 2 * TILE, floorY: px(WEST), depth: 2 * TILE })),
     { kind: 'kouloura', x: px(BLOCK), w: px(BLOCK_W), floorY: px(WEST), depth: px(H - WEST) },
+    { kind: 'kouloura', x: px(THIRD), w: 2 * TILE, floorY: px(WEST + 2), depth: px(H - WEST - 2) },
 
     // b. The storeroom: its jars against the wall, and Evans's four columns. The fifth is the span's.
     ...[px(MAG) + 20, px(MAG) + 56, px(MAG) + 92, px(ROOF_FROM) + 2, px(ROOF_FROM) + 66, px(ROOF_FROM) + 130, px(ROOF_TO) + 20].map((x) => ({
@@ -305,6 +312,19 @@ export const KNOSSOS: LevelData = {
       delay: 0,
       opens: 960,
       solidBelow: true,
+    },
+
+    // a. The floor of the third pit: its stone, drawn as the floor of the other two, over the
+    // same hole. It opens under whoever lands in the pit, the same way.
+    {
+      kind: 'crumble',
+      skin: 'floor',
+      rect: { x: px(THIRD), y: px(WEST + 2), w: 2 * TILE, h: TILE },
+      fake: true,
+      delay: 0,
+      opens: 960,
+      solidBelow: true,
+      asTiles: ['##'],
     },
 
     // b. The last Minoan column, burnt through, and the span of the burnt storey it carries.

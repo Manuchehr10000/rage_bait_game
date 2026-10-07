@@ -2074,7 +2074,8 @@ function drawEntityBack(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): voi
         const tx0 = Math.floor(d.rect.x / TILE);
         const ty0 = Math.floor(d.rect.y / TILE);
         for (let j = 0; j < r.h / TILE; j++)
-          for (let i = 0; i < r.w / TILE; i++) drawTileAt(ctx, s.level, j === 0 ? '=' : '#', tx0 + i, ty0 + j, j === 0, r.x + i * TILE, r.y + j * TILE);
+          for (let i = 0; i < r.w / TILE; i++)
+            drawTileAt(ctx, s.level, d.asTiles?.[j]?.[i] ?? (j === 0 ? '=' : '#'), tx0 + i, ty0 + j, j === 0, r.x + i * TILE, r.y + j * TILE);
       } else if (d.skin === 'floor') {
         // Looks exactly like the paving around it, all the way down. That is the point.
         for (let j = 0; j < r.h / TILE; j++) {

@@ -74,7 +74,7 @@ knowing run is 27.3 s from the spawn, 1.85 s of it standing at the doors.
 
 | Beat | Folder | What the player meets | The history it comes from |
 |---|---|---|---|
-| a | `a-west-court` | Evans's bronze bust by the way in. The paved court, the raised walkways crossing it, three open round pits to hop. Between the first two, the court opens under him and takes him down a pit the dig never emptied. The way past is down into the first pit and across into the second | The West Court, its causeways and its three *kouloures*: Old Palace pits the Minoans filled and paved over when they enlarged the court, emptied again by the dig |
+| a | `a-west-court` | Evans's bronze bust by the way in. The paved court, the raised walkways crossing it, three open round pits to hop. Between the first two, the court opens under him and takes him down a pit the dig never emptied. The way past is down into the first pit and across into the second; the third pit's floor opens the same way, so it is hopped | The West Court, its causeways and its three *kouloures*: Old Palace pits the Minoans filled and paved over when they enlarged the court, emptied again by the dig |
 | b | `b-magazines` | A long storeroom with a row of storage jars: open sky, then dark under a roof on five identical red columns, then open sky. Four columns are Evans's and hold. The fifth, standing against the light, is the last Minoan column, burnt through: set foot under its span and it folds, and the burnt storey comes down. Cross the last span in the air and land in the light | The West Magazines: long, narrow, dead-end storerooms. Evans roofed only VIII–XII, in concrete, in 1929; the rest are open. In the final fire the upper storey fell into them, and Evans rebuilt his upper floor from what fell |
 | c | `c-throne-room` | A dark room, Evans's all the way up, where nothing comes down. The only light falls into a sunken basin in his path. A full jump out of the basin lands him in front of the gypsum throne, and he is sitting in it. His visit is over. Walked past, it does nothing. Over the barrier, in the anteroom, Evans's copy of the throne, the same chair, where a full jump lands, and it does nothing | The Throne Room, found April 1900: the gypsum throne where it was found, the benches, the lustral basin and its light well; Evans's 1930 roof and upper storey; the wooden seat he put in the anteroom; the barrier visitors stand behind |
 | d | `d-central-court` | Full sun, nothing above and nothing below. The eastern half steps down. Nothing happens | The Central Court, crossed across its width; its east part found eroded at least 2 m below the original floor |
@@ -104,6 +104,12 @@ it opens under him, dropping a tile a frame with him on it, and he goes down wit
 - **Not everyone dies on it.** A long jump from the court that comes down on the block's last
   few pixels, with part of him already over the second pit, drops him into the second pit as
   well. A hop dies.
+- **The third pit** (designer's call, 2026-10-07). It looks like the first two, and its floor is
+  a lid on the same kind of hole: landing in it opens it, the same way, under the same label.
+  The pits he has just learned are safe ground are not all safe ground. A full jump out of the
+  second pit comes down at the third's lip, so the way through is a rhythm: down, across, out,
+  and straight over the third. Walls stand either side of its floor, so nobody steps off it
+  while it goes.
 
 ### b · The West Magazines
 

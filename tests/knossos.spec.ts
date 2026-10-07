@@ -52,8 +52,9 @@ const DRIVER = `
   const HALL = doors[0].def.clock.triggerX;
   const TERRACE = doors[1].def.planeX + 2 * T;
   /** The three open pits of the West Court, west to east. The fourth is under the court between the first two. */
-  const pits = L.decor.filter((d) => d.kind === 'kouloura' && d.depth === 2 * T).map((d) => d.x);
-  const block = E.find((e) => e.def.kind === 'crumble' && e.def.skin === 'floor');
+  const pits = L.decor.filter((d) => d.kind === 'kouloura' && d.floorY === L.spawn.y + 16 && d.depth === 2 * T).map((d) => d.x);
+  const block = E.find((e) => e.def.kind === 'crumble' && e.def.skin === 'floor' && e.def.rect.y === L.spawn.y + 16);
+  const thirdFloor = E.find((e) => e.def.kind === 'crumble' && e.def.skin === 'floor' && e.def.rect.x === pits[2]);
   const COURT_Y = L.spawn.y + 16;
   let phase = 'start';
   let done = false;
@@ -73,11 +74,12 @@ const DRIVER = `
   const climb = (h = 12) => { key('ArrowRight', true); if (p.onGround && hold === 0 && p.lastContacts.right) jump(h); };
   const ROUTE = {
     // Never onto the court between the first two pits: walk down into the first, jump from it
-    // into the second, out of that onto the court, and hop the third.
+    // into the second, out of that onto the court at the third's lip, and straight over the
+    // third, whose floor is not one.
     court: () => {
       key('ArrowRight', true);
-      if (hold === 0 && p.onGround && feet() > COURT_Y + 8) jump(14);
-      else if (hold === 0 && p.onGround && cx() >= pits[2] - 12 && cx() < pits[2]) jump(8);
+      if (hold === 0 && p.onGround && feet() > COURT_Y + 8 && cx() < pits[2]) jump(14);
+      else if (hold === 0 && p.onGround && cx() >= pits[2] - 12 && cx() < pits[2] + 8) jump(8);
       climb(14);
     },
     // From under the fourth span, a full jump: the roof cuts it flat and it lands in the light.
@@ -217,6 +219,21 @@ test('the burnt storey crushes him on the storeroom floor when it lands, never i
     expect(r.y + 16, `lifted ${lift}: feet on the floor`).toBe(after.floor);
     expect(after.landed, `lifted ${lift}: the span is down when he dies`).toBe(true);
   }
+});
+
+test('the third pit is a pit like the others, and its floor opens under whoever lands in it', async ({ page }) => {
+  // The first two pits were the safe ground. Out of the second and down into the third, and
+  // its floor goes the way the court between the first two did.
+  const r = await play(
+    page,
+    `let n = 0; const step = () => { key('ArrowRight', true); if (hold === 0 && p.onGround && feet() > COURT_Y + 8 && cx() < pits[1] + 2 * T) { jump(14); n++; } };`,
+    60 * 6,
+  );
+  expect(r.cause).toBe('The kouloura');
+  expect(r.total).toBe(1);
+  const third = KNOSSOS.decor.filter((d) => d.kind === 'kouloura' && d.floorY === KNOSSOS.spawn.y + 16 && d.depth === 32)[2];
+  if (third?.kind !== 'kouloura') throw new Error('no third pit');
+  expect(r.x).toBeGreaterThan(third.x - 10);
 });
 
 test('running into the storeroom brings the burnt storey down on him a stride short of the light', async ({ page }) => {
