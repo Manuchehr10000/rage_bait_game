@@ -7,9 +7,10 @@
 > Tricks already spent are in `content/tricks.md`. The summary is in `CLAUDE.md`.
 
 > Level 6, the legend: the Minotaur, exempt from the no-bull ruling (`arc.md` section 4).
+> Designed 2026-10-08, not built: `l06-minotaur/LEVEL.md`.
 
 Source: `content/research/arc.md`, chapter 3. Dates 1900 to 1200 BC. Runs Crete to
-mainland, Minoan giving way to Mycenaean. Status: locked in the research. Levels 1 and 2 are
+mainland, Minoan giving way to Mycenaean. Status: locked in the research. Levels 1, 2 and 6 are
 designed; level 1 is built, rough, drawn by code.
 
 | Level | Site | Place | Period | Designed | Built |
@@ -19,6 +20,7 @@ designed; level 1 is built, rough, drawn by code.
 | 3 | Akrotiri | Thera (Santorini) | Buried by eruption, late 17th c. BC | not yet | not yet |
 | 4 | Mycenae | Argolid | Peak c. 1350–1200 BC | not yet | not yet |
 | 5 | Tiryns | Argolid | Circuit and palace c. 1400–1200 BC | not yet | not yet |
+| 6 | The legend: the Minotaur | Daedalus's labyrinth, in the myth | Greek myth, as the Attic vases, Catullus, Ovid, Plutarch and Apollodorus tell it | yes | not yet |
 
 - **Costume:** bull-leaper kit, badly tied and slipping.
 - **Vocabulary:** light wells, multi-storey interiors and stairs, corbelled domes and
@@ -30,8 +32,9 @@ designed; level 1 is built, rough, drawn by code.
 
 ## The spine: what holds the floor up
 
-Every level of the chapter answers one question, and each answers it differently. It runs
-from the most rebuilt site in the chapter to the most original.
+Levels 1 to 5 each answer one question, and each answers it differently, from the most rebuilt
+site in the chapter to the most original. Level 6, the legend, is exempt from the chapter's
+rulings (`arc.md` section 4); its line is under Level 6 below.
 
 > Knossos: Evans does. The fake parts hold.
 > Phaistos: nobody does.
@@ -131,6 +134,30 @@ two levels leave it:
   collision to avoid.
 - **Under one roof.** Akrotiri is the only site in the chapter visited wholly under a modern
   shelter, which never falls. Whether any daylight reaches the floor through it is not checked.
+
+## Level 6 · The Minotaur
+
+Designed 2026-10-08, not built; see `l06-minotaur/LEVEL.md`.
+
+> The Minotaur: he pushed in to be eaten first, and nobody wants him.
+
+The legend, drawn from the myth's sources (Apollodorus, Ovid, Catullus, Plutarch and the Attic
+vases, read at search-extract level only; `l06-minotaur/LEVEL.md`, Confidence), not from a site: the
+labyrinth is never Knossos. **The Queue-Jumper.** The tribute waits in a queue at the labyrinth's
+door while Theseus kneels at the post tying Ariadne's thread; the tourist hops the kneeling hero and
+goes in first. Through the rock beside him the hero takes the long way down, paying out the thread,
+and still gets to the beast first. It is a boss fight he cannot win: Theseus kills the Minotaur with
+a sword, on his own clock, and the tourist gets out by the thread the hero laid, through look-alike
+turnings where the thread chooses.
+
+Four tricks: **'The knot'** (the hero tests his knot and the line takes his shins), **'The snort'**
+(a beast under the floor goes to its bed at his step, and the tribute's threshold rings it back),
+**'The hands'** (the chapter's one bull stands up a man and claps him out of the air) and **'The
+horns'** (on its back, the bull-leap the kilt was bought for is done to him). The five levels that
+refuse the bull, and the kilt, are the setup. About 22 s clean (22.43 s scripted on engine copies,
+to be pinned in Node), and a first visit estimated at about 2.5 minutes. One screen wide and 752 px
+tall, the story's people in black-figure on orange clay, the tourist the only thing in full colour
+and the thread the one pure white. Its rulings, 2026-10-06 to 2026-10-08, are in `arc.md` section 4.
 
 ## Rulings
 
