@@ -631,17 +631,23 @@ Catullus 64.112–115; Ovid, *Met.* 8.172–173, line numbers unverified). Reser
 
 ## New in the engine
 
-Nothing is built. In the order it must be done:
+Being built, in this order, as a stage in the dev build (`#minotaur`, in `STAGES`, not on the map). The first three are made (2026-10-09):
 
 - **The resolveY fix, game-wide, first.** In `physics.ts`, a dynamic solid rising into a body whose
   old bottom was at or above the solid's old top puts the body on top, whatever the sign of his own
   vertical speed. In the harness and the fight of an earlier draft, without it, the bull's rising back
   pushed mashers through it: 690 of 5,440 leap-then-mash runs went below the cell floor and 17 fell
   out of the level, a death with no label. It is a collision fix under pillar 1, so every built
-  level's tests are to be re-run with it (designer, on a recommendation, 2026-10-08). It is not yet
-  made: `physics.ts` is unchanged. Every number here assumes it.
-- **`Camera.reset` on the spawn**: today it starts at the bottom of the level, and this one is
-  752 px tall. **The map**, cell for cell as the harness's.
+  level's tests are to be re-run with it (designer, on a recommendation, 2026-10-08). Made
+  2026-10-09, with a second half the build found: a solid rising at its very edge under a man
+  threw him across itself, sideways, in one frame; now it lifts him. Every built level is
+  frame-identical with it in 6,168 random runs (`tests/physics.spec.ts`). Every number here
+  assumes it.
+- **`Camera.reset` on the spawn** (`LevelData.cameraOnSpawn`), since this level is 752 px tall,
+  opt-in because four built levels would start differently with it. **The map**, cell for cell as
+  the harness's, with the gated exit (`LevelData.exitAfter`) and the **per-level anchor for the
+  exit card** (`LevelData.exitCard`, right-anchored here). Made 2026-10-09
+  (`tests/minotaur.spec.ts`, `tests/level-options.spec.ts`). Still to come:
 - **The ear**, one entity at the hatch on spawn, read each tick before the fight's trigger, on the
   tick before's player, as beat d gives it: heard is on the ground with |feet − 576| ≤ 2, never
   exact contact. Its sounds: per-block steps (the ring on the lip, the hollow knock on the bed
@@ -660,8 +666,8 @@ Nothing is built. In the order it must be done:
   engine's 1 px ground probe lets a hopping man stand at 735.4 again and again. The clap's zone and
   the free hand's both kill as 'The hands', and the drawing picks the clap, the swat on the brow
   (in the air) or on the floor; the heave lifts the back as a rising solid.
-- **The knot**, the gated exit, the closing tableau, and a **per-level anchor for the exit card**
-  in `src/render/hud.ts`, right-anchored here.
+- **The knot** and the closing tableau. The exit waits for an event, `secondBlow`, that the fight
+  is to fire.
 - **`LevelData.tricks`**: 'The knot', 'The snort', 'The hands', 'The horns'; `dropCause` and
   `fallCause` 'The labyrinth', unreachable. The black-figure palette, the four deaths' drawings,
   and the queue, Ariadne and the body as background figures.
@@ -702,7 +708,7 @@ Twenty-five, from 2026-10-06 to the last, "accept all, write it up", on 2026-10-
 `arc.md` section 4, grouped, with their dates; each still standing is applied above: the boss
 fight he cannot win and its "3 minutes" (a first visit); the sword; the Queue-Jumper; the queue at
 the door; four counted tricks; the sandal ruled the cows' fifth; the staging, the falls and the art
-accepted; the game-wide resolveY fix, still to be made; the stride; the hands' cautious answer
+accepted; the game-wide resolveY fix, made 2026-10-09; the stride; the hands' cautious answer
 replaced, not tightened; the snort's clock and its bed; and the length, kept, with its two levers
 for after playtesting. Rulings 9, 11, 14 and 17, on length, were superseded by 20, 21 and 25, and
 ruling 7, the stone's label, became moot when the stone stopped killing.
