@@ -20,13 +20,15 @@ export interface HudState {
   levelName: string;
   /** How many of the level's tricks have ever killed this visitor, of how many; null where the level declares none. */
   tricks: { met: number; of: number } | null;
+  /** Where the exit label stands: centred, or 4 px in from the right edge (LevelData.exitCard). */
+  exitCard: 'centre' | 'right';
   /** 0 hidden, 1 fully shown. */
   title: number;
 }
 
 /** Everything textual is drawn on the scaled canvas so it stays legible. */
 export function renderHud(ctx: CanvasRenderingContext2D, scale: number, h: HudState): void {
-  const { stats, texts: worldTexts, camX, camY, complete, hasNext, levelName, title, tricks } = h;
+  const { stats, texts: worldTexts, camX, camY, complete, hasNext, levelName, title, tricks, exitCard } = h;
   const W = VIEW_W * scale;
   const H = VIEW_H * scale;
 
@@ -55,7 +57,7 @@ export function renderHud(ctx: CanvasRenderingContext2D, scale: number, h: HudSt
   ctx.fillText(String(stats.total), 6 * scale, 11 * scale);
 
   if (title > 0 && !complete) drawTitle(ctx, scale, levelName, W, title);
-  if (complete) drawExitLabel(ctx, scale, stats, W, H, levelName, hasNext, tricks);
+  if (complete) drawExitLabel(ctx, scale, stats, W, H, levelName, hasNext, tricks, exitCard);
 }
 
 /** A museum label, briefly, when you arrive. Not on retries. */
@@ -88,6 +90,7 @@ function drawExitLabel(
   levelName: string,
   hasNext: boolean,
   tricks: { met: number; of: number } | null,
+  anchor: 'centre' | 'right',
 ): void {
   const rows: [string, string][] = [];
   for (const [cause, n] of [...stats.byCause.entries()].sort((a, b) => b[1] - a[1])) {
@@ -96,7 +99,7 @@ function drawExitLabel(
   const lineH = 8 * scale;
   const boxW = 180 * scale;
   const boxH = (rows.length + (tricks ? 7 : 6)) * lineH + 14 * scale;
-  const x = (W - boxW) / 2;
+  const x = anchor === 'right' ? W - boxW - 4 * scale : (W - boxW) / 2;
   const y = (H - boxH) / 2;
 
   ctx.fillStyle = 'rgba(239, 230, 207, 0.98)';

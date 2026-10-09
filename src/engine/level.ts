@@ -793,8 +793,25 @@ export interface LevelData {
   decor: DecorDef[];
   /** Fixed exit zone. A platform with isExit is the alternative. */
   exit: Rect | null;
+  /**
+   * The fixed exit opens only once this event has fired in the attempt; until then
+   * he can stand in it and nothing happens. Without it, it is open from the start.
+   */
+  exitAfter?: string;
+  /**
+   * Where the exit label stands on the view. Centred by default; `right` puts it
+   * 4 px in from the view's right edge (view x 136 to 316), clear of whatever the
+   * level stages at its end on the left.
+   */
+  exitCard?: 'centre' | 'right';
   /** Lowest world y the camera will show. */
   cameraBottom: number;
+  /**
+   * Every attempt starts the camera at the height it settles at over the spawn,
+   * not at cameraBottom: for a level whose spawn is high above its cameraBottom,
+   * where he would otherwise be off the screen for the first frames of every retry.
+   */
+  cameraOnSpawn?: boolean;
   /** Floors that are ramps: stairs whose risers are too low to step over one by one. */
   slopes?: readonly SlopeDef[];
   /** Where the hill begins for the Abu Simbel backdrop, in px. */

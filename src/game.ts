@@ -380,7 +380,7 @@ export class Game {
     this.audio.stopLoops();
     const start = this.devStart ?? d.spawn;
     this.player.spawnAt(start.x, start.y);
-    this.camera.reset();
+    this.camera.reset(d.cameraOnSpawn ? this.player : undefined);
     // Started somewhere else by the dev tools: the camera settles on him before the first frame.
     if (this.devStart) for (let i = 0; i < 200; i++) this.camera.update(this.player);
     this.arriving = false;
@@ -590,8 +590,9 @@ export class Game {
       this.kill(this.level.data.fallCause ?? 'Fall');
       return;
     }
-    const exit = this.level.data.exit;
-    const reached = (exit && overlaps(this.player, exit)) || this.entities.some((e) => e.isExit?.(this.player));
+    const { exit, exitAfter } = this.level.data;
+    const open = exitAfter === undefined || this.events.has(exitAfter);
+    const reached = (exit && open && overlaps(this.player, exit)) || this.entities.some((e) => e.isExit?.(this.player));
     if (reached) {
       this.state = 'complete';
       this.progress.markCleared(this.level.data.id);
@@ -697,6 +698,7 @@ export class Game {
       hasNext: this.nextLevelIndex() !== null,
       levelName: this.level.data.name,
       tricks: this.tricksCount(),
+      exitCard: this.level.data.exitCard ?? 'centre',
       title: this.titleTimer > 0 ? Math.min(1, this.titleTimer / 0.4, (TITLE_TIME - this.titleTimer) / 0.4) : 0,
     });
     this.dev?.draw(this.ctx, this.scale, this.rulerView());
