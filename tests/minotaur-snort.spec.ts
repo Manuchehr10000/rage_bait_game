@@ -432,8 +432,11 @@ test('runners need 34 to 38 frames from their last bed frame at holds of 7 or mo
   expect(tapsIn(3, 1)).toBeGreaterThan(0);
 });
 
-/** A seeded generator, so a random test is the same test every time. */
-const seeded = (seed: number) => () => ((seed = (seed * 1103515245 + 12345) & 0x7fffffff) / 0x80000000);
+/**
+ * A seeded generator, so a random test is the same test every time. Multiplied as 32-bit
+ * integers: a plain product passes 2^53, loses its low bits, and repeats every 10,466.
+ */
+const seeded = (seed: number) => () => ((seed = (Math.imul(seed, 1103515245) + 12345) & 0x7fffffff) / 0x80000000);
 
 test('mashers holding left get in about 9 to 11 per cent of the time', () => {
   // Down X onto T_end, left held from the frame he can no longer jump back up out of it
@@ -480,8 +483,8 @@ test('mashers holding left get in about 9 to 11 per cent of the time', () => {
       if (mash(a, (k) => presses[k] ?? false) === 'in') jgot++;
     }
   }
-  // 336 of 3,000, 11.2 per cent. LEVEL.md has 8.9 jittered.
-  expect([jgot, jn]).toEqual([336, 3000]);
+  // 337 of 3,000, 11.2 per cent. LEVEL.md has 8.9 jittered.
+  expect([jgot, jn]).toEqual([337, 3000]);
 });
 
 test('after a ring the undo is the only way in: back until heard over the bed, turn, run and leap, 1.77 s to the cell floor, 0.93 s more than the clean run; a frightened hop from x 118.98 or less lands on the lip', () => {
@@ -547,9 +550,9 @@ test('after a ring the undo is the only way in: back until heard over the bed, t
     ins++;
     expect(x.ear.lastBed).toBeGreaterThan(ring + 1);
   }
-  // 4 of 400 random men got in, every one by going back over the bed first. LEVEL.md's
+  // 8 of 400 random men got in, every one by going back over the bed first. LEVEL.md's
   // 20,000 random runs from the lip found none: its random men did not go back.
-  expect([ins, tries]).toEqual([4, 400]);
+  expect([ins, tries]).toEqual([8, 400]);
   // The frightened hop: running over the bed, a hop at its best hold, 5, lands on the lip
   // from any take-off short of x 119; a full one from short of 113.
   const from = overTheBed();
@@ -638,6 +641,15 @@ test("the snort's death: sniffed where he is for 5 frames, carried up the hatch 
   for (const q of frames.slice(SNORT.sniff + SNORT.jet)) expect(q.dust.front).toEqual([]);
   expect(frames[SNORT.again]!.dust.behind.every((d) => d.x >= BEAST.hatch.x0 && d.x < BEAST.hatch.x1 && d.y >= T_END_FLOOR - PLUME && d.y < T_END_FLOOR)).toBe(true);
   expect(lowest(frames[44]!.dust.behind) - Math.min(...frames[44]!.dust.behind.map((d) => d.y))).toBeLessThan(PLUME);
+  // The in-breath is drawn whole, down into the hatch, as the settled dust was on 39: he is
+  // on the ceiling, and nothing of it is cut round the box he died in.
+  expect(lowest(frames[SNORT.again - 1]!.dust.behind)).toBe(T_END_FLOOR - 1);
+  expect(lowest(frames[SNORT.again]!.dust.behind)).toBe(T_END_FLOOR - 1);
+  const hx = (BEAST.hatch.x0 + BEAST.hatch.x1) / 2;
+  for (const q of frames.slice(SNORT.again)) {
+    expect(q.dust.behind, `frame ${q.f}`).toEqual(plumeDots(hx, T_END_FLOOR, BREATH.out + BREATH.hold + q.f - SNORT.again));
+    expect(q.dust.behind.some((d) => overlaps({ x: d.x, y: d.y, w: 1, h: 1 }, r.p)), `frame ${q.f}`).toBe(true);
+  }
 });
 
 test("the beast's breath: twin plumes out of the hatch, rising 32 px and drawn back in; through the bed block's joint at x 112 when it is at its bed, drawn behind him and never over his legs", () => {

@@ -2035,7 +2035,9 @@ export class Ear implements Entity {
    * Its dust this frame, with him at `him`. Behind him: its breath, as twin plumes out of
    * the hatch or through the joint, never where he stands; the puffs of its way back; and
    * after the snort, the dust settling back over the hatch. In front of him, only in the
-   * snort: the sniff, drawn down past his legs into the hole, and the jet up it.
+   * snort: the sniff, drawn down past his legs into the hole, and the jet up it. Once it
+   * has snorted him, `him` is where he died, and he is on the ceiling: its breath is
+   * whole down into the hatch.
    */
   dust(him: Rect): { behind: Dot[]; front: Dot[] } {
     const d = this.def;
@@ -2044,7 +2046,8 @@ export class Ear implements Entity {
     const behind: Dot[] = [];
     const front: Dot[] = [];
     const x = this.breathX;
-    if (x !== null) for (const q of plumeDots(x, floor, this.breath)) if (!overlaps({ x: q.x, y: q.y, w: 1, h: 1 }, him)) behind.push(q);
+    const stands = this.snortAt < 0;
+    if (x !== null) for (const q of plumeDots(x, floor, this.breath)) if (!stands || !overlaps({ x: q.x, y: q.y, w: 1, h: 1 }, him)) behind.push(q);
     for (const q of this.puffs) behind.push(...puffDots(q.x, floor, this.t - q.from));
     const f = this.snortFrame;
     if (f < 0 || f >= SNORT.again) return { behind, front };
