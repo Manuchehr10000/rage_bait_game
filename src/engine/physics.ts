@@ -45,7 +45,9 @@ export function moveAndCollide(
   tiles.length = 0;
   level.solidTilesIn(body, tiles);
   for (const s of tiles) resolveX(body, s, dx, c, oldX);
-  for (const s of dynamicSolids) if (!s.oneWay) resolveX(body, s.rect, dx, c, oldX);
+  // A solid that rose into him from under his feet is met on the Y pass, however little
+  // of him is over it: it lifts him; it never throws him across itself.
+  for (const s of dynamicSolids) if (!s.oneWay && !rose(s, oldBottom)) resolveX(body, s.rect, dx, c, oldX);
 
   body.y += dy;
   tiles.length = 0;
@@ -55,7 +57,7 @@ export function moveAndCollide(
     // Risen into him, and he was on it or over it before it rose: on it now, however
     // fast he was going up. A solid rising faster than he does lifts him; it never
     // swallows him. Anything else meets him as it always did.
-    const above = s.dy < 0 && oldBottom <= s.rect.y - s.dy + 1e-6;
+    const above = rose(s, oldBottom);
     if (s.oneWay && !above && (dy < 0 || oldBottom > s.rect.y + 0.5)) continue;
     resolveY(body, s.rect, dy, c, true, above);
   }
@@ -68,6 +70,11 @@ export function moveAndCollide(
       c.down = true;
     }
   return c;
+}
+
+/** It rose this frame, and his feet were on its top or over it before it did (its old top is `rect.y - dy`). */
+function rose(s: DynamicSolid, oldBottom: number): boolean {
+  return s.dy < 0 && oldBottom <= s.rect.y - s.dy + 1e-6;
 }
 
 function resolveX(body: Rect, s: Rect, dx: number, c: Contacts, oldX: number): void {

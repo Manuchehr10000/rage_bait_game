@@ -12,11 +12,14 @@ import { LEVELS } from '../src/levels';
  *
  * A moving solid that rose into him from below used to put him under it whenever his
  * own speed was upward, as if he had jumped into its underside: a back rising faster
- * than a hop, or a platform catching him at the top of one, pushed him through it. A
- * man who was on it or above it before it rose is on it after, whatever the sign of
- * his own speed (content/research/arc.md, section 4; the Minotaur's LEVEL.md, New in
- * the engine). Everything that did not rise into him meets him as it always did: rock,
- * a solid standing still or going down, and the underside of anything he jumps into.
+ * than a hop, or a platform catching him at the top of one, pushed him through it. And
+ * when less than half a pixel of him was over its edge, the X pass took it for a wall
+ * he had walked into and put him beside it, across its whole width if he was walking
+ * off it. A man who was on it or above it before it rose is on it after, whatever the
+ * sign of his own speed and however little of him is over it (content/research/arc.md,
+ * section 4; the Minotaur's LEVEL.md, New in the engine). Everything that did not rise
+ * into him meets him as it always did: rock, a solid standing still or going down, and
+ * the underside of anything he jumps into.
  */
 
 /** A bare room: rock overhead to 32, a floor at 160, nothing in it but what a test puts there. */
@@ -109,6 +112,29 @@ test('a solid that rose into a man going up more slowly puts him on it, never un
   expect(c3.standingOn).toBe(ledge.rect);
 });
 
+test('a solid that rose into a man at its very edge lifts him there, never throws him across it', () => {
+  const level = new Level(ROOM);
+  const rise = 20 / 6;
+  // A fifth of a pixel of him over the back's left edge or its right, in the air half a
+  // pixel over its old top, starting to move off it or onto it, as it heaves into his
+  // feet. Too little of him was over it for the X pass to see that the rise did it: it
+  // took the back for a wall he had walked into and put him beside it, on its far side
+  // when he was moving off it. Now he is lifted where he is.
+  for (const [x, dx] of [
+    [90.2, -0.15],
+    [90.2, 0.15],
+    [129.8, 0.15],
+    [129.8, -0.15],
+  ] as const) {
+    const back: MovingSolid = { rect: { x: 100, y: 120 - rise, w: 30, h: 20 }, dx: 0, dy: -rise };
+    const body: Rect = { x, y: 120 - 0.5 - 16, w: 10, h: 16 };
+    const c = moveAndCollide(body, dx, -0.2, level, [back]);
+    expect(body.x).toBeCloseTo(x + dx, 9);
+    expect(onTop(body, back.rect)).toBe(true);
+    expect(c).toMatchObject({ left: false, right: false, up: false, down: true });
+  }
+});
+
 test('a man going up into the underside of rock, or of a moving solid, still hits his head', () => {
   const level = new Level(ROOM);
   // Rock: the room's ceiling, whose underside is at 32.
@@ -146,22 +172,26 @@ test('a man going up into the underside of rock, or of a moving solid, still hit
 // ---------------------------------------------------------------------------
 
 /**
- * A man standing on a back resting on the room's floor. From frame 10 it rises `rise` px
- * at `speed` px a frame, holds 6 frames, and sinks back as fast. `jump` presses the
- * keys. The back moves first, then he does, as the game ticks them. Returns what went
- * wrong, frame by frame; whether it ever lifted him while he was going up, which is
- * where the old rule put him under it; and whether he ends standing on it.
+ * A man standing on a back resting on the room's floor, at `x` (its middle unless given),
+ * the back from 100 to 130. From frame 10 it rises `rise` px at `speed` px a frame, holds
+ * 6 frames, and sinks back as fast. `jump` presses the keys. The back moves first, then
+ * he does, as the game ticks them. Returns what went wrong, frame by frame (in it, under
+ * it, or moved sideways further than a run step); whether it ever lifted him while he
+ * was going up, which is where the old rule put him under it; whether it came up under
+ * him in the air with half a pixel of him over it or less, at its very edge; and whether
+ * he ends standing on it.
  */
-function onTheBack(speed: number, rise: number, jump: (k: ReturnType<typeof keys>['k'], i: number) => void) {
+function onTheBack(speed: number, rise: number, jump: (k: ReturnType<typeof keys>['k'], i: number) => void, x = 110) {
   const level = new Level(ROOM);
   const top = 160 - 24;
   const back: MovingSolid = { rect: { x: 100, y: top, w: 30, h: 24 }, dx: 0, dy: 0 };
   const p = new Player();
-  p.spawnAt(110, top - 16);
+  p.spawnAt(x, top - 16);
   const { k, input } = keys();
   const up = Math.ceil(rise / speed);
   const bad: string[] = [];
   let lifted = false;
+  let atItsEdge = false;
   for (let i = 0; i < 10 + 2 * up + 6 + 60; i++) {
     const t = i - 10;
     const step = t >= 0 && t < up ? -speed : t >= up + 6 && t < 2 * up + 6 ? speed : 0;
@@ -170,12 +200,16 @@ function onTheBack(speed: number, rise: number, jump: (k: ReturnType<typeof keys
     back.dy = back.rect.y - before;
     jump(k, i);
     const goingUp = !p.onGround && p.vy + PHYS.gravity * DT < 0;
+    const was = { x: p.x, air: !p.onGround };
     p.update(input, level, [back], 0);
     if ((goingUp || p.justJumped) && p.lastContacts.down && p.lastContacts.standingOn === back.rect) lifted = true;
+    const over = Math.min(was.x + p.w, back.rect.x + back.rect.w) - Math.max(was.x, back.rect.x);
+    if (was.air && back.dy < 0 && p.lastContacts.standingOn === back.rect && over <= 0.5) atItsEdge = true;
+    if (Math.abs(p.x - was.x) > PHYS.runSpeed * DT + 1e-9) bad.push(`frame ${i}: thrown sideways, x ${was.x.toFixed(2)} to ${p.x.toFixed(2)}`);
     if (inside(p, back.rect)) bad.push(`frame ${i}: inside it, feet ${(p.y + p.h).toFixed(2)} against its top ${back.rect.y.toFixed(2)}`);
     else if (swallowed(p, back.rect)) bad.push(`frame ${i}: under it, feet ${(p.y + p.h).toFixed(2)} against its top ${back.rect.y.toFixed(2)}`);
   }
-  return { bad, lifted, standing: p.onGround && onTop(p, back.rect) };
+  return { bad, lifted, atItsEdge, standing: p.onGround && onTop(p, back.rect) };
 }
 
 test('a man hopping on a back that heaves under him goes up with it, never into it or under it', () => {
@@ -229,6 +263,44 @@ test('a solid rising faster than he can jump carries him up, whatever he presses
   // Lifted on his way up in 191 runs of the 399: the old rule's 191 swallowed.
   expect(runs).toBe(399);
   expect(lifted).toBe(191);
+});
+
+test('a man at the very edge of a back that heaves is lifted with it, never thrown across it', () => {
+  // Less than half a pixel of him over its left edge or its right, at every press and
+  // hold, walking off it or onto it from the frame he presses or up to five frames later.
+  // He never moves further sideways in a frame than a run step.
+  const bad: string[] = [];
+  let runs = 0;
+  let atItsEdge = 0;
+  for (const edge of ['left', 'right'] as const) {
+    for (const over of [0.05, 0.15, 0.25, 0.35, 0.45]) {
+      for (const way of ['off', 'onto'] as const) {
+        const x = edge === 'left' ? 100 - 10 + over : 130 - over;
+        const key = (edge === 'left') === (way === 'off') ? 'left' : 'right';
+        for (let at = 0; at <= 20; at++) {
+          for (const hold of [0, 1, 2, 3, 4, 6, 8, 12, 18]) {
+            for (let lag = 0; lag <= 5; lag++) {
+              const walk = (k: ReturnType<typeof keys>['k'], i: number) => {
+                presses([at], hold)(k, i);
+                k[key] = i >= at + lag;
+              };
+              const r = onTheBack(20 / 6, 20, walk, x);
+              const where = `${edge} edge, ${over} over it, walking ${way} it from ${at + lag}, press at ${at}, hold ${hold}`;
+              bad.push(...r.bad.map((b) => `${where}: ${b}`));
+              runs++;
+              if (r.atItsEdge) atItsEdge++;
+            }
+          }
+        }
+      }
+    }
+  }
+  expect(bad.slice(0, 10)).toEqual([]);
+  // It came up under him at its very edge in 500 runs of the 22,680. Before, the X pass
+  // threw him across its whole width in one frame in 552 runs, every one walking off it,
+  // and it came up under him at its edge in only 280.
+  expect(runs).toBe(22680);
+  expect(atItsEdge).toBe(500);
 });
 
 // ---------------------------------------------------------------------------
@@ -299,9 +371,13 @@ test('every solid that rises in a built level lifts a man going up on it, and ne
   }
   expect(bad.slice(0, 10)).toEqual([]);
   // Each of them lifted him in some of its 462 runs, and the old rule put him under it in
-  // exactly those: Roc-aux-Sorciers's fifth figure and Pech-Merle's shelf that lifts, at
-  // 40 px a second, only the man at the top of a jump over them; Abu Simbel's 417 to 419,
-  // at 60, a tap from standing on them too.
+  // exactly those. Every one is a man put a quarter of a pixel over it, going up: at 30 px
+  // a second on Roc-aux-Sorciers's fifth figure and Pech-Merle's shelf that lifts, which
+  // rise at 40; at 30, 45 and 60 on Abu Simbel's 417 to 419, which rise at 60. No hop or
+  // held jump from standing on them is among them, and in play none can be: every built
+  // riser rises a pixel a frame or less, and the ground probe, a pixel deep, stands a man
+  // on it before it can rise into him. Played from on them, at every press and hold, as a
+  // masher and at random, the old rule and this one never part.
   expect(Object.fromEntries(lifted)).toMatchObject({ 'roc-aux-sorciers 4': 20, 'pech-merle 3': 20, 'abu-simbel 25': 60 });
   for (const [name, n] of lifted) expect(n, name).toBeGreaterThan(0);
 });
