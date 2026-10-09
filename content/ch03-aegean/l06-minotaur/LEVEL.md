@@ -741,6 +741,10 @@ replaced, not tightened; the snort's clock and its bed; and the length, kept, wi
 for after playtesting. Rulings 9, 11, 14 and 17, on length, were superseded by 20, 21 and 25, and
 ruling 7, the stone's label, became moot when the stone stopped killing.
 
+Three more on 2026-10-09, after the rough build, on recommendations: the toss's zone stays the
+whole cell, drawn with the bull reaching him; the knot's 9-frame window at a hold of 9 stays; and
+the level stays a dev stage, off the map, for now.
+
 ## Sources
 
 - Apollodorus, *Library* 3.1.4 and 3.15.8, and *Epitome* 1.9 (tr. J. G. Frazer, 1921):
@@ -811,8 +815,8 @@ clean run's landing); the boss at x 206–215 (the comedy check: 206–214), to 
 survivors. In the game the toss's zone is the whole cell up to 64 px from L+76 to 105, but the
 lurch never sweeps all of it: a man who jumps off the back too late waits by the far wall about
 24 frames for the back to come round, and 17 of 2,044 retreat runs land where nothing reaches
-them, so the head lunges out on a stretched neck. Shrinking the zone to the lurch's reach would
-change the kill, and is the designer's call.
+them, so the head lunges out on a stretched neck. The zone is kept (designer, on a
+recommendation, 2026-10-09).
 
 **Not designed.** How Tiryns's grand feature hands him to the door; the room the chapter's lyre is
 heard in here (`../CHAPTER.md`, The sound); the asset notes.
