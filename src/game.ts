@@ -1,6 +1,6 @@
 import { GameAudio, type MusicId, type Room } from './engine/audio';
 import { Camera } from './engine/camera';
-import { createEntity, Crumble, type Entity, type Platform, type Sweep, type Train, type Water, type World } from './engine/entities';
+import { createEntity, Crumble, type Ear, type Entity, type Platform, type Sweep, type Train, type Water, type World } from './engine/entities';
 import type { Stats } from './render/hud';
 import { renderHud } from './render/hud';
 import { Input } from './engine/input';
@@ -126,6 +126,8 @@ export class Game {
   private state: State = 'playing';
   private deathTimer = 0;
   private deathCause: DeathCause = 'Fall';
+  /** Where the death in progress leaves him, if it carries him off: the top-left of his box there. */
+  private deathAt: { x: number; y: number } | null = null;
   private titleTimer = 0;
 
   private stats: Stats = { total: 0, byCause: new Map(), lifetime: readLifetime() };
@@ -393,6 +395,7 @@ export class Game {
     this.lampSpent = false;
     // A new attempt has not died of anything yet.
     this.deathCause = 'Fall';
+    this.deathAt = null;
     this.state = 'playing';
   }
 
@@ -428,12 +431,13 @@ export class Game {
     this.resetLevel();
   }
 
-  private kill(cause: DeathCause): void {
+  private kill(cause: DeathCause, at?: { x: number; y: number }): void {
     if (this.state !== 'playing') return;
     if (this.level.data.tricks?.includes(cause)) this.progress.markTrick(this.level.data.id, cause);
     this.state = 'dead';
     this.deathTimer = DEATH_TIME;
     this.deathCause = cause;
+    this.deathAt = at ?? null;
     this.audio.play(DEATH_SOUND[cause]);
     this.stats.total += 1;
     this.stats.byCause.set(cause, (this.stats.byCause.get(cause) ?? 0) + 1);
@@ -541,9 +545,11 @@ export class Game {
     const wasOnGround = this.player.onGround;
     this.player.inWater = this.entities.some((e) => e.def.kind === 'water' && (e as Water).holds(this.player));
     this.player.update(this.input, this.level, solids, this.camera.x);
+    // Where something hears his feet, it sounds them itself, by what they are on.
+    const heard = this.entities.some((e) => e.ownsSteps?.(this.player));
     if (this.player.justJumped) this.audio.play(this.player.inWater ? 'splash' : 'jump');
-    else if (!wasOnGround && this.player.onGround) this.audio.play('land');
-    else if (this.player.justStepped) this.audio.play('step');
+    else if (!wasOnGround && this.player.onGround && !heard) this.audio.play('land');
+    else if (this.player.justStepped && !heard) this.audio.play('step');
     // A long way down is a long way down in every chapter. The rule is the same
     // everywhere; only the noun on the museum label changes.
     if (this.player.fellBy > PHYS.fatalFall) {
@@ -619,7 +625,7 @@ export class Game {
       cameraX: this.camera.x,
       events: this.events,
       alive: this.state === 'playing',
-      kill: (c) => this.kill(c),
+      kill: (c, at) => this.kill(c, at),
       sound: (n) => this.audio.play(n),
     };
   }
@@ -631,10 +637,15 @@ export class Game {
     let water = false;
     let beam = false;
     let hum = false;
+    let beast: ReturnType<Ear['voice']> = null;
     for (const e of this.entities) {
       const d = e.def;
       if (d.kind === 'train') {
         if ((e as Train).running) hum = true;
+        continue;
+      }
+      if (d.kind === 'ear') {
+        beast = (e as Ear).voice(this.player);
         continue;
       }
       if (d.kind === 'platform') {
@@ -654,6 +665,7 @@ export class Game {
     this.audio.setWater(water);
     this.audio.setBeam(beam);
     this.audio.setHum(hum);
+    this.audio.setBeast(beast);
   }
 
   private bumpBlocks(): void {
@@ -685,7 +697,7 @@ export class Game {
       coins: this.coins,
       texts: this.texts,
       time: this.time,
-      death: this.state === 'dead' ? { cause: this.deathCause, t: 1 - this.deathTimer / DEATH_TIME } : null,
+      death: this.state === 'dead' ? { cause: this.deathCause, t: 1 - this.deathTimer / DEATH_TIME, at: this.deathAt } : null,
       lampOn: this.lampOn && !this.lampOff,
       lampLeft: this.lampLeft,
     };

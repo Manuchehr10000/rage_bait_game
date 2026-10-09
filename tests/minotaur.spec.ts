@@ -64,8 +64,11 @@ test("the labyrinth is LEVEL.md's map, cell for cell: 320 by 752 px, 20 by 47 ti
   const level = new Level(MINOTAUR);
   expect([level.widthPx, level.heightPx]).toEqual([320, 752]);
   expect(builtMap(level)).toEqual(map);
-  // Rock and air only: nothing in it is anything but plain masonry, yet.
-  expect(new Set(MINOTAUR.rows.join(''))).toEqual(new Set(['#', ' ']));
+  // Rock and air, and one dressed stone: the lip before the hatch, x 64 to 80 on T_end's
+  // floor, solid like the rest. Every other block is plain masonry, the bed's too.
+  const dressed = MINOTAUR.rows.flatMap((row, ty) => [...row].flatMap((c, tx) => (c === '=' ? [[tx * TILE, ty * TILE]] : [])));
+  expect(dressed).toEqual([[64, 576]]);
+  expect(new Set(MINOTAUR.rows.join(''))).toEqual(new Set(['#', ' ', '=']));
 });
 
 test('a stage, not a level: off the map and out of the tour, entered by its deep link', () => {
@@ -90,8 +93,9 @@ test("the stage's data: the bull-leaper, the walk in, the camera on the spawn, t
   expect(d.spawn).toEqual({ x: 8, y: DOOR_FLOOR - 16 });
   expect(d.cameraOnSpawn).toBe(true);
   expect(d.cameraBottom).toBe(752);
-  // Theseus and his knot, and nothing else yet: no beast and no queue.
-  expect(d.entities.map((e) => e.kind)).toEqual(['hero']);
+  // Theseus and his knot, and the beast under T_end's floor, which hears him first of
+  // anything below: no fight and no queue yet. Its own data is tests/minotaur-snort.spec.ts.
+  expect(d.entities.map((e) => e.kind)).toEqual(['hero', 'ear']);
   const hero = d.entities[0] as HeroDef;
   expect({ kneel: hero.kneel, knot: hero.knot, ball: hero.ball, triggerX: hero.triggerX, lean: hero.lean, hold: hero.hold, line: hero.line, cause: hero.cause }).toEqual({
     // Kneeling at the doorpost, outside, 12 by 14.

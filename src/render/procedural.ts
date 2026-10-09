@@ -1642,6 +1642,29 @@ export const BULL_LEAPER_SEATED = compile(
 );
 
 /**
+ * Pasted flat on a ceiling by the snort, face up against it: the dead frame laid
+ * down, head to the left, the wig over his eyes; one arm hanging, one leg splayed.
+ * Drawn this way, never turned. 18 x 12; row 0 is against the ceiling.
+ */
+export const BULL_LEAPER_PASTED = compile(
+  [
+    '..OOOO...OOOOOOO..',
+    '.OKKWSO..VASAUSNO.',
+    'OHKKWSSO.VVVARSNO.',
+    'OHKKWSSSOVVVAROO..',
+    'OHKKWSSSSVVVAROO..',
+    'OHKKWSSSSVVVARRO..',
+    'OHKKWSSOOVVVARSO..',
+    'OHHKKOOKKOVVAOSSO.',
+    '.OHKKKKKKKOSOOONNO',
+    '..OOKKKKOOSO...OO.',
+    '....OOOO.OSO......',
+    '.........OO.......',
+  ],
+  BULL_LEAPER,
+);
+
+/**
  * In the throne, facing out, at rest: wig on and straight, hands on his knees, feet
  * on the floor. Never the slump of giving up and never a king. 12 x 16; the seat
  * line is row 10.

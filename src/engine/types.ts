@@ -65,7 +65,7 @@ export type DeathCause =
   | 'Gave up';
 
 /** How each death is drawn. */
-export type DeathAnim = 'crush' | 'plank' | 'drown' | 'burn' | 'snap' | 'swept' | 'gone' | 'sit' | 'flat' | 'enthroned' | 'carved' | 'trip';
+export type DeathAnim = 'crush' | 'plank' | 'drown' | 'burn' | 'snap' | 'swept' | 'gone' | 'sit' | 'flat' | 'enthroned' | 'carved' | 'trip' | 'snort';
 
 export const DEATH_ANIM: Record<DeathCause, DeathAnim> = {
   'The Beune': 'drown',
@@ -122,9 +122,9 @@ export const DEATH_ANIM: Record<DeathCause, DeathAnim> = {
   // The line takes his shins: he pitches forward over it and lands face down, the wig
   // over his eyes, on the floor under him.
   'The knot': 'trip',
-  // Sniffed, then snorted back up the hatch and pasted face up on the ceiling over it,
-  // which is not where he died. For now he is gone down the hole.
-  'The snort': 'gone',
+  // Sniffed where he is, then snorted back up the hatch and pasted face up on the
+  // ceiling over it, which is not where he died: the kill says where.
+  'The snort': 'snort',
   // Clapped flat between its palms like a fly and dropped at its feet, or swatted. For
   // now he lies where he was.
   'The hands': 'flat',
@@ -139,7 +139,7 @@ export const DEATH_ANIM: Record<DeathCause, DeathAnim> = {
 /** What each death sounds like. Material, never musical. */
 export const DEATH_SOUND: Record<
   DeathCause,
-  'squish' | 'bonk' | 'drown' | 'burn' | 'snap' | 'whoosh' | 'fallAway' | 'sigh' | 'thud' | 'click' | 'blast' | 'sitStone' | 'knock' | 'faceDown'
+  'squish' | 'bonk' | 'drown' | 'burn' | 'snap' | 'whoosh' | 'fallAway' | 'sigh' | 'thud' | 'click' | 'blast' | 'sitStone' | 'knock' | 'faceDown' | 'snort'
 > = {
   'The Beune': 'drown',
   'The cast': 'thud',
@@ -186,8 +186,8 @@ export const DEATH_SOUND: Record<
   'The audience': 'thud',
   // The Minotaur. One dry knock, a man face down on stone.
   'The knot': 'faceDown',
-  // The jet up the hatch. Its own sound, the sniff and the snort, comes with the trap.
-  'The snort': 'whoosh',
+  // The sniff, the snort up the hatch, and him against the ceiling.
+  'The snort': 'snort',
   // The palms, or the free hand. Its own sound comes with the trap.
   'The hands': 'squish',
   // Dropped flat after the toss. Its own sound comes with the trap.

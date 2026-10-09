@@ -57,6 +57,10 @@ export const SFX = [
   'creak',
   'footfall',
   'faceDown',
+  'ring',
+  'hollow',
+  'drag',
+  'snort',
 ] as const;
 
 export type Sfx = (typeof SFX)[number];
@@ -86,6 +90,8 @@ export class GameAudio {
   private noise: AudioBuffer | null = null;
   private muted = readMuted();
   private loops: Partial<Record<'winch' | 'water' | 'beam' | 'motor' | 'hum', Loop>> = {};
+  /** The beast under the Minotaur's floor, while it is heard. */
+  private beast: { breath: GainNode; snore: GainNode; pan: StereoPannerNode; stop(): void } | null = null;
   /** One gain per track, so one can fade out under the other without stopping. */
   private music: Partial<Record<MusicId, GainNode>> = {};
   /** How far each track has got: when its next step falls, and which step it is. */
@@ -341,7 +347,107 @@ export class GameAudio {
         this.tone(t + 0.22, 'sine', 210, 90, 0.07, 0.16);
         this.burst(t + 0.22, 900, 'bandpass', 0.025, 0.14);
         break;
+      case 'ring':
+        // A foot on the dressed threshold: a slab of fine stone over a hollow, ringing
+        // deep and long. Unlike any other step in the level.
+        this.burst(t, 1200, 'bandpass', 0.02, 0.12);
+        this.tone(t, 'sine', 196, 188, 0.9, 0.16);
+        this.tone(t, 'sine', 392.5, 380, 0.5, 0.05);
+        this.tone(t, 'triangle', 98, 96, 1.1, 0.07);
+        break;
+      case 'hollow':
+        // A foot on the block over the beast's bed: a knock with nothing under it.
+        this.burst(t, 520, 'bandpass', 0.05, 0.11);
+        this.tone(t, 'sine', 150, 118, 0.12, 0.13);
+        break;
+      case 'drag':
+        // Something heavy dragging itself across stone under the floor: low and long.
+        this.burst(t, 180, 'lowpass', 0.55, 0.24);
+        this.burst(t + 0.05, 420, 'bandpass', 0.4, 0.05);
+        this.tone(t, 'sawtooth', 41, 36, 0.5, 0.04);
+        break;
+      case 'snort':
+        // The sniff, through two nostrils under the hatch; the snort up it; and a man
+        // against the ceiling.
+        this.burst(t, 1600, 'bandpass', 0.07, 0.07);
+        this.burst(t + 0.03, 2200, 'bandpass', 0.04, 0.05);
+        this.burst(t + 0.083, 380, 'lowpass', 0.3, 0.35);
+        this.burst(t + 0.083, 1300, 'bandpass', 0.18, 0.14);
+        this.tone(t + 0.083, 'sawtooth', 70, 38, 0.25, 0.09);
+        this.burst(t + 0.15, 700, 'lowpass', 0.05, 0.2);
+        break;
     }
+  }
+
+  /**
+   * The beast under the floor, while it is heard: its breath, out and in, from where it is
+   * breathing, and its snore on the in-breath while it sleeps. Set every tick from the
+   * world (`flow` 0 to 1 each, `pan` -1 left to 1 right), so the sound keeps the dust's
+   * time; null stops it.
+   */
+  setBeast(v: { breath: number; snore: number; pan: number } | null): void {
+    const ctx = this.ctx;
+    if (!ctx || !this.master) return;
+    if (!v) {
+      this.beast?.stop();
+      this.beast = null;
+      return;
+    }
+    if (!this.beast) this.beast = this.beastVoice(ctx, this.master);
+    const now = ctx.currentTime;
+    this.beast.breath.gain.setTargetAtTime(0.045 * v.breath, now, 0.02);
+    this.beast.snore.gain.setTargetAtTime(0.11 * v.snore, now, 0.03);
+    // On the frame it moves, its breath moves with it.
+    this.beast.pan.pan.setTargetAtTime(v.pan, now, 0.005);
+  }
+
+  /** The breath, a soft rush of air; the snore, the soft palate flapping on a low growl. */
+  private beastVoice(ctx: AudioContext, out: GainNode): { breath: GainNode; snore: GainNode; pan: StereoPannerNode; stop(): void } {
+    const pan = ctx.createStereoPanner();
+    pan.connect(out);
+    const air = this.noiseSource(ctx);
+    const bp = ctx.createBiquadFilter();
+    bp.type = 'bandpass';
+    bp.frequency.value = 650;
+    bp.Q.value = 0.7;
+    const breath = ctx.createGain();
+    breath.gain.value = 0;
+    air.connect(bp).connect(breath).connect(pan);
+    const growl = ctx.createOscillator();
+    growl.type = 'sawtooth';
+    growl.frequency.value = 52;
+    const lp = ctx.createBiquadFilter();
+    lp.type = 'lowpass';
+    lp.frequency.value = 340;
+    const flutter = ctx.createGain();
+    flutter.gain.value = 0.5;
+    const palate = ctx.createOscillator();
+    palate.frequency.value = 27;
+    const depth = ctx.createGain();
+    depth.gain.value = 0.5;
+    palate.connect(depth).connect(flutter.gain);
+    const snore = ctx.createGain();
+    snore.gain.value = 0;
+    growl.connect(lp).connect(flutter).connect(snore).connect(pan);
+    air.start();
+    growl.start();
+    palate.start();
+    return {
+      breath,
+      snore,
+      pan,
+      stop: () => {
+        const now = ctx.currentTime;
+        breath.gain.setTargetAtTime(0, now, 0.05);
+        snore.gain.setTargetAtTime(0, now, 0.05);
+        setTimeout(() => {
+          air.stop();
+          growl.stop();
+          palate.stop();
+          pan.disconnect();
+        }, 400);
+      },
+    };
   }
 
   /** The crane motor while the blocks move. */
@@ -468,6 +574,7 @@ export class GameAudio {
     this.setBeam(false);
     this.setMotor(false);
     this.setHum(false);
+    this.setBeast(null);
   }
 
   // -------------------------------------------------------------------------

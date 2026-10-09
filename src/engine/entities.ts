@@ -4,6 +4,7 @@ import type {
   ConveyorDef,
   CrumbleDef,
   DoorDef,
+  EarDef,
   EntityDef,
   FallingDef,
   GuardsDef,
@@ -36,7 +37,11 @@ export interface World {
   events: Set<string>;
   /** False while a death plays out. The world keeps moving; a body sets nothing off. */
   alive: boolean;
-  kill(cause: DeathCause): void;
+  /**
+   * He dies of `cause`. `at`, where the death leaves him if it is not where he died: the
+   * top-left of his box there. Only a death that carries him off says.
+   */
+  kill(cause: DeathCause, at?: { x: number; y: number }): void;
   sound(name: Sfx): void;
 }
 
@@ -47,6 +52,8 @@ export interface Entity {
   solids?(): MovingSolid[];
   /** True while the player standing on it should count as reaching the exit. */
   isExit?(p: Player): boolean;
+  /** True while his steps are this entity's to sound, where it hears him: the game's own step and landing are not heard. */
+  ownsSteps?(p: Player): boolean;
 }
 
 export function createEntity(def: EntityDef, level: Level): Entity {
@@ -93,6 +100,8 @@ export function createEntity(def: EntityDef, level: Level): Entity {
       return new Guards(def);
     case 'hero':
       return new Hero(def, level);
+    case 'ear':
+      return new Ear(def);
   }
 }
 
@@ -1786,5 +1795,298 @@ export class Hero implements Entity {
   /** The only solid person in the game, and only while he kneels. */
   solids(): MovingSolid[] {
     return this.state === 'kneel' ? [this.solid] : [];
+  }
+}
+
+// ---------------------------------------------------------------------------
+// The Minotaur: the beast under the last corridor's floor.
+// ---------------------------------------------------------------------------
+
+/** One of the beast's breaths, in frames: out, held, in, and the pause before the next. */
+export const BREATH = { out: 36, hold: 8, in: 36, rest: 12 } as const;
+const BREATH_PERIOD = BREATH.out + BREATH.hold + BREATH.in + BREATH.rest;
+/**
+ * How far into a breath it is on the first frame of every attempt: drawing one in, where
+ * the snort's last frames leave it, so the reset after a snort does not jump.
+ */
+const BREATH_AT_SPAWN = BREATH.out + BREATH.hold + 5;
+/** How high its breath rises out of the floor, in px. */
+export const PLUME = 32;
+/**
+ * The snort, in frames from the one he dies on: the sniff where he is, then the jet that
+ * carries him up the hatch, then him flat on the ceiling. The dust settles back into the
+ * hatch, and on `again` it draws in a slow breath and is asleep.
+ */
+export const SNORT = { sniff: 5, jet: 4, again: 40 } as const;
+/** How long a puff of dust rises before it is gone, in frames. */
+export const PUFF = 14;
+
+type Dot = { x: number; y: number };
+
+/** How high its breath stands over the floor `b` frames into a breath: out, held, drawn back in, and none. */
+export function breathHeight(b: number): number {
+  if (b < BREATH.out) return PLUME * Math.sin(((b + 1) / BREATH.out) * (Math.PI / 2));
+  b -= BREATH.out;
+  if (b < BREATH.hold) return PLUME;
+  b -= BREATH.hold;
+  if (b < BREATH.in) return PLUME * (1 - (b + 1) / BREATH.in);
+  return 0;
+}
+
+/** How hard it is breathing `b` frames into a breath, 0 to 1, and whether it is breathing in. */
+export function breathFlow(b: number): { flow: number; inward: boolean } {
+  if (b < BREATH.out) return { flow: Math.sin(((b + 0.5) / BREATH.out) * Math.PI), inward: false };
+  const i = b - BREATH.out - BREATH.hold;
+  if (i >= 0 && i < BREATH.in) return { flow: Math.sin(((i + 0.5) / BREATH.in) * Math.PI), inward: true };
+  return { flow: 0, inward: false };
+}
+
+/**
+ * The dust of one breath, `b` frames into it, rising out of the floor at `x` as twin
+ * plumes: a dot every 2 px up each, leaning out as it rises, carried up on the out-breath
+ * and back down on the in-breath. The same through the hatch and through a joint.
+ */
+export function plumeDots(x: number, floorY: number, b: number): Dot[] {
+  const h = breathHeight(b);
+  const dots: Dot[] = [];
+  if (h < 1) return dots;
+  // How far the dust has been carried: up while it breathes out, back down while it breathes in.
+  const carried = b < BREATH.out + BREATH.hold ? Math.min(b, BREATH.out) : 2 * BREATH.out + BREATH.hold - b;
+  const shift = Math.floor(carried * 0.9) % 2;
+  for (const side of [-1, 1]) {
+    for (let u = 1 + shift; u <= h; u += 2) {
+      const lean = 2 + Math.floor((3 * u) / PLUME);
+      const waver = (Math.floor((u - shift) / 2) + (side > 0 ? 1 : 0)) % 2;
+      dots.push({ x: x + side * (lean + waver), y: floorY - u });
+    }
+  }
+  return dots;
+}
+
+/** One puff of dust out of the floor at `x`, `f` frames after it: a few dots rising and spreading, and gone. */
+export function puffDots(x: number, floorY: number, f: number): Dot[] {
+  if (f < 0 || f >= PUFF) return [];
+  const up = 2 + Math.floor(f * 0.9);
+  const spread = Math.floor(f / 4);
+  const dots: Dot[] = [
+    { x: x - 1 - spread, y: floorY - up },
+    { x: x + 1 + spread, y: floorY - up - 1 },
+    { x, y: floorY - up - 3 },
+  ];
+  if (f < PUFF - 4) dots.push({ x: x + (f % 2 ? 1 : -1), y: floorY - Math.max(1, up - 3) });
+  return dots;
+}
+
+/**
+ * Where the snort has him on frame `f` of his death, from where he died to `at`: still
+ * through the sniff, carried straight up the hatch by the jet, and from then on flat on
+ * the ceiling. Never turned.
+ */
+export function snortBody(from: { x: number; y: number }, at: { x: number; y: number }, f: number): { x: number; y: number; pasted: boolean } {
+  if (f < SNORT.sniff) return { x: from.x, y: from.y, pasted: false };
+  const k = Math.min(1, (f - SNORT.sniff + 1) / SNORT.jet);
+  if (f < SNORT.sniff + SNORT.jet) return { x: from.x + (at.x - from.x) * k, y: from.y + (at.y - from.y) * k, pasted: false };
+  return { x: at.x, y: at.y, pasted: true };
+}
+
+/**
+ * The beast (`EarDef`), never seen. Asleep under the hatch it snores, and breathes dust
+ * out of it. It hears him as the tick before left him, before anything that waits for him
+ * below does: over its bed he sends it there, dragging itself under the floor, and it
+ * breathes up through the bed block's joint instead; on the lip he brings it back at once,
+ * awake. Left alone it goes back on its own clock, and is seen going: a puff through the
+ * joint it passes as it leaves, one at the lip, and then the hatch breathes, and it
+ * sleeps. Whoever's feet go into the hatch while it is there is sniffed and snorted back
+ * up onto the ceiling. It sounds his steps on its floor itself, by the stone they are on.
+ */
+export class Ear implements Entity {
+  /** Where it is: under the hatch, at its bed, or on its way back. */
+  at: 'hatch' | 'bed' | 'way' = 'hatch';
+  /** Asleep, and snoring: under the hatch, and not woken by the lip since. */
+  asleep = true;
+  /** Ticks since the attempt began. */
+  t = 0;
+  /** The tick he was last heard over the bed. */
+  lastBed = -Infinity;
+  /** The tick the breath it is drawing began, at the hatch or the joint. */
+  breathFrom = -BREATH_AT_SPAWN;
+  /** The puffs of its way back: where, and the tick each went up. */
+  puffs: { x: number; from: number }[] = [];
+  /** He is in, down the hatch past it: it hears nothing more. */
+  in = false;
+  /** The tick it snorted him on, or -1. */
+  snortAt = -1;
+  /** The stone it heard him on last, and whether he was on the ground: his steps. */
+  private stone: 'lip' | 'bed' | 'plain' | null = null;
+  private ground = false;
+
+  constructor(readonly def: EarDef) {}
+
+  /** Frames since the snort, or -1. */
+  get snortFrame(): number {
+    return this.snortAt < 0 ? -1 : this.t - this.snortAt;
+  }
+
+  /** How far into its present breath it is. */
+  get breath(): number {
+    return (((this.t - this.breathFrom) % BREATH_PERIOD) + BREATH_PERIOD) % BREATH_PERIOD;
+  }
+
+  /** Where it is breathing from: the hatch, the joint over its bed, or nowhere, on its way back or snorting. */
+  get breathX(): number | null {
+    const d = this.def;
+    if (this.snortAt >= 0 && this.snortFrame < SNORT.again) return null;
+    if (this.at === 'hatch') return (d.hatch.x0 + d.hatch.x1) / 2;
+    if (this.at === 'bed') return d.joint;
+    return null;
+  }
+
+  /** Whether it hears him: on the ground on its floor, his feet within `reach` of its top, wherever the 1 px probe stood him. */
+  hears(p: Player): boolean {
+    const f = this.def.floor;
+    return p.onGround && Math.abs(p.y + p.h - f.y) <= this.def.reach && p.x < f.x1 && p.x + p.w > f.x0;
+  }
+
+  /** Where it hears his steps, they are its to sound. */
+  ownsSteps(p: Player): boolean {
+    return this.hears(p);
+  }
+
+  update(w: World): void {
+    const d = this.def;
+    this.t++;
+    if (this.puffs.length) this.puffs = this.puffs.filter((q) => this.t - q.from < PUFF);
+    if (this.snortAt >= 0) {
+      // The dust settles back into the hatch, and then it draws a slow breath in, asleep.
+      if (this.snortFrame === SNORT.again) {
+        this.asleep = true;
+        this.breathFrom = this.t - BREATH.out - BREATH.hold;
+      }
+      return;
+    }
+    if (this.in) return;
+    const p = w.player;
+    if (w.alive) {
+      if (p.y + p.h > d.inY && p.y < d.floor.y && p.x < d.hatch.x1 && p.x + p.w > d.hatch.x0) {
+        if (this.at === 'hatch') {
+          this.snortAt = this.t;
+          w.kill(d.cause, d.ceiling);
+        } else this.in = true;
+        return;
+      }
+      this.listen(w, p);
+    }
+    this.goBack(w);
+  }
+
+  /** His steps on its floor: each sounded by its stone, and the bed and the lip answered. */
+  private listen(w: World, p: Player): void {
+    const d = this.def;
+    const heard = this.hears(p);
+    const landed = heard && !this.ground;
+    this.ground = p.onGround;
+    if (!heard) {
+      this.stone = null;
+      return;
+    }
+    const over = (s: { x0: number; x1: number }) => p.x < s.x1 && p.x + p.w > s.x0;
+    const stone = over(d.lip) ? 'lip' : over(d.bed) ? 'bed' : 'plain';
+    // A ring on the lip, a hollow knock over the bed, and his own step on the rest: each
+    // step, each landing, and the first of him on the lip or the bed.
+    if (landed || p.justStepped || (stone !== this.stone && stone !== 'plain')) {
+      w.sound(stone === 'lip' ? 'ring' : stone === 'bed' ? 'hollow' : landed ? 'land' : 'step');
+    }
+    this.stone = stone;
+    if (stone === 'bed') {
+      this.lastBed = this.t;
+      if (this.at !== 'bed') this.move(w, 'bed');
+    } else if (stone === 'lip') {
+      this.asleep = false;
+      if (this.at !== 'hatch') this.move(w, 'hatch');
+    }
+  }
+
+  /** It drags itself to its bed or back under the hatch, and its breath starts again where it is. */
+  private move(w: World, to: 'hatch' | 'bed'): void {
+    this.at = to;
+    this.breathFrom = this.t;
+    w.sound('drag');
+  }
+
+  /** Its own way back, on the clock from his last step over the bed: never the ring. */
+  private goBack(w: World): void {
+    const d = this.def;
+    if (this.at === 'hatch') return;
+    const c = this.t - this.lastBed;
+    if (c === d.clock.leaves) {
+      this.at = 'way';
+      this.puffs.push({ x: d.puffs.leaves, from: this.t });
+      w.sound('drag');
+    } else if (c === d.clock.lip) {
+      this.puffs.push({ x: d.puffs.lip, from: this.t });
+    } else if (c >= d.clock.back) {
+      this.at = 'hatch';
+      this.asleep = true;
+      this.breathFrom = this.t;
+    }
+  }
+
+  /**
+   * Its dust this frame, with him at `him`. Behind him: its breath, as twin plumes out of
+   * the hatch or through the joint, never where he stands; the puffs of its way back; and
+   * after the snort, the dust settling back over the hatch. In front of him, only in the
+   * snort: the sniff, drawn down past his legs into the hole, and the jet up it.
+   */
+  dust(him: Rect): { behind: Dot[]; front: Dot[] } {
+    const d = this.def;
+    const floor = d.floor.y;
+    const hx = (d.hatch.x0 + d.hatch.x1) / 2;
+    const behind: Dot[] = [];
+    const front: Dot[] = [];
+    const x = this.breathX;
+    if (x !== null) for (const q of plumeDots(x, floor, this.breath)) if (!overlaps({ x: q.x, y: q.y, w: 1, h: 1 }, him)) behind.push(q);
+    for (const q of this.puffs) behind.push(...puffDots(q.x, floor, this.t - q.from));
+    const f = this.snortFrame;
+    if (f < 0 || f >= SNORT.again) return { behind, front };
+    const full = plumeDots(hx, floor, BREATH.out);
+    if (f < SNORT.sniff) {
+      // The sniff: the dust over the hatch pulled down into it, past his legs, faster each frame.
+      for (const q of full) {
+        const y = q.y + Math.round(((f + 1) * (f + 2) * PLUME) / 30);
+        if (y < floor + TILE) front.push({ x: Math.round(hx + (q.x - hx) * 0.6), y });
+      }
+    } else if (f < SNORT.sniff + SNORT.jet) {
+      // The jet: twin columns of dust, massed, out of the hole and up under his feet to the ceiling.
+      const feet = Math.round(snortBody(him, d.ceiling, f).y) + him.h;
+      for (const side of [-1, 1]) {
+        for (let y = feet; y < floor + TILE; y++) {
+          for (let i = 2; i <= 5; i++) if ((i + y + f) % 2 === 0) front.push({ x: hx + side * i - (side > 0 ? 1 : 0), y });
+        }
+      }
+    } else {
+      // Settling: the jet's dust comes back down from under him, flat on the ceiling, and
+      // hangs over the hatch.
+      const k = Math.min(1, (f - SNORT.sniff - SNORT.jet) / 22);
+      for (const [i, q] of full.entries()) {
+        const fromY = d.ceiling.y + 13 + ((i * 7) % 9);
+        behind.push({ x: q.x + ((i % 3) - 1) * Math.round(3 * (1 - k)), y: Math.round(fromY + (q.y - fromY) * k) });
+      }
+    }
+    return { behind, front };
+  }
+
+  /**
+   * What is heard of it this tick by a man at `p`: its breath, from where it is breathing,
+   * as far left or right of him as that is, and its snore on the in-breath while it sleeps
+   * under the hatch. Nothing at all to a man above `heardBelow`. Its drag, its stones'
+   * steps and its snort are sounds of their own.
+   */
+  voice(p: Rect): { breath: number; snore: number; pan: number } | null {
+    if (p.y + p.h <= this.def.heardBelow) return null;
+    const x = this.breathX;
+    if (x === null) return { breath: 0, snore: 0, pan: 0 };
+    const { flow, inward } = breathFlow(this.breath);
+    const pan = Math.max(-1, Math.min(1, (x - centerX(p)) / 160));
+    return { breath: flow, snore: this.asleep && this.at === 'hatch' && inward ? flow : 0, pan };
   }
 }

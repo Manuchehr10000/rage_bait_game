@@ -1,12 +1,13 @@
-import { Grid, type HeroDef, type LevelData } from '../../engine/level';
+import { Grid, type EarDef, type HeroDef, type LevelData } from '../../engine/level';
 import { TILE } from '../../engine/types';
 
 /**
  * Chapter 3, Level 6 — The Minotaur, the chapter's legend. A stage: the labyrinth in
  * section, cell for cell as its map, and Theseus in it, at the door with his knot and
- * then down his route to the cell, laying the thread. No beast and no queue yet: those
- * are built into it one at a time, and then it takes its place in LEVELS. Design:
- * content/ch03-aegean/l06-minotaur/LEVEL.md.
+ * then down his route to the cell, laying the thread; and the beast under the last
+ * corridor's floor, heard and breathed, never seen, which snorts him back up the hatch.
+ * No fight and no queue yet: those are built into it one at a time, and then it takes
+ * its place in LEVELS. Design: content/ch03-aegean/l06-minotaur/LEVEL.md.
  *
  * One screen wide and 47 tiles deep, every solid on the grid; the camera never moves
  * sideways, and it starts on the spawn. The spawn floor is y 160, so a designer's
@@ -17,16 +18,18 @@ import { TILE } from '../../engine/types';
  *           the passage P x 128..224 under a 64 px roof, O1 up to the hero's gallery G0
  *   c     the way down: five corridors through five plain 16 px holes, D0, D1, X2, D3
  *           and X, to T_end, under a 48 px roof
- *   d     T_end's floor and the hatch at its west end, 160 px over the cell
+ *   d     T_end's floor and the hatch at its west end, 160 px over the cell: the lip,
+ *           the one dressed stone, before it, and the beast's bed under a plain block
  *   e     the cell x 48..144, its far wall 80 px high, and row 5 over it
  *   f     the hero's route, the way out reversed: row 5, Daedalus's turnings J1 to J4,
  *           the column of four shafts with a ledge beside each, G0, O1, P, the door
  *
  * What the stage cannot do yet: the cell is a dead end, because its far wall is 80 px
- * and a full jump rises 61.8; the beast's heap is his way out of it. The exit waits for
- * the second blow, which nothing fires yet. Put on row 5 with the dev tools, he can
- * climb the hero's route all the way to the door. Theseus waits in his doorway for the
- * fight, which is not built, to step him out.
+ * and a full jump rises 61.8; the beast's heap is his way out of it. Whoever gets past
+ * the snort into the cell stands there: the beast is not drawn and does nothing in it.
+ * The exit waits for the second blow, which nothing fires yet. Put on row 5 with the dev
+ * tools, he can climb the hero's route all the way to the door. Theseus waits in his
+ * doorway for the fight, which is not built, to step him out.
  */
 const W = 20;
 const H = 47;
@@ -69,6 +72,9 @@ clear(64, 464, 128, 48); // T, directly above T_end
 clear(176, 512, 16, 16); // X
 clear(48, 528, 144, 48); // T_end, under a 48 px roof; its floor x 64..192
 clear(48, 576, 16, 16); // the hatch, 160 px down to the cell floor
+// The lip, x 64..80: the one dressed stone in the floor, before the hatch. Solid like
+// the rest; only its dressing differs. The blocks after it are plain, the bed's too.
+g.set(4, 36, '=');
 
 // ---------------------------------------------------------------------------
 // e. The cell, and row 5 over its far wall.
@@ -182,6 +188,41 @@ const THESEUS: HeroDef = {
   cause: 'The knot',
 };
 
+// ---------------------------------------------------------------------------
+// d. The beast under T_end's floor: the snort.
+// ---------------------------------------------------------------------------
+
+/** T_end's floor, the top of the beast's ceiling. */
+const T_END_FLOOR = 576;
+
+/**
+ * The beast, heard and breathed, never seen (LEVEL.md, beat d). Asleep under the hatch on
+ * every attempt; read every tick before anything that waits for him in the cell, on the
+ * tick before's tourist. Heard is on the ground with his feet within 2 px of 576. A step
+ * over the bed block, x 112 to 144, sends it to its bed, and its breath comes up through
+ * the plain joint at x 112; a step on the lip, his box over x 64 to 80, brings it back at
+ * once with a ring. 50 frames after his last step over the bed it goes back on its own,
+ * with the drag and never the ring: at 40 it leaves, a puff through the joint at x 80;
+ * at 45 a puff at the lip; at 50 the hatch breathes. When his feet pass 580 in the hatch
+ * he is snorted if it is there, up onto the ceiling over it, and is in if not. It is
+ * heard from Z1 down.
+ */
+const BEAST: EarDef = {
+  kind: 'ear',
+  floor: { y: T_END_FLOOR, x0: 64, x1: 192 },
+  reach: 2,
+  hatch: { x0: 48, x1: 64 },
+  lip: { x0: 64, x1: 80 },
+  bed: { x0: 112, x1: 144 },
+  joint: 112,
+  inY: 580,
+  clock: { leaves: 40, lip: 45, back: 50 },
+  puffs: { leaves: 80, lip: 72 },
+  ceiling: { x: 48, y: 528 },
+  heardBelow: 208,
+  cause: 'The snort',
+};
+
 export const MINOTAUR: LevelData = {
   id: 'minotaur',
   name: 'The Minotaur',
@@ -195,7 +236,7 @@ export const MINOTAUR: LevelData = {
   cameraBottom: px(H),
   cameraOnSpawn: true,
   // Four tricks (pillar 8), in the order he meets them. Each kills him itself: nothing
-  // needs to claim a death. The knot is built.
+  // needs to claim a death. The knot and the snort are built.
   tricks: ['The knot', 'The snort', 'The hands', 'The horns'],
   // No fall in the level kills, and nothing leaves by the bottom: never on the label.
   dropCause: 'The labyrinth',
@@ -215,5 +256,6 @@ export const MINOTAUR: LevelData = {
     // The hero's doorway on row 5, where he waits for the fight.
     { kind: 'blackDoorway', x: 148, w: 16, top: 628, floorY: 656 },
   ],
-  entities: [THESEUS],
+  // The beast before anything in the cell: it hears him first.
+  entities: [THESEUS, BEAST],
 };

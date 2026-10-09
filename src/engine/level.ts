@@ -593,7 +593,48 @@ export interface HeroDef {
   cause: DeathCause;
 }
 
+/**
+ * The beast under a floor, never seen: heard, and breathed. Asleep under the hatch on
+ * every attempt, breathing dust out of it. Each tick it hears him as the tick before
+ * left him: on the ground with his feet within `reach` of the floor's top, he is heard,
+ * however lightly he is standing on it. Heard over `bed`, he sends it to its bed, and it
+ * breathes up through `joint`; heard on `lip`, he brings it back to the hatch at once,
+ * awake. `clock.back` frames after he was last heard over the bed it goes back to the
+ * hatch on its own, and goes to sleep there. When his feet pass `inY` in the hatch he is
+ * `cause` if it is at the hatch, and in if it is not. It never touches anybody else.
+ */
+export interface EarDef {
+  kind: 'ear';
+  /** The floor it hears: its top, and the x it runs over. */
+  floor: { y: number; x0: number; x1: number };
+  /** Heard: on the ground with his feet within this many px of the floor's top. */
+  reach: number;
+  /** The hole it waits under, open from the floor down. */
+  hatch: { x0: number; x1: number };
+  /** The stone before the hatch. A step on it brings it back. */
+  lip: { x0: number; x1: number };
+  /** The block over its bed. A step over it sends it there. */
+  bed: { x0: number; x1: number };
+  /** The plain joint it breathes up through from its bed. */
+  joint: number;
+  /** He is in the hatch when his feet are past this, the top of him still above the floor. */
+  inY: number;
+  /**
+   * Its way back, in frames from his last step over the bed: it leaves its bed, with a
+   * puff of dust through the joint at `puffs.leaves`; it passes under the lip, with a puff
+   * at `puffs.lip`; and it is back under the hatch.
+   */
+  clock: { leaves: number; lip: number; back: number };
+  puffs: { leaves: number; lip: number };
+  /** Where the snort leaves him: the top-left of his box, flat on the ceiling over the hatch. */
+  ceiling: { x: number; y: number };
+  /** It is heard, and its breath, while his feet are below this. */
+  heardBelow: number;
+  cause: DeathCause;
+}
+
 export type EntityDef =
+  | EarDef
   | HeroDef
   | GuardsDef
   | SpanDef

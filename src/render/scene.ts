@@ -1,5 +1,5 @@
 import type { Camera } from '../engine/camera';
-import type { Chaser, Crumble, Door, Entity, Falling, Guards, Hero, HeroFrame, Horse, Platform, Pusher, Roof, Seat, Span, Sweep, Thrower, Tipper, TrapColumn, Water } from '../engine/entities';
+import type { Chaser, Crumble, Door, Ear, Entity, Falling, Guards, Hero, HeroFrame, Horse, Platform, Pusher, Roof, Seat, Span, Sweep, Thrower, Tipper, TrapColumn, Water } from '../engine/entities';
 import type { DecorDef, DoorDef, Level, SpanDef } from '../engine/level';
 import type { Player } from '../engine/player';
 import {
@@ -50,12 +50,13 @@ import { paint } from '../engine/assets';
 import { blit, blitFacing, frameOf, relief, silhouette, withLamp, type Frame, type ReliefTones } from './frame';
 import { SPLINTER, handStencils } from './hands';
 import { hash } from './hash';
-import { HERO, heroHand, PERSIAN_COLUMN, TRAIN, type Train } from '../engine/entities';
+import { HERO, heroHand, PERSIAN_COLUMN, snortBody, TRAIN, type Train } from '../engine/entities';
 import type { CavePanel } from '../engine/level';
 import { BEAR_STALAGMITE_SPRITE, SIGNAL_LAMP_SPRITE, STOP_SIGN_SPRITE, TRAIN_CAR_SPRITE, TRAIN_ENGINE_SPRITE, TRAIN_LAST_CAR_SPRITE } from './procedural';
 import {
   BULL_LEAPER_ENTHRONED,
   BULL_LEAPER_FRAMES,
+  BULL_LEAPER_PASTED,
   BULL_LEAPER_SEATED,
   CYPRESS_SPRITE,
   DELEGATE_SPRITE,
@@ -223,8 +224,8 @@ export interface Scene {
   texts: WorldText[];
   /** Seconds since level start, for water and dust animation only. */
   time: number;
-  /** The death in progress, t from 0 to 1, or null. */
-  death: { cause: DeathCause; t: number } | null;
+  /** The death in progress, t from 0 to 1, and where it leaves him if it carries him off; or null. */
+  death: { cause: DeathCause; t: number; at?: { x: number; y: number } | null } | null;
   /** True while the headlamp is burning: lit at the door, and not switched off. */
   lampOn: boolean;
   /** How much of the battery is left, 1 to 0. Always 1 where the lamp does not run down. */
@@ -1645,8 +1646,12 @@ function drawTileAt(
     drawKnossosTile(ctx, c, tx, ty, x, y, open);
     return;
   }
-  if (theme === 'minotaur' && (c === '=' || c === '#' || c === '%')) {
-    drawMasonry(ctx, ty, x, y, open);
+  if (theme === 'minotaur' && c === '=') {
+    drawThreshold(ctx, x, y, open);
+    return;
+  }
+  if (theme === 'minotaur' && (c === '#' || c === '%')) {
+    drawMasonry(ctx, tx, ty, x, y, open);
     return;
   }
   if (c === '=') {
@@ -1702,7 +1707,10 @@ function tileArtId(theme: Level['data']['theme'], c: string, open: boolean): str
     const k = c === '=' ? 'knossos-paving' : c === '%' ? 'knossos-slab' : 'knossos-ashlar';
     return open ? `tile-${k}-top` : `tile-${k}`;
   }
-  if (theme === 'minotaur') return open ? 'tile-labyrinth-top' : 'tile-labyrinth';
+  if (theme === 'minotaur') {
+    const k = c === '=' ? 'labyrinth-threshold' : 'labyrinth';
+    return open ? `tile-${k}-top` : `tile-${k}`;
+  }
   return open ? `tile-${name}-top` : `tile-${name}`;
 }
 
@@ -2169,6 +2177,9 @@ function drawEntityBack(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): voi
     case 'hero':
       drawHeroBack(ctx, e as Hero);
       break;
+    case 'ear':
+      drawDust(ctx, (e as Ear).dust(s.player).behind);
+      break;
     default:
       break;
   }
@@ -2526,6 +2537,7 @@ function drawEntityFront(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): vo
 function drawEntityOverlay(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): void {
   const d = e.def;
   if (d.kind === 'hero') drawHeroFront(ctx, e as Hero);
+  else if (d.kind === 'ear') drawDust(ctx, (e as Ear).dust(s.player).front);
   else if (d.kind === 'water') {
     const w = (e as Water).rect;
     if (w.h <= 0) return;
@@ -2699,12 +2711,14 @@ const COSTUMES: Record<
     held?: [HTMLCanvasElement, HTMLCanvasElement];
     /** In the throne, facing out, at rest. Only the chapter with the throne in it has one. */
     enthroned?: HTMLCanvasElement;
+    /** Flat on a ceiling, face up. Only the chapter with the snort in it has one. */
+    pasted?: HTMLCanvasElement;
   }
 > = {
   // The lens sits at sprite column 10, row 4, of the right-facing hiker.
   hiker: { id: 'hiker', frames: HIKER_FRAMES, seated: HIKER_SEATED, lamp: { x: 10, y: 4 }, held: HIKER_HELD },
   pharaoh: { id: 'tourist', frames: TOURIST_FRAMES, seated: TOURIST_SEATED },
-  bullLeaper: { id: 'bull-leaper', frames: BULL_LEAPER_FRAMES, seated: BULL_LEAPER_SEATED, enthroned: BULL_LEAPER_ENTHRONED },
+  bullLeaper: { id: 'bull-leaper', frames: BULL_LEAPER_FRAMES, seated: BULL_LEAPER_SEATED, enthroned: BULL_LEAPER_ENTHRONED, pasted: BULL_LEAPER_PASTED },
   falseBeard: { id: 'false-beard', frames: FALSE_BEARD_FRAMES, seated: FALSE_BEARD_SEATED },
 };
 
@@ -2852,6 +2866,9 @@ function drawDeath(ctx: CanvasRenderingContext2D, s: Scene, death: { cause: Deat
       break;
     case 'trip':
       drawTrip(ctx, s, death);
+      break;
+    case 'snort':
+      drawSnorted(ctx, s, death);
       break;
   }
 }
@@ -4519,6 +4536,11 @@ const MN = {
   wash: '#7b4527',
   washLight: '#8d5330',
   glaze: '#1f140e',
+  /** The dressed threshold: the one fine stone, paler and smoother than the masonry. */
+  dressed: '#a8693e',
+  dressedLight: '#c48552',
+  /** Dust, breathed out of the floor. Never the thread's white. */
+  dust: '#ecc999',
 };
 
 /** Where the door storey's outside ends: the outer face of the labyrinth, and the floor outside it. */
@@ -4548,17 +4570,50 @@ function drawLabyrinthAir(ctx: CanvasRenderingContext2D, s: Scene): void {
   ctx.fillRect(VESTIBULE.x, VESTIBULE.y, VESTIBULE.w, VESTIBULE.h);
 }
 
-/** A block of the labyrinth: a wash with a full-glaze course under it and staggered joints. */
-function drawMasonry(ctx: CanvasRenderingContext2D, ty: number, x: number, y: number, open: boolean): void {
+/**
+ * A tile of the labyrinth's masonry: a wash with a full-glaze course under it. Its blocks
+ * are two tiles long, each course's joints half a block along from the one under it, so
+ * every joint is a tile's edge: on the last corridor's floor, x 80, 112, 144 and 176.
+ * Every block is the same, joints and all; none is cracked.
+ */
+function drawMasonry(ctx: CanvasRenderingContext2D, tx: number, ty: number, x: number, y: number, open: boolean): void {
   ctx.fillStyle = MN.wash;
   ctx.fillRect(x, y, TILE, TILE);
-  ctx.fillStyle = MN.glaze;
-  ctx.fillRect(x, y + TILE - 1, TILE, 1);
-  ctx.fillRect(x + (ty % 2 === 0 ? 3 : 11), y, 1, TILE - 1);
   if (open) {
     ctx.fillStyle = MN.washLight;
     ctx.fillRect(x, y, TILE, 2);
   }
+  ctx.fillStyle = MN.glaze;
+  ctx.fillRect(x, y + TILE - 1, TILE, 1);
+  if ((tx + ty) % 2 === 1) ctx.fillRect(x, y, 1, TILE - 1);
+}
+
+/**
+ * The dressed threshold before the hatch, the only fine stone in the floor: smooth and
+ * pale, no course line, a fine arris along its top, and its top dished by two worn foot
+ * hollows where the tribute stood before it went in.
+ */
+function drawThreshold(ctx: CanvasRenderingContext2D, x: number, y: number, open: boolean): void {
+  ctx.fillStyle = MN.dressed;
+  ctx.fillRect(x, y, TILE, TILE);
+  ctx.fillStyle = MN.glaze;
+  ctx.fillRect(x, y + TILE - 1, TILE, 1);
+  if (!open) return;
+  ctx.fillStyle = MN.dressedLight;
+  ctx.fillRect(x, y, TILE, 1);
+  // The two hollows, dished into the top, their floors in the arris's light.
+  for (const h of [2, 9]) {
+    ctx.fillStyle = MN.clay;
+    ctx.fillRect(x + h, y, 5, 1);
+    ctx.fillRect(x + h + 1, y + 1, 3, 1);
+    ctx.fillStyle = MN.dressedLight;
+    ctx.fillRect(x + h, y + 1, 1, 1);
+    ctx.fillRect(x + h + 4, y + 1, 1, 1);
+    ctx.fillRect(x + h + 1, y + 2, 3, 1);
+  }
+  // Its edge at the hatch, cut square.
+  ctx.fillStyle = MN.glaze;
+  ctx.fillRect(x, y + 1, 1, TILE - 2);
 }
 
 /** The thread: the one pure white in the level. */
@@ -4929,4 +4984,33 @@ function drawTrip(ctx: CanvasRenderingContext2D, s: Scene, death: { cause: Death
   ctx.rotate(p.facing * angle);
   blitFacing(ctx, k >= 1 ? dead : idle, p.facing === 1 ? -w : 0, -16, p.facing);
   ctx.restore();
+}
+
+/** The beast's dust: dots, never a solid column. */
+function drawDust(ctx: CanvasRenderingContext2D, dots: readonly { x: number; y: number }[]): void {
+  ctx.fillStyle = MN.dust;
+  for (const q of dots) ctx.fillRect(q.x, q.y, 1, 1);
+}
+
+/** A death's frames: the 0.75 s the game plays one for. */
+const DEATH_FRAMES = 45;
+
+/**
+ * Snorted: stiff where the sniff caught him, then carried straight up the hatch by the
+ * jet just so, and pasted flat on the ceiling over it, face up and splayed, in full
+ * colour, for the rest of the death. Never turned, and the kilt never flies: those are
+ * the horns'. The dust is the beast's, drawn with it.
+ */
+function drawSnorted(ctx: CanvasRenderingContext2D, s: Scene, death: { cause: DeathCause; t: number; at?: { x: number; y: number } | null }): void {
+  const p = s.player;
+  const costume = s.level.data.costume;
+  const c = COSTUMES[costume];
+  const at = death.at ?? { x: p.x, y: p.y };
+  const body = snortBody(p, at, Math.round(death.t * DEATH_FRAMES));
+  if (!body.pasted || !c.pasted) {
+    blitFacing(ctx, tourist(costume, 'idle'), Math.round(body.x) - 1, Math.round(body.y), p.facing);
+    return;
+  }
+  // From the wall of the hatch, along the ceiling over it.
+  blit(ctx, frameOf(`${c.id}-pasted`, 0, c.pasted), Math.round(body.x), Math.round(body.y));
 }

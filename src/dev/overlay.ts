@@ -1,4 +1,4 @@
-import { Guards, Hero, PERSIAN_COLUMN, Sweep, Thrower, Water, type Entity } from '../engine/entities';
+import { Ear, Guards, Hero, PERSIAN_COLUMN, Sweep, Thrower, Water, type Entity } from '../engine/entities';
 import type { Level } from '../engine/level';
 import { PHYS, Player, type MovingSolid } from '../engine/player';
 import type { Input } from '../engine/input';
@@ -233,6 +233,16 @@ export function renderOverlay(
         trigger(d.triggerX);
         box(d.line, DEADLY, e instanceof Hero && e.taut ? { fill: 0.5 } : { dash: true });
         break;
+      case 'ear': {
+        // The lip that brings it back and the bed that sends it away, under the reach it
+        // hears in; the hatch, filled while it waits under it.
+        const band = (s: { x0: number; x1: number }): Rect => ({ x: s.x0, y: d.floor.y - d.reach, w: s.x1 - s.x0, h: 2 * d.reach });
+        box(band(d.lip), LIAR, { fill: 0.35 });
+        box(band(d.bed), LIAR, { dash: true });
+        const at = e instanceof Ear ? e.at : 'hatch';
+        box({ x: d.hatch.x0, y: d.floor.y, w: d.hatch.x1 - d.hatch.x0, h: d.inY - d.floor.y }, at === 'hatch' ? DEADLY : SAFE, at === 'hatch' ? { fill: 0.5 } : { dash: true });
+        break;
+      }
     }
   }
 
