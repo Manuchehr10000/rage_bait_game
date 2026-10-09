@@ -14,6 +14,8 @@ const tiles: Rect[] = [];
 
 export interface DynamicSolid {
   rect: Rect;
+  /** How far it moved down this frame, up being negative: its top was at `rect.y - dy`. */
+  dy: number;
   /** Solid from above only: you land on it, but pass through it sideways or from below. */
   oneWay?: boolean;
 }
@@ -48,10 +50,14 @@ export function moveAndCollide(
   body.y += dy;
   tiles.length = 0;
   level.solidTilesIn(body, tiles);
-  for (const s of tiles) resolveY(body, s, dy, c, false);
+  for (const s of tiles) resolveY(body, s, dy, c, false, false);
   for (const s of dynamicSolids) {
-    if (s.oneWay && (dy < 0 || oldBottom > s.rect.y + 0.5)) continue;
-    resolveY(body, s.rect, dy, c, true);
+    // Risen into him, and he was on it or over it before it rose: on it now, however
+    // fast he was going up. A solid rising faster than he does lifts him; it never
+    // swallows him. Anything else meets him as it always did.
+    const above = s.dy < 0 && oldBottom <= s.rect.y - s.dy + 1e-6;
+    if (s.oneWay && !above && (dy < 0 || oldBottom > s.rect.y + 0.5)) continue;
+    resolveY(body, s.rect, dy, c, true, above);
   }
   // Coming down onto a slope, or walking down one: stand on it. Solid from above only.
   if (dy >= 0)
@@ -78,9 +84,10 @@ function resolveX(body: Rect, s: Rect, dx: number, c: Contacts, oldX: number): v
   }
 }
 
-function resolveY(body: Rect, s: Rect, dy: number, c: Contacts, dynamic: boolean): void {
+function resolveY(body: Rect, s: Rect, dy: number, c: Contacts, dynamic: boolean, above: boolean): void {
   if (!overlaps(body, s)) return;
-  if (dy < 0) {
+  // Going up into it from under it: his head meets its underside.
+  if (dy < 0 && !above) {
     body.y = s.y + s.h;
     c.up = true;
     return;
