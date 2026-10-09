@@ -703,7 +703,28 @@ export interface FightDef {
   done: string;
 }
 
+/**
+ * The closing tableau, a staged second copy of Theseus with the dead Minotaur: once the
+ * event `after` has fired, on the tick the tourist is on the storey whose floor is `floorY`
+ * with his left edge past `triggerX`, Theseus comes out of the black vestibule dragging
+ * the body by a horn, his box's left edge from `from` to `to` at `pace` px a frame, and
+ * stops there, at the post. The body lies after him: its head `body.head` px from his
+ * box's left edge, and all of it `body.w` long. It plays to its end and stays; it is never
+ * solid, kills nothing, and nothing reacts to it.
+ */
+export interface TableauDef {
+  kind: 'tableau';
+  after: string;
+  triggerX: number;
+  floorY: number;
+  from: number;
+  to: number;
+  pace: number;
+  body: { head: number; w: number };
+}
+
 export type EntityDef =
+  | TableauDef
   | FightDef
   | EarDef
   | HeroDef
@@ -947,7 +968,16 @@ export type DecorDef =
   /** A small stone boss on a back wall. A drawing: it holds up nothing and nobody stands on it. */
   | { kind: 'boss'; rect: Rect }
   /** A doorway in a back wall, in black glaze. Whatever goes into it is not seen. */
-  | { kind: 'blackDoorway'; x: number; w: number; top: number; floorY: number };
+  | { kind: 'blackDoorway'; x: number; w: number; top: number; floorY: number }
+  /**
+   * The tribute waiting at the door in one file, facing it: a vase procession of
+   * overlapping figures, `maidens` and `youths` alternating, a maiden at its front, the
+   * front one's front edge at `front` and each `step` px behind the one before. It may run
+   * off the left edge. They stand still.
+   */
+  | { kind: 'queue'; front: number; step: number; maidens: number; youths: number; floorY: number }
+  /** Ariadne, apart from the file, over x `x0` to `x1`: facing the door, her hands empty. */
+  | { kind: 'ariadne'; x0: number; x1: number; floorY: number };
 
 /** The painted panels the game draws on cave rock, by site. */
 export type CavePanel =

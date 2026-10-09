@@ -10,7 +10,8 @@ import { CELL_FLOOR, cleanRun, DOOR_FLOOR, first, FULL, inAir, LEVEL, on, onFloo
  * Theseus in the Minotaur's stage (content/ch03-aegean/l06-minotaur/LEVEL.md, beats a to
  * c): kneeling at the doorpost, the knot and its windows, the stride, his route down to
  * his doorway and the thread he lays on it, the race to the cell, and the clean run as
- * far as the cell floor, where the stages after this one carry it on. The labyrinth
+ * far as the cell floor (tests/minotaur-fight.spec.ts and tests/minotaur-out.spec.ts carry
+ * it on, through the fight and out at the door). The labyrinth
  * itself is tests/minotaur.spec.ts. Every number is measured on the game's own entities
  * and physics, in Node; where it differs from LEVEL.md's, the comment says so.
  */

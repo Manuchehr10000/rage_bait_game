@@ -1,15 +1,16 @@
 import { MINOTAUR } from '../src/levels/ch03-aegean/l06-minotaur';
 import { Level } from '../src/engine/level';
-import { createEntity, Ear, Fight, Hero, type Entity, type World } from '../src/engine/entities';
+import { createEntity, Ear, Fight, Hero, Tableau, type Entity, type World } from '../src/engine/entities';
 import { Camera } from '../src/engine/camera';
 import { PHYS, Player } from '../src/engine/player';
 import type { Input } from '../src/engine/input';
+import { overlaps } from '../src/engine/types';
 
 /**
  * The Minotaur's stage in Node, for its specs (tests/minotaur*.spec.ts): an attempt on
  * the game's own entities and physics, ticked the way game.ts ticks them: the entities
- * see where he was, then he moves, then the camera follows him. And the clean run's
- * hands. Not a spec: nothing here is a test.
+ * see where he was, then he moves, then the camera follows him, and he is out if he has
+ * reached the open exit. And the clean run's hands. Not a spec: nothing here is a test.
  */
 
 export const LEVEL = new Level(MINOTAUR);
@@ -62,6 +63,8 @@ export class Run {
   log: Tick[] = [];
   /** The longest fall he has walked away from. */
   worstFall = 0;
+  /** The tick he went out at the door on, or -1: the game's exit, open from the second blow. */
+  out = -1;
   private held = false;
 
   constructor() {
@@ -80,6 +83,10 @@ export class Run {
 
   get fight(): Fight {
     return this.entities.find((e): e is Fight => e instanceof Fight)!;
+  }
+
+  get tableau(): Tableau {
+    return this.entities.find((e): e is Tableau => e instanceof Tableau)!;
   }
 
   /** The tick the line came taut on, or -1. */
@@ -108,7 +115,7 @@ export class Run {
   }
 
   tick(press: Press, without?: Entity): void {
-    if (this.cause) return;
+    if (this.cause || this.out >= 0) return;
     const k = { pressed: press.jump && !this.held };
     this.held = press.jump;
     const input = {
@@ -151,6 +158,7 @@ export class Run {
         const keep = live.map((e) => e.keepsInView?.() ?? null).filter((y): y is number => y !== null);
         this.cam.update(this.p, keep.length ? Math.max(...keep) : undefined);
         if (this.p.y > LEVEL.heightPx + 16) this.cause = MINOTAUR.fallCause!;
+        else if (this.events.has(MINOTAUR.exitAfter!) && overlaps(this.p, MINOTAUR.exit!)) this.out = this.t;
       }
     }
     const p = this.p;
@@ -158,9 +166,9 @@ export class Run {
     this.t++;
   }
 
-  /** Ticks with these hands until `until` says stop, the attempt ends, or `max` ticks. */
+  /** Ticks with these hands until `until` says stop, the attempt ends, he is out, or `max` ticks. */
   play(hands: Hands, until: (r: Run) => boolean = () => false, max = 2000): this {
-    for (let i = 0; i < max && !this.cause && !until(this); i++) this.tick(hands(this));
+    for (let i = 0; i < max && !this.cause && this.out < 0 && !until(this); i++) this.tick(hands(this));
     return this;
   }
 }
@@ -186,9 +194,85 @@ export const seeded = (seed: number) => () => ((seed = (Math.imul(seed, 11035152
 export const FULL = 20;
 
 /**
+ * One jump of the way out: along the floor at `floor` to `at` (the wall under a hole, as
+ * a rule, where he stops), and from there a jump held `hold` frames (a full one if not
+ * said), steering `steer` from `after` frames into it, onto the floor at `to`.
+ */
+export interface Climb {
+  name: string;
+  floor: number;
+  at: number;
+  steer: -1 | 0 | 1;
+  after: number;
+  hold?: number;
+  to: number;
+}
+
+/**
+ * The way out's climbs (LEVEL.md, beat f), in order: against the wall under the hole the
+ * thread goes up, a full jump, steered onto the floor it comes out on. Up through J1's
+ * floor hole and the thread holes of the four rooms, onto the stair slab; then up the
+ * column by the ledges beside the shafts and the pillar tops, the shelf, and G0.
+ */
+export const CLIMBS: readonly Climb[] = [
+  { name: 'J1', floor: ROW_5, at: 262, steer: -1, after: 14, to: 608 },
+  { name: 'J2', floor: 608, at: 240, steer: 1, after: 14, to: 560 },
+  { name: 'J3', floor: 560, at: 278, steer: -1, after: 14, to: 512 },
+  { name: 'J4', floor: 512, at: 240, steer: 1, after: 14, to: 464 },
+  { name: 'the stair slab', floor: 464, at: 262, steer: 1, after: 14, to: 416 },
+  { name: 'L_C', floor: 416, at: 278, steer: 1, after: 0, to: 368 },
+  { name: 'the ledge at 320', floor: 368, at: 294, steer: -1, after: 0, to: 320 },
+  { name: 'L_B', floor: 320, at: 272, steer: -1, after: 0, to: 272 },
+  { name: 'the ledge at 224', floor: 272, at: 256, steer: 1, after: 0, to: 224 },
+  { name: 'L_A', floor: 224, at: 278, steer: 1, after: 0, to: 176 },
+  { name: 'the shelf', floor: 176, at: 294, steer: -1, after: 0, to: 128 },
+  { name: 'G0', floor: 128, at: 256, steer: -1, after: 0, to: 80 },
+];
+
+/** His feet on the floor at `y`, as the 1 px ground probe stands him: the way out's test of a landing. */
+const standsOn = (p: Player, y: number) => p.onGround && Math.abs(p.y + p.h - y) < 0.6;
+
+/**
+ * Hands that make `climbs` in order, from wherever he is on the first one's floor, and then
+ * do what `then` says: each a walk to its `at`, and the jump from there once he is on its
+ * floor, until he stands on its `to`.
+ */
+export function climber(climbs: readonly Climb[], then: Hands): Hands {
+  let i = 0;
+  /** Which way he walks to the climb's `at`, and the tick he pressed its jump, or -1. */
+  let way: -1 | 1 | 0 = 0;
+  let pressed = -1;
+  const hands: Hands = (r) => {
+    const c = climbs[i];
+    if (!c) return then(r);
+    const p = r.p;
+    if (pressed < 0) {
+      if (!way) way = p.x < c.at ? 1 : -1;
+      if (standsOn(p, c.floor) && (way > 0 ? p.x >= c.at - 0.01 : p.x <= c.at + 0.01)) {
+        pressed = r.t;
+        return { dir: c.after ? 0 : c.steer, jump: true };
+      }
+      return { dir: way, jump: false };
+    }
+    const k = r.t - pressed;
+    if (k > 2 && standsOn(p, c.to)) {
+      i++;
+      way = 0;
+      pressed = -1;
+      return hands(r);
+    }
+    return { dir: k >= c.after ? c.steer : 0, jump: k < (c.hold ?? FULL) };
+  };
+  return hands;
+}
+
+/** Out of the turnings and the column: left along G0, down O1 into the passage, and out at the door. */
+export const toTheDoor: Hands = () => ({ dir: -1, jump: false });
+
+/**
  * The clean run (LEVEL.md: The beats, and The way down): what he presses, tick by tick,
- * from the spawn to row 5 over the cell, as the hands of a man who knows the level. Later
- * stages carry it on: out by the thread to the exit.
+ * from the spawn to the exit, as the hands of a man who knows the level: down to the cell,
+ * through the fight onto row 5, and out by the thread.
  */
 export function cleanRun(): Hands {
   /** Which way he runs on each floor: off its end into the hole, landing running the other way; on the cell's, at the bull. */
@@ -201,10 +285,15 @@ export function cleanRun(): Hands {
     done.add(name);
     hold = FULL;
   };
+  /** f. Out by the thread, from the frame he stands on row 5, over the cell's far wall. */
+  const out = climber(CLIMBS, toTheDoor);
+  let outward = false;
   return (r) => {
     const p = r.p;
     const feet = p.y + p.h;
     const floor = Math.round(feet);
+    outward ||= standsOn(p, ROW_5) && p.x + p.w > 144;
+    if (outward) return out(r);
     if (p.onGround && onFloor(feet, floor) && WAY[floor] !== undefined) dir = WAY[floor]!;
     // a. Over the kneeling hero at 0.42 s, a full jump, landing in the vestibule.
     jump('vault', r.t === 25);
@@ -221,8 +310,19 @@ export function cleanRun(): Hands {
     jump('off', r.fight.k + 1 === 60);
     const j = hold > 0;
     if (hold > 0) hold--;
-    // f. On row 5 he stands: the way out is not built yet.
-    const out = p.onGround && onFloor(feet, ROW_5) && p.x + p.w > 144;
-    return { dir: out ? 0 : dir, jump: j };
+    return { dir, jump: j };
   };
+}
+
+/** The clean run's presses, tick by tick from the spawn, to the tick he goes out at the door: for the game in a browser to replay. */
+export function cleanPresses(): Press[] {
+  const r = new Run();
+  const hands = cleanRun();
+  const out: Press[] = [];
+  while (!r.cause && r.out < 0 && r.t < 3000) {
+    const p = hands(r);
+    out.push(p);
+    r.tick(p);
+  }
+  return out;
 }

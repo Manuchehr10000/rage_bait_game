@@ -158,7 +158,7 @@ test("the fight's data: keyed 61 px down the hatch, the bull crouched at its bed
     done: 'secondBlow',
   });
   // After the beast, which hears him first, and before Theseus, whom it steps out.
-  expect(MINOTAUR.entities.map((e) => e.kind)).toEqual(['ear', 'fight', 'hero']);
+  expect(MINOTAUR.entities.map((e) => e.kind)).toEqual(['ear', 'fight', 'tableau', 'hero']);
   expect(MINOTAUR.exitAfter).toBe(FIGHT.done);
   // Each noun drawn by its own death. The fight sounds both: the hands by which of them it
   // was, the horns' toss and drop when the bull reaches him, which may be frames after the
@@ -772,9 +772,9 @@ test('the camera: the fight is in frame from L - 8, and the cell floor kept in i
   }
   expect([low[-8], low[-7], low[-6]]).toEqual([735, 738, 740]);
   // The clean run: from L - 8, all of the cell, to its floor at 736, in every frame to the
-  // second blow and the frames it takes the bull down, though he stands on row 5 from
-  // L + 86, where the camera alone would leave the floor 7 px out of the view; then it goes
-  // on up with him.
+  // second blow and the frames it takes the bull down, though he is on row 5 from L + 86,
+  // walking out along it, where the camera alone would leave the floor 7 px out of the
+  // view; then it goes on up with him.
   const r = cleanPast();
   const views = r.log.filter((l) => l.t >= L - 8).map((l) => ({ k: l.t - L, bottom: l.camY + VIEW_H }));
   expect(Math.min(...views.filter((v) => v.k < C.blow2 + STRUCK).map((v) => v.bottom))).toBe(CELL_FLOOR);

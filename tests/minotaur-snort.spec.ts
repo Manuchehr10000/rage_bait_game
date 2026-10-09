@@ -56,7 +56,7 @@ const leapFrom = (from: Run, x: number, hold: number, letGo = false): Outcome =>
 
 test("the beast's data: under T_end's floor, the lip and the bed, the joint it breathes through, its clock, the ceiling it snorts him onto", () => {
   // Read before anything in the cell: first of all, before the fight.
-  expect(MINOTAUR.entities.map((e) => e.kind)).toEqual(['ear', 'fight', 'hero']);
+  expect(MINOTAUR.entities.map((e) => e.kind)).toEqual(['ear', 'fight', 'tableau', 'hero']);
   expect(BEAST).toEqual({
     kind: 'ear',
     // T_end's floor, from the lip to the wall.

@@ -252,6 +252,10 @@ export function renderOverlay(
         if (e instanceof Fight) for (const sol of e.solids()) box(sol.rect, SAFE, { fill: 0.25 });
         break;
       }
+      case 'tableau':
+        // The line at the door that, the second blow fallen, brings the closing picture out.
+        trigger(d.triggerX);
+        break;
     }
   }
 

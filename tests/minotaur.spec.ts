@@ -94,9 +94,10 @@ test("the stage's data: the bull-leaper, the walk in, the camera on the spawn, t
   expect(d.cameraOnSpawn).toBe(true);
   expect(d.cameraBottom).toBe(752);
   // The beast under T_end's floor, which hears him first of anything below; the fight in
-  // the cell, which steps Theseus out of his doorway; and Theseus and his knot. No queue
-  // yet. Their own data is tests/minotaur-snort.spec.ts and tests/minotaur-fight.spec.ts.
-  expect(d.entities.map((e) => e.kind)).toEqual(['ear', 'fight', 'hero']);
+  // the cell, which steps Theseus out of his doorway; the closing tableau at the door,
+  // under Theseus's thread and knot; and Theseus. Their own data is
+  // tests/minotaur-snort.spec.ts, tests/minotaur-fight.spec.ts and tests/minotaur-out.spec.ts.
+  expect(d.entities.map((e) => e.kind)).toEqual(['ear', 'fight', 'tableau', 'hero']);
   const hero = d.entities.find((e): e is HeroDef => e.kind === 'hero')!;
   expect({ kneel: hero.kneel, knot: hero.knot, ball: hero.ball, triggerX: hero.triggerX, lean: hero.lean, hold: hero.hold, line: hero.line, cause: hero.cause }).toEqual({
     // Kneeling at the doorpost, outside, 12 by 14.
@@ -110,8 +111,11 @@ test("the stage's data: the bull-leaper, the walk in, the camera on the spawn, t
     line: { x: 80, y: 149, w: 128, h: 1 },
     cause: 'The knot',
   });
-  // The post the knot is on, the boss his foot pushes off, his black doorway on row 5.
+  // The queue and Ariadne at the door (tests/minotaur-out.spec.ts); the post the knot is
+  // on, the boss his foot pushes off, his black doorway on row 5.
   expect(d.decor).toEqual([
+    { kind: 'queue', front: 39, step: 5, maidens: 7, youths: 6, floorY: DOOR_FLOOR },
+    { kind: 'ariadne', x0: 42, x1: 52, floorY: DOOR_FLOOR },
     { kind: 'doorpost', x: 80, top: 80, floorY: DOOR_FLOOR },
     { kind: 'boss', rect: { x: 206, y: 140, w: 9, h: 8 } },
     { kind: 'blackDoorway', x: 148, w: 16, top: 628, floorY: 656 },
@@ -385,8 +389,9 @@ test('the route rule: from the way down no run or jump puts any of him on a hero
 });
 
 test('the route rule: from the cell floor alone, with nothing in the cell, row 5 is out of reach', () => {
-  // The cell's far wall is 80 px against a full jump's 61.8. Only the beast's heap,
-  // which is not built, lets him out.
+  // The cell's far wall is 80 px against a full jump's 61.8. Only the bull's back as it
+  // heaves, or after the fight its heap, lets him out (tests/minotaur-fight.spec.ts and
+  // tests/minotaur-out.spec.ts).
   const s = sweep(LEVEL, [floor(736, 48)], () => false);
   expect([...s.reached]).toEqual([CELL]);
   expect([...s.onHero]).toEqual([]);
@@ -419,19 +424,22 @@ test('no reachable fall in the stage is more than 200 px from the top of the arc
 });
 
 test('no reachable fall in the stage is more than 200 px from the top of the arc: up the hero\'s route to the door', () => {
-  // Until the fight exists only the dev tools put him on row 5. From there he climbs the
-  // turnings and the column by 48 px steps to G0, down O1 into the passage, and out of the
-  // door. Back down the way down from the passage is the way down's business.
+  // The way out, from row 5, where the fight leaves him: he climbs the turnings and the
+  // column by 48 px steps to G0, down O1 into the passage, and out of the door. Back down
+  // the way down from the passage is the way down's business.
   const corridors = new Set([Z1, T2, T3, T, T_END]);
   const s = sweep(LEVEL, [floor(656, 144)], (f) => corridors.has(name(f)));
   expect(s.reached.has(G0)).toBe(true);
   expect(s.reached.has(DOOR_STOREY)).toBe(true);
   expect(s.reached.has('16:80-320'), 'the roof').toBe(false);
   // None over 145 on the way out (LEVEL.md, Tests to pin). The worst is the relieved jump
-  // into D0 again, from the passage, under P's ceiling. Back into the cell from row 5 is
-  // under their ceiling at 592, and nothing else is more than 128: the drop from G0 down
-  // shaft A onto L_A, under the roof at 32, is the other that comes near it.
+  // into D0 again, from the passage, under P's ceiling: 143.61, a jump pressed from the
+  // highest stance the 1 px probe gives him, where LEVEL.md has 143.4. Back into the cell
+  // from row 5 is under their ceiling at 592, and nothing else is more than 128: the drop
+  // from G0 down shaft A onto L_A, under the roof at 32, is the other that comes near it.
   expect(s.worst).toBeLessThan(145);
+  expect(s.worst).toBeCloseTo(143.61, 2);
+  expect(s.worstOn.get(Z1)).toBe(s.worst);
   expect(s.worstOn.get(Z1)).toBeLessThanOrEqual(underRoof(96, 256));
   expect(s.worstOn.get(CELL)).toBeLessThanOrEqual(underRoof(592, 736));
   expect(s.worstOn.get(CELL)).toBeGreaterThan(underRoof(592, 736) - 1);

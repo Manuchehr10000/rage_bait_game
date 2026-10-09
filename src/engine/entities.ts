@@ -21,6 +21,7 @@ import type {
   SnareDef,
   SpanDef,
   SweepDef,
+  TableauDef,
   ThrowerDef,
   TipperDef,
   TrapColumnDef,
@@ -108,6 +109,8 @@ export function createEntity(def: EntityDef, level: Level): Entity {
       return new Ear(def);
     case 'fight':
       return new Fight(def);
+    case 'tableau':
+      return new Tableau(def);
   }
 }
 
@@ -1515,7 +1518,7 @@ export const HERO = { w: 12, h: 24, pace: 3 } as const;
 const HERO_STRIDE = 18;
 
 /** What he is doing on a frame of his route. */
-export type HeroPose = 'hold' | 'stand' | 'walk' | 'climb' | 'fall' | 'crouch' | 'leap' | HeroAct;
+export type HeroPose = 'hold' | 'stand' | 'walk' | 'climb' | 'fall' | 'crouch' | 'leap' | 'drag' | HeroAct;
 
 /** One frame of the hero's route. The route is worked out once, when the level is built. */
 export interface HeroFrame {
@@ -2509,5 +2512,48 @@ export class Fight implements Entity {
     if (this.k >= this.def.clock.blow2) return { breath: 0, snore: 0, pan: 0 };
     const pan = Math.max(-1, Math.min(1, (this.headAt(this.k).x - centerX(p)) / 160));
     return { breath: breathFlow(this.breath).flow, snore: 0, pan };
+  }
+}
+
+// ---------------------------------------------------------------------------
+// The Minotaur: the closing tableau at the door.
+// ---------------------------------------------------------------------------
+
+/**
+ * The closing tableau (`TableauDef`): Theseus again, with the dead Minotaur, out of the
+ * black vestibule as the tourist leaves, while the heap stays in the cell. It begins on
+ * the tick it sees him past its line on the door storey, the second blow fallen: as the
+ * tick before left him, like everything else that waits for him. From then on it plays on
+ * its own clock to the post, and stays there. Nothing touches anybody.
+ */
+export class Tableau implements Entity {
+  /** Frames since it began, or -1. */
+  k = -1;
+
+  constructor(readonly def: TableauDef) {}
+
+  get begun(): boolean {
+    return this.k >= 0;
+  }
+
+  /** Theseus's box's left edge: coming out at his pace, and at the post. */
+  get x(): number {
+    const d = this.def;
+    return Math.max(d.to, d.from - d.pace * Math.max(0, this.k));
+  }
+
+  /** At the post, and still. */
+  get stopped(): boolean {
+    return this.begun && this.x === this.def.to;
+  }
+
+  update(w: World): void {
+    if (this.begun) {
+      this.k++;
+      return;
+    }
+    const d = this.def;
+    const p = w.player;
+    if (w.alive && w.events.has(d.after) && p.x < d.triggerX && p.y + p.h <= d.floorY + 1e-6) this.k = 0;
   }
 }

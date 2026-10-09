@@ -1,5 +1,5 @@
 import type { Camera } from '../engine/camera';
-import type { Chaser, Crumble, Door, Ear, Entity, Falling, Fight, Guards, Hero, HeroFrame, Horse, Platform, Pusher, Roof, Seat, Span, Sweep, Thrower, Tipper, TrapColumn, Water } from '../engine/entities';
+import type { Chaser, Crumble, Door, Ear, Entity, Falling, Fight, Guards, Hero, HeroFrame, Horse, Platform, Pusher, Roof, Seat, Span, Sweep, Tableau, Thrower, Tipper, TrapColumn, Water } from '../engine/entities';
 import type { DecorDef, DoorDef, Level, SpanDef } from '../engine/level';
 import type { Player } from '../engine/player';
 import {
@@ -50,7 +50,7 @@ import { paint } from '../engine/assets';
 import { blit, blitFacing, frameOf, relief, silhouette, withLamp, type Frame, type ReliefTones } from './frame';
 import { SPLINTER, handStencils } from './hands';
 import { hash } from './hash';
-import { breathHeight, HERO, heroHand, PERSIAN_COLUMN, PLUME, snortBody, TRAIN, type Train } from '../engine/entities';
+import { breathHeight, BULL_HEAD, HERO, heroHand, PERSIAN_COLUMN, PLUME, snortBody, TRAIN, type Train } from '../engine/entities';
 import type { CavePanel } from '../engine/level';
 import { BEAR_STALAGMITE_SPRITE, SIGNAL_LAMP_SPRITE, STOP_SIGN_SPRITE, TRAIN_CAR_SPRITE, TRAIN_ENGINE_SPRITE, TRAIN_LAST_CAR_SPRITE } from './procedural';
 import {
@@ -1503,6 +1503,8 @@ function drawDecor(ctx: CanvasRenderingContext2D, s: Scene, d: DecorDef): void {
     case 'doorpost':
     case 'boss':
     case 'blackDoorway':
+    case 'queue':
+    case 'ariadne':
       drawMinotaurDecor(ctx, d);
       break;
     case 'landing': {
@@ -1651,7 +1653,7 @@ function drawTileAt(
     return;
   }
   if (theme === 'minotaur' && (c === '#' || c === '%')) {
-    drawMasonry(ctx, tx, ty, x, y, open);
+    drawMasonry(ctx, tx, ty, x, y, open, level.isSolid(tx - 1, ty));
     return;
   }
   if (c === '=') {
@@ -2185,6 +2187,9 @@ function drawEntityBack(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): voi
       break;
     case 'fight':
       drawBull(ctx, e as Fight);
+      break;
+    case 'tableau':
+      drawTableau(ctx, e as Tableau);
       break;
     default:
       break;
@@ -4554,6 +4559,10 @@ const MN = {
   dressedLight: '#c48552',
   /** Dust, breathed out of the floor. Never the thread's white. */
   dust: '#ecc999',
+  /** The women's flesh: cream, as the vase painters' added white, and never the thread's white. */
+  cream: '#f1dfb9',
+  /** Added red, only on fillets and garment borders. */
+  red: '#93321f',
 };
 
 /** Where the door storey's outside ends: the outer face of the labyrinth, and the floor outside it. */
@@ -4587,9 +4596,10 @@ function drawLabyrinthAir(ctx: CanvasRenderingContext2D, s: Scene): void {
  * A tile of the labyrinth's masonry: a wash with a full-glaze course under it. Its blocks
  * are two tiles long, each course's joints half a block along from the one under it, so
  * every joint is a tile's edge: on the last corridor's floor, x 80, 112, 144 and 176.
- * Every block is the same, joints and all; none is cracked.
+ * Every block is the same, joints and all; none is cracked. `stoneLeft`: the tile to its
+ * left is stone too, so that there is a joint between them to draw.
  */
-function drawMasonry(ctx: CanvasRenderingContext2D, tx: number, ty: number, x: number, y: number, open: boolean): void {
+function drawMasonry(ctx: CanvasRenderingContext2D, tx: number, ty: number, x: number, y: number, open: boolean, stoneLeft: boolean): void {
   ctx.fillStyle = MN.wash;
   ctx.fillRect(x, y, TILE, TILE);
   if (open) {
@@ -4598,7 +4608,9 @@ function drawMasonry(ctx: CanvasRenderingContext2D, tx: number, ty: number, x: n
   }
   ctx.fillStyle = MN.glaze;
   ctx.fillRect(x, y + TILE - 1, TILE, 1);
-  if ((tx + ty) % 2 === 1) ctx.fillRect(x, y, 1, TILE - 1);
+  // A joint is where two stones meet: where the stone ends on air there is none, so a
+  // hole's two jambs are alike whichever course it is cut through.
+  if ((tx + ty) % 2 === 1 && stoneLeft) ctx.fillRect(x, y, 1, TILE - 1);
 }
 
 /**
@@ -4699,10 +4711,111 @@ function drawMinotaurDecor(ctx: CanvasRenderingContext2D, d: MinotaurDecor): voi
       ctx.fillStyle = MN.wash;
       ctx.fillRect(d.x - 2, d.top - 2, d.w + 4, 2);
       break;
+    case 'queue': {
+      // Back to front, each over the one behind it, cut from it by a reserved line of clay
+      // down its back, as the vase painters cut one figure from the next.
+      const file = queueFile(d.maidens, d.youths);
+      for (let i = file.length - 1; i >= 0; i--) {
+        const right = d.front - i * d.step;
+        drawVaseFigure(ctx, file[i]!, right - VASE_W, d.floorY, i < file.length - 1);
+      }
+      break;
+    }
+    case 'ariadne':
+      drawVaseFigure(ctx, 'ariadne', d.x0 + Math.round((d.x1 - d.x0 - VASE_W) / 2), d.floorY, false);
+      break;
   }
 }
 
-type MinotaurDecor = Extract<DecorDef, { kind: 'doorpost' | 'boss' | 'blackDoorway' }>;
+type MinotaurDecor = Extract<DecorDef, { kind: 'doorpost' | 'boss' | 'blackDoorway' | 'queue' | 'ariadne' }>;
+
+/** Who stands at the door: a youth, a maiden, and Ariadne. */
+type VaseWho = 'youth' | 'maiden' | 'ariadne';
+
+/** The file, front first: maidens and youths alternating, a maiden at the front, until both are spent. */
+function queueFile(maidens: number, youths: number): VaseWho[] {
+  const file: VaseWho[] = [];
+  for (let m = maidens, y = youths; m > 0 || y > 0; ) {
+    if (m > 0 && (file.length % 2 === 0 || y === 0)) {
+      file.push('maiden');
+      m--;
+    } else {
+      file.push('youth');
+      y--;
+    }
+  }
+  return file;
+}
+
+/** How wide a figure of the story at the door is drawn, 24 px tall like Theseus: its pixels, and the reserved line down its back, are within this of its box's left. */
+const VASE_W = 10;
+
+/**
+ * One figure of the story standing at the door, facing it (right), in the vases' colours:
+ * rects of its box, its top-left at the top of its head, as [dx, dy, w, h, tone]. A youth
+ * all glaze, in a short chiton, an eye reserved in the clay; a maiden in a peplos to her
+ * feet, her face, arm and feet in cream; Ariadne a maiden with added red on her fillet and
+ * her hem, her near hand open at her side, empty.
+ */
+function vaseFigure(who: VaseWho): readonly (readonly [number, number, number, number, 'glaze' | 'cream' | 'red' | 'clay'])[] {
+  if (who === 'youth')
+    return [
+      [3, 0, 5, 5, 'glaze'],
+      [8, 2, 1, 1, 'glaze'],
+      [4, 5, 3, 1, 'glaze'],
+      [2, 6, 7, 8, 'glaze'],
+      [1, 13, 8, 3, 'glaze'],
+      [3, 16, 2, 8, 'glaze'],
+      [6, 16, 2, 8, 'glaze'],
+      [1, 7, 1, 6, 'glaze'],
+      [9, 7, 1, 6, 'glaze'],
+      [6, 1, 1, 1, 'clay'],
+    ];
+  const red = who === 'ariadne';
+  return [
+    // Her head in glaze, bound up behind, and her face painted in cream over it inside a
+    // line of the glaze, the eye left in it; her neck.
+    [2, 0, 7, 6, 'glaze'],
+    [9, 2, 1, 2, 'glaze'],
+    [5, 1, 3, 4, 'cream'],
+    [8, 2, 1, 2, 'cream'],
+    [6, 2, 1, 1, 'glaze'],
+    ...(red ? [[2, 1, 3, 1, 'red'] as const] : []),
+    [5, 5, 2, 1, 'cream'],
+    // The peplos, from her shoulders to her feet, flaring.
+    [3, 6, 6, 8, 'glaze'],
+    [2, 14, 7, 8, 'glaze'],
+    ...(red ? [[2, 21, 7, 1, 'red'] as const] : []),
+    // Her near arm at her side; Ariadne's hand open and a little forward, with nothing in it.
+    ...(red
+      ? ([
+          [8, 7, 1, 5, 'cream'],
+          [9, 11, 1, 3, 'cream'],
+        ] as const)
+      : ([
+          [7, 7, 1, 6, 'cream'],
+          [7, 13, 1, 1, 'cream'],
+        ] as const)),
+    // Her feet under the hem.
+    [2, 22, 3, 2, 'cream'],
+    [6, 22, 3, 2, 'cream'],
+  ];
+}
+
+/** A figure of the story at the door, its box's left at `x`, on the floor at `floorY`; `cut`, a reserved line of clay down its back. */
+function drawVaseFigure(ctx: CanvasRenderingContext2D, who: VaseWho, x: number, floorY: number, cut: boolean): void {
+  const y = floorY - HERO.h;
+  const parts = vaseFigure(who);
+  if (cut) {
+    ctx.fillStyle = MN.clay;
+    for (const [dx, dy, w, h, tone] of parts) if (tone !== 'clay') ctx.fillRect(x + dx - 1, y + dy, w, h);
+  }
+  const ink = { glaze: MN.glaze, cream: MN.cream, red: MN.red, clay: MN.clay };
+  for (const [dx, dy, w, h, tone] of parts) {
+    ctx.fillStyle = ink[tone];
+    ctx.fillRect(x + dx, y + dy, w, h);
+  }
+}
 
 /**
  * Theseus, rough: a figure in black glaze the size of his box, facing `facing`, in the
@@ -4848,6 +4961,27 @@ function drawHeroFigure(ctx: CanvasRenderingContext2D, f: HeroFrame, horn: { x: 
         l(7, 7, 13, 10);
         l(13, 10, 20, 12);
       }
+      return;
+    }
+    case 'drag': {
+      // Leaning into the pull, the horn in his far hand behind him; walking, his legs
+      // scissor, and his near hand swings forward with the pull.
+      head(1, false, 5);
+      r(6, 6, 3, 1);
+      r(4, 7, 7, 7);
+      r(3, 13, 9, 3);
+      const step = Math.floor(f.stride / 6) % 2;
+      if (step === 0) {
+        r(3, 16, 2, 8);
+        r(8, 16, 2, 8);
+      } else {
+        r(5, 16, 2, 8);
+        r(6, 16, 2, 8);
+      }
+      l(9, 8, 11, 12);
+      toHorn(5, 8);
+      // The sword at his hip.
+      r(1, 12, 4, 1);
       return;
     }
     case 'hold':
@@ -5307,9 +5441,9 @@ function drawBullStone(ctx: CanvasRenderingContext2D, x: number, y: number, w: n
   ctx.fillRect(Math.round(x) + 1, Math.round(y) + 1, w - 2, h - 1);
 }
 
-/** A bull's head, facing left, its box's top-left at (hx, hy): the muzzle forward and down, the horns up and forward over the brow. */
-function drawBullHead(ctx: CanvasRenderingContext2D, hx: number, hy: number): void {
-  ctx.fillStyle = MN.glaze;
+/** A bull's head, facing left, its box's top-left at (hx, hy): the muzzle forward and down, the horns up and forward over the brow. Drawn in `ink`; its eye and nostril reserved only in the glaze. */
+function drawBullHead(ctx: CanvasRenderingContext2D, hx: number, hy: number, ink: string = MN.glaze): void {
+  ctx.fillStyle = ink;
   ctx.fillRect(hx + 2, hy, 7, 6);
   ctx.fillRect(hx, hy + 3, 5, 5);
   ctx.fillRect(hx + 1, hy + 8, 3, 1);
@@ -5330,6 +5464,7 @@ function drawBullHead(ctx: CanvasRenderingContext2D, hx: number, hy: number): vo
   ] as const)
     ctx.fillRect(hx + ox, hy + oy, 1, 1);
   ctx.fillRect(hx + 3, hy - 1, 2, 1);
+  if (ink !== MN.glaze) return;
   // Its eye and its nostril, reserved in the clay.
   ctx.fillStyle = MN.clay;
   ctx.fillRect(hx + 3, hy + 2, 1, 1);
@@ -5553,4 +5688,87 @@ function drawTossed(ctx: CanvasRenderingContext2D, s: Scene, death: { t: number;
     case 'flat':
       drawPressed(ctx, dead, x + 8, y + 16, 16, 10);
   }
+}
+
+// ---------------------------------------------------------------------------
+// The Minotaur: the closing tableau at the door, rough.
+// ---------------------------------------------------------------------------
+
+/**
+ * The dead Minotaur lying on its front, dragged by a horn, in `ink`: its head down on the
+ * floor at `hx`, horns up, the muzzle toward whoever drags it; a man's shoulders, back
+ * and hips after it, an arm trailing along the floor, the legs, and a sole turned up at
+ * the end, BULL_HEAD.w + 34 px in all.
+ */
+function drawDeadBull(ctx: CanvasRenderingContext2D, hx: number, floorY: number, ink: string): void {
+  const F = floorY;
+  drawBullHead(ctx, hx, F - BULL_HEAD.h + 1, ink);
+  ctx.fillStyle = ink;
+  ctx.fillRect(hx + 8, F - 6, 4, 5);
+  ctx.fillRect(hx + 12, F - 8, 7, 7);
+  ctx.fillRect(hx + 11, F - 7, 1, 6);
+  ctx.fillRect(hx + 19, F - 7, 8, 6);
+  ctx.fillRect(hx + 27, F - 6, 5, 5);
+  ctx.fillRect(hx + 32, F - 5, 6, 4);
+  ctx.fillRect(hx + 38, F - 4, 5, 3);
+  ctx.fillRect(hx + 43, F - 6, 2, 5);
+  // The arm, trailing back along the floor beside it.
+  ctx.fillRect(hx + 14, F - 1, 12, 1);
+}
+
+/**
+ * The closing tableau (Tableau): Theseus dragging the dead Minotaur by a horn out of the
+ * black vestibule and stopping at the post where he knelt, the body after him, its head
+ * across the threshold on the clay of the door opening and the rest in the vestibule.
+ * Both are drawn with a reserved outline where they are in the black; nothing of them is
+ * drawn in the passage behind it, out of which they come.
+ */
+function drawTableau(ctx: CanvasRenderingContext2D, t: Tableau): void {
+  if (!t.begun) return;
+  const d = t.def;
+  const F = d.floorY;
+  const x = t.x;
+  const f: HeroFrame = {
+    x,
+    y: F - HERO.h,
+    pose: 'drag',
+    facing: -1,
+    grounded: true,
+    lookBack: false,
+    front: false,
+    unseen: false,
+    foot: null,
+    carrying: false,
+    payOut: 0,
+    heard: null,
+    stride: t.stopped ? 0 : d.from - x,
+  };
+  const hx = Math.round(x + d.body.head);
+  const horn = { x: hx + 3, y: F - BULL_HEAD.h - 1 };
+  const both = (ink: string) => {
+    drawDeadBull(ctx, hx, F, ink);
+    drawHeroFigure(ctx, f, horn, ink);
+  };
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(0, 0, VESTIBULE.x + VESTIBULE.w, F);
+  ctx.clip();
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(VESTIBULE.x, VESTIBULE.y, VESTIBULE.w, VESTIBULE.h);
+  ctx.clip();
+  for (const [dx, dy] of [
+    [-1, 0],
+    [1, 0],
+    [0, -1],
+    [0, 1],
+  ] as const) {
+    ctx.save();
+    ctx.translate(dx, dy);
+    both(MN.clay);
+    ctx.restore();
+  }
+  ctx.restore();
+  both(MN.glaze);
+  ctx.restore();
 }

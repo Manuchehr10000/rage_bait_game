@@ -1,4 +1,4 @@
-import { Grid, type EarDef, type FightDef, type HeroDef, type LevelData } from '../../engine/level';
+import { Grid, type EarDef, type FightDef, type HeroDef, type LevelData, type TableauDef } from '../../engine/level';
 import { TILE } from '../../engine/types';
 
 /**
@@ -6,9 +6,10 @@ import { TILE } from '../../engine/types';
  * section, cell for cell as its map, and Theseus in it, at the door with his knot and
  * then down his route to the cell, laying the thread; the beast under the last
  * corridor's floor, heard and breathed, never seen, which snorts him back up the hatch;
- * and the fight in its cell, where the bull claps him, swats him and tosses him while the
- * hero kills it. No queue and no way out yet: those are built into it one at a time, and
- * then it takes its place in LEVELS. Design: content/ch03-aegean/l06-minotaur/LEVEL.md.
+ * the fight in its cell, where the bull claps him, swats him and tosses him while the
+ * hero kills it; and the way out by the thread, past the queue and Ariadne at the door,
+ * with the closing picture. Rough art; it takes its place in LEVELS when the designer
+ * says. Design: content/ch03-aegean/l06-minotaur/LEVEL.md.
  *
  * One screen wide and 47 tiles deep, every solid on the grid; the camera never moves
  * sideways, and it starts on the spawn. The spawn floor is y 160, so a designer's
@@ -27,9 +28,8 @@ import { TILE } from '../../engine/types';
  *
  * The cell's far wall is 80 px and a full jump rises 61.8: he is out of it only off the
  * bull's back as it heaves, or, after the fight, off its heap. The exit waits for the
- * second blow, which the fight fires. What the stage cannot do yet: the way out is not
- * staged, and the closing picture is not; on row 5 he can climb the hero's route all the
- * way to the door, as the dev tools could put him there before.
+ * second blow, which the fight fires. The way out is the hero's route reversed, every
+ * climb an honest 48 px jump; nothing on it kills, and nothing carries him.
  */
 const W = 20;
 const H = 47;
@@ -331,6 +331,31 @@ const FIGHT: FightDef = {
   done: SECOND_BLOW,
 };
 
+// ---------------------------------------------------------------------------
+// f. Out at the door: the closing tableau.
+// ---------------------------------------------------------------------------
+
+/**
+ * The closing tableau (LEVEL.md): when his left edge passes x 80 on the door storey after
+ * the second blow, a staged second copy of Theseus comes out of the black vestibule
+ * dragging the dead Minotaur, while the heap stays in the cell. From x 110, all of him in
+ * the black, at a dragging pace of 1 px a frame, he stops at the post where he knelt, x 66
+ * to 78, 44 frames on, 45 after the line: nobody is out of the door sooner than 49. The
+ * head and horns lie across the threshold, x 82 to 93 on the clay of the door opening;
+ * the rest in the vestibule, to x 127. Drawn behind the tourist; he leaves first, the
+ * queue still waits, and Ariadne looks past him.
+ */
+const TABLEAU: TableauDef = {
+  kind: 'tableau',
+  after: SECOND_BLOW,
+  triggerX: 80,
+  floorY: DOOR_FLOOR,
+  from: 110,
+  to: THESEUS.kneel.x,
+  pace: 1,
+  body: { head: 16, w: 45 },
+};
+
 export const MINOTAUR: LevelData = {
   id: 'minotaur',
   name: 'The Minotaur',
@@ -357,6 +382,11 @@ export const MINOTAUR: LevelData = {
   // The closing picture is at the door, on the left: the label stands aside for it.
   exitCard: 'right',
   decor: [
+    // The thirteen at the door, six youths and seven maidens in one file facing it, its
+    // front at x 39 and running off the left edge; Ariadne apart, x 42 to 52, facing it.
+    // Both well clear of the hero at the post, x 56 to 80.
+    { kind: 'queue', front: 39, step: 5, maidens: 7, youths: 6, floorY: DOOR_FLOOR },
+    { kind: 'ariadne', x0: 42, x1: 52, floorY: DOOR_FLOOR },
     // The post the knot is tied to, in the door's thickness.
     { kind: 'doorpost', x: 80, top: 80, floorY: DOOR_FLOOR },
     // On P's back wall at head height, just right of O1: what his foot pushes off.
@@ -365,6 +395,8 @@ export const MINOTAUR: LevelData = {
     { kind: 'blackDoorway', x: 148, w: 16, top: 628, floorY: 656 },
   ],
   // The beast before anything in the cell: it hears him first. Then the fight, and then
-  // Theseus, whom it steps out of his doorway on the tick it says.
-  entities: [BEAST, FIGHT, THESEUS],
+  // Theseus, whom it steps out of his doorway on the tick it says. The picture at the door,
+  // which the second blow lets begin, is drawn before Theseus, so that his thread and his
+  // knot on the post lie over it.
+  entities: [BEAST, FIGHT, TABLEAU, THESEUS],
 };
