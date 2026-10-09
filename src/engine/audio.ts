@@ -61,6 +61,11 @@ export const SFX = [
   'hollow',
   'drag',
   'snort',
+  'palms',
+  'swat',
+  'toss',
+  'heave',
+  'blow',
 ] as const;
 
 export type Sfx = (typeof SFX)[number];
@@ -375,6 +380,41 @@ export class GameAudio {
         this.burst(t + 0.083, 1300, 'bandpass', 0.18, 0.14);
         this.tone(t + 0.083, 'sawtooth', 70, 38, 0.25, 0.09);
         this.burst(t + 0.15, 700, 'lowpass', 0.05, 0.2);
+        break;
+      case 'palms':
+        // Two palms as wide as his back meeting on him, flat and dry; then him, let fall
+        // on the stone at its feet.
+        this.burst(t, 1500, 'bandpass', 0.035, 0.3);
+        this.burst(t, 420, 'lowpass', 0.07, 0.2);
+        this.tone(t, 'sine', 130, 60, 0.09, 0.12);
+        this.burst(t + 0.27, 360, 'lowpass', 0.08, 0.18);
+        this.tone(t + 0.27, 'sine', 90, 42, 0.14, 0.1);
+        break;
+      case 'swat':
+        // The free hand coming down through the air, and one flat slap.
+        this.burst(t, 900, 'bandpass', 0.07, 0.07);
+        this.burst(t + 0.05, 1250, 'bandpass', 0.03, 0.28);
+        this.tone(t + 0.05, 'sine', 150, 70, 0.1, 0.14);
+        break;
+      case 'toss':
+        // Hooked on a horn, swung up and over through the air, and dropped flat on stone.
+        this.burst(t, 380, 'lowpass', 0.05, 0.2);
+        this.burst(t + 0.04, 900, 'bandpass', 0.32, 0.07);
+        this.burst(t + 0.4, 340, 'lowpass', 0.09, 0.24);
+        this.tone(t + 0.4, 'sine', 95, 40, 0.2, 0.15);
+        break;
+      case 'heave':
+        // A bull's weight heaving up off its knee with a grunt, and the stone it swings
+        // going through the air over the ducking man.
+        this.tone(t, 'sawtooth', 68, 92, 0.26, 0.05);
+        this.burst(t, 260, 'lowpass', 0.26, 0.12);
+        this.burst(t + 0.06, 650, 'bandpass', 0.14, 0.09);
+        break;
+      case 'blow':
+        // A sword struck home in a body: the blade's tick and a dull thwack. Never wet.
+        this.burst(t, 3200, 'highpass', 0.015, 0.06);
+        this.burst(t, 560, 'lowpass', 0.07, 0.2);
+        this.tone(t, 'sine', 110, 55, 0.12, 0.12);
         break;
     }
   }

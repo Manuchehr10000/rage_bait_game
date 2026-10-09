@@ -1,6 +1,6 @@
 import { MINOTAUR } from '../src/levels/ch03-aegean/l06-minotaur';
 import { Level } from '../src/engine/level';
-import { createEntity, Ear, Hero, type Entity, type World } from '../src/engine/entities';
+import { createEntity, Ear, Fight, Hero, type Entity, type World } from '../src/engine/entities';
 import { Camera } from '../src/engine/camera';
 import { PHYS, Player } from '../src/engine/player';
 import type { Input } from '../src/engine/input';
@@ -14,10 +14,12 @@ import type { Input } from '../src/engine/input';
 
 export const LEVEL = new Level(MINOTAUR);
 
-/** The floors of the way down, by their tops: the door storey's, T_end's and the cell's. */
+/** The floors of the way down, by their tops: the door storey's, T_end's and the cell's; and row 5's. */
 export const DOOR_FLOOR = 160;
 export const T_END_FLOOR = 576;
 export const CELL_FLOOR = 736;
+/** Row 5's floor, over the cell's far wall: out of the fight. */
+export const ROW_5 = 656;
 
 /** What he presses on a tick: which way, and whether jump is held. A press is the edge, as on the keyboard. */
 export interface Press {
@@ -55,6 +57,8 @@ export class Run {
   /** The tick the knot fired on, or -1. */
   fire = -1;
   heard: { t: number; sound: string }[] = [];
+  /** The events fired this attempt, as the game keeps them. */
+  events = new Set<string>();
   log: Tick[] = [];
   /** The longest fall he has walked away from. */
   worstFall = 0;
@@ -74,6 +78,10 @@ export class Run {
     return this.entities.find((e): e is Ear => e instanceof Ear)!;
   }
 
+  get fight(): Fight {
+    return this.entities.find((e): e is Fight => e instanceof Fight)!;
+  }
+
   /** The tick the line came taut on, or -1. */
   get yank(): number {
     return this.fire < 0 ? -1 : this.fire + this.hero.def.lean;
@@ -85,10 +93,16 @@ export class Run {
     r.entities = this.entities.map((e) => {
       const c = Object.assign(Object.create(Object.getPrototypeOf(e)), e);
       if (e instanceof Ear) c.puffs = [...e.puffs];
+      // Its solid is its own, and he rides the copy's.
+      if (e instanceof Fight) {
+        c.solid = { ...e.solid, rect: { ...e.solid.rect } };
+        if (this.p.riding === e.solid) r.p.riding = c.solid;
+      }
       return c;
     });
     r.cam = Object.assign(Object.create(Camera.prototype), this.cam);
     r.heard = [...this.heard];
+    r.events = new Set(this.events);
     r.log = [...this.log];
     return r;
   }
@@ -111,7 +125,7 @@ export class Run {
       level: LEVEL,
       player: this.p,
       cameraX: this.cam.x,
-      events: new Set<string>(),
+      events: this.events,
       alive: true,
       kill: (c: string, at?: { x: number; y: number }) => {
         if (this.cause) return;
@@ -134,7 +148,8 @@ export class Run {
       this.worstFall = Math.max(this.worstFall, this.p.fellBy);
       if (this.p.fellBy > PHYS.fatalFall) this.cause = MINOTAUR.dropCause!;
       else {
-        this.cam.update(this.p);
+        const keep = live.map((e) => e.keepsInView?.() ?? null).filter((y): y is number => y !== null);
+        this.cam.update(this.p, keep.length ? Math.max(...keep) : undefined);
         if (this.p.y > LEVEL.heightPx + 16) this.cause = MINOTAUR.fallCause!;
       }
     }
@@ -161,17 +176,23 @@ export const onFloor = (feet: number, floor: number) => Math.abs(feet - floor) <
 export const on = (floor: number) => (l: Tick) => onFloor(l.y + 16, floor);
 export const inAir = (l: Tick) => !l.ground;
 
+/**
+ * A seeded generator, so a random test is the same test every time. Multiplied as 32-bit
+ * integers: a plain product passes 2^53, loses its low bits, and repeats every 10,466.
+ */
+export const seeded = (seed: number) => () => ((seed = (Math.imul(seed, 1103515245) + 12345) & 0x7fffffff) / 0x80000000);
+
 /** A jump held this many frames is a full one: the cut never bites after 15. */
 export const FULL = 20;
 
 /**
  * The clean run (LEVEL.md: The beats, and The way down): what he presses, tick by tick,
- * from the spawn to the cell floor, as the hands of a man who knows the level. Later
- * stages carry it on: the fight, and out by the thread to the exit.
+ * from the spawn to row 5 over the cell, as the hands of a man who knows the level. Later
+ * stages carry it on: out by the thread to the exit.
  */
 export function cleanRun(): Hands {
-  /** Which way he runs on each floor: off its end into the hole, landing running the other way. */
-  const WAY: Record<number, -1 | 1> = { [DOOR_FLOOR]: 1, 256: -1, 336: 1, 416: -1, 512: 1, [T_END_FLOOR]: -1 };
+  /** Which way he runs on each floor: off its end into the hole, landing running the other way; on the cell's, at the bull. */
+  const WAY: Record<number, -1 | 1> = { [DOOR_FLOOR]: 1, 256: -1, 336: 1, 416: -1, 512: 1, [T_END_FLOOR]: -1, [CELL_FLOOR]: 1 };
   let dir: -1 | 1 = 1;
   let hold = 0;
   const done = new Set<string>();
@@ -193,10 +214,15 @@ export function cleanRun(): Hands {
     // d. Over the bed, which knocks hollow and sends the beast to it, and into the hatch: a
     // running leap from x 81.8, left held, never touching the lip.
     jump('hatch', onFloor(feet, T_END_FLOOR) && p.onGround && p.x <= 81.84);
+    // e. Running at the bull from the left wall, a full leap at L + 18, after the hero's
+    // and before his grip, down onto its back; and off it at L + 60, as the heave has
+    // lifted it, onto row 5. On this tick the fight's clock reads 18, and 60.
+    jump('bull', r.fight.k + 1 === 18);
+    jump('off', r.fight.k + 1 === 60);
     const j = hold > 0;
     if (hold > 0) hold--;
-    // e. Down on the cell floor he stands: the fight is not built yet.
-    const down = p.onGround && feet > CELL_FLOOR - 1;
-    return { dir: down ? 0 : dir, jump: j };
+    // f. On row 5 he stands: the way out is not built yet.
+    const out = p.onGround && onFloor(feet, ROW_5) && p.x + p.w > 144;
+    return { dir: out ? 0 : dir, jump: j };
   };
 }

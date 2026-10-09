@@ -1,6 +1,6 @@
 import { GameAudio, type MusicId, type Room } from './engine/audio';
 import { Camera } from './engine/camera';
-import { createEntity, Crumble, type Ear, type Entity, type Platform, type Sweep, type Train, type Water, type World } from './engine/entities';
+import { createEntity, Crumble, type Ear, type Entity, type Fight, type Platform, type Sweep, type Train, type Water, type World } from './engine/entities';
 import type { Stats } from './render/hud';
 import { renderHud } from './render/hud';
 import { Input } from './engine/input';
@@ -387,7 +387,7 @@ export class Game {
     this.player.spawnAt(start.x, start.y);
     this.camera.reset(d.cameraOnSpawn ? this.player : undefined);
     // Started somewhere else by the dev tools: the camera settles on him before the first frame.
-    if (this.devStart) for (let i = 0; i < 200; i++) this.camera.update(this.player);
+    if (this.devStart) for (let i = 0; i < 200; i++) this.camera.update(this.player, this.keepInView());
     this.arriving = false;
     this.lampOn = false;
     this.lampOff = false;
@@ -438,7 +438,8 @@ export class Game {
     this.deathTimer = DEATH_TIME;
     this.deathCause = cause;
     this.deathAt = at ?? null;
-    this.audio.play(DEATH_SOUND[cause]);
+    const sound = DEATH_SOUND[cause];
+    if (sound) this.audio.play(sound);
     this.stats.total += 1;
     this.stats.byCause.set(cause, (this.stats.byCause.get(cause) ?? 0) + 1);
     this.stats.lifetime += 1;
@@ -528,7 +529,7 @@ export class Game {
       }
       if (this.player.walkIn(0)) this.arriving = false;
       if (this.player.justStepped) this.audio.play('step');
-      this.camera.update(this.player);
+      this.camera.update(this.player, this.keepInView());
       this.driveLoops();
       return;
     }
@@ -586,7 +587,7 @@ export class Game {
         return;
       }
     }
-    this.camera.update(this.player);
+    this.camera.update(this.player, this.keepInView());
     this.driveLoops();
 
     for (const c of this.coins) {
@@ -608,6 +609,16 @@ export class Game {
       this.audio.stopLoops();
       this.audio.play('turnstile');
     }
+  }
+
+  /** The lowest world y anything on the level needs on the screen this frame, if anything does. */
+  private keepInView(): number | undefined {
+    let keep: number | undefined;
+    for (const e of this.entities) {
+      const y = e.keepsInView?.() ?? null;
+      if (y !== null) keep = Math.max(keep ?? y, y);
+    }
+    return keep;
   }
 
   /** Pillar 8's count for the exit label: how many of the level's tricks have ever killed this visitor. */
@@ -646,6 +657,11 @@ export class Game {
       }
       if (d.kind === 'ear') {
         beast = (e as Ear).voice(this.player);
+        continue;
+      }
+      // Once the fight is keyed the beast is heard where it crouches, after the ear.
+      if (d.kind === 'fight') {
+        beast = (e as Fight).voice(this.player) ?? beast;
         continue;
       }
       if (d.kind === 'platform') {

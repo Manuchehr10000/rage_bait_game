@@ -65,7 +65,7 @@ export type DeathCause =
   | 'Gave up';
 
 /** How each death is drawn. */
-export type DeathAnim = 'crush' | 'plank' | 'drown' | 'burn' | 'snap' | 'swept' | 'gone' | 'sit' | 'flat' | 'enthroned' | 'carved' | 'trip' | 'snort';
+export type DeathAnim = 'crush' | 'plank' | 'drown' | 'burn' | 'snap' | 'swept' | 'gone' | 'sit' | 'flat' | 'enthroned' | 'carved' | 'trip' | 'snort' | 'hands' | 'horns';
 
 export const DEATH_ANIM: Record<DeathCause, DeathAnim> = {
   'The Beune': 'drown',
@@ -117,29 +117,32 @@ export const DEATH_ANIM: Record<DeathCause, DeathAnim> = {
   // Persepolis. Where the guards stepped out, he is pressed flat into the wall where he
   // stood: upright, in profile, facing the centre like the guards round him, in stone.
   'The audience': 'carved',
-  // The Minotaur. Each of the four is drawn here by an existing death until its own is
-  // made with its trap (content/ch03-aegean/l06-minotaur/LEVEL.md).
+  // The Minotaur, each by its own death (content/ch03-aegean/l06-minotaur/LEVEL.md).
   // The line takes his shins: he pitches forward over it and lands face down, the wig
   // over his eyes, on the floor under him.
   'The knot': 'trip',
   // Sniffed where he is, then snorted back up the hatch and pasted face up on the
   // ceiling over it, which is not where he died: the kill says where.
   'The snort': 'snort',
-  // Clapped flat between its palms like a fly and dropped at its feet, or swatted. For
-  // now he lies where he was.
-  'The hands': 'flat',
-  // Hooked up and over in one full somersault, the kilt flying, and dropped flat. For
-  // now he lies where he was.
-  'The horns': 'flat',
+  // Clapped flat between its palms like a fly and dropped at its feet; or swatted by its
+  // free hand, flat on its own brow if he is in the air, flat on the floor if not. The
+  // fight says which.
+  'The hands': 'hands',
+  // Hooked up and over in one full somersault, the kilt flying, and dropped flat at the
+  // left wall.
+  'The horns': 'horns',
   // A fall that kills, or a fall off the bottom: neither can happen in the labyrinth.
   'The labyrinth': 'flat',
   'Gave up': 'sit',
 };
 
-/** What each death sounds like. Material, never musical. */
+/**
+ * What each death sounds like. Material, never musical. Null where the trap sounds it
+ * itself, because it kills under the one noun in more than one way.
+ */
 export const DEATH_SOUND: Record<
   DeathCause,
-  'squish' | 'bonk' | 'drown' | 'burn' | 'snap' | 'whoosh' | 'fallAway' | 'sigh' | 'thud' | 'click' | 'blast' | 'sitStone' | 'knock' | 'faceDown' | 'snort'
+  'squish' | 'bonk' | 'drown' | 'burn' | 'snap' | 'whoosh' | 'fallAway' | 'sigh' | 'thud' | 'click' | 'blast' | 'sitStone' | 'knock' | 'faceDown' | 'snort' | 'toss' | null
 > = {
   'The Beune': 'drown',
   'The cast': 'thud',
@@ -188,10 +191,10 @@ export const DEATH_SOUND: Record<
   'The knot': 'faceDown',
   // The sniff, the snort up the hatch, and him against the ceiling.
   'The snort': 'snort',
-  // The palms, or the free hand. Its own sound comes with the trap.
-  'The hands': 'squish',
-  // Dropped flat after the toss. Its own sound comes with the trap.
-  'The horns': 'thud',
+  // The palms, or the free hand: the fight sounds which.
+  'The hands': null,
+  // The hook, the somersault through the air, and the drop.
+  'The horns': 'toss',
   'The labyrinth': 'thud',
   'Gave up': 'sigh',
 };

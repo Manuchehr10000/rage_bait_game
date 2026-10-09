@@ -1,4 +1,4 @@
-import { Ear, Guards, Hero, PERSIAN_COLUMN, Sweep, Thrower, Water, type Entity } from '../engine/entities';
+import { Ear, Fight, Guards, Hero, PERSIAN_COLUMN, Sweep, Thrower, Water, type Entity } from '../engine/entities';
 import type { Level } from '../engine/level';
 import { PHYS, Player, type MovingSolid } from '../engine/player';
 import type { Input } from '../engine/input';
@@ -241,6 +241,15 @@ export function renderOverlay(
         box(band(d.bed), LIAR, { dash: true });
         const at = e instanceof Ear ? e.at : 'hatch';
         box({ x: d.hatch.x0, y: d.floor.y, w: d.hatch.x1 - d.hatch.x0, h: d.inY - d.floor.y }, at === 'hatch' ? DEADLY : SAFE, at === 'hatch' ? { fill: 0.5 } : { dash: true });
+        break;
+      }
+      case 'fight': {
+        // The line down the hatch where it is keyed; its three zones, each filled while it
+        // kills; its back or heap from the grip.
+        box({ x: 0, y: d.key.feet, w: d.key.x1, h: 1 }, LIAR, { dash: true });
+        const k = e instanceof Fight ? e.k : -Infinity;
+        for (const z of [d.clap, d.swat, d.toss]) box(z.rect, DEADLY, k >= z.from && k < z.to ? { fill: 0.5 } : { dash: true });
+        if (e instanceof Fight) for (const sol of e.solids()) box(sol.rect, SAFE, { fill: 0.25 });
         break;
       }
     }

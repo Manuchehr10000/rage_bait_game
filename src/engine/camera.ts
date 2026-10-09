@@ -19,11 +19,16 @@ export class Camera {
     this.y = on ? this.wantY(on) : this.levelH - VIEW_H;
   }
 
-  update(target: Rect): void {
+  /**
+   * Eases toward him. `keep`, a world y something on the level needs seen this frame: it
+   * eases far enough down to show it too, as long as that leaves him on the screen.
+   */
+  update(target: Rect, keep?: number): void {
     const wantX = Math.min(this.levelW - VIEW_W, Math.max(0, target.x - 110));
     if (wantX > this.x) this.x = wantX;
 
-    const wantY = this.wantY(target);
+    let wantY = this.wantY(target);
+    if (keep !== undefined) wantY = Math.min(this.levelH - VIEW_H, Math.max(wantY, Math.min(keep - VIEW_H, target.y - 8)));
     this.y += (wantY - this.y) * 0.15;
     if (Math.abs(wantY - this.y) < 0.05) this.y = wantY;
   }

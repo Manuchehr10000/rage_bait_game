@@ -15,6 +15,9 @@ import { CELL_FLOOR, cleanRun, DOOR_FLOOR, first, FULL, inAir, LEVEL, on, onFloo
  * and physics, in Node; where it differs from LEVEL.md's, the comment says so.
  */
 
+/** Theseus's data. */
+const THESEUS_DEF = MINOTAUR.entities.find((e): e is HeroDef => e.kind === 'hero')!;
+
 /** Inside page.evaluate: the type is erased, so it survives the trip into the page. */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type W = Window & { __game: any };
@@ -89,7 +92,7 @@ test('the knot fires on the tick his centre has reached x 144, with a creak; fro
 });
 
 test('the line kills from the yank for 22 frames, frames 0 to 21: a 1 px line at y 149 from the post at x 80 to the ball at x 208', () => {
-  const def = MINOTAUR.entities[0] as HeroDef;
+  const def = THESEUS_DEF;
   /** A hero fired by a man at x 150, ticked to frame k of his clock, and then whether `at` is killed on it. */
   const killsAt = (k: number, at: Rect): boolean => {
     const hero = new Hero(def, LEVEL);
@@ -292,7 +295,7 @@ test("the stride: at frames 68 to 70 the hero's trailing foot is on the boss, ov
 });
 
 test("the hero's route: never in rock, at his pace, never jumping, falling from rest under the game's gravity; where and when he lands, and into his doorway", () => {
-  const hero = new Hero(MINOTAUR.entities[0] as HeroDef, LEVEL);
+  const hero = new Hero(THESEUS_DEF, LEVEL);
   const { frames, landings } = hero.track;
   let vy = 0;
   for (let k = 0; k < frames.length; k++) {
@@ -397,7 +400,8 @@ test("the hero's route: never in rock, at his pace, never jumping, falling from 
     [288, 'land'],
   ]);
   // Along row 5 and into his doorway, all of him inside it, at 402, as LEVEL.md has it.
-  // There he is not seen, and there he stays: the fight is to step him out.
+  // There he is not seen, and there he waits for the fight to step him out
+  // (tests/minotaur-fight.spec.ts).
   const door = MINOTAUR.decor.find((d) => d.kind === 'blackDoorway')!;
   if (door.kind !== 'blackDoorway') throw new Error('no doorway');
   const inside = frames.findIndex((f) => f.x >= door.x && f.x + THESEUS.w <= door.x + door.w && f.y + THESEUS.h === door.floorY);
@@ -408,7 +412,7 @@ test("the hero's route: never in rock, at his pace, never jumping, falling from 
 });
 
 test('the thread: from the knot along the passage, up O1, along G0, straight down each shaft past its ledge, through the thread holes, and into his doorway', () => {
-  const hero = new Hero(MINOTAUR.entities[0] as HeroDef, LEVEL);
+  const hero = new Hero(THESEUS_DEF, LEVEL);
   const { thread, frames } = hero.track;
   // Taken up with the ball at the foot of O1, where he starts to climb.
   expect(thread[0]).toEqual({ x: 200, y: DOOR_FLOOR - 1, at: 66 });
@@ -563,11 +567,11 @@ function fastest(width: number): { lands: number; landed: number; yank: number }
   on.play(() => ({ dir: 0, jump: false }), (x) => onFloor(x.p.y + x.p.h, CELL_FLOOR), 120);
   return { lands: best.lands, landed: on.t - 1, yank: best.at.yank };
 }
-const MINOTAUR_LEAN = (MINOTAUR.entities[0] as HeroDef).lean;
+const MINOTAUR_LEAN = THESEUS_DEF.lean;
 
 test('the race: the fastest tourist a beam can find lands in the cell 20 frames or more after the hero has had to step out', () => {
   test.setTimeout(180_000);
-  const hero = new Hero(MINOTAUR.entities[0] as HeroDef, LEVEL);
+  const hero = new Hero(THESEUS_DEF, LEVEL);
   // In his doorway from yank + 402; the fight steps him out 8 frames before the tourist lands.
   const inDoorway = hero.track.frames.findIndex((f) => f.unseen);
   expect(inDoorway).toBe(402);

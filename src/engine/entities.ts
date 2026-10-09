@@ -7,8 +7,10 @@ import type {
   EarDef,
   EntityDef,
   FallingDef,
+  FightDef,
   GuardsDef,
   HazardDef,
+  HeroAct,
   HeroDef,
   HorseDef,
   Level,
@@ -54,6 +56,8 @@ export interface Entity {
   isExit?(p: Player): boolean;
   /** True while his steps are this entity's to sound, where it hears him: the game's own step and landing are not heard. */
   ownsSteps?(p: Player): boolean;
+  /** The lowest world y it needs on the screen this frame, or null: the camera keeps it in the view while it can. */
+  keepsInView?(): number | null;
 }
 
 export function createEntity(def: EntityDef, level: Level): Entity {
@@ -102,6 +106,8 @@ export function createEntity(def: EntityDef, level: Level): Entity {
       return new Hero(def, level);
     case 'ear':
       return new Ear(def);
+    case 'fight':
+      return new Fight(def);
   }
 }
 
@@ -1509,7 +1515,7 @@ export const HERO = { w: 12, h: 24, pace: 3 } as const;
 const HERO_STRIDE = 18;
 
 /** What he is doing on a frame of his route. */
-export type HeroPose = 'hold' | 'stand' | 'walk' | 'climb' | 'fall' | 'crouch';
+export type HeroPose = 'hold' | 'stand' | 'walk' | 'climb' | 'fall' | 'crouch' | 'leap' | HeroAct;
 
 /** One frame of the hero's route. The route is worked out once, when the level is built. */
 export interface HeroFrame {
@@ -1556,6 +1562,10 @@ export interface ThreadLoop {
 /** His route, frame by frame from the yank, and the thread he lays on it. */
 export interface HeroTrack {
   frames: HeroFrame[];
+  /** The event his last wait in `frames` ends on, or null if it is for good. */
+  until: string | null;
+  /** His frames after that wait, from the tick its event fired: the fight. */
+  after: HeroFrame[];
   /** The thread, from where it leaves the floor of the passage to where it was last laid, in order. */
   thread: ThreadPoint[];
   loops: ThreadLoop[];
@@ -1578,10 +1588,15 @@ export function heroHand(f: HeroFrame): { x: number; y: number } {
  * on whatever he comes down on. Where he goes over an edge carrying the ball, the thread
  * goes over it with him: from the edge down at 45 degrees to the line he lands on, so
  * that it never lies across a gap like a floor, and straight down that line to where he
- * landed.
+ * landed. A wait that ends on an event ends `frames`; the moves after it are worked out
+ * into `after`, from the tick it fires, and he has put the ball down.
  */
 function compileHero(def: HeroDef, level: Level): HeroTrack {
   const frames: HeroFrame[] = [];
+  const after: HeroFrame[] = [];
+  let until: string | null = null;
+  /** Where the moves are being worked out into: `frames`, then `after`. */
+  let out = frames;
   const thread: ThreadPoint[] = [];
   const loops: ThreadLoop[] = [];
   const landings: number[] = [];
@@ -1597,7 +1612,7 @@ function compileHero(def: HeroDef, level: Level): HeroTrack {
   let stride = 0;
   let vy = 0;
   const push = (f: Partial<HeroFrame> & { pose: HeroPose }): void => {
-    frames.push({
+    out.push({
       x: box.x,
       y: box.y,
       facing,
@@ -1614,20 +1629,20 @@ function compileHero(def: HeroDef, level: Level): HeroTrack {
     });
   };
   const standUntil = (k: number) => {
-    while (frames.length < k) push({ pose: 'stand' });
+    while (out.length < k) push({ pose: 'stand' });
   };
   route: for (const m of def.route) {
     switch (m.do) {
       case 'hold':
-        while (frames.length < def.hold) push({ pose: 'hold' });
+        while (out.length < def.hold) push({ pose: 'hold' });
         break;
       case 'go': {
         standUntil(m.at ?? 0);
-        const start = frames.length;
+        const start = out.length;
         let fellAt = -1;
         let lip: ThreadPoint | null = null;
         for (;;) {
-          const k = frames.length;
+          const k = out.length;
           const was = { ...box };
           // Falling, he steers for `air`, which the rock round the hole he went down keeps
           // him from until he is out of it. He faces the way he moves.
@@ -1680,7 +1695,7 @@ function compileHero(def: HeroDef, level: Level): HeroTrack {
               const bend: ThreadPoint = { x: cx, y: Math.min(lip.y + Math.abs(cx - lip.x), floor), at: k };
               // Laid as his hand comes down past it.
               for (let i = fellAt; i <= k; i++) {
-                if (heroHand(frames[i]!).y >= bend.y) {
+                if (heroHand(out[i]!).y >= bend.y) {
                   bend.at = i;
                   break;
                 }
@@ -1707,7 +1722,7 @@ function compileHero(def: HeroDef, level: Level): HeroTrack {
           const u = b.f === a.f ? 1 : (f - a.f) / (b.f - a.f);
           box.x = a.x + (b.x - a.x) * u;
           box.y = a.feet + (b.feet - a.feet) * u - box.h;
-          const k = frames.length;
+          const k = out.length;
           // He takes the ball from where it lies under the mouth, and the thread runs up after him.
           if (f === 0 && m.takes) {
             carrying = true;
@@ -1726,22 +1741,75 @@ function compileHero(def: HeroDef, level: Level): HeroTrack {
       }
       case 'payOut': {
         // From the frame he landed on, which is the last one there is.
-        const first = frames.length - 1;
-        const landing = frames[first]!;
-        frames[first] = { ...landing, pose: 'crouch', payOut: 1 / m.frames };
+        const first = out.length - 1;
+        const landing = out[first]!;
+        out[first] = { ...landing, pose: 'crouch', payOut: 1 / m.frames };
         for (let i = 1; i < m.frames; i++) push({ pose: 'crouch', payOut: (i + 1) / m.frames });
         loops.push({ x: box.x + box.w / 2, y: box.y + box.h - 1, from: first, to: first + m.frames - 1 });
         break;
       }
       case 'wait': {
         // From the frame he got there, which is the last one there is.
-        const last = frames.length - 1;
-        frames[last] = { ...frames[last]!, pose: 'stand', unseen: m.unseen ?? false };
-        break route;
+        const last = out.length - 1;
+        out[last] = { ...out[last]!, pose: 'stand', unseen: m.unseen ?? false };
+        if (!m.until || out !== frames) break route;
+        // He puts the ball down where he stands, and the thread ends there.
+        until = m.until;
+        carrying = false;
+        out = after;
+        break;
+      }
+      case 'leap': {
+        standUntil(m.at);
+        // Up and down first, under the game's gravity, frame by frame as he falls, from the
+        // speed that tops out `rise` px up: how many frames it takes him to come down.
+        const ys: number[] = [];
+        let v = -(Math.sqrt(2 * PHYS.gravity * m.rise) + (PHYS.gravity * DT) / 2);
+        let y = box.y;
+        for (;;) {
+          v = Math.min(PHYS.maxFall, v + PHYS.gravity * DT);
+          y += v * DT;
+          if (y + box.h >= m.feet) break;
+          ys.push(y);
+        }
+        ys.push(m.feet - box.h);
+        const x0 = box.x;
+        if (m.x !== x0) facing = m.x > x0 ? 1 : -1;
+        for (const [i, yy] of ys.entries()) {
+          box.x = x0 + ((m.x - x0) * (i + 1)) / ys.length;
+          box.y = yy;
+          if (tilesIn(box).length) throw new Error(`the hero's leap goes into rock, going for x ${m.x}`);
+          // He comes down without a sound.
+          const landed = i === ys.length - 1;
+          push({ pose: landed ? 'stand' : 'leap', grounded: landed });
+        }
+        vy = 0;
+        break;
+      }
+      case 'act': {
+        const keys = [...m.keys].sort((a, b) => a.f - b.f);
+        if (out.length > keys[0]!.f) throw new Error(`the hero's act at frame ${keys[0]!.f} starts before the move before it has ended`);
+        standUntil(keys[0]!.f);
+        const end = keys[keys.length - 1]!.f;
+        let act: HeroAct = 'stand';
+        for (let f = keys[0]!.f; f <= end; f++) {
+          for (const key of keys) {
+            if (key.f !== f) continue;
+            if (key.act) act = key.act;
+            if (key.facing) facing = key.facing;
+          }
+          // His x, straight from the last key that gives one to the next.
+          const a = keys.filter((key) => key.x !== undefined && key.f <= f).pop();
+          const b = keys.find((key) => key.x !== undefined && key.f > f);
+          if (a && b) box.x = a.x! + ((b.x! - a.x!) * (f - a.f)) / (b.f - a.f);
+          else if (a) box.x = a.x!;
+          push({ pose: act });
+        }
+        break;
       }
     }
   }
-  return { frames, thread, loops, landings };
+  return { frames, until, after, thread, loops, landings };
 }
 
 /**
@@ -1749,8 +1817,10 @@ function compileHero(def: HeroDef, level: Level): HeroTrack {
  * as long as the tourist takes; when the tourist's centre crosses the trigger he stands
  * and leans back on the line with a creak, and from the yank it is taut at shin height
  * for `hold` frames, and kills. Then he goes his route on his own clock, whatever the
- * tourist does: frames from the yank, worked out once from the level. Nothing he does
- * after he stands touches anybody, and he is heard where the route says he is.
+ * tourist does: frames from the yank, worked out once from the level. Waiting at the end
+ * of it for an event, he goes on from the tick it fires, on the clock of whatever fired
+ * it. Nothing he does after he stands touches anybody, and he is heard where the route
+ * says he is.
  */
 export class Hero implements Entity {
   /** Kneeling at the post, or up and on his clock. */
@@ -1759,6 +1829,8 @@ export class Hero implements Entity {
   t = 0;
   /** Frames from the yank once the knot has fired: below 0 while he leans back on the line. */
   k = -Infinity;
+  /** His clock on the tick the event his wait ends on fired, with him waiting: Infinity until then. */
+  cue = Infinity;
   readonly track: HeroTrack;
   private readonly solid: MovingSolid;
 
@@ -1772,15 +1844,21 @@ export class Hero implements Entity {
     return this.k >= 0 && this.k < this.def.hold;
   }
 
+  /** Past the end of his route and on with the moves after it, from the tick its event fired. */
+  get stepped(): boolean {
+    return this.k >= this.cue;
+  }
+
   /** Where he is on his route, from the yank on; null before it. At its end he stays. */
   get frame(): HeroFrame | null {
     if (this.k < 0) return null;
-    const f = this.track.frames;
-    return f[Math.min(this.k, f.length - 1)] ?? null;
+    const f = this.stepped ? this.track.after : this.track.frames;
+    return f[Math.min(this.stepped ? this.k - this.cue : this.k, f.length - 1)] ?? null;
   }
 
   update(w: World): void {
     const d = this.def;
+    const t = this.track;
     this.t++;
     if (this.state === 'kneel') {
       if (!w.alive || centerX(w.player) < d.triggerX) return;
@@ -1788,8 +1866,12 @@ export class Hero implements Entity {
       this.k = -d.lean;
       w.sound('creak');
     } else this.k++;
+    // Only waiting can he be stepped out: the event finds him at the end of his route.
+    if (t.until && !this.stepped && this.k >= t.frames.length - 1 && w.events.has(t.until)) this.cue = this.k;
     if (this.taut && w.alive && overlaps(d.line, w.player)) w.kill(d.cause);
-    if (this.k >= 0 && this.k < this.track.frames.length && this.track.frames[this.k]!.heard) w.sound('footfall');
+    const seg = this.stepped ? t.after : t.frames;
+    const i = this.stepped ? this.k - this.cue : this.k;
+    if (i >= 0 && i < seg.length && seg[i]!.heard) w.sound('footfall');
   }
 
   /** The only solid person in the game, and only while he kneels. */
@@ -1914,6 +1996,8 @@ export class Ear implements Entity {
   puffs: { x: number; from: number }[] = [];
   /** He is in, down the hatch past it: it hears nothing more. */
   in = false;
+  /** Killed in its cell: it neither breathes nor is heard again. */
+  dead = false;
   /** The tick it snorted him on, or -1. */
   snortAt = -1;
   /** The stone it heard him on last, and whether he was on the ground: his steps. */
@@ -1935,7 +2019,7 @@ export class Ear implements Entity {
   /** Where it is breathing from: the hatch, the joint over its bed, or nowhere, on its way back or snorting. */
   get breathX(): number | null {
     const d = this.def;
-    if (this.snortAt >= 0 && this.snortFrame < SNORT.again) return null;
+    if (this.dead || (this.snortAt >= 0 && this.snortFrame < SNORT.again)) return null;
     if (this.at === 'hatch') return (d.hatch.x0 + d.hatch.x1) / 2;
     if (this.at === 'bed') return d.joint;
     return null;
@@ -1964,6 +2048,7 @@ export class Ear implements Entity {
       }
       return;
     }
+    if (w.events.has(d.dies)) this.dead = true;
     if (this.in) return;
     const p = w.player;
     if (w.alive) {
@@ -2091,5 +2176,166 @@ export class Ear implements Entity {
     const { flow, inward } = breathFlow(this.breath);
     const pan = Math.max(-1, Math.min(1, (x - centerX(p)) / 160));
     return { breath: flow, snore: this.asleep && this.at === 'hatch' && inward ? flow : 0, pan };
+  }
+}
+
+// ---------------------------------------------------------------------------
+// The Minotaur: the fight in its cell.
+// ---------------------------------------------------------------------------
+
+/** How the bull killed him: which of its ways, on which frame of its clock, where his box was, and whether he was off the ground. */
+export interface FightCatch {
+  by: 'clap' | 'swat' | 'toss';
+  k: number;
+  x: number;
+  y: number;
+  air: boolean;
+}
+
+/** The bull's head, facing left: its box, the muzzle at its left edge and the brow in the middle of its top. */
+export const BULL_HEAD = { w: 11, h: 10, brow: 5 } as const;
+
+/** Frames the second blow jerks its head up before the head is down on the floor, and the fight is over. */
+export const STRUCK = 4;
+
+/**
+ * The fight in the Minotaur's cell (`FightDef`), on one clock from L, the frame he will
+ * come down on its floor, keyed from where he is falling down the hatch: nothing waits
+ * for him to touch the floor. The bull crouches facing the hatch with a hand flat on each
+ * stone and breathes; from the grip its back is a solid, pinned, heaved up, sunk again
+ * and at last a heap; it steps Theseus out of his doorway, and fires the end of the fight
+ * at the second blow. It reads the tourist as the tick before left him, like the beast
+ * over it: clapped or swatted he is the hands', tossed the horns'. He never changes any
+ * of it (pillar 11).
+ */
+export class Fight implements Entity {
+  /** Ticks since the attempt began: its breath's clock. */
+  t = 0;
+  /** Frames from L, the frame he comes down on the cell floor: -Infinity until it is keyed. */
+  k = -Infinity;
+  /** How it killed him, if it has. */
+  caught: FightCatch | null = null;
+  /** Its back from the grip, and from the second blow its heap: one solid, which carries what stands on it. */
+  readonly solid: MovingSolid = { rect: { x: 0, y: 0, w: 0, h: 0 }, dx: 0, dy: 0 };
+
+  constructor(readonly def: FightDef) {}
+
+  get keyed(): boolean {
+    return this.k > -Infinity;
+  }
+
+  /** How far into its present breath it is: its own slow loop, the beast's breath. */
+  get breath(): number {
+    return this.t % BREATH_PERIOD;
+  }
+
+  /** Its back's height over the floor, in px, on frame `k` of the clock. */
+  backAt(k: number): number {
+    const { back: b, clock: c } = this.def;
+    if (k < c.grip) return b.crouch;
+    if (k < c.grip + b.ease) return b.crouch + ((b.pin - b.crouch) * (k - c.grip + 1)) / b.ease;
+    if (k < c.heave) return b.pin;
+    if (k < c.heave + b.ease) return b.pin + ((b.risen - b.pin) * (k - c.heave + 1)) / b.ease;
+    const sink = c.heave + 2 * b.ease;
+    if (k < sink) return b.risen;
+    if (k < sink + b.ease) return b.risen - ((b.risen - b.pin) * (k - sink + 1)) / b.ease;
+    if (k < c.blow2) return b.pin;
+    return b.heap;
+  }
+
+  /** How far the struck body has lurched on its knees on frame `k`, in px, left being negative. */
+  lurchAt(k: number): number {
+    const l = this.def.lurch;
+    if (!l.length || k <= l[0]!.f || k >= l[l.length - 1]!.f) return 0;
+    const i = l.findIndex((p) => p.f > k);
+    const a = l[i - 1]!;
+    const b = l[i]!;
+    return Math.round(a.dx + ((b.dx - a.dx) * (k - a.f)) / (b.f - a.f));
+  }
+
+  /**
+   * The top-left of its head on frame `k`: over its shoulders at its back's height, with
+   * the lurch, tossing from the first blow; jerked up by the second, and then down on the
+   * floor before its heap.
+   */
+  headAt(k: number): { x: number; y: number } {
+    const d = this.def;
+    const c = d.clock;
+    if (k >= c.blow2) return k - c.blow2 < STRUCK ? { x: d.body.face, y: d.floorY - d.back.heap - 6 } : { x: d.body.face - 7, y: d.floorY - 9 };
+    const tossing = k >= c.blow1 && k < d.toss.to;
+    const toss = tossing ? -[2, 6, 3, 7, 1, 5][(k - c.blow1) % 6]! : 0;
+    return { x: d.body.face + this.lurchAt(k), y: d.floorY - Math.round(this.backAt(k)) - 4 + toss };
+  }
+
+  /** Its brow, between the horns, on frame `k`. */
+  browAt(k: number): { x: number; y: number } {
+    const h = this.headAt(k);
+    return { x: h.x + BULL_HEAD.brow, y: h.y };
+  }
+
+  update(w: World): void {
+    const d = this.def;
+    const c = d.clock;
+    this.t++;
+    if (this.keyed) this.k++;
+    else {
+      const p = w.player;
+      const feet = p.y + p.h;
+      if (!w.alive || p.x >= d.key.x1 || feet < d.key.feet || feet >= d.floorY) return;
+      // Falling at maxFall with nothing under him but the floor: the frame his feet reach it.
+      this.k = 1 - Math.ceil((d.floorY - feet) / (PHYS.maxFall * DT) - 1e-6);
+    }
+    const k = this.k;
+    if (k === c.stepOut) w.events.add(d.stepOut);
+    if (k === c.heave) w.sound('heave');
+    if (k === c.blow1 || k === c.blow2) w.sound('blow');
+    if (k === c.blow2) w.events.add(d.done);
+    if (k >= c.grip) {
+      const h = this.backAt(k);
+      const y = d.floorY - h;
+      this.solid.dy = k === c.grip ? 0 : y - this.solid.rect.y;
+      this.solid.rect = { x: d.body.x0, y, w: d.body.x1 - d.body.x0, h };
+    }
+    if (!w.alive) return;
+    const p = w.player;
+    const by = (['clap', 'swat', 'toss'] as const).find((z) => k >= d[z].from && k < d[z].to && overlaps(p, d[z].rect));
+    if (!by) return;
+    const air = !p.onGround;
+    this.caught = { by, k, x: p.x, y: p.y, air };
+    if (by === 'clap') {
+      // Clapped out of the air like a fly, and dropped at its feet.
+      w.sound('palms');
+      w.kill(d.hands, { x: d.clap.rect.x - p.w, y: d.floorY - p.h });
+    } else if (by === 'swat') {
+      // Swatted flat on its own brow if he is in the air; on the floor where he is if not.
+      w.sound('swat');
+      const brow = this.browAt(k);
+      w.kill(d.hands, air ? { x: brow.x - p.w / 2, y: brow.y - p.h } : undefined);
+    } else {
+      // Hooked up and over, and dropped flat at the left wall.
+      w.kill(d.horns, { x: d.toss.rect.x, y: d.floorY - p.h });
+    }
+  }
+
+  /** Its back, and then its heap, from the grip. */
+  solids(): MovingSolid[] {
+    return this.k >= this.def.clock.grip ? [this.solid] : [];
+  }
+
+  /** Its floor, from the moment it is keyed until the second blow has laid it down: the whole fight is on the screen. */
+  keepsInView(): number | null {
+    return this.keyed && this.k < this.def.clock.blow2 + STRUCK ? this.def.floorY : null;
+  }
+
+  /**
+   * What is heard of it once the fight is keyed: its breath, from its head, as far left or
+   * right of him as that is; nothing at all once it is dead. Before the fight it is the
+   * beast's, under the floor.
+   */
+  voice(p: Rect): { breath: number; snore: number; pan: number } | null {
+    if (!this.keyed) return null;
+    if (this.k >= this.def.clock.blow2) return { breath: 0, snore: 0, pan: 0 };
+    const pan = Math.max(-1, Math.min(1, (this.headAt(this.k).x - centerX(p)) / 160));
+    return { breath: breathFlow(this.breath).flow, snore: 0, pan };
   }
 }

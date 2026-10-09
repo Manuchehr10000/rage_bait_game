@@ -1,13 +1,14 @@
-import { Grid, type EarDef, type HeroDef, type LevelData } from '../../engine/level';
+import { Grid, type EarDef, type FightDef, type HeroDef, type LevelData } from '../../engine/level';
 import { TILE } from '../../engine/types';
 
 /**
  * Chapter 3, Level 6 — The Minotaur, the chapter's legend. A stage: the labyrinth in
  * section, cell for cell as its map, and Theseus in it, at the door with his knot and
- * then down his route to the cell, laying the thread; and the beast under the last
- * corridor's floor, heard and breathed, never seen, which snorts him back up the hatch.
- * No fight and no queue yet: those are built into it one at a time, and then it takes
- * its place in LEVELS. Design: content/ch03-aegean/l06-minotaur/LEVEL.md.
+ * then down his route to the cell, laying the thread; the beast under the last
+ * corridor's floor, heard and breathed, never seen, which snorts him back up the hatch;
+ * and the fight in its cell, where the bull claps him, swats him and tosses him while the
+ * hero kills it. No queue and no way out yet: those are built into it one at a time, and
+ * then it takes its place in LEVELS. Design: content/ch03-aegean/l06-minotaur/LEVEL.md.
  *
  * One screen wide and 47 tiles deep, every solid on the grid; the camera never moves
  * sideways, and it starts on the spawn. The spawn floor is y 160, so a designer's
@@ -24,12 +25,11 @@ import { TILE } from '../../engine/types';
  *   f     the hero's route, the way out reversed: row 5, Daedalus's turnings J1 to J4,
  *           the column of four shafts with a ledge beside each, G0, O1, P, the door
  *
- * What the stage cannot do yet: the cell is a dead end, because its far wall is 80 px
- * and a full jump rises 61.8; the beast's heap is his way out of it. Whoever gets past
- * the snort into the cell stands there: the beast is not drawn and does nothing in it.
- * The exit waits for the second blow, which nothing fires yet. Put on row 5 with the dev
- * tools, he can climb the hero's route all the way to the door. Theseus waits in his
- * doorway for the fight, which is not built, to step him out.
+ * The cell's far wall is 80 px and a full jump rises 61.8: he is out of it only off the
+ * bull's back as it heaves, or, after the fight, off its heap. The exit waits for the
+ * second blow, which the fight fires. What the stage cannot do yet: the way out is not
+ * staged, and the closing picture is not; on row 5 he can climb the hero's route all the
+ * way to the door, as the dev tools could put him there before.
  */
 const W = 20;
 const H = 47;
@@ -40,6 +40,44 @@ const DOOR_FLOOR = 160;
 
 /** The event the exit waits for: the second blow, which ends the fight. The fight fires it. */
 const SECOND_BLOW = 'secondBlow';
+
+/** The event that steps Theseus out of his doorway, 8 frames before the tourist lands. The fight fires it. */
+const STEP_OUT = 'stepOut';
+
+/** T_end's floor, the top of the beast's ceiling. */
+const T_END_FLOOR = 576;
+
+/** The cell's floor. */
+const CELL_FLOOR = 736;
+
+/**
+ * The fight's clock, in frames from L, the frame the tourist comes down on the cell floor
+ * (LEVEL.md, beat e): Theseus steps out, leaps the bull, has the horn; the bull is on its
+ * knee, heaves the stone at the ducking hero, and takes the two blows.
+ */
+const CLOCK = { stepOut: -8, leap: 4, grip: 40, knee: 46, heave: 56, duck: 58, blow1: 76, blow2: 130 };
+
+/**
+ * The struck body's lurch on its knees from the first blow, in px from where it kneels by
+ * frames from L: in jerks to the left wall, Theseus on the horn before it, and back to
+ * its place by the end of the toss.
+ */
+const LURCH = [
+  { f: 76, dx: 0 },
+  { f: 79, dx: -14 },
+  { f: 82, dx: -20 },
+  { f: 86, dx: -46 },
+  { f: 92, dx: -46 },
+  { f: 96, dx: -26 },
+  { f: 99, dx: -20 },
+  { f: 105, dx: 0 },
+];
+
+/** Where Theseus stands at the horn: in front of its face, his box x 94 to 106. */
+const AT_THE_HORN = 94;
+
+/** A frame of the fight's clock as a frame of Theseus's after his wait, which it steps him out of. */
+const fromStepOut = (k: number) => k - CLOCK.stepOut;
 
 /** Solid rock, every space of the plan cut out of it. */
 const g = new Grid(W, H).fill(0, 0, W, H, '#');
@@ -137,6 +175,12 @@ const G0_FLOOR = 80;
  * the turnings, out of each hole, he steers in the air for the room's next one, and
  * lands where that clock has him: J3 at 288, J2 at 320 and J1 at 346. Into row 5 he
  * drops straight, at 367, and is in the doorway at 402; steered, he would be there at 400.
+ *
+ * There he waits, unseen, till the fight steps him out at L - 8, and from then on his
+ * frames count from that tick, on the fight's clock (beat e; tests/minotaur-fight.spec.ts):
+ * to the edge of row 5, a low leap over the bull at L + 4, the horn at the grip, the duck
+ * under its stone, the two blows, carried on the horn as the struck body lurches, and he
+ * stands over the heap.
  */
 const THESEUS: HeroDef = {
   kind: 'hero',
@@ -183,7 +227,33 @@ const THESEUS: HeroDef = {
     { do: 'go', x: 256, quiet: true },
     // Along row 5 and into his doorway, x 148 to 164: all of him inside it.
     { do: 'go', x: 152, quiet: true },
-    { do: 'wait', unseen: true },
+    // e. There till the fight steps him out, 8 frames before the tourist lands; from
+    // then on his frames count from that tick. He leaves the ball in the doorway.
+    { do: 'wait', unseen: true, until: STEP_OUT },
+    // Out to the edge of row 5, over the bull, and at L + 4 a low leap over it, about 6 px
+    // of rise, onto the floor in front of its face: the vases' warrior, sword in hand.
+    { do: 'go', x: 140 },
+    { do: 'leap', at: fromStepOut(CLOCK.leap), x: AT_THE_HORN, rise: 6, feet: CELL_FLOOR },
+    {
+      do: 'act',
+      keys: [
+        // He turns to it, and at the grip has the horn in his left hand.
+        { f: fromStepOut(38), act: 'stand', facing: 1, x: AT_THE_HORN },
+        { f: fromStepOut(CLOCK.grip), act: 'grip' },
+        // He ducks the stone it heaves at him.
+        { f: fromStepOut(CLOCK.duck), act: 'duck' },
+        { f: fromStepOut(CLOCK.duck + 5), act: 'grip' },
+        // The first blow, the arm drawn back first; on the horn as the struck body lurches.
+        { f: fromStepOut(CLOCK.blow1 - 6), act: 'draw' },
+        { f: fromStepOut(CLOCK.blow1), act: 'blow' },
+        { f: fromStepOut(CLOCK.blow1 + 4), act: 'grip' },
+        ...LURCH.map((l) => ({ f: fromStepOut(l.f), x: AT_THE_HORN + l.dx })),
+        // The second, and he stands over the heap.
+        { f: fromStepOut(CLOCK.blow2 - 6), act: 'draw' },
+        { f: fromStepOut(CLOCK.blow2), act: 'blow' },
+        { f: fromStepOut(CLOCK.blow2 + 6), act: 'stand' },
+      ],
+    },
   ],
   cause: 'The knot',
 };
@@ -191,9 +261,6 @@ const THESEUS: HeroDef = {
 // ---------------------------------------------------------------------------
 // d. The beast under T_end's floor: the snort.
 // ---------------------------------------------------------------------------
-
-/** T_end's floor, the top of the beast's ceiling. */
-const T_END_FLOOR = 576;
 
 /**
  * The beast, heard and breathed, never seen (LEVEL.md, beat d). Asleep under the hatch on
@@ -220,7 +287,48 @@ const BEAST: EarDef = {
   puffs: { leaves: 80, lip: 72 },
   ceiling: { x: 48, y: 528 },
   heardBelow: 208,
+  dies: SECOND_BLOW,
   cause: 'The snort',
+};
+
+// ---------------------------------------------------------------------------
+// e. The fight in the cell: the hands and the horns.
+// ---------------------------------------------------------------------------
+
+/**
+ * The fight (LEVEL.md, beat e), keyed when his feet are 61 px down the hatch with his x
+ * under 64, on one clock from L, the frame it predicts he lands on the cell floor. The
+ * bull crouches at its bed, its body over x 114 to 144 and its face at x 108, facing the
+ * hatch, a hand flat on each stone. Theseus steps out at L - 8 and leaps it at L + 4; at
+ * the grip, L + 40, it lets go of its far stone, raises the near one and sinks to its knee
+ * by L + 46, its free right hand clawing over its brow at his hand on the horn to L + 67;
+ * at L + 56 it heaves the stone at him, and he ducks it at L + 58; the first blow at
+ * L + 76, and the struck body lurches on its knees to the left wall and back, to L + 105;
+ * the second at L + 130, and it sinks into a heap that stays, and the exit opens.
+ *
+ * Its back is a solid from the grip: 20 px crouched, pinned to 10 over 6 frames, risen to
+ * 30 over 6 from the heave, held 6 and sunk back to 10 over 6; the heap, 24, from the
+ * second blow. The clap: anything over the crouching bull up to 44 px, and 8 px in front
+ * of its face, to L + 39. The swat: the column at its face, x 100 to 112 up to 64 px,
+ * L + 46 to 67. Both are the hands'. The toss: the cell up to 64 px, L + 76 to 105, the
+ * horns'. Nothing kills from L + 106 on.
+ */
+const FIGHT: FightDef = {
+  kind: 'fight',
+  floorY: CELL_FLOOR,
+  key: { feet: T_END_FLOOR + 61, x1: 64 },
+  body: { x0: 114, x1: 144, face: 108 },
+  back: { crouch: 20, pin: 10, risen: 30, ease: 6, heap: 24 },
+  clock: CLOCK,
+  lurch: LURCH,
+  stones: { near: 100, far: 110, w: 8, h: 4 },
+  clap: { rect: { x: 100, y: CELL_FLOOR - 44, w: 44, h: 44 }, from: 0, to: CLOCK.grip },
+  swat: { rect: { x: 100, y: CELL_FLOOR - 64, w: 12, h: 64 }, from: CLOCK.knee, to: 68 },
+  toss: { rect: { x: 48, y: CELL_FLOOR - 64, w: 96, h: 64 }, from: CLOCK.blow1, to: 106 },
+  hands: 'The hands',
+  horns: 'The horns',
+  stepOut: STEP_OUT,
+  done: SECOND_BLOW,
 };
 
 export const MINOTAUR: LevelData = {
@@ -256,6 +364,7 @@ export const MINOTAUR: LevelData = {
     // The hero's doorway on row 5, where he waits for the fight.
     { kind: 'blackDoorway', x: 148, w: 16, top: 628, floorY: 656 },
   ],
-  // The beast before anything in the cell: it hears him first.
-  entities: [THESEUS, BEAST],
+  // The beast before anything in the cell: it hears him first. Then the fight, and then
+  // Theseus, whom it steps out of his doorway on the tick it says.
+  entities: [BEAST, FIGHT, THESEUS],
 };

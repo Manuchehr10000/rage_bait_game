@@ -93,10 +93,11 @@ test("the stage's data: the bull-leaper, the walk in, the camera on the spawn, t
   expect(d.spawn).toEqual({ x: 8, y: DOOR_FLOOR - 16 });
   expect(d.cameraOnSpawn).toBe(true);
   expect(d.cameraBottom).toBe(752);
-  // Theseus and his knot, and the beast under T_end's floor, which hears him first of
-  // anything below: no fight and no queue yet. Its own data is tests/minotaur-snort.spec.ts.
-  expect(d.entities.map((e) => e.kind)).toEqual(['hero', 'ear']);
-  const hero = d.entities[0] as HeroDef;
+  // The beast under T_end's floor, which hears him first of anything below; the fight in
+  // the cell, which steps Theseus out of his doorway; and Theseus and his knot. No queue
+  // yet. Their own data is tests/minotaur-snort.spec.ts and tests/minotaur-fight.spec.ts.
+  expect(d.entities.map((e) => e.kind)).toEqual(['ear', 'fight', 'hero']);
+  const hero = d.entities.find((e): e is HeroDef => e.kind === 'hero')!;
   expect({ kneel: hero.kneel, knot: hero.knot, ball: hero.ball, triggerX: hero.triggerX, lean: hero.lean, hold: hero.hold, line: hero.line, cause: hero.cause }).toEqual({
     // Kneeling at the doorpost, outside, 12 by 14.
     kneel: { x: 66, y: 146, w: 12, h: 14 },
@@ -135,9 +136,14 @@ test('the five new nouns are drawn and heard as deaths, never as giving up', () 
   const nouns: DeathCause[] = ['The knot', 'The snort', 'The hands', 'The horns', 'The labyrinth'];
   for (const n of nouns) {
     expect(DEATH_ANIM[n], n).toBeDefined();
-    expect(DEATH_SOUND[n], n).toBeDefined();
     expect(DEATH_ANIM[n], n).not.toBe(DEATH_ANIM['Gave up']);
-    expect(DEATH_SOUND[n], n).not.toBe(DEATH_SOUND['Gave up']);
+    // The hands are heard by which of them killed him, the palms or the free hand: the
+    // fight sounds it (tests/minotaur-fight.spec.ts). Every other is heard by its noun.
+    if (n === 'The hands') expect(DEATH_SOUND[n]).toBeNull();
+    else {
+      expect(DEATH_SOUND[n], n).toBeTruthy();
+      expect(DEATH_SOUND[n], n).not.toBe(DEATH_SOUND['Gave up']);
+    }
   }
 });
 

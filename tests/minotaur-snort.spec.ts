@@ -5,7 +5,7 @@ import { BREATH, Ear, PLUME, plumeDots, SNORT, snortBody, type World } from '../
 import { PHYS, Player } from '../src/engine/player';
 import type { Input } from '../src/engine/input';
 import { DEATH_ANIM, DEATH_SOUND, overlaps, VIEW_H, type Rect } from '../src/engine/types';
-import { CELL_FLOOR, cleanRun, FULL, LEVEL, onFloor, Run, T_END_FLOOR, type Press } from './minotaur-run';
+import { CELL_FLOOR, cleanRun, FULL, LEVEL, onFloor, Run, seeded, T_END_FLOOR, type Press } from './minotaur-run';
 
 /**
  * The snort, the Minotaur's second trick (content/ch03-aegean/l06-minotaur/LEVEL.md, beat
@@ -55,8 +55,8 @@ const leapFrom = (from: Run, x: number, hold: number, letGo = false): Outcome =>
 // ---------------------------------------------------------------------------
 
 test("the beast's data: under T_end's floor, the lip and the bed, the joint it breathes through, its clock, the ceiling it snorts him onto", () => {
-  // Read before anything in the cell: after Theseus, and nothing after it yet.
-  expect(MINOTAUR.entities.map((e) => e.kind)).toEqual(['hero', 'ear']);
+  // Read before anything in the cell: first of all, before the fight.
+  expect(MINOTAUR.entities.map((e) => e.kind)).toEqual(['ear', 'fight', 'hero']);
   expect(BEAST).toEqual({
     kind: 'ear',
     // T_end's floor, from the lip to the wall.
@@ -74,6 +74,8 @@ test("the beast's data: under T_end's floor, the lip and the bed, the joint it b
     ceiling: { x: 48, y: 528 },
     // Heard from Z1 down.
     heardBelow: 208,
+    // Dead at the second blow, in its cell: it breathes no more.
+    dies: 'secondBlow',
     cause: 'The snort',
   });
   // The lip is the only dressed stone; the bed block is plain, like its neighbours.
@@ -431,12 +433,6 @@ test('runners need 34 to 38 frames from their last bed frame at holds of 7 or mo
   expect(tapsIn(2, 1)).toBeGreaterThan(0);
   expect(tapsIn(3, 1)).toBeGreaterThan(0);
 });
-
-/**
- * A seeded generator, so a random test is the same test every time. Multiplied as 32-bit
- * integers: a plain product passes 2^53, loses its low bits, and repeats every 10,466.
- */
-const seeded = (seed: number) => () => ((seed = (Math.imul(seed, 1103515245) + 12345) & 0x7fffffff) / 0x80000000);
 
 test('mashers holding left get in about 9 to 11 per cent of the time', () => {
   // Down X onto T_end, left held from the frame he can no longer jump back up out of it

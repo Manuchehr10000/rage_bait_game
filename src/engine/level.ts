@@ -562,8 +562,28 @@ export type HeroMove =
     }
   /** Crouches where he landed and pays out a loop of thread: `frames` frames, the one he landed on the first. */
   | { do: 'payOut'; frames: number }
-  /** Stands where the last move left him, from the frame it did, for good: in a black doorway he is not seen. A later move steps him out. */
-  | { do: 'wait'; unseen?: boolean };
+  /**
+   * Stands where the last move left him, from the frame it did: in a black doorway he is
+   * not seen. For good, or until the event `until` has fired: then he puts the ball down
+   * where he stands, and the moves after it go on from that tick, their frames counted
+   * from it.
+   */
+  | { do: 'wait'; unseen?: boolean; until?: string }
+  /**
+   * Leaps from where he stands, from frame `at`: up `rise` px and down under the game's
+   * gravity onto the floor at `feet`, going straight for `x` the whole way, so that he
+   * comes down there, unheard. The only jump he makes.
+   */
+  | { do: 'leap'; at: number; x: number; rise: number; feet: number }
+  /**
+   * Fights where he stands, from the first key's frame to the last: from each key that
+   * gives one he is in its pose, or faces its way, and his x goes straight from each key
+   * that gives one to the next; his feet stay on his floor. The last pose he keeps.
+   */
+  | { do: 'act'; keys: readonly { f: number; act?: HeroAct; x?: number; facing?: 1 | -1 }[] };
+
+/** What he is doing on a frame of the fight. */
+export type HeroAct = 'stand' | 'grip' | 'duck' | 'draw' | 'blow';
 
 /**
  * The hero, Theseus, on one fixed clock. He kneels at the doorpost re-tying Ariadne's
@@ -630,10 +650,61 @@ export interface EarDef {
   ceiling: { x: number; y: number };
   /** It is heard, and its breath, while his feet are below this. */
   heardBelow: number;
+  /** The event it dies on, in its cell: from then on it neither breathes nor is heard. */
+  dies: string;
   cause: DeathCause;
 }
 
+/** A span of the fight's clock in which a zone kills: from `from` to `to`, frames from L, the last not included. */
+export interface FightZone {
+  rect: Rect;
+  from: number;
+  to: number;
+}
+
+/**
+ * The fight in the Minotaur's cell, on one clock: frames from `L`, the frame the tourist
+ * comes down on its floor. It is keyed once his feet are past `key.feet` with his x under
+ * `key.x1`, falling into the cell, and from there it predicts L: he is falling at maxFall
+ * and nothing is under him, so it is the frame his feet will reach `floorY`. Nothing
+ * waits for him to touch it. Whatever he does after, the clock is the same (pillar 11).
+ *
+ * The bull crouches over `body`, its face at `face`, facing the hatch, a hand flat on
+ * each of two stones. At `clock.stepOut` the event `stepOut` fires, and Theseus steps out
+ * of his doorway; at `grip` he has the horn, and the bull lets go of its far stone,
+ * raises the near one and sinks to its knee by `knee`; at `heave` it heaves up off its
+ * knee to swing the stone at the ducking hero; at `blow1` the first blow, and the struck
+ * body lurches on its knees by `lurch`, px from where it kneels, to the left wall and
+ * back; at `blow2` the second, and it sinks into a heap, and `done` fires.
+ *
+ * Its back is a solid from the grip, over `body`, as high as `back` says: `crouch` until
+ * the grip, pinned to `pin` over `ease` frames from it, risen to `risen` over `ease` from
+ * the heave, held `ease` and sunk back to `pin` over `ease`; from the second blow the heap,
+ * `heap` high, for good. It carries what stands on it.
+ *
+ * Whoever is in `clap` or `swat` while it is live is `hands`; in `toss`, `horns`.
+ */
+export interface FightDef {
+  kind: 'fight';
+  floorY: number;
+  key: { feet: number; x1: number };
+  body: { x0: number; x1: number; face: number };
+  back: { crouch: number; pin: number; risen: number; ease: number; heap: number };
+  clock: { stepOut: number; leap: number; grip: number; knee: number; heave: number; duck: number; blow1: number; blow2: number };
+  lurch: readonly { f: number; dx: number }[];
+  /** The two stones, by their left edge on the floor: under its near hand and its far one. */
+  stones: { near: number; far: number; w: number; h: number };
+  clap: FightZone;
+  swat: FightZone;
+  toss: FightZone;
+  hands: DeathCause;
+  horns: DeathCause;
+  stepOut: string;
+  done: string;
+}
+
 export type EntityDef =
+  | FightDef
   | EarDef
   | HeroDef
   | GuardsDef
