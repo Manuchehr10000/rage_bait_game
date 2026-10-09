@@ -1,9 +1,9 @@
 import { expect, test, type Page } from '@playwright/test';
 import { MINOTAUR } from '../src/levels/ch03-aegean/l06-minotaur';
 import type { FightDef } from '../src/engine/level';
-import { HERO as THESEUS, STRUCK } from '../src/engine/entities';
+import { BULL_HEAD, HERO as THESEUS, STRUCK, TOSS } from '../src/engine/entities';
 import { PHYS } from '../src/engine/player';
-import { DEATH_ANIM, DEATH_SOUND, overlaps, VIEW_H, type Rect } from '../src/engine/types';
+import { DEATH_ANIM, DEATH_FRAMES, DEATH_SOUND, overlaps, VIEW_H, type Rect } from '../src/engine/types';
 import { CELL_FLOOR, cleanRun, FULL, LEVEL, onFloor, ROW_5, Run, seeded, type Press } from './minotaur-run';
 
 /**
@@ -160,12 +160,13 @@ test("the fight's data: keyed 61 px down the hatch, the bull crouched at its bed
   // After the beast, which hears him first, and before Theseus, whom it steps out.
   expect(MINOTAUR.entities.map((e) => e.kind)).toEqual(['ear', 'fight', 'hero']);
   expect(MINOTAUR.exitAfter).toBe(FIGHT.done);
-  // Each noun drawn by its own death. The hands are heard by which of them it was, so the
-  // fight sounds them; the horns by the toss and the drop.
+  // Each noun drawn by its own death. The fight sounds both: the hands by which of them it
+  // was, the horns' toss and drop when the bull reaches him, which may be frames after the
+  // horns' frame caught him.
   expect(DEATH_ANIM['The hands']).toBe('hands');
   expect(DEATH_ANIM['The horns']).toBe('horns');
   expect(DEATH_SOUND['The hands']).toBeNull();
-  expect(DEATH_SOUND['The horns']).toBe('toss');
+  expect(DEATH_SOUND['The horns']).toBeNull();
 });
 
 test('the key: 61 px down the hatch it predicts the frame he lands on the cell floor, exact for every leap entry, whichever way he steers; it never waits for him to touch it', () => {
@@ -635,6 +636,88 @@ test('the horns: no retreat ever gets out; mashers do now and then', () => {
   expect(hoppers.every((h) => h.startsWith('19/') || h.startsWith('21/'))).toBe(true);
 });
 
+/** The gap between two boxes, in px: 0 if they touch or overlap. */
+const gapBetween = (a: Rect, b: Rect) => Math.max(0, a.x - (b.x + b.w), b.x - (a.x + a.w), a.y - (b.y + b.h), b.y - (a.y + a.h));
+
+/**
+ * The horns' death as drawn (Fight.tossed), frame by frame, after a toss: held where they
+ * caught him, standing, or falling, untouched, until the bull reaches him; on that frame
+ * its head as drawn, horns and all, or its lurching back is within TOSS.reach of him;
+ * a somersault of TOSS.minArc frames or more; and flat where the kill put him, at the left
+ * wall, for TOSS.flat frames or more before the attempt starts again.
+ */
+const tossOf = (r: Run) => {
+  const f = r.fight;
+  const c = f.caught!;
+  const hook = f.tossHook();
+  const frames = span(0, DEATH_FRAMES - 1).map((n) => f.tossed(n));
+  const wrong: string[] = [];
+  const untouched = frames
+    .slice(0, hook.f)
+    .every((t, n) => t.pose === 'held' && (c.air || (t.x === c.x && t.y === c.y)) && (hook.out || !f.reaches(c.k + n, { x: t.x, y: t.y, w: c.w, h: c.h })));
+  if (!untouched) wrong.push('moved or touched before the hook');
+  const t = frames[hook.f]!;
+  if (t.pose !== 'hooked') wrong.push('not hooked on the hook');
+  const k = c.k + hook.f;
+  const him = { x: hook.held[hook.f]!.x, y: hook.held[hook.f]!.y, w: c.w, h: c.h };
+  const lurch = f.headAt(k);
+  if (hook.by === 'body') {
+    const top = FIGHT.floorY - f.backAt(k);
+    if (gapBetween({ x: FIGHT.body.x0 + f.lurchAt(k), y: top, w: FIGHT.body.x1 - FIGHT.body.x0, h: FIGHT.floorY - top }, him) > TOSS.reach) wrong.push('its back out of reach');
+  } else {
+    const h = t.head ?? lurch;
+    if (gapBetween({ x: h.x, y: h.y - 5, w: BULL_HEAD.w, h: BULL_HEAD.h + 5 }, him) > TOSS.reach) wrong.push('its head out of reach');
+    // Tossed up at him from where it is on its lurch, never further, unless it went out to him.
+    if (!hook.out && (h.x !== lurch.x || lurch.y - h.y > TOSS.up + TOSS.reach + 2 || t.rear > TOSS.rear)) wrong.push('its head further than its toss');
+  }
+  if (frames.filter((x) => x.pose === 'thrown').length < TOSS.minArc) wrong.push('a short somersault');
+  const flat = frames.filter((x) => x.pose === 'flat');
+  if (flat.length < TOSS.flat || !flat.every((x) => x.x === r.at!.x && x.y === r.at!.y)) wrong.push('not flat where the kill put him');
+  return { hook: hook.f, by: hook.by, out: hook.out, flat: flat.length, wrong };
+};
+
+test("the horns' toss as drawn: held where they caught him till the bull reaches him, then up off its horns or its back and over to the left wall", () => {
+  const toss = (from: Run, hands: (k: number, r: Run) => Press) => {
+    const f = fight(from, hands);
+    expect(f.end).toBe('The horns');
+    const t = tossOf(f.r);
+    expect(t.wrong).toEqual([]);
+    return { caught: f.r.fight.caught!, toss: { hook: t.hook, by: t.by, out: t.out, flat: t.flat }, r: f.r };
+  };
+  // Waiting at the left wall: caught on the floor on L + 76, 46 px from its head, and held
+  // there standing till the lurching head reaches him on L + 86, its muzzle at x 62, 4 px
+  // from his right edge; up onto its horns in 3 frames, over in 21, flat for 11.
+  const wall = toss(WALL, (k) => ({ dir: k >= 0 ? -1 : 0, jump: false }));
+  expect(wall.caught).toMatchObject({ k: C.blow1, x: 48, y: CELL_FLOOR - 16, air: false });
+  expect(wall.toss).toEqual({ hook: 10, by: 'head', out: false, flat: 11 });
+  expect(wall.r.fight.headAt(C.blow1 + 10).x).toBe(62);
+  // Standing mid-cell at x 70: reached on L + 83, the head at x 82; at x 80, on L + 79.
+  expect(toss(restingAt(70), () => ({ dir: 0, jump: false })).toss).toEqual({ hook: 7, by: 'head', out: false, flat: 14 });
+  expect(toss(restingAt(80), () => ({ dir: 0, jump: false })).toss).toEqual({ hook: 3, by: 'head', out: false, flat: 18 });
+  // On its back, after the leap and no jump off: its back has him at once, and throws him.
+  const back = toss(WALL, (k) => ({ dir: k >= 0 ? 1 : 0, jump: k >= 12 && k < 12 + FULL }));
+  expect(back.caught).toMatchObject({ k: C.blow1, x: 134, y: CELL_FLOOR - FIGHT.back.pin - 16, air: false });
+  expect(back.toss).toEqual({ hook: 0, by: 'body', out: false, flat: 21 });
+  // In the air left of it, a hop at L + 70 from x 60: held rising and falling with his
+  // hands off the keys, till on L + 85 it rears 10 px and tosses its head up at him.
+  const hop = toss(restingAt(60), (k) => ({ dir: 0, jump: k >= 70 && k < 70 + FULL }));
+  expect(hop.caught).toMatchObject({ k: C.blow1, x: 60, air: true });
+  expect(hop.toss).toEqual({ hook: 9, by: 'head', out: false, flat: 12 });
+  expect(hop.r.fight.tossed(9).rear).toBe(10);
+  // Off its back to the wall too late, at L + 72: caught in the air by the far wall, held
+  // falling to the floor there behind it as it lurches away, and lifted by its back as it
+  // comes back to its place on L + 101; a shorter somersault, 11 frames, and flat for 6.
+  const late = toss(WALL, (k) => ({ dir: k >= 0 ? 1 : 0, jump: (k >= 12 && k < 12 + FULL) || (k >= 72 && k < 72 + FULL) }));
+  expect(late.caught).toMatchObject({ k: C.blow1, x: 134, air: true });
+  expect(late.toss).toEqual({ hook: 25, by: 'body', out: false, flat: 6 });
+  // Off its back to the left at L + 64, high over it: caught coming down on L + 100 in
+  // front of it as it goes back to its place, Theseus between. Nothing would reach him, so
+  // its head goes out to him, up and over Theseus, on the frame it came nearest.
+  const over = toss(WALL, keys((k) => ({ right: k >= 0 && k < 48, left: k >= 64, press: k === 12 || k === 64, held: (k >= 12 && k < 42) || (k >= 64 && k < 94) })));
+  expect(over.caught).toMatchObject({ k: 100, air: true });
+  expect(over.toss).toEqual({ hook: 3, by: 'head', out: true, flat: 18 });
+});
+
 // ---------------------------------------------------------------------------
 // The clean run, the camera, random play.
 // ---------------------------------------------------------------------------
@@ -698,11 +781,13 @@ test('the camera: the fight is in frame from L - 8, and the cell floor kept in i
   expect(views.find((v) => v.k === C.blow2 + 30)!.bottom).toBe(729);
 });
 
-test("random play in the cell dies only of the hands and the horns, and nothing kills from L + 106 on", () => {
+test("random play in the cell dies only of the hands and the horns, and nothing kills from L + 106 on; every toss is drawn with the bull on him", () => {
   // From the wall entry at its key, and the clean run at L + 20, 58 and 106 (on row 5),
   // 400 men each, random hands to L + 220.
   const rnd = seeded(20261011);
   const ends: Record<string, number> = {};
+  const reached: Record<string, number> = {};
+  const wrong: string[] = [];
   let late = 0;
   let worst = 0;
   const starts = [WALL, ...[20, 58, 106].map((k) => new Run().play(cleanRun(), (x) => x.fight.k >= k, 800))];
@@ -728,11 +813,23 @@ test("random play in the cell dies only of the hands and the horns, and nothing 
       const end = r.cause ?? 'alive';
       ends[end] = (ends[end] ?? 0) + 1;
       if (r.cause && r.fight.k >= FIGHT.toss.to) late++;
+      if (r.cause === 'The horns') {
+        const t = tossOf(r);
+        wrong.push(...t.wrong);
+        const by = t.out ? 'out' : `${t.by} ${t.hook <= 14 ? 'by 14' : 'later'}`;
+        reached[by] = (reached[by] ?? 0) + 1;
+      }
     }
   }
   expect(Object.keys(ends).sort()).toEqual(['The hands', 'The horns', 'alive']);
   expect(late).toBe(0);
   expect(worst).toBeLessThan(PHYS.fatalFall);
+  // Every toss drawn with the bull on him (tossOf): of 809, its head reaches 537, 516 of
+  // them within 14 frames, the full somersault; its back 271, 145 of them later, as it
+  // comes back from the wall to a man who fell behind it by the far wall. Its head went
+  // out to him, nothing having reached him, once.
+  expect(wrong).toEqual([]);
+  expect(reached).toEqual({ 'head by 14': 516, 'head later': 21, 'body by 14': 126, 'body later': 145, out: 1 });
 });
 
 // ---------------------------------------------------------------------------
@@ -799,7 +896,7 @@ test("in the game: the bull draws nothing above y 688 before the fight; the hand
       const crouched = { above, drawn: drawn > 0, keyed: fight().keyed };
       g.resetLevel();
       // The clean run's hands to the fight's key, an attempt from the spawn; and then these.
-      const fromHatch = (hands: (k: number) => { left?: boolean; right?: boolean; jump?: boolean }) => {
+      const fromHatch = (hands: (k: number) => { left?: boolean; right?: boolean; jump?: boolean }, dying?: (f: number) => void) => {
         const DIR: Record<number, number> = { 160: 1, 256: -1, 336: 1, 416: -1, 512: 1, 576: -1 };
         const hero = () => g.entities.find((x: { def: { kind: string } }) => x.def.kind === 'hero');
         let dir = 1;
@@ -835,25 +932,47 @@ test("in the game: the bull draws nothing above y 688 before the fight; the hand
         key('ArrowRight', false);
         key('Space', false);
         const out = { state: g.state, cause: g.deathCause, caught: fight().caught?.by ?? null, heard: heard.filter((n) => ['palms', 'swat', 'toss', 'heave', 'blow'].includes(n)) };
-        for (let j = 0; j < 60 && g.state === 'dead'; j++) g.tick();
+        for (let j = 0; j < 60 && g.state === 'dead'; j++) {
+          dying?.(j);
+          g.tick();
+        }
         return out;
       };
       const clapped = fromHatch((k) => ({ right: k >= 0 }));
       const swatted = fromHatch((k) => ({ right: k >= 34 }));
       const tossed = fromHatch((k) => ({ right: k >= 0, jump: k >= 18 && k < 38 }));
+      // Waiting at the left wall: the horns' frame catches him on L + 76, and he is drawn
+      // standing where he is, untouched, till the lurching head reaches him on L + 86, and
+      // the toss is heard then; then he is up off its horns.
+      const box = () => {
+        g.draw();
+        return Array.from(ctx.getImageData(46 * 4, (718 - g.camera.iy) * 4, 14 * 4, 18 * 4).data).join();
+      };
+      const pics: string[] = [];
+      const tossHeard: number[] = [];
+      const waited = fromHatch(
+        (k) => ({ left: k >= 0 }),
+        (j) => {
+          if (heard.includes('toss') && !tossHeard.length) tossHeard.push(fight().k);
+          if (j === 0 || j === 5 || j === 12) pics.push(box());
+        },
+      );
+      const wall = { ...waited, k: tossHeard, still: pics[0] === pics[1], gone: pics[0] !== pics[2] };
       const tricks = g.tricksCount();
       // The clean answer, and on row 5 till the second blow: the exit's event, from the fight.
       const out = fromHatch((k) => ({ right: k >= 0 && !(g.player.onGround && g.player.y + 16 < 657 && g.player.x > 140), jump: (k >= 18 && k < 38) || (k >= 60 && k < 80) }));
       const fired = { state: g.state, events: [...g.events], y: g.player.y + 16 };
-      return { crouched, clapped, swatted, tossed, tricks, out, fired };
+      return { crouched, clapped, swatted, tossed, wall, tricks, out, fired };
     },
     { floor: CELL_FLOOR, top: 688 },
   );
   expect(r.crouched).toEqual({ above: 0, drawn: true, keyed: false });
-  // The palms; the free hand, after the heave; and the toss, which the death sounds.
+  // The palms; the free hand, after the heave; and the toss, which the fight sounds when
+  // the bull reaches him: on the catch for a man on its back, ten frames on at the wall.
   expect(r.clapped).toEqual({ state: 'dead', cause: 'The hands', caught: 'clap', heard: ['palms'] });
   expect(r.swatted).toEqual({ state: 'dead', cause: 'The hands', caught: 'swat', heard: ['heave', 'swat'] });
   expect(r.tossed).toEqual({ state: 'dead', cause: 'The horns', caught: 'toss', heard: ['heave', 'blow', 'toss'] });
+  expect(r.wall).toEqual({ state: 'dead', cause: 'The horns', caught: 'toss', heard: ['heave', 'blow'], k: [C.blow1 + 10], still: true, gone: true });
   expect(r.tricks).toEqual({ met: 2, of: 4 });
   expect(r.out.heard).toEqual(['heave', 'blow', 'blow']);
   expect(r.fired.state).toBe('playing');

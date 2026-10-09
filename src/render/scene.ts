@@ -45,7 +45,7 @@ import {
   TOURIST_FRAMES,
   TOURIST_SEATED,
 } from './procedural';
-import { DEATH_ANIM, TILE, VIEW_H, VIEW_W, type Costume, type DeathCause, type Rect } from '../engine/types';
+import { DEATH_ANIM, DEATH_FRAMES, TILE, VIEW_H, VIEW_W, type Costume, type DeathCause, type Rect } from '../engine/types';
 import { paint } from '../engine/assets';
 import { blit, blitFacing, frameOf, relief, silhouette, withLamp, type Frame, type ReliefTones } from './frame';
 import { SPLINTER, handStencils } from './hands';
@@ -5108,9 +5108,6 @@ function drawDust(ctx: CanvasRenderingContext2D, dots: readonly { x: number; y: 
   for (const q of dots) ctx.fillRect(q.x, q.y, 1, 1);
 }
 
-/** A death's frames: the 0.75 s the game plays one for. */
-const DEATH_FRAMES = 45;
-
 /**
  * Snorted: stiff where the sniff caught him, then carried straight up the hatch by the
  * jet just so, and pasted flat on the ceiling over it, face up and splayed, in full
@@ -5170,6 +5167,8 @@ interface BullPose {
   x0: number;
   x1: number;
   head: { x: number; y: number };
+  /** Its head where it is on its lurch, its hands thrashing about it: Theseus's hand keeps its horn there while it tosses its head at the tourist. */
+  held: { x: number; y: number };
   /** Its near hand, the left, which takes the stone up at the grip; and its far hand, the right. */
   near: { x: number; y: number };
   far: { x: number; y: number };
@@ -5200,7 +5199,9 @@ function bullPose(f: Fight): BullPose {
   const clapping = caught?.by === 'clap' && u >= 0 && u < CLAP.back;
   let rear = 0;
   if (clapping) rear = u < CLAP.on ? (u + 1) / CLAP.on : u < CLAP.down ? 1 : Math.max(0, (CLAP.back - u) / (CLAP.back - CLAP.down));
-  const up = Math.round(12 * rear);
+  // Tossing, it rears up on its knees and tosses its head up at him, or out to him.
+  const toss = caught?.by === 'toss' && u >= 0 ? f.tossed(u) : null;
+  const up = toss ? toss.rear : Math.round(12 * rear);
   const top = F - Math.round(f.backAt(k)) - bob - up;
   const dx = f.lurchAt(k);
   const x0 = d.body.x0 + dx;
@@ -5284,12 +5285,12 @@ function bullPose(f: Fight): BullPose {
   }
   const stone =
     k < c.grip ? { x: st.near, y: F - st.h } : k < c.blow1 ? { x: near.x - st.w / 2, y: near.y - st.h + 1 } : { x: put.x - st.w / 2, y: F - st.h };
-  return { top, x0, x1, head, near, far, stone, on };
+  return { top, x0, x1, head: toss?.head ?? head, held: head, near, far, stone, on };
 }
 
 /** Where Theseus's left hand has the bull's near horn this frame. */
 function bullHorn(f: Fight): { x: number; y: number } {
-  const h = bullPose(f).head;
+  const h = bullPose(f).held;
   return { x: h.x + 3, y: h.y - 2 };
 }
 
@@ -5374,7 +5375,8 @@ function drawBullHand(ctx: CanvasRenderingContext2D, h: { x: number; y: number }
  * The bull in its cell, rough: a bull's head on a man's body, crouched at its bed facing
  * the hatch with a hand flat on each stone, breathing; and in the fight, on its knee with
  * the near stone raised and its free hand clawing, heaving the stone at the hero,
- * thrashing as it lurches after the first blow, and a heap after the second. Its near
+ * thrashing as it lurches after the first blow, rearing to toss its head at a tourist
+ * over its horns, and a heap after the second. Its near
  * limbs are incised, as the vase painters cut a limb from a body. Nothing of it is above
  * y 688 until the fight.
  */
@@ -5516,33 +5518,39 @@ function drawHanded(ctx: CanvasRenderingContext2D, s: Scene, death: { t: number;
 }
 
 /**
- * The horns: hooked up and over in one full somersault toward the left wall, the kilt up
- * and flying, and dropped flat on the floor there.
+ * The horns (Fight.tossed): held where they caught him, standing, or falling, until the
+ * bull reaches him; carried up onto its horns, or lifted off its back; hooked up and over
+ * in one full somersault to the left wall, the kilt up and flying; and dropped flat there.
  */
 function drawTossed(ctx: CanvasRenderingContext2D, s: Scene, death: { t: number; at?: { x: number; y: number } | null }): void {
   const p = s.player;
   const costume = s.level.data.costume;
   const c = COSTUMES[costume];
-  const f = Math.round(death.t * DEATH_FRAMES);
   const jump = tourist(costume, 'jump');
   const dead = frameOf(`${c.id}-dead`, 0, c.frames.dead);
-  const from = { x: Math.round(p.x) - 1, y: Math.round(p.y) };
-  const at = death.at ? { x: Math.round(death.at.x) - 1, y: Math.round(death.at.y) } : from;
-  if (f < 3) {
-    // On the horn: lifted.
-    blitFacing(ctx, jump, from.x, from.y - f, p.facing);
+  const fight = s.entities.find((e): e is Fight => e.def.kind === 'fight');
+  if (!fight || fight.caught?.by !== 'toss') {
+    const at = death.at ?? p;
+    drawPressed(ctx, dead, Math.round(at.x) + 7, Math.round(at.y) + 16, 16, 10);
     return;
   }
-  if (f < 24) {
-    const u = (f - 3) / 21;
-    const mx = from.x + (at.x - from.x) * u + 6;
-    const my = from.y + (at.y - from.y) * u - 40 * Math.sin(Math.PI * u) + 8;
-    ctx.save();
-    ctx.translate(Math.round(mx), Math.round(my));
-    ctx.rotate(-2 * Math.PI * u);
-    blit(ctx, jump, -6, -8);
-    ctx.restore();
-    return;
+  const b = fight.tossed(Math.round(death.t * DEATH_FRAMES));
+  const x = Math.round(b.x) - 1;
+  const y = Math.round(b.y);
+  switch (b.pose) {
+    case 'held':
+      blitFacing(ctx, b.ground ? tourist(costume, 'idle') : jump, x, y, p.facing);
+      return;
+    case 'hooked':
+    case 'thrown':
+      // Tipped over on the horns, and on round in the somersault.
+      ctx.save();
+      ctx.translate(Math.round(b.x + p.w / 2), Math.round(b.y + p.h / 2));
+      ctx.rotate(-2 * Math.PI * b.turn);
+      blit(ctx, jump, -6, -8);
+      ctx.restore();
+      return;
+    case 'flat':
+      drawPressed(ctx, dead, x + 8, y + 16, 16, 10);
   }
-  drawPressed(ctx, dead, at.x + 8, at.y + 16, 16, 10);
 }

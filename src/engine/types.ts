@@ -193,8 +193,9 @@ export const DEATH_SOUND: Record<
   'The snort': 'snort',
   // The palms, or the free hand: the fight sounds which.
   'The hands': null,
-  // The hook, the somersault through the air, and the drop.
-  'The horns': 'toss',
+  // The hook, the somersault through the air, and the drop: the fight sounds it when the
+  // bull reaches him.
+  'The horns': null,
   'The labyrinth': 'thud',
   'Gave up': 'sigh',
 };
@@ -211,3 +212,5 @@ export const VIEW_H = 180;
 export const ART_SCALE = 4;
 export const TILE = 16;
 export const DT = 1 / 60;
+/** A death's frames: the 0.75 s the game plays one for (game.ts, DEATH_TIME). */
+export const DEATH_FRAMES = 45;

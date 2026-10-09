@@ -29,7 +29,7 @@ import type {
 } from './level';
 import type { MovingSolid, Player } from './player';
 import { PHYS } from './player';
-import { centerX, centerY, DT, overlaps, TILE, VIEW_W, type DeathCause, type Rect } from './types';
+import { centerX, centerY, DEATH_FRAMES, DT, overlaps, TILE, VIEW_W, type DeathCause, type Rect } from './types';
 
 export interface World {
   level: Level;
@@ -2183,14 +2183,74 @@ export class Ear implements Entity {
 // The Minotaur: the fight in its cell.
 // ---------------------------------------------------------------------------
 
-/** How the bull killed him: which of its ways, on which frame of its clock, where his box was, and whether he was off the ground. */
+/** How the bull killed him: which of its ways, on which frame of its clock, his box and how fast it was going, and whether he was off the ground. */
 export interface FightCatch {
   by: 'clap' | 'swat' | 'toss';
   k: number;
   x: number;
   y: number;
+  w: number;
+  h: number;
+  vx: number;
+  vy: number;
   air: boolean;
 }
+
+/**
+ * The toss, in frames of his death (LEVEL.md, beat e: 'The horns'). He is held where the
+ * horns' frame caught him, standing, or falling as a man with his hands off the keys
+ * falls, until the bull reaches him: its head within `reach` px of him, horns and all,
+ * or anywhere `up` px over its horns, rearing up to `rear` px on its knees and tossing its
+ * head up at him; or its lurching body within `reach`. Its head carries him up onto its
+ * horns in `lift` frames, tipping him `tip` of a turn, or its back lifts him off it; one
+ * somersault of `arc` frames, `rise` px over the straight line, throws him up and over to
+ * the left wall, and he lies flat there for `flat` frames or more of the death. A late
+ * reach shortens the somersault, never below `minArc`; whatever has not reached him by
+ * then, its head goes out to him, on the frame it came nearest.
+ */
+export const TOSS = { reach: 4, up: 20, rear: 14, lift: 3, tip: 0.125, arc: 21, minArc: 10, rise: 40, flat: 6 } as const;
+
+/** How high the horns stand over the top of its head, in px. */
+const HORNS = 5;
+
+/** Where the toss has him on a frame of his death. */
+export interface Tossed {
+  pose: 'held' | 'hooked' | 'thrown' | 'flat';
+  /** The top-left of his box. */
+  x: number;
+  y: number;
+  /** How far round the somersault he is, in turns. */
+  turn: number;
+  /** Held on the floor, not falling. */
+  ground: boolean;
+  /** What reached him: its head, its back, or nothing yet. */
+  by: 'head' | 'body' | null;
+  /** Where its head is drawn while it has him on its horns, its box's top-left; null when it is where it is anyway. */
+  head: { x: number; y: number } | null;
+  /** How far it has reared up on its knees to toss its head at him, in px. */
+  rear: number;
+}
+
+/** Him held by the toss till the bull reaches him: his box's top-left, how fast it is going, and whether he is down on the floor. */
+export interface TossHold {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  ground: boolean;
+}
+
+/** Where the toss has hold of him (Fight.tossHook): for which catch; the frame of his death the bull reaches him on, and with what, or its head out to him; and him held on each frame to then. */
+export interface TossHook {
+  of: FightCatch;
+  f: number;
+  by: 'head' | 'body';
+  out: boolean;
+  held: readonly TossHold[];
+}
+
+/** The gap between two boxes, in px: 0 if they touch or overlap. */
+const gapBetween = (a: Rect, b: Rect) => Math.max(0, a.x - (b.x + b.w), b.x - (a.x + a.w), a.y - (b.y + b.h), b.y - (a.y + a.h));
 
 /** The bull's head, facing left: its box, the muzzle at its left edge and the brow in the middle of its top. */
 export const BULL_HEAD = { w: 11, h: 10, brow: 5 } as const;
@@ -2215,6 +2275,8 @@ export class Fight implements Entity {
   k = -Infinity;
   /** How it killed him, if it has. */
   caught: FightCatch | null = null;
+  /** If it tossed him, where the toss has hold of him: worked out once a catch. */
+  private hold: TossHook | null = null;
   /** Its back from the grip, and from the second blow its heap: one solid, which carries what stands on it. */
   readonly solid: MovingSolid = { rect: { x: 0, y: 0, w: 0, h: 0 }, dx: 0, dy: 0 };
 
@@ -2273,6 +2335,106 @@ export class Fight implements Entity {
     return { x: h.x + BULL_HEAD.brow, y: h.y };
   }
 
+  /** What of it reaches `r` on frame `k`: its head, horns and all, or tossed up at what is over it; its lurching body; or nothing. */
+  reaches(k: number, r: Rect): 'head' | 'body' | null {
+    const d = this.def;
+    const h = this.headAt(k);
+    const up = HORNS + TOSS.up;
+    if (gapBetween({ x: h.x, y: h.y - up, w: BULL_HEAD.w, h: BULL_HEAD.h + up }, r) <= TOSS.reach) return 'head';
+    const top = d.floorY - this.backAt(k);
+    if (gapBetween({ x: d.body.x0 + this.lurchAt(k), y: top, w: d.body.x1 - d.body.x0, h: d.floorY - top }, r) <= TOSS.reach) return 'body';
+    return null;
+  }
+
+  /** Him as the toss holds him, a frame on: standing, or falling with his hands off the keys, inside the cell. */
+  private fall(q: TossHold): TossHold {
+    if (q.ground) return q;
+    const c = this.caught!;
+    const z = this.def.toss.rect;
+    const vx = Math.sign(q.vx) * Math.max(0, Math.abs(q.vx) - PHYS.friction * DT);
+    const vy = Math.min(PHYS.maxFall, q.vy + PHYS.gravity * DT);
+    const x = Math.max(z.x, Math.min(z.x + z.w - c.w, q.x + vx * DT));
+    const y = q.y + vy * DT;
+    if (y + c.h >= this.def.floorY) return { x, y: this.def.floorY - c.h, vx: 0, vy: 0, ground: true };
+    return { x, y, vx, vy, ground: false };
+  }
+
+  /**
+   * Where the toss has hold of him: the frame of his death the bull reaches him on, with
+   * what, and where he is held on each frame to then, his hands off the keys from the
+   * catch, so a rising jump is cut, as letting go of jump cuts it. If nothing reaches him
+   * in time for a somersault of `minArc`, it is its head, out to him on the frame it came
+   * nearest. Worked out once a catch.
+   */
+  tossHook(): TossHook {
+    const c = this.caught!;
+    if (this.hold?.of === c) return this.hold;
+    let q: TossHold = { x: c.x, y: c.y, vx: c.vx, vy: c.air ? Math.max(c.vy, -PHYS.jumpCutVelocity) : 0, ground: !c.air };
+    const held: TossHold[] = [];
+    let near = { gap: Infinity, f: 0 };
+    const latest = DEATH_FRAMES - TOSS.flat - TOSS.lift - TOSS.minArc;
+    for (let f = 0; f <= latest; f++, q = this.fall(q)) {
+      held.push(q);
+      const box = { x: q.x, y: q.y, w: c.w, h: c.h };
+      const by = this.reaches(c.k + f, box);
+      if (by) return (this.hold = { of: c, f, by, out: false, held });
+      const h = this.headAt(c.k + f);
+      const gap = gapBetween({ x: h.x, y: h.y - HORNS, w: BULL_HEAD.w, h: BULL_HEAD.h + HORNS }, box);
+      if (gap < near.gap) near = { gap, f };
+    }
+    return (this.hold = { of: c, f: near.f, by: 'head', out: true, held: held.slice(0, near.f + 1) });
+  }
+
+  /**
+   * The toss on frame `f` of his death, once the horns have caught him: held, hooked,
+   * thrown, or flat at the left wall where the kill puts him (TOSS). Only drawn and heard:
+   * the kill was on the catch.
+   */
+  tossed(f: number): Tossed {
+    const c = this.caught!;
+    const d = this.def;
+    const at = { x: d.toss.rect.x, y: d.floorY - c.h };
+    const { f: hook, by, out, held: path } = this.tossHook();
+    if (f < hook) {
+      const q = path[f]!;
+      return { pose: 'held', x: q.x, y: q.y, turn: 0, ground: q.ground, by: null, head: null, rear: 0 };
+    }
+    const { x, y } = path[hook]!;
+    // Its head on him: reared up on its knees and tossed up at him if he is over its horns,
+    // and out to him if nothing reached him; tossing up 2 px a frame with him on its horns.
+    const reach = this.headAt(c.k + hook);
+    const need = by === 'head' ? Math.max(0, Math.round(reach.y - HORNS + 2 - (y + c.h))) : 0;
+    const rear = Math.min(TOSS.rear, need);
+    const offX = out ? Math.round(x + (c.w - BULL_HEAD.w) / 2) - reach.x : 0;
+    const headOn = (k: number, i: number) => {
+      const h = this.headAt(k);
+      return { x: h.x + offX, y: h.y - need - 2 * i };
+    };
+    const lifted = (k: number, i: number) => {
+      if (by === 'body') return { x, y: y - 2 * (i + 1) };
+      const h = headOn(k, i);
+      return { x: h.x + (BULL_HEAD.w - c.w) / 2, y: h.y - HORNS + 2 - c.h };
+    };
+    const i = f - hook;
+    if (i < TOSS.lift) {
+      const to = lifted(c.k + f, i);
+      const t = (i + 1) / TOSS.lift;
+      const head = by === 'head' && (offX || need || i) ? headOn(c.k + f, i) : null;
+      return { pose: 'hooked', x: x + (to.x - x) * t, y: y + (to.y - y) * t, turn: TOSS.tip * t, ground: false, by, head, rear };
+    }
+    // Thrown, as it sinks back down onto its knees.
+    const arc = Math.max(TOSS.minArc, Math.min(TOSS.arc, DEATH_FRAMES - TOSS.flat - hook - TOSS.lift));
+    const j = i - TOSS.lift;
+    const sinking = Math.round(rear * Math.max(0, 1 - (j + 1) / TOSS.lift));
+    if (j < arc) {
+      const from = lifted(c.k + hook + TOSS.lift - 1, TOSS.lift - 1);
+      const u = (j + 1) / (arc + 1);
+      const turn = TOSS.tip + (1 - TOSS.tip) * u;
+      return { pose: 'thrown', x: from.x + (at.x - from.x) * u, y: from.y + (at.y - from.y) * u - TOSS.rise * Math.sin(Math.PI * u), turn, ground: false, by, head: null, rear: sinking };
+    }
+    return { pose: 'flat', x: at.x, y: at.y, turn: 1, ground: true, by, head: null, rear: 0 };
+  }
+
   update(w: World): void {
     const d = this.def;
     const c = d.clock;
@@ -2296,12 +2458,15 @@ export class Fight implements Entity {
       this.solid.dy = k === c.grip ? 0 : y - this.solid.rect.y;
       this.solid.rect = { x: d.body.x0, y, w: d.body.x1 - d.body.x0, h };
     }
-    if (!w.alive) return;
+    if (!w.alive) {
+      this.hookHeard(w);
+      return;
+    }
     const p = w.player;
     const by = (['clap', 'swat', 'toss'] as const).find((z) => k >= d[z].from && k < d[z].to && overlaps(p, d[z].rect));
     if (!by) return;
     const air = !p.onGround;
-    this.caught = { by, k, x: p.x, y: p.y, air };
+    this.caught = { by, k, x: p.x, y: p.y, w: p.w, h: p.h, vx: p.vx, vy: p.vy, air };
     if (by === 'clap') {
       // Clapped out of the air like a fly, and dropped at its feet.
       w.sound('palms');
@@ -2312,9 +2477,16 @@ export class Fight implements Entity {
       const brow = this.browAt(k);
       w.kill(d.hands, air ? { x: brow.x - p.w / 2, y: brow.y - p.h } : undefined);
     } else {
-      // Hooked up and over, and dropped flat at the left wall.
+      // Hooked up and over, and dropped flat at the left wall: heard when the bull reaches him.
       w.kill(d.horns, { x: d.toss.rect.x, y: d.floorY - p.h });
+      this.hookHeard(w);
     }
+  }
+
+  /** The toss is heard on the frame of his death the bull reaches him, not the frame the horns caught him. */
+  private hookHeard(w: World): void {
+    const c = this.caught;
+    if (c?.by === 'toss' && this.k - c.k === this.tossHook().f) w.sound('toss');
   }
 
   /** Its back, and then its heap, from the grip. */

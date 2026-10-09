@@ -137,9 +137,10 @@ test('the five new nouns are drawn and heard as deaths, never as giving up', () 
   for (const n of nouns) {
     expect(DEATH_ANIM[n], n).toBeDefined();
     expect(DEATH_ANIM[n], n).not.toBe(DEATH_ANIM['Gave up']);
-    // The hands are heard by which of them killed him, the palms or the free hand: the
-    // fight sounds it (tests/minotaur-fight.spec.ts). Every other is heard by its noun.
-    if (n === 'The hands') expect(DEATH_SOUND[n]).toBeNull();
+    // The hands are heard by which of them killed him, the palms or the free hand, and the
+    // horns when the bull reaches him: the fight sounds both (tests/minotaur-fight.spec.ts).
+    // Every other is heard by its noun.
+    if (n === 'The hands' || n === 'The horns') expect(DEATH_SOUND[n], n).toBeNull();
     else {
       expect(DEATH_SOUND[n], n).toBeTruthy();
       expect(DEATH_SOUND[n], n).not.toBe(DEATH_SOUND['Gave up']);
