@@ -403,7 +403,8 @@ wanted.
   neighbour since Knossos's rebuild of 2026-10-07 (there the court beside the pit opens under him
   and the answer is to go straight into the pit; here too he must leave the floor at the hole's
   edge untouched and go straight into the hole, but this stone never gives, the hole is the one
-  he must use anyway, and the kill comes up it; for the designer to confirm);
+  he must use anyway, and the kill comes up it; confirmed a different trick by the designer,
+  2026-10-09);
   Dendera's zodiac (a special stone, a blast, a jump over it, but the lip never kills and the blast
   comes from the hole he must enter); Gargas's fifth tread (the same demand on the hands, but this
   roof is the corridor's normal height and never kills); thrown back into the gap you crossed, Cap
