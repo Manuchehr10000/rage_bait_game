@@ -316,7 +316,7 @@ const jumpTheLine = (from: Run, d: number, hold: number): Run => {
   );
 };
 
-test("the knot's press windows by hold: 5 frames at 11 or more, 6 at 10, 7 at 8, 3 at 6, never at 4 or less", () => {
+test("the knot's press windows by hold: none at 4 or less, 1 frame at 5, 3 at 6, 5 at 7, 7 at 8, 9 at 9, 6 at 10, 5 at 11 or more", () => {
   const from = approach(30);
   expect(from.yank).toBe(110);
   const windows: Record<number, number[]> = {};
@@ -350,6 +350,15 @@ test("the knot's press windows by hold: 5 frames at 11 or more, 6 at 10, 7 at 8,
     20: span(-6, -2),
     30: span(-6, -2),
   });
+  // LEVEL.md has 5 frames at 12 or more, 6 at 10, 7 at 8, 3 at 6 and none at 4 or less,
+  // as here, and "5 to 7 frames by hold"; it gives no window at 5, 7, 9 or 11. Here the
+  // windows run from 1 frame to 9, and 9 is hold 9's: the highest jump under P's roof,
+  // his head 1.33 px short of it, stays over the line the longest. From a hold of 10 the
+  // roof stops his head at y 96 and he comes down sooner.
+  const top = (hold: number) => Math.min(...jumpTheLine(from, -4, hold).log.filter((l) => l.t >= from.yank - 4).map((l) => l.y));
+  expect(top(8)).toBeGreaterThan(96 + 1.33);
+  expect(top(9)).toBeCloseTo(96 + 1.33, 2);
+  expect([10, 11, 20].map(top)).toEqual([96, 96, 96]);
   // The clean run's press, 4 frames before the line is taut, is in every window from a hold of 6.
   for (const hold of [6, 7, 8, 9, 10, 11, 12, 14, 16, 20, 30]) expect(windows[hold]).toContain(-4);
 });
@@ -481,22 +490,47 @@ test("the hero's route: never in rock, at his pace, never jumping, falling from 
       vy = 0;
     }
   }
-  // L_A, L_B, L_C and J4 as LEVEL.md has them, and J3. J2, J1 and row 5 come 1, 3 and 4
-  // frames after its 320, 346 and 367: a 12 px box at 3 px a frame needs 10 frames from
-  // where he lands in J3 and in J2 to the next hole, and 4 in J1.
-  expect(landings).toEqual([132, 174, 216, 258, 288, 321, 349, 371]);
+  // L_A, L_B, L_C, J4, J3, J2, J1 and row 5, as LEVEL.md has them, to the frame.
+  expect(landings).toEqual([132, 174, 216, 258, 288, 320, 346, 367]);
   const where = landings.map((k) => ({ x: frames[k]!.x, feet: frames[k]!.y + THESEUS.h }));
   expect(where).toEqual([
     { x: 288, feet: 176 }, // L_A
     { x: 260, feet: 272 }, // L_B
     { x: 288, feet: 368 }, // L_C
     { x: 256, feet: 464 }, // J4
-    { x: 244, feet: 512 }, // J3
-    { x: 272, feet: 560 }, // J2
-    { x: 244, feet: 608 }, // J1
+    { x: 247, feet: 512 }, // J3
+    { x: 266, feet: 560 }, // J2
+    { x: 247, feet: 608 }, // J1
     { x: 256, feet: 656 }, // row 5
   ]);
-  // On each, at least 8 px of him on the floor: here, all 12.
+  // In the turnings he goes over the edge of each floor hole, at x 244, 272, 244 and 256,
+  // and out of the first three steers in the air for the room's next hole, 3, 6 and 3
+  // px; into row 5 he drops straight. He moves sideways in the air only once his head is
+  // below the floor he went through, and faces the way he moves.
+  const legs: { over: number; sideways: number[] }[] = [];
+  /** The floor he went through: the last he stood on, 16 px of rock under his feet. */
+  let through = 0;
+  for (let k = 267; k < frames.length; k++) {
+    const f = frames[k]!;
+    const prev = frames[k - 1]!;
+    if (f.pose === 'fall' && prev.pose !== 'fall') {
+      legs.push({ over: f.x, sideways: [] });
+      through = prev.y + THESEUS.h + TILE;
+    }
+    // He moves, then falls: a move on a frame after one in the air is made in the air.
+    if (prev.pose === 'fall' && f.x !== prev.x) {
+      legs[legs.length - 1]!.sideways.push(f.x - prev.x);
+      expect(prev.y, `out of the hole at frame ${k}`).toBeGreaterThanOrEqual(through);
+      expect(f.facing).toBe(Math.sign(f.x - prev.x));
+    }
+  }
+  expect(legs).toEqual([
+    { over: 244, sideways: [3] },
+    { over: 272, sideways: [-3, -3] },
+    { over: 244, sideways: [3] },
+    { over: 256, sideways: [] },
+  ]);
+  // On each, at least 8 px of him on the floor: 9 in J1, all 12 everywhere else.
   for (const { x, feet } of where) {
     const floor: Rect[] = [];
     LEVEL.solidTilesIn({ x, y: feet, w: THESEUS.w, h: 1 }, floor);
@@ -537,15 +571,15 @@ test("the hero's route: never in rock, at his pace, never jumping, falling from 
     [258, 'land'],
     [288, 'land'],
   ]);
-  // Along row 5 and into his doorway, all of him inside it, at 406 (LEVEL.md: 402). There
-  // he is not seen, and there he stays: the fight is to step him out.
+  // Along row 5 and into his doorway, all of him inside it, at 402, as LEVEL.md has it.
+  // There he is not seen, and there he stays: the fight is to step him out.
   const door = MINOTAUR.decor.find((d) => d.kind === 'blackDoorway')!;
   if (door.kind !== 'blackDoorway') throw new Error('no doorway');
   const inside = frames.findIndex((f) => f.x >= door.x && f.x + THESEUS.w <= door.x + door.w && f.y + THESEUS.h === door.floorY);
-  expect(inside).toBe(406);
-  expect(frames).toHaveLength(407);
-  expect(frames[406]!.unseen).toBe(true);
-  expect(frames.slice(0, 406).some((f) => f.unseen)).toBe(false);
+  expect(inside).toBe(402);
+  expect(frames).toHaveLength(403);
+  expect(frames[402]!.unseen).toBe(true);
+  expect(frames.slice(0, 402).some((f) => f.unseen)).toBe(false);
 });
 
 test('the thread: from the knot along the passage, up O1, along G0, straight down each shaft past its ledge, through the thread holes, and into his doorway', () => {
@@ -580,15 +614,15 @@ test('the thread: from the knot along the passage, up O1, along G0, straight dow
     [266, 197, 271],
     [294, 293, 367],
     [262, 393, 463],
-    [250, 469, 511],
-    [278, 517, 559],
-    [250, 565, 607],
+    [253, 466, 511],
+    [272, 511, 559],
+    [253, 562, 607],
     [262, 613, 655],
   ]);
   // The last of it runs along row 5's floor into his doorway.
   const last = thread[thread.length - 1]!;
-  expect(last).toEqual({ x: 262, y: 655, at: 371 });
-  expect(frames[406]!.x + THESEUS.w / 2).toBe(158);
+  expect(last).toEqual({ x: 262, y: 655, at: 367 });
+  expect(frames[402]!.x + THESEUS.w / 2).toBe(158);
 });
 
 /**
@@ -686,16 +720,16 @@ const MINOTAUR_LEAN = (MINOTAUR.entities[0] as HeroDef).lean;
 test('the race: the fastest tourist a beam can find lands in the cell 20 frames or more after the hero has had to step out', () => {
   test.setTimeout(180_000);
   const hero = new Hero(MINOTAUR.entities[0] as HeroDef, LEVEL);
-  // In his doorway from yank + 406; the fight steps him out 8 frames before the tourist lands.
+  // In his doorway from yank + 402; the fight steps him out 8 frames before the tourist lands.
   const inDoorway = hero.track.frames.findIndex((f) => f.unseen);
-  expect(inDoorway).toBe(406);
+  expect(inDoorway).toBe(402);
   const f = fastest(2000);
   // The fight's prediction is his landing.
   expect(f.landed).toBe(f.lands);
   const race = f.lands - f.yank;
-  // This beam, 2,000 wide, finds 454; LEVEL.md's, 6,000 and 12,000 wide, found 449 and
-  // 450. Whatever a beam finds, the step-out at L - 8 must come 20 frames or more after
-  // he is in the doorway.
+  // This beam, 2,000 wide, finds 454: the step-out comes 44 frames after he is in the
+  // doorway. LEVEL.md's, 6,000 and 12,000 wide, found 449 and 450: 39 frames. Whatever a
+  // beam finds, the step-out at L - 8 must come 20 frames or more after he is in it.
   expect(race).toBe(454);
   expect(race).toBeGreaterThanOrEqual(inDoorway + 20 + 8);
 });
@@ -795,11 +829,10 @@ test('the clean run, from the spawn to the cell floor: its timings, and the hero
     const on = r.log.filter((l) => l.t > from && l.ground && Math.abs(l.y + 16 - floor) <= 1);
     seen[name] = [on.filter((l) => heroSeen(r, l)).length, on.length];
   }
-  // His frames on each floor, and how many of them the hero is on the screen: P, Z1, T2
-  // and T3 as LEVEL.md has them. On T and T_end he is seen longer, 57 and 18 frames
-  // against its 53 and 13, because he reaches the turnings' lower rooms and row 5 a
-  // few frames later; T_end is 70 frames, one more than its 69.
-  expect(seen).toEqual({ P: [11, 11], Z1: [51, 109], T2: [45, 45], T3: [45, 45], T: [57, 77], T_end: [18, 70] });
+  // His frames on each floor, and how many of them the hero is on the screen: P, Z1, T2,
+  // T3 and T as LEVEL.md has them. T_end is 70 frames, one more than its 69, and the
+  // hero is seen on 14 of them, one more than its 13.
+  expect(seen).toEqual({ P: [11, 11], Z1: [51, 109], T2: [45, 45], T3: [45, 45], T: [53, 77], T_end: [14, 70] });
 });
 
 test("in the game: the knot kills as 'The knot', the level's first trick, and every attempt finds Theseus kneeling at the post again", async ({ page }) => {

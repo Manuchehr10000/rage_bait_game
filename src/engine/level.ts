@@ -539,12 +539,13 @@ export type HeroMove =
   | { do: 'hold' }
   /**
    * Goes for `x` at his pace along whatever floor he is on, and off its end if it ends:
-   * falling, he keeps on for `x` until something stops him. The move ends on the frame
-   * he lands, or the frame he gets to `x` on the ground. It starts no earlier than `at`.
-   * `lookBack`: its first frames, he walks looking back over his shoulder. `steps`: his
-   * footsteps are heard. `quiet`: his landing is not.
+   * falling, he keeps on for `x` until something stops him, or for `air` if it is given,
+   * which the rock round the hole he went down keeps him from until he is clear of it.
+   * The move ends on the frame he lands, or the frame he gets to `x` on the ground. It
+   * starts no earlier than `at`. `lookBack`: its first frames, he walks looking back over
+   * his shoulder. `steps`: his footsteps are heard. `quiet`: his landing is not.
    */
-  | { do: 'go'; x: number; at?: number; lookBack?: number; steps?: boolean; quiet?: boolean }
+  | { do: 'go'; x: number; air?: number; at?: number; lookBack?: number; steps?: boolean; quiet?: boolean }
   /**
    * Climbs, from frame `at`: his feet go straight from each point of `path` to the next,
    * `f` frames after `at`. Drawn in front of the tourist. `foot`: from frame `from` to

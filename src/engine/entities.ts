@@ -1567,7 +1567,7 @@ export function heroHand(f: HeroFrame): { x: number; y: number } {
  * The hero's route, one frame at a time, on the level's own rock: he goes at his pace,
  * falls from rest under the game's gravity, is stopped by whatever he meets, and lands
  * on whatever he comes down on. Where he goes over an edge carrying the ball, the thread
- * goes over it with him: from the edge down at 45 degrees to the line he fell down, so
+ * goes over it with him: from the edge down at 45 degrees to the line he lands on, so
  * that it never lies across a gap like a floor, and straight down that line to where he
  * landed.
  */
@@ -1620,10 +1620,13 @@ function compileHero(def: HeroDef, level: Level): HeroTrack {
         for (;;) {
           const k = frames.length;
           const was = { ...box };
-          const dx = Math.max(-HERO.pace, Math.min(HERO.pace, m.x - box.x));
-          if (dx !== 0) facing = dx > 0 ? 1 : -1;
+          // Falling, he steers for `air`, which the rock round the hole he went down keeps
+          // him from until he is out of it. He faces the way he moves.
+          const to = fellAt >= 0 ? (m.air ?? m.x) : m.x;
+          const dx = Math.max(-HERO.pace, Math.min(HERO.pace, to - box.x));
           box.x += dx;
           for (const t of tilesIn(box)) box.x = dx > 0 ? t.x - box.w : t.x + t.w;
+          if (box.x !== was.x) facing = box.x > was.x ? 1 : -1;
           const grounded = fellAt < 0 && under(box).length > 0;
           let heard: HeroFrame['heard'] = null;
           let landed = false;

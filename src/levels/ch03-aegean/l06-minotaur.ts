@@ -126,10 +126,11 @@ const G0_FLOOR = 80;
  * each to pay out a loop; and goes down Daedalus's turnings by the thread holes, silent
  * from his drop into J2, along row 5 and into the black doorway, where he waits.
  *
- * Each `go` lands him on the side of the pillar or the room nearest the next way down.
- * Where the game's gravity and his pace cannot keep the design's clock, they win: in
- * the lower rooms he lands on J2, J1 and row 5, and is in the doorway, 1, 3, 4 and 4
- * frames after LEVEL.md's 320, 346, 367 and 402 (tests/minotaur.spec.ts pins them).
+ * Each `go` lands him on the side of the pillar or the room nearest the next way down,
+ * and his clock is LEVEL.md's to the frame (tests/minotaur-theseus.spec.ts pins it). In
+ * the turnings, out of each hole, he steers in the air for the room's next one, and
+ * lands where that clock has him: J3 at 288, J2 at 320 and J1 at 346. Into row 5 he
+ * drops straight, at 367, and is in the doorway at 402; steered, he would be there at 400.
  */
 const THESEUS: HeroDef = {
   kind: 'hero',
@@ -167,11 +168,12 @@ const THESEUS: HeroDef = {
     { do: 'payOut', frames: 12 },
     { do: 'go', x: 256 },
     { do: 'payOut', frames: 9 },
-    // The turnings, down by their floor holes: J3, then J2, J1 and row 5, unheard.
-    { do: 'go', x: 244 },
+    // The turnings, down by their floor holes: J3, then J2, J1 and row 5, unheard. Out
+    // of each hole he steers for the room's next one, 3, 6 and 3 px.
+    { do: 'go', x: 244, air: 247 },
     { do: 'payOut', frames: 6 },
-    { do: 'go', x: 272, quiet: true },
-    { do: 'go', x: 244, quiet: true },
+    { do: 'go', x: 272, air: 266, quiet: true },
+    { do: 'go', x: 244, air: 247, quiet: true },
     { do: 'go', x: 256, quiet: true },
     // Along row 5 and into his doorway, x 148 to 164: all of him inside it.
     { do: 'go', x: 152, quiet: true },
