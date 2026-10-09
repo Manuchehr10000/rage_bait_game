@@ -1,0 +1,137 @@
+import { Grid, type LevelData } from '../../engine/level';
+import { TILE } from '../../engine/types';
+
+/**
+ * Chapter 3, Level 6 — The Minotaur, the chapter's legend. A stage: the labyrinth in
+ * section, cell for cell as its map, with nothing in it yet. No knot, no Theseus, no
+ * beast, no queue: those are built into it one at a time, and then it takes its place
+ * in LEVELS. Design: content/ch03-aegean/l06-minotaur/LEVEL.md.
+ *
+ * One screen wide and 47 tiles deep, every solid on the grid; the camera never moves
+ * sideways, and it starts on the spawn. The spawn floor is y 160, so a designer's
+ * point (X, Y) is world x X, y 160 − Y. Two spaces, which meet only where a jump
+ * cannot cross: at O1, 80 px up from the passage, and at the cell's far wall, 80 px.
+ *
+ *   a, b  the door storey, floor 160: outside x 0..80, the door, the black vestibule,
+ *           the passage P x 128..224 under a 64 px roof, O1 up to the hero's gallery G0
+ *   c     the way down: five corridors through five plain 16 px holes, D0, D1, X2, D3
+ *           and X, to T_end, under a 48 px roof
+ *   d     T_end's floor and the hatch at its west end, 160 px over the cell
+ *   e     the cell x 48..144, its far wall 80 px high, and row 5 over it
+ *   f     the hero's route, the way out reversed: row 5, Daedalus's turnings J1 to J4,
+ *           the column of four shafts with a ledge beside each, G0, O1, P, the door
+ *
+ * What the stage cannot do yet: the cell is a dead end, because its far wall is 80 px
+ * and a full jump rises 61.8; the beast's heap is his way out of it. The exit waits for
+ * the second blow, which nothing fires yet. Put on row 5 with the dev tools, he can
+ * climb the hero's route all the way to the door.
+ */
+const W = 20;
+const H = 47;
+const px = (t: number) => t * TILE;
+
+/** The door storey's floor: the spawn's, and the passage's. */
+const DOOR_FLOOR = 160;
+
+/** The event the exit waits for: the second blow, which ends the fight. The fight fires it. */
+const SECOND_BLOW = 'secondBlow';
+
+/** Solid rock, every space of the plan cut out of it. */
+const g = new Grid(W, H).fill(0, 0, W, H, '#');
+/** A space of the plan, in world px, on the grid. */
+const clear = (x: number, y: number, w: number, h: number) => g.fill(x / TILE, y / TILE, w / TILE, h / TILE, ' ');
+/** Rock standing in a space already cut. */
+const rock = (x: number, y: number, w: number, h: number) => g.fill(x / TILE, y / TILE, w / TILE, h / TILE, '#');
+
+// ---------------------------------------------------------------------------
+// a, b. The door storey. Open sky over the roof and outside the door.
+// ---------------------------------------------------------------------------
+clear(0, 0, px(W), 16); // the sky over the labyrinth's roof
+clear(0, 16, 80, DOOR_FLOOR - 16); // outside, where he walks in, the queue waits and Theseus kneels
+clear(80, 80, 48, 80); // the door x 80..96 and the vestibule x 96..128, 80 px clear
+clear(128, 96, 112, 64); // the passage P, 64 px clear, and over its end the head of D0
+clear(192, 80, 16, 16); // O1, the mouth up to the hero's gallery, 80 px over P's floor
+clear(192, 32, 112, 48); // G0, the hero's gallery; its floor top 80 over x 208..256
+
+// ---------------------------------------------------------------------------
+// c, d. The way down: off each corridor's end, landing running the other way.
+// ---------------------------------------------------------------------------
+clear(224, DOOR_FLOOR, 16, 48); // D0, 96 px from P's floor to Z1's
+clear(64, 208, 176, 48); // Z1
+clear(64, 256, 16, 32); // D1, through Z1's 32 px floor
+clear(64, 288, 80, 48); // T2
+clear(128, 336, 16, 32); // X2
+clear(64, 368, 80, 48); // T3
+clear(64, 416, 16, 48); // D3
+clear(64, 464, 128, 48); // T, directly above T_end
+clear(176, 512, 16, 16); // X
+clear(48, 528, 144, 48); // T_end, under a 48 px roof; its floor x 64..192
+clear(48, 576, 16, 16); // the hatch, 160 px down to the cell floor
+
+// ---------------------------------------------------------------------------
+// e. The cell, and row 5 over its far wall.
+// ---------------------------------------------------------------------------
+clear(48, 592, 96, 144); // the cell; its far wall at x 144, 80 px high
+clear(144, 592, 64, 64); // row 5, west
+clear(208, 624, 64, 32); // row 5, east, ending under J1's floor hole
+
+// ---------------------------------------------------------------------------
+// f. The hero's route. The column: four straight 96 px shafts, A to D, each with a
+// ledge beside it he never needs; every climb back up is 48 px.
+// ---------------------------------------------------------------------------
+clear(256, 80, 48, 336); // the column, x 256..304, walled from D0 and Z1 by x 240..256
+rock(256, 128, 32, 16); // the shelf beside shaft A, top 128
+rock(288, 176, 16, 96); // L_A, at the foot of shaft A, top 176
+rock(272, 224, 16, 16); // the ledge beside shaft B, top 224
+rock(256, 272, 16, 96); // L_B, at the foot of shaft B, top 272
+rock(272, 320, 16, 16); // the ledge beside shaft C, top 320
+rock(288, 368, 16, 48); // L_C, at the foot of shaft C, top 368
+// The stair slab beside shaft D, x 272..288, top 416, is the rock left round its foot.
+
+/**
+ * Daedalus's turnings, J4 down to J1: four look-alike rooms, walled from T and T_end by
+ * x 192..208, each with two identical 16 px holes in its ceiling, one against each end
+ * wall. The thread goes up one; the other is a niche, closed above. One hole in the
+ * floor. J4's thread hole is the foot of shaft D; J1's floor hole opens on row 5.
+ */
+const TURNINGS = [
+  { name: 'J4', x: 208, y: 432, thread: 256, niche: 208, floor: 240 },
+  { name: 'J3', x: 240, y: 480, thread: 240, niche: 288, floor: 272 },
+  { name: 'J2', x: 224, y: 528, thread: 272, niche: 224, floor: 240 },
+  { name: 'J1', x: 240, y: 576, thread: 240, niche: 288, floor: 256 },
+];
+for (const j of TURNINGS) {
+  clear(j.x, j.y, 64, 32);
+  clear(j.thread, j.y - 16, 16, 16);
+  clear(j.niche, j.y - 16, 16, 16);
+  clear(j.floor, j.y + 32, 16, 16);
+}
+
+export const MINOTAUR: LevelData = {
+  id: 'minotaur',
+  name: 'The Minotaur',
+  theme: 'minotaur',
+  costume: 'bullLeaper',
+  arrival: 'walk',
+  widthTiles: W,
+  heightTiles: H,
+  rows: g.rows(),
+  spawn: { x: 8, y: DOOR_FLOOR - 16 },
+  cameraBottom: px(H),
+  cameraOnSpawn: true,
+  // Four tricks (pillar 8), in the order he meets them. Each kills him itself: nothing
+  // needs to claim a death. None is built yet.
+  tricks: ['The knot', 'The snort', 'The hands', 'The horns'],
+  // No fall in the level kills, and nothing leaves by the bottom: never on the label.
+  dropCause: 'The labyrinth',
+  fallCause: 'The labyrinth',
+  // The game's exit, at the door he came in by: his right edge short of x 16, once the
+  // second blow has fallen. No marker: he leaves the way he came, past the queue.
+  exit: { x: 0, y: DOOR_FLOOR - 24, w: 6, h: 24 },
+  exitAfter: SECOND_BLOW,
+  exitHidden: true,
+  // The closing picture is at the door, on the left: the label stands aside for it.
+  exitCard: 'right',
+  decor: [],
+  entities: [],
+};

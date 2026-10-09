@@ -110,12 +110,14 @@ test('every level has an exit that is standing on something', () => {
   expect(bad).toEqual([]);
 });
 
-test('every level id is unique and reachable from the tour map', async () => {
+test('every level id is unique and reachable from the tour map; a stage\'s is unique too, and on no map', async () => {
   const ids = LEVELS.map((l) => l.id);
-  expect(new Set(ids).size).toBe(ids.length);
+  const all = [...ids, ...STAGES.map((l) => l.id)];
+  expect(new Set(all).size).toBe(all.length);
   const { CHAPTERS } = await import('../src/map/atlas');
   const pinned = CHAPTERS.flatMap((c) => c.sites.map((s) => s.level)).filter(Boolean);
   for (const id of ids) expect(pinned).toContain(id);
+  for (const stage of STAGES) expect(pinned).not.toContain(stage.id);
 });
 
 test('every slope meets its floors at their tile tops, lies over its tiles, is not too steep, and has headroom', () => {
@@ -164,7 +166,8 @@ test('every slope meets its floors at their tile tops, lies over its tiles, is n
 
 test('a declared trick is a noun one of the level\'s traps kills under, never a fall, a drop, water or giving up', () => {
   const bad: string[] = [];
-  for (const data of LEVELS) {
+  // A stage declares its tricks before its traps are built: only a level must have a trap for each.
+  for (const data of [...LEVELS, ...STAGES]) {
     if (!data.tricks) continue;
     const plain = new Set<string>(['Fall', 'Gave up']);
     if (data.fallCause) plain.add(data.fallCause);
@@ -174,7 +177,7 @@ test('a declared trick is a noun one of the level\'s traps kills under, never a 
     if (new Set(data.tricks).size !== data.tricks.length) bad.push(`${data.id}: a trick declared twice`);
     for (const t of data.tricks) {
       if (plain.has(t)) bad.push(`${data.id}: '${t}' is a plain death, not a trick`);
-      else if (!traps.includes(JSON.stringify(t))) bad.push(`${data.id}: no trap kills under '${t}'`);
+      else if (LEVELS.includes(data) && !traps.includes(JSON.stringify(t))) bad.push(`${data.id}: no trap kills under '${t}'`);
     }
   }
   expect(bad).toEqual([]);

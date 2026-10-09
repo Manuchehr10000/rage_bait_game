@@ -9,6 +9,7 @@ import { KARNAK } from './ch02-egypt/l03-karnak';
 import { DENDERA } from './ch02-egypt/l04-dendera';
 import { PHILAE } from './ch02-egypt/l02-philae';
 import { KNOSSOS } from './ch03-aegean/l01-knossos';
+import { MINOTAUR } from './ch03-aegean/l06-minotaur';
 import { PERSEPOLIS } from './ch04-persia/l01-persepolis';
 
 /** Every level in tour order: chapter 1, then chapter 2 south to north along the Nile, then the Aegean, then Persia. */
@@ -20,7 +21,7 @@ export const LEVELS: LevelData[] = [CAP_BLANC, ROC_AUX_SORCIERS, PECH_MERLE, ROU
  * Not on the map and not in prod: the dev and local builds open one by its deep link,
  * `#<id>`. When its traps are in, it takes its level's place in LEVELS.
  */
-export const STAGES: LevelData[] = [];
+export const STAGES: LevelData[] = [MINOTAUR];
 
 /** `list` is what the game can enter: LEVELS, and the stages too where there are dev tools. */
 export function levelIndexFromHash(hash: string, list: readonly LevelData[] = LEVELS): number {

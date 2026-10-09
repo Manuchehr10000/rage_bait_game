@@ -22,7 +22,8 @@ export type Theme =
   | 'karnak'
   | 'dendera'
   | 'knossos'
-  | 'persepolis';
+  | 'persepolis'
+  | 'minotaur';
 
 /**
  * A floor that is a straight line from (x0, y0) to (x1, y1), x0 < x1: a stair of risers

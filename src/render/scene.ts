@@ -260,6 +260,7 @@ export function renderWorld(ctx: CanvasRenderingContext2D, s: Scene): void {
   if (theme === 'dendera') drawDenderaSky(ctx, s, cy);
   else if (theme === 'knossos') drawKnossosSky(ctx, cy);
   else if (theme === 'persepolis') drawPersepolisSky(ctx, cy);
+  else if (theme === 'minotaur') drawMinotaurSky(ctx);
   else drawSky(ctx, cy, theme);
   if (theme === 'capBlanc') drawFarBeune(ctx, cx, cy);
   else if (theme === 'rocAuxSorciers') drawFarAnglin(ctx, cx, cy);
@@ -269,13 +270,14 @@ export function renderWorld(ctx: CanvasRenderingContext2D, s: Scene): void {
   else if (theme === 'dendera') drawFarDendera(ctx, cx, cy);
   else if (theme === 'knossos') drawFarKnossos(ctx, cx, cy);
   else if (theme === 'persepolis') drawFarPersepolis(ctx, cx, cy);
-  else drawFarKarnak(ctx, cx, cy);
+  else if (theme !== 'minotaur') drawFarKarnak(ctx, cx, cy);
 
   ctx.save();
   ctx.translate(-cx, -cy);
 
   if (theme === 'abuSimbel') drawRock(ctx, s, cx, cy);
   else if (theme === 'philae') drawRiverbed(ctx, s, cx, cy);
+  else if (theme === 'minotaur') drawLabyrinthAir(ctx, s);
   else if (theme !== 'dendera' && theme !== 'knossos' && theme !== 'persepolis') drawKarnakGround(ctx, s, cx, cy);
   for (const d of level.data.decor) drawDecor(ctx, s, d);
   drawTiles(ctx, level, cx, cy);
@@ -1638,6 +1640,10 @@ function drawTileAt(
     drawKnossosTile(ctx, c, tx, ty, x, y, open);
     return;
   }
+  if (theme === 'minotaur' && (c === '=' || c === '#' || c === '%')) {
+    drawMasonry(ctx, ty, x, y, open);
+    return;
+  }
   if (c === '=') {
     if (theme === 'pechMerle' || theme === 'gargas') drawConcrete(ctx, x, y, open);
     else if (theme === 'rouffignac') drawBallast(ctx, tx, ty, x, y, open);
@@ -1691,6 +1697,7 @@ function tileArtId(theme: Level['data']['theme'], c: string, open: boolean): str
     const k = c === '=' ? 'knossos-paving' : c === '%' ? 'knossos-slab' : 'knossos-ashlar';
     return open ? `tile-${k}-top` : `tile-${k}`;
   }
+  if (theme === 'minotaur') return open ? 'tile-labyrinth-top' : 'tile-labyrinth';
   return open ? `tile-${name}-top` : `tile-${name}`;
 }
 
@@ -4482,4 +4489,62 @@ function drawCarved(ctx: CanvasRenderingContext2D, s: Scene, death: { cause: Dea
   ctx.clip();
   blit(ctx, relief(idle, face, STONE_RELIEF), x - 1, y);
   ctx.restore();
+}
+
+// ---------------------------------------------------------------------------
+// The Minotaur: the labyrinth in section, rough. Black-figure on orange clay, as on
+// the Attic vases (its LEVEL.md, Art): clay air, the masonry a dilute-glaze wash with
+// full-glaze courses, black glaze only for the vestibule. Outside the door, the sky.
+// ---------------------------------------------------------------------------
+
+const MN = {
+  /** The open sky outside the door, over the clay. */
+  skyTop: '#efd2a6',
+  skyBottom: '#e3b47c',
+  /** The clay: the air inside the labyrinth. */
+  clay: '#c8743d',
+  /** Dilute glaze, the masonry's wash, and the full glaze of its courses. */
+  wash: '#7b4527',
+  washLight: '#8d5330',
+  glaze: '#1f140e',
+};
+
+/** Where the door storey's outside ends: the outer face of the labyrinth, and the floor outside it. */
+const LABYRINTH_FACE = 80;
+const LABYRINTH_DOOR_FLOOR = 160;
+/** The vestibule behind the door, in black glaze, from the door's lintel to its floor. */
+const VESTIBULE: Rect = { x: 96, y: 80, w: 32, h: 80 };
+
+function drawMinotaurSky(ctx: CanvasRenderingContext2D): void {
+  const bands = 6;
+  for (let i = 0; i < bands; i++) {
+    ctx.fillStyle = mix(MN.skyTop, MN.skyBottom, i / (bands - 1));
+    ctx.fillRect(0, (i * VIEW_H) / bands, VIEW_W, VIEW_H / bands + 1);
+  }
+}
+
+/**
+ * The air inside the labyrinth, in clay: everything behind its outer face and under
+ * the floor outside, but the sky over its roof. The vestibule in black glaze.
+ */
+function drawLabyrinthAir(ctx: CanvasRenderingContext2D, s: Scene): void {
+  const { widthPx, heightPx } = s.level;
+  ctx.fillStyle = MN.clay;
+  ctx.fillRect(LABYRINTH_FACE, TILE, widthPx - LABYRINTH_FACE, heightPx - TILE);
+  ctx.fillRect(0, LABYRINTH_DOOR_FLOOR, LABYRINTH_FACE, heightPx - LABYRINTH_DOOR_FLOOR);
+  ctx.fillStyle = MN.glaze;
+  ctx.fillRect(VESTIBULE.x, VESTIBULE.y, VESTIBULE.w, VESTIBULE.h);
+}
+
+/** A block of the labyrinth: a wash with a full-glaze course under it and staggered joints. */
+function drawMasonry(ctx: CanvasRenderingContext2D, ty: number, x: number, y: number, open: boolean): void {
+  ctx.fillStyle = MN.wash;
+  ctx.fillRect(x, y, TILE, TILE);
+  ctx.fillStyle = MN.glaze;
+  ctx.fillRect(x, y + TILE - 1, TILE, 1);
+  ctx.fillRect(x + (ty % 2 === 0 ? 3 : 11), y, 1, TILE - 1);
+  if (open) {
+    ctx.fillStyle = MN.washLight;
+    ctx.fillRect(x, y, TILE, 2);
+  }
 }

@@ -66,6 +66,9 @@ const SOUND_OF: Record<Theme, { track: MusicId | null; room: Room }> = {
   dendera: { track: 'ch02', room: 'open' }, // up a stair in the wall, and then the roof, under the sky
   knossos: { track: 'ch03', room: 'open' }, // ruled: visitors look into Evans's rooms from outside
   persepolis: { track: null, room: 'open' }, // not scored yet; a terrace under the sky
+  // The chapter's lyre. Which room it is heard in here is not designed yet (its LEVEL.md);
+  // until it is, the chapter's open air, which claims no roof.
+  minotaur: { track: 'ch03', room: 'open' },
 };
 
 /** The pages of the brochure that have been arranged, by chapter number. */
