@@ -7,7 +7,7 @@
 > Tricks already spent are in `content/tricks.md`. The summary is in `CLAUDE.md`.
 
 > Level 6, the legend: the Minotaur, exempt from the no-bull ruling (`arc.md` section 4).
-> Designed 2026-10-08, not built: `l06-minotaur/LEVEL.md`.
+> Designed 2026-10-08, being built as a dev stage: `l06-minotaur/LEVEL.md`.
 
 Source: `content/research/arc.md`, chapter 3. Dates 1900 to 1200 BC. Runs Crete to
 mainland, Minoan giving way to Mycenaean. Status: locked in the research. Levels 1, 2 and 6 are
@@ -137,7 +137,7 @@ two levels leave it:
 
 ## Level 6 · The Minotaur
 
-Designed 2026-10-08, not built; see `l06-minotaur/LEVEL.md`.
+Designed 2026-10-08; being built as a dev stage since 2026-10-09, the knot and the snort in; see `l06-minotaur/LEVEL.md`.
 
 > The Minotaur: he pushed in to be eaten first, and nobody wants him.
 

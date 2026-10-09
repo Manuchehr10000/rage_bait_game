@@ -181,17 +181,20 @@ x 208, under O1.
 - **First attempt.** He trips forward over the white line and lands face down, the wig over his
   eyes, with one dry knock. Theseus lets the line go slack and walks in, looking back at his knot.
   Nothing reacts. Label: **The knot.**
-- **Second attempt.** A jump timed to the lean: a press window of 5 frames at a hold of 12 or more,
-  6 at 10, 7 at 8, 3 at 6, never at 4 or less. Steady hoppers get through 15, 15, 23, 10 and 0 per
-  cent at full holds and holds of 12, 8, 6 and 4; rhythmic mashers 3. The clean run presses 4
-  frames before the line is taut, lands at x 208 at 2.27 s and walks off into D0 at 2.45.
-- **A relieved second jump into D0 lives** (designer, on a recommendation, 2026-10-07): 6,664 of
-  them, no death, the worst fall 143.4 px.
+- **Second attempt.** A jump timed to the lean. Measured in the game (2026-10-09), the press
+  window by hold is 5 frames at a hold of 11 or more, 6 at 10, 9 at 9, 7 at 8, 5 at 7, 3 at 6, 1 at
+  5, never at 4 or less. Hold 9 is the widest because it is the highest jump that stays under P's
+  roof (his head 1.33 px short of it); from 10 the roof stops his head and he comes down sooner. In
+  the design's copy of the engine, steady hoppers got through 15, 15, 23, 10 and 0 per cent at full
+  holds and holds of 12, 8, 6 and 4, and rhythmic mashers 3. The clean run presses 4 frames before
+  the line is taut, lands at x 209.75 at 2.27 s and walks off into D0 at 2.43.
+- **A relieved second jump into D0 lives** (designer, on a recommendation, 2026-10-07): 6,588 of
+  them in the game, no death, the worst fall 143.44 px.
 - **The stride** (designer, on a recommendation, 2026-10-08), a picture, never a trap. Theseus walks
   P at 180 px/s, non-solid and a plane behind, then mantles 80 px up O1 (hero frames 66–85), drawn
   in front. At frames 68–70 his trailing foot pushes off a small stone boss on P's back wall,
   x 206–215, y 140–148, head height just right of O1. A knot survivor who stops on landing rests
-  at x 207.4–216.4, and the foot is over 30 of the 31 measured. It is frame-identical with or
+  at x 207.42–219.42 in the game, and the foot is over 57 of the 61 measured. It is frame-identical with or
   without him, moves nothing and kills nothing, and nothing reacts.
 
 ### c · The way down and the race
@@ -199,7 +202,8 @@ x 208, under O1.
 Honest: nothing here can kill. He walks off each corridor's end and lands running the other way: D0
 (96 px) onto Z1 at x 230 (2.73 s); D1 (80 px, through Z1's 32 px floor, 4.55) onto T2 at x 64; X2
 (80 px, 5.53) onto T3 at x 134; D3 (96 px, 6.52) onto T at x 64; X (64 px, 8.08) onto T_end at
-x 182 (8.27). Every hole, the hatch included, is the same plain 16 px hole. The worst relieved jump
+x 182 (8.27). In the game each of these walk-offs and landings comes one frame earlier. Every
+hole, the hatch included, is the same plain 16 px hole. The worst relieved jump
 falls 111.44 px into D1 and X2, 127.44 into D3 and 95.44 into X; a leap into the hatch at most
 191.44, because T_end's roof caps every leap at 192 (pillar 1's limit is 200).
 
@@ -237,15 +241,17 @@ and 0.3 to 0.7 s ahead.
 
 **The race.** The fastest tourist found lands at yank + 449 (the physics check's beam) or 450 (the
 design's two beams, widths 6,000 and 12,000), so the hero's step-out, 8 frames before the landing,
-comes 39 frames after he reaches the doorway. Every beam is heuristic, and none is a proof, so the
+comes 39 frames after he reaches the doorway. In the game the widest beam, 30,000, found 448 before
+the snort was built, which can only make it later, so the step-out comes 38 frames or more after
+the doorway at 402. Every beam is heuristic, and none is a proof, so the
 margin is pinned at 20 or more. On screen in the clean run: P 11 of 11 frames; Z1
-51 of 109, heard overhead first; T2 45 of 45; T3 45 of 45; T 53 of 77; T_end 13 of 69, only his
+51 of 109, heard overhead first; T2 45 of 45; T3 45 of 45; T 53 of 77; T_end 14 of 70 (13 of 69 in the design), only his
 head and chest at the bottom edge, x 184 to 148, before the black takes him.
 
 **The plant for the snort.** From Z1 down he hears a bull snore under the floor: snore, breath and
 drag, never footfalls or palms. From T he sees the hatch, a storey below, breathe: twin plumes of
 dust come out on the exhale, rising 32 px, and are drawn back down on the inhale, wholly in frame
-for 69 of the 94 frames from his drop into D3 to his drop into X (72 of the 80 grounded frames on
+for 70 of the 94 frames (69 in the design) from his drop into D3 to his drop into X (72 of the 80 grounded frames on
 T, by the physics check).
 
 ### d · T_end and the hatch
@@ -268,7 +274,7 @@ this game a crack means "will give", and Persepolis's cracked column holds.
   x 112, 30 px ahead of him: a flinch. He runs through them 27 frames later, drawn a plane behind
   him and never down past his legs, and they are behind him: relief, whatever was under the hole
   has gone to its bed. He leaps from x 81.8 at 9.42 s, never touching the lip, is in the hatch at
-  9.78, 35 frames after his last step over the bed, and lands in the cell at 10.28 s.
+  9.78, 37 frames after his last step over the bed (35 in the design), and lands in the cell at 10.28 s.
 - **First attempt.** He runs on, or walks off. His step on the lip rings, deep and unlike any other
   step in the level; on that frame the dust is back at the hatch and the drag comes back. As his
   feet go in he is sniffed, then snorted back up the hole onto the ceiling, and the snore starts
@@ -292,16 +298,18 @@ this game a crack means "will give", and Persepolis's cracked column holds.
   hatch breathes. A man standing on the bed is heard every frame, so waiting never helps. Runners
   need 34 to 38 frames from their last bed frame at holds of 7 or more (12 to 16 to spare), up to
   42 at hold 5's far take-off, and may let go of left for about 12 frames after the bed. A man who
-  slides to a stop may stand at most 10 to 11 frames. Taps of 1 to 3 frames never get in; the only
+  slides to a stop may stand at most 11 frames, never 12, measured in the game. Taps of 1 to 3 frames never get in; the only
   creeps that did were half-speed stutter-walks from just short of the band. Mashers holding left
-  get in 8.5 to 12.3 per cent of the time, 8.9 jittered (the physics check's realistic mashers, 0
+  get in 8.5 to 12.3 per cent of the time, 8.9 jittered (in the game 8.8 rhythmic and 11.2 jittered; other mashing models give 5.8 to 16.2) (the physics check's realistic mashers, 0
   to 14).
-- **No skip.** The longest jump under the roof travels 39.00 px against the 42 needed to clear the
-  bed block, and the first ground after X is never left of x 167.56, so he is always heard over the
-  bed. The margin is 3 px: any change to T_end, X or the roof is re-measured.
+- **No skip.** The longest jump under the roof travels 39.00 px from the floor, and 40.50 from the
+  engine's 1 px ground-probe stance, against the 42 needed to clear the bed block, and the first
+  ground after X is never left of x 165.69, so he is always heard over the bed. The margin is 1.5 px
+  in the game (3 in the design's copy): any change to T_end, X or the roof is re-measured.
 - **The undo**, after a ring, and the only way in (of 20,000 random runs from the lip, none got
-  in): walk back until heard over the bed, turn, run and leap; about 1.7 s to the cell floor,
-  human-paced, costing about 0.9 s. A frightened hop over the plume from x 118 or less lands on the
+  in; in the game 8 of 400 random men from the lip got in, every one only after going back over
+  the bed): walk back until heard over the bed, turn, run and leap; about 1.7 s to the cell floor,
+  human-paced, costing about 0.9 s. A frightened hop over the plume from left of x 118.98 at hold 5, or of 112.98 at a full hold, lands on the
   lip and rings.
 - **The camera.** The view's bottom before he drops is at most y 687.83, and the frozen snort view
   y 457.7 to 649.8: the beast draws nothing above y 688 and is never drawn under the hatch.
@@ -372,7 +380,7 @@ shins of the man who pushed in front of him.
   about a thread on a floor says danger: the most competent man in the myth, doing his most
   harmless chore.
 - **Timing the second time.** The line runs from the post to the ball, so he cannot outrun it or
-  back out behind it: a jump timed to the lean, 5 to 7 frames by hold (beat b).
+  back out behind it: a jump timed to the lean, 5 frames at a full hold and 1 to 9 by hold (beat b).
 - **Only here.** Theseus fastened the thread to the door (*Epitome* 1.9). The rules check called
   the site test strong.
 - **The closest tricks.** The boot snare: a fitting holds him; here nothing does. Nor Gargas's
@@ -390,7 +398,7 @@ wanted.
   and the lip, and then he sees the threat leave. The relief kills him.
 - **Timing and precision the second time.** A running leap from the plain block before the lip,
   under the 48 px roof, in a take-off band of 1.7 to 8.7 frames by hold (4.7 at a full hold),
-  within 50 frames of his last step over the bed; a man who stops off the bed may stand about 10
+  within 50 frames of his last step over the bed; a man who stops off the bed may stand 11
   frames.
 - **Only here: medium, accepted by the designer** (2026-10-08), as for Persepolis's column. The
   fodder is the story's (Apollodorus 3.15.8, unverified; Ovid, *Met.* 8, fed on Athenian blood
@@ -631,7 +639,7 @@ Catullus 64.112–115; Ovid, *Met.* 8.172–173, line numbers unverified). Reser
 
 ## New in the engine
 
-Being built, in this order, as a stage in the dev build (`#minotaur`, in `STAGES`, not on the map). The first three are made (2026-10-09):
+Being built, in this order, as a stage in the dev build (`#minotaur`, in `STAGES`, not on the map). Made so far, 2026-10-09, with rough art:
 
 - **The resolveY fix, game-wide, first.** In `physics.ts`, a dynamic solid rising into a body whose
   old bottom was at or above the solid's old top puts the body on top, whatever the sign of his own
@@ -647,27 +655,32 @@ Being built, in this order, as a stage in the dev build (`#minotaur`, in `STAGES
   opt-in because four built levels would start differently with it. **The map**, cell for cell as
   the harness's, with the gated exit (`LevelData.exitAfter`) and the **per-level anchor for the
   exit card** (`LevelData.exitCard`, right-anchored here). Made 2026-10-09
-  (`tests/minotaur.spec.ts`, `tests/level-options.spec.ts`). Still to come:
+  (`tests/minotaur.spec.ts`, `tests/level-options.spec.ts`).
 - **The ear**, one entity at the hatch on spawn, read each tick before the fight's trigger, on the
   tick before's player, as beat d gives it: heard is on the ground with |feet − 576| ≤ 2, never
   exact contact. Its sounds: per-block steps (the ring on the lip, the hollow knock on the bed
   block), the drag on every change, the snore only while asleep at the hatch. The breath loop
   moves, on the frame of the change, between the hatch and the x 112 joint, drawn a plane behind
-  him there.
+  him there. Made 2026-10-09 (`tests/minotaur-snort.spec.ts`), with the lip as its own tile and the
+  level's masonry laid in two-tile blocks so the joints fall at x 80, 112, 144 and 176.
 - **The snort's death**: its own drawing, a 5-frame sniff in place, 4 frames carried up the hatch,
   then pasted on the ceiling at y 528. It needs a death-frame position that differs from where he
-  died.
+  died: made 2026-10-09 as `World.kill(cause, at)`, which no other level passes.
 - **The hero**, one scripted, non-solid entity replaying the harness's route frame for frame: drawn
   in front during the mantle, the foot on the boss at frames 68–70, the pay-outs animated,
   footfalls down to J3 and none from J2, in the doorway from frame 402. Solid only while he kneels
-  at the door.
+  at the door. Made 2026-10-09 with the knot and the thread (`tests/minotaur-theseus.spec.ts`); his
+  route is data, a list of moves, and a fall can steer for the next hole once he is out of the one
+  he fell through.
+
+Still to come:
+
 - **The fight**, keyed when his feet are 61 px down the hatch with x under 64: L = T0 + ceil((736 −
   feet) / (`PHYS.maxFall` × DT) − 1e-6). No fight event or test waits for exact floor contact: the
   engine's 1 px ground probe lets a hopping man stand at 735.4 again and again. The clap's zone and
   the free hand's both kill as 'The hands', and the drawing picks the clap, the swat on the brow
   (in the air) or on the floor; the heave lifts the back as a rising solid.
-- **The knot** and the closing tableau. The exit waits for an event, `secondBlow`, that the fight
-  is to fire.
+- **The closing tableau.** The exit waits for an event, `secondBlow`, that the fight is to fire.
 - **`LevelData.tricks`**: 'The knot', 'The snort', 'The hands', 'The horns'; `dropCause` and
   `fallCause` 'The labyrinth', unreachable. The black-figure palette, the four deaths' drawings,
   and the queue, Ariadne and the body as background figures.
@@ -683,7 +696,7 @@ tricks. Above all:
 - **The stride**: the foot over a resting head at frames 68–70, the hero frame-identical with and
   without him.
 - **The ear's rule** on the tick before, never on exact contact, and the take-off bands.
-- **No skip**: 39.00 px, and x 167.56.
+- **No skip**: 39.00 px from the floor and 40.50 from the probe's stance, and x 165.69.
 - **The clock**: its 50 frames, with its drag and never the ring, and its puffs; the runners,
   stoppers, taps and mashers.
 - **The snort's death**: its frames, the snore silent until after it, and the joint's plume never
@@ -770,13 +783,13 @@ clapped, which spends "it stands up a man". Whether every fight, following his s
 beast to its bed, reads as the tourist being bait (pillar 11), despite the mitigations. Whether a
 muted stopper sees that his pause brought the beast back: the clock's puffs show it coming, not
 that he caused it. Whether the race reads: on T_end the hero is a head and chest for 13 frames,
-which first-timers miss, and on Z1 he is off screen for 58 of 109 frames, so his step-out carries
+which first-timers miss (14 in the game), and on Z1 he is off screen for 58 of 109 frames, so his step-out carries
 "how did he get here first". Whether the fight's two seconds hold the clawing hand as well.
 
 **Open risks.** The hands' windows depend on where he lands: 13 to 16 frames at the wall, 15 at the
 face, 5 to 8 at x 59 to 67, none for an entry still running right at x 87.3 or more. An expert's
 first step on the bed (yank + 360) comes while the hero is still visibly dropping, silent. The
-no-skip margin is 3 px; the race margin rests on heuristic beams. The design parts from the checks
+no-skip margin is 1.5 px in the game; the race margin rests on heuristic beams. The design parts from the checks
 in three places: the clock's 34 to 42 frames for runners (the physics check: 34 to 38; hold 5's far
 take-off measures 42); the runner's 15 to 16 frames (L+7 to 21 from the x 84 entry, 22 from the
 clean run's landing); the boss at x 206–215 (the comedy check: 206–214), to cover 30 of 31

@@ -12,7 +12,7 @@ content/
   map/                       the tour map: its art, and the twelve chapter plates in monuments/
   site/                      the tab icon's note
   ch01-palaeolithic/         five levels built, laid out as below
-  ch03-aegean/               Knossos built rough; Phaistos and the Minotaur designed; the rest decided
+  ch03-aegean/               Knossos built rough; the Minotaur being built; Phaistos designed; the rest decided
   ch04-persia/               Persepolis built rough; the rest in its ruled order, not designed
   ch02-egypt/
     CHAPTER.md               the period, the costume, the tone of the chapter

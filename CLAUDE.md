@@ -61,8 +61,8 @@ notes describe the levels as they were built.
   rulings bind every level (`arc.md` section 4): the sandal is the touchstone cows' fifth told
   overhead; and the resolveY fix is made game-wide, with every built level re-tested (on
   a recommendation, 2026-10-08; made 2026-10-09). It is being built as a dev stage
-  (`#minotaur`, `STAGES` in `src/levels/index.ts`): the map and its engine options are in, no
-  traps yet.
+  (`#minotaur`, `STAGES` in `src/levels/index.ts`): the knot and the snort are in, with rough
+  art; the fight and the way out are not.
 - **Open:** Apep or Sekhmet for chapter 2's legend; whether Karnak's exit has already spent
   the false completion (pillar 10, `content/tricks.md`).
 
