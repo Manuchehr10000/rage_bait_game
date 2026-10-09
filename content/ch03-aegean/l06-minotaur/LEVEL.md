@@ -205,7 +205,8 @@ Honest: nothing here can kill. He walks off each corridor's end and lands runnin
 x 182 (8.27). In the game each of these walk-offs and landings comes one frame earlier. Every
 hole, the hatch included, is the same plain 16 px hole. The worst relieved jump
 falls 111.44 px into D1 and X2, 127.44 into D3 and 95.44 into X; a leap into the hatch at most
-191.44, because T_end's roof caps every leap at 192 (pillar 1's limit is 200).
+191.44 (191.94 in the game, from the 1 px ground probe's highest stance), because T_end's roof
+caps every leap at 192 (pillar 1's limit is 200).
 
 **The hero's route**, the way out reversed. The column has four straight 96 px shafts, each with a
 ledge beside it he never needs; every climb back up is 48 px.
@@ -321,7 +322,9 @@ face at x 108, facing the hatch, human hands flat on a stone each (the stones ou
 breathing on its own slow loop.
 
 - **The key.** When his feet are 61 px down the hatch the fight predicts his landing, L, exactly
-  for 3,316 leap entries (4,453 in the physics check); nothing waits for contact with the floor.
+  for 3,316 leap entries (4,453 in the physics check; in the game, every one of 49,060 steered and
+  2,786 random entries, keyed 17 or 18 frames before he lands); nothing waits for contact with the
+  floor.
 - **The clock, from L.** L−8: Theseus steps out of the black doorway. L+4: he leaps low over the
   bull onto the horn, about 6 px of rise, drawn as the vases' warrior, never as a bull-leaper.
   L+40: the grip; the bull lets go of its right stone, raises the left and sinks to its knee by
@@ -346,7 +349,7 @@ breathing on its own slow loop.
 
 Honest, and never replayed: the way of winning.
 
-- Along row 5 to x 262 (13.02 s) and up through the rooms, J1 13.52, J2 14.07, J3 14.78, J4 15.50,
+- Along row 5 to x 262 (13.00 s, the press at 13.02) and up through the rooms, J1 13.52, J2 14.07, J3 14.78, J4 15.50,
   to the stair slab at 16.05: 3.03 s. In each, the wrong one of the two holes is a closed niche
   costing 0.82 to 1.08 s.
 - Up the column by the ledges beside the shafts and the pillar tops: L_C 16.57, the ledge at 320
@@ -354,7 +357,8 @@ Honest, and never replayed: the way of winning.
   forced.
 - Along G0, down O1 into P (20.43), past the knot still on the post (21.62) and out at 22.43. The
   exit is the game's, at the door he came in by: his right edge at x 16 or less, after blow 2.
-- Every climb is an honest 48 px jump at a hold of 10 or more, and the worst fall is 143.4 px. In
+- Every climb is an honest 48 px jump at a hold of 10 or more, and the worst fall is 143.4 px
+  (143.61 in the game, the relieved jump into D0 from the ground probe's highest stance). In
   2,700 random runs after blow 2 nobody died (1,500 more in the physics check, worst fall 127.44).
   A man who falls back into the cell is not trapped: nothing kills from L+106 on, and the heap's
   top, 650.2 against row 5's floor at 656, lets him out.
@@ -365,7 +369,7 @@ When his left edge passes x 80 after blow 2, a staged second copy, while the hea
 cell: Theseus comes out of the black vestibule dragging the dead Minotaur and stops at the post
 where he knelt, x 64–80, within 45 frames, the head and horns across the threshold on the clay of
 the door opening, the rest in the vestibule in a reserved outline. He is non-solid and drawn behind
-the tourist. The clean run takes 49 frames from the trigger to the exit; the fastest walk takes 50.
+the tourist. The clean run takes 49 frames from the trigger to the exit; the fastest walk takes 50 (49 or 50 in the game, by where in his stride he crosses x 80, so Theseus is always at the post first).
 He leaves first, the queue still waits, and Ariadne looks past him. The exit card is anchored right
 (view x 136–316), so at 0 to 4 rows of causes it covers neither the door nor Theseus with the body.
 
@@ -439,7 +443,8 @@ the horns if he is in the air, flat on the floor before its knee if he is not.
 - **Timing the second time.** One answer: go with the hero, after his leap and before his grip. A
   runner from the left-wall landing leaps at L+7 to 21 from the x 84 leap entry, or L+7 to 22 from
   the clean run's own landing: 15 or 16 frames at a hold of 16 or more, opening later at lower
-  holds (L+9 at 14, L+12 at 12, L+17 at 10, never at 8). A man who stopped leaps with the same
+  holds (L+9 at 14, L+12 at 12, L+17 at 10, never at 8). In the game (2026-10-09) it is L+7 to 21
+  from both, 15 frames, at a hold of 15 or more; the lower holds are as here. A man who stopped leaps with the same
   timing from where he stands, 5 to 15 frames by place, as below. A stop after walking up from the
   wall never works, and nothing after the grip does: no go at L+23 or later survived, from the wall
   or from 37 steered landings (x 48–83), at holds 2 to 30 with back jumps at L+50 to 74. "Stop
@@ -451,12 +456,12 @@ the horns if he is in the air, flat on the floor before its knee if he is not.
   |---|---|
   | 50 | 13 |
   | 55 | 10 |
-  | 59 | 8 |
+  | 59 | 8 (7 in the game) |
   | 63–67 | 5 to 7 |
   | 71 | 9 |
   | 75–77 | 12 to 14 |
-  | 77.4–80.5 | 15 (L+7 to 21, the runner's own) |
-  | 81 or more | a standing leap is clapped on the way up, so he steps back first (from 82.6, 12; from 84, 8) |
+  | 77.4–80.5 | 15 (L+7 to 21, the runner's own; in the game 13 at 77.4, 14 at 78, 15 at 79–80, 16 at 80.5) |
+  | 81 or more | a standing leap is clapped on the way up, so he steps back first (from 82.6, 12; from 84, 8; in the game 14 and 15) |
 
   Still running right as he lands:
 
@@ -487,10 +492,12 @@ he is dropped flat; the lurch on the knees reaches the left wall within the toss
   still a bull's.
 - **Timing the second time.** Stay on the back until the heave lifts it, then jump off its top to
   the wall, which is in reach only from the risen back. Leaps at L+7 to 19 jump off at L+59 to 68,
-  10 frames; late leaps at L+20 to 22 have the press buffered onto the risen back and jump off at
-  L+53 or 54 to 68. It needs a hold of 14 or more; at 12 the window is L+61 to 68. Every retreat
-  family escapes 0 times. Mashers: leap-then-mash 174 of 1,080, back-hoppers 7 of 56, rhythmic 927
-  of 2,560 (36.2 per cent). The stone's arc never crosses a live tourist: anyone at the face or
+  10 frames; late leaps at L+20 to 22 (L+20 to 21 in the game) have the press buffered onto the
+  risen back and jump off at L+53 or 54 to 68. It needs a hold of 14 or more; at 12 the window is
+  L+61 to 68. Every retreat family escapes 0 times. Mashers: leap-then-mash 174 of 1,080,
+  back-hoppers 7 of 56, rhythmic 927 of 2,560 (36.2 per cent). In the game: 31 of 1,080, 14 of 56
+  and 912 of 2,560 (35.6); the design's copy counted a key still held as a new press, and the game
+  does not. The stone's arc never crosses a live tourist: anyone at the face or
   over the head from L+46 has been swatted.
 - **Only here.** Catullus 64.110–111, and MFA 60.1's horn, knee and raised stone. Only a
   bull-headed man held by one horn can do this.
@@ -673,17 +680,25 @@ Being built, in this order, as a stage in the dev build (`#minotaur`, in `STAGES
   route is data, a list of moves, and a fall can steer for the next hole once he is out of the one
   he fell through.
 
-Still to come:
-
 - **The fight**, keyed when his feet are 61 px down the hatch with x under 64: L = T0 + ceil((736 −
-  feet) / (`PHYS.maxFall` × DT) − 1e-6). No fight event or test waits for exact floor contact: the
+  feet) / (`PHYS.maxFall` × DT) − 1e-6), less one frame for how T0 is counted, as the harness had
+  it; the tests pin the landing tick as L. No fight event or test waits for exact floor contact: the
   engine's 1 px ground probe lets a hopping man stand at 735.4 again and again. The clap's zone and
   the free hand's both kill as 'The hands', and the drawing picks the clap, the swat on the brow
-  (in the air) or on the floor; the heave lifts the back as a rising solid.
-- **The closing tableau.** The exit waits for an event, `secondBlow`, that the fight is to fire.
-- **`LevelData.tricks`**: 'The knot', 'The snort', 'The hands', 'The horns'; `dropCause` and
-  `fallCause` 'The labyrinth', unreachable. The black-figure palette, the four deaths' drawings,
-  and the queue, Ariadne and the body as background figures.
+  (in the air) or on the floor; the heave lifts the back as a rising solid. Made 2026-10-09
+  (`tests/minotaur-fight.spec.ts`), with a hook for an entity to keep a floor in the camera's
+  view (`Entity.keepsInView`), so the cell's floor stays on screen from L−7. The toss is drawn
+  from the moment the lurching bull reaches him, never from where it caught him.
+- **The closing tableau**, the queue and Ariadne, and the way out. The fight fires `secondBlow`,
+  which opens the exit. Made 2026-10-09 (`tests/minotaur-out.spec.ts`), with the masonry's joints
+  drawn only where two stones meet, so the two holes in each room are pixel-identical.
+
+Still to come:
+
+- **The black-figure art**: the palette, the four deaths' drawings, and the queue, Ariadne and the
+  body as background figures, each with its asset note first. Everything above is drawn rough.
+  (`LevelData.tricks`, 'The knot', 'The snort', 'The hands', 'The horns', and `dropCause` and
+  `fallCause` 'The labyrinth', unreachable, are made.)
 
 ## Tests to pin
 
@@ -793,7 +808,11 @@ no-skip margin is 1.5 px in the game; the race margin rests on heuristic beams. 
 in three places: the clock's 34 to 42 frames for runners (the physics check: 34 to 38; hold 5's far
 take-off measures 42); the runner's 15 to 16 frames (L+7 to 21 from the x 84 entry, 22 from the
 clean run's landing); the boss at x 206–215 (the comedy check: 206–214), to cover 30 of 31
-survivors.
+survivors. In the game the toss's zone is the whole cell up to 64 px from L+76 to 105, but the
+lurch never sweeps all of it: a man who jumps off the back too late waits by the far wall about
+24 frames for the back to come round, and 17 of 2,044 retreat runs land where nothing reaches
+them, so the head lunges out on a stretched neck. Shrinking the zone to the lurch's reach would
+change the kill, and is the designer's call.
 
 **Not designed.** How Tiryns's grand feature hands him to the door; the room the chapter's lyre is
 heard in here (`../CHAPTER.md`, The sound); the asset notes.

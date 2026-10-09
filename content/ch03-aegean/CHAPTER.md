@@ -137,7 +137,7 @@ two levels leave it:
 
 ## Level 6 · The Minotaur
 
-Designed 2026-10-08; being built as a dev stage since 2026-10-09, the knot and the snort in; see `l06-minotaur/LEVEL.md`.
+Designed 2026-10-08; built rough 2026-10-09 as a dev stage, playable start to exit, the black-figure art still to come; see `l06-minotaur/LEVEL.md`.
 
 > The Minotaur: he pushed in to be eaten first, and nobody wants him.
 
