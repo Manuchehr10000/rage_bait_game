@@ -8,6 +8,7 @@ import type {
   FallingDef,
   GuardsDef,
   HazardDef,
+  HeroDef,
   HorseDef,
   Level,
   PlatformDef,
@@ -90,6 +91,8 @@ export function createEntity(def: EntityDef, level: Level): Entity {
       return new Door(def);
     case 'guards':
       return new Guards(def);
+    case 'hero':
+      return new Hero(def, level);
   }
 }
 
@@ -1483,5 +1486,302 @@ export class TrapColumn implements Entity {
       w.sound('headThud');
     } else this.angle = next;
     if (w.alive && this.crushes(p)) w.kill(f.cause);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// The Minotaur.
+// ---------------------------------------------------------------------------
+
+/** The hero's box, and his pace in px a frame: 180 px/s, twice the tourist's. */
+export const HERO = { w: 12, h: 24, pace: 3 } as const;
+
+/** Px between his footsteps. */
+const HERO_STRIDE = 18;
+
+/** What he is doing on a frame of his route. */
+export type HeroPose = 'hold' | 'stand' | 'walk' | 'climb' | 'fall' | 'crouch';
+
+/** One frame of the hero's route. The route is worked out once, when the level is built. */
+export interface HeroFrame {
+  /** His box's top-left. */
+  x: number;
+  y: number;
+  pose: HeroPose;
+  facing: 1 | -1;
+  /** On the ground. */
+  grounded: boolean;
+  /** Walking with his head turned back over his shoulder, at his knot. */
+  lookBack: boolean;
+  /** Drawn in front of the tourist. Only the climb is. */
+  front: boolean;
+  /** In a black doorway, and not drawn. */
+  unseen: boolean;
+  /** His trailing foot, where it is on something that is not his floor: the stride. A drawing. */
+  foot: Rect | null;
+  /** He has the ball, and the thread is laid behind him. */
+  carrying: boolean;
+  /** How far into paying out a loop he is, from just over 0 to 1, or 0 when he is not. */
+  payOut: number;
+  /** What is heard of him this frame. */
+  heard: 'step' | 'land' | null;
+  /** Px he has walked, for the walk cycle. */
+  stride: number;
+}
+
+/** A point of the thread, laid from frame `at` of his route on. */
+export interface ThreadPoint {
+  x: number;
+  y: number;
+  at: number;
+}
+
+/** A loop of thread he paid out where he crouched: growing from frame `from` to `to`, then lying where it is. */
+export interface ThreadLoop {
+  x: number;
+  y: number;
+  from: number;
+  to: number;
+}
+
+/** His route, frame by frame from the yank, and the thread he lays on it. */
+export interface HeroTrack {
+  frames: HeroFrame[];
+  /** The thread, from where it leaves the floor of the passage to where it was last laid, in order. */
+  thread: ThreadPoint[];
+  loops: ThreadLoop[];
+  /** The frames he landed on, in order. */
+  landings: number[];
+}
+
+/** Where the thread leaves his hand. */
+export function heroHand(f: HeroFrame): { x: number; y: number } {
+  const cx = f.x + HERO.w / 2;
+  const feet = f.y + HERO.h;
+  if (f.pose === 'crouch') return { x: cx + 3 * f.facing, y: feet - 6 };
+  if (f.grounded) return { x: cx + 3 * f.facing, y: feet - 11 };
+  return { x: cx, y: feet - 12 };
+}
+
+/**
+ * The hero's route, one frame at a time, on the level's own rock: he goes at his pace,
+ * falls from rest under the game's gravity, is stopped by whatever he meets, and lands
+ * on whatever he comes down on. Where he goes over an edge carrying the ball, the thread
+ * goes over it with him: from the edge down at 45 degrees to the line he fell down, so
+ * that it never lies across a gap like a floor, and straight down that line to where he
+ * landed.
+ */
+function compileHero(def: HeroDef, level: Level): HeroTrack {
+  const frames: HeroFrame[] = [];
+  const thread: ThreadPoint[] = [];
+  const loops: ThreadLoop[] = [];
+  const landings: number[] = [];
+  const box: Rect = { x: def.kneel.x, y: def.kneel.y + def.kneel.h - HERO.h, w: HERO.w, h: HERO.h };
+  const tilesIn = (r: Rect): Rect[] => {
+    const out: Rect[] = [];
+    level.solidTilesIn(r, out);
+    return out.filter((t) => overlaps(t, r));
+  };
+  const under = (r: Rect) => tilesIn({ x: r.x, y: r.y + r.h, w: r.w, h: 1 });
+  let facing: 1 | -1 = 1;
+  let carrying = false;
+  let stride = 0;
+  let vy = 0;
+  const push = (f: Partial<HeroFrame> & { pose: HeroPose }): void => {
+    frames.push({
+      x: box.x,
+      y: box.y,
+      facing,
+      grounded: true,
+      lookBack: false,
+      front: false,
+      unseen: false,
+      foot: null,
+      carrying,
+      payOut: 0,
+      heard: null,
+      stride,
+      ...f,
+    });
+  };
+  const standUntil = (k: number) => {
+    while (frames.length < k) push({ pose: 'stand' });
+  };
+  route: for (const m of def.route) {
+    switch (m.do) {
+      case 'hold':
+        while (frames.length < def.hold) push({ pose: 'hold' });
+        break;
+      case 'go': {
+        standUntil(m.at ?? 0);
+        const start = frames.length;
+        let fellAt = -1;
+        let lip: ThreadPoint | null = null;
+        for (;;) {
+          const k = frames.length;
+          const was = { ...box };
+          const dx = Math.max(-HERO.pace, Math.min(HERO.pace, m.x - box.x));
+          if (dx !== 0) facing = dx > 0 ? 1 : -1;
+          box.x += dx;
+          for (const t of tilesIn(box)) box.x = dx > 0 ? t.x - box.w : t.x + t.w;
+          const grounded = fellAt < 0 && under(box).length > 0;
+          let heard: HeroFrame['heard'] = null;
+          let landed = false;
+          if (grounded) {
+            const before = Math.floor(stride / HERO_STRIDE);
+            stride += Math.abs(box.x - was.x);
+            if (m.steps && Math.floor(stride / HERO_STRIDE) !== before) heard = 'step';
+          } else {
+            if (fellAt < 0) {
+              fellAt = k;
+              if (carrying) {
+                // Over the edge of the floor he was on, on the side he went off it.
+                const floor = under(was);
+                const edge = facing > 0 ? Math.max(...floor.map((t) => t.x + t.w)) : Math.min(...floor.map((t) => t.x));
+                lip = { x: edge, y: was.y + was.h - 1, at: k };
+                thread.push(lip);
+              }
+            }
+            vy = Math.min(PHYS.maxFall, vy + PHYS.gravity * DT);
+            box.y += vy * DT;
+            if (box.y > level.heightPx) throw new Error(`the hero's route goes off the bottom of the level, going for x ${m.x}`);
+            const hit = tilesIn(box);
+            if (hit.length) {
+              box.y = Math.min(...hit.map((t) => t.y)) - box.h;
+              vy = 0;
+              landed = true;
+              landings.push(k);
+              if (!m.quiet) heard = 'land';
+            }
+          }
+          const moving = grounded && box.x !== was.x;
+          push({
+            pose: landed ? 'stand' : grounded ? (moving ? 'walk' : 'stand') : 'fall',
+            grounded: grounded || landed,
+            lookBack: moving && k - start < (m.lookBack ?? 0),
+            heard,
+          });
+          if (landed) {
+            if (lip) {
+              const cx = box.x + box.w / 2;
+              const floor = box.y + box.h - 1;
+              const bend: ThreadPoint = { x: cx, y: Math.min(lip.y + Math.abs(cx - lip.x), floor), at: k };
+              // Laid as his hand comes down past it.
+              for (let i = fellAt; i <= k; i++) {
+                if (heroHand(frames[i]!).y >= bend.y) {
+                  bend.at = i;
+                  break;
+                }
+              }
+              thread.push(bend, { x: cx, y: floor, at: k });
+            }
+            break;
+          }
+          // There, or walked into something he cannot pass.
+          if (grounded && (box.x === m.x || box.x === was.x)) break;
+        }
+        break;
+      }
+      case 'climb': {
+        standUntil(m.at);
+        const path = m.path;
+        const end = path[path.length - 1]!.f;
+        const top = Math.min(...path.map((p) => p.feet));
+        let over = false;
+        for (let f = 0; f <= end; f++) {
+          const i = path.findIndex((p) => p.f >= f);
+          const b = path[i]!;
+          const a = path[Math.max(0, i - 1)]!;
+          const u = b.f === a.f ? 1 : (f - a.f) / (b.f - a.f);
+          box.x = a.x + (b.x - a.x) * u;
+          box.y = a.feet + (b.feet - a.feet) * u - box.h;
+          const k = frames.length;
+          // He takes the ball from where it lies under the mouth, and the thread runs up after him.
+          if (f === 0 && m.takes) {
+            carrying = true;
+            thread.push({ x: box.x + box.w / 2, y: box.y + box.h - 1, at: k });
+          }
+          const foot = m.foot && f >= m.foot.from && f <= m.foot.to ? m.foot.rect : null;
+          push({ pose: 'climb', grounded: false, front: true, foot });
+          // Up the mouth behind him, and over its lip where he comes up out of it.
+          if (carrying && box.y + box.h === top && !over) {
+            over = true;
+            thread.push({ x: box.x + box.w / 2, y: top - 1, at: k });
+          }
+        }
+        vy = 0;
+        break;
+      }
+      case 'payOut': {
+        // From the frame he landed on, which is the last one there is.
+        const first = frames.length - 1;
+        const landing = frames[first]!;
+        frames[first] = { ...landing, pose: 'crouch', payOut: 1 / m.frames };
+        for (let i = 1; i < m.frames; i++) push({ pose: 'crouch', payOut: (i + 1) / m.frames });
+        loops.push({ x: box.x + box.w / 2, y: box.y + box.h - 1, from: first, to: first + m.frames - 1 });
+        break;
+      }
+      case 'wait': {
+        // From the frame he got there, which is the last one there is.
+        const last = frames.length - 1;
+        frames[last] = { ...frames[last]!, pose: 'stand', unseen: m.unseen ?? false };
+        break route;
+      }
+    }
+  }
+  return { frames, thread, loops, landings };
+}
+
+/**
+ * Theseus (`HeroDef`). He kneels at the doorpost re-tying the thread, a solid box, for
+ * as long as the tourist takes; when the tourist's centre crosses the trigger he stands
+ * and leans back on the line with a creak, and from the yank it is taut at shin height
+ * for `hold` frames, and kills. Then he goes his route on his own clock, whatever the
+ * tourist does: frames from the yank, worked out once from the level. Nothing he does
+ * after he stands touches anybody, and he is heard where the route says he is.
+ */
+export class Hero implements Entity {
+  /** Kneeling at the post, or up and on his clock. */
+  state: 'kneel' | 'up' = 'kneel';
+  /** Frames since the level began: the re-tie loop's clock. */
+  t = 0;
+  /** Frames from the yank once the knot has fired: below 0 while he leans back on the line. */
+  k = -Infinity;
+  readonly track: HeroTrack;
+  private readonly solid: MovingSolid;
+
+  constructor(readonly def: HeroDef, level: Level) {
+    this.track = compileHero(def, level);
+    this.solid = { rect: { ...def.kneel }, dx: 0, dy: 0 };
+  }
+
+  /** True from the yank for `hold` frames: the line is taut, and in it is dead. */
+  get taut(): boolean {
+    return this.k >= 0 && this.k < this.def.hold;
+  }
+
+  /** Where he is on his route, from the yank on; null before it. At its end he stays. */
+  get frame(): HeroFrame | null {
+    if (this.k < 0) return null;
+    const f = this.track.frames;
+    return f[Math.min(this.k, f.length - 1)] ?? null;
+  }
+
+  update(w: World): void {
+    const d = this.def;
+    this.t++;
+    if (this.state === 'kneel') {
+      if (!w.alive || centerX(w.player) < d.triggerX) return;
+      this.state = 'up';
+      this.k = -d.lean;
+      w.sound('creak');
+    } else this.k++;
+    if (this.taut && w.alive && overlaps(d.line, w.player)) w.kill(d.cause);
+    if (this.k >= 0 && this.k < this.track.frames.length && this.track.frames[this.k]!.heard) w.sound('footfall');
+  }
+
+  /** The only solid person in the game, and only while he kneels. */
+  solids(): MovingSolid[] {
+    return this.state === 'kneel' ? [this.solid] : [];
   }
 }

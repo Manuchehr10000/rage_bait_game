@@ -65,7 +65,7 @@ export type DeathCause =
   | 'Gave up';
 
 /** How each death is drawn. */
-export type DeathAnim = 'crush' | 'plank' | 'drown' | 'burn' | 'snap' | 'swept' | 'gone' | 'sit' | 'flat' | 'enthroned' | 'carved';
+export type DeathAnim = 'crush' | 'plank' | 'drown' | 'burn' | 'snap' | 'swept' | 'gone' | 'sit' | 'flat' | 'enthroned' | 'carved' | 'trip';
 
 export const DEATH_ANIM: Record<DeathCause, DeathAnim> = {
   'The Beune': 'drown',
@@ -119,9 +119,9 @@ export const DEATH_ANIM: Record<DeathCause, DeathAnim> = {
   'The audience': 'carved',
   // The Minotaur. Each of the four is drawn here by an existing death until its own is
   // made with its trap (content/ch03-aegean/l06-minotaur/LEVEL.md).
-  // The line takes his shins and he goes down face down, the wig over his eyes. For
-  // now he goes over like a plank, backwards.
-  'The knot': 'plank',
+  // The line takes his shins: he pitches forward over it and lands face down, the wig
+  // over his eyes, on the floor under him.
+  'The knot': 'trip',
   // Sniffed, then snorted back up the hatch and pasted face up on the ceiling over it,
   // which is not where he died. For now he is gone down the hole.
   'The snort': 'gone',
@@ -139,7 +139,7 @@ export const DEATH_ANIM: Record<DeathCause, DeathAnim> = {
 /** What each death sounds like. Material, never musical. */
 export const DEATH_SOUND: Record<
   DeathCause,
-  'squish' | 'bonk' | 'drown' | 'burn' | 'snap' | 'whoosh' | 'fallAway' | 'sigh' | 'thud' | 'click' | 'blast' | 'sitStone' | 'knock'
+  'squish' | 'bonk' | 'drown' | 'burn' | 'snap' | 'whoosh' | 'fallAway' | 'sigh' | 'thud' | 'click' | 'blast' | 'sitStone' | 'knock' | 'faceDown'
 > = {
   'The Beune': 'drown',
   'The cast': 'thud',
@@ -184,8 +184,8 @@ export const DEATH_SOUND: Record<
   'The column': 'squish',
   // A body against a stone wall, once.
   'The audience': 'thud',
-  // The Minotaur. One dry knock, a man on stone.
-  'The knot': 'knock',
+  // The Minotaur. One dry knock, a man face down on stone.
+  'The knot': 'faceDown',
   // The jet up the hatch. Its own sound, the sniff and the snort, comes with the trap.
   'The snort': 'whoosh',
   // The palms, or the free hand. Its own sound comes with the trap.

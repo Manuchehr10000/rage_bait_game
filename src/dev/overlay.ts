@@ -1,4 +1,4 @@
-import { Guards, PERSIAN_COLUMN, Sweep, Thrower, Water, type Entity } from '../engine/entities';
+import { Guards, Hero, PERSIAN_COLUMN, Sweep, Thrower, Water, type Entity } from '../engine/entities';
 import type { Level } from '../engine/level';
 import { PHYS, Player, type MovingSolid } from '../engine/player';
 import type { Input } from '../engine/input';
@@ -227,6 +227,11 @@ export function renderOverlay(
           box(e.gapRect, SAFE, { fill: 0.25 });
           for (const r of e.rects) box(r, DEADLY, e.deadly ? { fill: 0.5 } : { dash: true });
         }
+        break;
+      case 'hero':
+        // The line that sets the knot off, and the line itself, filled while it is taut.
+        trigger(d.triggerX);
+        box(d.line, DEADLY, e instanceof Hero && e.taut ? { fill: 0.5 } : { dash: true });
         break;
     }
   }

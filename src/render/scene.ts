@@ -1,5 +1,5 @@
 import type { Camera } from '../engine/camera';
-import type { Chaser, Crumble, Door, Entity, Falling, Guards, Horse, Platform, Pusher, Roof, Seat, Span, Sweep, Thrower, Tipper, TrapColumn, Water } from '../engine/entities';
+import type { Chaser, Crumble, Door, Entity, Falling, Guards, Hero, HeroFrame, Horse, Platform, Pusher, Roof, Seat, Span, Sweep, Thrower, Tipper, TrapColumn, Water } from '../engine/entities';
 import type { DecorDef, DoorDef, Level, SpanDef } from '../engine/level';
 import type { Player } from '../engine/player';
 import {
@@ -50,7 +50,7 @@ import { paint } from '../engine/assets';
 import { blit, blitFacing, frameOf, relief, silhouette, withLamp, type Frame, type ReliefTones } from './frame';
 import { SPLINTER, handStencils } from './hands';
 import { hash } from './hash';
-import { PERSIAN_COLUMN, TRAIN, type Train } from '../engine/entities';
+import { HERO, heroHand, PERSIAN_COLUMN, TRAIN, type Train } from '../engine/entities';
 import type { CavePanel } from '../engine/level';
 import { BEAR_STALAGMITE_SPRITE, SIGNAL_LAMP_SPRITE, STOP_SIGN_SPRITE, TRAIN_CAR_SPRITE, TRAIN_ENGINE_SPRITE, TRAIN_LAST_CAR_SPRITE } from './procedural';
 import {
@@ -1499,6 +1499,11 @@ function drawDecor(ctx: CanvasRenderingContext2D, s: Scene, d: DecorDef): void {
     case 'apadanaShelter':
       drawPersepolisDecor(ctx, s, d);
       break;
+    case 'doorpost':
+    case 'boss':
+    case 'blackDoorway':
+      drawMinotaurDecor(ctx, d);
+      break;
     case 'landing': {
       // Mooring posts on the landing stage.
       ctx.fillStyle = COLORS.wood;
@@ -2161,6 +2166,9 @@ function drawEntityBack(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): voi
     case 'guards':
       drawGuards(ctx, e as Guards);
       break;
+    case 'hero':
+      drawHeroBack(ctx, e as Hero);
+      break;
     default:
       break;
   }
@@ -2517,7 +2525,8 @@ function drawEntityFront(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): vo
 
 function drawEntityOverlay(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): void {
   const d = e.def;
-  if (d.kind === 'water') {
+  if (d.kind === 'hero') drawHeroFront(ctx, e as Hero);
+  else if (d.kind === 'water') {
     const w = (e as Water).rect;
     if (w.h <= 0) return;
     ctx.fillStyle = COLORS.water;
@@ -2840,6 +2849,9 @@ function drawDeath(ctx: CanvasRenderingContext2D, s: Scene, death: { cause: Deat
     }
     case 'carved':
       drawCarved(ctx, s, death);
+      break;
+    case 'trip':
+      drawTrip(ctx, s, death);
       break;
   }
 }
@@ -4547,4 +4559,374 @@ function drawMasonry(ctx: CanvasRenderingContext2D, ty: number, x: number, y: nu
     ctx.fillStyle = MN.washLight;
     ctx.fillRect(x, y, TILE, 2);
   }
+}
+
+/** The thread: the one pure white in the level. */
+const THREAD = '#ffffff';
+
+/** A 1 px line in world pixels, pixel by pixel, from one point to another: the thread is drawn with nothing else. */
+function pixelLine(ctx: CanvasRenderingContext2D, x0: number, y0: number, x1: number, y1: number): void {
+  let x = Math.round(x0);
+  let y = Math.round(y0);
+  const xe = Math.round(x1);
+  const ye = Math.round(y1);
+  const dx = Math.abs(xe - x);
+  const dy = -Math.abs(ye - y);
+  const sx = x < xe ? 1 : -1;
+  const sy = y < ye ? 1 : -1;
+  let err = dx + dy;
+  for (;;) {
+    ctx.fillRect(x, y, 1, 1);
+    if (x === xe && y === ye) return;
+    const e2 = 2 * err;
+    if (e2 >= dy) {
+      err += dy;
+      x += sx;
+    }
+    if (e2 <= dx) {
+      err += dx;
+      y += sy;
+    }
+  }
+}
+
+/** An outline of an ellipse, 1 px, centred on (cx, cy). */
+function pixelEllipse(ctx: CanvasRenderingContext2D, cx: number, cy: number, rx: number, ry: number): void {
+  const n = Math.max(8, Math.ceil((rx + ry) * 3));
+  let px = cx + rx;
+  let py = cy;
+  for (let i = 1; i <= n; i++) {
+    const a = (i / n) * Math.PI * 2;
+    const x = cx + Math.cos(a) * rx;
+    const y = cy + Math.sin(a) * ry;
+    pixelLine(ctx, px, py, x, y);
+    px = x;
+    py = y;
+  }
+}
+
+function drawMinotaurDecor(ctx: CanvasRenderingContext2D, d: MinotaurDecor): void {
+  switch (d.kind) {
+    case 'doorpost':
+      // The jamb, in the thickness of the outer wall: the wash, edged in glaze where it meets the door.
+      ctx.fillStyle = MN.wash;
+      ctx.fillRect(d.x, d.top, 3, d.floorY - d.top);
+      ctx.fillStyle = MN.glaze;
+      ctx.fillRect(d.x + 3, d.top, 1, d.floorY - d.top);
+      break;
+    case 'boss': {
+      const r = d.rect;
+      ctx.fillStyle = MN.glaze;
+      ctx.fillRect(r.x + 1, r.y, r.w - 2, r.h);
+      ctx.fillRect(r.x, r.y + 1, r.w, r.h - 2);
+      ctx.fillStyle = MN.wash;
+      ctx.fillRect(r.x + 1, r.y + 1, r.w - 2, r.h - 2);
+      ctx.fillStyle = MN.washLight;
+      ctx.fillRect(r.x + 2, r.y + 1, r.w - 4, 2);
+      break;
+    }
+    case 'blackDoorway':
+      ctx.fillStyle = MN.glaze;
+      ctx.fillRect(d.x, d.top, d.w, d.floorY - d.top);
+      ctx.fillStyle = MN.wash;
+      ctx.fillRect(d.x - 2, d.top - 2, d.w + 4, 2);
+      break;
+  }
+}
+
+type MinotaurDecor = Extract<DecorDef, { kind: 'doorpost' | 'boss' | 'blackDoorway' }>;
+
+/**
+ * Theseus, rough: a figure in black glaze the size of his box, facing `facing`, in the
+ * pose of the frame. `dx` and `dy` place a rect in his box as if he faced right.
+ */
+function drawHeroFigure(ctx: CanvasRenderingContext2D, f: HeroFrame): void {
+  const x0 = Math.round(f.x);
+  const y0 = Math.round(f.y);
+  const face = f.facing;
+  const r = (dx: number, dy: number, w: number, hh: number) =>
+    ctx.fillRect(face === 1 ? x0 + dx : x0 + HERO.w - dx - w, y0 + dy, w, hh);
+  ctx.fillStyle = MN.glaze;
+  const head = (dy: number, back = false) => {
+    r(4, dy, 5, 5);
+    // His nose, the way he is looking.
+    if (back) r(3, dy + 2, 1, 1);
+    else r(9, dy + 2, 1, 1);
+  };
+  switch (f.pose) {
+    case 'crouch': {
+      // Down on his heels, paying out a loop: the arm goes round and the loop grows.
+      head(9);
+      r(3, 14, 7, 6);
+      r(2, 20, 4, 4);
+      r(7, 20, 4, 4);
+      const hand = heroHand(f);
+      const a = f.payOut * Math.PI * 4;
+      const hx = hand.x + Math.round(Math.cos(a)) * face;
+      const hy = hand.y + Math.round(Math.sin(a));
+      pixelLine(ctx, x0 + 6 + 2 * face, y0 + 15, hx, hy);
+      ctx.fillStyle = THREAD;
+      const feet = f.y + HERO.h;
+      const size = f.payOut;
+      pixelEllipse(ctx, hx + 2 * face * size, (hy + feet - 1) / 2, 1 + 3 * size, (feet - 1 - hy) / 2);
+      ctx.fillRect(hx, hy, 2, 2);
+      return;
+    }
+    case 'climb': {
+      // Arms up over his head, at the lip; the trailing foot, where it is on the boss.
+      head(3);
+      r(3, 8, 7, 9);
+      r(2, 15, 9, 2);
+      r(4, 17, 2, 7);
+      r(7, 17, 2, 5);
+      r(3, 0, 1, 8);
+      r(9, 0, 1, 8);
+      if (f.foot) {
+        const hipX = x0 + HERO.w / 2;
+        const hipY = y0 + 16;
+        const fx = f.foot.x + 1;
+        const fy = f.foot.y + f.foot.h - 2;
+        pixelLine(ctx, hipX, hipY, fx, fy);
+        pixelLine(ctx, hipX, hipY + 1, fx, fy + 1);
+        ctx.fillRect(f.foot.x, f.foot.y + f.foot.h - 2, f.foot.w - 3, 2);
+      }
+      if (f.carrying) {
+        ctx.fillStyle = THREAD;
+        r(9, 0, 2, 2);
+      }
+      return;
+    }
+    case 'fall':
+      head(1);
+      r(3, 6, 7, 10);
+      r(2, 13, 9, 3);
+      r(4, 16, 2, 8);
+      r(7, 16, 2, 8);
+      r(2, 0, 1, 7);
+      r(10, 0, 1, 7);
+      if (f.carrying) {
+        ctx.fillStyle = THREAD;
+        r(10, 0, 2, 2);
+      }
+      return;
+    case 'hold':
+    case 'stand':
+    case 'walk': {
+      // The short chiton, bare legs, arms at his sides; walking, his legs scissor.
+      head(0, f.lookBack);
+      r(5, 5, 3, 1);
+      r(3, 6, 7, 8);
+      r(2, 13, 9, 3);
+      const step = f.pose === 'walk' ? Math.floor(f.stride / 9) % 2 : -1;
+      if (step === 0) {
+        r(2, 16, 2, 8);
+        r(8, 16, 2, 8);
+      } else if (step === 1) {
+        r(4, 16, 2, 8);
+        r(6, 16, 2, 8);
+      } else {
+        r(4, 16, 2, 8);
+        r(7, 16, 2, 8);
+      }
+      r(2, 7, 1, 6);
+      r(10, 7, 1, 6);
+      // The sword at his hip.
+      r(1, 12, 4, 1);
+      if (f.carrying) {
+        ctx.fillStyle = THREAD;
+        r(10, 12, 2, 2);
+      }
+      return;
+    }
+  }
+}
+
+/**
+ * Theseus at the post: kneeling at the knot, the fussy loop (wrap round the post, tug,
+ * unpick, and wrap again); then up, and leaning back on the line until it has held.
+ * The kneeling box is the def's.
+ */
+function drawHeroAtThePost(ctx: CanvasRenderingContext2D, h: Hero): void {
+  const d = h.def;
+  const k = d.kneel;
+  ctx.fillStyle = MN.glaze;
+  if (h.state === 'kneel' || h.k < -d.lean + 4) {
+    // Kneeling on his left knee, his right foot forward, at the post.
+    const x = k.x;
+    const y = k.y;
+    ctx.fillRect(x + 5, y, 5, 5);
+    ctx.fillRect(x + 10, y + 2, 1, 1);
+    ctx.fillRect(x + 3, y + 5, 7, 5);
+    ctx.fillRect(x, y + 10, 7, 4);
+    ctx.fillRect(x + 7, y + 9, 4, 2);
+    ctx.fillRect(x + 9, y + 11, 2, 3);
+    // The arm, at the knot: round the post, a tug back, picking at it, round again.
+    const phase = h.t % 40;
+    let hx: number;
+    let hy: number;
+    if (phase < 16) {
+      const a = (phase / 16) * Math.PI * 2;
+      hx = d.knot.x + Math.round(Math.cos(a) * 2);
+      hy = d.knot.y + Math.round(Math.sin(a) * 2);
+    } else if (phase < 24) {
+      hx = d.knot.x - 4;
+      hy = d.knot.y + 1;
+    } else {
+      hx = d.knot.x - 1 + (phase % 2);
+      hy = d.knot.y - 1 + (Math.floor(phase / 3) % 2);
+    }
+    pixelLine(ctx, x + 8, y + 6, hx, hy);
+    pixelLine(ctx, x + 8, y + 7, hx, hy + 1);
+    return;
+  }
+  // Up, and leaning back on the line, away from the post.
+  const lean = Math.min(1, (h.k + d.lean) / (d.lean - 4));
+  const slant = Math.round(3 * lean);
+  const x = k.x;
+  const feet = k.y + k.h;
+  const y = feet - HERO.h;
+  for (let row = 0; row < HERO.h; row++) {
+    // Each row of him moved back by how high it is, his feet planted.
+    const off = -Math.round((slant * (HERO.h - row)) / HERO.h);
+    if (row < 5) ctx.fillRect(x + 4 + off, y + row, 5, 1);
+    else if (row < 6) ctx.fillRect(x + 5 + off, y + row, 3, 1);
+    else if (row < 13) ctx.fillRect(x + 3 + off, y + row, 7, 1);
+    else if (row < 16) ctx.fillRect(x + 2 + off, y + row, 9, 1);
+    else {
+      ctx.fillRect(x + 4 + off, y + row, 2, 1);
+      ctx.fillRect(x + 7 + off + 1, y + row, 2, 1);
+    }
+  }
+  ctx.fillRect(x + 9 - slant, y + 2, 1, 1);
+  // Both arms out to the line, just inside the post.
+  pixelLine(ctx, x + 8 - slant, y + 8, d.knot.x + 1, d.knot.y);
+  pixelLine(ctx, x + 8 - slant, y + 9, d.knot.x + 1, d.knot.y + 1);
+}
+
+/** The line from the knot to the ball, before he takes it: slack, coming taut, taut, let go. */
+function drawKnotLine(ctx: CanvasRenderingContext2D, h: Hero): void {
+  const d = h.def;
+  const floor = d.ball.y - 1;
+  const x0 = d.knot.x + 4;
+  const x1 = d.ball.x;
+  ctx.fillStyle = THREAD;
+  // How taut: 0 lying in loose curves, 1 at shin height.
+  let u = 0;
+  let curve = 1;
+  if (h.state === 'up') {
+    if (h.k < 0) {
+      const k = (h.k + d.lean) / d.lean;
+      u = k * k;
+      curve = 1 - k;
+    } else if (h.taut) {
+      u = 1;
+      curve = 0;
+    } else {
+      // Let go: it drops back to the floor, straight.
+      u = Math.max(0, 1 - (h.k - d.hold) / 4);
+      curve = 0;
+    }
+  }
+  const taut = d.line.y;
+  const yAt = (x: number) => {
+    const slack = floor - 1 + Math.sin((x - x0) / 6) * 1.5 * curve;
+    return slack + (taut - slack) * u;
+  };
+  pixelLine(ctx, d.knot.x, d.knot.y, x0, yAt(x0));
+  let px = x0;
+  let py = yAt(x0);
+  for (let x = x0 + 2; x <= x1; x += 2) {
+    const y = yAt(x);
+    pixelLine(ctx, px, py, x, y);
+    px = x;
+    py = y;
+  }
+  pixelLine(ctx, px, py, x1 + 2, d.ball.y - 6);
+}
+
+/** The ball, wedged on the floor at the line's inner end: thread wound on itself. */
+function drawBall(ctx: CanvasRenderingContext2D, x: number, floor: number): void {
+  ctx.fillStyle = THREAD;
+  ctx.fillRect(x + 1, floor - 6, 4, 6);
+  ctx.fillRect(x, floor - 5, 6, 4);
+  ctx.fillStyle = MN.glaze;
+  ctx.fillRect(x + 1, floor - 4, 4, 1);
+  ctx.fillRect(x + 2, floor - 2, 3, 1);
+}
+
+/** The thread he has laid: from the knot along the passage, up, along and down his route, to him. */
+function drawLaidThread(ctx: CanvasRenderingContext2D, h: Hero, f: HeroFrame): void {
+  const d = h.def;
+  const t = h.track;
+  const k = h.k;
+  ctx.fillStyle = THREAD;
+  const floor = d.ball.y - 1;
+  const pts: { x: number; y: number }[] = [
+    { x: d.knot.x, y: d.knot.y },
+    { x: d.knot.x + 4, y: floor },
+  ];
+  for (const p of t.thread) if (p.at <= k) pts.push(p);
+  if (!f.unseen) {
+    const hand = heroHand(f);
+    if (f.grounded) pts.push({ x: f.x + HERO.w / 2 - 3 * f.facing, y: f.y + HERO.h - 1 });
+    pts.push(hand);
+  } else {
+    pts.push({ x: f.x + HERO.w / 2, y: f.y + HERO.h - 1 });
+  }
+  for (let i = 1; i < pts.length; i++) pixelLine(ctx, pts[i - 1]!.x, pts[i - 1]!.y, pts[i]!.x, pts[i]!.y);
+  // The loops he paid out, lying where he crouched.
+  for (const l of t.loops) if (k > l.to) pixelEllipse(ctx, l.x, l.y - 1, 4, 1);
+}
+
+/** The knot, the line, the ball and the thread: behind everything that moves. And Theseus, unless he is climbing. */
+function drawHeroBack(ctx: CanvasRenderingContext2D, h: Hero): void {
+  const d = h.def;
+  const f = h.frame;
+  if (!f || !f.carrying) {
+    drawKnotLine(ctx, h);
+    drawBall(ctx, d.ball.x, d.ball.y);
+  } else drawLaidThread(ctx, h, f);
+  // The knot itself, on the post.
+  ctx.fillStyle = THREAD;
+  ctx.fillRect(d.knot.x, d.knot.y - 1, 2, 3);
+  if (!f || f.pose === 'hold') drawHeroAtThePost(ctx, h);
+  else if (!f.front && !f.unseen) drawHeroFigure(ctx, f);
+}
+
+/** Theseus climbing: in front of the tourist. */
+function drawHeroFront(ctx: CanvasRenderingContext2D, h: Hero): void {
+  const f = h.frame;
+  if (f && f.front && !f.unseen) drawHeroFigure(ctx, f);
+}
+
+/**
+ * Tripped over the line: he pitches forward over his front foot, onto the floor under
+ * him, and lies face down, the wig over his eyes.
+ */
+function drawTrip(ctx: CanvasRenderingContext2D, s: Scene, death: { cause: DeathCause; t: number }): void {
+  const p = s.player;
+  const costume = s.level.data.costume;
+  const c = COSTUMES[costume];
+  const idle = tourist(costume, 'jump');
+  const dead = frameOf(`${c.id}-dead`, 0, c.frames.dead);
+  const x = Math.round(p.x) - 1;
+  const feet = p.y + p.h;
+  // The floor under his middle.
+  let floor = feet;
+  const tx = Math.floor((p.x + p.w / 2) / TILE);
+  for (let ty = Math.floor((feet - 0.01) / TILE) + 1; ty < s.level.heightTiles; ty++) {
+    if (s.level.isSolid(tx, ty)) {
+      floor = ty * TILE;
+      break;
+    }
+  }
+  const k = Math.min(1, death.t / 0.3);
+  const angle = (k * k * Math.PI) / 2;
+  const y = Math.round(feet + (floor - feet) * k * k);
+  const w = idle.w;
+  ctx.save();
+  ctx.translate(p.facing === 1 ? x + w : x, y);
+  ctx.rotate(p.facing * angle);
+  blitFacing(ctx, k >= 1 ? dead : idle, p.facing === 1 ? -w : 0, -16, p.facing);
+  ctx.restore();
 }

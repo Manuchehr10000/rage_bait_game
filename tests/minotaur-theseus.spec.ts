@@ -1,0 +1,831 @@
+import { expect, test, type Page } from '@playwright/test';
+import { MINOTAUR } from '../src/levels/ch03-aegean/l06-minotaur';
+import { Level, type HeroDef } from '../src/engine/level';
+import { createEntity, HERO as THESEUS, Hero, type Entity, type World } from '../src/engine/entities';
+import { Camera } from '../src/engine/camera';
+import { PHYS, Player } from '../src/engine/player';
+import type { Input } from '../src/engine/input';
+import { DEATH_ANIM, DEATH_SOUND, DT, overlaps, TILE, VIEW_H, type Rect } from '../src/engine/types';
+
+/**
+ * Theseus in the Minotaur's stage (content/ch03-aegean/l06-minotaur/LEVEL.md, beats a to
+ * c): kneeling at the doorpost, the knot and its windows, the stride, his route down to
+ * his doorway and the thread he lays on it, the race to the cell, and the clean run as
+ * far as the cell floor, where the stages after this one carry it on. The labyrinth
+ * itself is tests/minotaur.spec.ts. Every number is measured on the game's own entities
+ * and physics, in Node; where it differs from LEVEL.md's, the comment says so.
+ */
+
+/** Inside page.evaluate: the type is erased, so it survives the trip into the page. */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type W = Window & { __game: any };
+
+/** The spawn floor: a designer's point (X, Y) is world x X, y 160 − Y. */
+const DOOR_FLOOR = 160;
+
+const LEVEL = new Level(MINOTAUR);
+
+/** The longest fall from under a roof onto a floor: his head stopped at the roof, then his feet on the floor. */
+const underRoof = (roof: number, floorY: number) => floorY - 16 - roof;
+
+async function open(page: Page): Promise<void> {
+  const errors: string[] = [];
+  page.on('pageerror', (e) => errors.push(String(e)));
+  await page.goto('/#minotaur');
+  expect(await page.locator('#stamp').textContent(), 'a local build: a stage is entered only where there are dev tools').not.toMatch(/^prod/);
+  await page.waitForFunction(() => (window as unknown as Partial<W>).__game?.levelData.id === 'minotaur');
+  // Stop the loop, and let a frame already queued run out: only the test ticks.
+  await page.evaluate(async () => {
+    const raf = window.requestAnimationFrame.bind(window);
+    window.requestAnimationFrame = () => 0;
+    await new Promise((done) => raf(() => raf(done)));
+  });
+  expect(errors).toEqual([]);
+}
+
+// ---------------------------------------------------------------------------
+// Theseus: the knot at the door, his route and the thread, the race to the cell, and
+// the clean run. The game's own entities and physics, ticked the way game.ts ticks
+// them: the entities see where he was, then he moves, then the camera follows him.
+// ---------------------------------------------------------------------------
+
+/** The floors of the way down, by their tops. */
+const T_END_FLOOR = 576;
+const CELL_FLOOR = 736;
+
+/** What he presses on a tick: which way, and whether jump is held. A press is the edge, as on the keyboard. */
+interface Press {
+  dir: -1 | 0 | 1;
+  jump: boolean;
+}
+type Hands = (r: Run) => Press;
+
+/** One tick's worth of him and the world, after the tick. */
+interface Tick {
+  t: number;
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  ground: boolean;
+  /** The hero's clock after the tick. */
+  k: number;
+  camY: number;
+}
+
+/** An attempt, in Node, from the spawn: the level's entities, the tourist, the camera, and what was heard. */
+class Run {
+  p = new Player();
+  entities: Entity[];
+  cam = new Camera(LEVEL.widthPx, MINOTAUR.cameraBottom);
+  /** Ticks since the attempt began. */
+  t = 0;
+  cause: string | null = null;
+  /** The tick the knot fired on, or -1. */
+  fire = -1;
+  heard: { t: number; sound: string }[] = [];
+  log: Tick[] = [];
+  /** The longest fall he has walked away from. */
+  worstFall = 0;
+  private held = false;
+
+  constructor() {
+    this.entities = MINOTAUR.entities.map((d) => createEntity(d, LEVEL));
+    this.p.spawnAt(MINOTAUR.spawn.x, MINOTAUR.spawn.y);
+    this.cam.reset(this.p);
+  }
+
+  get hero(): Hero {
+    return this.entities.find((e): e is Hero => e instanceof Hero)!;
+  }
+
+  /** The tick the line came taut on, or -1. */
+  get yank(): number {
+    return this.fire < 0 ? -1 : this.fire + this.hero.def.lean;
+  }
+
+  clone(): Run {
+    const r = Object.assign(Object.create(Run.prototype), this) as Run;
+    r.p = Object.assign(new Player(), this.p);
+    r.entities = this.entities.map((e) => Object.assign(Object.create(Object.getPrototypeOf(e)), e));
+    r.cam = Object.assign(Object.create(Camera.prototype), this.cam);
+    r.heard = [...this.heard];
+    r.log = [...this.log];
+    return r;
+  }
+
+  tick(press: Press, without?: Entity): void {
+    if (this.cause) return;
+    const k = { pressed: press.jump && !this.held };
+    this.held = press.jump;
+    const input = {
+      left: press.dir < 0,
+      right: press.dir > 0,
+      jumpHeld: press.jump,
+      takeJumpPressed: () => {
+        const v = k.pressed;
+        k.pressed = false;
+        return v;
+      },
+    } as unknown as Input;
+    const w = {
+      level: LEVEL,
+      player: this.p,
+      cameraX: this.cam.x,
+      events: new Set<string>(),
+      alive: true,
+      kill: (c: string) => {
+        this.cause ??= c;
+      },
+      sound: (n: string) => this.heard.push({ t: this.t, sound: n }),
+    } as unknown as World;
+    const kneeling = this.hero.state === 'kneel';
+    const live = this.entities.filter((e) => e !== without);
+    for (const e of live) {
+      e.update(w);
+      if (this.cause) break;
+    }
+    if (kneeling && this.hero.state === 'up') this.fire = this.t;
+    if (!this.cause) {
+      const solids = live.flatMap((e) => e.solids?.() ?? []);
+      this.p.update(input, LEVEL, solids, this.cam.x);
+      this.worstFall = Math.max(this.worstFall, this.p.fellBy);
+      if (this.p.fellBy > PHYS.fatalFall) this.cause = MINOTAUR.dropCause!;
+      else {
+        this.cam.update(this.p);
+        if (this.p.y > LEVEL.heightPx + 16) this.cause = MINOTAUR.fallCause!;
+      }
+    }
+    const p = this.p;
+    this.log.push({ t: this.t, x: p.x, y: p.y, vx: p.vx, vy: p.vy, ground: p.onGround, k: this.hero.k, camY: this.cam.iy });
+    this.t++;
+  }
+
+  /** Ticks with these hands until `until` says stop, the attempt ends, or `max` ticks. */
+  play(hands: Hands, until: (r: Run) => boolean = () => false, max = 2000): this {
+    for (let i = 0; i < max && !this.cause && !until(this); i++) this.tick(hands(this));
+    return this;
+  }
+}
+
+/** The first tick, after `from`, on which `test` holds of him after the tick. */
+const first = (r: Run, test: (l: Tick) => boolean, from = 0) => r.log.find((l) => l.t >= from && test(l));
+/**
+ * His feet on a floor: on it, the contact the fight keys on, not the 1 px probe. To a
+ * millionth of a pixel: a fall at maxFall sums 5.333... px a frame and can stop a hair
+ * short of the floor it is on.
+ */
+const onFloor = (feet: number, floor: number) => Math.abs(feet - floor) < 1e-6;
+const on = (floor: number) => (l: Tick) => onFloor(l.y + 16, floor);
+const inAir = (l: Tick) => !l.ground;
+
+/** A jump held this many frames is a full one: the cut never bites after 15. */
+const FULL = 20;
+
+/**
+ * The clean run (LEVEL.md: The beats, and The way down): what he presses, tick by tick,
+ * from the spawn to the cell floor, as the hands of a man who knows the level. Later
+ * stages carry it on: the snort's clock, the fight, and out by the thread to the exit.
+ */
+function cleanRun(): Hands {
+  /** Which way he runs on each floor: off its end into the hole, landing running the other way. */
+  const WAY: Record<number, -1 | 1> = { [DOOR_FLOOR]: 1, 256: -1, 336: 1, 416: -1, 512: 1, [T_END_FLOOR]: -1 };
+  let dir: -1 | 1 = 1;
+  let hold = 0;
+  const done = new Set<string>();
+  const jump = (name: string, when: boolean) => {
+    if (!when || done.has(name)) return;
+    done.add(name);
+    hold = FULL;
+  };
+  return (r) => {
+    const p = r.p;
+    const feet = p.y + p.h;
+    const floor = Math.round(feet);
+    if (p.onGround && onFloor(feet, floor) && WAY[floor] !== undefined) dir = WAY[floor]!;
+    // a. Over the kneeling hero at 0.42 s, a full jump, landing in the vestibule.
+    jump('vault', r.t === 25);
+    // b. Over the line, a full jump pressed 4 frames before it is taut: on this tick the
+    // hero's clock reads -4.
+    jump('knot', r.hero.k + 1 === -4);
+    // d. Into the hatch: a running leap from x 81.8, left held, never touching the lip.
+    jump('hatch', onFloor(feet, T_END_FLOOR) && p.onGround && p.x <= 81.84);
+    const j = hold > 0;
+    if (hold > 0) hold--;
+    // e. Down on the cell floor he stands: the fight is not built yet.
+    const down = p.onGround && feet > CELL_FLOOR - 1;
+    return { dir: down ? 0 : dir, jump: j };
+  };
+}
+
+let cleanRunCache: Run | null = null;
+/** The clean run, to the cell floor and a little after. */
+const clean = (): Run => (cleanRunCache ??= new Run().play(cleanRun(), () => false, 640));
+
+test('Theseus kneels at the doorpost, a solid box until the knot fires: walked into, he stops him; jumped onto, he holds him', () => {
+  // Walking right from the spawn, he is stopped by the kneeling hero and never fires the knot.
+  const walk = new Run().play(() => ({ dir: 1, jump: false }), () => false, 120);
+  expect(walk.cause).toBeNull();
+  expect(walk.p.x).toBe(66 - walk.p.w);
+  expect(walk.hero.state).toBe('kneel');
+  expect(walk.hero.solids()).toHaveLength(1);
+  // Put down over him, he lands on him and stands there, 14 px up.
+  const r = new Run();
+  r.p.spawnAt(67, 100);
+  r.play(() => ({ dir: 0, jump: false }), () => false, 60);
+  expect(r.p.onGround).toBe(true);
+  expect(r.p.y + r.p.h).toBe(146);
+  expect(r.cause).toBeNull();
+});
+
+test('the knot fires on the tick his centre has reached x 144, with a creak; from then on Theseus is never solid', () => {
+  const r = new Run();
+  const hands = cleanRun();
+  let solid = 0;
+  while (r.fire < 0 || r.t <= r.yank + 420) {
+    r.tick(hands(r));
+    if (r.fire >= 0 && r.hero.solids().length) solid++;
+  }
+  expect(solid).toBe(0);
+  // 1.50 s, as LEVEL.md has it: the entities see where he was at the end of the tick before.
+  expect(r.fire).toBe(90);
+  const before = r.log[r.fire - 1]!;
+  const earlier = r.log[r.fire - 2]!;
+  expect(before.x + 5).toBeGreaterThanOrEqual(144);
+  expect(earlier.x + 5).toBeLessThan(144);
+  expect(r.heard.filter((h) => h.sound === 'creak')).toEqual([{ t: r.fire, sound: 'creak' }]);
+  expect(r.yank).toBe(110);
+  // Up off his knee, he is a picture, nothing to stand on or walk into, to the end of
+  // his route and after: a man put back at the door walks through where he knelt.
+  const p = r.clone();
+  p.p.spawnAt(40, MINOTAUR.spawn.y);
+  p.play(() => ({ dir: 1, jump: false }), () => false, 40);
+  expect(p.p.x).toBeGreaterThan(66 + THESEUS.w);
+});
+
+test('the line kills from the yank for 22 frames, frames 0 to 21: a 1 px line at y 149 from the post at x 80 to the ball at x 208', () => {
+  const def = MINOTAUR.entities[0] as HeroDef;
+  /** A hero fired by a man at x 150, ticked to frame k of his clock, and then whether `at` is killed on it. */
+  const killsAt = (k: number, at: Rect): boolean => {
+    const hero = new Hero(def, LEVEL);
+    const p = new Player();
+    let killed = false;
+    const w = { level: LEVEL, player: p, cameraX: 0, events: new Set(), alive: true, kill: () => (killed = true), sound: () => {} } as unknown as World;
+    // Fired by a man up in the air over x 150, clear of the line.
+    p.spawnAt(150, 0);
+    hero.update(w);
+    while (hero.k < k - 1) hero.update(w);
+    Object.assign(p, at);
+    killed = false;
+    hero.update(w);
+    expect(hero.k).toBe(k);
+    return killed;
+  };
+  const standing: Rect = { x: 150, y: DOOR_FLOOR - 16, w: 10, h: 16 };
+  const frames = [];
+  for (let k = -19; k <= 40; k++) if (killsAt(k, standing)) frames.push(k);
+  expect(frames).toEqual(Array.from({ length: 22 }, (_, i) => i));
+  // Its edges, on the yank: x 80 to 208, and y 149 to 150 only.
+  const at = (x: number, feet: number): Rect => ({ x, y: feet - 16, w: 10, h: 16 });
+  expect(killsAt(0, at(70, DOOR_FLOOR))).toBe(false);
+  expect(killsAt(0, at(70.01, DOOR_FLOOR))).toBe(true);
+  expect(killsAt(0, at(207.99, DOOR_FLOOR))).toBe(true);
+  expect(killsAt(0, at(208, DOOR_FLOOR))).toBe(false);
+  expect(killsAt(0, at(150, 149))).toBe(false);
+  expect(killsAt(0, at(150, 149.01))).toBe(true);
+  expect(killsAt(0, at(150, 165.99))).toBe(true);
+  expect(killsAt(0, at(150, 166))).toBe(false);
+  expect(DEATH_ANIM['The knot']).toBe('trip');
+  expect(DEATH_SOUND['The knot']).toBe('faceDown');
+});
+
+/** The clean approach to the knot: the clean run, as far as `ticks` before the yank. */
+const approach = (ticks: number): Run => {
+  const r = new Run();
+  const hands = cleanRun();
+  // Not the clean run's own jump over the line: only the way there.
+  return r.play((x) => (x.fire >= 0 && x.t >= x.yank - ticks ? { dir: 1, jump: false } : hands(x)), (x) => x.fire >= 0 && x.t >= x.yank - ticks);
+};
+
+/** A steady runner pressing at yank + d and holding for `hold` frames, right held throughout, to yank + 60. */
+const jumpTheLine = (from: Run, d: number, hold: number): Run => {
+  const press = from.yank + d;
+  return from.clone().play(
+    (x) => ({ dir: 1, jump: x.t >= press && x.t < press + hold }),
+    (x) => x.t > x.yank + 60,
+  );
+};
+
+test("the knot's press windows by hold: 5 frames at 11 or more, 6 at 10, 7 at 8, 3 at 6, never at 4 or less", () => {
+  const from = approach(30);
+  expect(from.yank).toBe(110);
+  const windows: Record<number, number[]> = {};
+  const causes = new Set<string>();
+  for (const hold of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 16, 20, 30]) {
+    windows[hold] = [];
+    for (let d = -28; d <= 22; d++) {
+      const r = jumpTheLine(from, d, hold);
+      if (r.cause === null) windows[hold]!.push(d);
+      else causes.add(r.cause);
+    }
+  }
+  // Every one that dies is the knot's.
+  expect([...causes]).toEqual(['The knot']);
+  const span = (a: number, b: number) => Array.from({ length: b - a + 1 }, (_, i) => a + i);
+  expect(windows).toEqual({
+    1: [],
+    2: [],
+    3: [],
+    4: [],
+    5: [-2],
+    6: span(-4, -2),
+    7: span(-6, -2),
+    8: span(-8, -2),
+    9: span(-10, -2),
+    10: span(-7, -2),
+    11: span(-6, -2),
+    12: span(-6, -2),
+    14: span(-6, -2),
+    16: span(-6, -2),
+    20: span(-6, -2),
+    30: span(-6, -2),
+  });
+  // The clean run's press, 4 frames before the line is taut, is in every window from a hold of 6.
+  for (const hold of [6, 7, 8, 9, 10, 11, 12, 14, 16, 20, 30]) expect(windows[hold]).toContain(-4);
+});
+
+/** Every knot survivor, at every hold, and the frames he pressed on. */
+const survivors = (from: Run): { d: number; hold: number }[] => {
+  const out: { d: number; hold: number }[] = [];
+  for (const hold of [5, 6, 7, 8, 9, 10, 11, 12, 14, 16, 20, 30]) for (let d = -12; d <= 0; d++) if (jumpTheLine(from, d, hold).cause === null) out.push({ d, hold });
+  return out;
+};
+
+test('a relieved second jump into D0 lives: every survivor of the knot, jumping again off the passage, at every hold and steering', () => {
+  const from = approach(30);
+  const all = survivors(from);
+  expect(all).toHaveLength(61);
+  let runs = 0;
+  let worst = 0;
+  const causes = new Set<string>();
+  for (const s of all) {
+    const press = from.yank + s.d;
+    // Landed back on the passage, then pressing again at every frame to the walk-off and its coyote time.
+    const base = from.clone();
+    base.play((x) => ({ dir: 1, jump: x.t >= press && x.t < press + s.hold }), (x) => x.t > press + 2 && x.p.onGround);
+    const landed = base.t;
+    for (let wait = 0; wait <= 16; wait += 2) {
+      for (const hold of [1, 3, 6, 10, 14, FULL]) {
+        for (const steer of [1, 0] as const) {
+          const r = base.clone();
+          const go = landed + wait;
+          r.worstFall = 0;
+          // Steered on in the air, or let go; down again anywhere, he runs on.
+          r.play((x) => ({ dir: x.t < go || (x.t > go + 1 && x.p.onGround) ? 1 : steer, jump: x.t >= go && x.t < go + hold }), (x) => onFloor(x.p.y + x.p.h, 256), 200);
+          runs++;
+          if (r.cause) causes.add(r.cause);
+          expect(onFloor(r.p.y + r.p.h, 256)).toBe(true);
+          worst = Math.max(worst, r.worstFall);
+        }
+      }
+    }
+  }
+  expect(runs).toBe(6588);
+  expect([...causes]).toEqual([]);
+  // Onto Z1, under P's roof: never more than the 144 px from the roof to Z1's floor.
+  // The worst is 143.44, as LEVEL.md has it.
+  expect(worst).toBeLessThan(PHYS.fatalFall);
+  expect(worst).toBeLessThanOrEqual(underRoof(96, 256));
+  expect(worst).toBeCloseTo(143.44, 2);
+});
+
+test("the stride: at frames 68 to 70 the hero's trailing foot is on the boss, over the head of a knot survivor who stopped on landing, and he is frame for frame the man he would be without him", () => {
+  const from = approach(30);
+  const hero = from.hero;
+  const track = hero.track.frames;
+  // On the boss at 68 to 70 and at no other frame; in front of the tourist all the way up O1.
+  const footAt = track.flatMap((f, k) => (f.foot ? [k] : []));
+  expect(footAt).toEqual([68, 69, 70]);
+  const boss = MINOTAUR.decor.find((d) => d.kind === 'boss')!;
+  if (boss.kind !== 'boss') throw new Error('no boss');
+  for (const k of footAt) {
+    const foot = track[k]!.foot!;
+    // On the boss's top, within its width.
+    expect(foot.y + foot.h).toBe(boss.rect.y);
+    expect(foot.x).toBeGreaterThanOrEqual(boss.rect.x);
+    expect(foot.x + foot.w).toBeLessThanOrEqual(boss.rect.x + boss.rect.w);
+  }
+  expect(track.flatMap((f, k) => (f.front ? [k] : []))).toEqual(Array.from({ length: 20 }, (_, i) => 66 + i));
+  let rested = 0;
+  let under = 0;
+  const xs: number[] = [];
+  for (const s of survivors(from)) {
+    // Over the line, and he lets go of right the frame he lands, and slides to a stop.
+    const press = from.yank + s.d;
+    const stops = (): Hands => {
+      let stopped = false;
+      return (x) => {
+        if (x.t > press + 2 && x.p.onGround) stopped = true;
+        return stopped ? { dir: 0, jump: false } : { dir: 1, jump: x.t >= press && x.t < press + s.hold };
+      };
+    };
+    const r = from.clone().play(stops(), (x) => x.t > x.yank + 120);
+    expect(r.cause).toBeNull();
+    // Without him: the same hands, and the hero gone from the world once the line is slack.
+    const gone = from.clone();
+    const hands = stops();
+    while (gone.t <= gone.yank + 120) gone.tick(hands(gone), gone.t >= gone.yank + hero.def.hold ? gone.hero : undefined);
+    expect(gone.log.map((l) => [l.x, l.y, l.vx, l.vy, l.ground])).toEqual(r.log.map((l) => [l.x, l.y, l.vx, l.vy, l.ground]));
+    // Where he came to rest, if he is still on the passage at frame 68, and whether the foot is over his head.
+    const at = (k: number) => r.log[r.yank + k]!;
+    if (!at(68).ground || at(68).y + 16 !== DOOR_FLOOR || at(68).vx !== 0) continue;
+    rested++;
+    xs.push(at(68).x);
+    const over = footAt.every((k) => {
+      const foot = track[k]!.foot!;
+      const him = at(k);
+      return foot.y + foot.h <= him.y && foot.x < him.x + 10 && foot.x + foot.w > him.x;
+    });
+    if (over) under++;
+  }
+  // Every survivor who stops comes to rest under O1 or just past it, and nearly all of
+  // them under the foot: 57 of 61, at x 207.4 to 219.4 (LEVEL.md: 30 of 31, at 207.4 to
+  // 216.4, from fewer holds). The foot covers every one who rests short of x 215.
+  expect({ rested, under }).toEqual({ rested: 61, under: 57 });
+  expect(Math.min(...xs)).toBeCloseTo(207.42, 2);
+  expect(Math.max(...xs)).toBeCloseTo(219.42, 2);
+  expect(xs.filter((x) => x < 215)).toHaveLength(57);
+});
+
+test("the hero's route: never in rock, at his pace, never jumping, falling from rest under the game's gravity; where and when he lands, and into his doorway", () => {
+  const hero = new Hero(MINOTAUR.entities[0] as HeroDef, LEVEL);
+  const { frames, landings } = hero.track;
+  let vy = 0;
+  for (let k = 0; k < frames.length; k++) {
+    const f = frames[k]!;
+    const box = { x: f.x, y: f.y, w: THESEUS.w, h: THESEUS.h };
+    const tiles: Rect[] = [];
+    LEVEL.solidTilesIn(box, tiles);
+    expect(tiles.filter((t) => overlaps(t, box)), `in rock at frame ${k}`).toEqual([]);
+    if (k === 0) continue;
+    const prev = frames[k - 1]!;
+    expect(Math.abs(f.x - prev.x), `frame ${k}`).toBeLessThanOrEqual(THESEUS.pace);
+    // Only the climb takes him up.
+    if (f.pose !== 'climb') expect(f.y, `frame ${k}`).toBeGreaterThanOrEqual(prev.y);
+    if (f.pose === 'fall') {
+      vy = Math.min(PHYS.maxFall, vy + PHYS.gravity * DT);
+      expect(f.y - prev.y, `frame ${k}`).toBeCloseTo(vy * DT, 9);
+    } else if (prev.pose === 'fall') {
+      // Landed: stopped short of the next frame's fall, on the floor.
+      expect(f.y - prev.y).toBeLessThanOrEqual(Math.min(PHYS.maxFall, vy + PHYS.gravity * DT) * DT + 1e-9);
+      vy = 0;
+    }
+  }
+  // L_A, L_B, L_C and J4 as LEVEL.md has them, and J3. J2, J1 and row 5 come 1, 3 and 4
+  // frames after its 320, 346 and 367: a 12 px box at 3 px a frame needs 10 frames from
+  // where he lands in J3 and in J2 to the next hole, and 4 in J1.
+  expect(landings).toEqual([132, 174, 216, 258, 288, 321, 349, 371]);
+  const where = landings.map((k) => ({ x: frames[k]!.x, feet: frames[k]!.y + THESEUS.h }));
+  expect(where).toEqual([
+    { x: 288, feet: 176 }, // L_A
+    { x: 260, feet: 272 }, // L_B
+    { x: 288, feet: 368 }, // L_C
+    { x: 256, feet: 464 }, // J4
+    { x: 244, feet: 512 }, // J3
+    { x: 272, feet: 560 }, // J2
+    { x: 244, feet: 608 }, // J1
+    { x: 256, feet: 656 }, // row 5
+  ]);
+  // On each, at least 8 px of him on the floor: here, all 12.
+  for (const { x, feet } of where) {
+    const floor: Rect[] = [];
+    LEVEL.solidTilesIn({ x, y: feet, w: THESEUS.w, h: 1 }, floor);
+    const on = floor.reduce((n, t) => n + Math.max(0, Math.min(x + THESEUS.w, t.x + t.w) - Math.max(x, t.x)), 0);
+    expect(on, `on the floor at ${x},${feet}`).toBeGreaterThanOrEqual(8);
+  }
+  // Holding the line at the post, 0 to 21; the passage, 22 on, looking back for 10
+  // frames; up O1, 66 to 85, in front of the tourist; along G0 from 86, and off its end at 105.
+  const span = (a: number, b: number) => Array.from({ length: b - a + 1 }, (_, i) => a + i);
+  const poses = (p: string) => frames.flatMap((f, k) => (f.pose === p ? [k] : []));
+  expect(poses('hold')).toEqual(span(0, 21));
+  expect(frames.flatMap((f, k) => (f.lookBack ? [k] : []))).toEqual(span(22, 31));
+  expect(frames.slice(22, 66).every((f) => f.y + THESEUS.h === DOOR_FLOOR)).toBe(true);
+  expect([frames[64]!.x, frames[65]!.x]).toEqual([194, 194]);
+  expect(poses('climb')).toEqual(span(66, 85));
+  expect(frames.slice(86, 105).every((f) => f.y + THESEUS.h === 80 && f.pose === 'walk')).toBe(true);
+  expect(frames[105]!.pose).toBe('fall');
+  // Crouched paying out a loop, from the frame he lands: 12, 12, 12, 9 and 6 frames, the
+  // loop growing every frame.
+  expect(hero.track.loops.map((l) => [l.from, l.to])).toEqual([
+    [132, 143],
+    [174, 185],
+    [216, 227],
+    [258, 266],
+    [288, 293],
+  ]);
+  for (const l of hero.track.loops) for (let k = l.from + 1; k <= l.to; k++) expect(frames[k]!.payOut).toBeGreaterThan(frames[k - 1]!.payOut);
+  expect(poses('crouch')).toEqual(hero.track.loops.flatMap((l) => span(l.from, l.to)));
+  // Footsteps along G0, overhead; a footfall on each landing down to J3; from his drop
+  // into J2, never heard.
+  expect(frames.flatMap((f, k) => (f.heard ? [[k, f.heard]] : []))).toEqual([
+    [91, 'step'],
+    [97, 'step'],
+    [103, 'step'],
+    [132, 'land'],
+    [174, 'land'],
+    [216, 'land'],
+    [258, 'land'],
+    [288, 'land'],
+  ]);
+  // Along row 5 and into his doorway, all of him inside it, at 406 (LEVEL.md: 402). There
+  // he is not seen, and there he stays: the fight is to step him out.
+  const door = MINOTAUR.decor.find((d) => d.kind === 'blackDoorway')!;
+  if (door.kind !== 'blackDoorway') throw new Error('no doorway');
+  const inside = frames.findIndex((f) => f.x >= door.x && f.x + THESEUS.w <= door.x + door.w && f.y + THESEUS.h === door.floorY);
+  expect(inside).toBe(406);
+  expect(frames).toHaveLength(407);
+  expect(frames[406]!.unseen).toBe(true);
+  expect(frames.slice(0, 406).some((f) => f.unseen)).toBe(false);
+});
+
+test('the thread: from the knot along the passage, up O1, along G0, straight down each shaft past its ledge, through the thread holes, and into his doorway', () => {
+  const hero = new Hero(MINOTAUR.entities[0] as HeroDef, LEVEL);
+  const { thread, frames } = hero.track;
+  // Taken up with the ball at the foot of O1, where he starts to climb.
+  expect(thread[0]).toEqual({ x: 200, y: DOOR_FLOOR - 1, at: 66 });
+  expect(thread[1]).toEqual({ x: 200, y: 79, at: 80 });
+  // Laid in order: no point before the one behind it.
+  for (let i = 1; i < thread.length; i++) expect(thread[i]!.at).toBeGreaterThanOrEqual(thread[i - 1]!.at);
+  // Never through rock: every pixel of every stretch of it is in the open.
+  for (let i = 1; i < thread.length; i++) {
+    const a = thread[i - 1]!;
+    const b = thread[i]!;
+    const n = Math.ceil(Math.max(Math.abs(b.x - a.x), Math.abs(b.y - a.y)));
+    for (let j = 0; j <= n; j++) {
+      const x = a.x + ((b.x - a.x) * j) / n;
+      const y = a.y + ((b.y - a.y) * j) / n;
+      expect(LEVEL.isSolid(Math.floor(x / TILE), Math.floor(y / TILE)), `the thread in rock at ${x},${y}`).toBe(false);
+    }
+  }
+  // Straight down each of the four shafts, x 288 to 304 or 256 to 272, to the pillar he
+  // landed on, past the ledge beside it; and straight down every floor hole of the turnings.
+  const drops = [];
+  for (let i = 1; i < thread.length; i++) {
+    const a = thread[i - 1]!;
+    const b = thread[i]!;
+    if (a.x === b.x && b.y - a.y > 32) drops.push([a.x, a.y, b.y]);
+  }
+  expect(drops).toEqual([
+    [294, 117, 175],
+    [266, 197, 271],
+    [294, 293, 367],
+    [262, 393, 463],
+    [250, 469, 511],
+    [278, 517, 559],
+    [250, 565, 607],
+    [262, 613, 655],
+  ]);
+  // The last of it runs along row 5's floor into his doorway.
+  const last = thread[thread.length - 1]!;
+  expect(last).toEqual({ x: 262, y: 655, at: 371 });
+  expect(frames[406]!.x + THESEUS.w / 2).toBe(158);
+});
+
+/**
+ * When the fight will say he lands: once his feet are 61 px down the hatch, under x 64,
+ * the frame they will reach the cell floor falling at maxFall (LEVEL.md, New in the
+ * engine). Null until then.
+ */
+const fightKey = (r: Run): number | null => {
+  const feet = r.p.y + r.p.h;
+  if (feet < T_END_FLOOR + 61 || r.p.x >= 64) return null;
+  return r.t - 1 + Math.ceil((CELL_FLOOR - feet) / (PHYS.maxFall * DT) - 1e-6);
+};
+
+/** The way down, floor by floor: where each floor's hole is, which way it is, and the floor under it. */
+const WAY_DOWN = [
+  { floor: DOOR_FLOOR, exit: 224, dir: 1 },
+  { floor: 256, exit: 70, dir: -1 },
+  { floor: 336, exit: 128, dir: 1 },
+  { floor: 416, exit: 70, dir: -1 },
+  { floor: 512, exit: 176, dir: 1 },
+  { floor: T_END_FLOOR, exit: 54, dir: -1 },
+  { floor: CELL_FLOOR, exit: 0, dir: 0 },
+] as const;
+
+/**
+ * Frames to the cell floor, roughly, from where he is and how fast: along to his floor's
+ * hole at run speed and down at maxFall, whichever is longer, and the floors under it.
+ * Each speed he has not got yet costs what getting it would.
+ */
+const toGo = (() => {
+  const run = PHYS.runSpeed * DT;
+  const fall = PHYS.maxFall * DT;
+  const rest: number[] = [];
+  for (let i = WAY_DOWN.length - 1; i >= 0; i--) {
+    const b = WAY_DOWN[i]!;
+    const n = WAY_DOWN[i + 1];
+    rest[i] = n ? (n.floor - b.floor) / fall + (n.dir ? Math.abs(n.exit - b.exit) / run : 0) + rest[i + 1]! : 0;
+  }
+  return (p: Player): number => {
+    const feet = p.y + p.h;
+    const i = Math.max(0, WAY_DOWN.findIndex((b) => feet <= b.floor + 1e-6));
+    const b = WAY_DOWN[i]!;
+    const v = Math.max(0, b.floor - feet) / fall + (PHYS.maxFall - Math.min(PHYS.maxFall, p.vy)) ** 2 / (2 * PHYS.gravity * PHYS.maxFall) / DT;
+    if (!b.dir) return v;
+    const d = Math.max(0, b.dir * (b.exit - p.x));
+    const h = d > 0 ? d / run + (PHYS.runSpeed - b.dir * p.vx) ** 2 / (2 * PHYS.groundAccel * PHYS.runSpeed) / DT : 0;
+    return Math.max(h, v) + rest[i]!;
+  };
+})();
+
+/**
+ * The fastest tourist a beam search finds, from the spawn: every frame, each of six
+ * presses (left, nothing or right; jump held or not), the `width` most promising kept by
+ * how far behind the yank he will reach the cell. Heuristic, never a proof.
+ */
+function fastest(width: number): { lands: number; landed: number; yank: number } {
+  let beam: Run[] = [new Run()];
+  let best: { lands: number; at: Run } | null = null;
+  for (let t = 0; t < 700 && beam.length; t++) {
+    const next = new Map<string, { r: Run; score: number }>();
+    for (const r of beam) {
+      for (const dir of [-1, 0, 1] as const) {
+        for (const jump of [false, true]) {
+          const c = r.clone();
+          c.log = [];
+          c.heard = [];
+          c.tick({ dir, jump });
+          if (c.cause) continue;
+          const key = fightKey(c);
+          if (key !== null) {
+            if (!best || key - c.yank < best.lands - best.at.yank) best = { lands: key, at: c };
+            continue;
+          }
+          const p = c.p;
+          // Before the knot has fired, its yank is as far off as his centre is from x 144.
+          const yank = c.yank >= 0 ? c.yank : c.t + Math.max(0, 144 - (p.x + p.w / 2)) / (PHYS.runSpeed * DT) + MINOTAUR_LEAN;
+          const g = toGo(p);
+          const score = g + c.t - yank + 1e-3 * g;
+          const id = `${Math.round(p.x * 8)},${Math.round(p.y * 8)},${Math.round(p.vx)},${Math.round(p.vy)},${+p.onGround},${+jump},${c.fire >= 0 ? c.t - c.fire : -1}`;
+          const old = next.get(id);
+          if (!old || old.score > score) next.set(id, { r: c, score });
+        }
+      }
+    }
+    beam = [...next.values()].sort((a, b) => a.score - b.score).slice(0, width).map((v) => v.r);
+  }
+  if (!best) throw new Error('nobody got into the cell');
+  // The key's prediction against his landing, falling on with his hands off.
+  const on = best.at.clone();
+  on.play(() => ({ dir: 0, jump: false }), (x) => onFloor(x.p.y + x.p.h, CELL_FLOOR), 120);
+  return { lands: best.lands, landed: on.t - 1, yank: best.at.yank };
+}
+const MINOTAUR_LEAN = (MINOTAUR.entities[0] as HeroDef).lean;
+
+test('the race: the fastest tourist a beam can find lands in the cell 20 frames or more after the hero has had to step out', () => {
+  test.setTimeout(180_000);
+  const hero = new Hero(MINOTAUR.entities[0] as HeroDef, LEVEL);
+  // In his doorway from yank + 406; the fight steps him out 8 frames before the tourist lands.
+  const inDoorway = hero.track.frames.findIndex((f) => f.unseen);
+  expect(inDoorway).toBe(406);
+  const f = fastest(2000);
+  // The fight's prediction is his landing.
+  expect(f.landed).toBe(f.lands);
+  const race = f.lands - f.yank;
+  // This beam, 2,000 wide, finds 454; LEVEL.md's, 6,000 and 12,000 wide, found 449 and
+  // 450. Whatever a beam finds, the step-out at L - 8 must come 20 frames or more after
+  // he is in the doorway.
+  expect(race).toBe(454);
+  expect(race).toBeGreaterThanOrEqual(inDoorway + 20 + 8);
+});
+
+/** Whether any of the hero is on the screen after a tick of a run: his box, against the camera's view. */
+const heroSeen = (r: Run, l: Tick): boolean => {
+  const hero = r.hero;
+  const d = hero.def;
+  let box: Rect = d.kneel;
+  if (l.k > -Infinity && l.k < d.hold) box = { x: d.kneel.x, y: d.kneel.y + d.kneel.h - THESEUS.h, w: THESEUS.w, h: THESEUS.h };
+  else if (l.k >= d.hold) {
+    const f = hero.track.frames[Math.min(l.k, hero.track.frames.length - 1)]!;
+    if (f.unseen) return false;
+    box = { x: f.x, y: f.y, w: THESEUS.w, h: THESEUS.h };
+  }
+  const y = Math.round(box.y);
+  return y < l.camY + VIEW_H && y + box.h > l.camY;
+};
+
+test('the clean run, from the spawn to the cell floor: its timings, and the hero on the screen on each floor of the way down', () => {
+  const r = clean();
+  expect(r.cause).toBeNull();
+  const air = (from: number) => first(r, inAir, from)!;
+  const land = (floor: number, from: number) => first(r, on(floor), from)!;
+  const at = (l: Tick) => [l.t, +l.x.toFixed(2)];
+  const got = {
+    // a. He jumps the kneeling hero at 0.42 s and lands in the vestibule at 1.12.
+    vault: at(air(0)),
+    vestibule: at(land(DOOR_FLOOR, 26)),
+    // b. The knot fires at 1.50 s; he presses 4 frames before the yank, lands at x 208
+    // and runs off the passage's end into D0.
+    fire: r.fire,
+    press: at(air(70)),
+    yank: r.yank,
+    passage: at(land(DOOR_FLOOR, 107)),
+    d0: at(air(137)),
+    // c. Down the five plain holes, landing running the other way.
+    z1: at(land(256, 120)),
+    d1: at(air(170)),
+    t2: at(land(336, 170)),
+    x2: at(air(290)),
+    t3: at(land(416, 290)),
+    d3: at(air(350)),
+    t: at(land(512, 350)),
+    x: at(air(410)),
+    tEnd: at(land(T_END_FLOOR, 410)),
+    // d. The running leap from x 81.8, into the hatch, and down to the cell floor.
+    leap: at(air(500)),
+    hatch: at(first(r, (l) => l.y + 16 > T_END_FLOOR && l.x < 64, 500)!),
+    cell: at(land(CELL_FLOOR, 500)),
+  };
+  // As LEVEL.md has it, to the frame, where it gives one: the vault at 0.42 s, the
+  // vestibule at 1.12, the knot at 1.50, the landing on the passage at 2.27, the leap
+  // at 9.42 and the cell at 10.28, 507 frames after the yank. Each walk-off and each
+  // landing on the way down comes one frame before LEVEL.md's (2.43 s into D0 against
+  // its 2.45, T_end at 8.25 against 8.27), and the hatch at 9.77 against 9.78. The
+  // passage's landing is at x 209.75: the 1 px probe stood him on it at x 208.25 a frame before.
+  expect(got).toEqual({
+    vault: [25, 43.25],
+    vestibule: [67, 106.25],
+    fire: 90,
+    press: [106, 164.75],
+    yank: 110,
+    passage: [136, 209.75],
+    d0: [146, 224.75],
+    z1: [163, 230],
+    d1: [272, 69.83],
+    t2: [286, 64],
+    x2: [331, 128.17],
+    t3: [345, 134],
+    d3: [390, 69.83],
+    t: [407, 64],
+    x: [484, 176.17],
+    tEnd: [495, 182],
+    leap: [565, 80.33],
+    hatch: [586, 48.83],
+    cell: [617, 48],
+  });
+  expect(got.cell[0]! - r.yank).toBe(507);
+  // What is heard of the hero in the game: the creak as he leans, his steps along G0 and
+  // his landings down to J3, by his clock.
+  expect(r.heard.filter((h) => h.sound === 'creak').map((h) => h.t)).toEqual([r.fire]);
+  expect(r.heard.filter((h) => h.sound === 'footfall').map((h) => h.t - r.yank)).toEqual([91, 97, 103, 132, 174, 216, 258, 288]);
+  // The press was 4 frames before the yank, and the leap from x 81.8.
+  expect(got.press[0]).toBe(r.yank - 4);
+  expect(r.log[got.leap[0]! - 1]!.x).toBeCloseTo(81.83, 2);
+  const seen: Record<string, [number, number]> = {};
+  const floors: [string, number, number][] = [
+    ['P', DOOR_FLOOR, r.yank],
+    ['Z1', 256, 0],
+    ['T2', 336, 0],
+    ['T3', 416, 0],
+    ['T', 512, 0],
+    ['T_end', T_END_FLOOR, 0],
+  ];
+  for (const [name, floor, from] of floors) {
+    const on = r.log.filter((l) => l.t > from && l.ground && Math.abs(l.y + 16 - floor) <= 1);
+    seen[name] = [on.filter((l) => heroSeen(r, l)).length, on.length];
+  }
+  // His frames on each floor, and how many of them the hero is on the screen: P, Z1, T2
+  // and T3 as LEVEL.md has them. On T and T_end he is seen longer, 57 and 18 frames
+  // against its 53 and 13, because he reaches the turnings' lower rooms and row 5 a
+  // few frames later; T_end is 70 frames, one more than its 69.
+  expect(seen).toEqual({ P: [11, 11], Z1: [51, 109], T2: [45, 45], T3: [45, 45], T: [57, 77], T_end: [18, 70] });
+});
+
+test("in the game: the knot kills as 'The knot', the level's first trick, and every attempt finds Theseus kneeling at the post again", async ({ page }) => {
+  await open(page);
+  const r = await page.evaluate(() => {
+    const g = (window as unknown as W).__game;
+    const key = (c: string, d: boolean) => window.dispatchEvent(new KeyboardEvent(d ? 'keydown' : 'keyup', { code: c }));
+    const hero = () => g.entities.find((e: { def: { kind: string } }) => e.def.kind === 'hero');
+    g.titleTimer = 0;
+    g.resetRun();
+    // Run at the door, vault him, and run on into the line.
+    key('ArrowRight', true);
+    let t = 0;
+    for (; t < 200 && g.state === 'playing'; t++) {
+      key('Space', t >= 25 && t < 45);
+      g.tick();
+    }
+    key('ArrowRight', false);
+    key('Space', false);
+    const died = { state: g.state, cause: g.deathCause, at: t, k: hero().k };
+    for (let i = 0; i < 60 && g.state === 'dead'; i++) g.tick();
+    const again = { state: g.state, kneeling: hero().state, solid: hero().solids().length, x: g.player.x };
+    return { died, again, tricks: g.tricksCount() };
+  });
+  // Dead on the yank, 110 ticks in, his clock at 0.
+  expect(r.died).toEqual({ state: 'dead', cause: 'The knot', at: 111, k: 0 });
+  expect(r.again).toEqual({ state: 'playing', kneeling: 'kneel', solid: 1, x: MINOTAUR.spawn.x });
+  expect(r.tricks).toEqual({ met: 1, of: 4 });
+});

@@ -529,7 +529,71 @@ export interface GuardsDef {
   cause: DeathCause;
 }
 
+/**
+ * One move of the hero's route, on his clock: frames counted from the yank, the frame
+ * the line he leans on comes taut. His box is 12 x 24; he goes 3 px a frame, falls
+ * under the game's gravity from rest, never jumps, and is never in rock.
+ */
+export type HeroMove =
+  /** Holds the line, leaning back on it, to the end of the yank. Where he stood up. */
+  | { do: 'hold' }
+  /**
+   * Goes for `x` at his pace along whatever floor he is on, and off its end if it ends:
+   * falling, he keeps on for `x` until something stops him. The move ends on the frame
+   * he lands, or the frame he gets to `x` on the ground. It starts no earlier than `at`.
+   * `lookBack`: its first frames, he walks looking back over his shoulder. `steps`: his
+   * footsteps are heard. `quiet`: his landing is not.
+   */
+  | { do: 'go'; x: number; at?: number; lookBack?: number; steps?: boolean; quiet?: boolean }
+  /**
+   * Climbs, from frame `at`: his feet go straight from each point of `path` to the next,
+   * `f` frames after `at`. Drawn in front of the tourist. `foot`: from frame `from` to
+   * `to` of the climb his trailing foot is on `rect`, which is a drawing and nothing
+   * more. `takes`: he picks up the ball as he starts, and from then on the thread is
+   * laid behind him.
+   */
+  | {
+      do: 'climb';
+      at: number;
+      path: readonly { f: number; x: number; feet: number }[];
+      foot?: { from: number; to: number; rect: Rect };
+      takes?: boolean;
+    }
+  /** Crouches where he landed and pays out a loop of thread: `frames` frames, the one he landed on the first. */
+  | { do: 'payOut'; frames: number }
+  /** Stands where the last move left him, from the frame it did, for good: in a black doorway he is not seen. A later move steps him out. */
+  | { do: 'wait'; unseen?: boolean };
+
+/**
+ * The hero, Theseus, on one fixed clock. He kneels at the doorpost re-tying Ariadne's
+ * thread, a solid box, the only solid person in the game, until the tourist's centre
+ * crosses `triggerX`. Then he stands and leans back on the line for `lean` frames, while
+ * its slack runs out along the floor to the ball, and it holds taut at shin height for
+ * `hold` frames: the yank. Whoever is in `line` while it is taut is `cause`. Then he lets
+ * it go slack and goes his `route`, laying the thread behind him, and nothing he does
+ * from then on touches anybody.
+ */
+export interface HeroDef {
+  kind: 'hero';
+  /** Where he kneels. Solid until the knot fires. */
+  kneel: Rect;
+  /** The knot, on the doorpost: where the thread is tied, and where the taut line starts. */
+  knot: { x: number; y: number };
+  /** The ball, wedged on the floor at the line's inner end. It stays there until he takes it. */
+  ball: { x: number; y: number };
+  triggerX: number;
+  /** Frames he leans back on the line before it is taut. */
+  lean: number;
+  /** Frames it holds taut, from the yank. */
+  hold: number;
+  /** The taut line: what kills, from the yank, for `hold` frames. */
+  line: Rect;
+  route: readonly HeroMove[];
+  cause: DeathCause;
+}
+
 export type EntityDef =
+  | HeroDef
   | GuardsDef
   | SpanDef
   | SeatDef
@@ -763,7 +827,14 @@ export type DecorDef =
       flightW: number;
     }
   /** The shelter over the east stair since the mid-1990s: a flat roof on steel posts, its underside at `y`. */
-  | { kind: 'apadanaShelter'; x0: number; x1: number; y: number; floorY: number };
+  | { kind: 'apadanaShelter'; x0: number; x1: number; y: number; floorY: number }
+  // The Minotaur.
+  /** The post of the labyrinth's door, in the thickness of its wall: what the thread is tied to. */
+  | { kind: 'doorpost'; x: number; top: number; floorY: number }
+  /** A small stone boss on a back wall. A drawing: it holds up nothing and nobody stands on it. */
+  | { kind: 'boss'; rect: Rect }
+  /** A doorway in a back wall, in black glaze. Whatever goes into it is not seen. */
+  | { kind: 'blackDoorway'; x: number; w: number; top: number; floorY: number };
 
 /** The painted panels the game draws on cave rock, by site. */
 export type CavePanel =

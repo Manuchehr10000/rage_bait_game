@@ -3,17 +3,18 @@ import { readFileSync } from 'node:fs';
 import { MINOTAUR } from '../src/levels/ch03-aegean/l06-minotaur';
 import { LEVELS, STAGES } from '../src/levels';
 import { CHAPTERS } from '../src/map/atlas';
-import { Level } from '../src/engine/level';
+import { Level, type HeroDef } from '../src/engine/level';
 import { PHYS, Player } from '../src/engine/player';
 import type { Input } from '../src/engine/input';
 import { DEATH_ANIM, DEATH_SOUND, overlaps, TILE, type DeathCause, type Rect } from '../src/engine/types';
 
 /**
  * The Minotaur's stage: the labyrinth built cell for cell from its design,
- * content/ch03-aegean/l06-minotaur/LEVEL.md, with nothing in it yet. What is pinned
- * here is the ground every trap will stand on: the map, the walk-in, the falls, and
- * the route rule, which keeps the tourist's way down and the hero's route apart
- * until the cell. The physics is the game's own, on the level's own tiles, in Node.
+ * content/ch03-aegean/l06-minotaur/LEVEL.md. What is pinned here is the ground every
+ * trap will stand on: the map, the walk-in, the falls, and the route rule, which keeps
+ * the tourist's way down and the hero's route apart until the cell. The physics is the
+ * game's own, on the level's own tiles, in Node. Theseus, his knot and his route, the
+ * race and the clean run are tests/minotaur-theseus.spec.ts.
  */
 
 /** Inside page.evaluate: the type is erased, so it survives the trip into the page. */
@@ -89,9 +90,27 @@ test("the stage's data: the bull-leaper, the walk in, the camera on the spawn, t
   expect(d.spawn).toEqual({ x: 8, y: DOOR_FLOOR - 16 });
   expect(d.cameraOnSpawn).toBe(true);
   expect(d.cameraBottom).toBe(752);
-  // No traps yet, and no Theseus, beast or queue.
-  expect(d.entities).toEqual([]);
-  expect(d.decor).toEqual([]);
+  // Theseus and his knot, and nothing else yet: no beast and no queue.
+  expect(d.entities.map((e) => e.kind)).toEqual(['hero']);
+  const hero = d.entities[0] as HeroDef;
+  expect({ kneel: hero.kneel, knot: hero.knot, ball: hero.ball, triggerX: hero.triggerX, lean: hero.lean, hold: hero.hold, line: hero.line, cause: hero.cause }).toEqual({
+    // Kneeling at the doorpost, outside, 12 by 14.
+    kneel: { x: 66, y: 146, w: 12, h: 14 },
+    knot: { x: 80, y: 149 },
+    ball: { x: 208, y: DOOR_FLOOR },
+    triggerX: 144,
+    lean: 20,
+    hold: 22,
+    // Shin height: 11 px over the passage's floor, from the post to the ball.
+    line: { x: 80, y: 149, w: 128, h: 1 },
+    cause: 'The knot',
+  });
+  // The post the knot is on, the boss his foot pushes off, his black doorway on row 5.
+  expect(d.decor).toEqual([
+    { kind: 'doorpost', x: 80, top: 80, floorY: DOOR_FLOOR },
+    { kind: 'boss', rect: { x: 206, y: 140, w: 9, h: 8 } },
+    { kind: 'blackDoorway', x: 148, w: 16, top: 628, floorY: 656 },
+  ]);
   // The four tricks, in the order he meets them; the labyrinth's fall is none of them.
   expect(d.tricks).toEqual(['The knot', 'The snort', 'The hands', 'The horns']);
   expect(d.dropCause).toBe('The labyrinth');

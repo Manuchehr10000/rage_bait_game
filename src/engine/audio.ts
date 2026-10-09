@@ -54,6 +54,9 @@ export const SFX = [
   'sitStone',
   'knock',
   'clack',
+  'creak',
+  'footfall',
+  'faceDown',
 ] as const;
 
 export type Sfx = (typeof SFX)[number];
@@ -322,6 +325,21 @@ export class GameAudio {
         // A door leaf turning on its pivot and coming home against its pier.
         this.burst(t, 1600, 'bandpass', 0.025, 0.09);
         this.tone(t, 'sine', 640, 480, 0.04, 0.04);
+        break;
+      case 'creak':
+        // A man leaning back on a line tied round a wooden post: the post, taking it in jerks.
+        this.tone(t, 'sawtooth', 95, 130, 0.3, 0.025);
+        for (let i = 0; i < 6; i++) this.burst(t + i * 0.045, 1400 + i * 120, 'bandpass', 0.018, 0.05);
+        break;
+      case 'footfall':
+        // Theseus's foot, heard through the rock: low and dull, never the tourist's own step.
+        this.burst(t, 240, 'lowpass', 0.07, 0.16);
+        this.tone(t, 'sine', 75, 45, 0.09, 0.09);
+        break;
+      case 'faceDown':
+        // A man face down on stone, once, a beat after his shins go: one dry knock.
+        this.tone(t + 0.22, 'sine', 210, 90, 0.07, 0.16);
+        this.burst(t + 0.22, 900, 'bandpass', 0.025, 0.14);
         break;
     }
   }
