@@ -169,6 +169,16 @@ const SWITCH_AT = [4, 10, 18, 28];
 const WALK_OFF = [10, 30, 60, 90];
 /** A coyote jump, this many frames after his feet leave the floor. */
 const COYOTE = [1, 3, 5];
+/**
+ * How high over the floor he stands to jump: on it, and as high as the game lets him
+ * stand. The 1 px ground probe stands him on a floor from the frame his feet come within
+ * a pixel of it, and a jump pressed before he lands goes from there. In this stage every
+ * y is a whole number of eighteenths of a pixel (every frame's rise or fall is, and every
+ * stop is on a whole pixel), so the highest is 17/18 px.
+ */
+const STANCES = [0, 17 / 18];
+/** Eighteenths of a pixel, the grid every y in the stage is on. */
+const onGrid = (y: number) => Math.abs(y * 18 - Math.round(y * 18)) < 1e-6;
 
 interface Plan {
   /** 0 for a walk-off with no jump. */
@@ -196,14 +206,16 @@ interface Sweep {
   examples: string[];
   /** The highest his head came while any of him was under O1. */
   o1Top: number;
+  /** Frames on which he was off the grid of eighteenths STANCES rests on. */
+  offGrid: number;
   runs: number;
 }
 
 /**
- * From the floors given, every take-off on every floor reached: standing or running
- * either way, every 2 px, at every hold and steering; and off each open end at four
- * speeds, falling straight or steered, with a coyote jump or without. Landings on a
- * floor not yet reached are swept from in turn, except on a terminal floor.
+ * From the floors given, every take-off on every floor reached: from each stance,
+ * standing or running either way, every 2 px, at every hold and steering; and off each
+ * open end at four speeds, falling straight or steered, with a coyote jump or without.
+ * Landings on a floor not yet reached are swept from in turn, except on a terminal floor.
  */
 function sweep(level: Level, start: Floor[], terminal: (f: Floor) => boolean): Sweep {
   const floors = floorsOf(level);
@@ -234,7 +246,7 @@ function sweep(level: Level, start: Floor[], terminal: (f: Floor) => boolean): S
     level.solidTilesIn({ x, y, w: p.w, h: p.h }, hits);
     return x >= 0 && hits.length === 0;
   };
-  const s: Sweep = { reached: new Set(), worst: 0, worstOn: new Map(), onHero: new Map(), examples: [], o1Top: Infinity, runs: 0 };
+  const s: Sweep = { reached: new Set(), worst: 0, worstOn: new Map(), onHero: new Map(), examples: [], o1Top: Infinity, offGrid: 0, runs: 0 };
 
   /** Standing at x on a floor at speed vx, then the plan. `off` walks off that way first; `coyote` jumps that long after. */
   const fly = (x: number, feet: number, vx: number, plan: Plan, off: number, coyote: number): Floor | null => {
@@ -253,6 +265,7 @@ function sweep(level: Level, start: Floor[], terminal: (f: Floor) => boolean): S
       keys.pressed = plan.hold > 0 && k === press;
       keys.jumpHeld = plan.hold > 0 && k >= press && k < press + plan.hold;
       p.update(input, level, [], 0);
+      if (!onGrid(p.y)) s.offGrid++;
       if (!p.onGround && left < 0) left = i;
       for (const [tile, r] of Object.entries(HERO)) {
         if (!overlaps(p, r)) continue;
@@ -283,9 +296,11 @@ function sweep(level: Level, start: Floor[], terminal: (f: Floor) => boolean): S
     const f = queue.shift()!;
     if (terminal(f)) continue;
     const feet = f.y;
-    for (let x = f.x0 - 9.5; x < f.x1; x += 2) {
-      if (!clear(x, feet - p.h)) continue;
-      for (const vx of [-PHYS.runSpeed, 0, PHYS.runSpeed]) for (const plan of PLANS) if (plan.hold > 0) found(fly(x, feet, vx, plan, 0, 0));
+    for (const lift of STANCES) {
+      for (let x = f.x0 - 9.5; x < f.x1; x += 2) {
+        if (!clear(x, feet - lift - p.h)) continue;
+        for (const vx of [-PHYS.runSpeed, 0, PHYS.runSpeed]) for (const plan of PLANS) if (plan.hold > 0) found(fly(x, feet - lift, vx, plan, 0, 0));
+      }
     }
     for (const dir of [-1, 1]) {
       const x = dir > 0 ? f.x1 - 0.01 : f.x0 - 9.99;
@@ -319,6 +334,9 @@ const G0 = '80:208-256';
 /** Down to the cell: he is in, and the way down ends there. */
 const atCell = (f: Floor) => name(f) === CELL;
 
+/** The longest fall from under a roof onto a floor: his head stopped at the roof, then his feet on the floor. */
+const underRoof = (roof: number, floorY: number) => floorY - 16 - roof;
+
 /** The way down, swept once for the two tests that read it. */
 let wayDownSweep: Sweep | null = null;
 const wayDown = (): Sweep => (wayDownSweep ??= sweep(LEVEL, [floor(DOOR_FLOOR, 0)], atCell));
@@ -329,10 +347,11 @@ test('the route rule: from the way down no run or jump puts any of him on a hero
   expect([...s.onHero], s.examples.join('\n')).toEqual([]);
   // Every floor of the way down, and nothing else: the door storey, the five corridors, the cell.
   expect([...s.reached].sort()).toEqual([DOOR_STOREY, Z1, T2, T3, T, T_END, CELL].sort());
-  // O1, 80 px over the passage's floor against a full jump's 61.8: his head stops 2.2 px
-  // short of G0's floor, 18.2 px short of standing on it.
-  expect(s.o1Top).toBeCloseTo(DOOR_FLOOR - 16 - 61.83, 1);
-  expect(s.o1Top).toBeGreaterThan(80);
+  // O1 is 80 px over the passage's floor, against a full jump's 61.8 from the floor and
+  // 62.8 from the highest stance: his head rises at most 64 px, so it stays under G0's
+  // floor at y 80, at least 16 px short of standing on it.
+  expect(DOOR_FLOOR - 16 - s.o1Top).toBeLessThanOrEqual(64);
+  expect(s.offGrid).toBe(0);
 });
 
 test('the route rule: from the cell floor alone, with nothing in the cell, row 5 is out of reach', () => {
@@ -346,20 +365,27 @@ test('the route rule: from the cell floor alone, with nothing in the cell, row 5
 test('no reachable fall in the stage is more than 200 px from the top of the arc: the way down', () => {
   const s = wayDown();
   expect(s.worst).toBeLessThan(PHYS.fatalFall);
-  // As LEVEL.md has them: the relieved jump into D0, 143.4; into D1 and X2, 111.44; into
-  // D3, 127.44; into X, 95.44; and a leap into the hatch at most 191.44, T_end's 48 px
-  // roof capping every leap at 192.
-  const worst = Object.fromEntries([...s.worstOn].map(([f, v]) => [f, Math.round(v * 100) / 100]));
-  expect(worst).toEqual({
-    [DOOR_STOREY]: 61.83,
-    [Z1]: 143.44,
-    [T2]: 111.44,
-    [T3]: 111.44,
-    [T]: 127.44,
-    [T_END]: 95.44,
-    [CELL]: 191.44,
-  });
-  expect(s.worst).toBeCloseTo(191.44, 2);
+  // Each is capped by the roof over the corridor he leapt from: the relieved jump into D0
+  // under P's ceiling (O1, the hole in it, is too far from D0 to come down from), into D1,
+  // X2 and D3 under the corridors', into X under T's, and into the hatch under T_end's
+  // 48 px roof, 192 against pillar 1's 200. The sweep's leaps come within a pixel of each
+  // cap, so the roofs are what stop them; what it finds is not a maximum.
+  const caps: Record<string, number> = {
+    [Z1]: underRoof(96, 256),
+    [T2]: underRoof(208, 336),
+    [T3]: underRoof(288, 416),
+    [T]: underRoof(368, 512),
+    [T_END]: underRoof(464, 576),
+    [CELL]: underRoof(528, 736),
+  };
+  expect(Object.values(caps)).toEqual([144, 112, 112, 128, 96, 192]);
+  for (const [f, cap] of Object.entries(caps)) {
+    expect(s.worstOn.get(f), f).toBeLessThanOrEqual(cap);
+    expect(s.worstOn.get(f), f).toBeGreaterThan(cap - 1);
+  }
+  // Back onto the door storey, never more than a jump's own height.
+  expect(s.worstOn.get(DOOR_STOREY)).toBeLessThanOrEqual(PHYS.jumpVelocity ** 2 / (2 * PHYS.gravity));
+  expect(new Set(s.worstOn.keys())).toEqual(new Set([DOOR_STOREY, ...Object.keys(caps)]));
 });
 
 test('no reachable fall in the stage is more than 200 px from the top of the arc: up the hero\'s route to the door', () => {
@@ -371,12 +397,16 @@ test('no reachable fall in the stage is more than 200 px from the top of the arc
   expect(s.reached.has(G0)).toBe(true);
   expect(s.reached.has(DOOR_STOREY)).toBe(true);
   expect(s.reached.has('16:80-320'), 'the roof').toBe(false);
-  // None over 145 on the way out (LEVEL.md, Tests to pin): the worst is D0 again, from the
-  // passage, 143.44; back into the cell from row 5, 127.44.
+  // None over 145 on the way out (LEVEL.md, Tests to pin). The worst is the relieved jump
+  // into D0 again, from the passage, under P's ceiling. Back into the cell from row 5 is
+  // under their ceiling at 592, and nothing else is more than 128: the drop from G0 down
+  // shaft A onto L_A, under the roof at 32, is the other that comes near it.
   expect(s.worst).toBeLessThan(145);
-  expect(s.worst).toBeCloseTo(143.44, 2);
-  expect(s.worstOn.get(CELL)).toBeCloseTo(127.44, 2);
-  expect(Math.max(...[...s.worstOn].filter(([f]) => f !== Z1).map(([, v]) => v))).toBeCloseTo(127.44, 2);
+  expect(s.worstOn.get(Z1)).toBeLessThanOrEqual(underRoof(96, 256));
+  expect(s.worstOn.get(CELL)).toBeLessThanOrEqual(underRoof(592, 736));
+  expect(s.worstOn.get(CELL)).toBeGreaterThan(underRoof(592, 736) - 1);
+  for (const [f, v] of s.worstOn) if (f !== Z1) expect(v, f).toBeLessThanOrEqual(128);
+  expect(s.offGrid).toBe(0);
 });
 
 // ---------------------------------------------------------------------------
