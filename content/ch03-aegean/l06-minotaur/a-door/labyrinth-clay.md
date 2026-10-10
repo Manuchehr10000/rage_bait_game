@@ -18,7 +18,9 @@ gap between two glaze shapes. One flat colour, `#c8743d`, the same everywhere.
 
 Behind everything, from x 0 to 320 and y 0 to 752. It replaces the warm sky the rough build drew
 outside the door and over the roof, which was fixed to the screen and did not move with the
-camera. The vestibule and the hero's doorway are glaze laid over it.
+camera. The vestibule and the hero's doorway are glaze laid over it. Its top 14 rows are never on
+the screen: the camera stops there to keep the vase's foot whole (`labyrinth-rays`,
+2026-10-10), two rows of clay over the roof's line.
 
 ## Must be right
 

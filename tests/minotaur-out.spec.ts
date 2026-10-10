@@ -379,6 +379,20 @@ test('the clean run out by the thread: along row 5, up the four rooms and the co
   expect(w.worstFall).toBeCloseTo(74.67, 2);
 });
 
+test("the vase's foot is never cut: however high he goes, the camera keeps the rays, their course line at y 191 and two rows under it on the screen, its top at y 14 at the highest, two rows of clay over the roof's line", () => {
+  expect(MINOTAUR.cameraKeeps).toBe(194);
+  const r = clean();
+  const top = (t0: number, t1: number) => Math.min(...r.log.filter((l) => l.t >= t0 && l.t <= t1).map((l) => l.view));
+  // Over the vault, 14.33; over the knot, 16.94; along G0 on the way out, held at 14 for 32
+  // frames. Before the keep they were 1.30, 12.93 and 0, and the band was cut partway up
+  // its rays at the bottom of the screen, or showed only its top 16 rows (a-door/labyrinth-rays.md).
+  expect(+top(0, 100).toFixed(2)).toBe(14.33);
+  expect(+top(100, 160).toFixed(2)).toBe(16.94);
+  expect(top(1100, r.out)).toBe(14);
+  expect(r.log.filter((l) => l.view === 14).length).toBe(32);
+  expect(Math.min(...r.log.map((l) => l.view))).toBe(14);
+});
+
 test('the closing tableau: never before the second blow; it begins the tick after his left edge passes x 80, Theseus out of the black and at the post 45 frames after the line; the clean run is out 49 frames after it, and nobody faster than 49', () => {
   const r = new Run();
   const hands = cleanRun();
@@ -497,7 +511,7 @@ test('after the second blow nothing kills: random men on the way out, from row 5
   expect([died, up]).toEqual([0, 85]);
 });
 
-test('random play over the whole level dies only of the four tricks; nobody leaks into the hero\'s spaces before the cell, and no fall is over 192 px', () => {
+test('random play over the whole level dies only of the four tricks; nobody leaks into the hero\'s spaces before the cell, no fall is over 192 px, and the camera never cuts the vase\'s foot', () => {
   // From 27 states of the clean run, every 50 frames from the spawn to 1300, 20 men each,
   // random hands for 40 s or until they are out: 540 runs, about 860,000 ticks, about 2 s.
   const HERO_TILES: Rect[] = [
@@ -517,6 +531,7 @@ test('random play over the whole level dies only of the four tricks; nobody leak
   const ends: Record<string, number> = {};
   let leaks = 0;
   let worst = 0;
+  let top = Infinity;
   for (const from of states) {
     for (let i = 0; i < 20; i++) {
       const r = from.clone();
@@ -526,6 +541,7 @@ test('random play over the whole level dies only of the four tricks; nobody leak
       for (let k = 0; k < 2400 && !r.cause && r.out < 0; k++) {
         r.tick(h());
         r.log.length = 0;
+        top = Math.min(top, r.cam.y);
         if (!r.ear.in) for (const t of HERO_TILES) if (overlaps(r.p, t)) leaks++;
       }
       worst = Math.max(worst, r.worstFall);
@@ -537,6 +553,9 @@ test('random play over the whole level dies only of the four tricks; nobody leak
   expect(leaks).toBe(0);
   expect(worst).toBeCloseTo(191.44, 2);
   expect(worst).toBeLessThan(PHYS.fatalFall);
+  // However they jump about outside, in the passage or along G0, the camera's top is never
+  // over y 14: the vase's foot stays whole on the screen.
+  expect(top).toBe(14);
 });
 
 // ---------------------------------------------------------------------------
@@ -772,7 +791,72 @@ test('in the game: the queue and Ariadne stand behind him and never over x 56, s
   for (const f of r.walk) expect(f).toEqual({ y: r.spawnY, ground: true, state: 'playing' });
 });
 
-test('in the game: the clean run goes out at the door at frame 1346 with Theseus and the body at the post behind him, and the card, at 0 to 4 rows of causes, covers neither the door nor them', async ({ page }) => {
+test('in the game: the death counter lies on the band of rays only while the camera looks down at Z1 and at the climb out, never while he is on the door storey or over it; open, for the designer', async ({ page }) => {
+  await open(page);
+  const ink = await page.evaluate(() => {
+    const g = (window as unknown as W).__game;
+    g.titleTimer = 0;
+    // The dev ruler's numbers are not the player's: the tools hidden, as G hides them.
+    g.dev.on = false;
+    // The HUD's words, as it sets them on the screen: the box of their ink, in view px.
+    const ctx = g.ctx as CanvasRenderingContext2D;
+    const texts: string[] = [];
+    const box = { x0: Infinity, x1: -Infinity, y0: Infinity, y1: -Infinity };
+    const watch = (draw: CanvasRenderingContext2D['fillText']) =>
+      function (this: CanvasRenderingContext2D, text: string, x: number, y: number) {
+        const m = ctx.measureText(text);
+        const half = ctx.lineWidth / 2;
+        texts.push(text);
+        box.x0 = Math.min(box.x0, (x - m.actualBoundingBoxLeft - half) / g.scale);
+        box.x1 = Math.max(box.x1, (x + m.actualBoundingBoxRight + half) / g.scale);
+        box.y0 = Math.min(box.y0, (y - m.actualBoundingBoxAscent - half) / g.scale);
+        box.y1 = Math.max(box.y1, (y + m.actualBoundingBoxDescent + half) / g.scale);
+        draw.call(this, text, x, y);
+      };
+    const fill = ctx.fillText;
+    const stroke = ctx.strokeText;
+    ctx.fillText = watch(fill);
+    ctx.strokeText = watch(stroke);
+    for (const n of [0, 9, 88, 99]) {
+      g.stats.total = n;
+      g.draw();
+    }
+    ctx.fillText = fill;
+    ctx.strokeText = stroke;
+    g.stats.total = 0;
+    return { texts: [...new Set(texts)], ...box };
+  });
+  expect(ink.texts).toEqual(['DEATHS', '0', '9', '88', '99']);
+  // Its column ends left of the fifth ray, whose base starts at x 32, at up to 99 deaths;
+  // its foot is over view y 28. In the font this Chromium sets for Georgia, x 5.60 to 29.06
+  // and y 5.18 to 27.10.
+  expect(ink.x1).toBeLessThan(32);
+  expect(ink.y1).toBeLessThan(28);
+  // The camera of the clean run, which is the game's (tests/minotaur-run.ts), against the
+  // band: the ground line on y 161 and 162, the rays from 164 to 189.
+  const r = clean();
+  const on = r.log.filter((l) => l.camY + ink.y1 > 161 && l.camY + ink.y0 < 190);
+  const spans: [number, number][] = [];
+  for (const l of on) {
+    const last = spans[spans.length - 1];
+    if (last && last[1] === l.t - 1) last[1] = l.t;
+    else spans.push([l.t, l.t]);
+  }
+  // Never while he is on the door storey or over it: on the first screen, over the vault
+  // and the knot, along G0 and back out past the queue, its foot is 80 rows or more over
+  // the ground line. Looking down at Z1, from the drop into D0, and on the climb from the
+  // ledge at 320 to L_B, the band is at the top of the screen and the counter lies on the
+  // ground line and the first four rays: 116 frames and 32 of the clean run, and the way
+  // down is replayed before every death after the knot. Left as built, for the designer to
+  // accept or to rule the counter's column clear of it (a-door/labyrinth-rays.md).
+  expect(on.filter((l) => l.y + 16 <= DOOR_FLOOR)).toEqual([]);
+  expect(spans).toEqual([
+    [167, 282],
+    [1037, 1068],
+  ]);
+});
+
+test('in the game: the clean run goes out at the door at frame 1346 with Theseus and the body at the post behind him, cut from it by clay on every frame, corners included, and the card, at 0 to 4 rows of causes, covers neither the door nor them; the camera keeps the vase\'s foot', async ({ page }) => {
   await open(page);
   const r = await page.evaluate(
     ({ presses }) => {
@@ -780,14 +864,58 @@ test('in the game: the clean run goes out at the door at frame 1346 with Theseus
       g.titleTimer = 0;
       const key = (c: string, d: boolean) => window.dispatchEvent(new KeyboardEvent(d ? 'keydown' : 'keyup', { code: c }));
       const tableau = g.entities.find((e: { def: { kind: string } }) => e.def.kind === 'tableau');
+      const wctx = g.world.getContext('2d') as CanvasRenderingContext2D;
+      const decor = g.levelData.decor as { kind: string; x: number; top: number; floorY: number }[];
+      const post = decor.find((d) => d.kind === 'doorpost')!;
+      // The post and a pixel either side of it, in world px, down to the floor.
+      const R = { x: post.x - 1, y: post.top, w: 6, h: post.floorY - post.top };
+      /** The glaze round the post as drawn now, a world pixel at a time. */
+      const glaze = () => {
+        g.draw();
+        const d = wctx.getImageData(R.x * 4, (R.y - g.camera.iy) * 4, R.w * 4, R.h * 4).data;
+        return (x: number, y: number) => {
+          if (x < R.x || x >= R.x + R.w || y < R.y || y >= R.y + R.h) return false;
+          const i = (((y - R.y) * 4 + 1) * R.w * 4 + (x - R.x) * 4 + 1) * 4;
+          return d[i] === 31 && d[i + 1] === 20 && d[i + 2] === 14;
+        };
+      };
+      // On every frame of the tableau, with the tourist away from the post: the post's own
+      // glaze, which is the glaze that is not theirs, drawn with no post; and theirs, never
+      // touching it at a side or a corner.
+      const touches: string[] = [];
+      let crossing = 0;
+      const look = (t: number) => {
+        const p = g.player;
+        const px = p.x;
+        p.x = 200;
+        const all = glaze();
+        const kept = decor.splice(0, decor.length);
+        decor.push(...kept.filter((d) => d !== post));
+        const theirs = glaze();
+        decor.splice(0, decor.length, ...kept);
+        p.x = px;
+        let over = false;
+        for (let y = R.y; y < R.y + R.h; y++) {
+          for (let x = post.x; x < post.x + 4; x++) {
+            if (theirs(x, y)) over = true;
+            if (!all(x, y) || theirs(x, y)) continue;
+            for (let dy = -1; dy <= 1; dy++)
+              for (let dx = -1; dx <= 1; dx++) if (theirs(x + dx, y + dy) && all(x + dx, y + dy)) touches.push(`${t}: (${x + dx}, ${y + dy}) against (${x}, ${y})`);
+          }
+        }
+        if (over) crossing++;
+      };
       let out = -1;
       let began = -1;
+      let top = Infinity;
       for (const [i, press] of presses.entries()) {
         key('ArrowRight', press.dir > 0);
         key('ArrowLeft', press.dir < 0);
         key('Space', press.jump);
         g.tick();
+        top = Math.min(top, g.camera.y);
         if (began < 0 && tableau.k >= 0) began = i;
+        if (began >= 0) look(i);
         if (g.state === 'complete') {
           out = i;
           break;
@@ -856,7 +984,7 @@ test('in the game: the clean run goes out at the door at frame 1346 with Theseus
         return rects[0]!;
       };
       const cards = [0, 1, 2, 3, 4].map(card);
-      return { out, began, state: g.state, k: tableau.k, x: tableau.x, picture: { x0, x1, y0, y1 }, camY: g.camera.iy, him, covered, cards };
+      return { out, began, state: g.state, k: tableau.k, x: tableau.x, picture: { x0, x1, y0, y1 }, camY: g.camera.iy, him, covered, cards, touches, crossing, top };
     },
     { presses: cleanPresses() },
   );
@@ -869,6 +997,14 @@ test('in the game: the clean run goes out at the door at frame 1346 with Theseus
   expect(r.picture.y1).toBeLessThanOrEqual(DOOR_FLOOR - r.camY);
   expect(r.him).toBeGreaterThan(50);
   expect(r.covered).toBe(0);
+  // In front of the post, Theseus and the dead head are cut from its glaze edge by their
+  // reserved outline, corners included, on every frame they cross it, the held frame under
+  // the card among them. (His outline had no corners until a check of the door stage,
+  // 2026-10-10: his glaze met the post's at a corner on 22 of the last 23 frames.)
+  expect(r.crossing).toBeGreaterThan(20);
+  expect(r.touches).toEqual([]);
+  // The camera's top never over y 14 in the game either: the vase's foot kept whole.
+  expect(r.top).toBe(14);
   // The card anchored right, view x 136 to 316, whatever its height: clear of the door,
   // x 80 to 96, and of Theseus and the body.
   for (const c of r.cards) {

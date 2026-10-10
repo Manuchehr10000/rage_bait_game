@@ -155,7 +155,7 @@ export class Run {
       this.worstFall = Math.max(this.worstFall, this.p.fellBy);
       if (this.p.fellBy > PHYS.fatalFall) this.cause = MINOTAUR.dropCause!;
       else {
-        const keep = live.map((e) => e.keepsInView?.() ?? null).filter((y): y is number => y !== null);
+        const keep = [MINOTAUR.cameraKeeps, ...live.map((e) => e.keepsInView?.())].filter((y): y is number => y != null);
         this.cam.update(this.p, keep.length ? Math.max(...keep) : undefined);
         if (this.p.y > LEVEL.heightPx + 16) this.cause = MINOTAUR.fallCause!;
         else if (this.events.has(MINOTAUR.exitAfter!) && overlaps(this.p, MINOTAUR.exit!)) this.out = this.t;

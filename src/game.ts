@@ -611,9 +611,9 @@ export class Game {
     }
   }
 
-  /** The lowest world y anything on the level needs on the screen this frame, if anything does. */
+  /** The lowest world y the level or anything on it needs on the screen this frame, if any does. */
   private keepInView(): number | undefined {
-    let keep: number | undefined;
+    let keep = this.level.data.cameraKeeps;
     for (const e of this.entities) {
       const y = e.keepsInView?.() ?? null;
       if (y !== null) keep = Math.max(keep ?? y, y);

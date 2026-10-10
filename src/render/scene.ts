@@ -5646,18 +5646,22 @@ function drawTableau(ctx: CanvasRenderingContext2D, t: Tableau, doorway: readonl
   ctx.beginPath();
   ctx.rect(0, 0, VESTIBULE.x + VESTIBULE.w, F);
   ctx.clip();
-  // Their reserved outlines, only where they lie over the black or the post: the body's a
-  // pixel all round it, corners included; his.
+  // Their reserved outlines, only where they lie over the black or the post: each a pixel
+  // all round it, corners included, so not even a corner of his glaze meets the post's.
   ctx.save();
   ctx.beginPath();
   for (const r of doorway) ctx.rect(r.x, r.y, r.w, r.h);
   ctx.clip();
   fillPixels(ctx, dead.outline());
   for (const [dx, dy] of [
+    [-1, -1],
+    [0, -1],
+    [1, -1],
     [-1, 0],
     [1, 0],
-    [0, -1],
+    [-1, 1],
     [0, 1],
+    [1, 1],
   ] as const) {
     ctx.save();
     ctx.translate(dx, dy);

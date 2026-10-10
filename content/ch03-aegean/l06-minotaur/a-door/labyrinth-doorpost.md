@@ -25,11 +25,11 @@ At the door, x 80, from the first frame to the last. Theseus kneels against it, 
   door").
 - **The kneeling hero's hand reaches x 81 at most**, onto the wash, a pixel short of the glaze
   edge: glaze never touches glaze (`theseus-kneel`).
-- **In the closing tableau its foot is crossed**, by Theseus's far arm reaching back to the horn
-  at about y 146 to 149 and by the dead head's muzzle over x 82 and 83. Both are in front of it,
-  in their reserved outline: there its glaze edge gives way to that 1 px line of clay, and the
-  line is cut into its wash (`../f-thread/theseus-drag.md`, `../f-thread/minotaur-dead.md`). The
-  knot stays over the arm.
+- **In the closing tableau its foot is crossed**, by Theseus's far arm reaching back to the horn at
+  about y 146 to 149 and by the dead head's muzzle over x 82 and 83. Both are in front of it, in
+  their reserved outline, corners included: there its glaze edge gives way to that 1 px line of
+  clay, and the line is cut into its wash (`../f-thread/theseus-drag.md`,
+  `../f-thread/minotaur-dead.md`). The knot stays over the arm.
 - Stone, not a person: the wash, never full glaze over its width.
 - Plain: no carving, no ring, no mark.
 

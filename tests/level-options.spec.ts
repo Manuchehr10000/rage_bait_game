@@ -9,7 +9,9 @@ import { VIEW_H } from '../src/engine/types';
  * spawn, the exit that waits for an event, and the exit card that stands aside.
  * Each is shown to leave the built levels exactly where they were, and to do what
  * it says on a level that takes it. In the browser a built level takes it for the
- * length of a test, in that page only.
+ * length of a test, in that page only. A fourth, a line the camera keeps in view
+ * (`cameraKeeps`), is pinned where the Minotaur takes it (tests/minotaur-out.spec.ts);
+ * here, only that no built level does.
  */
 
 /** Inside page.evaluate: the type is erased, so it survives the trip into the page. */
@@ -69,10 +71,11 @@ async function open(page: Page): Promise<void> {
 // The camera that starts on the spawn.
 // ---------------------------------------------------------------------------
 
-test('every built level is pinned, and its camera starts at the bottom of what it shows', () => {
+test('every built level is pinned, and its camera starts at the bottom of what it shows and keeps no line of its own in view', () => {
   expect(built().length).toBe(Object.keys(BUILT_START_Y).length);
   for (const { data } of built()) {
     expect(data.cameraOnSpawn, data.id).toBeUndefined();
+    expect(data.cameraKeeps, data.id).toBeUndefined();
     expect(data.cameraBottom - VIEW_H, data.id).toBe(BUILT_START_Y[data.id]);
     const c = new Camera(data.widthTiles * 16, data.cameraBottom);
     c.reset();

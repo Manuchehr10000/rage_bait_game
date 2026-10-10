@@ -1027,6 +1027,12 @@ export interface LevelData {
    * where he would otherwise be off the screen for the first frames of every retry.
    */
   cameraOnSpawn?: boolean;
+  /**
+   * A world y the camera keeps on the screen whenever it can leave him on it too, as
+   * an entity's keepsInView does, but on every frame: the foot of a picture the level
+   * stands on its first screen, which the camera rising after him is never to cut.
+   */
+  cameraKeeps?: number;
   /** Floors that are ramps: stairs whose risers are too low to step over one by one. */
   slopes?: readonly SlopeDef[];
   /** Where the hill begins for the Abu Simbel backdrop, in px. */

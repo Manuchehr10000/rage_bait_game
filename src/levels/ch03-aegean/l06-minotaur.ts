@@ -368,6 +368,13 @@ export const MINOTAUR: LevelData = {
   spawn: { x: 8, y: DOOR_FLOOR - 16 },
   cameraBottom: px(H),
   cameraOnSpawn: true,
+  // The vase's foot under the panel outside, kept whole on the screen however high he
+  // goes: the rays, their course line at y 191, and two rows of the masonry under it, so
+  // that the line reads as their foot and not as the screen's edge. Rising after him over
+  // the vault, the knot and G0, the camera stops with its top at y 14, two rows of clay
+  // over the roof's line at y 16: the band is never cut into spikes at the bottom of the
+  // screen, and the roof's top still shows from G0.
+  cameraKeeps: DOOR_FLOOR + px(2) + 2,
   // Four tricks (pillar 8), in the order he meets them. Each kills him itself: nothing
   // needs to claim a death. The knot and the snort are built.
   tricks: ['The knot', 'The snort', 'The hands', 'The horns'],

@@ -32,10 +32,44 @@ and a tourist in full colour walking into it.
 
 The bottom of the first screen: at the spawn the camera's top is y 53 and its bottom y 233, so
 the whole band is in view under the queue, Ariadne, the kneeling hero and the tourist, who stands
-over it on the ground line from the first frame, before anything is pressed. The camera rises to
-about y 37 over the vault and the knot, and the band stays in view. It is on the last screen
-too, when he comes back out past the closing tableau. Under it, the labyrinth's masonry by its
-rule; Z1, the first corridor down, runs under it from x 64 at y 208.
+over it on the ground line from the first frame, before anything is pressed. It is on the last
+screen too, when he comes back out past the closing tableau. Under it, the labyrinth's masonry
+by its rule; Z1, the first corridor down, runs under it from x 64 at y 208.
+
+**The camera keeps it whole** however high he goes (`LevelData.cameraKeeps`, y 194, after a check of
+the rays, 2026-10-10): the rays, their course line and two rows of the masonry under it, so that the
+line reads as their foot and not as the screen's edge. Rising after him, the camera stops with its
+top at y 14, two rows of clay over the roof's line at y 16, so the roof's top still shows from G0
+(`labyrinth-face`). In the clean run its top comes up to y 14.33 over the vault, 16.94 over the
+knot, and holds at 14 for 32 frames along G0 on the way out. Without it the camera rose to 1.30 over
+the vault, 12.93 over the knot and 0 along G0: from about frame 43 to 61 the rays were cut partway
+up at the bottom of the screen and read as spikes rising out of its edge under a thin ledge, every
+full jump outside did the same, and along G0, for about 60 frames, only their top 16 rows showed
+under the queue. (This note said the camera rose "to about y 37" and the band stayed in view, which
+was wrong.) The camera keeps nothing else from view but the top 14 rows of the level, clay over the
+roof and outside. It moves nothing and times nothing: every position of the clean run is the same
+with it.
+
+**The death counter on the band: open, for the designer** (the same check, 2026-10-10). The
+counter's ink is the top left of every screen, view x 5.6 to 29.1 and y 5.2 to 27.1 at up to 99
+deaths, in the font this Chromium sets for Georgia. Wherever he is on the door storey or over it,
+the camera's top is y 14 to 53, and the counter is on the clay over the queue, 80 rows or more over
+the ground line. But looking down at Z1 the band is at the top of the screen, and the counter lies
+on the ground line and the upper halves of the first four rays, x 0 to 30: in the clean run for 116
+frames, about 1.9 s, from the drop into D0 (frames 167 to 282), and for 32 more on the climb from
+the ledge at 320 to L_B (1037 to 1068); the way down is replayed before every death after the knot.
+Its cream outline keeps it legible, but the ground line runs through "DEATHS" and the numeral stands
+on the rays: the counter and the ornament meet, as they did when the tongues beside it read as
+bunting. Left as built until the designer rules: accept it; or keep the counter's column clear,
+which would start the rays at x 32, six of them, and not at the screen's edge. Pinned as built in
+`tests/minotaur-out.spec.ts`.
+
+**The reading at the spawn, for the designer** (the same check). The clay between the rays is the
+air's colour, so with the band whole the 2 px ground line can read as a ledge over a pit of spikes,
+though the ground line, the course line and the outer face close the band in (`labyrinth-clay`, its
+one place of clay in solid ground). Not changed: it is the ruled picture, black rays on the vase's
+clay, and the band of glaze the research puts with the rays was left out because in the ground it
+would read as a hole (Deliberately wrong).
 
 ## Must be right
 
@@ -50,7 +84,9 @@ rule; Z1, the first corridor down, runs under it from x 64 at y 208.
 - **Never touching the outer face's glaze**, or any other glaze, corners included: x 79 is clay
   beside the face at x 80; a row of clay under the ground line and one over the course line; a
   pixel of clay between every two bases.
-- **Visible at the spawn's camera**, whole, and whatever the camera does on the door storey.
+- **Whole on the screen** at the spawn's camera and however high he goes: never cut into spikes
+  at the screen's bottom edge, its course line never the screen's last row (the camera's
+  `cameraKeeps`, above).
 - Every ray is the same, to the pixel, by construction.
 - Glaze only: no added red, which is only on fillets and garment borders.
 - **Rays, never a meander.** The meander is the labyrinth on the reverse of the Knossian staters

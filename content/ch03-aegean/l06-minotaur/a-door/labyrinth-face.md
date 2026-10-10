@@ -30,8 +30,9 @@ the black vestibule from x 96.
 ## Where it stands in the game
 
 The face over the door and the lintel are on the first screen (y 53 to 80 of the face at the
-spawn). The roof's top is seen from G0 on the way out, when the camera is at the top of the
-level.
+spawn). The roof's top is seen from G0 on the way out, when the camera is as high as it goes:
+its top at y 14, two rows of clay over the roof's line, where it stops to keep the vase's foot
+whole on the screen (`labyrinth-rays`, 2026-10-10).
 
 ## Must be right
 

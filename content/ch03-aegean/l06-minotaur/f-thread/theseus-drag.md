@@ -22,17 +22,21 @@ stride's first frame held. In the vestibule he is drawn in a reserved outline, a
 is drawn in the passage behind it (`tests/minotaur-out.spec.ts`). Behind the tourist.
 
 Stopped at the post, his far arm reaches back across it to the horn: from his far shoulder at
-(72, 143), 2 px, to the horn at (88, 151), crossing the post, x 80 to 83, at about y 146 to 149,
-its 2 × 2 hand on the horn at x 87 and 88, y 150 and 151 (as drawn, 2026-10-10; the horn moved
-from (85, 149) when the dead head was drawn lying on its cheek, its horns at its back,
-`minotaur-dead`). The arm is in front of the post, and a 1 px
-line of reserved clay round it, corners included, his reserved outline carried over the post, breaks
-the post's glaze edge at x 83 where it crosses and is cut into its wash
-(`../a-door/labyrinth-doorpost.md`). The knot, on the post at x 80 and 81, y 148 to 150, and the
-thread stay drawn over the arm, white on glaze: the knot he walks past on the way out is never
-hidden. Past the post his arm and hand lie in front of the dead head, which gives way round them
-by a line of clay, corners included (`minotaur-dead`; added after a check of the drawn bull,
-2026-10-10, when his hand met the horn with no clay between).
+(72, 143), 2 px, to the horn at (88, 151), crossing the post, x 80 to 83, at about y 146 to 149, its
+2 × 2 hand on the horn at x 87 and 88, y 150 and 151 (as drawn, 2026-10-10; the horn moved from
+(85, 149) when the dead head was drawn lying on its cheek, its horns at its back, `minotaur-dead`).
+The arm is in front of the post, and a 1 px line of reserved clay round it, corners included, his
+reserved outline carried over the post, breaks the post's glaze edge at x 83 where it crosses and is
+cut into its wash (`../a-door/labyrinth-doorpost.md`). So does the rest of him as he passes in front
+of the post: his outline has its corners wherever it lies over the post or the black. (It was drawn
+without them until a check of the door stage, 2026-10-10, which found his glaze meeting the post's
+edge at a corner on 22 of the last 23 frames of the drag, the held frame under the exit card among
+them, at (82, 148) against the edge's end at (83, 147); pinned in `tests/minotaur-out.spec.ts`.) The
+knot, on the post at x 80 and 81, y 148 to 150, and the thread stay drawn over the arm, white on
+glaze: the knot he walks past on the way out is never hidden. Past the post his arm and hand lie in
+front of the dead head, which gives way round them by a line of clay, corners included
+(`minotaur-dead`; added after a check of the drawn bull, 2026-10-10, when his hand met the horn with
+no clay between).
 
 ## Must be right
 

@@ -140,7 +140,14 @@ Chosen in the asset notes (2026-10-10), where this file did not decide, for the 
   Each widens a pixel at a time, on its left and then its right, so that its sides are straight
   slopes, not a stack of blocks. (Built first, the same day: five tongues over the outside at
   x 42 to 75 and y 56 to 64, right of the death counter's column, and under a 1 px ground line a
-  plain band of the wash.)
+  plain band of the wash.) The camera keeps the band whole however high he goes, its course line
+  and two rows under it, so its top never rises over y 14 (`LevelData.cameraKeeps`, after a check
+  of the rays: rising to y 1 over the vault and 0 along G0, it cut the rays into spikes at the
+  screen's bottom edge). **For the designer**, from the same check: the death counter lies on the
+  ground line and the first four rays while the camera looks down at Z1, about 1.9 s of every
+  way down, and on the climb out, left as built until ruled (accept it, or start the rays at x 32,
+  clear of the counter's column); and at the spawn the clay between the rays, the air's colour,
+  can read as a pit of spikes under a ledge (`a-door/labyrinth-rays.md`).
 - The masonry's blocks square, two tiles each way: a longer block would lose the bed's joint at
   x 112. A line runs under any block over air, its whole length, so the two holes in each room,
   one against each end wall, keep the same line. (When the world was drawn, 2026-10-10: the notes
@@ -169,9 +176,10 @@ Chosen in the asset notes (2026-10-10), where this file did not decide, for the 
 - Where glaze would meet glaze, the nearer thing is cut by clay (after a check of the notes, the
   same day): no joint reaches a floor's top row, and the stone round the vestibule's black is
   reserved from it by a row and a column of clay; the tableau's head and Theseus's far arm lie in
-  front of the post's foot in their reserved outline; the heap's head, body and arm lie in front of
-  its stones. Each hand lies along the whole top of its own stone, x 100 to 107 and 110 to 117, so
-  its anchor moves from the rough's to the stone's back end.
+  front of the post's foot in their reserved outline, corners included (his had none until a check
+  of the door stage, 2026-10-10, and met the post's edge at a corner); the heap's head, body and arm
+  lie in front of its stones. Each hand lies along the whole top of its own stone, x 100 to 107 and
+  110 to 117, so its anchor moves from the rough's to the stone's back end.
 - The bull, as drawn (2026-10-10, `e-cell` and `f-thread`): crouched on its feet, the knee forward
   under its chest, the toes forward under the knee and the heel under the rump, which is rounded
   down into it, its arms straight to the stones, its shoulders behind its head; each hand gripping
@@ -924,7 +932,11 @@ Being built, in this order, as a stage in the dev build (`#minotaur`, in `STAGES
   the outer face beside them a row shorter; the file a figure every 6 px, the youth redrawn whole,
   and the reserved line between figures carried round their corners. Nothing that kills, carries
   or times moved. Pinned in `tests/minotaur-out.spec.ts` (the file's data, the eyes on the first
-  screen, and the floor course outside pixel for pixel).
+  screen, and the floor course outside pixel for pixel). Then, after a check, the same day: a
+  level's own line for the camera to keep in view (`LevelData.cameraKeeps`, as an entity's
+  `keepsInView` but on every frame), here y 194, so the band is never cut at the bottom of the
+  screen; and Theseus's outline in the tableau with its corners. Pinned in the same file, with
+  where the death counter lies on the band, which is the designer's to rule.
 
 Still to come: nothing the notes ask the drawing for. (`LevelData.tricks`, 'The knot', 'The
 snort', 'The hands', 'The horns', and `dropCause` and `fallCause` 'The labyrinth', unreachable,
@@ -947,7 +959,7 @@ tricks. Above all:
 - **The snort's death**: its frames, the snore silent until after it, and the joint's plume never
   over his legs.
 - **The camera**: its caps (688 before T0, 650 in the frozen snort view), and the plume in frame
-  from T for 69 frames or more.
+  from T for 69 frames or more; its top never over y 14, so the vase's foot is never cut.
 - **The fight's key**, exact for every leap entry and never keyed on floor contact.
 - **The hands**: the windows by hold and by landing, no go at L+23 or later, and the swat killing
   as 'The hands'.
