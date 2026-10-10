@@ -10,7 +10,7 @@
 ## What it is
 
 Theseus going 80 px up the mouth O1, from the passage floor onto G0's, both arms up in front of
-his face to the lip, together, as the vases draw a man reaching, the ball in his hand at the top.
+his face to the lip, together, a pose chosen here, the ball in his hand at the top.
 The frames:
 
 0. Arms up, both legs under him.
@@ -47,4 +47,6 @@ As `../a-door/theseus-kneel.md`.
 
 ## Confidence
 
-Design choice.
+Design choice. **Not verified:** how the vases draw a man reaching or climbing; none was found, and
+the arms up together before his face are the game's choice, made so that nothing stands up behind
+his head.

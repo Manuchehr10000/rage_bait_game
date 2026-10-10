@@ -1581,6 +1581,8 @@ export function heroHand(f: HeroFrame): { x: number; y: number } {
   const cx = f.x + HERO.w / 2;
   const feet = f.y + HERO.h;
   if (f.pose === 'crouch') return { x: cx + 3 * f.facing, y: feet - 6 };
+  // Dropping, the ball is up in his front hand, before his face.
+  if (f.pose === 'fall') return { x: cx + 5 * f.facing, y: feet - 23 };
   if (f.grounded) return { x: cx + 3 * f.facing, y: feet - 11 };
   return { x: cx, y: feet - 12 };
 }

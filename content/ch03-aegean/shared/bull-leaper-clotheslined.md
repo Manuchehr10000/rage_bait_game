@@ -17,10 +17,14 @@ drawing of him at that angle, never his frame rotated.
 
 The Minotaur, beat b, under the taut line at y 149, a hero's shin and the tourist's throat:
 
-- Frames 0 to 2: his own frame as he was, upright, the line across his throat.
-- Frames 3 to 7: this frame, its throat (8, 8) where the line took his, his head back over the
+- Frames 0 to 2: his own frame as he was, upright, the line across his throat; or across his
+  legs, where a jump came down on it.
+- Frames 3 to 7: this frame, its throat (8, 8) where the line took him, 5 px down his frame on the
+  floor, or at his own throat, 8 px down it, where the line took him lower; his head back over the
   line and his feet ahead off the floor, the way he was going, coming down to the floor, its
-  bottom never below it. Caught in the air by a jump timed wrong, it starts from his own throat.
+  bottom never below it. Caught in the air by a jump timed wrong, by the legs, it starts from his
+  own throat, its top where his own frame's was, and he is swept down onto his back: never dropped
+  onto the line by the throat (`tests/minotaur-theseus.spec.ts` pins a catch at his feet).
 - From frame 8 to the end: `bull-leaper-dead` turned a quarter, flat on his back on the passage
   floor, 16 × 11, his neck where his throat was, his head behind him toward the post and his face
   up, the wig over his eyes; and on frame 8 one dry knock as he lands (`onHisBack` in

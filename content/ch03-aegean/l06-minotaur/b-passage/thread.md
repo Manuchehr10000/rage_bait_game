@@ -31,7 +31,9 @@ states:
    degrees to the line it lands on, so it never lies across a gap like a floor.
 7. **The loops** he pays out: each grows in his hand every frame of a pay-out and is left lying
    where he crouched, a 9 × 3 oval.
-8. **In his hand**, while he carries it: 2 × 2 at his hand.
+8. **In his hand**, while he carries it: 2 × 2 at his hand. Dropping down a shaft, up in his
+   front hand before his face (`../c-way-down/theseus-fall.md`), and the laid thread runs down to
+   it, never into his head; its bend over the edge is laid as that hand comes down past it.
 9. **In the fight and after**, the laid thread ends at the ball he left in his doorway
    (`thread-ball`).
 

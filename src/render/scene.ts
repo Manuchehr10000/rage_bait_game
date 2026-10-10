@@ -4914,7 +4914,7 @@ function heroSprite(f: HeroFrame): Frame | null {
 const payOutQuarter = (f: HeroFrame) => Math.min(7, Math.floor(f.payOut * 8)) % 4;
 
 /** Where the ball is in his hand while he carries it, in his box as if he faced right: walking, climbing and falling. */
-const BALL_IN_HAND: Partial<Record<HeroFrame['pose'], readonly [number, number]>> = { stand: [10, 13], walk: [10, 13], climb: [9, 0], fall: [9, 0] };
+const BALL_IN_HAND: Partial<Record<HeroFrame['pose'], readonly [number, number]>> = { stand: [10, 13], walk: [10, 13], climb: [9, 0], fall: [10, 0] };
 
 /**
  * Theseus, in black glaze, facing `facing`, in the pose of the frame: a drawing at the
@@ -5356,11 +5356,13 @@ function drawClothesline(ctx: CanvasRenderingContext2D, s: Scene, death: { cause
   if (frame < CLOTHESLINE.tipped || !c.clotheslined) {
     blit(ctx, tourist(costume, p.animFrame()), sx, sy);
   } else if (frame < CLOTHESLINE.flat) {
-    // Tipped back from where the line took his throat, and coming down to the floor.
+    // Tipped back from his throat, or from the line where it took him higher, under the
+    // chin as he stood on the floor; and coming down to the floor. Caught in the air lower
+    // down, by the legs, he tips from where he was and is swept down onto his back.
     const tipped = frameOf(`${c.id}-clotheslined`, 0, c.clotheslined);
     const hero = s.entities.find((e): e is Hero => e.def.kind === 'hero');
     const line = hero ? hero.def.line.y : null;
-    const throat = line !== null && line >= p.y && line < feet ? line : sy + THROAT.upright.y;
+    const throat = Math.min(sy + THROAT.upright.y, line !== null && line >= p.y ? line : Infinity);
     const from = Math.min(throat - THROAT.tipped.y, floor - tipped.h);
     const to = floor - tipped.h;
     const k = (frame - CLOTHESLINE.tipped) / (CLOTHESLINE.flat - CLOTHESLINE.tipped);

@@ -2052,20 +2052,24 @@ export const THESEUS = {
     [...THESEUS_MANTLE, ...THESEUS_MANTLE_LOW, ...THESEUS_LEGS_STAND.slice(1)],
     [...THESEUS_MANTLE, ...THESEUS_MANTLE_LOW, ...Array<string>(6).fill('.......##...'), '.......###..'],
   ].map((r) => compile(r, VASE)),
-  /** Dropping down a shaft from rest, feet first, arms up and bent at the elbow. 12 x 24. */
+  /**
+   * Dropping down a shaft from rest, feet first: his front arm up before his face, cut
+   * from it by the clay, the ball at the top; his back arm flung out behind him and down.
+   * Never anything up on both sides of his head: two would be the bull's horns. 12 x 24.
+   */
   fall: compile(
     [
-      '.##......##.',
-      '.##......##.',
-      '..##.###.##.',
-      '..######.#..',
-      '...#.##_##..',
-      '....######..',
-      '.....####...',
-      '......##....',
-      '....######..',
+      '..........##',
+      '..........##',
+      '....###...##',
+      '...#####..##',
+      '...###_##.##',
+      '...######.##',
+      '....####.##.',
+      '.....##.##..',
       '...#######..',
-      '...###_###..',
+      '.#########..',
+      '##.###_###..',
       '...##_####..',
       '..#_####....',
       '..######....',

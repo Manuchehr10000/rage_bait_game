@@ -60,9 +60,9 @@ wash, short of its glaze edge at x 83. His knee and foot rest on y 159, over the
 clay. The fussy loop stays on his first 4 frames of leaning, before he is up
 (`../b-passage/theseus-lean.md`).
 
-As drawn (2026-10-10): upright on his left knee, as the vases kneel an archer, his head level and
-his eye on the knot; the hilt of his sword a pixel in front of his belt and the scabbard's end
-behind his hip. His arm is 2 px, a staircase where it slants.
+As drawn (2026-10-10): upright on his left knee, a pose chosen here, his head level and his eye on
+the knot; the hilt of his sword a pixel in front of his belt and the scabbard's end behind his hip.
+His arm is 2 px, a staircase where it slants.
 
 ## Must be right
 
@@ -108,4 +108,5 @@ behind his hip. His arm is 2 px, a staircase where it slants.
 His dress: at search-extract level, from one record of fragments. No vase was looked at
 (designer's ruling, 2026-10-10). **Not verified:** how he wears the scabbard (on a baldric or at
 the belt) and on which side; his hair; whether the vases' Theseus wears anything on his head. No
-source gives him kneeling at the door.
+source gives him kneeling at the door, and none was found for how the vases draw a kneeling man:
+the upright kneel on one knee is the game's choice, not a convention of the vases.
