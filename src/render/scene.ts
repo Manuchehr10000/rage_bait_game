@@ -2189,7 +2189,7 @@ function drawEntityBack(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): voi
       break;
     case 'hero': {
       // In the fight, against the bull: his left hand on its near horn, his blade over it.
-      drawHeroBack(ctx, e as Hero, heroAgainst(s), doorGlaze(s), heroDoorway(s));
+      drawHeroBack(ctx, s.level, e as Hero, heroAgainst(s), doorGlaze(s), heroDoorway(s));
       break;
     }
     case 'ear':
@@ -4831,21 +4831,6 @@ function pixelLine(ctx: CanvasRenderingContext2D, x0: number, y0: number, x1: nu
   }
 }
 
-/** An outline of an ellipse, 1 px, centred on (cx, cy). */
-function pixelEllipse(ctx: CanvasRenderingContext2D, cx: number, cy: number, rx: number, ry: number): void {
-  const n = Math.max(8, Math.ceil((rx + ry) * 3));
-  let px = cx + rx;
-  let py = cy;
-  for (let i = 1; i <= n; i++) {
-    const a = (i / n) * Math.PI * 2;
-    const x = cx + Math.cos(a) * rx;
-    const y = cy + Math.sin(a) * ry;
-    pixelLine(ctx, px, py, x, y);
-    px = x;
-    py = y;
-  }
-}
-
 function drawMinotaurDecor(ctx: CanvasRenderingContext2D, d: MinotaurDecor): void {
   switch (d.kind) {
     case 'doorpost':
@@ -5015,16 +5000,13 @@ function drawHeroFigure(ctx: CanvasRenderingContext2D, f: HeroFrame, horn: { x: 
   }
   ctx.fillStyle = ink;
   if (f.pose === 'crouch') {
-    // Paying out: the loop grows from his hand to the floor, and the ball is in it.
+    // Paying out: the ball in his hand, the loop growing on the floor before him from it
+    // (drawLaidThread), behind him as the thread always is.
     if (!glaze) return;
     const [hx0, hy0] = THESEUS.payoutHand[payOutQuarter(f)]!;
     const hx = face === 1 ? x0 + hx0 : x0 + HERO.w - 1 - hx0;
-    const hy = y0 + hy0;
     ctx.fillStyle = THREAD;
-    const feet = y0 + HERO.h;
-    const size = f.payOut;
-    pixelEllipse(ctx, hx + 2 * face * size, (hy + feet - 1) / 2, 1 + 3 * size, (feet - 1 - hy) / 2);
-    ctx.fillRect(face === 1 ? hx : hx - 1, hy, 2, 2);
+    ctx.fillRect(face === 1 ? hx : hx - 1, y0 + hy0, 2, 2);
     return;
   }
   if (f.pose === 'climb' && f.foot) {
@@ -5225,12 +5207,46 @@ function drawBall(ctx: CanvasRenderingContext2D, x: number, floor: number): void
   ctx.fillRect(x, floor - 5, 6, 4);
 }
 
-/** A loop of thread lying on the floor, its bottom on the floor's last row of air at `y`: a flat oval, 9 by 3. */
-function drawLoop(ctx: CanvasRenderingContext2D, x: number, y: number): void {
-  ctx.fillRect(x - 3, y - 2, 7, 1);
-  ctx.fillRect(x - 4, y - 1, 1, 1);
-  ctx.fillRect(x + 4, y - 1, 1, 1);
-  ctx.fillRect(x - 3, y, 7, 1);
+/**
+ * A loop of thread lying on the floor (b-passage/thread.md, the loops): a flat oval, 9 by 3,
+ * its pixels as he lays it, from its middle and the floor's last row of air, as if he faced
+ * right. It is laid from under his front foot, its first `LOOP_UNDER` there, then out along
+ * the floor away from him and round, and closed under his foot: a coil lying on the floor,
+ * never a ring stood up.
+ */
+const LOOP: readonly (readonly [number, number])[] = [
+  [-2, 0],
+  [-3, 0],
+  [-4, -1],
+  [-3, -2],
+  [-2, -2],
+  [-1, -2],
+  [0, -2],
+  [1, -2],
+  [2, -2],
+  [3, -2],
+  [4, -1],
+  [3, 0],
+  [2, 0],
+  [1, 0],
+  [0, 0],
+  [-1, 0],
+];
+const LOOP_UNDER = 5;
+
+/** The column of his box, as if he faced right, that a loop he pays out lies under the middle of: his front, under his hand. */
+const LOOP_AT = 11;
+
+/** Where a loop he paid out lies: its middle, under his front as he crouched, and which way he faced. */
+function loopAt(t: Hero['track'], l: Hero['track']['loops'][number]): { x: number; y: number; facing: number } {
+  const f = t.frames[l.from]!;
+  const x0 = Math.round(f.x);
+  return { x: f.facing === 1 ? x0 + LOOP_AT : x0 + HERO.w - 1 - LOOP_AT, y: l.y, facing: f.facing };
+}
+
+/** The first `n` pixels of a loop as he lays it, at `at`. */
+function drawLoop(ctx: CanvasRenderingContext2D, at: { x: number; y: number; facing: number }, n: number = LOOP.length): void {
+  for (const [dx, dy] of LOOP.slice(0, n)) ctx.fillRect(at.x + dx * at.facing, at.y + dy, 1, 1);
 }
 
 /**
@@ -5258,7 +5274,19 @@ function drawLaidThread(ctx: CanvasRenderingContext2D, h: Hero, f: HeroFrame): v
     pts.push({ x: f.x + HERO.w / 2, y: f.y + HERO.h - 1 });
   }
   for (let i = 1; i < pts.length; i++) pixelLine(ctx, pts[i - 1]!.x, pts[i - 1]!.y, pts[i]!.x, pts[i]!.y);
-  for (const l of t.loops) if (k > l.to) drawLoop(ctx, Math.round(l.x), l.y);
+  for (const l of t.loops) {
+    if (k < l.from) continue;
+    const at = loopAt(t, l);
+    if (k > l.to) {
+      drawLoop(ctx, at);
+      continue;
+    }
+    // Paying it out, the ball going round in his hand over it: more of it laid every frame,
+    // so that it grows on the floor before him and is whole on his last frame there.
+    const i = k - l.from;
+    const n = l.to - l.from;
+    drawLoop(ctx, at, LOOP_UNDER + (n ? Math.round(((LOOP.length - LOOP_UNDER) * i) / n) : LOOP.length - LOOP_UNDER));
+  }
 }
 
 /**
@@ -5266,14 +5294,15 @@ function drawLaidThread(ctx: CanvasRenderingContext2D, h: Hero, f: HeroFrame): v
  * unless he is climbing. In the fight he is drawn against the bull, `against`, and then
  * the thread, which ends at the ball he left in his doorway.
  */
-function drawHeroBack(ctx: CanvasRenderingContext2D, h: Hero, against: HeroAgainst | null, doorway: readonly Rect[], his: { black: Rect; frame: Rect[] } | null): void {
+function drawHeroBack(ctx: CanvasRenderingContext2D, level: Level, h: Hero, against: HeroAgainst | null, doorway: readonly Rect[], his: { black: Rect; frame: Rect[] } | null): void {
   const d = h.def;
   const f = h.frame;
   // Through the door and the black vestibule, cut from them by a reserved line; and into his
   // own doorway, cut from its frame, never from its black, where nothing of his clay is drawn:
   // he goes into the black edge by edge. The line first, and the thread over it: the clay
-  // round him is for glaze, and never bites the thread's white.
-  const walking = f && f.pose !== 'hold' && !h.stepped && !f.front && !f.unseen ? f : null;
+  // round him is for glaze, and never bites the thread's white. Against a wall's stone,
+  // a pixel off it.
+  const walking = f && f.pose !== 'hold' && !h.stepped && !f.front && !f.unseen ? heroOffWall(level, f) : null;
   if (walking) drawHeroReserve(ctx, walking, his ? [...doorway, ...his.frame] : doorway);
   if (h.stepped) {
     // In the fight; and laid to his doorway, where he waited, and the ball there on the
@@ -5285,12 +5314,34 @@ function drawHeroBack(ctx: CanvasRenderingContext2D, h: Hero, against: HeroAgain
   } else if (!f || !f.carrying) {
     drawKnotLine(ctx, h);
     drawBall(ctx, d.ball.x, d.ball.y);
-  } else drawLaidThread(ctx, h, f);
+  } else drawLaidThread(ctx, h, walking ?? f);
   // The knot itself, on the post.
   ctx.fillStyle = THREAD;
   ctx.fillRect(d.knot.x, d.knot.y - 1, 2, 3);
   if (!f || f.pose === 'hold') drawHeroAtThePost(ctx, h);
   else if (walking) drawHeroFigure(ctx, walking, null, MN.glaze, his?.black);
+}
+
+/**
+ * Where his frame is drawn on his way down, as the tourist's is (`touristLeft`): at his box;
+ * but where a wall's stone is against its last column, and not its first, a pixel left, and
+ * the other way about a pixel right, so that nothing of him touches the masonry's lines
+ * where they come to the wall's face (a-door/tile-labyrinth.md). His box, his clock and the
+ * thread he has laid are where they were; the ball in his hand, and the thread to it, go
+ * with him.
+ */
+function heroOffWall(level: Level, f: HeroFrame): HeroFrame {
+  const x0 = Math.round(f.x);
+  const y0 = Math.round(f.y);
+  const stone = (x: number) => {
+    for (let ty = Math.floor(y0 / TILE); ty <= Math.floor((y0 + HERO.h - 1) / TILE); ty++) if (level.isSolid(Math.floor(x / TILE), ty)) return true;
+    return false;
+  };
+  const right = stone(x0 + HERO.w);
+  const left = stone(x0 - 1);
+  if (right && !left && !stone(x0 - 2)) return { ...f, x: f.x - 1 };
+  if (left && !right && !stone(x0 + HERO.w + 1)) return { ...f, x: f.x + 1 };
+  return f;
 }
 
 /**
@@ -5498,12 +5549,55 @@ function drawBullFront(ctx: CanvasRenderingContext2D, s: Scene, f: Fight): void 
 
 /** Its hands on him, over him: the palms of the clap, or the swat, cut from him by clay. */
 function drawBullHands(ctx: CanvasRenderingContext2D, s: Scene, f: Fight): void {
+  const shape = reserveShape;
+  reserveShape = null;
   if (!f.keyed || f.k >= f.def.clock.blow2) return;
   ctx.save();
   ctx.beginPath();
   ctx.rect(0, 0, VIEW_W * 4, f.def.floorY);
   ctx.clip();
-  fillPixels(ctx, bullNow(s, f).over);
+  const pic = bullNow(s, f);
+  // Its far horn in front of him on its horns, cut from him by clay wherever it meets him,
+  // its root where his body lies over its head too (../shared/bull-leaper-tumbling.md).
+  if (pic.tips.px.size && shape) cutOnHim(ctx, pic.tips, shape);
+  fillPixels(ctx, pic.over);
+  ctx.restore();
+}
+
+/** A canvas the size of the world's for cutting a line of clay on the tourist's shape alone. */
+let cutLayer: HTMLCanvasElement | null = null;
+
+/**
+ * A line of clay round `part`, a pixel all round it, corners included, laid only on the
+ * tourist as he is drawn this frame (his shape in the reserve's layer, within `within`).
+ */
+function cutOnHim(ctx: CanvasRenderingContext2D, part: Pixels, within: Rect): void {
+  const layer = reserveLayer;
+  if (!layer) return;
+  if (!cutLayer || cutLayer.width !== layer.width || cutLayer.height !== layer.height) {
+    cutLayer = document.createElement('canvas');
+    cutLayer.width = layer.width;
+    cutLayer.height = layer.height;
+  }
+  const c = cutLayer.getContext('2d');
+  if (!c) return;
+  const t = ctx.getTransform();
+  c.setTransform(1, 0, 0, 1, 0, 0);
+  c.globalCompositeOperation = 'source-over';
+  c.clearRect(0, 0, cutLayer.width, cutLayer.height);
+  c.setTransform(t);
+  c.beginPath();
+  c.rect(within.x, within.y, within.w, within.h);
+  c.clip();
+  c.fillStyle = MN.clay;
+  for (const { x, y } of part.outline().each()) c.fillRect(x, y, 1, 1);
+  c.setTransform(1, 0, 0, 1, 0, 0);
+  c.globalCompositeOperation = 'destination-in';
+  c.drawImage(layer, 0, 0);
+  c.globalCompositeOperation = 'source-over';
+  ctx.save();
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.drawImage(cutLayer, 0, 0);
   ctx.restore();
 }
 
@@ -5762,6 +5856,8 @@ function glazeBehind(s: Scene): Rect[] {
 
 /** A canvas the tourist is drawn into to take his shape for the reserve: the world canvas's size. */
 let reserveLayer: HTMLCanvasElement | null = null;
+/** Where his shape is in the reserve's layer this frame, or null: what is drawn over him afterwards cuts its line of clay there. */
+let reserveShape: Rect | null = null;
 
 /**
  * The tourist's reserve (content/ch03-aegean/l06-minotaur/a-door/tourist-reserve.md): a
@@ -5772,11 +5868,13 @@ let reserveLayer: HTMLCanvasElement | null = null;
  * notches the masonry, and never on the costume, which is drawn over it.
  */
 function drawTouristReserve(ctx: CanvasRenderingContext2D, s: Scene): void {
+  reserveShape = null;
   const p = s.player;
   const cx = s.camera.ix;
   const cy = s.camera.iy;
-  // Where he can be drawn and a pixel round it: his sprite, or, dying, anywhere in the view.
-  const him: Rect = s.death ? { x: cx, y: cy, w: VIEW_W, h: VIEW_H } : { x: Math.round(p.x) - 2, y: Math.round(p.y) - 1, w: 15, h: 18 };
+  // Where he can be drawn and a pixel round it: his sprite, a pixel either way off a wall's
+  // stone (`touristLeft`), or, dying, anywhere in the view.
+  const him: Rect = s.death ? { x: cx, y: cy, w: VIEW_W, h: VIEW_H } : { x: Math.round(p.x) - 3, y: Math.round(p.y) - 1, w: 16, h: 18 };
   const stone = doorposts(s);
   const clip: Rect[] = [];
   for (const b of glazeBehind(s)) {
@@ -5813,26 +5911,81 @@ function drawTouristReserve(ctx: CanvasRenderingContext2D, s: Scene): void {
   lctx.fillStyle = MN.clay;
   lctx.fillRect(him.x, him.y, him.w, him.h);
   lctx.restore();
-  // Set a pixel left, right and up where the glaze is, and up at the corners; and down only
-  // while he is off his feet, in the air or tossed, so it never lifts him off what he stands on.
-  ctx.save();
-  ctx.beginPath();
-  for (const r of clip) ctx.rect(r.x, r.y, r.w, r.h);
-  ctx.clip();
+  reserveShape = him;
+  // Set a pixel left, right and up where the glaze is, and up at the corners. Down, and down
+  // at the corners: off his feet, in the air or tossed, wholly; on them, or lying where he
+  // fell, only as far as his own last row, so that it cuts his lower corners and the gap
+  // under his hem but never comes between him and what he stands or lies on; and wholly
+  // over Theseus in the fight, whom he never stands on.
   const sx = t.a * him.x + t.e;
   const sy = t.d * him.y + t.f;
-  const sides: (readonly [number, number])[] = [
+  const shifted = (at: readonly (readonly [number, number])[], within: Rect[]) => {
+    ctx.save();
+    ctx.beginPath();
+    for (const r of clip) ctx.rect(r.x, r.y, r.w, r.h);
+    ctx.clip();
+    ctx.beginPath();
+    for (const r of within) ctx.rect(r.x, r.y, r.w, r.h);
+    ctx.clip();
+    for (const [dx, dy] of at) ctx.drawImage(reserveLayer!, sx, sy, t.a * him.w, t.d * him.h, him.x + dx, him.y + dy, him.w, him.h);
+    ctx.restore();
+  };
+  const sides = [
     [-1, 0],
     [1, 0],
     [0, -1],
     [-1, -1],
     [1, -1],
-  ];
-  if (aloft(s)) sides.push([0, 1], [-1, 1], [1, 1]);
-  for (const [dx, dy] of sides) {
-    ctx.drawImage(reserveLayer, sx, sy, t.a * him.w, t.d * him.h, him.x + dx, him.y + dy, him.w, him.h);
+  ] as const;
+  const under = [
+    [-1, 1],
+    [0, 1],
+    [1, 1],
+  ] as const;
+  shifted(sides, [him]);
+  if (aloft(s)) {
+    shifted(under, [him]);
+    return;
   }
-  ctx.restore();
+  const floor = underside(s);
+  if (floor > him.y) shifted(under, [{ x: him.x, y: him.y, w: him.w, h: Math.min(him.h, floor - him.y) }]);
+  const theseus = theseusGlaze(s, him);
+  if (theseus.length) shifted(under, theseus);
+}
+
+/**
+ * The row under him as he is drawn this frame, which his reserve never goes below: under
+ * his feet, standing; under him where he lies, clapped or swatted, on the floor or on its
+ * brow; under him held by the horns, or flat at the wall.
+ */
+function underside(s: Scene): number {
+  const p = s.player;
+  const feet = Math.round(p.y) + p.h;
+  if (!s.death) return feet;
+  const fight = s.entities.find((e): e is Fight => e.def.kind === 'fight');
+  const c = fight?.caught;
+  if (!fight || !c) return feet;
+  const u = Math.round(s.death.t * DEATH_FRAMES);
+  if (s.death.cause === fight.def.hands && c.by === 'clap') return u < CLAP.on ? feet : u < CLAP.down ? clapHeld(fight, u).y + c.h : fight.def.floorY;
+  if (s.death.cause === fight.def.hands && c.by === 'swat') return swatHeld(fight, u).y;
+  if (s.death.cause !== fight.def.horns || c.by !== 'toss') return feet;
+  const b = fight.tossed(u);
+  return b.pose === 'flat' ? fight.def.floorY : Math.round(b.y) + p.h;
+}
+
+/** Theseus's glaze in the fight near `near`, a rect a pixel: what is under the tourist there is never what he stands on. */
+function theseusGlaze(s: Scene, near: Rect): Rect[] {
+  const h = s.entities.find((e): e is Hero => e.def.kind === 'hero');
+  const f = h?.frame;
+  if (!h || !f || !h.stepped || f.unseen) return [];
+  const pic = heroNow(h, f, heroAgainst(s));
+  const out: Rect[] = [];
+  for (const part of [pic.back, pic.front]) {
+    for (const { x, y, ink } of part.each()) {
+      if (ink === '#' && x >= near.x && x < near.x + near.w && y >= near.y && y < near.y + near.h) out.push({ x, y, w: 1, h: 1 });
+    }
+  }
+  return out;
 }
 
 /**

@@ -251,6 +251,15 @@ test('its back drawn on its solid on every frame from the grip, pinned, heaved a
     if (k >= FIGHT.toss.to + 5 && k < C.blow2 + STRUCK && Math.min(...mine.filter((q) => q.ink === '#').map((q) => q.y)) > F - FIGHT.back.heap - 4) wrong.push(`L+${k}: kneeling no taller than the heap`);
     if (k > FIGHT.toss.to && k < C.blow2 + STRUCK && farStone(body) !== crouched) wrong.push(`L+${k}: the far stone hidden`);
     if (k >= FIGHT.toss.to + 5) for (const q of mine) if (q.ink === '_' && q.x >= FIGHT.body.x0 + 8) wrong.push(`L+${k}: a cut across it at (${q.x}, ${q.y})`);
+    // The heap's shoulder and back, over the notch under its chest, one mass: no pixel of
+    // clay inside its outline on any row (after the final review, 2026-10-10: a pixel of the
+    // neck's line left in its shoulder at (121, 719) read as an eye, the heap a second head).
+    if (k >= C.blow2 + STRUCK) {
+      for (let y = F - FIGHT.back.heap; y < F - 14; y++) {
+        const xs = mine.filter((q) => q.y === y && q.ink === '#').map((q) => q.x);
+        for (let x = Math.min(...xs); x <= Math.max(...xs); x++) if (!glaze(body, x, y)) wrong.push(`L+${k}: clay in its shoulder at (${x}, ${y})`);
+      }
+    }
   }
   // The second blow lets it slump: through the frames its head jerks up, nothing of it from its
   // shoulders back stands higher than it knelt, and then its highest glaze goes down (after a
@@ -744,9 +753,10 @@ async function open(page: Page): Promise<void> {
 
 /**
  * Every frame of an attempt from L - 8 on, and of its death: Theseus's glaze, the bull's
- * and where they touch; and anything of either, or of the tourist, drawn on the cell's stone.
+ * and where they touch; anything of either, or of the tourist, drawn on the cell's stone;
+ * and where the tourist touches any glaze but what he stands or lies on, under his last row.
  */
-async function looked(page: Page, name: string, hands: string | null): Promise<{ cause: string | null; frames: number; bull: number; him: number; touches: string[]; stone: string[] }> {
+async function looked(page: Page, name: string, hands: string | null): Promise<{ cause: string | null; frames: number; bull: number; him: number; touches: string[]; stone: string[]; tourist: string[] }> {
   await open(page);
   return page.evaluate(
     ({ presses, floor, view, glaze, name, hands, tile, colours }) => {
@@ -802,7 +812,7 @@ async function looked(page: Page, name: string, hands: string | null): Promise<{
       };
       const GL = parseInt(glaze.slice(1), 16);
       const GREEN = 0x00ff00;
-      const seen = { frames: 0, bull: 0, him: 0, touches: [] as string[], stone: [] as string[] };
+      const seen = { frames: 0, bull: 0, him: 0, touches: [] as string[], stone: [] as string[], tourist: [] as string[] };
       let at = '';
       /** This frame: the bull's glaze, green, against his, which is the glaze that goes when he does. */
       const look = (now: string) => {
@@ -817,6 +827,24 @@ async function looked(page: Page, name: string, hands: string | null): Promise<{
         g.entities = keep;
         mark = false;
         seen.frames++;
+        // The tourist against the glaze: Theseus's, which he never stands on, nowhere; the
+        // bull's or any other, but the masonry's lines, nowhere above his last row: his
+        // reserve, its lower corners included (a-door/tourist-reserve.md; after the final
+        // review, 2026-10-10: Theseus's glaze met him dead on its brow and at its feet).
+        let last = -1;
+        for (let j = 1; j < view.h - 1; j++) for (let i = 1; i < view.w - 1; i++) if (HIS.has(ink(all, i, j))) last = j;
+        for (let j = 1; j <= last; j++) {
+          for (let i = 1; i < view.w - 1; i++) {
+            if (!HIS.has(ink(all, i, j))) continue;
+            for (const [dx, dy] of [[-1, -1], [0, -1], [1, -1], [-1, 0], [1, 0], [-1, 1], [0, 1], [1, 1]] as const) {
+              const c = ink(all, i + dx, j + dy);
+              if (c !== GL && c !== GREEN) continue;
+              const theseus = c === GL && ink(without, i + dx, j + dy) !== GL;
+              if (!theseus && (j + dy > last || stone(i + dx, j + dy + g.camera.iy))) continue;
+              if (seen.tourist.length < 20) seen.tourist.push(`${at}: (${i}, ${j + g.camera.iy}) by ${theseus ? 'Theseus' : c === GREEN ? 'the bull' : 'glaze'} at (${i + dx}, ${j + dy + g.camera.iy})`);
+            }
+          }
+        }
         for (let j = 1; j < view.h - 1; j++) {
           for (let i = 1; i < view.w - 1; i++) {
             const c = ink(all, i, j);
@@ -857,7 +885,7 @@ async function looked(page: Page, name: string, hands: string | null): Promise<{
   );
 }
 
-test("in the game: no glaze of the bull's touches Theseus's, corners included, and nothing of either is drawn on the cell's stone, on any frame of the clean run's fight, the clap, the swat or the toss", async ({ context }) => {
+test("in the game: no glaze of the bull's touches Theseus's, corners included, and nothing of either is drawn on the cell's stone, on any frame of the clean run's fight, the clap, the swat or the toss; nor does the tourist touch either but what he stands or lies on, to the last frame of his death", async ({ context }) => {
   test.setTimeout(120_000);
   // From L on, by the fight's clock: these hands, or the clean run's own where they give none.
   const attempts: [string, string | null, string | null][] = [
@@ -881,6 +909,7 @@ test("in the game: no glaze of the bull's touches Theseus's, corners included, a
     expect([r.bull > 0, r.him > 0], name).toEqual([true, true]);
     expect(r.touches, name).toEqual([]);
     expect(r.stone, name).toEqual([]);
+    expect(r.tourist, name).toEqual([]);
   }
 });
 

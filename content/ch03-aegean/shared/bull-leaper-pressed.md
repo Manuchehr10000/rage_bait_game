@@ -33,11 +33,18 @@ The Minotaur, beat e, the hands:
   who gives way round it, was a torso on a hand. Here the stone stays whole in front of him and
   nothing of him or of the hand on him touches Theseus. Pressed down, he goes a few pixels back
   toward the hatch from where he stood, his trainers at x 90, short of where his feet were.)
+  When the first blow's lurch shoves Theseus left over him, L+77 to 104, Theseus is behind him
+  and cut from him by his reserved line, its lower corners included
+  (`../l06-minotaur/a-door/tourist-reserve.md`; after the final review, 2026-10-10, Theseus's
+  foot met his outline at a corner at L+80 and 102).
 - Frame 1 where the swat catches him off the floor, in the air or standing on its back behind its
   head: frames 0 and 1 his own frame under the palm; from frame 2 this frame, carried down with
   the palm onto the brow by frame 5, and riding the head after. On the brow he is pressed 2 px
   down into its poll, his bottom row a pixel under the brow's, so that the tips of its horns stand
-  up behind him either side, two pixels each, over the line of clay round him. (When it was
+  up behind him either side, two pixels each, over the line of clay round him. Theseus's head
+  and sword arm, which come up under him there from L+70, are cut from him by that line under
+  him too, which never goes on the brow he lies on (after the final review, 2026-10-10: they met
+  his outline from L+70 to 99). (When it was
   drawn, 2026-10-10: lying on top of the brow, the clay round him took the horns' last row and he
   hid them; it read as a flat man on a lump, not on its brow. After the check of the deaths, the
   same day: caught standing on its back he was first dropped 27 px to the floor, under its raised

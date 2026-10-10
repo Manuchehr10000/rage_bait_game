@@ -926,3 +926,94 @@ test("in the game: Theseus goes into his black doorway edge by edge, the last fr
   expect(r.inBlack).toEqual([]);
   expect(r.touches).toEqual([]);
 });
+
+test("in the game: on his way down nothing of Theseus touches the masonry's lines, corners included: against a wall's stone his frame is drawn a pixel off it; and each loop he pays out grows on the floor every frame, never a ring stood up", async ({ page }) => {
+  await open(page);
+  const r = await page.evaluate(
+    ({ presses, glaze, from, to }) => {
+      const g = (window as unknown as W).__game;
+      g.titleTimer = 0;
+      const hero = () => g.entities.find((e: { def: { kind: string } }) => e.def.kind === 'hero');
+      const key = (c: string, d: boolean) => window.dispatchEvent(new KeyboardEvent(d ? 'keydown' : 'keyup', { code: c }));
+      const ctx = g.world.getContext('2d') as CanvasRenderingContext2D;
+      const s = ctx.canvas.width / 320;
+      const GL = parseInt(glaze.slice(1), 16);
+      const stone = (x: number, y: number) => g.level.isSolid(Math.floor(x / 16), Math.floor(y / 16));
+      const out = { frames: 0, his: 0, touches: [] as string[], loops: [] as number[][], upright: 0 };
+      let loop: number[] | null = null;
+      for (let i = 0; i < 700; i++) {
+        const p = presses[i] ?? { dir: 0, jump: false };
+        key('ArrowRight', p.dir > 0);
+        key('ArrowLeft', p.dir < 0);
+        key('Space', p.jump);
+        g.tick();
+        const h = hero();
+        const f = h.frame;
+        if (h.k < from || !f || f.unseen || f.front) continue;
+        if (h.k > to) break;
+        // Only where a line could reach him: a wall's stone within 2 px of his frame's sides,
+        // in his rows (a floor's top row is the wash, and no roof comes within 8 px of his
+        // head); and paying out.
+        const fx = Math.round(f.x);
+        const fy = Math.round(f.y);
+        let near = f.pose === 'crouch';
+        for (let y = fy; y < fy + 24 && !near; y++) for (const x of [fx - 2, fx - 1, fx + 12, fx + 13]) if (stone(x, y)) near = true;
+        if (!near) continue;
+        // The view on him, wherever the tourist is, for this drawing only. Round his box, the
+        // glaze on air is his and the glaze on stone the masonry's lines.
+        const keep = g.camera.y;
+        g.camera.y = Math.max(0, Math.min(g.camera.levelH - 180, f.y - 78));
+        g.draw();
+        const x0 = Math.round(f.x) - 6;
+        const y0 = Math.round(f.y) - 3;
+        const d = ctx.getImageData(x0 * s, (y0 - g.camera.iy) * s, 24 * s, 30 * s).data;
+        g.camera.y = keep;
+        const ink = (x: number, y: number) => {
+          const o = (((y - y0) * s + 1) * 24 * s + (x - x0) * s + 1) * 4;
+          return (d[o]! << 16) | (d[o + 1]! << 8) | d[o + 2]!;
+        };
+        out.frames++;
+        // Paying out: the thread's white on the floor's three rows before him, which grows,
+        // and over them, where nothing but the ball in his hand is, and the thread to it.
+        if (f.pose === 'crouch') {
+          if (!loop) out.loops.push((loop = []));
+          let floor = 0;
+          for (let y = y0 + 24; y < y0 + 27; y++) for (let x = x0 + 1; x < x0 + 23; x++) if (ink(x, y) === 0xffffff) floor++;
+          loop.push(floor);
+          let over = 0;
+          for (let y = y0 + 12; y < y0 + 24; y++) for (let x = x0 + 1; x < x0 + 23; x++) if (ink(x, y) === 0xffffff) over++;
+          out.upright = Math.max(out.upright, over);
+        } else loop = null;
+        for (let y = y0 + 1; y < y0 + 29; y++) {
+          for (let x = x0 + 4; x < x0 + 20; x++) {
+            if (ink(x, y) !== GL || stone(x, y)) continue;
+            out.his++;
+            for (const [dx, dy] of [[-1, -1], [0, -1], [1, -1], [-1, 0], [1, 0], [-1, 1], [0, 1], [1, 1]] as const) {
+              if (stone(x + dx, y + dy) && ink(x + dx, y + dy) === GL && out.touches.length < 20) out.touches.push(`hero ${h.k}: (${x}, ${y}) by (${x + dx}, ${y + dy})`);
+            }
+          }
+        }
+      }
+      key('ArrowLeft', false);
+      key('ArrowRight', false);
+      key('Space', false);
+      return out;
+    },
+    // From his drop off G0 to row 5, short of his doorway (its frame is glaze on air; the test above has it).
+    { presses: cleanPresses(), glaze: '#1f140e', from: 105, to: 394 },
+  );
+  // Every frame of it by a wall seen, him on each (after the final review, 2026-10-10:
+  // dropping past a wall, or flush against one, his raised hand or edge met a course line's
+  // end on 24 frames).
+  expect(r.frames).toBe(162);
+  expect(r.his).toBeGreaterThan(162 * 50);
+  expect(r.touches).toEqual([]);
+  // The five pay-outs, 12, 12, 12, 9 and 6 frames: the loop more on the floor every frame
+  // (after the final review, 2026-10-10: it grew as a closed ring stood up from his hand to
+  // the floor, up to 11 rows, a white 0 or O beside him).
+  expect(r.loops.map((l) => l.length)).toEqual([12, 12, 12, 9, 6]);
+  for (const l of r.loops) for (let i = 1; i < l.length; i++) expect(l[i], JSON.stringify(l)).toBeGreaterThan(l[i - 1]!);
+  // Over the floor's rows, from his head down, never more white than the ball in his hand
+  // and the pixel of thread at it: no ring stood up.
+  expect(r.upright).toBeLessThanOrEqual(6);
+});

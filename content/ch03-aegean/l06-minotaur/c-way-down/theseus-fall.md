@@ -22,7 +22,9 @@ screen beside the tourist, before the cell, that read as a horned head (found on
 
 Down each of the column's four 96 px shafts onto the pillar tops, through the thread holes of
 Daedalus's rooms, and from J1 onto row 5: on the screen beside the tourist on Z1, T2, T3 and T
-(`../LEVEL.md`, beat c, the race). Behind the tourist.
+(`../LEVEL.md`, beat c, the race). Behind the tourist. Dropping flush against a shaft's wall,
+his frame is drawn a pixel off its stone, so that his raised hand never meets a course line where
+it comes to the wall's face (`../a-door/theseus-kneel.md`, "Theseus, in every pose").
 
 ## Must be right
 

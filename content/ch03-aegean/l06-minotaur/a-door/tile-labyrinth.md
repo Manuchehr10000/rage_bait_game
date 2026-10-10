@@ -65,7 +65,11 @@ the joint at x 112, and a puff rises at the one at x 80.
 - **No line of it ever touches another glaze shape**: two glaze shapes never touch without 1 px
   of clay between them (`../LEVEL.md`, Art, 2026-10-10). Wash is not glaze, so a figure may stand
   on it and the black may meet it; a line may not, hence the joints a pixel under every floor's
-  top and the clay round the vestibule's black.
+  top and the clay round the vestibule's black; and a figure against a wall's stone is drawn a
+  pixel off it, where a course line comes to the wall's face: the tourist
+  (`tourist-reserve.md`) and Theseus on his way down (`theseus-kneel.md`, "Theseus, in every
+  pose"; after the final review, 2026-10-10, `tests/minotaur-theseus.spec.ts`), never the stone
+  notched.
 - **No lit top.** The rough's pale top on stone with air over it was light from above, which this
   chapter keeps for open sky (`../../CHAPTER.md`): the shafts and the hatch must never read as
   light wells.

@@ -856,10 +856,10 @@ test('in the game: the death counter lies on the band of rays only while the cam
   ]);
 });
 
-test('in the game: the clean run goes out at the door at frame 1346 with Theseus and the body at the post behind him, cut from it by clay on every frame, corners included, and the card, at 0 to 4 rows of causes, covers neither the door nor them; the camera keeps the vase\'s foot', async ({ page }) => {
+test('in the game: the clean run goes out at the door at frame 1346 with Theseus and the body at the post behind him, cut from it by clay on every frame, corners included, and the card, at 0 to 4 rows of causes, covers neither the door nor them; the camera keeps the vase\'s foot; and on the door storey, going in and coming out, the tourist\'s reserve has its lower corners', async ({ page }) => {
   await open(page);
   const r = await page.evaluate(
-    ({ presses }) => {
+    ({ presses, colours }) => {
       const g = (window as unknown as W).__game;
       g.titleTimer = 0;
       const key = (c: string, d: boolean) => window.dispatchEvent(new KeyboardEvent(d ? 'keydown' : 'keyup', { code: c }));
@@ -905,6 +905,33 @@ test('in the game: the clean run goes out at the door at frame 1346 with Theseus
         }
         if (over) crossing++;
       };
+      // The tourist's reserve, on his feet among the glaze of the door storey: nothing of him
+      // a pixel from glaze, corners included, but under his feet, and the post's edge and the
+      // masonry's lines, which it never notches (a-door/tourist-reserve.md; after the final
+      // review, 2026-10-10: his lower corners met the queue, Ariadne and the vestibule's black).
+      const HIS = new Set(colours.map((c: string) => parseInt(c.slice(1), 16)));
+      const reserved: string[] = [];
+      const reserve = (t: number) => {
+        const p = g.player;
+        const x0 = Math.round(p.x) - 3;
+        const y0 = Math.round(p.y) - 2;
+        const cy = g.camera.iy;
+        g.draw();
+        const d = wctx.getImageData(x0 * 4, (y0 - cy) * 4, 18 * 4, 20 * 4).data;
+        const ink = (x: number, y: number) => {
+          const o = (((y - y0) * 4 + 1) * 18 * 4 + (x - x0) * 4 + 1) * 4;
+          return (d[o]! << 16) | (d[o + 1]! << 8) | d[o + 2]!;
+        };
+        const feet = Math.round(p.y) + 16;
+        const free = (x: number, y: number) => y >= feet || g.level.isSolid(Math.floor(x / 16), Math.floor(y / 16)) || (x >= post.x && x < post.x + 4 && y >= post.top);
+        for (let y = y0 + 1; y < y0 + 19; y++) {
+          for (let x = x0 + 1; x < x0 + 17; x++) {
+            if (!HIS.has(ink(x, y))) continue;
+            for (let dy = -1; dy <= 1; dy++)
+              for (let dx = -1; dx <= 1; dx++) if (ink(x + dx, y + dy) === 0x1f140e && !free(x + dx, y + dy) && reserved.length < 20) reserved.push(`${t}: (${x}, ${y}) by (${x + dx}, ${y + dy})`);
+          }
+        }
+      };
       let out = -1;
       let began = -1;
       let top = Infinity;
@@ -915,6 +942,7 @@ test('in the game: the clean run goes out at the door at frame 1346 with Theseus
         g.tick();
         top = Math.min(top, g.camera.y);
         if (began < 0 && tableau.k >= 0) began = i;
+        if (i <= 90 || began >= 0) reserve(i);
         if (began >= 0) look(i);
         if (g.state === 'complete') {
           out = i;
@@ -984,10 +1012,12 @@ test('in the game: the clean run goes out at the door at frame 1346 with Theseus
         return rects[0]!;
       };
       const cards = [0, 1, 2, 3, 4].map(card);
-      return { out, began, state: g.state, k: tableau.k, x: tableau.x, picture: { x0, x1, y0, y1 }, camY: g.camera.iy, him, covered, cards, touches, crossing, top };
+      return { out, began, state: g.state, k: tableau.k, x: tableau.x, picture: { x0, x1, y0, y1 }, camY: g.camera.iy, him, covered, cards, touches, crossing, top, reserved };
     },
-    { presses: cleanPresses() },
+    // His costume's inks (content/ch03-aegean/shared/bull-leaper.md; src/render/procedural.ts, BULL_LEAPER).
+    { presses: cleanPresses(), colours: ['#2b1d10', '#1d1917', '#b08850', '#f4f1ea', '#e6b48c', '#1c1c1c', '#b5d93b', '#d6ae45', '#b4392b', '#2f5f9a', '#2d3a66', '#ecebe6'] },
   );
+  expect(r.reserved).toEqual([]);
   expect({ out: r.out, began: r.began, state: r.state, k: r.k, x: r.x }).toEqual({ out: 1346, began: 1298, state: 'complete', k: 48, x: 66 });
   // Theseus at the post, x 66, and the body to x 127: in the view, the camera never moving
   // sideways, from x 66 to under 128, on the door storey.

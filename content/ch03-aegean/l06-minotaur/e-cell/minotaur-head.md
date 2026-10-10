@@ -50,8 +50,10 @@ it, so that it is always whole.
   him, and what the toss hooks him with (`tests/minotaur-fight.spec.ts`).
 - **The hook seen**: with a tourist on its horns, his feet on their tips, its far horn, the 8 px
   of frame 1's four horn rows from 6 px into the box, is drawn again in front of him with a line
-  of clay round it where it lies on him, so that the horn is seen in front of his feet, never
-  lost under him; the near one is in Theseus's hand. On the last frame a man from its back is on
+  of clay round it wherever it lies on him, its root too where he lies over its head, so that
+  the horn is seen in front of his feet, never lost under him (after the final review's sweep,
+  2026-10-10: tossed from the wall, its root met his kilt, where the clay had been left out
+  over its own head behind him); the near one is in Theseus's hand. On the last frame a man from its back is on
   them, 22 px of glaze stand in the horns' 5 rows over its box, of frame 1's 24 (`tests/minotaur-fight.spec.ts`,
   `tests/minotaur-bull.spec.ts`; after a check of the polish, 2026-10-10: 0 to 8 were seen, the
   head under his feet).

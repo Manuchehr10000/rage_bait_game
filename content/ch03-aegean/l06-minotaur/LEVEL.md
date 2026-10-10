@@ -164,7 +164,14 @@ Chosen in the asset notes (2026-10-10), where this file did not decide, for the 
 - A 1 px line of reserved clay round the tourist wherever glaze is behind him, corners included,
   never on the costume and never inside the hero's doorway before L−8; and against a wall's stone
   his frame drawn a pixel off it, so that nothing of him lies on the masonry's lines (his box where
-  it was; `a-door/tourist-reserve.md`, after the whole-level review, 2026-10-10).
+  it was; `a-door/tourist-reserve.md`, after the whole-level review, 2026-10-10). On his feet it
+  goes down to his last row, never under it, so that his lower corners are cut too; and under
+  him over Theseus's glaze, which he never stands on (after the final review, the same day).
+  Theseus's frame on his way down is drawn a pixel off a wall's stone too (`a-door/theseus-kneel.md`).
+- The loops Theseus pays out are coils lying flat on the floor before his front foot, laid from
+  under it and growing every frame after the first to the whole 9 × 3 oval he leaves there
+  (`b-passage/thread.md`, item 7; after the final review, 2026-10-10: grown as an upright closed
+  ring from his hand to the floor, they read as a white 0 or O beside him).
 - The boss drawn as a small round knob of filled glaze, 5 by 3, and the hero's doorway framed by
   a line, not the rough's lintel of stone in row 5's air. (Drawn first in outline, as a ring, the
   knob read as the letter o beside the ball; a check of the stage filled it, 2026-10-10.)
@@ -265,8 +272,11 @@ Chosen in the asset notes (2026-10-10), where this file did not decide, for the 
   after a check of the polish, as now).
 - Where he lies flat, and the swat's hand on him (after the same check, `../shared`,
   `e-cell/minotaur-hand.md`): clapped or swatted on the floor, at its feet, x 76 to 91, the same
-  place for both, before Theseus's feet (from x 94) with two pixels of clay, and clear of the near
-  stone where it rests (x 100) and where it is set down (x 98); so a man swatted on the floor goes
+  place for both, before Theseus's feet (from x 94) with two pixels of clay while he stands at
+  its head, and clear of the near stone where it rests (x 100) and where it is set down (x 98);
+  shoved left over him by the lurch, L+77 to 104, Theseus is cut from him by his reserve, its
+  lower corners included, as he is on its brow, where Theseus's head and sword arm come up under
+  him (after the final review, 2026-10-10); so a man swatted on the floor goes
   down a few pixels back from where he stood, and a floor clap carries him 12 px along the floor
   between its palms. The swat's hand on a man on the floor is never over Theseus, who stands in
   front of its far arm: on his head short of Theseus's head, then on his face and chest, its

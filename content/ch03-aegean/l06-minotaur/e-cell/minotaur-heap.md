@@ -41,7 +41,10 @@ The head, `minotaur-head` frame 2, lies on the floor, its pixels within x 105 to
 735 (`headAt`, `src/engine/entities.ts`), clear of Theseus's feet, which come to x 103, and over
 the far stone where it was let go, x 110 to 117; the near one, where it was set down, x 98 to 105,
 lies before it, both y 732 to 735. The head and its neck are cut from what is behind them by a
-1 px line of reserved clay, corners included, but where the neck comes out of the chest; the
+1 px line of reserved clay, corners included, but where the neck comes out of the chest, over
+whose root the shoulder is one mass of glaze with nothing of that line left in it (after the
+final review, 2026-10-10: a pixel of it left in the shoulder at (121, 719) read as an eye, and
+the heap's front as a second, gaping head over the real one on the floor); the
 stones are behind everything, drawn only where nothing of it is, and where its glaze meets a
 stone's contour the contour gives way to clay. What lies over a stone hides it. (The head lay at
 x 101 to 111, across both stones and behind his feet, until the whole-level review, 2026-10-10.)
@@ -67,7 +70,8 @@ included, his feet before its head.
   the Minotaur.
 - The head and the body cut from the stones by clay, and the head from the body but at its
   neck; every bent leg a filled wedge, never a Z or a 2; nothing incised across it, which would
-  read as a cut (`tests/minotaur-bull.spec.ts`).
+  read as a cut, and no pixel of clay inside its outline over the notch under its chest, which
+  would read as an eye (`tests/minotaur-bull.spec.ts`).
 - Nothing kills from L+106 on.
 
 ## Deliberately wrong

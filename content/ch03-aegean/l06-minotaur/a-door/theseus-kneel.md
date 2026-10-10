@@ -49,6 +49,14 @@ This note is the figure every other Theseus pose is drawn from: `../b-passage/th
 - **Behind the tourist**, except while he mantles up O1 (frames 66 to 85 of his route). Cut by a
   reserved line of clay from any glaze he is in front of or behind (`../LEVEL.md`, Art,
   2026-10-10), except in his black doorway, where he is unseen until he steps out.
+- **Against a wall's stone, a pixel off it**, on his way down: where the stone is against his
+  frame's last column and not its first, his frame is drawn a pixel left, and the other way
+  about a pixel right, the ball in his hand and the thread to it with him, so that nothing of
+  him touches the masonry's lines where they come to the wall's face
+  (`tile-labyrinth.md`), as the tourist's frame is (`tourist-reserve.md`). His box, his clock
+  and the thread he has laid are where they were. (After the final review, 2026-10-10: dropping
+  past a wall, or paying out flush against one, his raised hand or edge column met the end of a
+  course line on 24 frames of the way down.)
 
 ## Where it stands in the game
 

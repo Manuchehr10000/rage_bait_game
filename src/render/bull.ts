@@ -1553,9 +1553,10 @@ export type Masonry = (x: number, y: number) => boolean;
 /**
  * The bull on this frame: what is drawn behind Theseus and the tourist; what of it is drawn
  * again in front of Theseus (`nearer`); and over him, its hands on him, or its far horn when he
- * is on its horns. `ridden`: the tourist stands on its back (`holdsKneel`).
+ * is on its horns, and that horn alone, `tips`, which the scene cuts from him by clay where it
+ * lies on him over its own head. `ridden`: the tourist stands on its back (`holdsKneel`).
  */
-export function bullPicture(f: Fight, masonry: Masonry, ridden = false): { body: Pixels; front: Pixels; over: Pixels } {
+export function bullPicture(f: Fight, masonry: Masonry, ridden = false): { body: Pixels; front: Pixels; over: Pixels; tips: Pixels } {
   const d = f.def;
   const F = d.floorY;
   const st = d.stones;
@@ -1645,7 +1646,7 @@ export function bullPicture(f: Fight, masonry: Masonry, ridden = false): { body:
   clear(over, masonry);
   const drawn = withOutline(over);
   drawn.lay(before(tips, body));
-  return { body, front, over: drawn };
+  return { body, front, over: drawn, tips };
 }
 
 /** The far horn, from its tip to its poll: the rows of the head's drawing over its box, from this far into it as the game turns it. */
@@ -1740,6 +1741,9 @@ function heap(p: Pixels, f: Fight): void {
   else part.taper({ x: head.x + 8, y: head.y + 6 }, neck, 4, 5);
   part.sprite(BULL_HEAD_FRAMES[struck ? HEAD_TOSSED : HEAD_DOWN]!, head.x, head.y - HEAD_HORNS, true);
   p.lay(part, 'reserve', neck);
+  // Bowed down, the neck comes out of its chest at its root: over the root the chest is one
+  // mass of glaze, with no line of the neck's clay left in it.
+  if (!struck) for (const { x, y } of body.each()) if (y < neck.y && !part.get(x, y) && p.get(x, y) === '_') p.put(x, y);
   behind(p, floor);
   onTheSolid(p, x0, x1, top);
 }

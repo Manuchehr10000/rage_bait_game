@@ -29,8 +29,14 @@ states:
    straight down each shaft past the ledge beside it, through the thread holes of Daedalus's rooms
    and into his doorway (`tests/minotaur-theseus.spec.ts`). Over an edge it goes down at 45
    degrees to the line it lands on, so it never lies across a gap like a floor.
-7. **The loops** he pays out: each grows in his hand every frame of a pay-out and is left lying
-   where he crouched, a 9 × 3 oval.
+7. **The loops** he pays out: each a coil lying on the floor before him, a flat 9 × 3 oval,
+   never a ring stood up. It is laid from under his front foot out along the floor away from
+   him and round, a pixel more of it every frame of a pay-out after the first, while the ball
+   goes round in his hand over it, and is whole on his last frame there, where it is left lying,
+   its middle under his front column. No line runs from his hand down into it: with the ball
+   and the floor it made a T or an L. (After the final review, 2026-10-10: it grew in front of
+   him from his hand to the floor as an upright closed ring up to 9 × 11, a white 0 or O beside
+   him, and was then left lying under his feet.)
 8. **In his hand**, while he carries it: 2 × 2 at his hand. Dropping down a shaft, up in his
    front hand before his face (`../c-way-down/theseus-fall.md`), and the laid thread runs down to
    it, never into his head; its bend over the edge is laid as that hand comes down past it.
