@@ -14,6 +14,11 @@ Him pressed flat, lying, his head to the left, his colours in their order along 
 0. Flat on the floor, face up, all 16 px of him.
 1. Flat on the bull's brow between its horns: 14 px of him, centred in the frame.
 
+As drawn (2026-10-10): outlined all round, 2 px of colour between, as the clap's sliver laid down
+face up: the wig, the sweatband, his face with its eye on top and the wig's lock under his head,
+the vest and its armband, the belt, the kilt and its blue edge, his legs and his trainers. His
+head is to the left whichever way he faced.
+
 ## Where it stands in the game
 
 The Minotaur, beat e, the hands:
@@ -23,7 +28,12 @@ The Minotaur, beat e, the hands:
   16 × 3 in the rough build; it is this frame now, the clap's.
 - Frame 1 where the swat catches him in the air: frames 0 and 1 his own frame under the palm; from
   frame 2 this frame, carried down with the palm onto the brow by frame 5, and riding the head
-  after.
+  after. On the brow he is pressed 2 px down into its poll, his bottom row a pixel under the
+  brow's, so that the tips of its horns stand up behind him either side, two pixels each, over the
+  line of clay round him. (When it was drawn, 2026-10-10: lying on top of the brow, the clay round
+  him took the horns' last row and he hid them; it read as a flat man on a lump, not on its brow.)
+- The swat's hand is flat on top of him, a line of clay between its fingertips and him, from the
+  catch to frame 8, when it leaves him (`../l06-minotaur/e-cell/minotaur-hand.md`).
   The rough build squashed his frame from 13 × 14 to 17 × 6 over those frames; squashed pixels are
   rotated pixels' cousin, and the drawn frame replaces them.
 

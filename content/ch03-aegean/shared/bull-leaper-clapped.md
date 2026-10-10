@@ -13,12 +13,18 @@ Clapped flat between two palms like a fly: him seen edge-on, a sliver 4 px wide 
 high, his colours in their order down it (the wig, the sweatband, his face, the lime vest, the
 gold belt, the red kilt, his legs, the trainers).
 
+As drawn (2026-10-10): outlined down both sides, 2 px of colour between; the wig's two rows under
+his rounded top, the sweatband, his face with its eye at his front, the wig's lock down the back
+of his face and neck, the vest with the armband at his front, the belt, the kilt with its blue
+edge at his front, his legs and his trainers. Drawn facing right, and flipped with him.
+
 ## Where it stands in the game
 
 The Minotaur, beat e, the hands, where the clap catches him: frames 0 and 1 his own frame as he
 was; from frame 2 this frame, between the bull's two palms
 (`../l06-minotaur/e-cell/minotaur-hand.md`, the palm), held there to frame 5 and carried down with
-them to its feet by frame 8; from frame 9 `bull-leaper-pressed`, flat on the floor at its feet.
+them to its feet by frame 8; from frame 9 `bull-leaper-pressed`, flat on the floor at its feet, its middle where his sliver's
+was.
 
 ## Must be right
 

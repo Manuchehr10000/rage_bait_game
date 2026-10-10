@@ -17,7 +17,9 @@ head to the left, one arm hanging and one leg splayed. Row 0 is against the ceil
 
 The Minotaur, beat d. Drawn at (48, 528) on T_end's ceiling over the hatch, x 48 to 66: his box
 is at x 48 to 58, y 528 (`../l06-minotaur/LEVEL.md`, beat d), and the drawing reaches 8 px past
-it. Frames 9 to 44 of the snort's death. Before it, frames 0 to 8, he is his idle frame, unturned:
+it, 2 px past the hatch, over the lip. (Settled when the deaths were drawn, 2026-10-10:
+LEVEL.md's x 48 to 58 is his box, and the drawing stays 18 wide, so that he lies splayed, not
+folded, across the whole of the hole.) Frames 9 to 44 of the snort's death. Before it, frames 0 to 8, he is his idle frame, unturned:
 stiff where the sniff caught him for 5 frames, then carried straight up the hatch by the jet for
 4. The dust is the beast's (`../l06-minotaur/c-way-down/beast-dust.md`).
 

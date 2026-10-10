@@ -20,7 +20,10 @@ The breath of the beast under T_end's floor, which is never seen: dust, `#ecc999
 - **The puffs** of its clock: 3 or 4 grains rising and spreading for 14 frames, at the joint at
   x 80 at 40 frames, at the lip at 45.
 - **The sniff**, frames 0 to 4 of the snort: the plume over the hatch drawn down into it past his
-  legs, faster each frame.
+  legs, faster each frame, and in toward the hole's middle as it goes: the plume he stepped into,
+  as it stood, or the whole plume if it stood under half its height. (When the deaths were drawn,
+  2026-10-10: the sniff began from the whole plume, so the dust he walked into first jumped up, an
+  out-breath, on the frame it was drawn in.)
 - **The jet**, frames 5 to 8: two massed columns, each 6 px wide with 2 px of clay between them,
   out of the hole and up under his feet to the ceiling, inside the hatch's 16 px.
 - **The settling**, from frame 9: the jet's dust comes back down from under him over 22 frames and

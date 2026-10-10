@@ -1696,6 +1696,57 @@ export const BULL_LEAPER_CLOTHESLINED = compile(
 );
 
 /**
+ * Tossed by the Minotaur's horns: the jump frame, kilt up and flying out at both sides
+ * and the running shorts showing, his legs apart, tipped over at 45 degrees. The
+ * half-quarter of the somersault, turned by quarters for the other three, and drawn at
+ * that angle, never his frame rotated. The head is the clothesline's, a row lower. 18 x
+ * 18; facing right he tips back to his left, his head to the top left.
+ */
+export const BULL_LEAPER_TUMBLING = compile(
+  [
+    '..................',
+    '....OOO...........',
+    '...OKKKOO.........',
+    '..OKKKKKWO........',
+    '.OKKKKKWWSO.......',
+    'OKKKKKWWSESO......',
+    'OKKKKWWSSSSO......',
+    '.OKKKKWSSSSO......',
+    '.OKKKKOSSSO.......',
+    '..OKKKKOSOVO......',
+    '...OKKOOVVVVO.....',
+    '....OOVVVVVVAO....',
+    '.....ORVVVVVRUO...',
+    '......ORRVVRRAOOO.',
+    '.......OAARRAAPSSN',
+    '........OPAAAPPOSN',
+    '.........OPPSOO.O.',
+    '..........OSNN....',
+  ],
+  BULL_LEAPER,
+);
+
+/**
+ * Clapped flat between the Minotaur's palms like a fly: him edge-on, a sliver 4 wide and
+ * his full 16 high, his colours in their order down it, the wig's lock behind his face.
+ * Faces right.
+ */
+export const BULL_LEAPER_CLAPPED = compile(
+  ['.OO.', 'OKKO', 'OKKO', 'OWWO', 'OSEO', 'OSSO', 'OKSO', 'OKSO', 'OKSO', 'OVVO', 'OVAO', 'OVVO', 'OAAO', 'ORUO', 'OSSO', 'ONNO'],
+  BULL_LEAPER,
+);
+
+/**
+ * Pressed flat by the Minotaur's hands, lying face up, his head to the left and his
+ * colours in their order along him: on the floor, all 16 px of him; and on its brow, 14,
+ * in the middle of the frame. 16 x 4 each.
+ */
+export const BULL_LEAPER_PRESSED = [
+  compile(['.OOOOOOOOOOOOOO.', 'OKKWSESSVVAAUSNO', 'OKKWSSKKVVVARSNO', '.OOOOOOOOOOOOOO.'], BULL_LEAPER),
+  compile(['..OOOOOOOOOOOO..', '.OKKWESVVAAUSNO.', '.OKKWSKVVVARSNO.', '..OOOOOOOOOOOO..'], BULL_LEAPER),
+] as const;
+
+/**
  * In the throne, facing out, at rest: wig on and straight, hands on his knees, feet
  * on the floor. Never the slump of giving up and never a king. 12 x 16; the seat
  * line is row 10.

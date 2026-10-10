@@ -57,7 +57,9 @@ its muzzle, and its arm, behind its head, never crosses him; and never on the wa
 (`tests/minotaur-bull.spec.ts`). (Drawn first over his box's columns −1 to 6, behind his chest,
 it lay on his back and hips, and its fingers and their clay cut his kilt into a comb; at the
 wall it went into the stone. A check of the hero stage found it, 2026-10-10.) The swat's hand is frame 0, flat
-on top of him, carried down with him onto its brow or the floor, with a line of clay round it.
+on top of him, carried down with him onto its brow or the floor, with a line of clay round it and
+between its fingertips and him, until it leaves him on frame 8 of his death
+(`../../shared/bull-leaper-pressed.md`).
 The free hand, once it has stopped clawing, goes down behind its head, unseen, and once the near
 one has set the stone down, flat on its far stone; from then both hands are flat on their stones,
 the near one on the stone where it set it. The heap's hand, flat on the floor beyond its stones,

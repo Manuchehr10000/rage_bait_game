@@ -26,6 +26,7 @@ import {
   heroDrawing,
   heroGrip,
   heroPicture,
+  SWAT,
   type Hand,
   type HeroAgainst,
   type HeroDrawing,
@@ -738,4 +739,254 @@ test('in the game: off his feet, in the air or hooked and thrown by the horns, t
   expect(r.frames).toBeGreaterThan(40);
   expect(r.his).toBeGreaterThan(0);
   expect(r.touches).toEqual([]);
+});
+
+// ---------------------------------------------------------------------------
+// The tourist's deaths in the cell, as drawn (content/ch03-aegean/shared:
+// bull-leaper-clapped, -pressed, -tumbling and -dead).
+// ---------------------------------------------------------------------------
+
+/** His costume's inks (content/ch03-aegean/shared/bull-leaper.md; src/render/procedural.ts, BULL_LEAPER), as the canvas gives them back. */
+const HIS = ['#2b1d10', '#1d1917', '#b08850', '#f4f1ea', '#e6b48c', '#1c1c1c', '#b5d93b', '#d6ae45', '#b4392b', '#2f5f9a', '#2d3a66', '#ecebe6'];
+const WIG = 0x1d1917;
+const CLAY = 0xc8743d;
+const GLAZE = 0x1f140e;
+const TRAINERS = 0xecebe6;
+
+/** What is drawn of him on a frame: his pixels by his inks, in world px, each with its ink. */
+type Him = { x: number; y: number; ink: number }[];
+
+/** His pixels as a picture from the top-left of their box: `x,y:ink`, sorted, and the box's size. */
+function shape(px: Him): { w: number; h: number; key: string } {
+  const x0 = Math.min(...px.map((q) => q.x));
+  const y0 = Math.min(...px.map((q) => q.y));
+  const w = Math.max(...px.map((q) => q.x)) - x0 + 1;
+  const h = Math.max(...px.map((q) => q.y)) - y0 + 1;
+  return { w, h, key: px.map((q) => `${q.x - x0},${q.y - y0}:${q.ink}`).sort().join(' ') };
+}
+
+/** The picture turned a quarter counter-clockwise, as the game turns a frame. */
+function turned(px: Him): Him {
+  return px.map((q) => ({ x: q.y, y: -q.x, ink: q.ink }));
+}
+
+/** The picture mirrored, as the game flips a frame to face left. */
+const mirrored = (px: Him): Him => px.map((q) => ({ x: -q.x, y: q.y, ink: q.ink }));
+
+/** Every whole quarter turn of a picture, 0 to 3. */
+function quarters(px: Him): string[] {
+  const out: string[] = [];
+  let p = px;
+  for (let q = 0; q < 4; q++, p = turned(p)) out.push(shape(p).key);
+  return out;
+}
+
+/** The mean of the ys or xs of his pixels in one ink. */
+const mean = (px: Him, ink: number, of: 'x' | 'y') => {
+  const q = px.filter((v) => v.ink === ink);
+  return q.reduce((a, v) => a + v[of], 0) / q.length;
+};
+
+/**
+ * One attempt from the spawn, with the clean run's hands but from L these (by the fight's
+ * clock): his pixels on a frame in the air before he dies, if `air` is given (the fight's
+ * frame), and on every frame of his death; with the fight as it is on each.
+ */
+async function dying(page: Page, hands: string, air: number | null) {
+  await open(page);
+  return page.evaluate(
+    ({ presses, hands, air, colours }) => {
+      const g = (window as unknown as W).__game;
+      g.titleTimer = 0;
+      g.dev.on = false;
+      const fight = () => g.entities.find((e: { def: { kind: string } }) => e.def.kind === 'fight');
+      const key = (c: string, d: boolean) => window.dispatchEvent(new KeyboardEvent(d ? 'keydown' : 'keyup', { code: c }));
+      const press = (p: { dir: number; jump: boolean }) => {
+        key('ArrowRight', p.dir > 0);
+        key('ArrowLeft', p.dir < 0);
+        key('Space', p.jump);
+        g.tick();
+      };
+      // eslint-disable-next-line no-new-func
+      const by = new Function('k', `return (${hands})(k);`) as (k: number) => { dir: number; jump: boolean } | null;
+      const ctx = g.world.getContext('2d') as CanvasRenderingContext2D;
+      const HIS = new Set(colours.map((c: string) => parseInt(c.slice(1), 16)));
+      /** His pixels this frame, one per world px; and the inks a pixel left and right of their box, down its rows. */
+      let beside: [number, number][] = [];
+      const him = () => {
+        g.draw();
+        const W4 = ctx.canvas.width;
+        const d = ctx.getImageData(0, 0, W4, ctx.canvas.height).data;
+        const inkAt = (i: number, j: number) => {
+          const o = ((j * 4 + 1) * W4 + i * 4 + 1) * 4;
+          return (d[o]! << 16) | (d[o + 1]! << 8) | d[o + 2]!;
+        };
+        const out: { x: number; y: number; ink: number }[] = [];
+        for (let j = 0; j < ctx.canvas.height / 4; j++) {
+          for (let i = 0; i < W4 / 4; i++) {
+            const ink = inkAt(i, j);
+            if (HIS.has(ink)) out.push({ x: i + g.camera.ix, y: j + g.camera.iy, ink });
+          }
+        }
+        const xs = out.map((q) => q.x - g.camera.ix);
+        const ys = out.map((q) => q.y - g.camera.iy);
+        beside = [];
+        for (let j = Math.min(...ys); j <= Math.max(...ys); j++) beside.push([inkAt(Math.min(...xs) - 1, j), inkAt(Math.max(...xs) + 1, j)]);
+        // Its horns' tips: the head's two top rows, 2 px in from each end.
+        const h = fight().headAt(fight().k);
+        tips = [0, 1, 9, 10].flatMap((dx) => [5, 4].map((dy) => inkAt(h.x + dx - g.camera.ix, h.y - dy - g.camera.iy)));
+        return out;
+      };
+      let tips: number[] = [];
+      let jump: { x: number; y: number; ink: number }[] | null = null;
+      for (let i = 0; i < 4000 && g.state === 'playing'; i++) {
+        const f = fight();
+        const k = f.keyed ? f.k + 1 : -99;
+        press((k >= 0 ? by(k) : null) ?? presses[i] ?? { dir: 0, jump: false });
+        if (air !== null && fight().keyed && fight().k === air && !g.player.onGround) jump = him();
+      }
+      const f = fight();
+      const facing = g.player.facing;
+      const cause = g.deathCause as string;
+      const frames = [];
+      for (let u = 0; u < 45 && g.state === 'dead'; u++) {
+        const t = f.caught.by === 'toss' ? f.tossed(u) : null;
+        frames.push({ u, k: f.k, him: him(), beside, tips, pose: t?.pose ?? null, head: f.headAt(f.k) });
+        press({ dir: 0, jump: false });
+      }
+      key('ArrowLeft', false);
+      key('ArrowRight', false);
+      key('Space', false);
+      return { cause, caught: f.caught, facing, jump, frames };
+    },
+    { presses: cleanPresses(), hands, air, colours: HIS },
+  );
+}
+
+test("in the game: the hands as drawn: clapped edge-on between its palms, 4 px wide and his full 16, a pixel of clay either side, carried down to its feet, then flat on the floor face up, 16 by 4, his head to the left; swatted, flat under its hand from frame 2, on the floor where he stood or on its brow, 14 by 4, between its horns' tips", async ({ context }) => {
+  test.setTimeout(120_000);
+  for (const [name, hands, air] of [
+    ['the clap', '() => ({ dir: 1, jump: false })', false],
+    ['the clap in the air', '(k) => ({ dir: 1, jump: k >= 2 && k < 22 })', true],
+  ] as const) {
+    const page = await context.newPage();
+    const r = await dying(page, hands, null);
+    await page.close();
+    expect([r.cause, r.caught.by, r.caught.air], name).toEqual(['The hands', 'clap', air]);
+    const c = r.caught;
+    for (const q of r.frames) {
+      const s = shape(q.him);
+      if (q.u < CLAP.on) continue;
+      if (q.u < CLAP.down) {
+        // Edge-on between its palms, where its palms are, and on the floor by the eighth.
+        const x0 = Math.min(...q.him.map((v) => v.x));
+        const y0 = Math.min(...q.him.map((v) => v.y));
+        expect([s.w, s.h], `${name}, frame ${q.u}`).toEqual([4, 16]);
+        const held = { x: Math.round(c.x) + 3, y: Math.round(c.y) };
+        if (q.u < CLAP.drop) expect({ x: x0, y: y0 }, `${name}, frame ${q.u}`).toEqual(held);
+        // A pixel of clay either side of him, the length of its palms, from the frame they are on him.
+        for (const [l, r] of q.beside.slice(2, 14)) expect([l, r], `${name}, frame ${q.u}`).toEqual([CLAY, CLAY]);
+        if (q.u === CLAP.down - 1) expect(y0 + 16, name).toBe(F);
+      } else {
+        // Dropped flat at its feet, face up, his head to the left and his trainers at the far end.
+        expect([s.w, s.h], `${name}, frame ${q.u}`).toEqual([16, 4]);
+        expect(Math.max(...q.him.map((v) => v.y)), name).toBe(F - 1);
+        expect(mean(q.him, WIG, 'x'), name).toBeLessThan(mean(q.him, TRAINERS, 'x'));
+      }
+    }
+  }
+  for (const [name, hands, air] of [
+    ['the swat on the floor', '(k) => ({ dir: k >= 34 ? 1 : 0, jump: false })', false],
+    ['the swat in the air', '(k) => ({ dir: k >= 24 ? 1 : 0, jump: k >= 44 && k < 60 })', true],
+  ] as const) {
+    const page = await context.newPage();
+    const r = await dying(page, hands, null);
+    await page.close();
+    expect([r.cause, r.caught.by, r.caught.air], name).toEqual(['The hands', 'swat', air]);
+    for (const q of r.frames) {
+      const s = shape(q.him);
+      // His own frame under its hand for two frames, never squashed: then pressed flat.
+      if (q.u < 2) {
+        expect(s.h, `${name}, frame ${q.u}`).toBe(16);
+        continue;
+      }
+      expect([s.w, s.h], `${name}, frame ${q.u}`).toEqual(air ? [14, 4] : [16, 4]);
+      expect(mean(q.him, WIG, 'x'), name).toBeLessThan(mean(q.him, TRAINERS, 'x'));
+      const y1 = Math.max(...q.him.map((v) => v.y));
+      if (!air) expect(y1, `${name}, frame ${q.u}`).toBe(F - 1);
+      else if (q.u >= 5) {
+        // On its brow from frame 5, riding its head after, pressed into its poll so that
+        // its horns' tips stand up behind him either side.
+        expect(y1, `${name}, frame ${q.u}`).toBe(q.head.y + 1);
+        const x0 = Math.min(...q.him.map((v) => v.x));
+        expect(x0, `${name}, frame ${q.u}`).toBe(q.head.x - 2);
+        // Once its hand has left him, which lies over the far tips while it is on him; the
+        // near tips until Theseus has the near horn again, his hand and its line of clay on them.
+        const [near, far] = [q.tips.slice(0, 4), q.tips.slice(4)];
+        if (q.u >= SWAT.off) expect(far, `${name}, frame ${q.u}`).toEqual([GLAZE, GLAZE, GLAZE, GLAZE]);
+        if (q.u >= SWAT.off && q.k < C.blow1 - 6) expect(near, `${name}, frame ${q.u}`).toEqual([GLAZE, GLAZE, GLAZE, GLAZE]);
+      }
+    }
+  }
+});
+
+test("in the game: the horns as drawn: one full somersault counter-clockwise in eighths, never a frame of him turned by less than a quarter: the jump frame turned by quarters, and the drawn half-quarter turned by quarters, mirrored if he faced left; then flat on his back at the left wall, his head at the wall", async ({ context }) => {
+  test.setTimeout(120_000);
+  // From its back, facing right and facing left; and hooked by its head at the wall, where he walked left.
+  for (const [name, hands, facing] of [
+    ['on its back', '(k) => (k < 59 ? null : { dir: 0, jump: false })', 1],
+    ['on its back, facing left', '(k) => (k < 59 ? null : { dir: k < 62 ? -1 : 0, jump: false })', -1],
+    ['at the wall', '() => ({ dir: -1, jump: false })', -1],
+  ] as const) {
+    const page = await context.newPage();
+    // His jump frame, facing right, from the clean run's leap over the bull at L + 30.
+    const r = await dying(page, hands, 30);
+    await page.close();
+    expect([r.cause, r.caught.by, r.facing], name).toEqual(['The horns', 'toss', facing]);
+    let jump = r.jump;
+    if (!jump) {
+      const again = await context.newPage();
+      jump = (await dying(again, '(k) => (k < 59 ? null : { dir: 0, jump: false })', 30)).jump;
+      await again.close();
+    }
+    const upright = quarters(facing === -1 ? mirrored(jump!) : jump!);
+    const round = r.frames.filter((q) => q.pose === 'hooked' || q.pose === 'thrown');
+    expect(round.length, name).toBeGreaterThanOrEqual(10);
+    // The drawn half-quarter: the first frame that is no quarter turn of his jump frame.
+    const half = round.find((q) => !upright.includes(shape(q.him).key));
+    expect(half, name).toBeDefined();
+    const halves = quarters(half!.him);
+    // Every frame of the round is one or the other, turned by whole quarters; the eighth it
+    // shows, counter-clockwise from upright, never goes back or skips one, and goes round
+    // to the last eighth at least.
+    let turn = -1;
+    for (const q of round) {
+      const k = shape(q.him).key;
+      const i = upright.indexOf(k);
+      const j = halves.indexOf(k);
+      expect(i >= 0 || j >= 0, `${name}, frame ${q.u}: turned by less than a quarter`).toBe(true);
+      const e = i >= 0 ? 2 * i : 2 * j + 1;
+      const next = turn < 0 ? e : turn + ((e - (turn % 8) + 8) % 8);
+      expect(next - Math.max(turn, 0), `${name}, frame ${q.u}`).toBeLessThanOrEqual(1);
+      turn = next;
+    }
+    expect(turn, name).toBeGreaterThanOrEqual(7);
+    // And the half-quarter tips him counter-clockwise: his head to the top left of his feet.
+    expect(mean(half!.him, WIG, 'x'), name).toBeLessThan(mean(half!.him, TRAINERS, 'x'));
+    expect(mean(half!.him, WIG, 'y'), name).toBeLessThan(mean(half!.him, TRAINERS, 'y'));
+    // Never in the cell's walls or floor.
+    for (const q of round) {
+      expect(Math.min(...q.him.map((v) => v.x)), `${name}, frame ${q.u}`).toBeGreaterThanOrEqual(FIGHT.toss.rect.x);
+      expect(Math.max(...q.him.map((v) => v.y)), `${name}, frame ${q.u}`).toBeLessThan(F);
+    }
+    // Flat on his back at the left wall: the dead frame turned a quarter, 16 long and 11
+    // high, his head at the wall, on the floor and never in it, the wig under his head.
+    for (const q of r.frames.filter((v) => v.pose === 'flat')) {
+      const s = shape(q.him);
+      expect([s.w, s.h], `${name}, frame ${q.u}`).toEqual([16, 11]);
+      expect(Math.min(...q.him.map((v) => v.x)), name).toBe(FIGHT.toss.rect.x);
+      expect(Math.max(...q.him.map((v) => v.y)), name).toBe(F - 1);
+      expect(mean(q.him, WIG, 'x'), name).toBeLessThan(mean(q.him, TRAINERS, 'x'));
+    }
+  }
 });

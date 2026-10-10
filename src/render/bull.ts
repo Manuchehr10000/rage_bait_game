@@ -597,7 +597,7 @@ export function bullPose(f: Fight): BullPose {
     }
   }
   // The swat: its free hand on him, and down with him onto its brow, or onto the floor.
-  if (caught?.by === 'swat' && u >= 0 && u < 8) {
+  if (caught?.by === 'swat' && u >= 0 && u < SWAT.off) {
     far = { frame: HAND_FLAT, wrist: swatWrist(f, u) };
     on = 'swat';
   }
@@ -619,22 +619,43 @@ export function bullPose(f: Fight): BullPose {
 }
 
 /**
+ * The swat, in frames from the catch: its hand is on him, his own frame under it, until
+ * `flat`, when he is pressed flat; carried down with it onto its brow by `brow` if he was
+ * in the air; and its hand leaves him at `off`. The death draws him to the same frames.
+ */
+export const SWAT = { flat: 2, brow: 5, off: 8 } as const;
+
+/**
+ * Where the swat has him on frame `u` of his death: the middle of his underside, and how
+ * tall he is drawn, his own 16 or pressed flat to 4. Where it caught him; pressed flat
+ * there, on the floor where he stood if he was not in the air; or carried down with its
+ * hand onto its brow, and riding its head after.
+ */
+export function swatHeld(f: Fight, u: number): { x: number; y: number; tall: number } {
+  const c = f.caught!;
+  const from = { x: Math.round(c.x) + 5, y: Math.round(c.y) + c.h };
+  if (u < SWAT.flat) return { ...from, tall: c.h };
+  if (!c.air) return { x: from.x, y: f.def.floorY, tall: PRESSED_TALL };
+  const brow = f.browAt(f.k);
+  const q = at(lerp(from, { x: brow.x, y: brow.y + SUNK }, Math.min(1, (u - SWAT.flat) / (SWAT.brow - SWAT.flat))));
+  return { ...q, tall: PRESSED_TALL };
+}
+
+/** How far he is pressed down into its poll on its brow, so that its horns' tips stand up behind him either side, in px. */
+const SUNK = 2;
+
+/** How tall he is pressed flat, in px (content/ch03-aegean/shared/bull-leaper-pressed.md). */
+const PRESSED_TALL = 4;
+
+/**
  * The swat's hand on frame `u` of his death, its wrist: flat on top of him where it
- * caught him, and down with him onto its brow if he was in the air, or onto the floor
- * where he stood. His drawing goes down with it (the hands' death, in scene.ts).
+ * caught him, its line of clay between its fingertips and him, and down with him onto its
+ * brow if he was in the air, or onto the floor where he stood (the hands' death, in
+ * scene.ts).
  */
 export function swatWrist(f: Fight, u: number): Pt {
-  const c = f.caught!;
-  const cx = Math.round(c.x) + 5;
-  const F = f.def.floorY;
-  const tall = (n: number) => (n < 6 ? Math.max(4, 16 - 2 * n) : 4);
-  if (!c.air) {
-    const from = { x: cx + 4, y: Math.round(c.y) - 5 };
-    return u < 2 ? from : { x: cx + 4, y: F - 3 - 5 };
-  }
-  const brow = f.browAt(f.k);
-  const q = u < 1 ? { x: cx, y: Math.round(c.y) + 16 } : at(lerp({ x: cx, y: Math.round(c.y) + 16 }, brow, Math.min(1, (u - 1) / 5)));
-  return { x: q.x + 4, y: q.y - tall(u) - 5 };
+  const q = swatHeld(f, u);
+  return { x: q.x + 4, y: q.y - q.tall - 1 - BULL_HAND_FRAMES[HAND_FLAT]!.rows.length };
 }
 
 /**

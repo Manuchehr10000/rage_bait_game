@@ -2035,6 +2035,8 @@ export class Ear implements Entity {
   dead = false;
   /** The tick it snorted him on, or -1. */
   snortAt = -1;
+  /** How far into its breath it was when it snorted him: the plume he stepped into, which the sniff draws down. */
+  private snortBreath: number = BREATH.out;
   /** The stone it heard him on last, and whether he was on the ground: his steps. */
   private stone: 'lip' | 'bed' | 'plain' | null = null;
   private ground = false;
@@ -2090,6 +2092,7 @@ export class Ear implements Entity {
       if (p.y + p.h > d.inY && p.y < d.floor.y && p.x < d.hatch.x1 && p.x + p.w > d.hatch.x0) {
         if (this.at === 'hatch') {
           this.snortAt = this.t;
+          this.snortBreath = this.breath;
           w.kill(d.cause, d.ceiling);
         } else this.in = true;
         return;
@@ -2173,12 +2176,16 @@ export class Ear implements Entity {
     if (f < 0 || f >= SNORT.again) return { behind, front };
     const full = plumeDots(hx, floor, BREATH.out);
     if (f < SNORT.sniff) {
-      // The sniff: the dust over the hatch pulled in and down into it, past his legs, faster each frame.
+      // The sniff: the dust over the hatch pulled in and down into it, past his legs, faster
+      // each frame: the plume he stepped into, as it stood, or the whole plume if it stood
+      // under half its height.
+      const b = this.snortBreath;
+      const stood = b < BREATH.out + BREATH.hold && breathHeight(b) >= PLUME / 2 ? plumeDots(hx, floor, b) : full;
       const down = Math.round(((f + 1) * (f + 2) * PLUME) / 30);
       const pulled: Dot[] = [];
-      for (const q of full) {
+      for (const q of stood) {
         const y = q.y + down;
-        const cx = hx + (q.x + q.s / 2 - hx) * 0.6;
+        const cx = hx + (q.x + q.s / 2 - hx) * (1 - (f + 1) / (2 * (SNORT.sniff + 1)));
         if (y + q.s <= floor + TILE) pulled.push({ x: Math.round(cx - q.s / 2), y, s: q.s });
       }
       front.push(...apart(pulled));

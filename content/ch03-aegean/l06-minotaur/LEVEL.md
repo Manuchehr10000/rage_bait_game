@@ -200,6 +200,12 @@ Chosen in the asset notes (2026-10-10), where this file did not decide, for the 
   check of the hero stage, 2026-10-10: the stone came down through him after the duck, the near
   hand lay on his back in the lurch and went into the wall, and his glaze joined the doorway's
   black to its jamb.)
+- The tourist's last three deaths, as drawn (2026-10-10, `../shared`): pressed flat, he lies face
+  up with his head to the left whichever way he faced; swatted in the air, he is pressed 2 px into
+  its poll, so that its horns' tips stand up behind him; the somersault goes round
+  counter-clockwise, his head first to the wall, facing left in his own frames mirrored, ends
+  upright when it comes full circle, and is kept out of the cell's wall and floor; and the sniff
+  draws down the plume he stepped into, as it stood, so the dust never first rises.
 
 ## The beats
 
@@ -859,12 +865,18 @@ Being built, in this order, as a stage in the dev build (`#minotaur`, in `STAGES
   cell's stone; and his walk into his doorway cut from its frame and black in its black (pinned
   in the same file and `tests/minotaur-theseus.spec.ts`).
 
-Still to come:
+- **The tourist's last three deaths, drawn** (2026-10-10, to the notes in `../shared`): clapped
+  edge-on between its palms (`bull-leaper-clapped`) and dropped flat at its feet; pressed flat
+  (`bull-leaper-pressed`), on the floor where he stood, or on its brow, sunk into its poll between
+  its horns' tips; hooked and thrown round in eighths, the jump frame and its drawn half-quarter
+  (`bull-leaper-tumbling`) turned only by quarters, and flat on his back at the left wall, the dead
+  frame turned a quarter; pasted on the ceiling, 18 wide as its note decided; and the sniff drawing
+  down the plume he stepped into, as it stood. Nothing that kills, carries or times moved. Pinned in
+  `tests/minotaur-bull.spec.ts` and `tests/minotaur-snort.spec.ts`.
 
-- **The black-figure figures** still rough: the other three deaths' drawings, to their asset
-  notes in the beat folders and `../shared`.
-  (`LevelData.tricks`, 'The knot', 'The snort', 'The hands', 'The horns', and `dropCause` and
-  `fallCause` 'The labyrinth', unreachable, are made.)
+Still to come: nothing the notes ask the drawing for. (`LevelData.tricks`, 'The knot', 'The
+snort', 'The hands', 'The horns', and `dropCause` and `fallCause` 'The labyrinth', unreachable,
+are made.)
 
 ## Tests to pin
 

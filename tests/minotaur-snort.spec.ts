@@ -621,6 +621,13 @@ test("the snort's death: sniffed where he is for 5 frames, carried up the hatch 
   expect(frames.slice(0, SNORT.sniff).some((q) => pastLegs(q.dust.front))).toBe(true);
   const lowest = (dots: Dot[]) => Math.max(...dots.map((q) => q.y + q.s - 1));
   expect(lowest(frames[SNORT.sniff - 1]!.dust.front)).toBeGreaterThan(r.p.y + r.p.h);
+  // It draws down the plume he stepped into, as it stood when it snorted him, which never
+  // first rises: on frame 0 the top of its dust is that plume's top, 2 px down. The ring
+  // brought it back under the hatch breathing from nothing, 17 frames before.
+  const stood = plumeDots((BEAST.hatch.x0 + BEAST.hatch.x1) / 2, T_END_FLOOR, r.died - ring);
+  expect(PLUME - (T_END_FLOOR - Math.min(...stood.map((q) => q.y)))).toBeGreaterThan(0);
+  const top = (dots: Dot[]) => Math.min(...dots.map((q) => q.y));
+  expect(top(frames[0]!.dust.front)).toBe(top(stood) + 2);
   // The jet: massed twin columns of dots, never a solid column, out of the hole and up to
   // his feet as he rises.
   for (const q of frames.slice(SNORT.sniff, SNORT.sniff + SNORT.jet)) {

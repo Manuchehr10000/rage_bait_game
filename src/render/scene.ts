@@ -50,17 +50,20 @@ import { paint } from '../engine/assets';
 import { blit, blitFacing, frameOf, relief, silhouette, withLamp, type Frame, type ReliefTones } from './frame';
 import { SPLINTER, handStencils } from './hands';
 import { hash } from './hash';
-import { bullHorn, bullPicture, CLAP, deadBull, deadHorn, giveWay, heroGrip, heroPicture, type HeroAgainst, type Masonry, type Pixels } from './bull';
+import { bullHorn, bullPicture, CLAP, clapHeld, deadBull, deadHorn, giveWay, heroGrip, heroPicture, SWAT, swatHeld, type HeroAgainst, type Masonry, type Pixels } from './bull';
 import { HERO, heroHand, PERSIAN_COLUMN, snortBody, TRAIN, type Dot, type Train } from '../engine/entities';
 import type { CavePanel } from '../engine/level';
 import { BEAR_STALAGMITE_SPRITE, SIGNAL_LAMP_SPRITE, STOP_SIGN_SPRITE, TRAIN_CAR_SPRITE, TRAIN_ENGINE_SPRITE, TRAIN_LAST_CAR_SPRITE } from './procedural';
 import {
   ARIADNE_SPRITE,
+  BULL_LEAPER_CLAPPED,
   BULL_LEAPER_CLOTHESLINED,
   BULL_LEAPER_ENTHRONED,
   BULL_LEAPER_FRAMES,
   BULL_LEAPER_PASTED,
+  BULL_LEAPER_PRESSED,
   BULL_LEAPER_SEATED,
+  BULL_LEAPER_TUMBLING,
   CYPRESS_SPRITE,
   DELEGATE_SPRITE,
   EVANS_BUST_SPRITE,
@@ -2742,12 +2745,28 @@ const COSTUMES: Record<
     pasted?: HTMLCanvasElement;
     /** Tipped back at 45 degrees by a line at his throat. Only the chapter with the knot in it has one. */
     clotheslined?: HTMLCanvasElement;
+    /** Clapped edge-on between two palms. Only the chapter with the Minotaur's hands in it has one. */
+    clapped?: HTMLCanvasElement;
+    /** Pressed flat, lying face up: on the floor, and on a brow. Only the chapter with the Minotaur's hands in it has them. */
+    pressed?: readonly [HTMLCanvasElement, HTMLCanvasElement];
+    /** The jump frame tipped over at 45 degrees, a somersault's half-quarter. Only the chapter with the Minotaur's horns in it has one. */
+    tumbling?: HTMLCanvasElement;
   }
 > = {
   // The lens sits at sprite column 10, row 4, of the right-facing hiker.
   hiker: { id: 'hiker', frames: HIKER_FRAMES, seated: HIKER_SEATED, lamp: { x: 10, y: 4 }, held: HIKER_HELD },
   pharaoh: { id: 'tourist', frames: TOURIST_FRAMES, seated: TOURIST_SEATED },
-  bullLeaper: { id: 'bull-leaper', frames: BULL_LEAPER_FRAMES, seated: BULL_LEAPER_SEATED, enthroned: BULL_LEAPER_ENTHRONED, pasted: BULL_LEAPER_PASTED, clotheslined: BULL_LEAPER_CLOTHESLINED },
+  bullLeaper: {
+    id: 'bull-leaper',
+    frames: BULL_LEAPER_FRAMES,
+    seated: BULL_LEAPER_SEATED,
+    enthroned: BULL_LEAPER_ENTHRONED,
+    pasted: BULL_LEAPER_PASTED,
+    clotheslined: BULL_LEAPER_CLOTHESLINED,
+    clapped: BULL_LEAPER_CLAPPED,
+    pressed: BULL_LEAPER_PRESSED,
+    tumbling: BULL_LEAPER_TUMBLING,
+  },
   falseBeard: { id: 'false-beard', frames: FALSE_BEARD_FRAMES, seated: FALSE_BEARD_SEATED },
 };
 
@@ -5382,11 +5401,6 @@ function drawSnorted(ctx: CanvasRenderingContext2D, s: Scene, death: { cause: De
 // over him.
 // ---------------------------------------------------------------------------
 
-const lerpPt = (a: { x: number; y: number }, b: { x: number; y: number }, t: number) => ({
-  x: Math.round(a.x + (b.x - a.x) * t),
-  y: Math.round(a.y + (b.y - a.y) * t),
-});
-
 /** A picture at 1 world px, filled in the vase's inks. */
 function fillPixels(ctx: CanvasRenderingContext2D, p: Pixels): void {
   for (const r of p.runs()) {
@@ -5461,20 +5475,41 @@ function drawBullHands(ctx: CanvasRenderingContext2D, s: Scene, f: Fight): void 
   ctx.restore();
 }
 
-/** The dead frame laid down on its back, head to the left, pressed `w` long and `h` high, its middle at `cx`, on `floor`. */
-function drawPressed(ctx: CanvasRenderingContext2D, frame: Frame, cx: number, floor: number, w: number, h: number): void {
+/**
+ * A frame turned by `quarters` whole quarter turns, counter-clockwise, about (`cx`, `cy`),
+ * and mirrored first if `mirror`: never turned by less, which drops and doubles pixels
+ * (content/ch03-aegean/l06-minotaur/LEVEL.md, Art, 2026-10-10). Kept inside `inside`.
+ */
+function blitTurned(ctx: CanvasRenderingContext2D, frame: Frame, quarters: number, cx: number, cy: number, mirror: boolean, inside: { x0: number; x1: number; floor: number }): void {
+  const q = ((quarters % 4) + 4) % 4;
+  const w = q % 2 === 0 ? frame.w : frame.h;
+  const h = q % 2 === 0 ? frame.h : frame.w;
+  const x = Math.min(Math.max(Math.round(cx - w / 2), inside.x0), inside.x1 - w);
+  const y = Math.min(Math.round(cy - h / 2), inside.floor - h);
   ctx.save();
-  ctx.translate(Math.round(cx - w / 2), Math.round(floor));
+  ctx.translate(x + w / 2, y + h / 2);
+  ctx.rotate((-Math.PI / 2) * q);
+  if (mirror) ctx.scale(-1, 1);
+  blit(ctx, frame, -frame.w / 2, -frame.h / 2);
+  ctx.restore();
+}
+
+/** The dead frame turned a quarter, flat on his back, his head to the left at `x` and his face up, on `floor`. */
+function blitOnHisBack(ctx: CanvasRenderingContext2D, dead: Frame, x: number, floor: number): void {
+  ctx.save();
+  ctx.translate(x, floor);
   ctx.rotate(-Math.PI / 2);
-  ctx.scale(h / frame.w, w / frame.h);
-  blit(ctx, frame, 0, 0);
+  blit(ctx, dead, 0, 0);
   ctx.restore();
 }
 
 /**
- * The hands: clapped flat between its palms like a fly where he was caught, and dropped
- * at its feet; or swatted by its free hand, flat on its own brow between the horns if he
- * was in the air, riding its head after, or flat on the floor where he stood if not.
+ * The hands (content/ch03-aegean/shared/bull-leaper-clapped.md, -pressed.md): his own frame
+ * as he was for the first frames, as its hands come onto him. Clapped, edge-on between its
+ * palms like a fly where they caught him, carried down with them, and dropped flat on the
+ * floor at its feet. Swatted, pressed flat under its hand: on the floor where he stood if
+ * he was not in the air; carried down with it onto its own brow if he was, riding its head
+ * after. Flat, he lies face up with his head to the left, whichever way he faced.
  */
 function drawHanded(ctx: CanvasRenderingContext2D, s: Scene, death: { t: number; at?: { x: number; y: number } | null }): void {
   const p = s.player;
@@ -5483,44 +5518,42 @@ function drawHanded(ctx: CanvasRenderingContext2D, s: Scene, death: { t: number;
   const fight = s.entities.find((e): e is Fight => e.def.kind === 'fight');
   const caught = fight?.caught;
   const f = Math.round(death.t * DEATH_FRAMES);
-  const up = tourist(costume, p.onGround ? 'idle' : 'jump');
-  const dead = frameOf(`${c.id}-dead`, 0, c.frames.dead);
   const x = Math.round(p.x) - 1;
   const y = Math.round(p.y);
-  const cx = x + 6;
-  if (!fight || !caught) {
-    drawPressed(ctx, dead, cx, y + 16, 16, 4);
+  if (!fight || !caught || !c.clapped || !c.pressed) {
+    blitFacing(ctx, frameOf(`${c.id}-dead`, 0, c.frames.dead), x, y, p.facing);
     return;
   }
-  if (f < CLAP.on) {
-    blitFacing(ctx, up, x, y, p.facing);
+  const flat = (i: 0 | 1) => frameOf(`${c.id}-pressed`, i, c.pressed![i]);
+  if (f < (caught.by === 'clap' ? CLAP.on : SWAT.flat)) {
+    blitFacing(ctx, tourist(costume, p.animFrame()), x, y, p.facing);
     return;
   }
   if (caught.by === 'clap') {
-    // Between its palms, carried down with them, and left flat on the floor at its feet.
-    const at = death.at ?? { x: p.x, y: p.y };
-    if (f < CLAP.drop) blit(ctx, up, cx - 2, y, 4, 16);
-    else if (f < CLAP.down) {
-      const q = lerpPt({ x: cx, y }, { x: Math.round(at.x) + 5, y: Math.round(at.y) }, (f - CLAP.drop + 1) / (CLAP.down - CLAP.drop));
-      blit(ctx, up, q.x - 2, q.y, 4, 16);
-    } else drawPressed(ctx, dead, Math.round(at.x) + 5, Math.round(at.y) + 16, 16, 4);
+    if (f < CLAP.down) {
+      const q = clapHeld(fight, f);
+      blitFacing(ctx, frameOf(`${c.id}-clapped`, 0, c.clapped), q.x, q.y, p.facing);
+    } else {
+      // Where its palms left him: his sliver's middle, on its floor.
+      const q = clapHeld(fight, CLAP.down);
+      const lie = flat(0);
+      blit(ctx, lie, q.x + 2 - lie.w / 2, fight.def.floorY - lie.h);
+    }
     return;
   }
-  if (caught.air) {
-    const brow = fight.browAt(fight.k);
-    if (f < 6) {
-      const q = lerpPt({ x: cx, y: y + 16 }, brow, (f - 1) / 5);
-      drawPressed(ctx, dead, q.x, q.y, 12 + f, 16 - 2 * f);
-    } else drawPressed(ctx, dead, brow.x, brow.y, 14, 4);
-    return;
-  }
-  drawPressed(ctx, dead, cx, y + 16, 16, 3);
+  const q = swatHeld(fight, f);
+  const lie = flat(caught.air ? 1 : 0);
+  blit(ctx, lie, q.x - lie.w / 2, q.y - lie.h);
 }
 
 /**
- * The horns (Fight.tossed): held where they caught him, standing, or falling, until the
- * bull reaches him; carried up onto its horns, or lifted off its back; hooked up and over
- * in one full somersault to the left wall, the kilt up and flying; and dropped flat there.
+ * The horns (Fight.tossed; content/ch03-aegean/shared/bull-leaper-tumbling.md): held where
+ * they caught him, standing, or falling, until the bull reaches him; carried up onto its
+ * horns, or lifted off its back, tipping to the first eighth of a turn; and hooked up and
+ * over in one full somersault to the left wall, the kilt up and flying, round in eighths:
+ * the jump frame turned by quarters, and between them the drawn half-quarter turned by
+ * quarters. Then dropped flat there on his back, the dead frame turned a quarter, his head
+ * at the wall. Facing left, the same somersault in his own frames, mirrored.
  */
 function drawTossed(ctx: CanvasRenderingContext2D, s: Scene, death: { t: number; at?: { x: number; y: number } | null }): void {
   const p = s.player;
@@ -5531,27 +5564,31 @@ function drawTossed(ctx: CanvasRenderingContext2D, s: Scene, death: { t: number;
   const fight = s.entities.find((e): e is Fight => e.def.kind === 'fight');
   if (!fight || fight.caught?.by !== 'toss') {
     const at = death.at ?? p;
-    drawPressed(ctx, dead, Math.round(at.x) + 7, Math.round(at.y) + 16, 16, 10);
+    blitOnHisBack(ctx, dead, Math.round(at.x), Math.round(at.y) + p.h);
     return;
   }
+  const d = fight.def;
   const b = fight.tossed(Math.round(death.t * DEATH_FRAMES));
-  const x = Math.round(b.x) - 1;
-  const y = Math.round(b.y);
   switch (b.pose) {
     case 'held':
-      blitFacing(ctx, b.ground ? tourist(costume, 'idle') : jump, x, y, p.facing);
+      blitFacing(ctx, b.ground ? tourist(costume, 'idle') : jump, Math.round(b.x) - 1, Math.round(b.y), p.facing);
       return;
     case 'hooked':
-    case 'thrown':
-      // Tipped over on the horns, and on round in the somersault.
-      ctx.save();
-      ctx.translate(Math.round(b.x + p.w / 2), Math.round(b.y + p.h / 2));
-      ctx.rotate(-2 * Math.PI * b.turn);
-      blit(ctx, jump, -6, -8);
-      ctx.restore();
+    case 'thrown': {
+      // Round counter-clockwise, his head first to the wall, in eighths: an odd eighth is
+      // the drawn half-quarter, which tips his own frame a half-quarter round, and so his
+      // mirrored frame a half-quarter back.
+      const e = Math.min(8, Math.round(b.turn * 8));
+      const left = p.facing === -1;
+      const half = e % 2 === 1 && c.tumbling !== undefined;
+      const frame = half ? frameOf(`${c.id}-tumbling`, 0, c.tumbling!) : jump;
+      const quarters = half ? (left ? (e + 1) / 2 : (e - 1) / 2) : Math.round(e / 2);
+      const inside = { x0: d.toss.rect.x, x1: d.toss.rect.x + d.toss.rect.w, floor: d.floorY };
+      blitTurned(ctx, frame, quarters, b.x + p.w / 2, b.y + p.h / 2, left, inside);
       return;
+    }
     case 'flat':
-      drawPressed(ctx, dead, x + 8, y + 16, 16, 10);
+      blitOnHisBack(ctx, dead, Math.round(b.x), d.floorY);
   }
 }
 

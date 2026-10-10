@@ -16,10 +16,19 @@ rotated.
 ## Where it stands in the game
 
 The Minotaur, beat e, the horns: hooked up on the bull's horns and thrown over in one full
-somersault to the left wall. The somersault goes round in eighths, the way it turns now: the even
-eighths are the jump frame turned by quarters, and the odd ones (45, 135, 225 and 315 degrees) are
-this frame turned by quarters. Hooked, he tips to the first eighth. Then he is dropped flat at the
-left wall: `bull-leaper-dead` turned a quarter, on his back, 16 × 12, no longer pressed flatter.
+somersault to the left wall. The somersault goes round counter-clockwise, his head first to the
+wall, in eighths: the even eighths are the jump frame turned by quarters, and the odd ones (45,
+135, 225 and 315 degrees) are this frame turned by quarters. Hooked, he tips to the first eighth;
+a round that comes full circle before he is dropped ends upright. Facing left, it is his own
+frames mirrored, turned the same way round, so that his head still goes first to the wall. Where a
+turned frame would go into the cell's wall or floor, it is drawn against them. Then he is dropped
+flat at the left wall: `bull-leaper-dead` turned a quarter, on his back, his head at the wall and
+his face up, 16 long and 11 high, no longer pressed flatter.
+
+As drawn (2026-10-10): the clothesline's head, a row lower, so that the two 45-degree drawings
+are one head; the vest; the kilt flying out at both sides of his hips, red with its blue edge; the
+belt and the running shorts; one leg on along the line of his body and the other kicked out ahead,
+each with its trainer.
 
 ## Must be right
 
