@@ -17,8 +17,13 @@ top, a pixel of clay between them over the brow. The frames:
 0. Level: its head on its neck as it crouches and fights.
 1. Tossed up: the muzzle raised and forward, the horns hooking up and forward.
 2. Down: lying on its cheek on the floor, the muzzle along it toward the front and the horns up
-   at the back, all of it in the box's lower 9 rows. (Drawn 2026-10-10. Drawn first as the
-   level head with its horns cut short, it read as a lump among the stones.)
+   at the back, two posts of 2 px, 3 rows high, a pixel of clay between them and between the far
+   one and its neck, the near one 6 px in on the box's top row; all of it in the box's first 9
+   rows. (Drawn 2026-10-10. Drawn first as the level head with its horns cut short, it read as a
+   lump among the stones. Then, after the whole-level review the same day, its horns were 1 px
+   for their top two rows, the antennae this note forbids, in the heap and in the closing
+   tableau's last frame; and set 2 px wide where they were, the far one touched its neck. This
+   read "the box's lower 9 rows": it is the first 9, the heap's x 101 to 111 and y 727 to 735.)
 
 ## Where it stands in the game
 
@@ -41,7 +46,8 @@ it, so that it is always whole.
   In frame 2 its near horn is 6 px in and on the box's top row, where his hand has it in the
   tableau.
 - **A brow between the horns**, at its top's middle, flat enough for a swatted tourist to lie on.
-- Horns of 2 px, never the rough's 1 px antennae.
+- Horns of 2 px, never the rough's 1 px antennae, in all three frames
+  (`tests/minotaur-bull.spec.ts`).
 - Nothing of it above y 688 before the fight.
 - Bloodless; no added red.
 

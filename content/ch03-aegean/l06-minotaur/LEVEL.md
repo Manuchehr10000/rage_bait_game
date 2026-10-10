@@ -182,7 +182,13 @@ Chosen in the asset notes (2026-10-10), where this file did not decide, for the 
   body, head and far arm, behind its near arm, its hand and the near stone, each cut from the other
   by clay, corners included, and his hand on the horn in front of it. (After a check of the drawn
   bull, the same day: the crouched leg read as the digit 4, the flat hands as rakes, and its glaze
-  met Theseus's at the corners on every frame from L+31.)
+  met Theseus's at the corners on every frame from L+31. After the whole-level review, the same
+  day: the claw and the reach were rows of four like prongs, a rake over its brow and a grille on
+  his chest, and are now a hand raised, three fingers hooked forward and the thumb out under
+  them, and the same hand closed at his chest; a clap that ran into the grip took its hand up
+  empty and the stone jumped into it, and now the palm comes back flat on the stone and takes it
+  up from there; the near stone set down on the floor was drawn again in front of the lurching
+  body over it, a box on its body; and the head lying down had horns of 1 px.)
 - Theseus in the fight, as drawn (2026-10-10, `e-cell`, and the stand and the walk in `b-passage`):
   his sword drawn from the step out of his doorway, a 6 px blade in every drawing, glaze over the
   clay and a line of clay over glaze; at guard on his feet and walking out, the sword upright in
@@ -208,7 +214,13 @@ Chosen in the asset notes (2026-10-10), where this file did not decide, for the 
   draws down the plume he stepped into, as he saw it on the frame before, so the dust never first
   rises. (After a check of the deaths, the same day: the sniff after a lip landing drew a whole
   plume up out of nothing; it now draws down only what was seen, after a quick lip landing
-  little or nothing, and is heard.)
+  little or nothing, and is heard.) For the designer (after the whole-level review, the same
+  day): a man left on its back after the heave, and most who jump about on it, is reached by its
+  lurching back before its head, and is heaved up off its rump with its head going on away from
+  him toward the wall, so that what is drawn reads as bucked, not horned
+  (`../shared/bull-leaper-tumbling.md`). A drawing-only change could swing its head back under
+  him on its stretched neck for the hooked frames, as it goes out to a man nothing reached; not
+  made.
 - Where he lies flat, and the swat's hand on him (after the same check, `../shared`,
   `e-cell/minotaur-hand.md`): clapped or swatted on the floor, at its feet, x 76 to 91, the same
   place for both, before Theseus's feet (from x 94) with two pixels of clay, and clear of the near

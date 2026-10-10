@@ -58,6 +58,8 @@ In the cell, on one clock from L, the frame the tourist comes down on its floor:
 - **The clap**, if it catches him to L+39: it rears up 12 px off its stones, a man for a moment,
   up on its feet; its palms are together on him from the second frame of the catch, go down with
   him to its feet from the sixth to the ninth, and are back on the stones by the fourteenth.
+  Where it runs into the grip, the near palm comes back flat on its stone, which is still on the
+  floor, and the grip takes the stone up from there (`minotaur-stone`).
 - **The grip**, L+40 to 46: it takes the near stone up in its left hand, up and back in front of
   its own face, right of the hero who stands before it, and over its head to its raised place
   over its shoulder (`minotaur-stone`), and sinks onto its knees; its right hand leaves the far
@@ -82,12 +84,18 @@ In the cell, on one clock from L, the frame the tourist comes down on its floor:
   back, 46 px and back, thrashing, both hands flailing at the hero on its horn, two frames a
   place: the near one low, reaching up at his chest in front of him, at the front of it between
   him and its head, under his neck and over his hips, its arm behind its head and never across
-  him (`minotaur-hand`, frame 4), the far one high over its horns, behind him; never both up over
-  its horns. (Drawn first both before
-  its head, they lay behind him, merged with his glaze.)
-- **The toss**, if it has him: it rears up on its knees, up to 14 px, and tosses its head up at
-  him, its head tossed up while he is on its horns; where the lurch cannot reach him the head
-  lunges out to him on a stretched neck (ruled 2026-10-09).
+  him (`minotaur-hand`, frame 4, closed), the far one raised open high over its horns, behind
+  him; never both up over its horns. (Drawn first both before its head, they lay behind him,
+  merged with his glaze.)
+- **The toss**, if it has him: where its head reaches him, it rears up on its knees, up to 14 px,
+  and tosses its head up at him, its head tossed up under him while he is on its horns; where the
+  lurch cannot reach him the head lunges out to him on a stretched neck (ruled 2026-10-09). Where
+  its back reaches him first, as it does a man left standing on its back after the heave and most
+  who jump about on it (41 of 45 late hands tried, 2026-10-10), the lurching body heaves him up off
+  its back while its head goes on toward the wall, 25 to 35 px from him: as drawn, he is bucked
+  off its rump, not horned (after the whole-level review, 2026-10-10; this read as if its head
+  were under him in every toss; whether the head should swing back under him there is the
+  designer's).
 - **L+105 to 130**: down on its hands, flat on its stones.
 - **The second blow**, L+130: its head jerks up for 4 frames, and it sinks into the heap.
 

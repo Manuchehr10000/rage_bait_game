@@ -17,6 +17,7 @@ import {
   giveWay,
   HAND_CLAW,
   HAND_FLAT,
+  HAND_HOLD,
   HAND_PALM,
   HAND_REACH,
   handBox,
@@ -26,11 +27,13 @@ import {
   heroDrawing,
   heroGrip,
   heroPicture,
+  HOLD_WRIST,
   SWAT,
+  type BullPose,
   type Hand,
   type HeroAgainst,
   type HeroDrawing,
-  type Pixels,
+  Pixels,
 } from '../src/render/bull';
 import { CELL_FLOOR, cleanPresses, LEVEL, Run, type Press } from './minotaur-run';
 
@@ -77,13 +80,25 @@ test("its drawings: a bull's head whose horns are 2 px and whose near horn is wh
   }
   const [level, tossed, down] = BULL_HEAD_FRAMES.map((f) => left(f));
   // Level and tossed up, the near horn passes 3 px in from the box's left and 2 over its
-  // top, where Theseus's left hand is (bullHorn); its horns 2 px at every row, never antennae.
+  // top, where Theseus's left hand is (bullHorn).
   for (const f of [level!, tossed!]) expect(f[5 - 2]![3]).toBe('#');
-  for (const r of level!.slice(0, 5)) for (const run of runs(r)) expect(run.length).toBeGreaterThanOrEqual(2);
+  // Its horns 2 px at every row, never antennae, in all three: every row from their tips
+  // down to the poll, the first row with a run of 4 or more.
+  for (const f of [level!, tossed!, down!]) {
+    const tip = f.findIndex((r) => r.includes('#'));
+    const poll = f.findIndex((r) => runs(r).some((run) => run.length >= 4));
+    expect(poll - tip).toBeGreaterThanOrEqual(2);
+    for (const r of f.slice(tip, poll)) {
+      expect(runs(r).length, r).toBe(2);
+      for (const run of runs(r)) expect(run.length, r).toBeGreaterThanOrEqual(2);
+    }
+  }
   // Down on the floor, all of it in the box's first 9 rows, so the heap's head lies in
-  // x 101 to 111 and y 727 to 735 (headAt).
+  // x 101 to 111 and y 727 to 735 (headAt); its near horn 6 px in on the box's top row,
+  // where Theseus's hand has it in the tableau (deadHorn).
   expect(down!.slice(0, 5).every((r) => !r.includes('#'))).toBe(true);
   expect(down![14]!.includes('#')).toBe(false);
+  expect(down![5]![6]).toBe('#');
   // The flat hand: 8 long, its palm in the rows over the stone; its thumb laid forward
   // along the top, parted from the hand by the one incision, glaze before it and after it;
   // its palm's last row on the stone the length of it but for the thumb's end; and its
@@ -101,10 +116,33 @@ test("its drawings: a bull's head whose horns are 2 px and whose near horn is wh
   expect(fingers.length).toBeGreaterThanOrEqual(1);
   expect(runs(fingers[0]!)).toEqual(['#', '#', '#']);
   for (const r of fingers) expect([r[0], r[7]]).toEqual(['.', '.']);
-  // The claw spread too; reaching, the claw upside down; and the palm upright, as tall as
-  // half of him or more.
-  expect(runs(left(BULL_HAND_FRAMES[HAND_CLAW]!.rows).at(-1)!).length).toBeGreaterThanOrEqual(3);
-  expect(BULL_HAND_FRAMES[HAND_REACH]!.rows).toEqual([...BULL_HAND_FRAMES[HAND_CLAW]!.rows].reverse());
+  // No hand is a rake: no row of any of them has four like prongs.
+  for (const f of BULL_HAND_FRAMES) for (const r of f.rows) expect(runs(r).length, r).toBeLessThanOrEqual(3);
+  // The thumb goes one way and the fingers another: the glaze just in front of the one
+  // incision, 2 px or more, at the hand's front, on a row 2 or more under the fingers'
+  // tips, and nothing of the fingers in front of it on the rows over it.
+  const thumbOf = (rows: readonly string[]) => {
+    expect(rows.join('').split('_').length - 1).toBe(1);
+    const y = rows.findIndex((r) => r.includes('_'));
+    const i = rows[y]!.indexOf('_');
+    let x0 = i;
+    while (x0 > 0 && rows[y]![x0 - 1] === '#') x0--;
+    expect(i - x0, rows[y]).toBeGreaterThanOrEqual(2);
+    expect(x0, rows[y]).toBe(0);
+    expect(y).toBeGreaterThanOrEqual(2);
+    for (const r of rows.slice(0, y - 1)) expect(r[x0], r).toBe('.');
+  };
+  // Clawing, a hand raised: three fingers, each a pixel wide, a pixel apart, their tips
+  // hooked forward at its top, and the thumb out forward under them.
+  const claw = left(BULL_HAND_FRAMES[HAND_CLAW]!.rows);
+  expect(runs(claw[0]!)).toEqual(['#', '#', '#']);
+  thumbOf(claw);
+  // Reaching up at his chest, the same hand closed: its fingers together, so that no row of
+  // it lies striped over his glaze, and the thumb out forward under them.
+  const reach = left(BULL_HAND_FRAMES[HAND_REACH]!.rows);
+  for (const r of reach) expect(runs(r).length, r).toBeLessThanOrEqual(2);
+  thumbOf(reach);
+  // And the palm upright, as tall as half of him or more.
   expect(BULL_HAND_FRAMES[HAND_PALM]!.rows.length).toBeGreaterThanOrEqual(8);
 });
 
@@ -444,6 +482,96 @@ test('struck, its near hand reaches up at his chest in front of him, between him
     }
   }
   expect(wrong).toEqual([]);
+});
+
+test('the clap into the grip: the near stone stays on the floor under its hand till the palm is back on it, then goes up in it; never on the floor while the hand holds it, never moving but in its hand, and the claw clear of it', () => {
+  // Its hand has the stone: under it, holding it up, or flat on it, gripping it.
+  const inHand = (b: BullPose) => {
+    const box = handBox(b.near);
+    if (b.near.frame === HAND_HOLD) return b.near.wrist.x === b.stone.x + HOLD_WRIST.x && b.near.wrist.y === b.stone.y + HOLD_WRIST.y;
+    return b.near.frame === HAND_FLAT && box.x === b.stone.x && box.y === b.stone.y - FLAT_ON;
+  };
+  const wrong: string[] = [];
+  // Uncaught, and clapped on the floor before its face or out of the air, on every frame it can be.
+  const catches: (Fight['caught'] | null)[] = [null];
+  for (let ck = 0; ck < C.grip; ck++) {
+    catches.push({ by: 'clap', k: ck, x: 91.17, y: F - 16, w: 10, h: 16, vx: 0, vy: 0, air: false });
+    catches.push({ by: 'clap', k: ck, x: 120, y: 700, w: 10, h: 16, vx: 0, vy: 0, air: true });
+  }
+  for (const caught of catches) {
+    const at0 = caught ? `clapped at L+${caught.k}${caught.air ? ' in the air' : ''}` : 'uncaught';
+    let last: BullPose | null = null;
+    for (let k = caught?.k ?? C.grip - 2; k < C.blow1 + 4; k++) {
+      const f = at(k);
+      f.caught = caught;
+      const b = bullPose(f);
+      if (b.near.frame === HAND_HOLD && b.stone.y + ST.h >= F) wrong.push(`${at0}, L+${k}: held on the floor`);
+      if (b.near.frame === HAND_HOLD && !inHand(b)) wrong.push(`${at0}, L+${k}: the hand holding nothing`);
+      if (b.stoneHeld && !inHand(b)) wrong.push(`${at0}, L+${k}: carried out of its hand`);
+      if (last && (last.stone.x !== b.stone.x || last.stone.y !== b.stone.y) && !(inHand(last) && inHand(b))) wrong.push(`${at0}, L+${k}: the stone moved out of its hand`);
+      // A pixel of clay at least between the clawing hand and the stone in its hand, and the hand that holds it.
+      if (b.far.frame === HAND_CLAW && b.stoneHeld && k >= C.knee) {
+        const c = handBox(b.far);
+        const near = (r: { x: number; y: number; w: number; h: number }) => c.x <= r.x + r.w && r.x <= c.x + c.w && c.y <= r.y + r.h && r.y <= c.y + c.h;
+        if (near({ ...b.stone, w: ST.w, h: ST.h }) || near(handBox(b.near))) wrong.push(`${at0}, L+${k}: the claw on the stone`);
+      }
+      last = b;
+    }
+  }
+  expect(wrong.slice(0, 20)).toEqual([]);
+});
+
+/** A block of glaze the stone's size, ringed with clay on its top and both sides, corners included, anywhere in `p`. */
+function stamped(p: Pixels): string[] {
+  const out: string[] = [];
+  for (const { x, y, ink } of p.each()) {
+    if (ink !== '#') continue;
+    let block = true;
+    for (let j = 0; j < ST.h && block; j++) for (let i = 0; i < ST.w && block; i++) block = p.get(x + i, y + j) === '#';
+    if (!block) continue;
+    let ring = true;
+    for (let i = -1; i <= ST.w && ring; i++) ring = p.get(x + i, y - 1) === '_';
+    for (let j = 0; j < ST.h && ring; j++) ring = p.get(x - 1, y + j) === '_' && p.get(x + ST.w, y + j) === '_';
+    if (ring) out.push(`(${x}, ${y})`);
+  }
+  return out;
+}
+
+test("the near stone on the floor behind everything of it: as the struck body lurches over it, nothing of it is drawn again in front, so no clay-ringed block is stamped on the body, from L + 76 to 105, in the clean run, the horns or the swat", () => {
+  const attempts: [string, ((k: number) => Press | null) | null, string | null][] = [
+    ['the clean run', null, null],
+    ['the horns on its back', (k) => (k < 59 ? null : { dir: 0, jump: false }), 'The horns'],
+    ['the horns at the wall', () => ({ dir: -1, jump: false }), 'The horns'],
+    ['the horns in the air', (k) => (k < 57 ? null : { dir: 0, jump: (k - 57) % 12 < 10 }), 'The horns'],
+    ['the swat in the air', (k) => ({ dir: k >= 24 ? 1 : 0, jump: k >= 44 && k < 60 }), 'The hands'],
+  ];
+  for (const [name, hands, cause] of attempts) {
+    const r = new Run();
+    const presses = cleanPresses();
+    const wrong: string[] = [];
+    let frames = 0;
+    let dying = 0;
+    for (let i = 0; i < 4000 && dying < 45; i++) {
+      const f = r.fight;
+      if (r.cause) {
+        const w = { level: LEVEL, player: r.p, cameraX: r.cam.x, events: r.events, alive: false, kill: () => undefined, sound: () => undefined } as unknown as World;
+        for (const e of r.entities) e.update(w);
+        dying++;
+      } else {
+        const k = f.keyed ? f.k + 1 : -Infinity;
+        r.tick((hands && k >= 0 ? hands(k) : null) ?? presses[i] ?? { dir: 0, jump: false });
+      }
+      if (!f.keyed || f.k < C.blow1 || f.k > FIGHT.toss.to - 1) continue;
+      frames++;
+      const pic = picture(f);
+      const seen = new Pixels();
+      for (const p of [pic.body, pic.front]) for (const q of p.each()) seen.put(q.x, q.y, q.ink);
+      for (const at0 of stamped(seen)) wrong.push(`${r.cause ? 'dead' : 'L+'}${f.k}: ${at0}`);
+    }
+    expect(r.cause, name).toBe(cause);
+    expect(frames, name).toBeGreaterThan(10);
+    expect(wrong.slice(0, 10), name).toEqual([]);
+  }
 });
 
 test("nothing of the bull or of Theseus is ever drawn on the cell's stone: on every frame of the clean run's fight from L - 8, and of the toss at the wall, on its back and in the air, through its death", () => {

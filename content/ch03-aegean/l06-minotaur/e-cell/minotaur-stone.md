@@ -14,29 +14,38 @@ Minotaur's hand. Two, the same drawing.
 
 ## Where it stands in the game
 
-On the cell floor before its face, the near one at x 100 and the far one at x 110, y 732 to 735,
-a hand flat on each while it crouches. At the grip the far one is let go and stays; the near one
-is taken up in its left hand, up and back in front of its own face, right of Theseus, who stands
-before it, and over its head, raised over its shoulder; swung over its head at the ducking hero
-in the heave, to the end of its reach in front of its face, over him; then, missed, drawn back in
-front of its own chest, x 107 or more, brought down there, and only at the floor slid along it,
-in front of the far stone, to where it is set down before it at x 98 on L+74, the hand flat on it.
-So nothing of the stone, its hand or its arm comes over Theseus above his knees on any frame it is
-in its hand (`tests/minotaur-bull.spec.ts`); its arm crosses only his shins, as the stones on the
+On the cell floor before its face, the near one at x 100 and the far one at x 110, y 732 to 735, a
+hand flat on each while it crouches. At the grip the far one is let go and stays; the near one is
+taken up in its left hand, up and back in front of its own face, right of Theseus, who stands
+before it, and over its head, raised over its shoulder; swung over its head at the ducking hero in
+the heave, to the end of its reach in front of its face, over him; then, missed, drawn back in
+front of its own chest, x 107 or more, brought down there, and only at the floor slid along it, in
+front of the far stone, to where it is set down before it at x 98 on L+74, the hand flat on it. So
+nothing of the stone, its hand or its arm comes over Theseus above his knees on any frame it is in
+its hand (`tests/minotaur-bull.spec.ts`); its arm crosses only his shins, as the stones on the
 floor do. (Drawn first, 2026-10-10, it was taken up straight before its face and brought down from
-the end of the swing straight to x 98: in front of Theseus both times, it came up through his
-belly and face at the grip, and down through his face, chest and belly from L+63 to 69, the arm
-over the stone leaving a few cream pixels of it, so that what read was a dark pole driven into
-him and the duck's end read as the stone hitting him. A check of the hero stage found the second;
-drawing the fix, the first.) On the floor the stones are behind everything of it: what comes down
-over them hides them, and where its glaze meets a stone's contour the contour gives way to clay.
-Both stay by the heap, behind its head and its arm (`minotaur-heap`). In its hand the stone is in
-front of it, the far stone included, its contour whole, cut from the body by clay, and nothing
-lies on it but its own hand: under it, the fingers across its face (`minotaur-hand`, frame 1),
-while it is up at its shoulder or over it; gripping it from above, the palm on its top and the
-fingers down its face (frame 0), while it is lower, the arm straight down to it. The near stone,
-on the floor or in its hand, is in front of Theseus, who stands by it at the bull's head, with a
-line of clay round it (`minotaur-body`, Against Theseus); the far one is behind him.
+the end of the swing straight to x 98: in front of Theseus both times, it came up through his belly
+and face at the grip, and down through his face, chest and belly from L+63 to 69, the arm over the
+stone leaving a few cream pixels of it, so that what read was a dark pole driven into him and the
+duck's end read as the stone hitting him. A check of the hero stage found the second; drawing the
+fix, the first.) Where a clap runs into the grip, the stone stays on the floor under its hand while
+its palm comes back from him, and is taken up the same way once the palm is flat on it again, over
+as many frames and done by the heave: it never goes into its hand from the floor at a jump, and the
+hand never holds nothing (`tests/minotaur-bull.spec.ts`; after the whole-level review, 2026-10-10:
+the palm came back empty to the raised stone's place, and the stone jumped into it as the clap
+ended). On the floor the stones are behind everything of it: what comes down over them hides them,
+and where its glaze meets a stone's contour the contour gives way to clay. The near stone, in front
+of Theseus, is drawn again in front of him only where it is seen (after the whole-level review,
+2026-10-10: as the struck body lurched over it where it was set down, its place was drawn again in
+the body's glaze with a line of clay round it, a box stamped on the body;
+`tests/minotaur-bull.spec.ts`). Both stay by the heap, behind its head and its arm
+(`minotaur-heap`). In its hand the stone is in front of it, the far stone included, its contour
+whole, cut from the body by clay, and nothing lies on it but its own hand: under it, the fingers
+across its face (`minotaur-hand`, frame 1), while it is up at its shoulder or over it; gripping it
+from above, the palm on its top and the fingers down its face (frame 0), while it is lower, the arm
+straight down to it. The near stone, on the floor or in its hand, is in front of Theseus, who
+stands by it at the bull's head, with a line of clay round it (`minotaur-body`, Against Theseus);
+the far one is behind him.
 
 ## Must be right
 

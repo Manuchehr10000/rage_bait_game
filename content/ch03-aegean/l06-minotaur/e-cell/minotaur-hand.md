@@ -4,7 +4,7 @@
 |---|---|
 | Id | `minotaur-hand` |
 | File | None, and none is wanted: drawn in code at 1 world px (`../LEVEL.md`, Art, ruled 2026-10-10) |
-| Size | Up to 8 × 12 world px per frame (flat 8 × 6, holding 7 × 4, clawing 7 × 5, the palm 5 × 12, reaching 7 × 5), 5 frames, each hung from its wrist; drawn facing right, and flipped by the game to face left |
+| Size | Up to 8 × 12 world px per frame (flat 8 × 6, holding 7 × 4, clawing 7 × 6, the palm 5 × 12, reaching 6 × 5), 5 frames, each hung from its wrist; drawn facing right, and flipped by the game to face left |
 | Beat | `e-cell` |
 
 ## What it is
@@ -20,11 +20,15 @@ reserved clay, parts the thumb from the fingers. The frames:
    hoof's two and never a rake.
 1. Holding: 7 × 4, under the stone's front, its fingers spread up across the stone's face, so
    that the stone shows cream between them: the stone up in its hand.
-2. Clawing: 7 × 5, the fingers spread and hooked down, the thumb parted by the incision.
+2. Clawing: 7 × 6, raised from the wrist at its foot: three fingers up, a pixel wide and a pixel
+   apart, their tips hooked forward over at its top, and the thumb out forward from the heel of
+   the hand under them, 2 px with its tip a row up, parted by the incision.
 3. The palm: 5 × 12, upright and edge-on, the fingers up and the thumb out on its outer side,
    parted by the incision: the clap's two.
-4. Reaching: frame 2 upside down, the fingers spread and hooked up, the near hand thrashing at
-   the hero's chest after the first blow.
+4. Reaching: 6 × 5, the same hand closed, grabbing at the hero's chest after the first blow:
+   its fingers together, up and forward, and the thumb out forward under them, parted by the
+   incision, the wrist at its foot. It lies over his glaze, where fingers a pixel apart would lie
+   on him as stripes of glaze and clay: closed, it is one shape in its line of clay.
 
 (Drawn 2026-10-10. The notes first had the flat hand 3 high, its thumb under the fingers, the
 holding hand's fingers curled over the stone's top, and the palm 3 × 8: three rows left no room
@@ -33,7 +37,12 @@ the same day, the flat hand was drawn 8 × 4 with three fingers and the thumb as
 the stone's top, the thumb under the wrist; a check of the drawn bull read it, at the game's
 scale, as a rake, a comb or a toed paw, the thumb where an animal's heel or dewclaw is, and it was
 redrawn as above. Frame 4 was added then, when the near hand came to thrash in front of the hero:
-hooked down over his chest it read as a fringe on his kilt.)
+hooked down over his chest it read as a fringe on his kilt. After the whole-level review, the same
+day: the claw hung from its wrist with four fingers down, the thumb's among them, and the reach was
+the claw upside down; over its brow the claw read as a rake or a crook, and over his chest the
+reach, its four prongs and their clay, as a grille on him. Both were redrawn as above; the claw's
+loop is where it was, but for one place a pixel higher, where the taller hand would have come
+within a pixel of the stone in the heave.)
 
 ## Where it stands in the game
 
@@ -43,7 +52,8 @@ palm on y 728 to 731, straight on the stone's top row (y 732), the thumb at the 
 and the wrist near its back end, x 105 and x 115, and the fingers down the stone's face at x 102,
 104 and 106 (and 112, 114, 116), y 732 and 733. The two hands are 2 px of clay apart. They stay
 flat on their stones through the breath, which lifts the rest of it (`tests/minotaur-bull.spec.ts`).
-From the grip until it sets it down, the near hand has the stone: frame 1, under it, while the
+From the grip until it sets it down, the near hand has the stone (where a clap runs into the
+grip, its palm comes back flat on the stone first and takes it up from there, `minotaur-stone`): frame 1, under it, while the
 stone is up at its shoulder or over it, so that the arm comes up to it from below; frame 0,
 gripping it from above, the palm on its top and the fingers down its face, while it is lower, the
 arm straight down to it, so that no arm or elbow ever lies across the stone (2026-10-10: held under
@@ -87,7 +97,7 @@ the stone's back end, the stone's x + 6, and the hand is laid forward from it
 - **Hands, never hooves** (ruled 2026-10-10: "the bull's hands read as hands before the clap:
   human, oversized, flat on pale stones"). A thumb, fingers that end square or spread, a wrist
   narrower than the hand. Never a single notch at the tip, which is a cloven hoof; never a row of
-  like prongs, which is a rake: the thumb goes one way and the fingers another
+  like prongs, which is a rake: the thumb goes one way and the fingers another, in every frame
   (`tests/minotaur-bull.spec.ts`).
 - **Seen before the clap**: flat on the cream stones, glaze on cream, from the first frame he is in
   the cell.
