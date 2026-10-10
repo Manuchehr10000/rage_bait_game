@@ -94,7 +94,7 @@
       "dx": -1,
       "dy": -1,
       "beat": "a-door",
-      "what": "A 1 px line of reserved clay round the tourist's top and sides, and under him only while he is off his feet, drawn only where glaze is behind him, so that the one full-colour figure is cut from the black as the vase painters cut one figure from the next."
+      "what": "A 1 px line of reserved clay round the tourist's top and sides, corners included, and under him only while he is off his feet, drawn only where glaze is behind him, so that the one full-colour figure is cut from the black as the vase painters cut one figure from the next."
     },
     {
       "id": "thread",
@@ -198,7 +198,7 @@
       "w": 44,
       "h": 30,
       "beat": "e-cell",
-      "what": "The Minotaur's man's body, drawn by code in flat glaze: the back on its solid every frame, the neck, arms 4 px at the shoulder and 3 at the wrist, the folded leg a filled wedge, never a letter or a digit; crouched, gripped, on its knee, heaving, lurching on both knees, tossing. Theseus stands between its body and its near arm. Size as crouched, with its stones."
+      "what": "The Minotaur's man's body, drawn by code in flat glaze: the back on its solid every frame, the neck, arms pixelled as the people are, the upper arm thicker than the forearm, bent at the elbow and narrowed to a wrist, the folded leg a filled wedge, never a letter or a digit; crouched, gripped, on its knee, heaving, lurching on both knees, tossing, its head swung back under a man on its back, kneeling up before the second blow. Theseus stands between its body and its near arm. Size as crouched, with its stones."
     },
     {
       "id": "minotaur-head",
@@ -215,7 +215,7 @@
       "h": 12,
       "frames": 5,
       "beat": "e-cell",
-      "what": "The Minotaur's hand, a man's, oversized: flat on a stone, gripping it, its palm on the top, its fingers down the stone's face and its thumb laid forward along the top, parted by the one incision; holding the stone up with its fingers across its face; clawing, raised, three fingers hooked forward at its top and the thumb out forward under them; upright and edge-on as a palm for the clap; and reaching, the same hand closed, its fingers together and the thumb out under them. Never a hoof, never a rake. Up to 8 x 12 a frame. Faces right; the game flips it to face left."
+      "what": "The Minotaur's hand, a man's, oversized: flat on a stone, gripping it, its palm on the top, its fingers down the stone's face and its thumb laid forward along the stone's top on the palm's last row, parted by the one incision; holding the stone up on its fist, two fingertips on its face; clawing, raised, three fingers hooked forward at its top and the thumb out forward under them; upright and edge-on as a palm for the clap; and reaching, the same hand closed, its fingers together and the thumb out under them. Never a hoof, never a rake. Up to 8 x 12 a frame. Faces right; the game flips it to face left."
     },
     {
       "id": "minotaur-stone",
@@ -226,10 +226,10 @@
     },
     {
       "id": "minotaur-heap",
-      "w": 54,
+      "w": 39,
       "h": 24,
       "beat": "e-cell",
-      "what": "The Minotaur after the second blow: the body sunk over its knees, its back on the 24 px solid, an arm thrown out over its head to the floor, its head down before it. Bloodless. It stays. Drawn by code, facing left."
+      "what": "The Minotaur after the second blow: the body sunk over its knees and bowed, its back on the 24 px solid, its neck bowed down to its head on the floor before it, clear of Theseus's feet; nothing incised across it. Bloodless. It stays. Drawn by code, facing left."
     },
     {
       "id": "theseus-leap",
@@ -283,9 +283,9 @@
     {
       "id": "minotaur-dead",
       "w": 45,
-      "h": 9,
+      "h": 12,
       "beat": "f-thread",
-      "what": "The dead Minotaur in the closing tableau, on its front, dragged by a horn: its head down across the threshold, the rest in the vestibule in a reserved outline. Drawn by code, facing left."
+      "what": "The dead Minotaur in the closing tableau, on its front, dragged by a horn, a man's silhouette in its outline: its head down across the threshold, a shoulder, an arm trailing, a knee bent with the shin up, the rest in the vestibule in a reserved outline. Drawn by code, facing left."
     }
   ]
 }

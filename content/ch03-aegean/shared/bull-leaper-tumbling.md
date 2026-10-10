@@ -37,12 +37,12 @@ each with its trainer.
 - **Turned only in quarter turns, with this one drawn half-quarter** (2026-10-10): no frame of his
   is ever rotated by less than a quarter.
 - **The bull on him**, from the moment it reaches him: its head under him while he is hooked,
-  where its head reaches him; where its lurching back reaches him first, as it does a man left on
-  its back after the heave, he is heaved up off its back, and its head is away from him, going on
-  toward the wall (`../l06-minotaur/e-cell/minotaur-body.md`, the toss). Corrected after the
-  whole-level review, 2026-10-10: this read "its head under him while he is hooked", which the
-  drawing never was where its back reached him. As drawn, that case reads as bucked off its rump,
-  not horned; whether its head should swing back under him there is the designer's.
+  hooked up and over by the horns (`../l06-minotaur/LEVEL.md`, the horns). Where its lurching back
+  reaches him first, as it does a man left on its back after the heave, its head swings back under
+  him on its stretched neck, over its back, from the frame its back reaches him, and he goes up on
+  its horns (`../l06-minotaur/e-cell/minotaur-body.md`, the toss). (After the whole-level review,
+  2026-10-10: there its head went on toward the wall and he read as bucked off its rump, and this
+  note had been changed to say so; it is back to LEVEL.md, and the drawing with it.)
 - Nothing reacts.
 
 ## Deliberately wrong

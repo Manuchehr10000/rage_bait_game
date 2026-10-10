@@ -11,27 +11,33 @@
 
 A bull's head in profile on the man's neck (`minotaur-body`): a long face to a broad muzzle, the
 nostril and the eye reserved in the clay, the eye high, an ear out behind, and the horns, 2 px
-at every row, up out of the poll in a lyre, apart, and forward at the tips, standing 5 px over its
-top, a pixel of clay between them over the brow. The frames:
+at every row, a bull's lyre: out of the poll sideways and curving up, to tips that stand up at the
+box's sides, standing 5 px over its top, a pixel of clay between them over the brow; never a
+goat's or an antelope's straight V. (After the whole-level review, 2026-10-10: built first rising
+straight from the poll in a V to upright tips, they read as a goat's or an antelope's.) The frames:
 
 0. Level: its head on its neck as it crouches and fights.
-1. Tossed up: the muzzle raised and forward, the horns hooking up and forward.
+1. Tossed up: the muzzle raised and forward, the same lyre tipped back with it.
 2. Down: lying on its cheek on the floor, the muzzle along it toward the front and the horns up
-   at the back, two posts of 2 px, 3 rows high, a pixel of clay between them and between the far
-   one and its neck, the near one 6 px in on the box's top row; all of it in the box's first 9
+   at the back, two posts of 2 px, 3 rows high, their tips curving back a pixel, a pixel of clay
+   between them and between the far one and its neck, the near one 6 px in on the box's top row; all of it in the box's first 9
    rows. (Drawn 2026-10-10. Drawn first as the level head with its horns cut short, it read as a
    lump among the stones. Then, after the whole-level review the same day, its horns were 1 px
    for their top two rows, the antennae this note forbids, in the heap and in the closing
    tableau's last frame; and set 2 px wide where they were, the far one touched its neck. This
-   read "the box's lower 9 rows": it is the first 9, the heap's x 101 to 111 and y 727 to 735.)
+   read "the box's lower 9 rows": it is the first 9, the heap's x 105 to 115 and y 727 to 735.)
 
 ## Where it stands in the game
 
 Its box's top-left is where the fight puts it: x 108 and y 712 crouched, with the back and the
 lurch, a pixel up with the breath, tossing 2 to 7 px from the first blow. Frame 0 throughout, but
-frame 1 while it has a tourist on its horns, tossing him up, and for the 4 frames its head jerks
-up at the second blow; frame 2 from then on, at x 101 on the floor, across both stones and
-in front of them (`minotaur-heap`), and in the closing tableau (`../f-thread/minotaur-dead.md`).
+frame 1 while it has a tourist on its horns, tossing him up, swung back under him over its own
+back where its back reached him first (`minotaur-body`, the toss), and for the 4 frames its head
+jerks up at the second blow; frame 2 from then on, at x 105 on the floor before the heap, clear of
+Theseus's feet, which come to x 103, and in front of the far stone (`minotaur-heap`), and in the
+closing tableau (`../f-thread/minotaur-dead.md`). (After the whole-level review, 2026-10-10: at
+x 101, across both stones, it lay behind his feet and could not be read.) Kneeling up before the
+second blow it is up before its shoulders, its box's top at y 711, in Theseus's hand.
 The neck between it and the shoulders is the body's, drawn by code, and stretches when the head
 lunges out, or tosses up at a man high over it. The arms, raised to claw or thrashing, go behind
 it, so that it is always whole.

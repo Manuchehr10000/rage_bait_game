@@ -9,9 +9,12 @@
 
 ## What it is
 
-A 1 px line of the clay round the tourist's top and sides, never under his feet while he is on
+A 1 px line of the clay round the tourist's top and sides, its corners included, so that not
+even a corner of his dark outline meets the glaze diagonally, never under his feet while he is on
 them, drawn only where something of glaze is behind him. Off his feet, in the air, in the bull's
-hands off the floor or hooked and thrown by the horns, it goes under him too. It is how the vase
+hands off the floor or hooked and thrown by the horns, it goes under him too, its lower corners
+with it. (After the whole-level review, 2026-10-10: it was set a pixel left, right and up, and
+down off his feet, but not at the corners, so his outline touched the glaze at a corner.) It is how the vase
 painters cut one figure from the next (the research), applied to the one figure in full colour.
 
 ## Where it stands in the game
@@ -21,7 +24,14 @@ behind him: the vestibule; the hero's doorway, from L−8 only; Theseus; the que
 bull, its hands and its heap; the tableau's Theseus and body; the knob on the passage's wall.
 Never on a tile of stone or on the doorpost, so it never notches the masonry. On the clay it is
 clay and does not show; on the stone nothing is drawn. Pasted on the ceiling by the snort he
-needs none. Whatever lies behind him in those boxes is cut by it as the glaze is: the white of
+needs none.
+
+His frame is drawn where it always is, a pixel left of his box, but against a wall's stone, where
+its first column is the stone and the far side of him is not, a pixel right, and where its last
+column is, a pixel further left, so that nothing of him is drawn on the masonry and its lines:
+down the cell's left wall to its floor, L−10 to L0, the sniff at the hatch, and up the cell's far
+wall off the bull's back (`tests/minotaur-bull.spec.ts`). His box and all he collides with are where they were (pillar 9). (After the
+whole-level review, 2026-10-10: there his frame overlapped the wall's glaze line by a pixel.) Whatever lies behind him in those boxes is cut by it as the glaze is: the white of
 the thread too, a pixel each side of him.
 
 ## Must be right

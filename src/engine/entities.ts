@@ -2252,7 +2252,8 @@ export interface FightCatch {
  * falls, until the bull reaches him: its head within `reach` px of him, horns and all,
  * or anywhere `up` px over its horns, rearing up to `rear` px on its knees and tossing its
  * head up at him; or its lurching body within `reach`. Its head carries him up onto its
- * horns in `lift` frames, tipping him `tip` of a turn, or its back lifts him off it; one
+ * horns in `lift` frames, tipping him `tip` of a turn, swung back under him over its back
+ * where its back reached him first; one
  * somersault of `arc` frames, `rise` px over the straight line, throws him up and over to
  * the left wall, and he lies flat there for `flat` frames or more of the death. A late
  * reach shortens the somersault, never below `minArc`; whatever has not reached him by
@@ -2373,7 +2374,7 @@ export class Fight implements Entity {
   headAt(k: number): { x: number; y: number } {
     const d = this.def;
     const c = d.clock;
-    if (k >= c.blow2) return k - c.blow2 < STRUCK ? { x: d.body.face, y: d.floorY - d.back.heap - 6 } : { x: d.body.face - 7, y: d.floorY - 9 };
+    if (k >= c.blow2) return k - c.blow2 < STRUCK ? { x: d.body.face, y: d.floorY - d.back.heap - 6 } : { x: d.body.face - 3, y: d.floorY - 9 };
     const tossing = k >= c.blow1 && k < d.toss.to;
     const toss = tossing ? -[2, 6, 3, 7, 1, 5][(k - c.blow1) % 6]! : 0;
     return { x: d.body.face + this.lurchAt(k), y: d.floorY - Math.round(this.backAt(k)) - 4 + toss };
@@ -2452,16 +2453,24 @@ export class Fight implements Entity {
     const { x, y } = path[hook]!;
     // Its head on him: reared up on its knees and tossed up at him if he is over its horns,
     // and out to him if nothing reached him; tossing up 2 px a frame with him on its horns.
+    // Where its back reached him, its head swings back under him on its stretched neck, its
+    // horns under him over its back, never past the far wall (drawn only: the horns have him
+    // as they would have had him from the frame its back reached him).
     const reach = this.headAt(c.k + hook);
     const need = by === 'head' ? Math.max(0, Math.round(reach.y - HORNS + 2 - (y + c.h))) : 0;
     const rear = Math.min(TOSS.rear, need);
     const offX = out ? Math.round(x + (c.w - BULL_HEAD.w) / 2) - reach.x : 0;
+    const z = d.toss.rect;
+    const back = {
+      x: Math.min(z.x + z.w - BULL_HEAD.w - 1, Math.round(x + (c.w - BULL_HEAD.w) / 2)),
+      y: Math.min(Math.round(y + c.h) + HORNS - 2, d.floorY - Math.round(this.backAt(c.k + hook)) - BULL_HEAD.h),
+    };
     const headOn = (k: number, i: number) => {
+      if (by === 'body') return { x: back.x, y: back.y - 2 * i };
       const h = this.headAt(k);
       return { x: h.x + offX, y: h.y - need - 2 * i };
     };
     const lifted = (k: number, i: number) => {
-      if (by === 'body') return { x, y: y - 2 * (i + 1) };
       const h = headOn(k, i);
       return { x: h.x + (BULL_HEAD.w - c.w) / 2, y: h.y - HORNS + 2 - c.h };
     };
@@ -2469,7 +2478,7 @@ export class Fight implements Entity {
     if (i < TOSS.lift) {
       const to = lifted(c.k + f, i);
       const t = (i + 1) / TOSS.lift;
-      const head = by === 'head' && (offX || need || i) ? headOn(c.k + f, i) : null;
+      const head = by === 'body' || offX || need || i ? headOn(c.k + f, i) : null;
       return { pose: 'hooked', x: x + (to.x - x) * t, y: y + (to.y - y) * t, turn: TOSS.tip * t, ground: false, by, head, rear };
     }
     // Thrown, as it sinks back down onto its knees.

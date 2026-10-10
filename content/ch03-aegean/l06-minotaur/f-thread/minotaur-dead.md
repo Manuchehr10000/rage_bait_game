@@ -4,15 +4,19 @@
 |---|---|
 | Id | `minotaur-dead` |
 | File | None, and none is wanted: drawn in code at 1 world px (`../LEVEL.md`, Art, ruled 2026-10-10) |
-| Size | 45 × 9 world px, 1 frame: its head down, `../e-cell/minotaur-head.md` frame 2, 11 × 9, and the body after it, on the floor; drawn by code facing left |
+| Size | 45 × 12 world px, 1 frame: its head down, `../e-cell/minotaur-head.md` frame 2, 11 × 9, and the body after it, on the floor, its near shin up to 12 px; drawn by code facing left |
 | Beat | `f-thread` |
 
 ## What it is
 
-The Minotaur dead on its front, dragged by a horn: its head down on its cheek at the front, the
-horns up at its back, the muzzle along the floor toward whoever drags it; a man's shoulders, back
-and hips lying flat after it, an arm trailing back along its side (an incised line from the
-shoulder), the legs, and a sole turned up at the end. In flat glaze, the bull's head as
+The Minotaur dead on its front, dragged by a horn, a man's silhouette in its outline: its head
+down on its cheek at the front, across the threshold, the horns up at its back, the muzzle along
+the floor toward whoever drags it; behind its neck a shoulder, the highest of it, 9 px; its back
+down to the waist and up again over the buttock; its near arm trailing back along its side from
+the shoulder to the elbow and the hand, cut from the body by clay; its far leg straight back along
+the floor, and its near leg bent at the knee, the knee down and the shin up, 12 px, to the foot,
+its sole turned up. (After the whole-level review, 2026-10-10: drawn first as a body 8 px high and
+flat to the sole at its end, with an incised line for the arm, it read as a log.) In flat glaze, the bull's head as
 `../e-cell/minotaur-head.md` draws it down, frame 2, the same as the heap's.
 
 ## Where it stands in the game

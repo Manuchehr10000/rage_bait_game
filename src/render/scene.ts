@@ -298,7 +298,7 @@ export function renderWorld(ctx: CanvasRenderingContext2D, s: Scene): void {
   drawCoins(ctx, s);
   if (level.data.exit && !level.data.exitHidden) drawExit(ctx, level.data.exit);
   if (theme === 'minotaur' && (!s.death || DEATH_ANIM[s.death.cause] !== 'crush')) drawTouristReserve(ctx, s);
-  if (!s.death) drawPlayer(ctx, s.player, level.data.costume, lampLit(s));
+  if (!s.death) drawPlayer(ctx, s.player, level.data.costume, lampLit(s), touristLeft(s, s.player.x, s.player.y));
   else if (DEATH_ANIM[s.death.cause] !== 'crush') drawDeath(ctx, s, s.death);
   for (const e of s.entities) drawEntityOverlay(ctx, s, e);
   if (s.death && (DEATH_ANIM[s.death.cause] === 'drown' || DEATH_ANIM[s.death.cause] === 'snap')) drawDrownSurface(ctx, s, s.death.t);
@@ -2711,9 +2711,25 @@ function drawExit(ctx: CanvasRenderingContext2D, e: Rect): void {
 }
 
 /** A lost tourist in a visibly wrong costume. Nobody will mention it. */
-export function drawPlayer(ctx: CanvasRenderingContext2D, p: Player, costume: Costume, lampOn: boolean): void {
+export function drawPlayer(ctx: CanvasRenderingContext2D, p: Player, costume: Costume, lampOn: boolean, x = Math.round(p.x) - 1): void {
   const f = p.held ? heldTourist(costume, p.heldPose(), lampOn) : tourist(costume, p.animFrame(), lampOn);
-  blitFacing(ctx, f, Math.round(p.x) - 1, Math.round(p.y), p.facing);
+  blitFacing(ctx, f, x, Math.round(p.y), p.facing);
+}
+
+/**
+ * Where his 12 px frame is drawn for his box at (`x`, `y`): a pixel left of it, as in every
+ * level; but in the Minotaur's labyrinth, where its first column is a wall's stone and the far
+ * side is not, a pixel right, and where its last column is, a pixel further left, so that
+ * nothing of him is drawn on the masonry and its lines (down the cell's left wall, and up its
+ * far one). His box, and all he collides with, are where they were (pillar 9).
+ */
+function touristLeft(s: Scene, x: number, y: number): number {
+  const sx = Math.round(x) - 1;
+  if (s.level.data.theme !== 'minotaur') return sx;
+  const ys = [Math.round(y), Math.round(y) + 8, Math.round(y) + 15];
+  const stone = (px: number) => ys.some((py) => s.level.isSolid(Math.floor(px / TILE), Math.floor(py / TILE)));
+  if (stone(sx) && !stone(sx + 12)) return sx + 1;
+  return stone(sx + 11) && !stone(sx - 1) ? sx - 1 : sx;
 }
 
 /** Held by the boot: pulling at it, or stood with it stuck. A costume with no such frames just stands. */
@@ -5399,7 +5415,7 @@ function drawSnorted(ctx: CanvasRenderingContext2D, s: Scene, death: { cause: De
   const at = death.at ?? { x: p.x, y: p.y };
   const body = snortBody(p, at, Math.round(death.t * DEATH_FRAMES));
   if (!body.pasted || !c.pasted) {
-    blitFacing(ctx, tourist(costume, 'idle'), Math.round(body.x) - 1, Math.round(body.y), p.facing);
+    blitFacing(ctx, tourist(costume, 'idle'), touristLeft(s, body.x, body.y), Math.round(body.y), p.facing);
     return;
   }
   // From the wall of the hatch, along the ceiling over it.
@@ -5562,7 +5578,7 @@ function drawHanded(ctx: CanvasRenderingContext2D, s: Scene, death: { t: number;
 /**
  * The horns (Fight.tossed; content/ch03-aegean/shared/bull-leaper-tumbling.md): held where
  * they caught him, standing, or falling, until the bull reaches him; carried up onto its
- * horns, or lifted off its back, tipping to the first eighth of a turn; and hooked up and
+ * horns, its head swung back under him where its back reached him, tipping to the first eighth of a turn; and hooked up and
  * over in one full somersault to the left wall, the kilt up and flying, round in eighths:
  * the jump frame turned by quarters, and between them the drawn half-quarter turned by
  * quarters. Then dropped flat there on his back, the dead frame turned a quarter, his head
@@ -5755,7 +5771,7 @@ function drawTouristReserve(ctx: CanvasRenderingContext2D, s: Scene): void {
   const cx = s.camera.ix;
   const cy = s.camera.iy;
   // Where he can be drawn and a pixel round it: his sprite, or, dying, anywhere in the view.
-  const him: Rect = s.death ? { x: cx, y: cy, w: VIEW_W, h: VIEW_H } : { x: Math.round(p.x) - 2, y: Math.round(p.y) - 1, w: 14, h: 18 };
+  const him: Rect = s.death ? { x: cx, y: cy, w: VIEW_W, h: VIEW_H } : { x: Math.round(p.x) - 2, y: Math.round(p.y) - 1, w: 15, h: 18 };
   const stone = doorposts(s);
   const clip: Rect[] = [];
   for (const b of glazeBehind(s)) {
@@ -5787,13 +5803,13 @@ function drawTouristReserve(ctx: CanvasRenderingContext2D, s: Scene): void {
   lctx.imageSmoothingEnabled = false;
   lctx.clearRect(him.x, him.y, him.w, him.h);
   if (s.death) drawDeath(lctx, s, s.death);
-  else drawPlayer(lctx, p, s.level.data.costume, lampLit(s));
+  else drawPlayer(lctx, p, s.level.data.costume, lampLit(s), touristLeft(s, p.x, p.y));
   lctx.globalCompositeOperation = 'source-in';
   lctx.fillStyle = MN.clay;
   lctx.fillRect(him.x, him.y, him.w, him.h);
   lctx.restore();
-  // Set a pixel left, right and up where the glaze is; and down only while he is off his
-  // feet, in the air or tossed, so it never lifts him off what he stands on.
+  // Set a pixel left, right and up where the glaze is, and up at the corners; and down only
+  // while he is off his feet, in the air or tossed, so it never lifts him off what he stands on.
   ctx.save();
   ctx.beginPath();
   for (const r of clip) ctx.rect(r.x, r.y, r.w, r.h);
@@ -5804,8 +5820,10 @@ function drawTouristReserve(ctx: CanvasRenderingContext2D, s: Scene): void {
     [-1, 0],
     [1, 0],
     [0, -1],
+    [-1, -1],
+    [1, -1],
   ];
-  if (aloft(s)) sides.push([0, 1]);
+  if (aloft(s)) sides.push([0, 1], [-1, 1], [1, 1]);
   for (const [dx, dy] of sides) {
     ctx.drawImage(reserveLayer, sx, sy, t.a * him.w, t.d * him.h, him.x + dx, him.y + dy, him.w, him.h);
   }

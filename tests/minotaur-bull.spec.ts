@@ -4,6 +4,7 @@ import type { FightDef, HeroDef, TableauDef } from '../src/engine/level';
 import { BREATH, BULL_HEAD, createEntity, HERO, STRUCK, type Fight, type Hero, type HeroFrame, type World } from '../src/engine/entities';
 import { TILE, VIEW_H, VIEW_W } from '../src/engine/types';
 import {
+  BLOW,
   BULL_HAND_FRAMES,
   BULL_HEAD_FRAMES,
   bullHorn,
@@ -93,6 +94,21 @@ test("its drawings: a bull's head whose horns are 2 px and whose near horn is wh
       for (const run of runs(r)) expect(run.length, r).toBeGreaterThanOrEqual(2);
     }
   }
+  // A bull's lyre, never a goat's V: level, each horn's tip stands up at the box's side for
+  // its first three rows, and only then curves in, row by row, to the poll.
+  const tip = level!.findIndex((r) => r.includes('#'));
+  const poll = level!.findIndex((r) => runs(r).some((run) => run.length >= 4));
+  const inner = level!.slice(tip, poll).map((r) => [r.indexOf('#'), r.lastIndexOf('#')]);
+  expect(inner.slice(0, 3)).toEqual([
+    [0, 10],
+    [0, 10],
+    [0, 10],
+  ]);
+  for (let i = 3; i < inner.length; i++) {
+    const [a0, a1] = inner[i - 1]!;
+    const [b0, b1] = inner[i]!;
+    expect(b0! > a0! && b1! < a1!, level![tip + i]).toBe(true);
+  }
   // Down on the floor, all of it in the box's first 9 rows, so the heap's head lies in
   // x 101 to 111 and y 727 to 735 (headAt); its near horn 6 px in on the box's top row,
   // where Theseus's hand has it in the tableau (deadHorn).
@@ -100,18 +116,18 @@ test("its drawings: a bull's head whose horns are 2 px and whose near horn is wh
   expect(down![14]!.includes('#')).toBe(false);
   expect(down![5]![6]).toBe('#');
   // The flat hand: 8 long, its palm in the rows over the stone; its thumb laid forward
-  // along the top, parted from the hand by the one incision, glaze before it and after it;
-  // its palm's last row on the stone the length of it but for the thumb's end; and its
-  // fingers over the edge and down the stone's face, three apart, each a pixel wide, never
-  // a hoof's two and never at the stone's ends.
+  // along the stone's top on the palm's last row, never a spur over it, parted from the hand
+  // by the one incision, glaze before it and after it, so that the row lies the stone's
+  // whole length but for that incision; and its fingers over the edge and down the stone's
+  // face, three apart, each a pixel wide, never a hoof's two and never at the stone's ends.
   const flat = left(BULL_HAND_FRAMES[HAND_FLAT]!.rows);
   expect(flat.map((r) => r.length)).toEqual(flat.map(() => 8));
   expect(flat.join('').split('_').length - 1).toBe(1);
   const thumb = flat.findIndex((r) => r.includes('_'));
-  expect(thumb).toBeLessThan(FLAT_ON);
+  expect(thumb).toBe(FLAT_ON - 1);
   expect(flat[thumb]!.slice(0, flat[thumb]!.indexOf('_'))).toMatch(/^#{2,}$/);
   expect(flat[thumb]!.slice(flat[thumb]!.indexOf('_') + 1)).toMatch(/^#/);
-  expect(flat[FLAT_ON - 1]!.slice(2)).toBe('######');
+  expect(flat[thumb]!.replace('_', '#')).toBe('########');
   const fingers = flat.slice(FLAT_ON);
   expect(fingers.length).toBeGreaterThanOrEqual(1);
   expect(runs(fingers[0]!)).toEqual(['#', '#', '#']);
@@ -215,12 +231,23 @@ test('its back drawn on its solid on every frame from the grip, pinned, heaved a
     // And nothing of it on the solid behind its shoulders: the back is the top.
     for (let x = x0 + 16; x <= x1 - 3; x++) if (body.get(x, top - 1)) wrong.push(`L+${k}: over the back at (${x}, ${top - 1})`);
   }
+  // Kneeling up before the second blow, taller than the heap it sinks into: its glaze over its
+  // body's front half higher than the heap's top. And neither it nor the heap is incised across
+  // its body behind the shoulders, where a line reads as a sword cut.
+  for (let k = FIGHT.toss.to + 5; k < C.blow2 + 30; k++) {
+    const { body } = picture(at(k));
+    const mine = [...body.each()].filter((q) => q.x >= FIGHT.body.x0 && q.x < FIGHT.body.x1 && q.y < F);
+    if (k < C.blow2 && Math.min(...mine.filter((q) => q.ink === '#').map((q) => q.y)) > F - FIGHT.back.heap - 4) wrong.push(`L+${k}: kneeling no taller than the heap`);
+    for (const q of mine) if (q.ink === '_' && q.x >= FIGHT.body.x0 + 8) wrong.push(`L+${k}: a cut across it at (${q.x}, ${q.y})`);
+  }
   expect(wrong).toEqual([]);
-  // The heap's head jerked up for STRUCK frames, then down on the floor in x 101 to 111.
+  // The heap's head jerked up for STRUCK frames, then down on the floor in x 105 to 115,
+  // clear of Theseus's feet, which come to x 103 (after the whole-level review, 2026-10-10:
+  // at x 101 to 111 it lay behind them).
   const down = picture(at(C.blow2 + STRUCK)).body;
   const head = at(C.blow2 + STRUCK).headAt(C.blow2 + STRUCK);
-  expect(head).toEqual({ x: 101, y: F - 9 });
-  for (let x = 101; x <= 111; x++) for (let y = F - 9; y < F; y++) if (left(BULL_HEAD_FRAMES[2]!)[y - head.y + 5]![x - head.x] === '#') expect(down.get(x, y)).toBe('#');
+  expect(head).toEqual({ x: 105, y: F - 9 });
+  for (let x = 105; x <= 115; x++) for (let y = F - 9; y < F; y++) if (left(BULL_HEAD_FRAMES[2]!)[y - head.y + 5]![x - head.x] === '#') expect(down.get(x, y)).toBe('#');
 });
 
 test("its free hand claws in the swat's column, x 100 to 111, from L + 46 to 67, and never touches the stone it heaves over its head", () => {
@@ -461,7 +488,13 @@ test("the stone in its hand, from the grip until it is set down: whole on every 
 
 test('struck, its near hand reaches up at his chest in front of him, between him and its head: in his front half, under his neck and over his hips, on every frame of the lurch; and its arm never crosses him', () => {
   const wrong: string[] = [];
-  for (let k = C.blow1; k < FIGHT.toss.to; k++) {
+  // On the frames of the first blow its hands are still flat on its stones, clear of his sword
+  // arm, so the blow is seen (after the whole-level review, 2026-10-10); then it thrashes.
+  for (let k = C.blow1; k < C.blow1 + BLOW; k++) {
+    const b = bullPose(at(k));
+    if (b.near.frame !== HAND_FLAT || b.far.frame !== HAND_FLAT) wrong.push(`L+${k}: its hands off its stones in the blow`);
+  }
+  for (let k = C.blow1 + BLOW; k < FIGHT.toss.to; k++) {
     const f = at(k);
     const b = bullPose(f);
     const h = heroAt(k);
@@ -687,14 +720,15 @@ async function open(page: Page): Promise<void> {
 
 /**
  * Every frame of an attempt from L - 8 on, and of its death: Theseus's glaze, the bull's
- * and where they touch; and anything of either drawn on the cell's stone.
+ * and where they touch; and anything of either, or of the tourist, drawn on the cell's stone.
  */
 async function looked(page: Page, name: string, hands: string | null): Promise<{ cause: string | null; frames: number; bull: number; him: number; touches: string[]; stone: string[] }> {
   await open(page);
   return page.evaluate(
-    ({ presses, floor, view, glaze, name, hands, tile }) => {
+    ({ presses, floor, view, glaze, name, hands, tile, colours }) => {
       const g = (window as unknown as W).__game;
       g.titleTimer = 0;
+      const HIS = new Set(colours.map((c: string) => parseInt(c.slice(1), 16)));
       const fight = () => g.entities.find((e: { def: { kind: string } }) => e.def.kind === 'fight');
       const key = (c: string, d: boolean) => window.dispatchEvent(new KeyboardEvent(d ? 'keydown' : 'keyup', { code: c }));
       const press = (p: { dir: number; jump: boolean }) => {
@@ -765,6 +799,10 @@ async function looked(page: Page, name: string, hands: string | null): Promise<{
             if (c === GL && ink(without, i, j) !== GL) seen.him++;
             // Anything of Theseus on the stone: what goes when he does.
             if (c !== ink(without, i, j) && stone(i, j + g.camera.iy) && seen.stone.length < 20) seen.stone.push(`${at}: Theseus at (${i}, ${j + g.camera.iy})`);
+            // Anything of the tourist on it: against the wall his frame is drawn a pixel right,
+            // off its stone (a-door/tourist-reserve.md; after the whole-level review, 2026-10-10,
+            // it lay a pixel over the wall's line, sliding down it to the cell floor).
+            if (HIS.has(c) && stone(i, j + g.camera.iy) && seen.stone.length < 20) seen.stone.push(`${at}: the tourist at (${i}, ${j + g.camera.iy})`);
             if (c !== GREEN) continue;
             seen.bull++;
             for (const [dx, dy] of [[-1, -1], [0, -1], [1, -1], [-1, 0], [1, 0], [-1, 1], [0, 1], [1, 1]] as const) {
@@ -791,7 +829,7 @@ async function looked(page: Page, name: string, hands: string | null): Promise<{
       return { cause, ...seen, touches: seen.touches.slice(0, 20) };
     },
     // The vase's glaze (VASE_INK.glaze, src/render/procedural.ts), as the canvas gives it back.
-    { presses: cleanPresses(), floor: F, view: { w: VIEW_W, h: VIEW_H }, glaze: '#1f140e', name, hands, tile: TILE },
+    { presses: cleanPresses(), floor: F, view: { w: VIEW_W, h: VIEW_H }, glaze: '#1f140e', name, hands, tile: TILE, colours: HIS },
   );
 }
 
@@ -853,7 +891,8 @@ test('in the game: off his feet, in the air or hooked and thrown by the horns, t
           for (let i = 0; i < W4; i++) {
             if (!HIS.has(ink(i, j))) continue;
             out.his++;
-            for (const [dx, dy] of [[-s, 0], [s, 0], [0, -s], [0, s]] as const) {
+            // Its corners too: not even a corner of his outline meets the glaze.
+            for (const [dx, dy] of [[-s, -s], [0, -s], [s, -s], [-s, 0], [s, 0], [-s, s], [0, s], [s, s]] as const) {
               const x = (i + dx) / s;
               const y = (j + dy) / s + g.camera.iy;
               if (x < cell.x0 || x >= cell.x1 || y < cell.y0 || y >= cell.y1) continue;
@@ -1150,7 +1189,8 @@ test('in the game: in its hands off the floor, clapped out of the air or swatted
             for (let i = 0; i < W4; i++) {
               if (!HIS.has(ink(i, j))) continue;
               out.his++;
-              for (const [dx, dy] of [[-s, 0], [s, 0], [0, -s], [0, s]] as const) {
+              // Its corners too: not even a corner of his outline meets the glaze.
+              for (const [dx, dy] of [[-s, -s], [0, -s], [s, -s], [-s, 0], [s, 0], [-s, s], [0, s], [s, s]] as const) {
                 const x = (i + dx) / s;
                 const y = (j + dy) / s + g.camera.iy;
                 if (x < cell.x0 || x >= cell.x1 || y < cell.y0 || y >= cell.y1) continue;

@@ -11,13 +11,19 @@
 
 Asterius, the Minotaur: the face of a bull, and the rest of him human (Apollodorus 3.1.4). A
 bull's head (`minotaur-head`) on a man's body, all in flat glaze: a man's back, shoulders and hips,
-a neck 4 px thick, arms 4 px at the shoulder and 3 at the wrist, a thigh 6 px at the hip and 4 at
-the knee, human hands (`minotaur-hand`), human feet. Every bent leg is a filled wedge, thigh and
+a neck 4 px thick, a thigh 6 px at the hip and 4 at the knee, human hands (`minotaur-hand`), human
+feet. Its arms are pixelled as the people at the door are, never a ruler's beam: the upper arm 5 px
+at the shoulder and 4 at the elbow, bent there, and the forearm 4 px narrowing to a wrist of 2 where
+the hand begins; reaching out, the elbow stands out a little behind the line and down, and more as
+the hand comes in to the shoulder. (After the whole-level review, 2026-10-10: arms 4 px at the
+shoulder and 3 at the wrist, straight from shoulder to hand, read as beams 30 to 40 px long in a
+different hand from the hand-pixelled people.) Every bent leg is a filled wedge, thigh and
 shin in one shape where they fold: never two strokes that read as a Z, a 2, a 4 or any letter or
 digit (pillar 2). Two incisions, lines of reserved clay: one round the near arm where it lies over
 the body, never round its root at the shoulder, and one up the near thigh toward the hip: on its
-feet a little way up the thigh's top from the groin, never down its front; on its knees and in
-the heap from the thigh's middle; nothing models it. Its shoulders are behind its head, which its
+feet a little way up the thigh's top from the groin, never down its front; on its knees from the
+thigh's middle; none kneeling up before the second blow or in the heap, where a line across the
+body reads as a sword cut; nothing models it. Its shoulders are behind its head, which its
 neck holds out before them. (Corrected 2026-10-10, after a check of the
 drawn bull: crouched, the incision ran down the thigh's front, and with the notch under the belly,
 the knee's flat underside and the shin and foot standing under the hip it read as the digit 4.)
@@ -60,9 +66,10 @@ In the cell, on one clock from L, the frame the tourist comes down on its floor:
   him to its feet from the sixth to the ninth, and are back on the stones by the fourteenth.
   Where it runs into the grip, the near palm comes back flat on its stone, which is still on the
   floor, and the grip takes the stone up from there (`minotaur-stone`).
-- **The grip**, L+40 to 46: it takes the near stone up in its left hand, up and back in front of
-  its own face, right of the hero who stands before it, and over its head to its raised place
-  over its shoulder (`minotaur-stone`), and sinks onto its knees; its right hand leaves the far
+- **The grip**, L+40 to 46: it takes the near stone up in its left hand, along the floor under
+  its face, at its chest and up behind its head, never over its face, right of the hero who stands
+  before it, to its raised place over its shoulder, held up on its fist, the elbow out behind it
+  and never over its back behind its shoulders (`minotaur-stone`), and sinks onto its knees; its right hand leaves the far
   stone two frames on, as the near stone goes over, and rises to claw. Its back goes from 20 to
   10, the thigh folded over the shin, the knee on the floor ahead of the hip and the foot behind,
   its sole turned up and never past its rump: nothing of it on the far wall's stone. (Drawn
@@ -81,22 +88,33 @@ In the cell, on one clock from L, the frame the tourist comes down on its floor:
   the hand or the arm comes over him above his knees (`minotaur-stone`). Its free hand goes down
   behind its head once it stops clawing, and flat on the far stone once the near one is set down.
 - **The first blow**, L+76: to L+105 the struck body lurches on both knees to the left wall and
-  back, 46 px and back, thrashing, both hands flailing at the hero on its horn, two frames a
-  place: the near one low, reaching up at his chest in front of him, at the front of it between
-  him and its head, under his neck and over his hips, its arm behind its head and never across
-  him (`minotaur-hand`, frame 4, closed), the far one raised open high over its horns, behind
-  him; never both up over its horns. (Drawn first both before its head, they lay behind him,
-  merged with his glaze.)
-- **The toss**, if it has him: where its head reaches him, it rears up on its knees, up to 14 px,
-  and tosses its head up at him, its head tossed up under him while he is on its horns; where the
-  lurch cannot reach him the head lunges out to him on a stretched neck (ruled 2026-10-09). Where
-  its back reaches him first, as it does a man left standing on its back after the heave and most
-  who jump about on it (41 of 45 late hands tried, 2026-10-10), the lurching body heaves him up off
-  its back while its head goes on toward the wall, 25 to 35 px from him: as drawn, he is bucked
-  off its rump, not horned (after the whole-level review, 2026-10-10; this read as if its head
-  were under him in every toss; whether the head should swing back under him there is the
-  designer's).
-- **L+105 to 130**: down on its hands, flat on its stones.
+  back, 46 px and back. For the blow's own 4 frames, L+76 to 79, its hands are still flat on their
+  stones, nothing of it near his sword arm, so that the blow is seen going home under its jaw
+  (after the whole-level review, 2026-10-10: thrashing from L+76, its claw and its reaching hand
+  lay over his arm, and the blow could not be read). Then it thrashes, both hands flailing at the
+  hero on its horn, two frames a place: the near one low, reaching up at his chest in front of
+  him, at the front of it between him and its head, under his neck and over his hips, its arm
+  behind its head, the elbow up, and never across him (`minotaur-hand`, frame 4, closed), the far
+  one raised open high over its horns, behind him; never both up over its horns. (Drawn first
+  both before its head, they lay behind him, merged with his glaze.)
+- **The toss**, if it has him: hooked up and over in one full somersault (`../LEVEL.md`, the
+  horns), its head under him while he is on its horns. Where its head reaches him, it rears up on
+  its knees, up to 14 px, and tosses its head up at him; where the lurch cannot reach him the head
+  lunges out to him on a stretched neck (ruled 2026-10-09). Where its back reaches him first, as
+  it does a man left standing on its back after the heave and most who jump about on it, its head
+  swings back under him on its stretched neck, over its own back and never past the far wall, from
+  the frame its back reaches him, so that its horns are under him as he goes up, and he goes up on
+  them. (Corrected after the whole-level review, 2026-10-10: there its head went on toward the
+  wall, 25 to 35 px from him, and he read as bucked off its rump; the notes had drifted from
+  LEVEL.md to say so. Drawing only: the kill zone and the kill frame are where they were.)
+- **L+106 to 129**: it comes up off its hands over 6 frames and kneels up, its rump on its heels on
+  the solid, its body leaning up from them to its shoulders, its head up before them in Theseus's
+  hand, its hands still flat on their stones: 29 px over the floor at its shoulders and 30 at its
+  horns' tips, taller than the heap's 24, so that the second blow lets it slump down into the heap.
+  Its rump keeps to its back's solid, still 10 px, the solid never moving: nothing of it is over
+  that solid behind its shoulders, and its top is whole over the rest. (After the whole-level
+  review, 2026-10-10: down on its hands, 10 px tall, the second blow raised it in one frame to the
+  24 px heap, so that "sinks into the heap" read as rising.)
 - **The second blow**, L+130: its head jerks up for 4 frames, and it sinks into the heap.
 
 ## Must be right
@@ -112,7 +130,7 @@ In the cell, on one clock from L, the frame the tourist comes down on its floor:
 - **The back drawn on its solid, every frame** from the grip: the top of its drawn back is the
   top of the solid he stands on (20, then 10, 30, 10; the heap 24), never snapped to a held pose:
   its top row whole over the solid, no cut breaking it, and nothing of it on the solid behind
-  its shoulders (`tests/minotaur-bull.spec.ts`).
+  its shoulders, its raised arm and its rump kneeling up included (`tests/minotaur-bull.spec.ts`).
 - **Every frame of the fight at its true place.** No pose is held for looks: the claw's loop, the
   flails and the tossing head are the kills' own places. Only the crouch before L+40 is still,
   but for its breath.

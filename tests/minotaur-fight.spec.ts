@@ -664,6 +664,13 @@ const tossOf = (r: Run) => {
   if (hook.by === 'body') {
     const top = FIGHT.floorY - f.backAt(k);
     if (gapBetween({ x: FIGHT.body.x0 + f.lurchAt(k), y: top, w: FIGHT.body.x1 - FIGHT.body.x0, h: FIGHT.floorY - top }, him) > TOSS.reach) wrong.push('its back out of reach');
+    // Its head swung back under him on every hooked frame, and by the last of them he is on its
+    // horns: hooked, never bucked off its back (LEVEL.md, the horns; after the whole-level
+    // review, 2026-10-10).
+    const hooked = frames.slice(hook.f, hook.f + TOSS.lift);
+    if (hooked.some((h) => !h.head)) wrong.push('its head not swung back under him');
+    const up = hooked[hooked.length - 1]!;
+    if (up.head && (Math.abs(up.head.x + BULL_HEAD.w / 2 - (up.x + c.w / 2)) > 0.5 || Math.abs(up.head.y - 5 + 2 - (up.y + c.h)) > 0.5)) wrong.push('not on its horns');
   } else {
     const h = t.head ?? lurch;
     if (gapBetween({ x: h.x, y: h.y - 5, w: BULL_HEAD.w, h: BULL_HEAD.h + 5 }, him) > TOSS.reach) wrong.push('its head out of reach');

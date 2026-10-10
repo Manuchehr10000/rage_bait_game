@@ -197,9 +197,9 @@ export class Pixels {
 /**
  * The bull's head (e-cell/minotaur-head.md): 11 wide, its 10 rows of box and the 5 of its
  * horns over them. A long face to a broad muzzle, the eye and the nostril reserved in it,
- * an ear out behind, and the horns, 2 px at every row, up out of the poll in a lyre and
- * forward at the tips; the brow flat between them. Level; tossed up, the muzzle raised and
- * the horns hooking; and down, lying on its cheek on the floor, the muzzle along it and the
+ * an ear out behind, and the horns, 2 px at every row, a bull's lyre: out of the poll
+ * sideways and then up, the tips standing up at the box's sides, never a goat's V; the brow
+ * flat between them. Level; tossed up, the muzzle raised and the lyre tipped back; and down, lying on its cheek on the floor, the muzzle along it and the
  * horns up at the back, a pixel of clay between them and between the far one and its neck,
  * all of it inside its box's first 9 rows.
  */
@@ -207,9 +207,9 @@ export const BULL_HEAD_FRAMES: readonly (readonly string[])[] = [
   [
     '##.......##',
     '##.......##',
-    '.##.....##.',
-    '..##...##..',
-    '..###.###..',
+    '##.......##',
+    '.###...###.',
+    '...##.##...',
     '...#####...',
     '#########..',
     '.######_##.',
@@ -222,10 +222,10 @@ export const BULL_HEAD_FRAMES: readonly (readonly string[])[] = [
     '.....#####.',
   ],
   [
-    '.##..##....',
-    '..##..##...',
-    '..##..##...',
-    '...##.###..',
+    '##.....##..',
+    '##.....##..',
+    '.##....##..',
+    '..##..###..',
     '...#######.',
     '..#########',
     '..#######_#',
@@ -244,7 +244,7 @@ export const BULL_HEAD_FRAMES: readonly (readonly string[])[] = [
     '...........',
     '...........',
     '...........',
-    '.##.##.....',
+    '##.##......',
     '.##.##.....',
     '.##.##.....',
     '#####......',
@@ -265,8 +265,9 @@ export const HEAD_DOWN = 2;
 /**
  * A man's hand, much too big (e-cell/minotaur-hand.md): flat on a stone, its palm on the
  * stone's top, its fingers over the edge and down the stone's face, and its thumb laid
- * forward along the top, parted from the hand by the one incision; holding the stone
- * up, its fingers spread across the stone's face; clawing, raised from the wrist, three
+ * forward along the stone's top on the palm's last row, parted from the hand by the one
+ * incision, never a spur over the stone; holding the stone up, a fist under its front end,
+ * two fingertips on its face; clawing, raised from the wrist, three
  * fingers hooked forward at its top and the thumb out forward under them; the palm, upright
  * and edge-on, the fingers up and the thumb out, for the clap; and reaching, the clawing hand
  * closed, its fingers together, so that over the hero's glaze it lies as one shape in its line
@@ -275,16 +276,16 @@ export const HEAD_DOWN = 2;
  * the drawing as the game turns it, facing left.
  */
 export const BULL_HAND_FRAMES: readonly { rows: readonly string[]; wrist: Pt }[] = [
-  { rows: ['.###....', '####_###', '#####...', '######..', '.#.#.#..', '...#.#..'], wrist: { x: 5, y: 0 } },
-  { rows: ['.#.#.#.', '.#.#.#.', '#######', '######.'], wrist: { x: 1, y: 3 } },
+  { rows: ['.###....', '#####...', '######..', '####_###', '.#.#.#..', '...#.#..'], wrist: { x: 5, y: 0 } },
+  { rows: ['.#.#..', '#####.', '######', '..###.'], wrist: { x: 2, y: 3 } },
   { rows: ['.#.#.#.', '#.#.#..', '#.#.#..', '#####.#', '####_##', '####...'], wrist: { x: 5, y: 5 } },
   { rows: ['.##..', '###..', '###..', '###.#', '###.#', '##_##', '####.', '####.', '####.', '###..', '###..', '###..'], wrist: { x: 3, y: 11 } },
   { rows: ['.###..', '.####.', '####.#', '###_##', '###...'], wrist: { x: 4, y: 4 } },
 ];
 /** The flat hand's rows over what it lies on; its fingers go on down a stone's face. */
 export const FLAT_ON = 4;
-/** Where the holding hand's wrist is from the top-left of the stone in it: under its front, the fingers over its face. */
-export const HOLD_WRIST = { x: 1, y: 5 };
+/** Where the holding hand's wrist is from the top-left of the stone in it: the fist under its front end, two fingertips on its face. */
+export const HOLD_WRIST = { x: 1, y: 6 };
 export const HAND_FLAT = 0;
 export const HAND_HOLD = 1;
 export const HAND_CLAW = 2;
@@ -374,7 +375,7 @@ const CLAW: readonly Pt[] = [
   { x: -3, y: -16 },
   { x: -8, y: -18 },
   { x: -5, y: -19 },
-  { x: -7, y: -17 },
+  { x: -8, y: -18 },
 ];
 /**
  * Its hands thrashing as the struck body lurches, at the hero on its horn, two frames
@@ -384,13 +385,28 @@ const CLAW: readonly Pt[] = [
  * high over its horns, behind him: its top-left from its head's. Never both up over its
  * horns.
  */
+/** The frames of the first blow, Theseus lunging in (theseus-blow): its hands stay on its stones, clear of his sword arm. */
+export const BLOW = 4;
 const FLAIL: readonly (readonly [Pt, Pt])[] = [
   [{ x: -8, y: -16 }, { x: -1, y: -11 }],
   [{ x: -8, y: -15 }, { x: 2, y: -12 }],
   [{ x: -8, y: -16 }, { x: -3, y: -10 }],
   [{ x: -8, y: -15 }, { x: 1, y: -13 }],
 ];
+/**
+ * Taken up at the grip, the stone's top-left by the share of the lift done, in px from where
+ * it lay on the floor, before it goes on to its raised place: along the floor under its face,
+ * at its chest, and up behind its head, never over it, so that its head is whole as it takes
+ * the stone up, and nothing of it comes over the hero above his knees.
+ */
+const LIFT: readonly { t: number; x: number; y: number }[] = [
+  { t: 0, x: 0, y: 0 },
+  { t: 0.35, x: 12, y: -4 },
+  { t: 0.65, x: 21, y: -13 },
+];
 /** The near arm's reach, from the shoulder to the wrist, raising and swinging the stone. */
+/** Each half of the arm that holds the stone up, in px: bent at the elbow, out behind it. */
+const HOLD_ARM = 11;
 const SWING_R = 18;
 /**
  * Its angle over the forward line, in degrees: the stone raised up and back, and swung
@@ -416,6 +432,67 @@ const SET_DOWN: readonly { f: number; x: number; y: number }[] = [
   { f: 12, x: 0, y: 0 },
 ];
 
+/**
+ * Kneeling up before the second blow (e-cell/minotaur-body.md): from the end of the lurch it
+ * comes up off its hands over `rise` frames, its rump on its heels on the solid, its body
+ * leaning up from them to its shoulders, its head up before them in Theseus's hand, its hands
+ * still on its stones, taller than the heap it sinks into at the blow. Its points as
+ * [crouched, kneeling up], from its body's front and the floor: the torso's outline round
+ * from the top of its shoulders, and its near and far shoulders; its head's box.
+ */
+const KNEEL = {
+  rise: 6,
+  torso: [
+    [{ x: 1, y: -9 }, { x: 2, y: -27 }],
+    [{ x: 6, y: -10 }, { x: 7, y: -29 }],
+    [{ x: 12, y: -10 }, { x: 12, y: -28 }],
+    [{ x: 16, y: -10 }, { x: 16, y: -10 }],
+    [{ x: 7, y: -2 }, { x: 7, y: -8 }],
+    [{ x: 0, y: -5 }, { x: 2, y: -18 }],
+  ],
+  near: [{ x: 7, y: -5 }, { x: 3, y: -22 }],
+  far: [{ x: 9, y: -6 }, { x: 6, y: -23 }],
+  head: { x: -1, y: -25 },
+} as const;
+
+/** Its rump on its heels and its folded legs, kneeling: from its body's front and the floor, the knee forward on it. */
+const HAUNCH: readonly Pt[] = [
+  { x: 4, y: -10 },
+  { x: 28, y: -10 },
+  { x: 29, y: -9 },
+  { x: 29, y: 0 },
+  { x: -6, y: 0 },
+  { x: -6, y: -3 },
+  { x: -4, y: -5 },
+  { x: 1, y: -8 },
+];
+
+/**
+ * The heap (e-cell/minotaur-heap.md), from its body's front and the floor: its back flat on
+ * the solid from the shoulders to the rump, the rump down to its heel at the far wall, and
+ * under the back its folded leg, the knee down on the floor forward under its chest, the
+ * thigh rising back from it to the belly; under its chest, before the thigh, clay. One mass,
+ * and nothing incised across it.
+ */
+const HEAP: readonly Pt[] = [
+  { x: 0, y: -20 },
+  { x: 1, y: -22 },
+  { x: 3, y: -24 },
+  { x: 28, y: -24 },
+  { x: 29, y: -23 },
+  { x: 29, y: -10 },
+  { x: 27, y: -7 },
+  { x: 29, y: -5 },
+  { x: 29, y: 0 },
+  { x: 8, y: 0 },
+  { x: 6, y: -2 },
+  { x: 7, y: -5 },
+  { x: 11, y: -9 },
+  { x: 15, y: -11 },
+  { x: 8, y: -13 },
+  { x: 3, y: -14 },
+];
+
 /** The bull on a frame, for drawing it. */
 export interface BullPose {
   /** Its back's top, drawn, and its body's ends, with the lurch. */
@@ -438,6 +515,8 @@ export interface BullPose {
   stoneHeld: boolean;
   /** Its hands are on him: the palms of the clap, or the swat. Drawn over him. */
   on: 'clap' | 'swat' | null;
+  /** Up on its knees before the second blow, from 0, down on its hands, to 1, kneeling up (`KNEEL`). */
+  kneel: number;
 }
 
 const lerp = (a: Pt, b: Pt, t: number): Pt => ({ x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t });
@@ -507,8 +586,10 @@ export function bullPose(f: Fight): BullPose {
   const x0 = d.body.x0 + dx;
   const x1 = d.body.x1 + dx;
   const hd = f.headAt(k);
-  const head = { x: hd.x, y: hd.y - bob - up };
-  const sn = nearShoulder(x0, top);
+  // Kneeling up before the second blow, its head up before its shoulders.
+  const kneel = k >= d.toss.to && k < c.blow2 ? Math.min(1, (k - d.toss.to + 1) / KNEEL.rise) : 0;
+  const head = at(lerp({ x: hd.x, y: hd.y - bob - up }, { x: d.body.face + KNEEL.head.x, y: F + KNEEL.head.y }, kneel));
+  const sn = shoulders(x0, top, F, kneel).near;
   // Flat on a stone: the hand along its whole top, the wrist over its back end.
   const flatOn = (sx: number): Hand => handAt(HAND_FLAT, { x: sx, y: F - st.h - FLAT_ON });
   // The stone up in its hand, the hand's wrist `deg` round from the forward line at the
@@ -523,7 +604,7 @@ export function bullPose(f: Fight): BullPose {
   // that the arm comes down to it and never across it; and so too on the floor.
   const gripping = (s: Pt): Hand => handAt(HAND_FLAT, { x: s.x, y: s.y - FLAT_ON });
   const holding = (s: Pt): Hand =>
-    sn.y < s.y + HOLD_WRIST.y - 1 || s.y + HOLD_WRIST.y > F - 1 ? gripping(s) : { frame: HAND_HOLD, wrist: { x: s.x + HOLD_WRIST.x, y: s.y + HOLD_WRIST.y } };
+    sn.y < s.y + HOLD_WRIST.y - 4 || s.y + HOLD_WRIST.y > F - 1 ? gripping(s) : { frame: HAND_HOLD, wrist: { x: s.x + HOLD_WRIST.x, y: s.y + HOLD_WRIST.y } };
   const claw = (kk: number): Hand => {
     const p = CLAW[(((kk - c.knee) % CLAW.length) + CLAW.length) % CLAW.length]!;
     return handAt(HAND_CLAW, { x: head.x + p.x, y: head.y + p.y });
@@ -544,16 +625,14 @@ export function bullPose(f: Fight): BullPose {
     near = flatOn(st.near);
     far = flatOn(st.far);
   } else if (k < lifted) {
-    // The grip: it takes the near stone up and back, in front of its own face, clear of the
-    // hero before it, and over its head, as it sinks to its knee; its far hand leaves its
-    // stone as the near one goes over.
+    // The grip: it takes the near stone up and back, under its own face, at its chest and
+    // up behind its head, clear of the hero before it, as it sinks to its knee; its far hand
+    // leaves its stone as the near one goes up.
     const t = Math.max(0, (k - lifts + 1) / (lifted - lifts));
-    const lift = { x: st.near + 22, y: F - st.h - 32 };
-    const to = raised(STONE_RAISED);
-    stoneAt = at({
-      x: (1 - t) * (1 - t) * nearStone.x + 2 * t * (1 - t) * lift.x + t * t * to.x,
-      y: (1 - t) * (1 - t) * nearStone.y + 2 * t * (1 - t) * lift.y + t * t * to.y,
-    });
+    const path = [...LIFT.map((p) => ({ t: p.t, x: nearStone.x + p.x, y: nearStone.y + p.y })), { t: 1, ...raised(STONE_RAISED) }];
+    const i = Math.max(1, path.findIndex((p) => p.t >= t));
+    const [a, b] = [path[i - 1]!, path[i]!];
+    stoneAt = at(lerp(a, b, (t - a.t) / (b.t - a.t)));
     carried = stoneAt.x !== nearStone.x || stoneAt.y !== nearStone.y;
     near = holding(stoneAt);
     const u2 = Math.max(0, (k - c.grip - 2) / (c.knee - c.grip - 3));
@@ -590,9 +669,14 @@ export function bullPose(f: Fight): BullPose {
     far = k < d.swat.to ? claw(k) : carried ? handAt(HAND_FLAT, { x: head.x + 1, y: head.y + 4 }) : flatOn(st.far);
   } else {
     stoneAt = put;
-    if (k < d.toss.to) {
+    if (k < c.blow1 + BLOW) {
+      // Struck under its jaw, still down on its hands on its stones: nothing of it near the
+      // sword arm, so that the blow is seen going home.
+      near = flatOn(put.x);
+      far = flatOn(st.far);
+    } else if (k < d.toss.to) {
       // Struck: it thrashes, both hands, as it lurches on its knees.
-      const [a, b] = FLAIL[Math.floor((k - c.blow1) / 2) % FLAIL.length]!;
+      const [a, b] = FLAIL[Math.floor((k - c.blow1 - BLOW) / 2) % FLAIL.length]!;
       near = handAt(HAND_REACH, { x: head.x + a.x, y: F + a.y });
       far = handAt(HAND_CLAW, { x: head.x + b.x, y: head.y + b.y });
     } else {
@@ -629,7 +713,7 @@ export function bullPose(f: Fight): BullPose {
     on = 'swat';
   }
   // Its head tossed up while it has him on its horns, and as it throws him.
-  const tossing = toss && toss.by === 'head' && (toss.pose === 'hooked' || (toss.pose === 'thrown' && toss.rear > 0));
+  const tossing = toss && (toss.pose === 'hooked' || (toss.by === 'head' && toss.pose === 'thrown' && toss.rear > 0));
   return {
     top,
     x0,
@@ -642,7 +726,22 @@ export function bullPose(f: Fight): BullPose {
     stone: stoneAt,
     stoneHeld: carried,
     on,
+    kneel,
   };
+}
+
+/** Its shoulders, near and far: behind its head, which its neck holds out before them; kneeling up, where KNEEL has them. */
+function shoulders(x0: number, top: number, floor: number, kneel: number): { near: Pt; far: Pt } {
+  if (!kneel) return { near: nearShoulder(x0, top), far: farShoulder(x0, top) };
+  return { near: at(lerp(...kneelAt(KNEEL.near, x0, floor), kneel)), far: at(lerp(...kneelAt(KNEEL.far, x0, floor), kneel)) };
+}
+
+/** A point of KNEEL, [crouched, kneeling up], in the world, from its body's front `x0` and the floor. */
+function kneelAt(p: readonly [Pt, Pt], x0: number, floor: number): [Pt, Pt] {
+  return [
+    { x: x0 + p[0].x, y: floor + p[0].y },
+    { x: x0 + p[1].x, y: floor + p[1].y },
+  ];
 }
 
 /**
@@ -1250,31 +1349,36 @@ export function heroPicture(f: HeroFrame, a: HeroAgainst | null): { back: Pixels
 // ---------------------------------------------------------------------------
 
 /**
- * An arm from the shoulder to the wrist, 4 px at the shoulder and 3 at the wrist, and its
- * hand: straight, braced or stretched to it, and bent at the elbow, out behind it and down,
- * only when the hand comes in close to the shoulder; or bent at `elbowAt`.
+ * An arm from the shoulder to the wrist, and its hand, pixelled as the people at the door
+ * are and never a ruler's beam: the upper arm thick at the shoulder, the forearm thinner,
+ * bent at the elbow, and narrowed to a wrist of 2 px where the hand begins. The elbow is at
+ * `elbowAt`, or bent out behind it and down, a little where it reaches out and more as
+ * the hand comes in to the shoulder (`elbowOf`).
  */
 function armTo(p: Pixels, s: Pt, h: Hand, withHand = true, elbowAt?: Pt): void {
-  const w = h.wrist;
+  const e = elbowAt ?? elbowOf(s, h.wrist);
+  p.taper(s, e, 5, 4);
+  p.taper(e, h.wrist, 3.8, 2.2);
+  if (withHand) handInto(p, h);
+}
+
+/**
+ * Where an arm from `s` to the wrist `w` bends: each half of it a little longer than half the
+ * way, and never under 6 px, so that the elbow stands out from the straight line, behind it
+ * and down, the way the clay of a vase's arm never runs straight from shoulder to hand.
+ */
+function elbowOf(s: Pt, w: Pt, arm = 0, up = false): Pt {
   const dx = w.x - s.x;
   const dy = w.y - s.y;
   const dist = Math.hypot(dx, dy);
-  const half = 6;
-  if (elbowAt) {
-    p.taper(s, elbowAt, 4, 3);
-    p.limb(elbowAt, w, 3);
-  } else if (dist >= 2 * half - 2 || dist < 1) p.taper(s, w, 4, 3);
-  else {
-    const a = dist / 2;
-    const hgt = Math.sqrt(Math.max(0, half * half - a * a));
-    const m = { x: s.x + dx / 2, y: s.y + dy / 2 };
-    const e1 = { x: m.x - (hgt * dy) / dist, y: m.y + (hgt * dx) / dist };
-    const e2 = { x: m.x + (hgt * dy) / dist, y: m.y - (hgt * dx) / dist };
-    const elbow = e1.x + e1.y >= e2.x + e2.y ? e1 : e2;
-    p.taper(s, elbow, 4, 3);
-    p.limb(elbow, w, 3);
-  }
-  if (withHand) handInto(p, h);
+  if (dist < 1) return s;
+  const half = Math.max(6, arm, dist / 2 + 0.6);
+  const hgt = Math.sqrt(Math.max(0, half * half - (dist * dist) / 4));
+  const m = { x: s.x + dx / 2, y: s.y + dy / 2 };
+  const e1 = { x: m.x - (hgt * dy) / dist, y: m.y + (hgt * dx) / dist };
+  const e2 = { x: m.x + (hgt * dy) / dist, y: m.y - (hgt * dx) / dist };
+  if (up) return e1.y <= e2.y ? e1 : e2;
+  return e1.x + e1.y >= e2.x + e2.y ? e1 : e2;
 }
 
 /**
@@ -1398,6 +1502,18 @@ function feet(p: Pixels, x1: number, hip: Pt, floor: number, thigh: number): voi
   incision(p, groin, lerp(groin, { x: hip.x, y: hip.y - 1 }, 0.55));
 }
 
+/**
+ * Kneeling up before the second blow (KNEEL): its rump on its heels and its folded leg on the
+ * solid, the knee forward on the floor, and its body leaning up from them to its shoulders,
+ * `u` of the way from down on its hands.
+ */
+function kneeling(p: Pixels, x0: number, floor: number, u: number): void {
+  const part = new Pixels();
+  part.shape(HAUNCH.map((q) => ({ x: x0 + q.x, y: floor + q.y })));
+  part.shape(KNEEL.torso.map((q) => lerp(...kneelAt(q, x0, floor), u)));
+  p.lay(part);
+}
+
 /** A line of reserved clay from `a` to `b`, only where it lies inside the glaze: it separates, and never breaks the outline. */
 function incision(p: Pixels, a: Pt, b: Pt): void {
   const n = Math.max(1, Math.ceil(Math.max(Math.abs(b.x - a.x), Math.abs(b.y - a.y))));
@@ -1423,8 +1539,7 @@ export function bullPicture(f: Fight, masonry: Masonry): { body: Pixels; front: 
   if (k >= d.clock.blow2) heap(body, f);
   else {
     const b = bullPose(f);
-    const sn = nearShoulder(b.x0, b.top);
-    const sf = farShoulder(b.x0, b.top);
+    const { near: sn, far: sf } = shoulders(b.x0, b.top, F, b.kneel);
     const farStone = { x: st.far, y: F - st.h };
     const floor = [stone(farStone.x, farStone.y, st.w, st.h, lyingOn(b.far, farStone))];
     const nearStone = stone(b.stone.x, b.stone.y, st.w, st.h, lyingOn(b.near, b.stone));
@@ -1436,24 +1551,46 @@ export function bullPicture(f: Fight, masonry: Masonry): { body: Pixels; front: 
     const clawing = b.far.frame === HAND_CLAW && k >= d.clock.knee && k < d.swat.to;
     armTo(farArm, sf, b.far, !b.on, clawing ? { x: b.head.x + 8, y: b.head.y } : undefined);
     body.lay(farArm);
-    torso(body, b.x0, b.x1, b.top, F);
-    leg(body, b.x1, b.top, F);
+    if (b.kneel) kneeling(body, b.x0, F, b.kneel);
+    else {
+      torso(body, b.x0, b.x1, b.top, F);
+      leg(body, b.x1, b.top, F);
+    }
     // The near arm, the left, cut from the body: behind its head when it thrashes about it,
     // in front of everything when it is down on a stone or has the stone up in it.
     // Carrying the stone below its shoulder, gripped from above, the arm is straight to it:
     // no elbow comes down across the stone.
     const nearArm = new Pixels();
+    // Holding it up over its shoulder, the elbow is out behind it, the forearm up to the fist.
     const gripped = b.stoneHeld && b.near.frame === HAND_FLAT;
-    armTo(nearArm, sn, b.near, b.on !== 'clap', gripped ? lerp(sn, b.near.wrist, 0.5) : undefined);
+    const bent = b.near.frame === HAND_HOLD ? elbowOf(sn, b.near.wrist, HOLD_ARM) : undefined;
+    // Never over its back behind its shoulders, where a man may stand on it.
+    const up = bent && { x: Math.min(bent.x, b.x0 + 13), y: bent.y };
+    // Reaching up at the hero's chest, the elbow is up behind its head, clear of his hips.
+    const reaching = b.near.frame === HAND_REACH ? elbowOf(sn, b.near.wrist, 0, true) : undefined;
+    // Holding it up, its fist under it, its arm is behind the stone and the fist in front.
+    const fist = b.stoneHeld && b.near.frame === HAND_HOLD;
+    armTo(nearArm, sn, b.near, b.on !== 'clap' && !fist, gripped ? lerp(sn, b.near.wrist, 0.5) : (up ?? reaching));
+    const hand = new Pixels();
+    if (fist) handInto(hand, b.near);
+    // Thrashing, or kneeling up with its head down before its shoulders, its near arm is
+    // behind its head.
     const thrashing = b.near.frame === HAND_CLAW || b.near.frame === HAND_REACH;
-    if (thrashing) body.lay(nearArm, 'reserve', sn);
+    const under = thrashing || b.kneel > 0;
+    if (under) body.lay(nearArm, 'reserve', sn);
     // The neck, and a bull's head on it, out to it on a stretched neck where it lunges.
     const head = new Pixels();
     head.limb({ x: b.head.x + 7, y: b.head.y + 6 }, { x: sn.x + 1, y: sn.y - 1 }, 4);
     head.sprite(BULL_HEAD_FRAMES[b.headFrame]!, b.head.x, b.head.y - HEAD_HORNS, true);
-    body.lay(head, thrashing || b.far.frame === HAND_CLAW ? 'reserve' : undefined, { x: sn.x + 1, y: sn.y - 1 });
-    if (b.stoneHeld) body.lay(nearStone, 'reserve');
-    if (!thrashing) body.lay(nearArm, 'reserve', sn);
+    body.lay(head, under || b.far.frame === HAND_CLAW || b.headFrame === HEAD_TOSSED ? 'reserve' : undefined, { x: sn.x + 1, y: sn.y - 1 });
+    if (fist) {
+      body.lay(nearArm, 'reserve', sn);
+      body.lay(nearStone, 'reserve');
+      body.lay(hand, 'reserve');
+    } else {
+      if (b.stoneHeld) body.lay(nearStone, 'reserve');
+      if (!under) body.lay(nearArm, 'reserve', sn);
+    }
     // On the floor the near stone is behind everything of it: what is seen of it is only
     // where nothing of it has come down over it, as the struck body does when it lurches.
     const seen = new Pixels();
@@ -1464,8 +1601,8 @@ export function bullPicture(f: Fight, masonry: Masonry): { body: Pixels; front: 
     // stands between them and the rest of it: but where its head is over the arm, as it
     // thrashes.
     const near = new Pixels();
-    for (const part of [nearArm, seen]) for (const { x, y } of part.each()) near.put(x, y);
-    front = nearer(body, near, thrashing ? head : null, sn, F);
+    for (const part of [nearArm, hand, seen]) for (const { x, y } of part.each()) near.put(x, y);
+    front = nearer(body, near, under ? head : null, sn, F);
     // Its hands on him: the palms of the clap, either side of him; the swat's, flat on top of him.
     if (b.on === 'clap') {
       handInto(over, b.near);
@@ -1522,10 +1659,10 @@ function clear(p: Pixels, masonry: Masonry): void {
 
 /**
  * The heap (e-cell/minotaur-heap.md): after the second blow, its head jerked up for
- * STRUCK frames, then the body sunk over its knees, its top on the solid, a leg folded
- * under it, an arm thrown out forward over its head and the stones to the floor beyond,
- * and its head down on the floor before it. Front to back: the head, the arm, the body,
- * the stones; the head and the arm each cut from what is behind it by clay.
+ * STRUCK frames, then the body sunk over its knees and bowed (HEAP), its top on the solid,
+ * and its neck bowed down to its head on the floor before it, clear of Theseus's feet.
+ * Front to back: the head and neck, the body, the stones; the head cut from what is behind
+ * it by clay, and nothing incised across the body, where a line reads as a sword cut.
  */
 function heap(p: Pixels, f: Fight): void {
   const d = f.def;
@@ -1536,23 +1673,17 @@ function heap(p: Pixels, f: Fight): void {
   const top = F - d.back.heap;
   const struck = f.k - d.clock.blow2 < STRUCK;
   const floor = [stone(st.far, F - st.h, st.w, st.h, false), stone(d.body.face - 6 - st.w / 2, F - st.h, st.w, st.h, false)];
-  // Sunk over its knees, its back on the solid: the body it crouched in, its knee down and
-  // forward under its chest, the rump over its heel, its arms gone limp.
-  torso(p, x0, x1, top, F);
-  leg(p, x1, top, F, true, 22);
-  // The near arm thrown out forward over its head and the stones, its hand flat on the
-  // floor beyond them.
-  const sn = nearShoulder(x0, top);
-  const elbow = { x: d.body.face - 4, y: F - 15 };
-  const arm = new Pixels();
-  arm.taper(sn, elbow, 4, 3);
-  armTo(arm, elbow, handAt(HAND_FLAT, { x: d.body.face - 18, y: F - 4 }));
-  p.lay(arm, 'reserve', sn);
+  // Sunk over its knees, its back on the solid.
+  const body = new Pixels();
+  body.shape(HEAP.map((q) => ({ x: x0 + q.x, y: F + q.y })));
+  p.lay(body);
+  const sn = { x: x0 + 3, y: top + 6 };
   // Its head jerked up once, on its neck; then down on the floor before it, the neck down to it.
   const head = f.headAt(f.k);
-  const neck = struck ? { x: sn.x - 2, y: sn.y } : { x: x0 + 2, y: top + 12 };
+  const neck = struck ? { x: sn.x, y: sn.y } : { x: x0 + 5, y: F - 14 };
   const part = new Pixels();
-  part.limb(struck ? { x: head.x + 7, y: head.y + 6 } : { x: head.x + 10, y: head.y + 7 }, neck, 4);
+  if (struck) part.limb({ x: head.x + 7, y: head.y + 6 }, neck, 4);
+  else part.taper({ x: head.x + 8, y: head.y + 6 }, neck, 4, 5);
   part.sprite(BULL_HEAD_FRAMES[struck ? HEAD_TOSSED : HEAD_DOWN]!, head.x, head.y - HEAD_HORNS, true);
   p.lay(part, 'reserve', neck);
   behind(p, floor);
@@ -1578,28 +1709,63 @@ export function deadBull(hx: number, floor: number): Pixels {
   const F = floor;
   const p = new Pixels();
   const body = new Pixels();
-  body.shape([
-    { x: hx + 8, y: F - 6 },
-    { x: hx + 12, y: F - 8 },
-    { x: hx + 20, y: F - 8 },
-    { x: hx + 26, y: F - 6 },
-    { x: hx + 31, y: F - 6 },
-    { x: hx + 35, y: F - 5 },
-    { x: hx + 42, y: F - 4 },
-    { x: hx + 42, y: F },
-    { x: hx + 8, y: F },
-  ]);
-  // The legs, and the sole of a foot turned up at the end.
-  body.rect(hx + 42, F - 6, 2, 6);
+  // Its shoulders, back and hips, flat on its front after its head: the shoulder highest,
+  // the back down to the waist, the buttock up again.
+  body.shape(DEAD.body.map((q) => ({ x: hx + q.x, y: F + q.y })));
+  // The far leg straight back along the floor; the near one bent at the knee, its shin up
+  // and the sole of its foot turned up.
+  body.shape(DEAD.leg.map((q) => ({ x: hx + q.x, y: F + q.y })));
+  body.taper({ x: hx + DEAD.knee.x, y: F + DEAD.knee.y }, { x: hx + DEAD.foot.x, y: F + DEAD.foot.y }, 3.4, 2.4);
+  body.rect(hx + DEAD.foot.x - 2, F + DEAD.foot.y - 1, 3, 2);
   p.lay(body);
-  // The arm, trailing back along its side: an incised line from the shoulder.
-  incision(p, { x: hx + 14, y: F - 6 }, { x: hx + 22, y: F - 2 });
+  // The near arm trailing back along its side from the shoulder, cut from it by clay.
+  const arm = new Pixels();
+  const [s, e, w] = DEAD.arm.map((q) => ({ x: hx + q.x, y: F + q.y }));
+  arm.taper(s!, e!, 3.6, 3);
+  arm.taper(e!, w!, 3, 2.2);
+  p.lay(arm, 'incise', s);
   const head = new Pixels();
   head.limb({ x: hx + 10, y: F - 3 }, { x: hx + 13, y: F - 4 }, 4);
   head.sprite(BULL_HEAD_FRAMES[HEAD_DOWN]!, hx, F - DOWN_TALL - HEAD_HORNS, true);
   p.lay(head, 'reserve', { x: hx + 12, y: F - 4 });
   return p;
 }
+
+/**
+ * The dead body after its head, from the head's box's left and the floor
+ * (f-thread/minotaur-dead.md): its back's outline, a shoulder up behind the neck, the waist
+ * and the buttock; its legs, the far one along the floor and the near one's knee down with
+ * the shin up to the foot; and the near arm, from the shoulder to the elbow and the hand.
+ */
+const DEAD = {
+  body: [
+    { x: 10, y: 0 },
+    { x: 10, y: -4 },
+    { x: 13, y: -8 },
+    { x: 16, y: -9 },
+    { x: 20, y: -9 },
+    { x: 24, y: -7 },
+    { x: 28, y: -6 },
+    { x: 32, y: -7 },
+    { x: 35, y: -7 },
+    { x: 37, y: -5 },
+    { x: 37, y: 0 },
+  ],
+  leg: [
+    { x: 34, y: -5 },
+    { x: 40, y: -4 },
+    { x: 44, y: -2 },
+    { x: 45, y: 0 },
+    { x: 34, y: 0 },
+  ],
+  knee: { x: 40, y: -2 },
+  foot: { x: 43, y: -11 },
+  arm: [
+    { x: 16, y: -6 },
+    { x: 22, y: -2 },
+    { x: 31, y: -2 },
+  ],
+} as const;
 
 /** Where the hero's hand has the dead Minotaur's near horn, its head's box at `hx` on `floor`. */
 export function deadHorn(hx: number, floor: number): Pt {

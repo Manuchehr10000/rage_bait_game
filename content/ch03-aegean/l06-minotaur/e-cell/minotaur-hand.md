@@ -4,7 +4,7 @@
 |---|---|
 | Id | `minotaur-hand` |
 | File | None, and none is wanted: drawn in code at 1 world px (`../LEVEL.md`, Art, ruled 2026-10-10) |
-| Size | Up to 8 × 12 world px per frame (flat 8 × 6, holding 7 × 4, clawing 7 × 6, the palm 5 × 12, reaching 6 × 5), 5 frames, each hung from its wrist; drawn facing right, and flipped by the game to face left |
+| Size | Up to 8 × 12 world px per frame (flat 8 × 6, holding 6 × 4, clawing 7 × 6, the palm 5 × 12, reaching 6 × 5), 5 frames, each hung from its wrist; drawn facing right, and flipped by the game to face left |
 | Beat | `e-cell` |
 
 ## What it is
@@ -13,13 +13,15 @@ A man's hand, in glaze, much too big: the joke is that a man has hands. One inci
 reserved clay, parts the thumb from the fingers. The frames:
 
 0. Flat: 8 px long, its palm 4 high on the stone's top, the back of the hand rising to the wrist
-   near its back end; the thumb laid forward along the top to the stone's front end, 3 px, parted
-   from the hand by the incision at its root; and the fingers over the stone's edge and down its
+   near its back end; the thumb laid forward along the stone's top on the palm's last row, y 731
+   on the stones, to the stone's front end, 3 px, parted from the hand by the incision at its root,
+   never a spur over the stone; and the fingers over the stone's edge and down its
    face, three of them, a pixel wide and a pixel apart, dark on the cream, two of them 2 px down
    and the last 1: a hand gripping the stone, its thumb one way and its fingers another, never a
    hoof's two and never a rake.
-1. Holding: 7 × 4, under the stone's front, its fingers spread up across the stone's face, so
-   that the stone shows cream between them: the stone up in its hand.
+1. Holding: 6 × 4, a fist under the stone's front end, the stone sitting on it, and two
+   fingertips up on its face: the stone up in its hand. The arm comes up to the fist behind the
+   stone, and the fist is in front of it.
 2. Clawing: 7 × 6, raised from the wrist at its foot: three fingers up, a pixel wide and a pixel
    apart, their tips hooked forward over at its top, and the thumb out forward from the heel of
    the hand under them, 2 px with its tip a row up, parted by the incision.
@@ -42,7 +44,12 @@ day: the claw hung from its wrist with four fingers down, the thumb's among them
 the claw upside down; over its brow the claw read as a rake or a crook, and over his chest the
 reach, its four prongs and their clay, as a grille on him. Both were redrawn as above; the claw's
 loop is where it was, but for one place a pixel higher, where the taller hand would have come
-within a pixel of the stone in the heave.)
+within a pixel of the stone in the heave. After the whole-level review's second look, the same
+day: the flat hand's thumb, laid on the row 2 px over the stone, y 729, read as a spur and the
+hands as dark caps with teeth, and is laid along the stone at y 731; the holding hand's three
+fingers spread across the stone's face read as the crenellations of a box on a pole, and it is a
+fist under the stone; and one more place of the claw's loop moved a pixel up and back, clear of
+the fist.)
 
 ## Where it stands in the game
 
@@ -54,16 +61,18 @@ and the wrist near its back end, x 105 and x 115, and the fingers down the stone
 flat on their stones through the breath, which lifts the rest of it (`tests/minotaur-bull.spec.ts`).
 From the grip until it sets it down, the near hand has the stone (where a clap runs into the
 grip, its palm comes back flat on the stone first and takes it up from there, `minotaur-stone`): frame 1, under it, while the
-stone is up at its shoulder or over it, so that the arm comes up to it from below; frame 0,
+stone is up at its shoulder or over it, or no more than 4 px under it, so that the arm comes up
+to it from below, behind the stone; frame 0,
 gripping it from above, the palm on its top and the fingers down its face, while it is lower, the
 arm straight down to it, so that no arm or elbow ever lies across the stone (2026-10-10: held under
 it below the shoulder, the arm came down over the stone and left a few cream pixels of it). Frame
-2 for the free right hand from L+46 to 67, and the far hand's in the flails; frame 3 on him in the
+2 for the free right hand from L+46 to 67, and the far hand's in the flails from L+80; frame 3 on him in the
 clap, one either side of him, with a line of clay between them and him; frame 4 the near hand's
-in the flails, reaching up at Theseus's chest: at the front of it, between him and its head, its
+in the flails from L+80, after the first blow's 4 frames, when both hands are still flat on their
+stones, clear of his sword arm, reaching up at Theseus's chest: at the front of it, between him and its head, its
 top-left from its head's x and the floor, so that however its head tosses or it rears it is over
 his box's columns 6 to 12 and rows 8 to 13, under his neck and over his hips, its thumb short of
-its muzzle, and its arm, behind its head, never crosses him; and never on the wall's stone
+its muzzle, and its arm, behind its head, its elbow up, never crosses him; and never on the wall's stone
 (`tests/minotaur-bull.spec.ts`). (Drawn first over his box's columns −1 to 6, behind his chest,
 it lay on his back and hips, and its fingers and their clay cut his kilt into a comb; at the
 wall it went into the stone. A check of the hero stage found it, 2026-10-10.) The swat's hand is frame 0, flat
@@ -77,8 +86,8 @@ short of Theseus's head from x 98; on his face and chest once he lies flat at it
 stood, it came over Theseus's legs, and Theseus, giving way round it, stood a torso on a hand.)
 The free hand, once it has stopped clawing, goes down behind its head, unseen, and once the near
 one has set the stone down, flat on its far stone; from then both hands are flat on their stones,
-the near one on the stone where it set it. The heap's hand, flat on the floor beyond its stones,
-has its fingers under the floor's line, unseen.
+the near one on the stone where it set it, and so they stay while it kneels up before the second
+blow. In the heap its hands are under it, unseen.
 
 The near hand, on its stone or holding it, is in front of Theseus, who stands at the bull's head
 with his feet by the near stone; the far hand is behind him (`minotaur-body`, Against Theseus).

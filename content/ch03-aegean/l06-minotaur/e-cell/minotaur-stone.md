@@ -16,8 +16,10 @@ Minotaur's hand. Two, the same drawing.
 
 On the cell floor before its face, the near one at x 100 and the far one at x 110, y 732 to 735, a
 hand flat on each while it crouches. At the grip the far one is let go and stays; the near one is
-taken up in its left hand, up and back in front of its own face, right of Theseus, who stands
-before it, and over its head, raised over its shoulder; swung over its head at the ducking hero in
+taken up in its left hand, along the floor under its face, at its chest and up behind its head,
+never over its face, right of Theseus, who stands before it, and raised over its shoulder on its
+fist (after the whole-level review, 2026-10-10: taken up over its face, it hid its head at L+40
+and 41); swung over its head at the ducking hero in
 the heave, to the end of its reach in front of its face, over him; then, missed, drawn back in
 front of its own chest, x 107 or more, brought down there, and only at the floor slid along it, in
 front of the far stone, to where it is set down before it at x 98 on L+74, the hand flat on it. So
@@ -40,8 +42,10 @@ of Theseus, is drawn again in front of him only where it is seen (after the whol
 the body's glaze with a line of clay round it, a box stamped on the body;
 `tests/minotaur-bull.spec.ts`). Both stay by the heap, behind its head and its arm
 (`minotaur-heap`). In its hand the stone is in front of it, the far stone included, its contour
-whole, cut from the body by clay, and nothing lies on it but its own hand: under it, the fingers
-across its face (`minotaur-hand`, frame 1), while it is up at its shoulder or over it; gripping it
+whole, cut from the body by clay, and nothing lies on it but its own hand: held up on its fist,
+the fist under its front end and two fingertips up on its face, the arm behind the stone and the
+fist in front of it (`minotaur-hand`, frame 1), while it is up at its shoulder or over it, or no
+more than 4 px under it; gripping it
 from above, the palm on its top and the fingers down its face (frame 0), while it is lower, the arm
 straight down to it. The near stone, on the floor or in its hand, is in front of Theseus, who
 stands by it at the bull's head, with a line of clay round it (`minotaur-body`, Against Theseus);
