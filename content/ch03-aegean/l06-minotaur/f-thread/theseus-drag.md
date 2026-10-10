@@ -21,11 +21,22 @@ frame: at the post 45 frames after the tourist's left edge passes x 80, and ther
 stride's first frame held. In the vestibule he is drawn in a reserved outline, and nothing of him
 is drawn in the passage behind it (`tests/minotaur-out.spec.ts`). Behind the tourist.
 
+Stopped at the post, his far arm reaches back across it to the horn: in the rough, from his far
+shoulder at about (72, 144) to the horn at (85, 149), crossing the post, x 80 to 83, at about
+y 146 to 149, its 2 × 2 hand on the horn at x 84 and 85. The arm is in front of the post, and a 1 px
+line of reserved clay round it, corners included, his reserved outline carried over the post, breaks
+the post's glaze edge at x 83 where it crosses and is cut into its wash
+(`../a-door/labyrinth-doorpost.md`). The knot, on the post at x 80 and 81, y 148 to 150, and the
+thread stay drawn over the arm, white on glaze: the knot he walks past on the way out is never
+hidden.
+
 ## Must be right
 
 - **He leaves second**: the tourist is out first, and Theseus comes after with the body, never
   looking at him.
 - **Seen in the black** by his reserved outline, cut from the body by clay.
+- **Cut from the post** where his far arm crosses it: glaze never touches glaze (`../LEVEL.md`,
+  Art, 2026-10-10).
 - **The horn in his far hand, behind him**, the body after him.
 - The exit card, anchored right, never covers him or the body (`tests/minotaur-out.spec.ts`).
 - As `../a-door/theseus-kneel.md`, "Theseus, in every pose".

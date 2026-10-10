@@ -18,17 +18,28 @@ bull's head as `../e-cell/minotaur-head.md` draws it.
 
 The closing tableau, a staged second copy while the heap stays in the cell. It comes out of the
 black vestibule after Theseus at 1 px a frame and stops with its head and horns across the
-threshold, x 82 to 93, on the clay of the door opening, and the rest of it in the vestibule, to
-x 127 (`tests/minotaur-out.spec.ts`). In the vestibule it is drawn in a reserved outline; nothing
-of it is drawn in the passage behind. The thread and the knot lie over it, and the tourist is in
-front of it. It stays as he leaves.
+threshold, the head's box x 82 to 93 (`tests/minotaur-out.spec.ts`), and the rest of it in the
+vestibule, to x 127. The door opening is the post, x 80 to 83, and then clay, x 84 to 95: the
+head's muzzle lies over the post's foot, x 82 and 83, and the rest of the head and the horns on
+the clay. Nothing of it is drawn in the passage behind.
+
+It lies in front of the post and of the black, and wherever it lies over either it is drawn in a
+reserved outline, a 1 px line of clay round it, its corners included: over the post, where that line
+breaks the post's glaze edge at x 83 and is cut into its wash at x 81
+(`../a-door/labyrinth-doorpost.md`), and in the vestibule. The rough draws the outline in the
+vestibule only, as four copies offset a pixel, which leave its corners touching the black; it is
+whole, and reaches the post, when this is drawn. The thread and the knot lie over it, and the
+tourist is in front of it. It stays as he leaves.
 
 ## Must be right
 
 - **Dead, and dragged from the door** (the Aison cup: Theseus drags the dead Minotaur from the gates
   of the labyrinth).
-- **Its head across the threshold, on the clay**, where the door opening is plain; its horns read
-  against the clay and the post.
+- **Its head across the threshold**, its muzzle over the post's foot and the rest on the clay of
+  the door opening, which is plain; its horns read against the clay.
+- **Glaze never touches glaze** (`../LEVEL.md`, Art, 2026-10-10): its muzzle lies over the
+  post's glaze edge, and its near horn, with Theseus's hand on it at about x 84 and 85, lies
+  against it, so the reserved outline runs over the post as well as in the black.
 - **A body, never a sack**: the rough's read as one. The head, a man's shoulders and limbs.
 - **Seen in the black** by its reserved outline: the clay outline round it inside the vestibule
   must be clean, never the rough's zig-zag.

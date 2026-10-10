@@ -31,8 +31,9 @@ is a pixel under their feet.
   without 1 px of clay between them (`../LEVEL.md`, Art, 2026-10-10). The clay under it cuts it
   from the masonry's wash, against which glaze alone reads weakly.
 - **It ends at x 79**, at the outer face. The door opening, x 80 to 96, is the threshold: its
-  floor is the masonry, and the tableau lays the Minotaur's head on the door opening's clay at
-  x 82 to 93 (`tests/minotaur-out.spec.ts`).
+  floor is the masonry, and the tableau lays the Minotaur's head across it at x 82 to 93
+  (`tests/minotaur-out.spec.ts`), its muzzle over the post's foot and the rest on the door
+  opening's clay, x 84 to 95 (`../f-thread/minotaur-dead.md`).
 - Straight, level and the same all along: no grass, stones, shadow or slope.
 
 ## Deliberately wrong

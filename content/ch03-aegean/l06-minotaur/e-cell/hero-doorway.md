@@ -29,6 +29,8 @@ x 147, in front of it, after L.
   black is what the rough build read best.
 - **Never a ledge.** The rough's lintel was a 20 × 2 bar of the masonry's wash in row 5's air,
   where he can jump: stone that takes no weight. The frame is a line on the back wall.
+- No line of the masonry touches its black: the floor's joint under it, at x 160, begins a pixel
+  under the floor's top (`../a-door/tile-labyrinth.md`).
 - Behind the tourist.
 
 ## Deliberately wrong

@@ -23,7 +23,7 @@ outside, x 0 to 79).
 - **Identical to `tile-labyrinth`.** No lit top, no pale lip, no edge line on its top: the rough
   build's 2 px pale top was light from above (ruled away 2026-10-10, "no lit tops").
 - No line along a floor's top: Theseus and the figures stand on it, and a glaze line there would
-  touch their glaze feet.
+  touch their glaze feet. For the same reason the joints begin a pixel under it (`tile-labyrinth`).
 
 ## Deliberately wrong
 

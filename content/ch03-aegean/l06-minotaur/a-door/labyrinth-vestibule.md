@@ -27,6 +27,12 @@ last.
   - Theseus, walking through it after the knot, by a reserved line round him: the clay-gap rule's
     one exception is the hero's doorway, not this room;
   - the tableau's Theseus and the dead body, in a reserved outline (`../f-thread/minotaur-dead.md`).
+- **No line of the masonry touches it**, not even at a corner (`tile-labyrinth`, against the
+  black). It stays a plain rectangle, x 96 to 127 and y 80 to 159, and the stone gives way round
+  it: the stone over it has its bottom row in reserved clay, y 79 from x 95 to 128, so its
+  underside line and its joints stop short; P's roof beside it has its left column in reserved
+  clay, x 128 from y 79 to 95; the floor's joints under it begin a pixel under its top. Its foot
+  stands on the floor's wash, as every figure's does.
 - The knot's line crosses it in white at y 149, its best read (white on glaze is 18 to 1).
 - Nothing else in it: no door leaf, no steps, no wall line.
 

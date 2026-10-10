@@ -22,8 +22,9 @@ thick, up out of the head and forward at the tip, standing 5 px over its top. Th
 Its box's top-left is where the fight puts it: x 108 and y 712 crouched, with the back and the
 lurch, a pixel up with the breath, tossing 2 to 7 px from the first blow. Frame 0 throughout, but
 frame 1 when it tosses its head up at a tourist over its horns, and for the 4 frames its head
-jerks up at the second blow; frame 2 from then on, at x 101 on the floor. The neck between it and
-the shoulders is the body's, drawn by code, and stretches when the head lunges out.
+jerks up at the second blow; frame 2 from then on, at x 101 on the floor, across both stones and
+in front of them, cut from their contours by clay (`minotaur-heap`). The neck between it and the
+shoulders is the body's, drawn by code, and stretches when the head lunges out.
 
 ## Must be right
 

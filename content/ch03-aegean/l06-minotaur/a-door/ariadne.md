@@ -44,10 +44,11 @@ when she is drawn.
 ## Sources
 
 Apollodorus, *Epitome* 1.9 (tr. J. G. Frazer), as `../LEVEL.md` reads it: Ariadne gave him the
-thread. On the vases Ariadne and Daedalus flank the fight on the Houston amphora, MFAH 107420
-(the research; not opened).
+thread. On one vase in Houston, MFAH 107420 (Antimenes Painter), Ariadne and Daedalus flank the
+fight, and it is listed as public domain (the research; not opened, and its shape not given).
 
 ## Confidence
 
 The thread from Ariadne: solid at search-extract level. **Not verified:** how any vase draws her;
-MFAH 107420's figures.
+MFAH 107420's figures, and what kind of vase it is: the research gives only its number, its painter
+and its scene, and an earlier draft of this note called it an amphora without a source.

@@ -25,9 +25,9 @@ In the cell, on one clock from L, the frame the tourist comes down on its floor:
 
 - **Before the fight, and to L+40**: crouched at its bed facing the hatch, like a beast on all
   fours, its hips up over its bent legs, its body x 114 to 144, its face at x 108, its back's top
-  20 px over the floor, a hand flat on each stone. It breathes on its own slow loop: the whole of
-  it up a pixel while the breath is out. Nothing of it above y 688 before the fight
-  (`tests/minotaur-fight.spec.ts`).
+  20 px over the floor, a hand flat on each stone. It breathes on its own slow loop: all of it but
+  its hands up a pixel while the breath is out; the hands stay flat on their stones. Nothing of it
+  above y 688 before the fight (`tests/minotaur-fight.spec.ts`).
 - **The clap**, if it catches him to L+39: it rears up 12 px off its stones, a man for a moment;
   its palms are together on him from the second frame of the catch, go down with him to its feet
   from the sixth to the ninth, and are back on the stones by the fourteenth.

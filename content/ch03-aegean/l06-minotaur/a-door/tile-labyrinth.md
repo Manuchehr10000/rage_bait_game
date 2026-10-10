@@ -21,7 +21,19 @@ dilute-glaze wash with full-glaze course lines, as designed, laid by rule:
   it, where the stone ends.
 - **Blocks two tiles (32 px) long**: a 1 px glaze joint down a tile's left column where
   `tx + floor(ty / 3)` is odd and the tile to its left is stone, so that each course's joints fall
-  halfway along the blocks of the next. Where a stone ends on air there is no joint.
+  halfway along the blocks of the next. Where a stone ends on air there is no joint. In a tile
+  with air over it the joint begins a pixel down: a floor's top row is wash from end to end, so
+  nothing that stands on it touches a joint.
+- **Against the black**, the rule's one exception: no line of the masonry touches the
+  vestibule's black (x 96 to 127, y 80 to 159), not even at a corner. Where the stone has that
+  black under it, its bottom row is reserved clay instead of the underside line: y 79 from x 95
+  to 128, so the joints at x 96 and 128 in that course end at y 78, and the lintel over the door
+  opening (`labyrinth-face`) ends at x 94. P's roof, the stone beside the black from y 80 to 95,
+  has its left column in reserved clay, x 128 from y 79 to 95, its course line included, which
+  starts at x 129. The floor under the black keeps its wash top row, as every floor does, and its
+  joints at x 96 and 128 begin at y 161. The hero's doorway frames its black with its own line
+  and clay (`../e-cell/hero-doorway.md`); the floor's joint under it, at x 160, begins at y 657
+  by the floor rule.
 - **Nothing else**: no lit top, no grain, no wear, no crack, no shading, no light.
 
 ## Where it stands in the game
@@ -43,6 +55,10 @@ the joint at x 112, and a puff rises at the one at x 80.
 - **Fewer and longer courses** than the rough build's one course a tile, which read as a castle's
   brick (ruled 2026-10-10). The blocks stay two tiles long: a longer block would lose the joint at
   x 112, the bed's, so the courses are made taller instead.
+- **No line of it ever touches another glaze shape**: two glaze shapes never touch without 1 px
+  of clay between them (`../LEVEL.md`, Art, 2026-10-10). Wash is not glaze, so a figure may stand
+  on it and the black may meet it; a line may not, hence the joints a pixel under every floor's
+  top and the clay round the vestibule's black.
 - **No lit top.** The rough's pale top on stone with air over it was light from above, which this
   chapter keeps for open sky (`../../CHAPTER.md`): the shafts and the hatch must never read as
   light wells.
@@ -70,4 +86,7 @@ None for the stone: the labyrinth is Daedalus's building in the myth (Apollodoru
 
 Design choice. The course height of three tiles is chosen here: it is the height at which all four
 rooms' ceilings are a course's last row, which keeps their pinned holes identical with a course
-line in them.
+line in them. So are the joints that begin a pixel under a floor's top and the clay round the
+vestibule's black, both for the clay-gap rule (2026-10-10, after a check of the notes): the rule
+as first written drew the underside line along y 79 onto the black and put joints in the top row
+of the floor under it.

@@ -146,6 +146,12 @@ Chosen in the asset notes (2026-10-10), where this file did not decide, for the 
   the dead frame turned a quarter; the toss's end is no longer pressed flatter; the swat on the
   floor shares the clap's flat frame; the swat in the air cuts to its flat frame instead of
   squashing his.
+- Where glaze would meet glaze, the nearer thing is cut by clay (after a check of the notes, the
+  same day): no joint reaches a floor's top row, and the stone round the vestibule's black is
+  reserved from it by a row and a column of clay; the tableau's head and Theseus's far arm lie in
+  front of the post's foot in their reserved outline; the heap's head, body and arm lie in front of
+  its stones. Each hand lies along the whole top of its own stone, x 100 to 107 and 110 to 117, so
+  its anchor moves from the rough's to the stone's back end.
 
 ## The beats
 
@@ -425,9 +431,9 @@ Honest, and never replayed: the way of winning.
 
 When his left edge passes x 80 after blow 2, a staged second copy, while the heap stays in the
 cell: Theseus comes out of the black vestibule dragging the dead Minotaur and stops at the post
-where he knelt, x 64–80, within 45 frames, the head and horns across the threshold on the clay of
-the door opening, the rest in the vestibule in a reserved outline. He is non-solid and drawn behind
-the tourist. The clean run takes 49 frames from the trigger to the exit; the fastest walk takes 50 (49 or 50 in the game, by where in his stride he crosses x 80, so Theseus is always at the post first).
+where he knelt, x 64–80, within 45 frames, the head and horns across the threshold, over the
+post's foot and the clay of the door opening, the rest in the vestibule in a reserved outline. He
+is non-solid and drawn behind the tourist. The clean run takes 49 frames from the trigger to the exit; the fastest walk takes 50 (49 or 50 in the game, by where in his stride he crosses x 80, so Theseus is always at the post first).
 He leaves first, the queue still waits, and Ariadne looks past him. The exit card is anchored right
 (view x 136–316), so at 0 to 4 rows of causes it covers neither the door nor Theseus with the body.
 
