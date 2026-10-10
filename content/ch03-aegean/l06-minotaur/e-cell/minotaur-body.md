@@ -95,27 +95,45 @@ In the cell, on one clock from L, the frame the tourist comes down on its floor:
   hero on its horn, two frames a place: the near one low, reaching up at his chest in front of
   him, at the front of it between him and its head, under his neck and over his hips, its arm
   behind its head, the elbow up, and never across him (`minotaur-hand`, frame 4, closed), the far
-  one raised open high over its horns, behind him; never both up over its horns. (Drawn first
+  one raised open high over its horns, behind him; never both up over its horns, and the far one
+  down flat on its far stone, under its body, while a tourist is on its horns. (Drawn first
   both before its head, they lay behind him, merged with his glaze.)
 - **The toss**, if it has him: hooked up and over in one full somersault (`../LEVEL.md`, the
   horns), its head under him while he is on its horns. Where its head reaches him, it rears up on
   its knees, up to 14 px, and tosses its head up at him; where the lurch cannot reach him the head
   lunges out to him on a stretched neck (ruled 2026-10-09). Where its back reaches him first, as
-  it does a man left standing on its back after the heave and most who jump about on it, its head
-  swings back under him on its stretched neck, over its own back and never past the far wall, from
-  the frame its back reaches him, so that its horns are under him as he goes up, and he goes up on
-  them. (Corrected after the whole-level review, 2026-10-10: there its head went on toward the
-  wall, 25 to 35 px from him, and he read as bucked off its rump; the notes had drifted from
-  LEVEL.md to say so. Drawing only: the kill zone and the kill frame are where they were.)
+  it does a man left standing on its back after the heave and most who jump about on it, its back
+  pitches him up off it, tipped, and forward over its shoulders, and he comes down on its horns
+  where its head is, in Theseus's hand: its head never leaves its place on its neck to fetch him,
+  and takes him only once the first blow has gone home, its 4 frames, L+76 to 79, so that the
+  blow is seen going in under its jaw; then for 3 frames it has him on its horns, tossed up
+  (`minotaur-head`, frame 1), its far horn drawn in front of his feet with a line of clay round
+  it, and throws him. A man it caught late is pitched onto them in those 3 frames. (Corrected
+  after the whole-level review, 2026-10-10: there its head went on toward the wall, 25 to 35 px
+  from him, and he read as bucked off its rump. Then its head swung back 24 px to him in one
+  frame, out of Theseus's hand and away from the first blow, on a neck the length of its back,
+  its horns hidden under him, and he read as thrown by a see-saw; corrected after a check of the
+  polish, the same day. Drawing only: the kill zone and the kill frame are where they were, and
+  the toss is heard when its back reaches him.)
 - **L+106 to 129**: it comes up off its hands over 6 frames and kneels up, its rump on its heels on
   the solid, its body leaning up from them to its shoulders, its head up before them in Theseus's
   hand, its hands still flat on their stones: 29 px over the floor at its shoulders and 30 at its
   horns' tips, taller than the heap's 24, so that the second blow lets it slump down into the heap.
   Its rump keeps to its back's solid, still 10 px, the solid never moving: nothing of it is over
-  that solid behind its shoulders, and its top is whole over the rest. (After the whole-level
-  review, 2026-10-10: down on its hands, 10 px tall, the second blow raised it in one frame to the
-  24 px heap, so that "sinks into the heap" read as rising.)
-- **The second blow**, L+130: its head jerks up for 4 frames, and it sinks into the heap.
+  that solid behind its shoulders, and its top is whole over the rest. Its knee comes forward
+  only to x 119, a pixel of clay short of the far stone and the hand flat on it, x 110 to 117, so
+  that both stones and both hands are seen from L+107. Where a man it caught late is still on its
+  horns at L+106, it kneels up once it has thrown him. (After the whole-level review, 2026-10-10:
+  down on its hands, 10 px tall, the second blow raised it in one frame to the 24 px heap, so
+  that "sinks into the heap" read as rising. After a check of the polish, the same day: its knee
+  came forward to x 108 and hid the far stone and its hand from L+106 to 129.)
+- **The second blow**, L+130: for the 4 frames its head jerks up, the sword in its throat, it
+  holds its kneel, nothing of it from its shoulders back any higher; at L+134 it slumps into the
+  heap, its head down on the floor, its highest pixel lower than the kneel's. Under a man who
+  stands on its back at the blow, whom the heap's solid lifts 14 px, it is the heap from L+130,
+  its head jerked up before it, so that he never stands over its drawn back. (After a check of the
+  polish, 2026-10-10: the heap came at the blow itself, the head jerking up over the kneel and the
+  rump rising 14 px into the heap's top in the same frame, so that it read as rising again.)
 
 ## Must be right
 
@@ -131,6 +149,8 @@ In the cell, on one clock from L, the frame the tourist comes down on its floor:
   top of the solid he stands on (20, then 10, 30, 10; the heap 24), never snapped to a held pose:
   its top row whole over the solid, no cut breaking it, and nothing of it on the solid behind
   its shoulders, its raised arm and its rump kneeling up included (`tests/minotaur-bull.spec.ts`).
+  The one hold: the kneel through the 4 frames of the second blow, on the solid it knelt on, and
+  only while nobody stands on its back.
 - **Every frame of the fight at its true place.** No pose is held for looks: the claw's loop, the
   flails and the tossing head are the kills' own places. Only the crouch before L+40 is still,
   but for its breath.

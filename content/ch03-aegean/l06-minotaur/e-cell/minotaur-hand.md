@@ -87,7 +87,11 @@ stood, it came over Theseus's legs, and Theseus, giving way round it, stood a to
 The free hand, once it has stopped clawing, goes down behind its head, unseen, and once the near
 one has set the stone down, flat on its far stone; from then both hands are flat on their stones,
 the near one on the stone where it set it, and so they stay while it kneels up before the second
-blow. In the heap its hands are under it, unseen.
+blow and through the 4 frames it holds its kneel at the blow, the far one seen whole on its stone
+in front of the knee (after a check of the polish, 2026-10-10: the knee hid it from L+106 to 129).
+In the heap its hands are under it, unseen. Thrashing, it puts the free hand down flat on its far
+stone, under its body, while a tourist is on its horns: the claw high over its horns would be
+under him, where the horns are to be seen hooking him (`minotaur-body`, the toss).
 
 The near hand, on its stone or holding it, is in front of Theseus, who stands at the bull's head
 with his feet by the near stone; the far hand is behind him (`minotaur-body`, Against Theseus).

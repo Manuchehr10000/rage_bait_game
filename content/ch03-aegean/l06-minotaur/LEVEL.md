@@ -199,7 +199,10 @@ Chosen in the asset notes (2026-10-10), where this file did not decide, for the 
   hand down behind its head, then back flat on its far stone, and down on its hands on its stones,
   where they stay through the first blow's 4 frames, clear of the sword arm, before it thrashes;
   kneeling up from L+106 to 129, its rump on its heels on its 10 px solid and its shoulders up at
-  29 px, taller than the heap it slumps into at the second blow;
+  29 px, its knee short of the far stone so that both stones and both hands are seen, taller than
+  the heap it slumps into; holding the kneel through the 4 frames the second blow jerks its head
+  up, and slumping into the heap at L+134 as its head goes down, but the heap from the blow under
+  a man standing on its back, whom the heap's solid lifts;
   nothing of it ever on the cell's stone; the swat a flat hand pressed on top of him, the palm the
   clap's only; the heap bowed over its folded leg, its arms under it, nothing incised across it, and
   its head down before it lying on its cheek, at x 105, clear of Theseus's feet, horns up at its
@@ -220,7 +223,10 @@ Chosen in the asset notes (2026-10-10), where this file did not decide, for the 
   the crouched hands' thumbs spurs over the stones; the stone in its hand a crenellated box on a
   pole, hiding its head as it was taken up; the first blow lost under the claw and the flails; the
   body rose into the heap at the second blow, the heap's incisions read as sword cuts and its head
-  lay behind Theseus's feet; and the tableau's body read as a log.)
+  lay behind Theseus's feet; and the tableau's body read as a log. After a check of the polish,
+  the same day: the heap still came at the blow itself, its rump rising 14 px into the heap's top
+  as its head jerked up, so that it rose again; the kneel's knee hid the far stone and its hand
+  from L+106 to 129; and the square heap read as a box.)
 - Theseus in the fight, as drawn (2026-10-10, `e-cell`, and the stand and the walk in `b-passage`):
   his sword drawn from the step out of his doorway, a 6 px blade in every drawing, glaze over the
   clay and a line of clay over glaze; at guard on his feet and walking out, the sword upright in
@@ -247,12 +253,16 @@ Chosen in the asset notes (2026-10-10), where this file did not decide, for the 
   rises. (After a check of the deaths, the same day: the sniff after a lip landing drew a whole
   plume up out of nothing; it now draws down only what was seen, after a quick lip landing
   little or nothing, and is heard.) Hooked up and over by the horns in every toss
-  (the horns, below): a man left on its back after the heave, and most who jump about on it, is
-  reached by its lurching back before its head, and from that frame its head swings back under him
-  on its stretched neck, over its back, so that its horns are under him as he goes up
-  (`../shared/bull-leaper-tumbling.md`; drawn after the whole-level review, the same day, where it
-  had read as bucked off its rump, its head going on away from him; drawing only, the kill zone
-  and the kill frame where they were).
+  (the horns, below), its far horn drawn in front of his feet while he is on them: a man left on
+  its back after the heave, and most who jump about on it, is reached by its lurching back before
+  its head, and from that frame its back pitches him up off it and forward over its shoulders
+  onto its horns, where its head is in Theseus's hand, which take him once the first blow has
+  gone home, L+80, so that the blow is seen going in under its jaw and its head never leaves its
+  neck to fetch him (`../shared/bull-leaper-tumbling.md`; drawing only, the kill zone, the kill
+  frame and the toss's sound where they were. Drawn first, the same day, as bucked off its rump,
+  its head going on away from him; then, after the whole-level review, its head swung back 24 px
+  in a frame on a neck the length of its back, out of Theseus's hand, its horns hidden under him;
+  after a check of the polish, as now).
 - Where he lies flat, and the swat's hand on him (after the same check, `../shared`,
   `e-cell/minotaur-hand.md`): clapped or swatted on the floor, at its feet, x 76 to 91, the same
   place for both, before Theseus's feet (from x 94) with two pixels of clay, and clear of the near
@@ -961,6 +971,16 @@ Being built, in this order, as a stage in the dev build (`#minotaur`, in `STAGES
   head swung back under a man its back reached (`Fight.tossed`, drawing only), the tableau's body
   a man's silhouette, the reserve's corners, and his frame kept off a wall's stone (`touristLeft`, `src/render/scene.ts`). Nothing that
   kills, carries or times moved. Pinned in `tests/minotaur-bull.spec.ts`.
+
+- **The polish checked** (2026-10-10, to the notes in `e-cell` and `../shared/bull-leaper-tumbling.md`):
+  a man its back reaches pitched forward off it onto its horns, where Theseus holds its head, once
+  the first blow has gone home (`Fight.tossed`, drawing only; `BLOW`, the blow's 4 frames, now the
+  engine's), its far horn drawn again in front of his feet, its free hand down on its stone while
+  he is on its horns, and its kneel put off until it has thrown him; the kneel's knee short of
+  the far stone; the kneel held through the second blow's 4 frames, unless a man stands on its
+  back (`bullPicture`'s `ridden`, from `scene.ts`), and the heap with a rounded rump and deeper
+  notches. Nothing that kills, carries, times or sounds moved. Pinned in
+  `tests/minotaur-bull.spec.ts` and `tests/minotaur-fight.spec.ts`.
 
 Still to come: nothing the notes ask the drawing for. (`LevelData.tricks`, 'The knot', 'The
 snort', 'The hands', 'The horns', and `dropCause` and `fallCause` 'The labyrinth', unreachable,

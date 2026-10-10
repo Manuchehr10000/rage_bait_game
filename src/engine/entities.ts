@@ -2252,14 +2252,16 @@ export interface FightCatch {
  * falls, until the bull reaches him: its head within `reach` px of him, horns and all,
  * or anywhere `up` px over its horns, rearing up to `rear` px on its knees and tossing its
  * head up at him; or its lurching body within `reach`. Its head carries him up onto its
- * horns in `lift` frames, tipping him `tip` of a turn, swung back under him over its back
- * where its back reached him first; one
+ * horns in `lift` frames, tipping him `tip` of a turn. Where its back reached him first,
+ * its back pitches him up off it, `pitch` px over the straight line, forward over its
+ * shoulders and onto its horns where Theseus holds its head, which takes him only once the
+ * first blow has gone home (`BLOW`); one
  * somersault of `arc` frames, `rise` px over the straight line, throws him up and over to
  * the left wall, and he lies flat there for `flat` frames or more of the death. A late
  * reach shortens the somersault, never below `minArc`; whatever has not reached him by
  * then, its head goes out to him, on the frame it came nearest.
  */
-export const TOSS = { reach: 4, up: 20, rear: 14, lift: 3, tip: 0.125, arc: 21, minArc: 10, rise: 40, flat: 6 } as const;
+export const TOSS = { reach: 4, up: 20, rear: 14, lift: 3, tip: 0.125, arc: 21, minArc: 10, rise: 40, flat: 6, pitch: 8 } as const;
 
 /** How high the horns stand over the top of its head, in px. */
 const HORNS = 5;
@@ -2280,6 +2282,8 @@ export interface Tossed {
   head: { x: number; y: number } | null;
   /** How far it has reared up on its knees to toss its head at him, in px. */
   rear: number;
+  /** He is on its horns, its head tossed up under him. */
+  horns: boolean;
 }
 
 /** Him held by the toss till the bull reaches him: his box's top-left, how fast it is going, and whether he is down on the floor. */
@@ -2308,6 +2312,12 @@ export const BULL_HEAD = { w: 11, h: 10, brow: 5 } as const;
 
 /** Frames the second blow jerks its head up before the head is down on the floor, and the fight is over. */
 export const STRUCK = 4;
+
+/**
+ * Frames the first blow goes home under its jaw, Theseus lunging in (e-cell/theseus-blow.md):
+ * its hands stay on its stones and its head in his hand, and only then does it toss it.
+ */
+export const BLOW = 4;
 
 /**
  * The fight in the Minotaur's cell (`FightDef`), on one clock from L, the frame he will
@@ -2448,50 +2458,51 @@ export class Fight implements Entity {
     const { f: hook, by, out, held: path } = this.tossHook();
     if (f < hook) {
       const q = path[f]!;
-      return { pose: 'held', x: q.x, y: q.y, turn: 0, ground: q.ground, by: null, head: null, rear: 0 };
+      return { pose: 'held', x: q.x, y: q.y, turn: 0, ground: q.ground, by: null, head: null, rear: 0, horns: false };
     }
     const { x, y } = path[hook]!;
     // Its head on him: reared up on its knees and tossed up at him if he is over its horns,
     // and out to him if nothing reached him; tossing up 2 px a frame with him on its horns.
-    // Where its back reached him, its head swings back under him on its stretched neck, its
-    // horns under him over its back, never past the far wall (drawn only: the horns have him
-    // as they would have had him from the frame its back reached him).
+    // Where its back reached him first, its back pitches him up off it and forward over its
+    // shoulders, and its head, where it is in Theseus's hand, takes him on its horns once
+    // the first blow has gone home: never further from its shoulders than its neck (drawn
+    // only: the horns have him as they would have had him from the frame its back reached
+    // him).
     const reach = this.headAt(c.k + hook);
     const need = by === 'head' ? Math.max(0, Math.round(reach.y - HORNS + 2 - (y + c.h))) : 0;
     const rear = Math.min(TOSS.rear, need);
     const offX = out ? Math.round(x + (c.w - BULL_HEAD.w) / 2) - reach.x : 0;
-    const z = d.toss.rect;
-    const back = {
-      x: Math.min(z.x + z.w - BULL_HEAD.w - 1, Math.round(x + (c.w - BULL_HEAD.w) / 2)),
-      y: Math.min(Math.round(y + c.h) + HORNS - 2, d.floorY - Math.round(this.backAt(c.k + hook)) - BULL_HEAD.h),
-    };
+    const on = by === 'body' ? Math.max(hook, d.clock.blow1 + BLOW - c.k) : hook;
     const headOn = (k: number, i: number) => {
-      if (by === 'body') return { x: back.x, y: back.y - 2 * i };
       const h = this.headAt(k);
-      return { x: h.x + offX, y: h.y - need - 2 * i };
+      return by === 'body' ? h : { x: h.x + offX, y: h.y - need - 2 * i };
     };
     const lifted = (k: number, i: number) => {
       const h = headOn(k, i);
       return { x: h.x + (BULL_HEAD.w - c.w) / 2, y: h.y - HORNS + 2 - c.h };
     };
     const i = f - hook;
-    if (i < TOSS.lift) {
+    const hooked = on - hook + TOSS.lift;
+    if (i < hooked) {
       const to = lifted(c.k + f, i);
-      const t = (i + 1) / TOSS.lift;
-      const head = by === 'body' || offX || need || i ? headOn(c.k + f, i) : null;
-      return { pose: 'hooked', x: x + (to.x - x) * t, y: y + (to.y - y) * t, turn: TOSS.tip * t, ground: false, by, head, rear };
+      const t = (i + 1) / hooked;
+      const pitch = by === 'body' ? TOSS.pitch * Math.sin(Math.PI * t) : 0;
+      const head = by === 'head' && (offX || need || i) ? headOn(c.k + f, i) : null;
+      // Pitched forward off its back, he is tipped from the first frame.
+      const turn = by === 'body' ? TOSS.tip : TOSS.tip * t;
+      return { pose: 'hooked', x: x + (to.x - x) * t, y: y + (to.y - y) * t - pitch, turn, ground: false, by, head, rear, horns: f >= on };
     }
     // Thrown, as it sinks back down onto its knees.
-    const arc = Math.max(TOSS.minArc, Math.min(TOSS.arc, DEATH_FRAMES - TOSS.flat - hook - TOSS.lift));
-    const j = i - TOSS.lift;
+    const arc = Math.max(TOSS.minArc, Math.min(TOSS.arc, DEATH_FRAMES - TOSS.flat - on - TOSS.lift));
+    const j = i - hooked;
     const sinking = Math.round(rear * Math.max(0, 1 - (j + 1) / TOSS.lift));
     if (j < arc) {
-      const from = lifted(c.k + hook + TOSS.lift - 1, TOSS.lift - 1);
+      const from = lifted(c.k + on + TOSS.lift - 1, TOSS.lift - 1);
       const u = (j + 1) / (arc + 1);
       const turn = TOSS.tip + (1 - TOSS.tip) * u;
-      return { pose: 'thrown', x: from.x + (at.x - from.x) * u, y: from.y + (at.y - from.y) * u - TOSS.rise * Math.sin(Math.PI * u), turn, ground: false, by, head: null, rear: sinking };
+      return { pose: 'thrown', x: from.x + (at.x - from.x) * u, y: from.y + (at.y - from.y) * u - TOSS.rise * Math.sin(Math.PI * u), turn, ground: false, by, head: null, rear: sinking, horns: false };
     }
-    return { pose: 'flat', x: at.x, y: at.y, turn: 1, ground: true, by, head: null, rear: 0 };
+    return { pose: 'flat', x: at.x, y: at.y, turn: 1, ground: true, by, head: null, rear: 0, horns: false };
   }
 
   update(w: World): void {

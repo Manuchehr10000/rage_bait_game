@@ -5456,12 +5456,16 @@ function masonryLine(level: Level): Masonry {
   };
 }
 
-/** The bull's picture this frame, worked out once a frame and drawn twice: behind him and over him. */
-let bullDrawn: { f: Fight; k: number; t: number; caught: unknown; pic: ReturnType<typeof bullPicture> } | null = null;
+/**
+ * The bull's picture this frame, worked out once a frame and drawn twice: behind him and
+ * over him. Whether he stands on its back, which its heap lifts at the second blow.
+ */
+let bullDrawn: { f: Fight; k: number; t: number; caught: unknown; ridden: boolean; pic: ReturnType<typeof bullPicture> } | null = null;
 function bullNow(s: Scene, f: Fight): ReturnType<typeof bullPicture> {
-  if (bullDrawn && bullDrawn.f === f && bullDrawn.k === f.k && bullDrawn.t === f.t && bullDrawn.caught === f.caught) return bullDrawn.pic;
-  const pic = bullPicture(f, masonryLine(s.level));
-  bullDrawn = { f, k: f.k, t: f.t, caught: f.caught, pic };
+  const ridden = !s.death && s.player.riding === f.solid;
+  if (bullDrawn && bullDrawn.f === f && bullDrawn.k === f.k && bullDrawn.t === f.t && bullDrawn.caught === f.caught && bullDrawn.ridden === ridden) return bullDrawn.pic;
+  const pic = bullPicture(f, masonryLine(s.level), ridden);
+  bullDrawn = { f, k: f.k, t: f.t, caught: f.caught, ridden, pic };
   return pic;
 }
 
@@ -5578,7 +5582,8 @@ function drawHanded(ctx: CanvasRenderingContext2D, s: Scene, death: { t: number;
 /**
  * The horns (Fight.tossed; content/ch03-aegean/shared/bull-leaper-tumbling.md): held where
  * they caught him, standing, or falling, until the bull reaches him; carried up onto its
- * horns, its head swung back under him where its back reached him, tipping to the first eighth of a turn; and hooked up and
+ * horns, or pitched by its back forward onto them where its back reached him, tipping to the
+ * first eighth of a turn, its far horn drawn in front of his feet (bull.ts); and hooked up and
  * over in one full somersault to the left wall, the kilt up and flying, round in eighths:
  * the jump frame turned by quarters, and between them the drawn half-quarter turned by
  * quarters. Then dropped flat there on his back, the dead frame turned a quarter, his head

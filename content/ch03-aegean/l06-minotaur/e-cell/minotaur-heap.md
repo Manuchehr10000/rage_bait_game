@@ -11,11 +11,13 @@
 
 The Minotaur after the second blow, sunk over its knees and bowed forward, its head down on the
 floor before it: its back flat on the solid from the shoulders to the rump, rounded at the
-shoulder; the rump down to its heel at the far wall, with a notch where the heel sits under it;
-under its back its folded leg, the knee down on the floor forward under its chest and the thigh
-rising back from it to the belly; under its chest, before the thigh, clay; and its neck bowed
+shoulder and at the rump; the rump down to its heel at the far wall, the back of the thigh
+cut in deep over the heel, which sits in the notch under it; under its back its folded leg, the
+knee down on the floor forward under its chest and the thigh rising back from it to the belly;
+under its chest, before the thigh, clay, a notch from the floor to the belly; and its neck bowed
 down out of its chest to its head, which is `minotaur-head` frame 2, lying on its cheek on the
-floor, horns up at its back. Its arms are under it, unseen. One mass of flat glaze, and nothing
+floor, horns up at its back. (After a check of the polish, 2026-10-10, the rump rounded and the
+notches cut deeper: square at the rump and shallow under the belly, it read as a box.) Its arms are under it, unseen. One mass of flat glaze, and nothing
 incised across it. (After the whole-level review, 2026-10-10: drawn first as the body it crouched
 in, with its near arm thrown out over its head and the stones, the thigh's incision and the clay
 between the thigh and the belly were two parallel diagonal lines across it that read as sword
@@ -25,10 +27,14 @@ Now it kneels up before the blow, taller than the heap, `minotaur-body`, and slu
 
 ## Where it stands in the game
 
-In the cell from L+130 to the end of the attempt, its body over x 114 to 143 and its top 24 px over
-the floor. It is a solid: a man who falls back into the cell climbs out over it. The tableau at the
-door is a second copy; the heap stays (`../LEVEL.md`, the closing tableau). For the 4 frames of the
-second blow its head jerks up on its neck before its shoulders, and then lies down.
+In the cell from L+134 to the end of the attempt, its body over x 114 to 143 and its top 24 px over
+the floor. It is a solid from L+130: a man who falls back into the cell climbs out over it. The
+tableau at the door is a second copy; the heap stays (`../LEVEL.md`, the closing tableau). For the
+4 frames of the second blow, L+130 to 133, its head jerks up while the body holds its kneel
+(`minotaur-body`), and at L+134 the body slumps into the heap as the head goes down, so that the
+blow is seen to lay it low and never to raise it; but under a man standing on its back at the
+blow, whom the heap's solid lifts, it is the heap from L+130, its head jerked up on its neck
+before its shoulders for those frames, so that he stands on its drawn back.
 
 **How it lies against its stones.** Front to back: its head and neck, its body, then the stones.
 The head, `minotaur-head` frame 2, lies on the floor, its pixels within x 105 to 115 and y 727 to
@@ -50,7 +56,9 @@ included, his feet before its head.
 ## Must be right
 
 - **Its top drawn on its solid**: the heap's 24 px over x 114 to 144 is what he stands on, its top
-  row whole from x 118 to 141 (`tests/minotaur-bull.spec.ts`).
+  row whole from x 118 to 141, from the frame it is drawn (`tests/minotaur-bull.spec.ts`).
+- **It slumps**: at L+134 its highest pixel is lower than the kneel's, the head going down as the
+  rump comes up onto the solid (`tests/minotaur-bull.spec.ts`).
 - **A body, never a rock**: a man's back bowed over his folded leg, the bull's head on the floor
   before it, read whole whenever the floor is in view.
 - **Bloodless, and no added red** on it (`../LEVEL.md`): its damage shows only in how it lies.

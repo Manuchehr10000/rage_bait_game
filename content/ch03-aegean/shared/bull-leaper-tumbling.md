@@ -36,13 +36,16 @@ each with its trainer.
   bull-leap the kilt was bought for, done to him.
 - **Turned only in quarter turns, with this one drawn half-quarter** (2026-10-10): no frame of his
   is ever rotated by less than a quarter.
-- **The bull on him**, from the moment it reaches him: its head under him while he is hooked,
-  hooked up and over by the horns (`../l06-minotaur/LEVEL.md`, the horns). Where its lurching back
-  reaches him first, as it does a man left on its back after the heave, its head swings back under
-  him on its stretched neck, over its back, from the frame its back reaches him, and he goes up on
-  its horns (`../l06-minotaur/e-cell/minotaur-body.md`, the toss). (After the whole-level review,
-  2026-10-10: there its head went on toward the wall and he read as bucked off its rump, and this
-  note had been changed to say so; it is back to LEVEL.md, and the drawing with it.)
+- **The bull on him**, from the moment it reaches him: hooked up and over by the horns
+  (`../l06-minotaur/LEVEL.md`, the horns), its head under him while he is on them and its far horn
+  drawn in front of his feet, so that the hook is seen. Where its lurching back reaches him first,
+  as it does a man left on its back after the heave, its back pitches him up off it, tipped to
+  this frame from the first, and forward over its shoulders onto its horns where its head is, in
+  Theseus's hand, once the first blow has gone home, and he goes up on them
+  (`../l06-minotaur/e-cell/minotaur-body.md`, the toss). (After the whole-level review,
+  2026-10-10: there its head went on toward the wall and he read as bucked off its rump. Then its
+  head swung back 24 px to him on a neck the length of its back, under his feet and hidden; after
+  a check of the polish, the same day, it stays on its neck and he is pitched onto its horns.)
 - Nothing reacts.
 
 ## Deliberately wrong

@@ -1,10 +1,9 @@
 import { expect, test, type Page } from '@playwright/test';
 import { MINOTAUR } from '../src/levels/ch03-aegean/l06-minotaur';
 import type { FightDef, HeroDef, TableauDef } from '../src/engine/level';
-import { BREATH, BULL_HEAD, createEntity, HERO, STRUCK, type Fight, type Hero, type HeroFrame, type World } from '../src/engine/entities';
+import { BLOW, BREATH, BULL_HEAD, createEntity, HERO, STRUCK, type Fight, type Hero, type HeroFrame, type World } from '../src/engine/entities';
 import { TILE, VIEW_H, VIEW_W } from '../src/engine/types';
 import {
-  BLOW,
   BULL_HAND_FRAMES,
   BULL_HEAD_FRAMES,
   bullHorn,
@@ -220,26 +219,51 @@ test('its back drawn on its solid on every frame from the grip, pinned, heaved a
   const wrong: string[] = [];
   for (let k = C.grip; k < C.blow2 + 30; k++) {
     const f = at(k);
-    const { body } = picture(f);
-    const heap = k >= C.blow2;
-    const top = F - (heap ? FIGHT.back.heap : Math.round(f.backAt(k)));
-    const dx = heap ? 0 : f.lurchAt(k);
-    const x0 = FIGHT.body.x0 + dx;
-    const x1 = FIGHT.body.x1 + dx;
-    // Its top row whole over the solid, but for a pixel's rounding at its ends.
-    for (let x = x0 + 4; x <= x1 - 3; x++) if (!glaze(body, x, top)) wrong.push(`L+${k}: no back at (${x}, ${top})`);
-    // And nothing of it on the solid behind its shoulders: the back is the top.
-    for (let x = x0 + 16; x <= x1 - 3; x++) if (body.get(x, top - 1)) wrong.push(`L+${k}: over the back at (${x}, ${top - 1})`);
+    // Struck by the second blow, it holds its kneel on the solid it knelt on while its head
+    // jerks up; but under a man standing on its back, whom the heap's solid lifts, it is the
+    // heap from the blow.
+    for (const ridden of k >= C.blow2 && k < C.blow2 + STRUCK ? [false, true] : [false]) {
+      const { body } = bullPicture(f, () => false, ridden);
+      const heap = k >= C.blow2 && (ridden || k >= C.blow2 + STRUCK);
+      const top = F - (heap ? FIGHT.back.heap : k >= C.blow2 ? FIGHT.back.pin : Math.round(f.backAt(k)));
+      const dx = k >= C.blow2 ? 0 : f.lurchAt(k);
+      const x0 = FIGHT.body.x0 + dx;
+      const x1 = FIGHT.body.x1 + dx;
+      const when = `L+${k}${ridden ? ', ridden' : ''}`;
+      // Its top row whole over the solid, but for a pixel's rounding at its ends.
+      for (let x = x0 + 4; x <= x1 - 3; x++) if (!glaze(body, x, top)) wrong.push(`${when}: no back at (${x}, ${top})`);
+      // And nothing of it on the solid behind its shoulders: the back is the top.
+      for (let x = x0 + 16; x <= x1 - 3; x++) if (body.get(x, top - 1)) wrong.push(`${when}: over the back at (${x}, ${top - 1})`);
+    }
   }
   // Kneeling up before the second blow, taller than the heap it sinks into: its glaze over its
-  // body's front half higher than the heap's top. And neither it nor the heap is incised across
-  // its body behind the shoulders, where a line reads as a sword cut.
-  for (let k = FIGHT.toss.to + 5; k < C.blow2 + 30; k++) {
+  // body's front half higher than the heap's top; and its hands still flat on their stones,
+  // both seen, the far one as whole as it is crouched from the frame after it comes up off
+  // them, its knee clear of it (after a check of the polish, 2026-10-10: the knee hid the far
+  // stone and its hand from L + 106 to 129). And
+  // neither it nor the heap is incised across its body behind the shoulders, where a line
+  // reads as a sword cut.
+  const farStone = (p: Pixels) => [...Array(ST.w * ST.h).keys()].filter((i) => p.get(ST.far + (i % ST.w), F - ST.h + Math.floor(i / ST.w)) === 'o').length;
+  const crouched = farStone(picture(at(null)).body);
+  for (let k = FIGHT.toss.to; k < C.blow2 + 30; k++) {
     const { body } = picture(at(k));
     const mine = [...body.each()].filter((q) => q.x >= FIGHT.body.x0 && q.x < FIGHT.body.x1 && q.y < F);
-    if (k < C.blow2 && Math.min(...mine.filter((q) => q.ink === '#').map((q) => q.y)) > F - FIGHT.back.heap - 4) wrong.push(`L+${k}: kneeling no taller than the heap`);
-    for (const q of mine) if (q.ink === '_' && q.x >= FIGHT.body.x0 + 8) wrong.push(`L+${k}: a cut across it at (${q.x}, ${q.y})`);
+    if (k >= FIGHT.toss.to + 5 && k < C.blow2 + STRUCK && Math.min(...mine.filter((q) => q.ink === '#').map((q) => q.y)) > F - FIGHT.back.heap - 4) wrong.push(`L+${k}: kneeling no taller than the heap`);
+    if (k > FIGHT.toss.to && k < C.blow2 + STRUCK && farStone(body) !== crouched) wrong.push(`L+${k}: the far stone hidden`);
+    if (k >= FIGHT.toss.to + 5) for (const q of mine) if (q.ink === '_' && q.x >= FIGHT.body.x0 + 8) wrong.push(`L+${k}: a cut across it at (${q.x}, ${q.y})`);
   }
+  // The second blow lets it slump: through the frames its head jerks up, nothing of it from its
+  // shoulders back stands higher than it knelt, and then its highest glaze goes down (after a
+  // check of the polish, 2026-10-10: the heap's 24 px rose at the blow over the kneel's rump).
+  const tops = (k: number) => {
+    const { body } = picture(at(k));
+    const out: number[] = [];
+    for (let x = FIGHT.body.x0; x < FIGHT.body.x1; x++) out.push(Math.min(F, ...[...Array(F - 680).keys()].map((j) => 680 + j).filter((y) => glaze(body, x, y))));
+    return out;
+  };
+  const knelt = tops(C.blow2 - 1);
+  for (let k = C.blow2; k < C.blow2 + STRUCK; k++) tops(k).forEach((y, i) => i >= 5 && y < knelt[i]! && wrong.push(`L+${k}: higher than it knelt at x ${FIGHT.body.x0 + i}`));
+  if (Math.min(...tops(C.blow2 + STRUCK)) <= Math.min(...tops(C.blow2 + STRUCK - 1))) wrong.push('not slumped');
   expect(wrong).toEqual([]);
   // The heap's head jerked up for STRUCK frames, then down on the floor in x 105 to 115,
   // clear of Theseus's feet, which come to x 103 (after the whole-level review, 2026-10-10:
@@ -880,7 +904,7 @@ test('in the game: off his feet, in the air or hooked and thrown by the horns, t
       const s = W4 / 320;
       const GL = parseInt(glaze.slice(1), 16);
       const HIS = new Set(colours.map((c: string) => parseInt(c.slice(1), 16)));
-      const out = { frames: 0, his: 0, touches: [] as string[] };
+      const out = { frames: 0, his: 0, touches: [] as string[], horns: [] as number[] };
       /** This frame: every pixel of his, at the canvas's own scale, and the glaze a world pixel from it in the cell. */
       const look = (at: string) => {
         g.draw();
@@ -917,8 +941,23 @@ test('in the game: off his feet, in the air or hooked and thrown by the horns, t
       for (let j = 0; j < 46 && g.state === 'dead'; j++) {
         press({ dir: 0, jump: false });
         const f = fight();
-        const pose = f.caught?.by === 'toss' ? f.tossed(Math.round((1 - g.deathTimer / 0.75) * 45)).pose : null;
+        const u = Math.round((1 - g.deathTimer / 0.75) * 45);
+        const pose = f.caught?.by === 'toss' ? f.tossed(u).pose : null;
         if (pose === 'hooked' || pose === 'thrown') look(`${pose}, dead ${j}`);
+        // On the last frame he is on its horns, its horns seen: the glaze in their rows over
+        // its head's box, and of it its far horn's, drawn in front of him.
+        if (pose === 'hooked' && f.tossed(u + 1).pose !== 'hooked') {
+          const h = f.headAt(f.k);
+          const d = ctx.getImageData(0, 0, W4, ctx.canvas.height).data;
+          const glazed = (x: number, y: number) => {
+            const o = (((y - g.camera.iy) * s + 1) * W4 + (x - g.camera.ix) * s + 1) * 4;
+            return ((d[o]! << 16) | (d[o + 1]! << 8) | d[o + 2]!) === GL;
+          };
+          let all = 0;
+          let far = 0;
+          for (let y = h.y - 5; y < h.y; y++) for (let x = h.x; x <= h.x + 10; x++) if (glazed(x, y)) (all++, x >= h.x + 6 && y < h.y - 1 && far++);
+          out.horns.push(all, far);
+        }
       }
       key('ArrowLeft', false);
       key('ArrowRight', false);
@@ -936,7 +975,14 @@ test('in the game: off his feet, in the air or hooked and thrown by the horns, t
   expect(r.frames).toBeGreaterThan(40);
   expect(r.his).toBeGreaterThan(0);
   expect(r.touches).toEqual([]);
+  // Hooked from its back, he is seen on its horns: most of their 24 px of glaze, and the far
+  // horn's 8 whole in front of his feet (after a check of the polish, 2026-10-10: 1 to 8 px
+  // of them were seen, under him).
+  expect(r.horns).toEqual([HORNS_SEEN, 8]);
 });
+
+/** The glaze of its horns seen over its head's box on the last frame a man from its back is on them, of their 24 in the tossed head (e-cell/minotaur-head.md, frame 1). */
+const HORNS_SEEN = 22;
 
 // ---------------------------------------------------------------------------
 // The tourist's deaths in the cell, as drawn (content/ch03-aegean/shared:
@@ -982,6 +1028,34 @@ function quarters(px: Him): string[] {
   const out: string[] = [];
   let p = px;
   for (let q = 0; q < 4; q++, p = turned(p)) out.push(shape(p).key);
+  return out;
+}
+
+/**
+ * Which of `turns` (pictures) his pixels are, but for some of them covered: every pixel of his
+ * on the picture, in its ink, at one place, and at most a fifth of it covered. Its index, or -1.
+ */
+function covered(px: Him, turns: Him[]): number {
+  const key = (q: { x: number; y: number }) => `${q.x},${q.y}`;
+  const x0 = Math.min(...px.map((q) => q.x));
+  const y0 = Math.min(...px.map((q) => q.y));
+  return turns.findIndex((t) => {
+    const tx = Math.min(...t.map((q) => q.x));
+    const ty = Math.min(...t.map((q) => q.y));
+    const ink = new Map(t.map((q) => [key({ x: q.x - tx, y: q.y - ty }), q.ink]));
+    if (px.length < t.length * 0.8) return false;
+    for (let dy = 0; dy <= 4; dy++) {
+      for (let dx = 0; dx <= 4; dx++) if (px.every((q) => ink.get(key({ x: q.x - x0 + dx, y: q.y - y0 + dy })) === q.ink)) return true;
+    }
+    return false;
+  });
+}
+
+/** Every whole quarter turn of a picture, 0 to 3, as pictures. */
+function turnsOf(px: Him): Him[] {
+  const out: Him[] = [];
+  let p = px;
+  for (let q = 0; q < 4; q++, p = turned(p)) out.push(p);
   return out;
 }
 
@@ -1055,7 +1129,7 @@ async function dying(page: Page, hands: string, air: number | null) {
       const frames = [];
       for (let u = 0; u < 45 && g.state === 'dead'; u++) {
         const t = f.caught.by === 'toss' ? f.tossed(u) : null;
-        frames.push({ u, k: f.k, him: him(), beside, tips, pose: t?.pose ?? null, head: f.headAt(f.k) });
+        frames.push({ u, k: f.k, him: him(), beside, tips, pose: t?.pose ?? null, horns: t?.horns ?? false, head: f.headAt(f.k) });
         press({ dir: 0, jump: false });
       }
       key('ArrowLeft', false);
@@ -1245,18 +1319,26 @@ test("in the game: the horns as drawn: one full somersault counter-clockwise in 
     const upright = quarters(facing === -1 ? mirrored(jump!) : jump!);
     const round = r.frames.filter((q) => q.pose === 'hooked' || q.pose === 'thrown');
     expect(round.length, name).toBeGreaterThanOrEqual(10);
-    // The drawn half-quarter: the first frame that is no quarter turn of his jump frame.
-    const half = round.find((q) => !upright.includes(shape(q.him).key));
+    // The drawn half-quarter: the first frame that is no quarter turn of his jump frame, and
+    // not on its horns, where its far horn is in front of him.
+    const half = round.find((q) => !q.horns && !upright.includes(shape(q.him).key));
     expect(half, name).toBeDefined();
     const halves = quarters(half!.him);
-    // Every frame of the round is one or the other, turned by whole quarters; the eighth it
+    // Every frame of the round is one or the other, turned by whole quarters; on its horns,
+    // what is seen of one or the other, its far horn in front of his feet. The eighth it
     // shows, counter-clockwise from upright, never goes back or skips one, and goes round
     // to the last eighth at least.
+    const all = [...turnsOf(facing === -1 ? mirrored(jump!) : jump!), ...turnsOf(half!.him)];
     let turn = -1;
     for (const q of round) {
       const k = shape(q.him).key;
-      const i = upright.indexOf(k);
-      const j = halves.indexOf(k);
+      let i = upright.indexOf(k);
+      let j = halves.indexOf(k);
+      if (i < 0 && j < 0 && q.horns) {
+        const c = covered(q.him, all);
+        if (c >= 0 && c < 4) i = c;
+        if (c >= 4) j = c - 4;
+      }
       expect(i >= 0 || j >= 0, `${name}, frame ${q.u}: turned by less than a quarter`).toBe(true);
       const e = i >= 0 ? 2 * i : 2 * j + 1;
       const next = turn < 0 ? e : turn + ((e - (turn % 8) + 8) % 8);

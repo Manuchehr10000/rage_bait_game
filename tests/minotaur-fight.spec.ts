@@ -1,7 +1,8 @@
 import { expect, test, type Page } from '@playwright/test';
 import { MINOTAUR } from '../src/levels/ch03-aegean/l06-minotaur';
 import type { FightDef } from '../src/engine/level';
-import { BULL_HEAD, HERO as THESEUS, STRUCK, TOSS } from '../src/engine/entities';
+import { BLOW, BULL_HEAD, HERO as THESEUS, STRUCK, TOSS } from '../src/engine/entities';
+import { bullPicture } from '../src/render/bull';
 import { PHYS } from '../src/engine/player';
 import { DEATH_ANIM, DEATH_FRAMES, DEATH_SOUND, overlaps, VIEW_H, type Rect } from '../src/engine/types';
 import { CELL_FLOOR, cleanRun, FULL, LEVEL, onFloor, ROW_5, Run, seeded, type Press } from './minotaur-run';
@@ -636,6 +637,9 @@ test('the horns: no retreat ever gets out; mashers do now and then', () => {
   expect(hoppers.every((h) => h.startsWith('19/') || h.startsWith('21/'))).toBe(true);
 });
 
+/** The pixels of its far horn, tossed (e-cell/minotaur-head.md, frame 1): 2 px in each of its 4 rows over the head's box. */
+const FAR_HORN = 8;
+
 /** The gap between two boxes, in px: 0 if they touch or overlap. */
 const gapBetween = (a: Rect, b: Rect) => Math.max(0, a.x - (b.x + b.w), b.x - (a.x + a.w), a.y - (b.y + b.h), b.y - (a.y + a.h));
 
@@ -664,13 +668,27 @@ const tossOf = (r: Run) => {
   if (hook.by === 'body') {
     const top = FIGHT.floorY - f.backAt(k);
     if (gapBetween({ x: FIGHT.body.x0 + f.lurchAt(k), y: top, w: FIGHT.body.x1 - FIGHT.body.x0, h: FIGHT.floorY - top }, him) > TOSS.reach) wrong.push('its back out of reach');
-    // Its head swung back under him on every hooked frame, and by the last of them he is on its
-    // horns: hooked, never bucked off its back (LEVEL.md, the horns; after the whole-level
-    // review, 2026-10-10).
-    const hooked = frames.slice(hook.f, hook.f + TOSS.lift);
-    if (hooked.some((h) => !h.head)) wrong.push('its head not swung back under him');
+    // Its back pitches him up off it and forward over its shoulders onto its horns, where
+    // Theseus holds its head, which takes him once the first blow has gone home: its head where
+    // it is on every frame, never swung back from its shoulders; on its horns, and only then,
+    // for its last TOSS.lift frames, and by the last of them his feet on their tips and his
+    // middle over its head; and seen on them, its far horn whole in front of him, drawn after
+    // him (LEVEL.md, the horns; after a check of the polish, 2026-10-10: its head swung 24 px
+    // back to him in a frame on a neck the length of its back, away from Theseus's hand and
+    // the first blow, and behind him).
+    const on = Math.max(hook.f, C.blow1 + BLOW - c.k);
+    const hooked = frames.map((h, n) => ({ ...h, n })).filter((h) => h.pose === 'hooked');
+    if (hooked.length !== on - hook.f + TOSS.lift || hooked[0]!.n !== hook.f) wrong.push('not hooked from its back to its horns');
+    if (hooked.some((h) => h.head)) wrong.push('its head not where it is');
+    if (hooked.some((h) => h.horns !== h.n >= on)) wrong.push('on its horns before the first blow has gone home');
     const up = hooked[hooked.length - 1]!;
-    if (up.head && (Math.abs(up.head.x + BULL_HEAD.w / 2 - (up.x + c.w / 2)) > 0.5 || Math.abs(up.head.y - 5 + 2 - (up.y + c.h)) > 0.5)) wrong.push('not on its horns');
+    const h = f.headAt(c.k + up.n);
+    if (Math.abs(h.x + BULL_HEAD.w / 2 - (up.x + c.w / 2)) > 0.5 || Math.abs(h.y - 5 + 2 - (up.y + c.h)) > 0.5) wrong.push('not on its horns');
+    const then = Object.assign(Object.create(Object.getPrototypeOf(f)), f) as typeof f;
+    then.k = c.k + up.n;
+    const { over } = bullPicture(then, () => false);
+    const far = [...over.each()].filter((q) => q.ink === '#' && q.x >= h.x + 6 && q.x <= h.x + 10 && q.y >= h.y - 5 && q.y < h.y - 1);
+    if (far.length !== FAR_HORN) wrong.push('its far horn not in front of him');
   } else {
     const h = t.head ?? lurch;
     if (gapBetween({ x: h.x, y: h.y - 5, w: BULL_HEAD.w, h: BULL_HEAD.h + 5 }, him) > TOSS.reach) wrong.push('its head out of reach');
@@ -701,10 +719,12 @@ test("the horns' toss as drawn: held where they caught him till the bull reaches
   // Standing mid-cell at x 70: reached on L + 83, the head at x 82; at x 80, on L + 79.
   expect(toss(restingAt(70), () => ({ dir: 0, jump: false })).toss).toEqual({ hook: 7, by: 'head', out: false, flat: 14 });
   expect(toss(restingAt(80), () => ({ dir: 0, jump: false })).toss).toEqual({ hook: 3, by: 'head', out: false, flat: 18 });
-  // On its back, after the leap and no jump off: its back has him at once, and throws him.
+  // On its back, after the leap and no jump off: its back has him at once and pitches him
+  // forward over its shoulders, onto its horns once the first blow has gone home, 4 frames
+  // on; over in 21, and flat for 17.
   const back = toss(WALL, (k) => ({ dir: k >= 0 ? 1 : 0, jump: k >= 12 && k < 12 + FULL }));
   expect(back.caught).toMatchObject({ k: C.blow1, x: 134, y: CELL_FLOOR - FIGHT.back.pin - 16, air: false });
-  expect(back.toss).toEqual({ hook: 0, by: 'body', out: false, flat: 21 });
+  expect(back.toss).toEqual({ hook: 0, by: 'body', out: false, flat: 17 });
   // In the air left of it, a hop at L + 70 from x 60: held rising and falling with his
   // hands off the keys, till on L + 85 it rears 10 px and tosses its head up at him.
   const hop = toss(restingAt(60), (k) => ({ dir: 0, jump: k >= 70 && k < 70 + FULL }));

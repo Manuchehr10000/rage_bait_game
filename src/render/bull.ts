@@ -1,4 +1,5 @@
-import { breathHeight, HERO, PLUME, STRUCK, type Fight, type HeroFrame } from '../engine/entities';
+import { BLOW, breathHeight, HERO, PLUME, STRUCK, type Fight, type HeroFrame } from '../engine/entities';
+import { DEATH_FRAMES } from '../engine/types';
 
 /**
  * The Minotaur, as pixels at 1 world px (content/ch03-aegean/l06-minotaur/e-cell and
@@ -385,8 +386,6 @@ const CLAW: readonly Pt[] = [
  * high over its horns, behind him: its top-left from its head's. Never both up over its
  * horns.
  */
-/** The frames of the first blow, Theseus lunging in (theseus-blow): its hands stay on its stones, clear of his sword arm. */
-export const BLOW = 4;
 const FLAIL: readonly (readonly [Pt, Pt])[] = [
   [{ x: -8, y: -16 }, { x: -1, y: -11 }],
   [{ x: -8, y: -15 }, { x: 2, y: -12 }],
@@ -455,42 +454,47 @@ const KNEEL = {
   head: { x: -1, y: -25 },
 } as const;
 
-/** Its rump on its heels and its folded legs, kneeling: from its body's front and the floor, the knee forward on it. */
+/**
+ * Its rump on its heels and its folded legs, kneeling: from its body's front and the floor,
+ * the knee forward on it under its chest, and no further, so that a pixel of clay lies
+ * between it and the far stone and the hand flat on it (x 110 to 117), and both are seen.
+ */
 const HAUNCH: readonly Pt[] = [
   { x: 4, y: -10 },
   { x: 28, y: -10 },
   { x: 29, y: -9 },
   { x: 29, y: 0 },
-  { x: -6, y: 0 },
-  { x: -6, y: -3 },
-  { x: -4, y: -5 },
-  { x: 1, y: -8 },
+  { x: 5, y: 0 },
+  { x: 5, y: -8 },
 ];
 
 /**
  * The heap (e-cell/minotaur-heap.md), from its body's front and the floor: its back flat on
- * the solid from the shoulders to the rump, the rump down to its heel at the far wall, and
- * under the back its folded leg, the knee down on the floor forward under its chest, the
- * thigh rising back from it to the belly; under its chest, before the thigh, clay. One mass,
- * and nothing incised across it.
+ * the solid from the shoulders to the rump, rounded at both; the rump down to its heel at the
+ * far wall, the back of the thigh cut in deep over the heel; and under the back its folded leg,
+ * the knee down on the floor forward under its chest, the thigh rising back from it to the
+ * belly; under its chest, before the thigh, clay from the floor to the belly. One mass, and
+ * nothing incised across it.
  */
 const HEAP: readonly Pt[] = [
-  { x: 0, y: -20 },
+  { x: 0, y: -19 },
   { x: 1, y: -22 },
   { x: 3, y: -24 },
   { x: 28, y: -24 },
-  { x: 29, y: -23 },
-  { x: 29, y: -10 },
-  { x: 27, y: -7 },
-  { x: 29, y: -5 },
+  { x: 29, y: -22 },
+  { x: 29, y: -14 },
+  { x: 25, y: -9 },
+  { x: 28, y: -5 },
+  { x: 29, y: -3 },
   { x: 29, y: 0 },
-  { x: 8, y: 0 },
-  { x: 6, y: -2 },
-  { x: 7, y: -5 },
-  { x: 11, y: -9 },
-  { x: 15, y: -11 },
-  { x: 8, y: -13 },
-  { x: 3, y: -14 },
+  { x: 9, y: 0 },
+  { x: 7, y: -2 },
+  { x: 8, y: -5 },
+  { x: 13, y: -9 },
+  { x: 17, y: -12 },
+  { x: 9, y: -14 },
+  { x: 4, y: -15 },
+  { x: 1, y: -17 },
 ];
 
 /** The bull on a frame, for drawing it. */
@@ -517,6 +521,8 @@ export interface BullPose {
   on: 'clap' | 'swat' | null;
   /** Up on its knees before the second blow, from 0, down on its hands, to 1, kneeling up (`KNEEL`). */
   kneel: number;
+  /** A man on its horns, tossed: their tips are drawn in front of him. */
+  horns: boolean;
 }
 
 const lerp = (a: Pt, b: Pt, t: number): Pt => ({ x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t });
@@ -562,7 +568,17 @@ function palmsOn(s: Pt): [Hand, Hand] {
   return [handAt(HAND_PALM, { x: s.x - 6, y: s.y + 2 }), handAt(HAND_PALM, { x: s.x + 5, y: s.y + 2 }, true)];
 }
 
-export function bullPose(f: Fight): BullPose {
+/**
+ * Whether it holds its kneel through the frames the second blow jerks its head up, and only
+ * then slumps into its heap: unless a man stands on its back, whom the heap's solid lifts at
+ * the blow, and under whom it is the heap from then on, its top on its solid.
+ */
+export function holdsKneel(f: Fight, ridden: boolean): boolean {
+  const c = f.def.clock;
+  return !ridden && f.keyed && f.k >= c.blow2 && f.k < c.blow2 + STRUCK;
+}
+
+export function bullPose(f: Fight, ridden = false): BullPose {
   const d = f.def;
   const c = d.clock;
   const F = d.floorY;
@@ -581,14 +597,19 @@ export function bullPose(f: Fight): BullPose {
   // Tossing, it rears up on its knees and tosses its head up at him, or out to him.
   const toss = caught?.by === 'toss' && u >= 0 ? f.tossed(u) : null;
   const up = toss ? toss.rear : Math.round(12 * rear);
-  const top = F - Math.round(f.backAt(k)) - bob - up;
+  // Struck by the second blow, it holds its kneel on the solid it knelt on while its head jerks up.
+  const struck = holdsKneel(f, ridden);
+  const top = struck ? F - d.back.pin : F - Math.round(f.backAt(k)) - bob - up;
   const dx = f.lurchAt(k);
   const x0 = d.body.x0 + dx;
   const x1 = d.body.x1 + dx;
   const hd = f.headAt(k);
   // Kneeling up before the second blow, its head up before its shoulders.
-  const kneel = k >= d.toss.to && k < c.blow2 ? Math.min(1, (k - d.toss.to + 1) / KNEEL.rise) : 0;
-  const head = at(lerp({ x: hd.x, y: hd.y - bob - up }, { x: d.body.face + KNEEL.head.x, y: F + KNEEL.head.y }, kneel));
+  // Not while a man it caught late is still on its horns: it kneels up when it has thrown him.
+  let free = d.toss.to;
+  if (toss) for (let v = 0; v < DEATH_FRAMES; v++) if (f.tossed(v).horns) free = Math.max(free, caught!.k + v + 1);
+  const kneel = (k >= free && k < c.blow2) || struck ? Math.min(1, (k - free + 1) / KNEEL.rise) : 0;
+  const head = struck ? hd : at(lerp({ x: hd.x, y: hd.y - bob - up }, { x: d.body.face + KNEEL.head.x, y: F + KNEEL.head.y }, kneel));
   const sn = shoulders(x0, top, F, kneel).near;
   // Flat on a stone: the hand along its whole top, the wrist over its back end.
   const flatOn = (sx: number): Hand => handAt(HAND_FLAT, { x: sx, y: F - st.h - FLAT_ON });
@@ -675,10 +696,11 @@ export function bullPose(f: Fight): BullPose {
       near = flatOn(put.x);
       far = flatOn(st.far);
     } else if (k < d.toss.to) {
-      // Struck: it thrashes, both hands, as it lurches on its knees.
+      // Struck: it thrashes, both hands, as it lurches on its knees; but with a man on its
+      // horns its free hand is down on its far stone, never up over its horns under him.
       const [a, b] = FLAIL[Math.floor((k - c.blow1 - BLOW) / 2) % FLAIL.length]!;
       near = handAt(HAND_REACH, { x: head.x + a.x, y: F + a.y });
-      far = handAt(HAND_CLAW, { x: head.x + b.x, y: head.y + b.y });
+      far = toss?.horns ? flatOn(st.far) : handAt(HAND_CLAW, { x: head.x + b.x, y: head.y + b.y });
     } else {
       // Down on its hands before the second blow, on its stones.
       near = flatOn(put.x);
@@ -713,13 +735,13 @@ export function bullPose(f: Fight): BullPose {
     on = 'swat';
   }
   // Its head tossed up while it has him on its horns, and as it throws him.
-  const tossing = toss && (toss.pose === 'hooked' || (toss.by === 'head' && toss.pose === 'thrown' && toss.rear > 0));
+  const tossing = toss && (toss.horns || (toss.by === 'head' && toss.pose === 'thrown' && toss.rear > 0));
   return {
     top,
     x0,
     x1,
     head: toss?.head ?? head,
-    headFrame: tossing ? HEAD_TOSSED : HEAD_LEVEL,
+    headFrame: tossing || struck ? HEAD_TOSSED : HEAD_LEVEL,
     held: head,
     near,
     far,
@@ -727,6 +749,7 @@ export function bullPose(f: Fight): BullPose {
     stoneHeld: carried,
     on,
     kneel,
+    horns: !!toss?.horns,
   };
 }
 
@@ -1527,8 +1550,12 @@ function incision(p: Pixels, a: Pt, b: Pt): void {
 /** The masonry's glaze the bull keeps a pixel of clay from: true where it is. */
 export type Masonry = (x: number, y: number) => boolean;
 
-/** The bull on this frame: what is drawn behind Theseus and the tourist; what of it is drawn again in front of Theseus (`nearer`); and its hands on the tourist, drawn over him. */
-export function bullPicture(f: Fight, masonry: Masonry): { body: Pixels; front: Pixels; over: Pixels } {
+/**
+ * The bull on this frame: what is drawn behind Theseus and the tourist; what of it is drawn
+ * again in front of Theseus (`nearer`); and over him, its hands on him, or its far horn when he
+ * is on its horns. `ridden`: the tourist stands on its back (`holdsKneel`).
+ */
+export function bullPicture(f: Fight, masonry: Masonry, ridden = false): { body: Pixels; front: Pixels; over: Pixels } {
   const d = f.def;
   const F = d.floorY;
   const st = d.stones;
@@ -1536,9 +1563,10 @@ export function bullPicture(f: Fight, masonry: Masonry): { body: Pixels; front: 
   const body = new Pixels();
   let front = new Pixels();
   const over = new Pixels();
-  if (k >= d.clock.blow2) heap(body, f);
+  let tips = new Pixels();
+  if (k >= d.clock.blow2 && !holdsKneel(f, ridden)) heap(body, f);
   else {
-    const b = bullPose(f);
+    const b = bullPose(f, ridden);
     const { near: sn, far: sf } = shoulders(b.x0, b.top, F, b.kneel);
     const farStone = { x: st.far, y: F - st.h };
     const floor = [stone(farStone.x, farStone.y, st.w, st.h, lyingOn(b.far, farStone))];
@@ -1608,11 +1636,36 @@ export function bullPicture(f: Fight, masonry: Masonry): { body: Pixels; front: 
       handInto(over, b.near);
       handInto(over, b.far);
     } else if (b.on === 'swat') handInto(over, b.far);
+    // A man on its horns: the far horn in front of his feet, cut from him by clay, so that he
+    // is seen on it; the near one is in Theseus's hand.
+    if (b.horns) tips = farHorn(b.head, b.headFrame);
   }
   clear(body, masonry);
   clear(front, masonry);
   clear(over, masonry);
-  return { body, front, over: withOutline(over) };
+  const drawn = withOutline(over);
+  drawn.lay(before(tips, body));
+  return { body, front, over: drawn };
+}
+
+/** The far horn, from its tip to its poll: the rows of the head's drawing over its box, from this far into it as the game turns it. */
+const FAR_HORN = { from: 6, rows: 4 };
+
+/** Its far horn, in the drawing `frame` of its head at `head`, the box's top-left. */
+function farHorn(head: Pt, frame: number): Pixels {
+  const all = new Pixels();
+  all.sprite(BULL_HEAD_FRAMES[frame]!.slice(0, FAR_HORN.rows), head.x, head.y - HEAD_HORNS, true);
+  const p = new Pixels();
+  for (const q of all.each()) if (q.ink === '#' && q.x >= head.x + FAR_HORN.from) p.put(q.x, q.y);
+  return p;
+}
+
+/** Part of it drawn again in front of him, with a line of clay round it wherever that is not its own glaze, corners included. */
+function before(part: Pixels, own: Pixels): Pixels {
+  const out = new Pixels();
+  for (const { x, y } of part.each()) for (const [dx, dy] of N8) if (!part.get(x + dx, y + dy) && own.get(x + dx, y + dy) !== '#') out.put(x + dx, y + dy, '_');
+  out.lay(part);
+  return out;
 }
 
 /**
@@ -1658,9 +1711,10 @@ function clear(p: Pixels, masonry: Masonry): void {
 }
 
 /**
- * The heap (e-cell/minotaur-heap.md): after the second blow, its head jerked up for
- * STRUCK frames, then the body sunk over its knees and bowed (HEAP), its top on the solid,
- * and its neck bowed down to its head on the floor before it, clear of Theseus's feet.
+ * The heap (e-cell/minotaur-heap.md): after the second blow, the body sunk over its knees
+ * and bowed (HEAP), its top on the solid, and its neck bowed down to its head on the floor
+ * before it, clear of Theseus's feet; with its head jerked up for the blow's STRUCK frames
+ * only under a man on its back (`holdsKneel`), where it is the heap from the blow.
  * Front to back: the head and neck, the body, the stones; the head cut from what is behind
  * it by clay, and nothing incised across the body, where a line reads as a sword cut.
  */

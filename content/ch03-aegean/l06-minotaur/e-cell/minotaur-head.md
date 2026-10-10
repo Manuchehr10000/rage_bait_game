@@ -31,9 +31,10 @@ straight from the poll in a V to upright tips, they read as a goat's or an antel
 
 Its box's top-left is where the fight puts it: x 108 and y 712 crouched, with the back and the
 lurch, a pixel up with the breath, tossing 2 to 7 px from the first blow. Frame 0 throughout, but
-frame 1 while it has a tourist on its horns, tossing him up, swung back under him over its own
-back where its back reached him first (`minotaur-body`, the toss), and for the 4 frames its head
-jerks up at the second blow; frame 2 from then on, at x 105 on the floor before the heap, clear of
+frame 1 while it has a tourist on its horns, tossing him up: where it is, in Theseus's hand,
+where its back reached him first and pitched him onto them, never swung back over its back to
+fetch him (`minotaur-body`, the toss); and for the 4 frames its head jerks up at the second blow,
+over the kneel it holds; frame 2 from then on, at x 105 on the floor before the heap, clear of
 Theseus's feet, which come to x 103, and in front of the far stone (`minotaur-heap`), and in the
 closing tableau (`../f-thread/minotaur-dead.md`). (After the whole-level review, 2026-10-10: at
 x 101, across both stones, it lay behind his feet and could not be read.) Kneeling up before the
@@ -47,6 +48,13 @@ it, so that it is always whole.
 - **A bull's, in silhouette first**: the muzzle and the horns say bull before anything else.
 - **Inside its box and its horns**: the head's 11 × 10 and the horns' 5 px over it are what reaches
   him, and what the toss hooks him with (`tests/minotaur-fight.spec.ts`).
+- **The hook seen**: with a tourist on its horns, his feet on their tips, its far horn, the 8 px
+  of frame 1's four horn rows from 6 px into the box, is drawn again in front of him with a line
+  of clay round it where it lies on him, so that the horn is seen in front of his feet, never
+  lost under him; the near one is in Theseus's hand. On the last frame a man from its back is on
+  them, 22 px of glaze stand in the horns' 5 rows over its box, of frame 1's 24 (`tests/minotaur-fight.spec.ts`,
+  `tests/minotaur-bull.spec.ts`; after a check of the polish, 2026-10-10: 0 to 8 were seen, the
+  head under his feet).
 - **The near horn where the hero holds it**: in frames 0 and 1 it passes through 3 px in from the
   box's left and 2 px over its top, where Theseus's left hand is (`tests/minotaur-bull.spec.ts`).
   In frame 2 its near horn is 6 px in and on the box's top row, where his hand has it in the

@@ -198,7 +198,7 @@
       "w": 44,
       "h": 30,
       "beat": "e-cell",
-      "what": "The Minotaur's man's body, drawn by code in flat glaze: the back on its solid every frame, the neck, arms pixelled as the people are, the upper arm thicker than the forearm, bent at the elbow and narrowed to a wrist, the folded leg a filled wedge, never a letter or a digit; crouched, gripped, on its knee, heaving, lurching on both knees, tossing, its head swung back under a man on its back, kneeling up before the second blow. Theseus stands between its body and its near arm. Size as crouched, with its stones."
+      "what": "The Minotaur's man's body, drawn by code in flat glaze: the back on its solid every frame, the neck, arms pixelled as the people are, the upper arm thicker than the forearm, bent at the elbow and narrowed to a wrist, the folded leg a filled wedge, never a letter or a digit; crouched, gripped, on its knee, heaving, lurching on both knees, tossing, a man on its back pitched forward onto its horns where Theseus holds its head, kneeling up before the second blow, clear of the far stone, and holding its kneel while the blow jerks its head up. Theseus stands between its body and its near arm. Size as crouched, with its stones."
     },
     {
       "id": "minotaur-head",
@@ -229,7 +229,7 @@
       "w": 39,
       "h": 24,
       "beat": "e-cell",
-      "what": "The Minotaur after the second blow: the body sunk over its knees and bowed, its back on the 24 px solid, its neck bowed down to its head on the floor before it, clear of Theseus's feet; nothing incised across it. Bloodless. It stays. Drawn by code, facing left."
+      "what": "The Minotaur after the second blow: the body slumped over its knees and bowed, the rump rounded over the heel, its back on the 24 px solid, its neck bowed down to its head on the floor before it, clear of Theseus's feet; nothing incised across it. Bloodless. It stays. Drawn by code, facing left."
     },
     {
       "id": "theseus-leap",
