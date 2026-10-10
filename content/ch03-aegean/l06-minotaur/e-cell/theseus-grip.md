@@ -20,7 +20,9 @@ the horn is. The figure of `../a-door/theseus-kneel.md`. The frames:
 1. Shoved: the same, leaning into it, his hips back and his back leg braced straight behind him,
    while the struck body's lurch carries him on the horn to the left wall and back. Nothing of it
    in his box's first column, so that the clay round him never notches the wall he is shoved
-   against.
+   against. The bull's near hand reaches up at his chest in front of him, over his box's columns
+   6 to 12 and rows 8 to 13: his head, his neck and his shoulders whole over it, his kilt and his
+   legs under it, his far arm to the horn over it (`minotaur-hand`, frame 4).
 
 **The horn while it is in his reach** (drawn 2026-10-10): his far hand has it while it is within
 14 px of his far shoulder, a straight arm. The heave lifts it out of reach: he lets go of it to duck

@@ -28,6 +28,14 @@ x 147, in front of it, after L.
 - **Theseus unseen in it until L−8**: no reserve, no line, nothing of him inside x 148 to 164
   before he steps out, the clay-gap rule's one exception (2026-10-10). Black stepping out of
   black is what the rough build read best.
+- **He goes into it edge by edge.** Walking in (frames 398 to 401 of his route), all of him that
+  is over its black is black: his eye and his incisions are not drawn there. All of him that is
+  not yet in it is cut from its frame, the jambs and the lintel, by a line of reserved clay,
+  corners included, so his glaze never joins the black to the jamb through the pixel of clay
+  between them (`tests/minotaur-theseus.spec.ts`). (2026-10-10, after a check of the hero stage:
+  drawn first, his walking line cut him only from the vestibule and the post, so his glaze
+  bridged the black and the right jamb on 398 to 400, and his eye and an incision showed in the
+  black as clay on 400 and 401.)
 - **Never a ledge.** The rough's lintel was a 20 × 2 bar of the masonry's wash in row 5's air,
   where he can jump: stone that takes no weight. The frame is a line on the back wall.
 - No line of the masonry touches its black: the floor's joint under it, at x 160, begins a pixel

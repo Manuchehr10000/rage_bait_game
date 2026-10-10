@@ -168,15 +168,19 @@ Chosen in the asset notes (2026-10-10), where this file did not decide, for the 
   down into it, its arms straight to the stones, its shoulders behind its head; each hand gripping
   its stone, the palm on its top, three fingers down its face and the thumb laid forward along the
   top, parted by the one incision, never a hoof's two and never a rake; the stone held up with the
-  fingers across its face; the far arm always behind its body and head, raised from behind its
-  head to claw over its brow and above the hero's head, the near one behind its head only while it
-  thrashes, reaching up at his chest; after the swat its free hand back flat on its far stone, and
-  down on its hands on its stones; the swat a flat hand pressed on top of him, the palm the clap's
-  only; the heap's arm thrown over its head, and its head down lying on its cheek, horns up at its
-  back, the same in the tableau, where Theseus's hand has the horn at (88, 151), 3 px right of and
-  2 below where it was. Theseus stands between its body and its near arm: in front of its body,
-  head and far arm, behind its near arm, its hand and the near stone, each cut from the other by
-  clay, corners included, and his hand on the horn in front of it. (After a check of the drawn
+  fingers across its face, and gripped from above, the arm straight down to it, wherever it is
+  under the shoulder; taken up, and after the heave set down, in front of its own chest, right of
+  Theseus, so that nothing of it comes over him above his knees, and swung at him over his ducked
+  head; the far arm always behind its body and head, raised from behind its head to claw over its
+  brow and above the hero's head, the near one behind its head only while it thrashes, its hand
+  reaching up at the front of his chest, under his neck and over his hips; after the swat its free
+  hand down behind its head, then back flat on its far stone, and down on its hands on its stones;
+  nothing of it ever on the cell's stone; the swat a flat hand pressed on top of him, the palm the
+  clap's only; the heap's arm thrown over its head, and its head down lying on its cheek, horns up
+  at its back, the same in the tableau, where Theseus's hand has the horn at (88, 151), 3 px right
+  of and 2 below where it was. Theseus stands between its body and its near arm: in front of its
+  body, head and far arm, behind its near arm, its hand and the near stone, each cut from the other
+  by clay, corners included, and his hand on the horn in front of it. (After a check of the drawn
   bull, the same day: the crouched leg read as the digit 4, the flat hands as rakes, and its glaze
   met Theseus's at the corners on every frame from L+31.)
 - Theseus in the fight, as drawn (2026-10-10, `e-cell`, and the stand and the walk in `b-passage`):
@@ -190,7 +194,12 @@ Chosen in the asset notes (2026-10-10), where this file did not decide, for the 
   lunges in past the bull's near arm and is in front of all of it; the first goes under its jaw
   into its throat, the second rises into the throat of the jerked-up head. He gives way round the
   clap's palms by two pixels of clay; the ball is drawn over his heels as he steps out; and the
-  tourist's reserve goes under him too while he is off his feet, in the air or tossed.
+  tourist's reserve goes under him too while he is off his feet, in the air or tossed. Walking
+  into his doorway he is cut from its frame by a line of clay, corners included, and black in its
+  black, eye and incisions too: he goes into it edge by edge (`e-cell/hero-doorway.md`). (After a
+  check of the hero stage, 2026-10-10: the stone came down through him after the duck, the near
+  hand lay on his back in the lurch and went into the wall, and his glaze joined the doorway's
+  black to its jamb.)
 
 ## The beats
 
@@ -844,7 +853,11 @@ Being built, in this order, as a stage in the dev build (`#minotaur`, in `STAGES
   the two blows, in front of its near arm; and at guard over the heap. His blade is reserved clay
   over glaze; his hand has the horn while it is in reach; his line of clay round him never bites
   the floor, cream or the thread. The tourist's reserve goes under him off his feet. Pinned in
-  `tests/minotaur-bull.spec.ts`.
+  `tests/minotaur-bull.spec.ts`. Then, after a check, the same day: the stone taken up and set
+  down in front of the bull's own chest, never over him above his knees, and whole in its hand;
+  the near hand at the front of his chest in the lurch; nothing of the bull or of him on the
+  cell's stone; and his walk into his doorway cut from its frame and black in its black (pinned
+  in the same file and `tests/minotaur-theseus.spec.ts`).
 
 Still to come:
 

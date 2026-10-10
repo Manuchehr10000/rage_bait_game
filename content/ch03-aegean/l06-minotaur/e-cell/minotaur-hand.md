@@ -43,13 +43,25 @@ palm on y 728 to 731, straight on the stone's top row (y 732), the thumb at the 
 and the wrist near its back end, x 105 and x 115, and the fingers down the stone's face at x 102,
 104 and 106 (and 112, 114, 116), y 732 and 733. The two hands are 2 px of clay apart. They stay
 flat on their stones through the breath, which lifts the rest of it (`tests/minotaur-bull.spec.ts`).
-Frame 1 on the near stone from the grip until it sets it down; frame 2 for the free right hand
-from L+46 to 67, and the far hand's in the flails; frame 4 the near hand's in the flails; frame 3
-on him in the clap, one either side of him, with a line of clay between them and him. The swat's
-hand is frame 0, flat on top of him, carried down with him onto its brow or the floor, with a line
-of clay round it. Once it has set the stone down and stopped clawing, both hands go back down
-flat on their stones, the near one on the stone where it set it. The heap's hand, flat on the
-floor beyond its stones, has its fingers under the floor's line, unseen.
+From the grip until it sets it down, the near hand has the stone: frame 1, under it, while the
+stone is up at its shoulder or over it, so that the arm comes up to it from below; frame 0,
+gripping it from above, the palm on its top and the fingers down its face, while it is lower, the
+arm straight down to it, so that no arm or elbow ever lies across the stone (2026-10-10: held under
+it below the shoulder, the arm came down over the stone and left a few cream pixels of it). Frame
+2 for the free right hand from L+46 to 67, and the far hand's in the flails; frame 3 on him in the
+clap, one either side of him, with a line of clay between them and him; frame 4 the near hand's
+in the flails, reaching up at Theseus's chest: at the front of it, between him and its head, its
+top-left from its head's x and the floor, so that however its head tosses or it rears it is over
+his box's columns 6 to 12 and rows 8 to 13, under his neck and over his hips, its thumb short of
+its muzzle, and its arm, behind its head, never crosses him; and never on the wall's stone
+(`tests/minotaur-bull.spec.ts`). (Drawn first over his box's columns −1 to 6, behind his chest,
+it lay on his back and hips, and its fingers and their clay cut his kilt into a comb; at the
+wall it went into the stone. A check of the hero stage found it, 2026-10-10.) The swat's hand is frame 0, flat
+on top of him, carried down with him onto its brow or the floor, with a line of clay round it.
+The free hand, once it has stopped clawing, goes down behind its head, unseen, and once the near
+one has set the stone down, flat on its far stone; from then both hands are flat on their stones,
+the near one on the stone where it set it. The heap's hand, flat on the floor beyond its stones,
+has its fingers under the floor's line, unseen.
 
 The near hand, on its stone or holding it, is in front of Theseus, who stands at the bull's head
 with his feet by the near stone; the far hand is behind him (`minotaur-body`, Against Theseus).

@@ -1,8 +1,8 @@
 import { expect, test, type Page } from '@playwright/test';
 import { MINOTAUR } from '../src/levels/ch03-aegean/l06-minotaur';
 import type { FightDef, HeroDef, TableauDef } from '../src/engine/level';
-import { BREATH, BULL_HEAD, createEntity, HERO, STRUCK, type Fight, type Hero, type HeroFrame } from '../src/engine/entities';
-import { VIEW_H, VIEW_W } from '../src/engine/types';
+import { BREATH, BULL_HEAD, createEntity, HERO, STRUCK, type Fight, type Hero, type HeroFrame, type World } from '../src/engine/entities';
+import { TILE, VIEW_H, VIEW_W } from '../src/engine/types';
 import {
   BULL_HAND_FRAMES,
   BULL_HEAD_FRAMES,
@@ -26,11 +26,12 @@ import {
   heroDrawing,
   heroGrip,
   heroPicture,
+  type Hand,
   type HeroAgainst,
   type HeroDrawing,
   type Pixels,
 } from '../src/render/bull';
-import { CELL_FLOOR, cleanPresses, LEVEL } from './minotaur-run';
+import { CELL_FLOOR, cleanPresses, LEVEL, Run, type Press } from './minotaur-run';
 
 /**
  * The bull as drawn (src/render/bull.ts), held to its notes in
@@ -375,6 +376,115 @@ test("the duck: his head under the stone's arc with clay between, on every frame
   }
 });
 
+/** The pixels of a hand's drawing, as the game turns it, where it is. */
+function drawn(h: Hand): Set<string> {
+  const b = handBox(h);
+  const rows = h.right ? BULL_HAND_FRAMES[h.frame]!.rows : left(BULL_HAND_FRAMES[h.frame]!.rows);
+  const out = new Set<string>();
+  rows.forEach((r, j) => [...r].forEach((c, i) => c !== '.' && out.add(`${b.x + i},${b.y + j}`)));
+  return out;
+}
+
+test("the stone in its hand, from the grip until it is set down: whole on every frame, nothing on it but its own hand; taken up and set down in front of its own chest, never over Theseus above his knees", () => {
+  // His knees: the 15th row of his box, standing on the cell floor (y 727).
+  const knees = F - HERO.h + 15;
+  const wrong: string[] = [];
+  let k = C.grip;
+  for (; k < C.blow1; k++) {
+    const f = at(k);
+    const b = bullPose(f);
+    if (!b.stoneHeld) break;
+    const { body, front } = picture(f);
+    // Its cream all there but under its own hand: under it, its fingers across its face; or
+    // gripped from above, its top row cream under the palm. No arm lies across it.
+    const hand = drawn(b.near);
+    const topCream = b.near.frame === HAND_FLAT;
+    for (let j = 0; j < ST.h; j++) {
+      for (let i = 0; i < ST.w; i++) {
+        const x = b.stone.x + i;
+        const y = b.stone.y + j;
+        const cream = j === 0 ? topCream : i > 0 && i < ST.w - 1;
+        if (cream && !hand.has(`${x},${y}`) && body.get(x, y) !== 'o') wrong.push(`L+${k}: the stone not whole at (${x}, ${y})`);
+      }
+    }
+    // Nothing of its near arm, its hand or the stone, nor their line of clay, over him above
+    // his knees: the arm crosses only his shins, as the stones on the floor do.
+    for (const q of hisGlaze(heroPicture(heroAt(k), against(f)).back)) if (q.y < knees && front.get(q.x, q.y)) wrong.push(`L+${k}: over him at (${q.x}, ${q.y})`);
+  }
+  expect(wrong).toEqual([]);
+  // In its hand from the grip; set down on L + 74, before the first blow, before its face
+  // at x 98, its hand flat on it.
+  expect(k).toBe(C.heave + FIGHT.back.ease + 12);
+  const set = bullPose(at(k));
+  expect(set.stone).toEqual({ x: FIGHT.body.face - 6 - ST.w / 2, y: F - ST.h });
+  expect(handBox(set.near)).toMatchObject({ x: set.stone.x, y: set.stone.y - FLAT_ON });
+});
+
+test('struck, its near hand reaches up at his chest in front of him, between him and its head: in his front half, under his neck and over his hips, on every frame of the lurch; and its arm never crosses him', () => {
+  const wrong: string[] = [];
+  for (let k = C.blow1; k < FIGHT.toss.to; k++) {
+    const f = at(k);
+    const b = bullPose(f);
+    const h = heroAt(k);
+    expect(h.facing).toBe(1);
+    const x = Math.round(h.x);
+    const y = Math.round(h.y);
+    const n = handBox(b.near);
+    if (b.near.frame !== HAND_REACH) wrong.push(`L+${k}: not reaching`);
+    // His front half is the box's columns 6 to 11; its thumb may come a pixel past it, short of its muzzle.
+    if (n.x < x + 6 || n.x + n.w - 1 > x + 12) wrong.push(`L+${k}: the hand over his columns ${n.x - x} to ${n.x + n.w - 1 - x}`);
+    // His neck is row 5 of his box, and his hips rows 12 to 15: the hand from row 8 to 13.
+    if (n.y < y + 8 || n.y + n.h - 1 > y + 13) wrong.push(`L+${k}: the hand over his rows ${n.y - y} to ${n.y + n.h - 1 - y}`);
+    // Of its arm, nothing in his box but its wrist, a pixel from its hand.
+    for (const q of picture(f).front.each()) {
+      if (q.ink === '_' || q.x < x || q.x >= x + HERO.w || q.y < y || q.y >= y + HERO.h) continue;
+      if (q.x >= b.stone.x && q.x < b.stone.x + ST.w && q.y >= b.stone.y) continue;
+      if (q.x < n.x - 1 || q.x > n.x + n.w || q.y < n.y - 1 || q.y > n.y + n.h) wrong.push(`L+${k}: its arm across him at (${q.x - x}, ${q.y - y}) of his box`);
+    }
+  }
+  expect(wrong).toEqual([]);
+});
+
+test("nothing of the bull or of Theseus is ever drawn on the cell's stone: on every frame of the clean run's fight from L - 8, and of the toss at the wall, on its back and in the air, through its death", () => {
+  const stone = (x: number, y: number) => y < F && LEVEL.isSolid(Math.floor(x / TILE), Math.floor(y / TILE));
+  const attempts: [string, ((k: number) => Press | null) | null, string | null][] = [
+    ['the clean run', null, null],
+    ['the horns at the wall', () => ({ dir: -1, jump: false }), 'The horns'],
+    ['the horns on its back', (k) => (k < 59 ? null : { dir: 0, jump: false }), 'The horns'],
+    ['the horns in the air', (k) => (k < 57 ? null : { dir: 0, jump: (k - 57) % 12 < 10 }), 'The horns'],
+  ];
+  for (const [name, hands, cause] of attempts) {
+    const r = new Run();
+    const presses = cleanPresses();
+    const wrong: string[] = [];
+    let frames = 0;
+    let dying = 0;
+    for (let i = 0; i < 4000 && dying < 45; i++) {
+      const f = r.fight;
+      if (r.cause) {
+        // Dead: the game goes on updating everything but him for the 45 frames of his death.
+        const w = { level: LEVEL, player: r.p, cameraX: r.cam.x, events: r.events, alive: false, kill: () => undefined, sound: () => undefined } as unknown as World;
+        for (const e of r.entities) e.update(w);
+        dying++;
+      } else {
+        const k = f.keyed ? f.k + 1 : -Infinity;
+        r.tick((hands && k >= 0 ? hands(k) : null) ?? presses[i] ?? { dir: 0, jump: false });
+      }
+      if (!f.keyed || f.k < C.stepOut) continue;
+      if (!r.cause && f.k > C.blow2 + 20) break;
+      frames++;
+      const pic = picture(f);
+      const him = heroPicture(r.hero.frame!, against(f));
+      for (const [layer, p] of [['its body', pic.body], ['its near arm', pic.front], ['its hands on him', pic.over], ['Theseus', him.back], ['Theseus lunging', him.front]] as const) {
+        for (const q of p.each()) if (stone(q.x, q.y)) wrong.push(`${r.cause ? 'dead' : 'L+'}${f.k}: ${layer} at (${q.x}, ${q.y})`);
+      }
+    }
+    expect(r.cause, name).toBe(cause);
+    expect(frames, name).toBeGreaterThan(cause ? 100 : 150);
+    expect([...new Set(wrong)].slice(0, 10), name).toEqual([]);
+  }
+});
+
 test("the clap's catch point: two pixels of clear clay round its palms on him, whatever of Theseus is behind them", () => {
   // Walked up from the wall and clapped before its face at L + 31, as Theseus lands there.
   const f = at(31);
@@ -416,11 +526,14 @@ async function open(page: Page): Promise<void> {
   expect(errors).toEqual([]);
 }
 
-/** Every frame of an attempt from L - 8 on, and of its death: Theseus's glaze, the bull's and where they touch. */
-async function looked(page: Page, name: string, hands: string | null): Promise<{ cause: string | null; frames: number; bull: number; him: number; touches: string[] }> {
+/**
+ * Every frame of an attempt from L - 8 on, and of its death: Theseus's glaze, the bull's
+ * and where they touch; and anything of either drawn on the cell's stone.
+ */
+async function looked(page: Page, name: string, hands: string | null): Promise<{ cause: string | null; frames: number; bull: number; him: number; touches: string[]; stone: string[] }> {
   await open(page);
   return page.evaluate(
-    ({ presses, floor, view, glaze, name, hands }) => {
+    ({ presses, floor, view, glaze, name, hands, tile }) => {
       const g = (window as unknown as W).__game;
       g.titleTimer = 0;
       const fight = () => g.entities.find((e: { def: { kind: string } }) => e.def.kind === 'fight');
@@ -454,7 +567,10 @@ async function looked(page: Page, name: string, hands: string | null): Promise<{
         if (x === 0 && y === 0 && w === view.w * 4 && h === floor) bull = depth;
         P.rect.call(this, x, y, w, h);
       };
+      const stone = (x: number, y: number) => y < floor && g.level.isSolid(Math.floor(x / tile), Math.floor(y / tile));
       ctx.fillRect = function (x: number, y: number, w: number, h: number) {
+        // Anything the bull draws, in any ink, on the stone.
+        if (mark && bull >= 0) for (let j = y; j < y + h; j++) for (let i = x; i < x + w; i++) if (stone(i, j) && seen.stone.length < 20) seen.stone.push(`${at}: the bull at (${i}, ${j})`);
         if (mark && bull >= 0 && this.fillStyle === glaze) {
           this.fillStyle = '#00ff00';
           P.fillRect.call(this, x, y, w, h);
@@ -469,9 +585,11 @@ async function looked(page: Page, name: string, hands: string | null): Promise<{
       };
       const GL = parseInt(glaze.slice(1), 16);
       const GREEN = 0x00ff00;
-      const seen = { frames: 0, bull: 0, him: 0, touches: [] as string[] };
+      const seen = { frames: 0, bull: 0, him: 0, touches: [] as string[], stone: [] as string[] };
+      let at = '';
       /** This frame: the bull's glaze, green, against his, which is the glaze that goes when he does. */
-      const look = (at: string) => {
+      const look = (now: string) => {
+        at = now;
         mark = true;
         g.draw();
         const all = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height).data;
@@ -486,6 +604,8 @@ async function looked(page: Page, name: string, hands: string | null): Promise<{
           for (let i = 1; i < view.w - 1; i++) {
             const c = ink(all, i, j);
             if (c === GL && ink(without, i, j) !== GL) seen.him++;
+            // Anything of Theseus on the stone: what goes when he does.
+            if (c !== ink(without, i, j) && stone(i, j + g.camera.iy) && seen.stone.length < 20) seen.stone.push(`${at}: Theseus at (${i}, ${j + g.camera.iy})`);
             if (c !== GREEN) continue;
             seen.bull++;
             for (const [dx, dy] of [[-1, -1], [0, -1], [1, -1], [-1, 0], [1, 0], [-1, 1], [0, 1], [1, 1]] as const) {
@@ -512,11 +632,11 @@ async function looked(page: Page, name: string, hands: string | null): Promise<{
       return { cause, ...seen, touches: seen.touches.slice(0, 20) };
     },
     // The vase's glaze (VASE_INK.glaze, src/render/procedural.ts), as the canvas gives it back.
-    { presses: cleanPresses(), floor: F, view: { w: VIEW_W, h: VIEW_H }, glaze: '#1f140e', name, hands },
+    { presses: cleanPresses(), floor: F, view: { w: VIEW_W, h: VIEW_H }, glaze: '#1f140e', name, hands, tile: TILE },
   );
 }
 
-test("in the game: no glaze of the bull's touches Theseus's, corners included, on any frame of the clean run's fight, the clap, the swat or the toss", async ({ context }) => {
+test("in the game: no glaze of the bull's touches Theseus's, corners included, and nothing of either is drawn on the cell's stone, on any frame of the clean run's fight, the clap, the swat or the toss", async ({ context }) => {
   test.setTimeout(120_000);
   // From L on, by the fight's clock: these hands, or the clean run's own where they give none.
   const attempts: [string, string | null, string | null][] = [
@@ -527,6 +647,7 @@ test("in the game: no glaze of the bull's touches Theseus's, corners included, o
     ['the swat on the floor', '(k) => ({ dir: k >= 34 ? 1 : 0, jump: false })', 'The hands'],
     ['the horns on its back', '(k) => (k < 59 ? null : { dir: 0, jump: false })', 'The horns'],
     ['the horns at the wall', '() => ({ dir: -1, jump: false })', 'The horns'],
+    ['the horns in the air', '(k) => (k < 57 ? null : { dir: 0, jump: (k - 57) % 12 < 10 })', 'The horns'],
   ];
   for (const [name, hands, cause] of attempts) {
     // A fresh page each time: the clean run's hands are the first attempt's, from the spawn.
@@ -538,6 +659,7 @@ test("in the game: no glaze of the bull's touches Theseus's, corners included, o
     expect(r.frames, name).toBeGreaterThan(cause ? 60 : 150);
     expect([r.bull > 0, r.him > 0], name).toEqual([true, true]);
     expect(r.touches, name).toEqual([]);
+    expect(r.stone, name).toEqual([]);
   }
 });
 

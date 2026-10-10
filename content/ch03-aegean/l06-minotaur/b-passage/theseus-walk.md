@@ -25,9 +25,12 @@ The stride changes every 9 px he goes, every 3 frames.
 ## Where it stands in the game
 
 - Along the passage after the knot, from the post to O1, looking back at his knot for his first
-  10 frames (frames 2 and 3), and through the vestibule, cut from its black by a reserved line.
+  10 frames (frames 2 and 3), and through the vestibule, cut from its black and the post by a
+  reserved line, corners included (2026-10-10: drawn a pixel left, right, up and down only, it left
+  his glaze touching the black at the corners).
 - Along G0 overhead, heard; along each pillar top and room to the next way down; along row 5 and
-  into his doorway.
+  into his doorway, cut from its frame by the same line and black in its black
+  (`../e-cell/hero-doorway.md`).
 - In the fight, out to the edge of row 5 after he steps out, at guard (frames 4 and 5): he comes
   out of the black with his sword drawn (drawn 2026-10-10; the notes did not say, and the sword in
   its scabbard there would have come into his hand between his stand on the edge and his leap).

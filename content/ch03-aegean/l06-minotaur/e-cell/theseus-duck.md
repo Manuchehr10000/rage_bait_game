@@ -27,7 +27,11 @@ At the horn, from L+58 for 5 frames, while the stone swings over him.
 - **A pose that reads: a man ducking**, never the rough's small black block.
 - **His head under the stone's arc**, with clay between them: the stone is swung at him and misses
   him. On every frame of the duck his head's top is more than a pixel under the stone and the hand
-  that holds it (`tests/minotaur-bull.spec.ts`).
+  that holds it (`tests/minotaur-bull.spec.ts`). Missed, the stone is never brought down on him
+  as he rises: it is drawn back in front of the bull's own chest and set down at his feet, never
+  over him above his knees (`minotaur-stone`; 2026-10-10, after a check of the hero stage: drawn
+  first, it came down from the end of the swing through his face, chest and belly, and the duck's
+  end read as the stone hitting him).
 - **Nothing of him across the stone's arc**: no arm up to the horn through it.
 - Clay between him and the bull everywhere they meet.
 - As `../a-door/theseus-kneel.md`, "Theseus, in every pose".

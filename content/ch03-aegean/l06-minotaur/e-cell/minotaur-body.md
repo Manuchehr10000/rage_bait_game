@@ -58,11 +58,13 @@ In the cell, on one clock from L, the frame the tourist comes down on its floor:
 - **The clap**, if it catches him to L+39: it rears up 12 px off its stones, a man for a moment,
   up on its feet; its palms are together on him from the second frame of the catch, go down with
   him to its feet from the sixth to the ninth, and are back on the stones by the fourteenth.
-- **The grip**, L+40 to 46: it takes the near stone up in its left hand, up before its face and
-  back over its head to its raised place over its shoulder, and sinks onto its knees; its right
-  hand leaves the far stone two frames on, as the near stone goes over, and rises to claw. Its
-  back goes from 20 to 10, the thigh folded over the shin, the knee on the floor ahead of the hip
-  and the foot behind, its sole turned up.
+- **The grip**, L+40 to 46: it takes the near stone up in its left hand, up and back in front of
+  its own face, right of the hero who stands before it, and over its head to its raised place
+  over its shoulder (`minotaur-stone`), and sinks onto its knees; its right hand leaves the far
+  stone two frames on, as the near stone goes over, and rises to claw. Its back goes from 20 to
+  10, the thigh folded over the shin, the knee on the floor ahead of the hip and the foot behind,
+  its sole turned up and never past its rump: nothing of it on the far wall's stone. (Drawn
+  first, 2026-10-10, the sole went 2 px into the far wall, in the kneel and in the heap.)
 - **L+46 to 67**: on its knee, the stone raised up and back in its left hand, its free right hand
   clawing at the hero's hand on the horn, its arm raised from behind its head, the elbow behind its
   horns, a loop of seven places over its brow and above the hero's head, which stands in front of
@@ -71,13 +73,17 @@ In the cell, on one clock from L, the frame the tourist comes down on its floor:
   under its jaw, in front of its brow, the claw lay behind the hero's head, hidden.)
 - **The heave**, L+56 to 62: its back rises from 10 to 30, up on its feet again, as it swings
   the stone over its head and down at the ducking hero (the duck at L+58), the arm straight from
-  the shoulder; held at 30 to L+68, back to 10 by L+74. It sets the stone down before it, at x 98,
-  its hand flat on it, and its free hand goes back down flat on the far stone once it stops
-  clawing.
+  the shoulder; held at 30 to L+68, back to 10 by L+74. Missed, it draws the stone back in front
+  of its own chest, clear of the hero, brings it down there and slides it along the floor to
+  where it sets it down before it, at x 98, on L+74, its hand flat on it: nothing of the stone,
+  the hand or the arm comes over him above his knees (`minotaur-stone`). Its free hand goes down
+  behind its head once it stops clawing, and flat on the far stone once the near one is set down.
 - **The first blow**, L+76: to L+105 the struck body lurches on both knees to the left wall and
   back, 46 px and back, thrashing, both hands flailing at the hero on its horn, two frames a
-  place: the near one low, reaching up at his chest in front of him (`minotaur-hand`, frame 4), the
-  far one high over its horns, behind him; never both up over its horns. (Drawn first both before
+  place: the near one low, reaching up at his chest in front of him, at the front of it between
+  him and its head, under his neck and over his hips, its arm behind its head and never across
+  him (`minotaur-hand`, frame 4), the far one high over its horns, behind him; never both up over
+  its horns. (Drawn first both before
   its head, they lay behind him, merged with his glaze.)
 - **The toss**, if it has him: it rears up on its knees, up to 14 px, and tosses its head up at
   him, its head tossed up while he is on its horns; where the lurch cannot reach him the head
@@ -115,7 +121,10 @@ In the cell, on one clock from L, the frame the tourist comes down on its floor:
   air, flat on the floor before its knee if not.
 - **The lurch on both knees, thrashing: never a step, a run or a turn toward the tourist**
   (`content/research/arc.md`, section 4). A Minotaur that charges is Karnak's scarab.
-- **The stone is never thrown.**
+- **The stone is never thrown**, and never brought down on the hero: swung at him over his
+  ducked head, it is drawn back in front of its own chest (`minotaur-stone`).
+- **Nothing of it on the cell's stone**, on any frame of the fight or of the toss
+  (`tests/minotaur-bull.spec.ts`): its hands, its foot and its head keep to the cell's clay.
 - **Bloodless, and no added red on it anywhere**, on a wound, a blow or the heap. Its damage shows
   only in its body: thrashing, then down on its hands, then a heap.
 - Never Picasso's, Renault's or Borges's (`../LEVEL.md`): a monster, not Asterion; no modern

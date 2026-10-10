@@ -373,21 +373,43 @@ const CLAW: readonly Pt[] = [
 ];
 /**
  * Its hands thrashing as the struck body lurches, at the hero on its horn, two frames
- * each: the near hand's and the far hand's top-left from its head's. The near one low,
- * at his chest, in front of him; the far one high over its horns, behind him. Never
- * both up over its horns.
+ * each. The near one low, reaching up at his chest, in front of him: its top-left from
+ * its head's x and the floor, so that it is at the front of his chest, between him and its
+ * head, however its head tosses or it rears, and never on his hips or his back. The far one
+ * high over its horns, behind him: its top-left from its head's. Never both up over its
+ * horns.
  */
 const FLAIL: readonly (readonly [Pt, Pt])[] = [
-  [{ x: -14, y: 1 }, { x: -1, y: -11 }],
-  [{ x: -12, y: 3 }, { x: 2, y: -12 }],
-  [{ x: -15, y: 2 }, { x: -3, y: -10 }],
-  [{ x: -13, y: 4 }, { x: 1, y: -13 }],
+  [{ x: -8, y: -16 }, { x: -1, y: -11 }],
+  [{ x: -8, y: -15 }, { x: 2, y: -12 }],
+  [{ x: -8, y: -16 }, { x: -3, y: -10 }],
+  [{ x: -8, y: -15 }, { x: 1, y: -13 }],
 ];
 /** The near arm's reach, from the shoulder to the wrist, raising and swinging the stone. */
 const SWING_R = 18;
-/** Its angle over the forward line, in degrees: the stone raised up and back, and swung forward and down. */
+/**
+ * Its angle over the forward line, in degrees: the stone raised up and back, and swung
+ * forward over the ducking hero to the end of its reach, in front of its face, where the
+ * hand under it is still clear of it.
+ */
 const STONE_RAISED = 112;
-const STONE_SWUNG = -15;
+const STONE_SWUNG = 4;
+/**
+ * Missed, it brings the stone back in and sets it down: the stone's top-left by frames from
+ * the swing's end, in px from where it is set down. Drawn back in front of its own chest,
+ * clear of the hero, and brought down there, gripped from above; only at the floor is it
+ * slid to its place, in front of the far stone, so that nothing of it comes down over him
+ * above his knees.
+ */
+const SET_DOWN: readonly { f: number; x: number; y: number }[] = [
+  { f: 1, x: 9, y: -22 },
+  { f: 2, x: 9, y: -17 },
+  { f: 5, x: 10, y: -14 },
+  { f: 7, x: 10, y: -10 },
+  { f: 9, x: 9, y: -4 },
+  { f: 10, x: 8, y: 0 },
+  { f: 12, x: 0, y: 0 },
+];
 
 /** The bull on a frame, for drawing it. */
 export interface BullPose {
@@ -403,7 +425,10 @@ export interface BullPose {
   /** Its near hand, the left, which takes the stone up at the grip; and its far hand, the right. */
   near: Hand;
   far: Hand;
-  /** The near stone's top-left: under its hand, in it, or put down; and whether it is in its hand. */
+  /**
+   * The near stone's top-left: under its hand, in it, or put down; and whether it is in its
+   * hand, off the floor where it lay or where it is set down.
+   */
   stone: Pt;
   stoneHeld: boolean;
   /** Its hands are on him: the palms of the clap, or the swat. Drawn over him. */
@@ -474,10 +499,13 @@ export function bullPose(f: Fight): BullPose {
     x: Math.round(sn.x - SWING_R * Math.cos((deg * Math.PI) / 180)) - HOLD_WRIST.x,
     y: Math.round(sn.y - SWING_R * Math.sin((deg * Math.PI) / 180)) - HOLD_WRIST.y,
   });
-  // Its hand on the stone at `s`: holding it, its fingers across its face; flat on its top
-  // where the stone is too near the floor for the hand to be under it.
+  // Its hand on the stone at `s`: under it, its fingers across its face, while the stone is
+  // up at its shoulder or over it, so that the arm comes up to it from below; gripping it
+  // from above, the palm on its top and the fingers down its face, while it is lower, so
+  // that the arm comes down to it and never across it; and so too on the floor.
+  const gripping = (s: Pt): Hand => handAt(HAND_FLAT, { x: s.x, y: s.y - FLAT_ON });
   const holding = (s: Pt): Hand =>
-    s.y + HOLD_WRIST.y > F - 1 ? handAt(HAND_FLAT, { x: s.x, y: s.y - FLAT_ON }) : { frame: HAND_HOLD, wrist: { x: s.x + HOLD_WRIST.x, y: s.y + HOLD_WRIST.y } };
+    sn.y < s.y + HOLD_WRIST.y - 1 || s.y + HOLD_WRIST.y > F - 1 ? gripping(s) : { frame: HAND_HOLD, wrist: { x: s.x + HOLD_WRIST.x, y: s.y + HOLD_WRIST.y } };
   const claw = (kk: number): Hand => {
     const p = CLAW[(((kk - c.knee) % CLAW.length) + CLAW.length) % CLAW.length]!;
     return handAt(HAND_CLAW, { x: head.x + p.x, y: head.y + p.y });
@@ -488,6 +516,7 @@ export function bullPose(f: Fight): BullPose {
   let far: Hand;
   let on: BullPose['on'] = null;
   let stoneAt: Pt = nearStone;
+  let carried = false;
   if (clapping && caught) {
     const palms = palmsOn(clapHeld(f, u));
     const rest: [Hand, Hand] = crouched ? [flatOn(st.near), flatOn(st.far)] : [holding(raised(STONE_RAISED)), claw(k)];
@@ -510,41 +539,56 @@ export function bullPose(f: Fight): BullPose {
     near = flatOn(st.near);
     far = flatOn(st.far);
   } else if (k < c.knee) {
-    // The grip: it takes the near stone up, in front of its face and back over its head, as
-    // it sinks to its knee; its far hand leaves its stone as the near one goes over.
+    // The grip: it takes the near stone up and back, in front of its own face, clear of the
+    // hero before it, and over its head, as it sinks to its knee; its far hand leaves its
+    // stone as the near one goes over.
     const t = (k - c.grip + 1) / (c.knee - c.grip);
-    const lift = { x: st.near, y: F - st.h - 32 };
+    const lift = { x: st.near + 22, y: F - st.h - 32 };
     const to = raised(STONE_RAISED);
     stoneAt = at({
       x: (1 - t) * (1 - t) * nearStone.x + 2 * t * (1 - t) * lift.x + t * t * to.x,
       y: (1 - t) * (1 - t) * nearStone.y + 2 * t * (1 - t) * lift.y + t * t * to.y,
     });
+    carried = stoneAt.x !== nearStone.x || stoneAt.y !== nearStone.y;
     near = holding(stoneAt);
     const u2 = Math.max(0, (k - c.grip - 2) / (c.knee - c.grip - 3));
     far = u2 <= 0 ? flatOn(st.far) : { frame: HAND_CLAW, wrist: at(lerp(flatOn(st.far).wrist, claw(c.knee).wrist, Math.min(1, u2))) };
   } else if (k < c.heave) {
     stoneAt = raised(STONE_RAISED);
+    carried = true;
     near = holding(stoneAt);
     far = claw(k);
   } else if (k <= c.heave + d.back.ease) {
-    // The heave: the stone swung over its head and down at the ducking hero.
+    // The heave: the stone swung over its head and on at the ducking hero, over him.
     const t = (k - c.heave + 1) / (d.back.ease + 1);
     stoneAt = raised(STONE_RAISED + (STONE_SWUNG - STONE_RAISED) * t);
+    carried = true;
     near = holding(stoneAt);
     far = claw(k);
   } else if (k < c.blow1) {
-    // The stone set down before it, the hand flat on it; the free hand back down flat on its
-    // far stone once it has stopped clawing.
-    const t = Math.min(1, (k - c.heave - d.back.ease) / 8);
-    stoneAt = at(lerp(raised(STONE_SWUNG), put, t));
+    // Missed: the stone drawn back in front of its chest, gripped from above, brought down
+    // there and slid along the floor to where it is set down, the hand flat on it. The free
+    // hand goes down behind its head once it has stopped clawing, and flat on its far stone
+    // once the near one is set down.
+    const f = k - c.heave - d.back.ease;
+    const i = SET_DOWN.findIndex((p) => p.f >= f);
+    const there = (p: { f: number; x: number; y: number }) => ({ f: p.f, x: put.x + p.x, y: put.y + p.y });
+    if (i < 0) stoneAt = put;
+    else {
+      const a = i > 0 ? there(SET_DOWN[i - 1]!) : { f: 0, ...raised(STONE_SWUNG) };
+      const b = there(SET_DOWN[i]!);
+      stoneAt = at(lerp(a, b, (f - a.f) / (b.f - a.f)));
+    }
+    carried = stoneAt.x !== put.x || stoneAt.y !== put.y;
     near = holding(stoneAt);
-    far = k < d.swat.to ? claw(k) : flatOn(st.far);
+    // Behind its head, its hand is wholly inside the head's outline: unseen.
+    far = k < d.swat.to ? claw(k) : carried ? handAt(HAND_FLAT, { x: head.x + 1, y: head.y + 4 }) : flatOn(st.far);
   } else {
     stoneAt = put;
     if (k < d.toss.to) {
       // Struck: it thrashes, both hands, as it lurches on its knees.
       const [a, b] = FLAIL[Math.floor((k - c.blow1) / 2) % FLAIL.length]!;
-      near = handAt(HAND_REACH, { x: head.x + a.x, y: head.y + a.y });
+      near = handAt(HAND_REACH, { x: head.x + a.x, y: F + a.y });
       far = handAt(HAND_CLAW, { x: head.x + b.x, y: head.y + b.y });
     } else {
       // Down on its hands before the second blow, on its stones.
@@ -569,7 +613,7 @@ export function bullPose(f: Fight): BullPose {
     near,
     far,
     stone: stoneAt,
-    stoneHeld: near.frame === HAND_HOLD && !clapping,
+    stoneHeld: carried && !clapping,
     on,
   };
 }
@@ -1204,8 +1248,9 @@ function leg(p: Pixels, x1: number, top: number, floor: number, kneeling = false
     feet(p, x1, hip, floor, thigh);
     return;
   }
-  // On its feet the foot is under the hip; as it sinks the foot goes back, under the rump.
-  const back = kneeling ? 5 : Math.max(0, Math.min(5, (18 - room) * 0.75));
+  // On its feet the foot is under the hip; as it sinks the foot goes back, under the rump,
+  // its sole never past the rump's end: nothing of it is drawn on the far wall's stone.
+  const back = kneeling ? 3 : Math.max(0, Math.min(3, (18 - room) * 0.75));
   const ankle = { x: hip.x + 1 + back, y: floor - 3 };
   const dx = ankle.x - hip.x;
   const dy = ankle.y - hip.y;
@@ -1309,7 +1354,7 @@ export function bullPicture(f: Fight, masonry: Masonry): { body: Pixels; front: 
     const sf = farShoulder(b.x0, b.top);
     const farStone = { x: st.far, y: F - st.h };
     const floor = [stone(farStone.x, farStone.y, st.w, st.h, lyingOn(b.far, farStone))];
-    const nearStone = b.stoneHeld ? stone(b.stone.x, b.stone.y, st.w, st.h, false) : stone(b.stone.x, b.stone.y, st.w, st.h, lyingOn(b.near, b.stone));
+    const nearStone = stone(b.stone.x, b.stone.y, st.w, st.h, lyingOn(b.near, b.stone));
     if (!b.stoneHeld) floor.push(nearStone);
     // The far arm, the right, behind its body and its head, whatever it does. Clawing, it
     // is raised from behind its head, the elbow up behind its horns, and the claw comes
@@ -1322,8 +1367,11 @@ export function bullPicture(f: Fight, masonry: Masonry): { body: Pixels; front: 
     leg(body, b.x1, b.top, F);
     // The near arm, the left, cut from the body: behind its head when it thrashes about it,
     // in front of everything when it is down on a stone or has the stone up in it.
+    // Carrying the stone below its shoulder, gripped from above, the arm is straight to it:
+    // no elbow comes down across the stone.
     const nearArm = new Pixels();
-    armTo(nearArm, sn, b.near, b.on !== 'clap');
+    const gripped = b.stoneHeld && b.near.frame === HAND_FLAT;
+    armTo(nearArm, sn, b.near, b.on !== 'clap', gripped ? lerp(sn, b.near.wrist, 0.5) : undefined);
     const thrashing = b.near.frame === HAND_CLAW || b.near.frame === HAND_REACH;
     if (thrashing) body.lay(nearArm, 'reserve', sn);
     // The neck, and a bull's head on it, out to it on a stretched neck where it lunges.

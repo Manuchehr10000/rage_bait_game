@@ -2187,7 +2187,7 @@ function drawEntityBack(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): voi
       break;
     case 'hero': {
       // In the fight, against the bull: his left hand on its near horn, his blade over it.
-      drawHeroBack(ctx, e as Hero, heroAgainst(s), doorGlaze(s));
+      drawHeroBack(ctx, e as Hero, heroAgainst(s), doorGlaze(s), heroDoorway(s));
       break;
     }
     case 'ear':
@@ -4598,6 +4598,17 @@ function doorposts(s: Scene): Rect[] {
 }
 /** The glaze at the door: the vestibule's black, and the post, which the story's people are cut from where they pass in front of them. */
 const doorGlaze = (s: Scene): Rect[] => [{ ...VESTIBULE }, ...doorposts(s)];
+/**
+ * The hero's black doorway on row 5 (e-cell/hero-doorway.md): its black, and its frame,
+ * the jambs and the lintel with the pixel of clay between them and the black. Walking into
+ * it he is cut from the frame by a reserved line, and goes into the black edge by edge.
+ */
+function heroDoorway(s: Scene): { black: Rect; frame: Rect[] } | null {
+  const d = s.level.data.decor.find((x) => x.kind === 'blackDoorway');
+  if (!d || d.kind !== 'blackDoorway') return null;
+  const black = { x: d.x, y: d.top, w: d.w, h: d.floorY - d.top };
+  return { black, frame: without({ x: d.x - 2, y: d.top - 2, w: d.w + 4, h: d.floorY - d.top + 2 }, black) };
+}
 /** The masonry's courses, in tiles: two tiles high, counted from the level's top; its blocks are as long. */
 const LABYRINTH_COURSE = 2;
 /** Outside the door: the open clay over the roof, and in front of the outer face down to the ground. */
@@ -4935,7 +4946,7 @@ function fillGrip(ctx: CanvasRenderingContext2D, f: HeroFrame, horn: { x: number
  * tableau, his far hand, the left, is on its horn at `horn`. Drawn in `ink`; the thread he
  * carries only in the glaze. In the fight he is his picture (`drawHeroIncised`).
  */
-function drawHeroFigure(ctx: CanvasRenderingContext2D, f: HeroFrame, horn: { x: number; y: number } | null = null, ink: string = MN.glaze): void {
+function drawHeroFigure(ctx: CanvasRenderingContext2D, f: HeroFrame, horn: { x: number; y: number } | null = null, ink: string = MN.glaze, black?: Rect): void {
   const x0 = Math.round(f.x);
   const y0 = Math.round(f.y);
   const face = f.facing;
@@ -4946,6 +4957,15 @@ function drawHeroFigure(ctx: CanvasRenderingContext2D, f: HeroFrame, horn: { x: 
   const sprite = heroSprite(f);
   if (!sprite) return;
   blitFacing(ctx, glaze ? sprite : silhouette(sprite, ink), x0, y0, face);
+  if (glaze && black && overlap(black, { x: x0, y: y0, w: sprite.w, h: sprite.h })) {
+    // Over the black, all of him glaze: no eye, no incision, black in black.
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(black.x, black.y, black.w, black.h);
+    ctx.clip();
+    blitFacing(ctx, silhouette(sprite, MN.glaze), x0, y0, face);
+    ctx.restore();
+  }
   ctx.fillStyle = ink;
   if (f.pose === 'crouch') {
     // Paying out: the loop grows from his hand to the floor, and the ball is in it.
@@ -5199,9 +5219,15 @@ function drawLaidThread(ctx: CanvasRenderingContext2D, h: Hero, f: HeroFrame): v
  * unless he is climbing. In the fight he is drawn against the bull, `against`, and then
  * the thread, which ends at the ball he left in his doorway.
  */
-function drawHeroBack(ctx: CanvasRenderingContext2D, h: Hero, against: HeroAgainst | null, doorway: readonly Rect[]): void {
+function drawHeroBack(ctx: CanvasRenderingContext2D, h: Hero, against: HeroAgainst | null, doorway: readonly Rect[], his: { black: Rect; frame: Rect[] } | null): void {
   const d = h.def;
   const f = h.frame;
+  // Through the door and the black vestibule, cut from them by a reserved line; and into his
+  // own doorway, cut from its frame, never from its black, where nothing of his clay is drawn:
+  // he goes into the black edge by edge. The line first, and the thread over it: the clay
+  // round him is for glaze, and never bites the thread's white.
+  const walking = f && f.pose !== 'hold' && !h.stepped && !f.front && !f.unseen ? f : null;
+  if (walking) drawHeroReserve(ctx, walking, his ? [...doorway, ...his.frame] : doorway);
   if (h.stepped) {
     // In the fight; and laid to his doorway, where he waited, and the ball there on the
     // floor, at his heels as he steps out: never cut by the clay round him, which is for glaze.
@@ -5217,17 +5243,13 @@ function drawHeroBack(ctx: CanvasRenderingContext2D, h: Hero, against: HeroAgain
   ctx.fillStyle = THREAD;
   ctx.fillRect(d.knot.x, d.knot.y - 1, 2, 3);
   if (!f || f.pose === 'hold') drawHeroAtThePost(ctx, h);
-  else if (!h.stepped && !f.front && !f.unseen) {
-    // Through the door and the black vestibule, cut from them by a reserved line.
-    drawHeroReserve(ctx, f, doorway);
-    drawHeroFigure(ctx, f);
-  }
+  else if (walking) drawHeroFigure(ctx, walking, null, MN.glaze, his?.black);
 }
 
 /**
- * A reserved line of clay round Theseus as he is drawn this frame, a pixel left, right,
- * up and down, only on `on`: the glaze he passes in front of, where nothing else would
- * part him from it. Over the clay it is the clay.
+ * A reserved line of clay round Theseus as he is drawn this frame, a pixel all round him,
+ * corners included, only on `on`: the glaze he passes in front of, where nothing else
+ * would part him from it. Over the clay it is the clay.
  */
 function drawHeroReserve(ctx: CanvasRenderingContext2D, f: HeroFrame, on: readonly Rect[]): void {
   const box: Rect = { x: Math.round(f.x) - 2, y: Math.round(f.y) - 2, w: HERO.w + 4, h: HERO.h + 4 };
@@ -5238,10 +5260,14 @@ function drawHeroReserve(ctx: CanvasRenderingContext2D, f: HeroFrame, on: readon
   for (const r of clip) ctx.rect(r.x, r.y, r.w, r.h);
   ctx.clip();
   for (const [dx, dy] of [
+    [-1, -1],
+    [0, -1],
+    [1, -1],
     [-1, 0],
     [1, 0],
-    [0, -1],
+    [-1, 1],
     [0, 1],
+    [1, 1],
   ] as const) {
     ctx.save();
     ctx.translate(dx, dy);
