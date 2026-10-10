@@ -127,11 +127,14 @@ Decided while building, and not objected to (2026-10-10):
   through.
 
 Chosen in the asset notes (2026-10-10), where this file did not decide, for the designer to see:
-- The tongues over the outside only, x 0 to 75 and y 56 to 64: on the first screen, and out of
-  his reach; they hang, with no line over them. Under the ground line, a plain band of the wash
-  with no joints, the outer face going on down beside it at x 80 (when the world was drawn,
-  2026-10-10: the notes first had the masonry there); the ground line is glaze between two
-  reserved rows, so no glaze foot touches it.
+- The tongues over the outside only, x 42 to 75 and y 56 to 64: on the first screen, and out of
+  his reach; they hang, with no line over them. Five, right of the death counter's column: the
+  HUD stays as it is, and as the camera rises over the vault and the knot the counter passes
+  through the band's rows. (When the world was drawn, 2026-10-10, eleven ran from x 0, and the
+  counter covered nearly half of them; a check of the stage moved them.) Under the ground line,
+  a plain band of the wash with no joints, the outer face going on down beside it at x 80 (when
+  the world was drawn, 2026-10-10: the notes first had the masonry there); the ground line is
+  glaze between two reserved rows, so no glaze foot touches it.
 - The masonry's blocks square, two tiles each way: a longer block would lose the bed's joint at
   x 112. A line runs under any block over air, its whole length, so the two holes in each room,
   one against each end wall, keep the same line. (When the world was drawn, 2026-10-10: the notes
@@ -140,8 +143,9 @@ Chosen in the asset notes (2026-10-10), where this file did not decide, for the 
   front at about x 42; Ariadne moved to about x 45 to 55 (beat a).
 - A 1 px line of reserved clay round the tourist wherever glaze is behind him, never on the
   costume and never inside the hero's doorway before L−8.
-- The boss drawn as a knob in outline, and the hero's doorway framed by a line, not the rough's
-  lintel of stone in row 5's air.
+- The boss drawn as a small round knob of filled glaze, 5 by 3, and the hero's doorway framed by
+  a line, not the rough's lintel of stone in row 5's air. (Drawn first in outline, as a ring, the
+  knob read as the letter o beside the ball; a check of the stage filled it, 2026-10-10.)
 - No added red on Theseus anywhere; the youths' red fillets tell them from him. The stones in
   cream; the hands' one incision parts the thumb from the fingers. No tail. No dust in the cell,
   and the dust in 2 × 2 grains, the jet in 1 px.

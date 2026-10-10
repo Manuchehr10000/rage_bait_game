@@ -613,6 +613,43 @@ test('in the game: the two holes in the ceiling of each room are pixel for pixel
   }
 });
 
+test('in the game: the death counter never lies on the tongues: its ink ends left of the band at x 42 at up to 99 deaths, so at any height of the camera', async ({ page }) => {
+  await open(page);
+  const r = await page.evaluate(() => {
+    const g = (window as unknown as W).__game;
+    g.titleTimer = 0;
+    // The dev ruler's numbers are not the player's: the tools hidden, as G hides them.
+    g.dev.on = false;
+    const band = (g.levelData.decor as { kind: string; x0?: number }[]).find((d) => d.kind === 'tongues')!;
+    // The HUD's words, as it sets them on the screen: where the ink of each ends, in view
+    // px. The level is one screen wide, so the camera never moves sideways and a view x
+    // is a world x; the band hangs at the top of the first screen and the counter at the
+    // top left of every screen, so as the camera rises and falls they meet unless their
+    // columns are apart.
+    const ctx = g.ctx as CanvasRenderingContext2D;
+    const ends: { text: string; right: number }[] = [];
+    const watch = (draw: CanvasRenderingContext2D['fillText']) =>
+      function (this: CanvasRenderingContext2D, text: string, x: number, y: number) {
+        const m = ctx.measureText(text);
+        ends.push({ text, right: (x + m.actualBoundingBoxRight + ctx.lineWidth / 2) / g.scale });
+        draw.call(this, text, x, y);
+      };
+    ctx.fillText = watch(ctx.fillText);
+    ctx.strokeText = watch(ctx.strokeText);
+    for (const n of [0, 9, 88, 99]) {
+      g.stats.total = n;
+      g.draw();
+    }
+    g.stats.total = 0;
+    return { x0: band.x0!, texts: [...new Set(ends.map((e) => e.text))], right: Math.max(...ends.map((e) => e.right)) };
+  });
+  expect(r.texts).toEqual(['DEATHS', '0', '9', '88', '99']);
+  expect(r.x0).toBe(42);
+  // At x 29.06 in the font this Chromium sets for Georgia, the label's end; about 35 in
+  // DejaVu Serif. Georgia itself is not measured (a-door/labyrinth-tongues.md).
+  expect(r.right).toBeLessThan(r.x0);
+});
+
 test('in the game: the queue and Ariadne stand behind him and never over x 56; Ariadne faces the door on every frame; he walks in past them', async ({ page }) => {
   await open(page);
   const r = await page.evaluate(

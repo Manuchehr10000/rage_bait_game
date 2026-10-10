@@ -15,7 +15,7 @@ the lip, the ball in his upper hand. The frames:
 0. Arms up, both legs under him.
 1. Arms up, his near leg only. While his trailing foot is on the knob, at frames 68 to 70 of his
    route, the code draws that leg from his hip out to the foot: 2 px of glaze, and a 6 × 2 sole on
-   the knob's top at y 138, a row of clay above the knob's contour.
+   the knob's top at y 138, a row of clay above the knob.
 
 ## Where it stands in the game
 

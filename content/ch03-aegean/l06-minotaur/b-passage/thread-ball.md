@@ -22,8 +22,8 @@ doorway on row 5, where he left it; it is drawn there only once he has stepped o
 
 - **Plain.** The rough's two stripes read as a face, or a marshmallow.
 - **The thread's white**, the only white: it is the thread.
-- **Clear of the knob over it** (`boss`), 6 px of clay between, so the two never stack into one
-  thing.
+- **Clear of the knob over it** (`boss`), 10 px of clay between, y 144 to 153, so the two never
+  stack into one thing.
 - Nothing in the doorway before L−8: Theseus waits there unseen.
 
 ## Deliberately wrong

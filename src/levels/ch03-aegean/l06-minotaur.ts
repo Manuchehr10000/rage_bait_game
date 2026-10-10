@@ -383,9 +383,12 @@ export const MINOTAUR: LevelData = {
   exitCard: 'right',
   decor: [
     // The first screen is a vase's panel: over the outside, a band of tongues as on its
-    // shoulder, hanging from y 56 to 64 within x 0 to 78, in view at the spawn. Out of his
-    // reach: nothing of him rises above y 68.2, even off the kneeling hero's back.
-    { kind: 'tongues', x0: 0, x1: 78, y: 56 },
+    // shoulder, hanging from y 56 to 64 within x 42 to 75, in view at the spawn. Right of
+    // the death counter, which the HUD draws from x 6 at the top left of every level and
+    // which lies over y 56 to 64 here as the camera rises and falls on the vault and the
+    // knot. Out of his reach: nothing of him rises above y 68.2, even off the kneeling
+    // hero's back.
+    { kind: 'tongues', x0: 42, x1: 75, y: 56 },
     // The thirteen at the door, six youths and seven maidens in one file facing it, its
     // front at x 39 and running off the left edge; Ariadne apart, x 42 to 52, facing it.
     // Both well clear of the hero at the post, x 56 to 80.

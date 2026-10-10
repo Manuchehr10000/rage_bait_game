@@ -111,11 +111,11 @@ test("the stage's data: the bull-leaper, the walk in, the camera on the spawn, t
     line: { x: 80, y: 149, w: 128, h: 1 },
     cause: 'The knot',
   });
-  // The band of tongues over the outside, a vase's shoulder, out of his reach; the queue
-  // and Ariadne at the door (tests/minotaur-out.spec.ts); the post the knot is on, the
-  // boss his foot pushes off, his black doorway on row 5.
+  // The band of tongues over the outside, a vase's shoulder, out of his reach and right of
+  // the death counter; the queue and Ariadne at the door (tests/minotaur-out.spec.ts); the
+  // post the knot is on, the boss his foot pushes off, his black doorway on row 5.
   expect(d.decor).toEqual([
-    { kind: 'tongues', x0: 0, x1: 78, y: 56 },
+    { kind: 'tongues', x0: 42, x1: 75, y: 56 },
     { kind: 'queue', front: 39, step: 5, maidens: 7, youths: 6, floorY: DOOR_FLOOR },
     { kind: 'ariadne', x0: 42, x1: 52, floorY: DOOR_FLOOR },
     { kind: 'doorpost', x: 80, top: 80, floorY: DOOR_FLOOR },

@@ -11,10 +11,10 @@
     },
     {
       "id": "labyrinth-tongues",
-      "w": 76,
+      "w": 34,
       "h": 9,
       "beat": "a-door",
-      "what": "A band of black and red tongues over the outside, out of his reach: the shoulder of the amphora whose panel the first screen is."
+      "what": "A band of black and red tongues over the outside, out of his reach and right of the death counter: the shoulder of the amphora whose panel the first screen is."
     },
     {
       "id": "labyrinth-ground-line",
@@ -120,9 +120,9 @@
     {
       "id": "boss",
       "w": 5,
-      "h": 4,
+      "h": 3,
       "beat": "b-passage",
-      "what": "The knob on the passage's back wall that the hero's trailing foot pushes off as he mantles up O1: a glaze contour on the clay, reserved inside. Background, never rock."
+      "what": "The knob on the passage's back wall that the hero's trailing foot pushes off as he mantles up O1: a small glaze silhouette on the clay, round and filled, never a ring. Background, never rock."
     },
     {
       "id": "theseus-lean",

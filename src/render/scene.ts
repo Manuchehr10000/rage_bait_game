@@ -4749,10 +4749,10 @@ function drawMinotaurDecor(ctx: CanvasRenderingContext2D, d: MinotaurDecor): voi
       ctx.fillRect(d.x + 3, d.top, 1, d.floorY - d.top);
       break;
     case 'boss': {
-      // A knob on the far wall, drawn as the vase painter draws a thing on the ground: a
-      // round glaze contour, its inside reserved clay. Never the wash, which in the section
-      // is rock he would walk through; no flat top; its top a row under the sole that
-      // pushes off it.
+      // A knob on the far wall, drawn as the vase painter draws a thing: a glaze
+      // silhouette, round and filled. Never the wash, which in the section is rock he would
+      // walk through; never a ring, which this small is the letter o; no flat top; its top a
+      // row under the sole that pushes off it.
       const r = d.rect;
       const x = r.x + Math.floor((r.w - KNOB[0]!.length) / 2);
       ctx.fillStyle = MN.glaze;
@@ -4792,8 +4792,8 @@ function drawMinotaurDecor(ctx: CanvasRenderingContext2D, d: MinotaurDecor): voi
 
 type MinotaurDecor = Extract<DecorDef, { kind: 'doorpost' | 'boss' | 'blackDoorway' | 'tongues' | 'queue' | 'ariadne' }>;
 
-/** The knob on the passage's far wall, a row at a time: its glaze contour, reserved clay inside, its top 3 px. */
-const KNOB = ['.###.', '#...#', '#...#', '.###.'];
+/** The knob on the passage's far wall, a row at a time: filled glaze, wider than high, its corners cut. */
+const KNOB = ['.###.', '#####', '.###.'];
 
 /** How wide each tongue is, with the pixel of clay after it; how long, its foot included. */
 const TONGUE = { w: 6, step: 7, h: 9 } as const;
