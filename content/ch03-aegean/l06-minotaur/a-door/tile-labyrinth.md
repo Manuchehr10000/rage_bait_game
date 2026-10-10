@@ -10,7 +10,10 @@
 ## What it is
 
 Every solid tile in the level but the lip: the outer wall, the floors, roofs and walls of every
-corridor, room and shaft, the pillar tops in the column, and the ground under the outside. A
+corridor, room and shaft, the pillar tops in the column, and the ground under the outside. Its
+one variation is the floor course outside the outer face, x 0 to 79 and y 160 to 191, which is
+the vase's foot under its panel: the ground line (`labyrinth-ground-line`) and the band of rays
+(`labyrinth-rays`) on clay, standing on this rule's course line along y 191, with no joints. A
 dilute-glaze wash with full-glaze course lines, as designed, laid by rule:
 
 - **The wash**, `#7b4527`, over the whole of every stone tile.

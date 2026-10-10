@@ -120,44 +120,26 @@ test('the closing tableau, the queue and Ariadne: where each stands, and none of
   const e = createEntity(t, LEVEL);
   expect(e.solids).toBeUndefined();
   // The thirteen and Ariadne are decor: drawn, never collided with. Six youths and seven
-  // maidens in one file, overlapping as a vase procession does: the front's box ends at
-  // x 41 and a figure stands every 3 px back from it, so the last box begins at x -5 and
-  // every head is on the first screen; Ariadne apart, her box x 45 to 55. Both clear of
-  // x 56 to 80. (The rough build had the front at x 39, a figure every 5 px running off
-  // the left edge, and Ariadne at x 42 to 52.)
+  // maidens in one file, each over the back of the one ahead: the front's box ends at
+  // x 41 and a figure stands every 6 px back from it, so the seventh's box begins at x -5,
+  // her face whole at the screen's edge, and the eighth's at x -11, all of him off the
+  // screen; Ariadne apart, her box x 45 to 55. Both clear of x 56 to 80. (The rough build
+  // had the front at x 39, a figure every 5 px, and Ariadne at x 42 to 52; the first art
+  // pass a figure every 3 px, every head on the screen, which read as a comb.)
   const people = MINOTAUR.decor.filter((d) => d.kind === 'queue' || d.kind === 'ariadne');
   expect(people).toEqual([
-    { kind: 'queue', front: 41, step: 3, maidens: 7, youths: 6, floorY: DOOR_FLOOR },
+    { kind: 'queue', front: 41, step: 6, maidens: 7, youths: 6, floorY: DOOR_FLOOR },
     { kind: 'ariadne', x0: 45, x1: 55, floorY: DOOR_FLOOR },
   ]);
   const queue = people[0]!;
   if (queue.kind !== 'queue') throw new Error('no queue');
-  expect(queue.front - 12 * queue.step - 10).toBe(-5);
+  expect(queue.front - 6 * queue.step - 10).toBe(-5);
+  expect(queue.front - 7 * queue.step - 10 + 9).toBeLessThan(0);
 });
 
 // ---------------------------------------------------------------------------
 // The way out: the turnings, the niches and the climbs.
 // ---------------------------------------------------------------------------
-
-test("the tongues over the outside are out of his reach: a full jump off the kneeling hero's back, the highest he can stand outside, brings his head to y 68.2, under the band's foot at y 64", () => {
-  const band = MINOTAUR.decor.find((d) => d.kind === 'tongues')!;
-  if (band.kind !== 'tongues') throw new Error('no tongues');
-  const hero = MINOTAUR.entities.find((e): e is HeroDef => e.kind === 'hero')!;
-  let top = Infinity;
-  for (let x = hero.kneel.x - 8; x <= hero.kneel.x + hero.kneel.w - 2; x += 2) {
-    for (const hold of [1, 5, 10, FULL]) {
-      const r = new Run();
-      r.p.spawnAt(x, hero.kneel.y - 16);
-      r.play((q) => ({ dir: 0, jump: q.t < hold }), () => false, 90);
-      expect(r.cause).toBeNull();
-      top = Math.min(top, ...r.log.map((l) => l.y));
-    }
-  }
-  expect(top).toBeCloseTo(68.2, 1);
-  // Nine rows of tongues hang from y 56: their feet on y 64, 4 px over his highest head.
-  expect(band.y + 9).toBeLessThan(top);
-  expect(band.x1).toBeLessThan(80);
-});
 
 test("Daedalus's turnings: two 16 px holes in each room's ceiling, one against each end wall; the thread goes up one, and the other is a niche, closed above", () => {
   const hero = new Hero(HERO_DEF, LEVEL);
@@ -619,44 +601,7 @@ test('in the game: the two holes in the ceiling of each room are pixel for pixel
   }
 });
 
-test('in the game: the death counter never lies on the tongues: its ink ends left of the band at x 42 at up to 99 deaths, so at any height of the camera', async ({ page }) => {
-  await open(page);
-  const r = await page.evaluate(() => {
-    const g = (window as unknown as W).__game;
-    g.titleTimer = 0;
-    // The dev ruler's numbers are not the player's: the tools hidden, as G hides them.
-    g.dev.on = false;
-    const band = (g.levelData.decor as { kind: string; x0?: number }[]).find((d) => d.kind === 'tongues')!;
-    // The HUD's words, as it sets them on the screen: where the ink of each ends, in view
-    // px. The level is one screen wide, so the camera never moves sideways and a view x
-    // is a world x; the band hangs at the top of the first screen and the counter at the
-    // top left of every screen, so as the camera rises and falls they meet unless their
-    // columns are apart.
-    const ctx = g.ctx as CanvasRenderingContext2D;
-    const ends: { text: string; right: number }[] = [];
-    const watch = (draw: CanvasRenderingContext2D['fillText']) =>
-      function (this: CanvasRenderingContext2D, text: string, x: number, y: number) {
-        const m = ctx.measureText(text);
-        ends.push({ text, right: (x + m.actualBoundingBoxRight + ctx.lineWidth / 2) / g.scale });
-        draw.call(this, text, x, y);
-      };
-    ctx.fillText = watch(ctx.fillText);
-    ctx.strokeText = watch(ctx.strokeText);
-    for (const n of [0, 9, 88, 99]) {
-      g.stats.total = n;
-      g.draw();
-    }
-    g.stats.total = 0;
-    return { x0: band.x0!, texts: [...new Set(ends.map((e) => e.text))], right: Math.max(...ends.map((e) => e.right)) };
-  });
-  expect(r.texts).toEqual(['DEATHS', '0', '9', '88', '99']);
-  expect(r.x0).toBe(42);
-  // At x 29.06 in the font this Chromium sets for Georgia, the label's end; about 35 in
-  // DejaVu Serif. Georgia itself is not measured (a-door/labyrinth-tongues.md).
-  expect(r.right).toBeLessThan(r.x0);
-});
-
-test('in the game: the queue and Ariadne stand behind him and never over x 56; Ariadne faces the door on every frame; he walks in past them', async ({ page }) => {
+test('in the game: the queue and Ariadne stand behind him and never over x 56, seven of the file on the first screen over the rays at the vase\'s foot; Ariadne faces the door on every frame; he walks in past them', async ({ page }) => {
   await open(page);
   const r = await page.evaluate(
     ({ presses }) => {
@@ -691,11 +636,9 @@ test('in the game: the queue and Ariadne stand behind him and never over x 56; A
       const queue = diff(all, without(['queue'], draw));
       const ariadne = diff(all, without(['ariadne'], draw));
       const span = (q: { x: number; y: number }[]) => [Math.min(...q.map((p) => p.x)), Math.max(...q.map((p) => p.x)), Math.min(...q.map((p) => p.y)), Math.max(...q.map((p) => p.y))];
-      // The heads, at the spawn, a world pixel at a time on the rows of the file's heads,
-      // y 136 to 142: each maiden's face a patch of cream and each youth's fillet a patch of
-      // red, among the file's own pixels; each youth's eye a pixel of clay with glaze either
-      // side of it and under it and his fillet over it, each maiden's a pixel of glaze with
-      // her cream either side.
+      // The eyes on the first screen, a world pixel at a time on the rows of the file's
+      // eyes: each youth's a pixel of clay with glaze either side of it and under it and his
+      // fillet over it, each maiden's a pixel of glaze with her cream either side.
       const iy = g.camera.iy;
       const toneAt = (x: number, y: number) => {
         const i = (((y - iy) * 4 + 1) * W4 + x * 4 + 1) * 4;
@@ -705,39 +648,22 @@ test('in the game: the queue and Ariadne stand behind him and never over x 56; A
       const RED = '147,50,31';
       const GLAZE = '31,20,14';
       const CLAY = '200,116,61';
-      const file = new Set(queue.map((q) => `${Math.floor(q.x)},${Math.floor(q.y)}`));
-      const HEADS = { y0: 136, y1: 142, x1: 42 };
-      /** Patches of `ink` among the file's pixels on the heads' rows, touching at a side or a corner: where each begins. */
-      const patches = (ink: string) => {
-        const seen = new Set<string>();
-        const at: number[] = [];
-        for (let y = HEADS.y0; y <= HEADS.y1; y++) {
-          for (let x = 0; x < HEADS.x1; x++) {
-            const key = `${x},${y}`;
-            if (seen.has(key) || !file.has(key) || toneAt(x, y) !== ink) continue;
-            at.push(x);
-            const todo = [[x, y]];
-            seen.add(key);
-            while (todo.length) {
-              const [a, b] = todo.pop()!;
-              for (let dy = -1; dy <= 1; dy++)
-                for (let dx = -1; dx <= 1; dx++) {
-                  const q = `${a! + dx},${b! + dy}`;
-                  if (b! + dy < HEADS.y0 || b! + dy > HEADS.y1 || seen.has(q) || !file.has(q) || toneAt(a! + dx, b! + dy) !== ink) continue;
-                  seen.add(q);
-                  todo.push([a! + dx, b! + dy]);
-                }
-            }
-          }
-        }
-        return at;
-      };
+      const WASH = '123,69,39';
       const eyes = { youths: [] as number[], maidens: [] as number[] };
-      for (let x = 1; x < HEADS.x1; x++) {
+      for (let x = 1; x < 42; x++) {
         if (toneAt(x, 138) === CLAY && toneAt(x - 1, 138) === GLAZE && toneAt(x + 1, 138) === GLAZE && toneAt(x, 139) === GLAZE && toneAt(x, 137) === RED) eyes.youths.push(x);
         if (toneAt(x, 140) === GLAZE && toneAt(x - 1, 140) === CREAM && toneAt(x + 1, 140) === CREAM) eyes.maidens.push(x);
       }
-      const heads = { faces: patches(CREAM), fillets: patches(RED), eyes, view: [iy, iy + 180] };
+      // The floor course outside under them, y 160 to 191, from the screen's edge to a
+      // pixel past the outer face at x 80, as glaze '#', clay '_' and the masonry's wash 'w'.
+      const ink = (t: string) => (t === GLAZE ? '#' : t === CLAY ? '_' : t === WASH ? 'w' : '?');
+      const band: string[] = [];
+      for (let y = 160; y <= 191; y++) {
+        let row = '';
+        for (let x = 0; x <= 81; x++) row += ink(toneAt(x, y));
+        band.push(row);
+      }
+      const heads = { eyes, view: [iy, iy + 180] };
       // Him, at the spawn, in front of the file: his own pixels are the same whether it is
       // there or not.
       const p = g.player;
@@ -796,7 +722,7 @@ test('in the game: the queue and Ariadne stand behind him and never over x 56; A
         walk.push({ y: p.y, ground: p.onGround, state: g.state });
       }
       key('ArrowRight', false);
-      return { queue: span(queue), ariadne: span(ariadne), heads, hidden, him: him.length, looks, frames, turned, state: g.state, walkedTo: p.x, walk, spawnY: g.levelData.spawn.y };
+      return { queue: span(queue), ariadne: span(ariadne), heads, band, hidden, him: him.length, looks, frames, turned, state: g.state, walkedTo: p.x, walk, spawnY: g.levelData.spawn.y };
     },
     { presses: cleanPresses() },
   );
@@ -805,13 +731,35 @@ test('in the game: the queue and Ariadne stand behind him and never over x 56; A
   expect(r.queue[1]).toBe(39.75);
   expect([r.ariadne[0], r.ariadne[1]]).toEqual([46, 54.75]);
   expect([r.queue[3], r.ariadne[3]]).toEqual([159.75, 159.75]);
-  // All thirteen heads on the first screen, and countable: seven faces of cream, the last
-  // whole at the screen's left edge, and six fillets of red, alternating, a head every
-  // 3 px; an eye in every one.
+  // Seven of the file on the first screen, an eye every 6 px, maidens and youths
+  // alternating: the last maiden's whole at the screen's left edge, the rest of the file
+  // off it. (The first art pass had all thirteen heads on it, a figure every 3 px.)
   expect(r.heads.view[0]).toBeLessThanOrEqual(136);
-  expect(r.heads.faces).toEqual([0, 7, 13, 19, 25, 31, 37]);
-  expect(r.heads.fillets).toEqual([4, 10, 16, 22, 28, 34]);
-  expect(r.heads.eyes).toEqual({ youths: [5, 11, 17, 23, 29, 35], maidens: [1, 7, 13, 19, 25, 31, 37] });
+  expect(r.heads.eyes).toEqual({ youths: [7, 19, 31], maidens: [1, 13, 25, 37] });
+  // Under them the vase's foot, on the first screen: the ground line, two rows of glaze
+  // between rows of clay, and under it ten rays, points up, standing on the course line
+  // at y 191, every one the same. A row of clay between them and the ground line, and
+  // between them and the course line; a pixel of clay between every two, and between
+  // the last and the outer face at x 80, which starts a row under the ground line's clay.
+  expect(r.heads.view[1]).toBeGreaterThanOrEqual(192);
+  const RAY = [
+    ...Array(3).fill('___#____'),
+    ...Array(4).fill('__##____'),
+    ...Array(4).fill('__###___'),
+    ...Array(4).fill('_####___'),
+    ...Array(4).fill('_#####__'),
+    ...Array(4).fill('######__'),
+    ...Array(3).fill('#######_'),
+  ];
+  expect(r.band).toEqual([
+    '_'.repeat(80) + 'ww',
+    '#'.repeat(80) + 'ww',
+    '#'.repeat(80) + 'ww',
+    '_'.repeat(80) + 'ww',
+    ...RAY.map((row) => row.repeat(10) + '#w'),
+    '_'.repeat(80) + '#w',
+    '#'.repeat(82),
+  ]);
   // Behind him: nothing of the file is drawn over his own pixels.
   expect(r.him).toBeGreaterThan(100);
   expect(r.hidden).toBe(0);

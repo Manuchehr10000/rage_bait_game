@@ -15,8 +15,9 @@ because it asks every level for a `-top`.
 
 ## Where it stands in the game
 
-Under his feet everywhere but the lip, and under the queue (with the ground line drawn over it
-outside, x 0 to 79).
+Under his feet everywhere but the lip, and under the queue, where outside, x 0 to 79, the
+floor course is the ground line and the rays under it (`labyrinth-ground-line`,
+`labyrinth-rays`).
 
 ## Must be right
 

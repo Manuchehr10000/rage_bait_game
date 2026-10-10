@@ -10,32 +10,25 @@
       "what": "The clay: the air of the whole level, outside the door and inside the labyrinth, one flat colour to the edges of the screen. No sky."
     },
     {
-      "id": "labyrinth-tongues",
-      "w": 34,
-      "h": 9,
-      "beat": "a-door",
-      "what": "A band of black and red tongues over the outside, out of his reach and right of the death counter: the shoulder of the amphora whose panel the first screen is."
-    },
-    {
       "id": "labyrinth-ground-line",
       "w": 80,
-      "h": 3,
+      "h": 4,
       "beat": "a-door",
-      "what": "The glaze ground line the queue, Ariadne and the kneeling hero stand on, between two reserved lines: the panel's lower border."
+      "what": "The heavier glaze ground line the queue, Ariadne and the kneeling hero stand on, 2 px between two reserved lines: the panel's lower border."
     },
     {
-      "id": "labyrinth-lower-zone",
+      "id": "labyrinth-rays",
       "w": 80,
-      "h": 32,
+      "h": 28,
       "beat": "a-door",
-      "what": "The band under the ground line outside: the masonry's wash, plain, with no joints, to its course line, the outer face beside it at x 80. Distinct from the labyrinth's masonry; no earth, no turf, no rays, no black band."
+      "what": "A band of black rays rising from below, as at an amphora's foot, in the strip of ground outside the door under the ground line: ten tall glaze triangles, points up, standing on the course line with clay between them. Never spikes, a hazard or a platform."
     },
     {
       "id": "labyrinth-face",
       "w": 240,
       "h": 176,
       "beat": "a-door",
-      "what": "The labyrinth's outer face: a glaze contour down the wall over the door, along the top of the roof and down beside the band under the ground line, and the door's lintel, so that outside and inside are told apart by the wall alone."
+      "what": "The labyrinth's outer face: a glaze contour down the wall over the door, along the top of the roof and down beside the rays under the ground line, and the door's lintel, so that outside and inside are told apart by the wall alone."
     },
     {
       "id": "labyrinth-doorpost",
@@ -70,14 +63,14 @@
       "w": 10,
       "h": 24,
       "beat": "a-door",
-      "what": "One of the six youths of the tribute, waiting in the file at the door: all glaze, beardless, a red fillet, empty hands. Faces right."
+      "what": "One of the six youths of the tribute, waiting in the file at the door, a figure every 6 px: all glaze, beardless, a red fillet, empty hands, no incision down his body. Faces right."
     },
     {
       "id": "queue-maiden",
       "w": 10,
       "h": 24,
       "beat": "a-door",
-      "what": "One of the seven maidens of the tribute, waiting in the file at the door: a peplos in glaze, her face, arm and feet in cream. Faces right."
+      "what": "One of the seven maidens of the tribute, waiting in the file at the door, a figure every 6 px: a peplos in glaze, her face, arm and feet in cream. Faces right."
     },
     {
       "id": "ariadne",

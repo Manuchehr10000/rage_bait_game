@@ -1789,28 +1789,31 @@ const VASE: Palette = { '#': VASE_INK.glaze, _: VASE_INK.clay, o: VASE_INK.cream
 
 /**
  * A youth of the tribute, waiting in the file at the door (a-door/queue-youth.md): a
- * beardless young man in a short chiton, all glaze, his hands empty at his sides. His
- * eye a pixel of reserved clay, high and forward; a fillet of added red round his head,
- * glaze over it and under it. His head is a row higher than a maiden's. 10 x 24.
+ * beardless young man in a short chiton, all glaze, standing with his hands empty at his
+ * sides. A round head, its nose forward, a lock of hair behind the neck; his eye a pixel
+ * of reserved clay, high and forward, under a fillet of added red round his head, glaze
+ * over it and under it. No incision down his body, which with the gap between his legs
+ * made a letter A: a solid figure, his near hand a pixel forward at his thigh, the
+ * chiton's hem flaring behind. His head is a row higher than a maiden's. 10 x 24.
  */
 export const QUEUE_YOUTH_SPRITE = compile(
   [
-    '.....###..',
-    '.....#rr#.',
-    '.....##_#.',
-    '.....###..',
-    '.....##...',
-    '.....##...',
-    '....#####.',
+    '....###...',
+    '...#rrr#..',
+    '...###_##.',
     '...######.',
-    '...###_##.',
-    '...###_##.',
-    '...###_##.',
-    '...###_##.',
-    '...###_##.',
+    '...#####..',
+    '...#.##...',
     '...######.',
     '...######.',
     '...######.',
+    '...######.',
+    '...######.',
+    '...######.',
+    '...######.',
+    '...#######',
+    '...######.',
+    '..#######.',
     '....##.##.',
     '....##.##.',
     '....##.##.',
@@ -1818,7 +1821,7 @@ export const QUEUE_YOUTH_SPRITE = compile(
     '....##.##.',
     '....##.##.',
     '....##.##.',
-    '....##.###',
+    '...###.###',
   ],
   VASE,
 );

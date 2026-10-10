@@ -26,9 +26,12 @@ camera. The vestibule and the hero's doorway are glaze laid over it.
   texture, no grain: flat, as the vase's ground is.
 - **One clay, outside and in.** The wall alone tells the outside from the inside
   (`labyrinth-face`).
-- **Air is clay, and only air and reserved lines are.** Stone is the masonry's wash, people are glaze
-  or cream, the dark is glaze, the tourist is in full colour and the thread is white. A reserved
-  line is this clay and never a lighter or darker one: an incision is the clay showing through.
+- **Air is clay, and only air, reserved lines and the vase's foot are.** Stone is the masonry's
+  wash, people are glaze or cream, the dark is glaze, the tourist is in full colour and the thread
+  is white. A reserved line is this clay and never a lighter or darker one: an incision is the
+  clay showing through. The one place clay is in solid ground is the band of rays under the
+  ground line outside (`labyrinth-rays`, ruled 2026-10-10), the ground of the vase's ornament
+  between its rays, closed by the ground line, the course line and the outer face.
 - Never the thread's white and never the women's cream.
 
 ## Deliberately wrong

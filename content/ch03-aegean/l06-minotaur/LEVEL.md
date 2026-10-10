@@ -131,24 +131,29 @@ Decided while building, and not objected to (2026-10-10):
   through.
 
 Chosen in the asset notes (2026-10-10), where this file did not decide, for the designer to see:
-- The tongues over the outside only, x 42 to 75 and y 56 to 64: on the first screen, and out of
-  his reach; they hang, with no line over them. Five, right of the death counter's column: the
-  HUD stays as it is, and as the camera rises over the vault and the knot the counter passes
-  through the band's rows. (When the world was drawn, 2026-10-10, eleven ran from x 0, and the
-  counter covered nearly half of them; a check of the stage moved them.) Under the ground line,
-  a plain band of the wash with no joints, the outer face going on down beside it at x 80 (when
-  the world was drawn, 2026-10-10: the notes first had the masonry there); the ground line is
-  glaze between two reserved rows, so no glaze foot touches it.
+- The rays at the vase's foot (`a-door/labyrinth-rays.md`, after the ruling that replaced the
+  tongues, 2026-10-10): ten, each 7 px wide at its base and 26 rows tall, one every 8 px from the
+  screen's edge, on clay in the floor course outside, x 0 to 78 and y 164 to 189. They stand on
+  the course line at y 191 with a row of clay between, their points a row under the heavier
+  ground line, 2 px of glaze on y 161 and 162 between reserved rows, so no glaze foot touches
+  it; the last a pixel of clay short of the outer face, which now starts a row lower, at y 164.
+  Each widens a pixel at a time, on its left and then its right, so that its sides are straight
+  slopes, not a stack of blocks. (Built first, the same day: five tongues over the outside at
+  x 42 to 75 and y 56 to 64, right of the death counter's column, and under a 1 px ground line a
+  plain band of the wash.)
 - The masonry's blocks square, two tiles each way: a longer block would lose the bed's joint at
   x 112. A line runs under any block over air, its whole length, so the two holes in each room,
   one against each end wall, keep the same line. (When the world was drawn, 2026-10-10: the notes
   first had courses three tiles high, and blocks 32 px long and 48 high read as planks.)
-- The queue a figure every 3 px, each drawn over the one ahead so that every face is whole, its
-  front at about x 42; Ariadne moved to about x 45 to 55 (beat a). (When the people at the door
-  were drawn, 2026-10-10: the front's box ends at x 41 and its face at x 39, the last box begins
-  at x −5 with its face whole at the screen's edge, and each figure's reserved line runs over and
-  under it as well as down its front. At this step the heads are counted by the alternation of
-  seven cream faces and six red fillets, each with its eye, not at a glance.)
+- The queue a figure every 6 px (after the ruling that opened it, 2026-10-10), each drawn over
+  the one ahead so that every face is whole, its front's box ending at x 41 and its face at x 39;
+  seven on the first screen, the seventh's box at x −5 with her face whole at its edge, and the
+  rest off it; Ariadne where she was, x 45 to 55 (beat a). Each figure's reserved line runs over
+  and under it and down its front, corners included. The youth redrawn whole: a round head, a
+  lock of hair behind his neck, a solid chiton with his hand a pixel forward, and no line down
+  his body, which with the gap between his legs read as a letter A (`a-door/queue-youth.md`).
+  (Drawn first a figure every 3 px, the last box at x −5, so that all thirteen heads were
+  counted by the alternation of cream faces and red fillets; it read as a comb.)
 - A 1 px line of reserved clay round the tourist wherever glaze is behind him, never on the
   costume and never inside the hero's doorway before L−8.
 - The boss drawn as a small round knob of filled glaze, 5 by 3, and the hero's doorway framed by
@@ -767,9 +772,10 @@ Catullus 64.112–115; Ovid, *Met.* 8.172–173, line numbers unverified). Reser
   photographs are reference only. (Drawn from the research, without images, ruled 2026-10-10.)
 - No painted names (pillar 2): no inscriptions or kalos-names, though Attic vases may label their
   figures (Toledo's Tleson cup labels Theseus, at search-extract level; the research, 2026-10-10).
-- Added red only on fillets, garment borders and the tongues' band. (Corrected from the research,
-  2026-10-10: this read "fillets, beards and garment borders, never on a wound, a blow or the heap";
-  nobody here has a beard, and the rest is the game's rule, now under Deliberately wrong.)
+- Added red only on fillets and garment borders (and on the band of tongues while it stood, until
+  the rays replaced it, 2026-10-10). (Corrected from the research, 2026-10-10: this read
+  "fillets, beards and garment borders, never on a wound, a blow or the heap"; nobody here has a
+  beard, and the rest is the game's rule, now under Deliberately wrong.)
 
 ## Not in the level
 
@@ -859,20 +865,21 @@ Being built, in this order, as a stage in the dev build (`#minotaur`, in `STAGES
 
 - **The world, drawn by rule, and the door storey as a vase panel** (2026-10-10, to the asset
   notes): the palette; clay to the screen's edges, the tongues over the outside (a decor,
-  `tongues`), the ground line and the band under it; the masonry and the outer face by rule,
-  with the clay round the vestibule's black; the hero's doorway framed; the lip; the knob; the
-  ball; the thread's states drawn by hand; the dust in grains (`Ear.dust`, each grain with its
-  size); and the tourist's reserve, a pixel of clay round him wherever glaze is behind him, his
-  deaths included, never inside the hero's doorway before L−8.
+  `tongues`, since replaced by the rays), the ground line and the band under it; the masonry and
+  the outer face by rule, with the clay round the vestibule's black; the hero's doorway framed;
+  the lip; the knob; the ball; the thread's states drawn by hand; the dust in grains
+  (`Ear.dust`, each grain with its size); and the tourist's reserve, a pixel of clay round him
+  wherever glaze is behind him, his deaths included, never inside the hero's doorway before L−8.
 - **The people at the door, Theseus's poses, and the knot's clothesline** (2026-10-10, to the
   asset notes): the youth, the maiden and Ariadne drawn at 1 world px, the file overlapped at a
-  3 px step with every head on the first screen; Theseus drawn kneeling (the re-tie loop's four
-  frames), leaning (three, on the lean's own frames, so no window of the knot moves), standing,
-  walking (looking back by his head alone), mantling, falling, paying out and dragging, and cut
-  by a reserved line from the vestibule and the post where he passes them; and the knot's death a
-  clothesline, `DEATH_ANIM` 'clothesline' and its knock `onHisBack`, with the drawn half-quarter
-  `bull-leaper-clotheslined`. Pinned in `tests/minotaur-out.spec.ts` (the thirteen heads, Ariadne's
-  facing) and `tests/minotaur-theseus.spec.ts` (the clothesline's frames).
+  3 px step with every head on the first screen (since opened to 6 px); Theseus drawn kneeling
+  (the re-tie loop's four frames), leaning (three, on the lean's own frames, so no window of the
+  knot moves), standing, walking (looking back by his head alone), mantling, falling, paying out
+  and dragging, and cut by a reserved line from the vestibule and the post where he passes them;
+  and the knot's death a clothesline, `DEATH_ANIM` 'clothesline' and its knock `onHisBack`, with
+  the drawn half-quarter `bull-leaper-clotheslined`. Pinned in `tests/minotaur-out.spec.ts` (the
+  thirteen heads, since the eyes on the first screen, Ariadne's facing) and
+  `tests/minotaur-theseus.spec.ts` (the clothesline's frames).
 
 - **The bull, drawn** (2026-10-10, to the asset notes in `e-cell` and `f-thread`): its head, its
   hands and its stones as drawings at 1 world px, its man's body laid between them by code on the
@@ -910,6 +917,14 @@ Being built, in this order, as a stage in the dev build (`#minotaur`, in `STAGES
   the swat's hand on a man on the floor never over Theseus, whose every pixel stays on every
   frame it is on him; a man swatted on its back onto its brow; his reserve under him in its hands
   off the floor; and the sniff never first rising after a lip landing (pinned in the same files).
+
+- **The rays at the vase's foot, and the queue opened** (2026-10-10, on the designer's rulings, to
+  the notes in `a-door`): the band of tongues removed, its decor, drawing, note and tests; the
+  ground line 2 px; the rays drawn by the masonry's rule in the floor course outside, on clay,
+  the outer face beside them a row shorter; the file a figure every 6 px, the youth redrawn whole,
+  and the reserved line between figures carried round their corners. Nothing that kills, carries
+  or times moved. Pinned in `tests/minotaur-out.spec.ts` (the file's data, the eyes on the first
+  screen, and the floor course outside pixel for pixel).
 
 Still to come: nothing the notes ask the drawing for. (`LevelData.tricks`, 'The knot', 'The
 snort', 'The hands', 'The horns', and `dropCause` and `fallCause` 'The labyrinth', unreachable,

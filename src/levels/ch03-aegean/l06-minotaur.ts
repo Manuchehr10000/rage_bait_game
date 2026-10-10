@@ -382,19 +382,13 @@ export const MINOTAUR: LevelData = {
   // The closing picture is at the door, on the left: the label stands aside for it.
   exitCard: 'right',
   decor: [
-    // The first screen is a vase's panel: over the outside, a band of tongues as on its
-    // shoulder, hanging from y 56 to 64 within x 42 to 75, in view at the spawn. Right of
-    // the death counter, which the HUD draws from x 6 at the top left of every level and
-    // which lies over y 56 to 64 here as the camera rises and falls on the vault and the
-    // knot. Out of his reach: nothing of him rises above y 68.2, even off the kneeling
-    // hero's back.
-    { kind: 'tongues', x0: 42, x1: 75, y: 56 },
     // The thirteen at the door, six youths and seven maidens in one file facing it, a
-    // figure every 3 px, each over the one ahead: the front's box ends at x 41, its face
-    // at x 39, and the last face is whole at the screen's left edge, so every head is on
-    // the first screen. Ariadne apart, her box x 45 to 55, facing the door. Both clear of
-    // the hero at the post, x 56 to 80.
-    { kind: 'queue', front: 41, step: 3, maidens: 7, youths: 6, floorY: DOOR_FLOOR },
+    // figure every 6 px, each over the back of the one ahead: the front's box ends at
+    // x 41, its face at x 39, and seven stand on the first screen, the rest off its left
+    // edge. Ariadne apart, her box x 45 to 55, facing the door. Both clear of the hero at
+    // the post, x 56 to 80. The ground line under them and the rays under it are the
+    // masonry's, drawn by rule.
+    { kind: 'queue', front: 41, step: 6, maidens: 7, youths: 6, floorY: DOOR_FLOOR },
     { kind: 'ariadne', x0: 45, x1: 55, floorY: DOOR_FLOOR },
     // The post the knot is tied to, in the door's thickness.
     { kind: 'doorpost', x: 80, top: 80, floorY: DOOR_FLOOR },

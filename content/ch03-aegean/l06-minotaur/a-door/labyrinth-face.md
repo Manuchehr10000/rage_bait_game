@@ -17,9 +17,11 @@ contour where its stone meets the clay outside.
 - The door's lintel, which this drawing does not draw: the masonry's own underside line over the
   door opening (`tile-labyrinth`), 1 px of glaze along y 79 from x 80 to 94. From x 95 the
   stone's bottom row is reserved clay over the vestibule's black, which stops it there.
-- Under the threshold, down x 80 from y 163 to the course line at y 191, beside the band under
-  the ground line outside (`labyrinth-lower-zone`): the labyrinth's wall going on down into the
-  ground. It starts a row under the ground line's last clay row, so it never touches its glaze.
+- Under the threshold, down x 80 from y 164 to the course line at y 191, beside the band of
+  rays under the ground line outside (`labyrinth-rays`): the labyrinth's wall going on down into
+  the ground, and the rays' band's edge. It starts a row under the ground line's last clay row,
+  y 163, so it never touches its glaze, not even at the corner (79, 162); it started on y 163
+  while the ground line was 1 px (2026-10-10).
 
 The stone inside the contour is the masonry by its rule (`tile-labyrinth`). Under the lintel is
 the door opening, x 80 to 96: the post at its outer side (`labyrinth-doorpost`), then clay, then
@@ -41,7 +43,7 @@ level.
   2026-10-10). It is the masonry's underside line, and the masonry's rule stops it: y 79 is
   reserved clay from x 95 to 128 (`tile-labyrinth`, against the black). With the post's glaze
   edge it is one outline, the door's frame.
-- The tongues end at x 75, with clay from 76 to 79: they never touch it.
+- The rays end at x 78, with clay at 79: they never touch it (`labyrinth-rays`).
 - **Never Knossos**: no Knossian door, no red-and-black column, no light well, no meander
   (`../LEVEL.md`, Deliberately wrong; `../../CHAPTER.md`, error dossier).
 - Nothing on the face: no ornament, no mark, no text (pillar 2).

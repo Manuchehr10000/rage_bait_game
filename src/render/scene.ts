@@ -1514,7 +1514,6 @@ function drawDecor(ctx: CanvasRenderingContext2D, s: Scene, d: DecorDef): void {
     case 'doorpost':
     case 'boss':
     case 'blackDoorway':
-    case 'tongues':
     case 'queue':
     case 'ariadne':
       drawMinotaurDecor(ctx, d);
@@ -4595,7 +4594,7 @@ const MN = {
   dust: '#ecc999',
   /** Added white, cream: the women's flesh and the bull's stones, never the thread's white. */
   cream: VASE_INK.cream,
-  /** Added red, only on fillets, garment borders and the tongues' band. */
+  /** Added red, only on fillets and garment borders. */
   red: VASE_INK.red,
 };
 
@@ -4634,6 +4633,15 @@ const LABYRINTH_COURSE = 2;
 const outsideAir = (tx: number, ty: number) => ty < 1 || (tx * TILE < LABYRINTH_FACE && ty * TILE < LABYRINTH_DOOR_FLOOR);
 /** The zone under the ground line outside: the stone of the door storey's floor course, in front of the outer face. */
 const lowerZone = (tx: number, ty: number) => tx * TILE < LABYRINTH_FACE && ty * TILE >= LABYRINTH_DOOR_FLOOR && Math.floor(ty / LABYRINTH_COURSE) === Math.floor(LABYRINTH_DOOR_FLOOR / TILE / LABYRINTH_COURSE);
+/** The ground line the figures outside stand on, in rows under the floor's top: clay, then glaze over `h` rows, then clay. */
+const GROUND_LINE = { from: 1, h: 2 } as const;
+/**
+ * The rays under it, as at an amphora's foot (a-door/labyrinth-rays.md), in rows under the
+ * floor's top and px along: each `w` wide at its base and one at its point, one every
+ * `pitch` from the screen's edge, its point on row `tip` and its base on row `base`, a row
+ * of clay between it and the ground line over it and the course line under it.
+ */
+const RAYS = { w: 7, pitch: 8, tip: 4, base: 29 } as const;
 
 /** The vase's ground, flat clay to the edges of the screen: no sky, no light, no grain. */
 function drawMinotaurClay(ctx: CanvasRenderingContext2D): void {
@@ -4659,10 +4667,10 @@ function drawVestibule(ctx: CanvasRenderingContext2D): void {
  * a floor's top is wash from end to end. No lit top, no grain, no crack.
  *
  * Where the stone meets the outside's clay it has a glaze contour, the outer face: down
- * the wall over the door, and along the roof. Under the ground line outside it is the
- * lower zone, the panel's band: the wash and its course line, no joints, the ground line
- * over it, glaze between two reserved rows, and the outer face going on down beside it.
- * Round the vestibule's black the stone keeps a pixel of clay.
+ * the wall over the door, and along the roof. Outside, the floor course is the vase's
+ * foot under its panel: the ground line, glaze between two reserved rows, and under it the
+ * rays standing on the course line, with the outer face going on down beside them (by
+ * `drawRays`). Round the vestibule's black the stone keeps a pixel of clay.
  */
 function drawMasonry(ctx: CanvasRenderingContext2D, level: Level, tx: number, ty: number, x: number, y: number): void {
   const stone = (i: number, j: number) => level.isSolid(i, j);
@@ -4678,21 +4686,16 @@ function drawMasonry(ctx: CanvasRenderingContext2D, level: Level, tx: number, ty
   ctx.fillStyle = MN.glaze;
   if (ty % LABYRINTH_COURSE === LABYRINTH_COURSE - 1 || !under(tx, ty + 1) || !under(mate, ty + 1)) ctx.fillRect(x, y + TILE - 1, TILE, 1);
   if (lowerZone(tx, ty)) {
-    if (airAbove) {
-      // The ground line the figures outside stand on, a pixel under their feet.
-      ctx.fillRect(x, y + 1, TILE, 1);
-      ctx.fillStyle = MN.clay;
-      ctx.fillRect(x, y, TILE, 1);
-      ctx.fillRect(x, y + 2, TILE, 1);
-    }
+    drawRays(ctx, x, y);
     return;
   }
   // The outer face where the stone meets the outside: along the roof, and down the wall.
   if (airAbove && outsideAir(tx, ty - 1)) ctx.fillRect(x, y, TILE, 1);
   if (!stone(tx - 1, ty) && outsideAir(tx - 1, ty)) ctx.fillRect(x, y, 1, TILE);
-  // Going on down past the threshold, beside the lower zone, to its course line.
+  // Going on down past the threshold, beside the rays, to their course line: from a row
+  // under the ground line's last row of clay, so that not even its corner touches it.
   if (lowerZone(tx - 1, ty)) {
-    const from = stone(tx - 1, ty - 1) ? 0 : 3;
+    const from = stone(tx - 1, ty - 1) ? 0 : GROUND_LINE.from + GROUND_LINE.h + 1;
     ctx.fillRect(x, y + from, 1, TILE - from);
   }
   // A joint is where two stones meet: where the stone ends on air there is none, so a
@@ -4710,6 +4713,41 @@ function drawMasonry(ctx: CanvasRenderingContext2D, level: Level, tx: number, ty
   if (x1 > x0 && y1 > y0) {
     ctx.fillStyle = MN.clay;
     ctx.fillRect(x0, y0, x1 - x0, y1 - y0);
+  }
+}
+
+/**
+ * A tile of the floor course outside, the vase's foot under its panel
+ * (a-door/labyrinth-ground-line.md, labyrinth-rays.md): clay down to the course line along
+ * its foot, which the masonry's rule has drawn; over it the ground line, a pixel under the
+ * figures' feet; and the rays, points up, standing on the course line with a row of clay
+ * between, and a row under the ground line over their points; a pixel of clay between
+ * the last and the outer face. Every ray is the same, by construction.
+ */
+function drawRays(ctx: CanvasRenderingContext2D, x: number, y: number): void {
+  const top = LABYRINTH_DOOR_FLOOR;
+  const foot = top + LABYRINTH_COURSE * TILE - 1;
+  const y0 = Math.max(y, top);
+  const y1 = Math.min(y + TILE, foot);
+  ctx.fillStyle = MN.clay;
+  ctx.fillRect(x, y0, TILE, y1 - y0);
+  ctx.fillStyle = MN.glaze;
+  const g0 = Math.max(y0, top + GROUND_LINE.from);
+  const g1 = Math.min(y1, top + GROUND_LINE.from + GROUND_LINE.h);
+  if (g1 > g0) ctx.fillRect(x, g0, TILE, g1 - g0);
+  const { w, pitch, tip, base } = RAYS;
+  const h = base - tip;
+  for (let left = Math.max(0, Math.floor((x - w + 1) / pitch) * pitch); left < x + TILE && left + w <= LABYRINTH_FACE - 1; left += pitch) {
+    for (let r = Math.max(0, y0 - top - tip); r <= h && top + tip + r < y1; r++) {
+      // A pixel wider at a time down from the point, on its left side and then its
+      // right, so that each side is one straight slope in even steps, half a step from
+      // the other's: never a stack of blocks.
+      const k = 1 + Math.round(((w - 1) * r) / h);
+      const from = left + (w - 1) / 2 - Math.floor(k / 2);
+      const a = Math.max(x, from);
+      const b = Math.min(x + TILE, from + k);
+      if (b > a) ctx.fillRect(a, top + tip + r, b - a, 1);
+    }
   }
 }
 
@@ -4824,14 +4862,11 @@ function drawMinotaurDecor(ctx: CanvasRenderingContext2D, d: MinotaurDecor): voi
       ctx.fillStyle = MN.glaze;
       ctx.fillRect(d.x, d.top, d.w, d.floorY - d.top);
       break;
-    case 'tongues':
-      drawTongues(ctx, d.x0, d.x1, d.y);
-      break;
     case 'queue': {
       // Front to back, each over the one ahead of it and cut from it by a reserved line
-      // of clay along its own front and over and under it, as the vase painters cut one
-      // figure from the next: every face is whole, and the one ahead loses the back of its
-      // head.
+      // of clay along its own front and over and under it, corners included, as the vase
+      // painters cut one figure from the next: every face is whole, and the one ahead loses
+      // only its back.
       const file = queueFile(d.maidens, d.youths);
       for (let i = 0; i < file.length; i++) drawVaseFigure(ctx, file[i]!, d.front - i * d.step - VASE_W, d.floorY, i > 0);
       break;
@@ -4842,35 +4877,10 @@ function drawMinotaurDecor(ctx: CanvasRenderingContext2D, d: MinotaurDecor): voi
   }
 }
 
-type MinotaurDecor = Extract<DecorDef, { kind: 'doorpost' | 'boss' | 'blackDoorway' | 'tongues' | 'queue' | 'ariadne' }>;
+type MinotaurDecor = Extract<DecorDef, { kind: 'doorpost' | 'boss' | 'blackDoorway' | 'queue' | 'ariadne' }>;
 
 /** The knob on the passage's far wall, a row at a time: filled glaze, wider than high, its corners cut. */
 const KNOB = ['.###.', '#####', '.###.'];
-
-/** How wide each tongue is, with the pixel of clay after it; how long, its foot included. */
-const TONGUE = { w: 6, step: 7, h: 9 } as const;
-
-/**
- * The band of tongues over the door storey, the amphora's shoulder over its panel: from
- * x `x0` to `x1`, hanging from y `y`, alternately black glaze and added red, the first
- * black. Each hangs, its foot rounded, with nothing over it: no line, no bar, no flat top
- * to stand on. A red tongue is red inside a pixel of glaze, as added red lies on the
- * glaze. Every black tongue is the same, and every red one.
- */
-function drawTongues(ctx: CanvasRenderingContext2D, x0: number, x1: number, y: number): void {
-  const { w, step, h } = TONGUE;
-  for (let i = 0, x = x0; x + w - 1 <= x1; i++, x += step) {
-    ctx.fillStyle = MN.glaze;
-    ctx.fillRect(x, y, w, h - 2);
-    ctx.fillRect(x + 1, y + h - 2, w - 2, 1);
-    ctx.fillRect(x + 2, y + h - 1, w - 4, 1);
-    if (i % 2 === 1) {
-      ctx.fillStyle = MN.red;
-      ctx.fillRect(x + 1, y, w - 2, h - 3);
-      ctx.fillRect(x + 2, y + h - 3, w - 4, 1);
-    }
-  }
-}
 
 /** Who stands at the door: a youth, a maiden, and Ariadne. */
 type VaseWho = 'youth' | 'maiden' | 'ariadne';
@@ -4900,11 +4910,13 @@ function vaseFigure(who: VaseWho): Frame {
   return frameOf('ariadne', 0, ARIADNE_SPRITE);
 }
 
-/** Where a figure's reserved line of clay is set from it: along its front, and over and under it. */
+/** Where a figure's reserved line of clay is set from it: along its front, and over and under it, corners included. */
 const VASE_CUT: readonly (readonly [number, number])[] = [
   [1, 0],
   [0, -1],
   [0, 1],
+  [1, -1],
+  [1, 1],
 ];
 
 /**

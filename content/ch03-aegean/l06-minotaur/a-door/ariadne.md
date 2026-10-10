@@ -21,9 +21,11 @@ front face, and clear of x 56.
 Facing the door from the first frame to the last. She never turns, so her look goes past him to
 the hero (`../LEVEL.md`, beat a). In the closing tableau she looks past the tourist again.
 
-Her place moved from the rough build's x 42 to 52 to 45 to 55, so that the file can overlap with
-all thirteen heads on screen and she still stands apart (the asset notes, 2026-10-10; `../LEVEL.md`,
-beat a); the level's data and its tests moved with her when she was drawn.
+Her place moved from the rough build's x 42 to 52 to 45 to 55, so that the file could overlap with
+all thirteen heads on screen and she still stand apart (the asset notes, 2026-10-10; `../LEVEL.md`,
+beat a); the level's data and its tests moved with her when she was drawn. When the file was
+opened to a figure every 6 px (ruled 2026-10-10) its front stayed where it was, and so did she:
+the same 6 px of clay, x 40 to 45, between her and the file's front face.
 
 ## Must be right
 

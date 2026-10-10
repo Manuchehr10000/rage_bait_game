@@ -969,8 +969,6 @@ export type DecorDef =
   | { kind: 'boss'; rect: Rect }
   /** A doorway in a back wall, in black glaze. Whatever goes into it is not seen. */
   | { kind: 'blackDoorway'; x: number; w: number; top: number; floorY: number }
-  /** A band of tongues hanging from y `y` over x `x0` to `x1`, as on a vase's shoulder. A drawing, out of reach. */
-  | { kind: 'tongues'; x0: number; x1: number; y: number }
   /**
    * The tribute waiting at the door in one file, facing it: a vase procession of
    * overlapping figures, `maidens` and `youths` alternating, a maiden at its front, the
