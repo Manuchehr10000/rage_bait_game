@@ -103,14 +103,18 @@ only for the vestibule and the hero's doorway; the thread the one pure white. Ev
 silhouette.
 
 Ruled (designer, on recommendations, 2026-10-10), after the art conversation:
-- **The level is the vase.** Clay to the edges of the screen and no sky. Over the door storey, out
-  of his reach, a band of black and red tongues, and under the figures outside, a glaze ground
-  line, so the first screen reads as an amphora's panel: a tourist in full colour walking into a
-  museum vase.
+- **The level is the vase.** Clay to the edges of the screen and no sky. Under the figures
+  outside, a heavier glaze ground line, and under it, in the strip of ground outside the door, a
+  band of black rays rising from below, as at the foot of an amphora, so the first screen reads as
+  an amphora's panel: a tourist in full colour walking into a museum vase. (A band of tongues over
+  the door storey, ruled first, was built and read as bunting beside the death counter; replaced
+  by the rays, designer, on a recommendation, 2026-10-10.)
 - **The bull's hands read as hands** before the clap: human, oversized, flat on pale stones. The
   joke is that a man has hands, so the setup is seen.
-- **The queue overlaps** as a vase procession does, so all thirteen heads are on screen and can be
-  counted.
+- **The queue reads as people**: a figure every 5 to 6 px, so about eight stand on screen and the
+  rest of the thirteen off its left edge. The count is given up. (Ruled first as overlapped at
+  3 px so all thirteen heads could be counted; built, it read as a comb, not people; replaced,
+  designer, on a recommendation, 2026-10-10.)
 - **Drawn from the research, without images of the vases.** Nobody on the project has seen MFA
   60.1 or the others; what the research could not verify stays marked so in each note.
 
@@ -297,10 +301,10 @@ He walks in on foot off the left edge onto the outside ground, and a retry start
 (pillar 13). How Tiryns's grand feature hands him over is decided when Tiryns is designed.
 
 - **The thirteen**, six youths and seven maidens, stand in one file, a vase procession of
-  overlapping figures, the maidens' cream alternating with the youths' black so the heads can be
-  counted. Its front is at about x 42 (the front's box ends at x 41, its face at x 39), a figure
-  every 3 px, so that all thirteen heads are on screen; the last loses the back of her hair at the
-  left edge, never her face. They stand still, clear of x 56–80, and are still waiting at the end.
+  overlapping figures, the maidens' cream alternating with the youths' black. Its front is at about
+  x 42 (the front's box ends at x 41, its face at x 39), a figure every 5 to 6 px, so that about
+  eight stand on screen, each one read as a person, and the rest off the left edge (designer,
+  2026-10-10; the 3 px file that showed all thirteen read as a comb). They stand still, clear of x 56–80, and are still waiting at the end.
 - **Ariadne** stands apart, her box x 45–55, clear of x 56, hands empty, facing the door from first
   frame to last. She never turns, so her look goes past him to the hero. (Both moved in the asset
   notes, 2026-10-10, from a front at x 40 and Ariadne at x 42–52, so that the overlapped file
