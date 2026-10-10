@@ -204,7 +204,7 @@
       "w": 44,
       "h": 30,
       "beat": "e-cell",
-      "what": "The Minotaur's man's body, drawn by code in flat glaze: the back on its solid every frame, the neck, 3 px arms and legs, the folded leg a filled wedge; crouched, gripped, on its knee, heaving, lurching on both knees, tossing. Size as crouched, with its stones."
+      "what": "The Minotaur's man's body, drawn by code in flat glaze: the back on its solid every frame, the neck, arms 4 px at the shoulder and 3 at the wrist, the folded leg a filled wedge; crouched, gripped, on its knee, heaving, lurching on both knees, tossing. Size as crouched, with its stones."
     },
     {
       "id": "minotaur-head",
@@ -213,15 +213,15 @@
       "dy": -5,
       "frames": 3,
       "beat": "e-cell",
-      "what": "The bull's head on the man's body, horns and all: level, tossed up, and down on the floor. Faces right; the game flips it to face left."
+      "what": "The bull's head on the man's body, horns and all, a lyre of 2 px horns: level, tossed up, and down on the floor lying on its cheek, its horns up at its back. Faces right; the game flips it to face left."
     },
     {
       "id": "minotaur-hand",
       "w": 8,
-      "h": 8,
+      "h": 12,
       "frames": 4,
       "beat": "e-cell",
-      "what": "The Minotaur's hand, a man's, oversized: flat on a stone, holding the stone, clawing, and edge-on as a palm for the clap and the swat. Never a hoof. Faces right; the game flips it to face left."
+      "what": "The Minotaur's hand, a man's, oversized: flat on a stone with its fingers spread and its thumb parted by the one incision, holding the stone up with its fingers across its face, clawing, and upright and edge-on as a palm for the clap. Never a hoof. Up to 8 x 12 a frame. Faces right; the game flips it to face left."
     },
     {
       "id": "minotaur-stone",
@@ -235,7 +235,7 @@
       "w": 54,
       "h": 24,
       "beat": "e-cell",
-      "what": "The Minotaur after the second blow: the body sunk in a 24 px heap over its knees, an arm thrown out along the floor. Bloodless. It stays. Faces right; the game flips it to face left."
+      "what": "The Minotaur after the second blow: the body sunk over its knees, its back on the 24 px solid, an arm thrown out over its head to the floor, its head down before it. Bloodless. It stays. Drawn by code, facing left."
     },
     {
       "id": "theseus-leap",
@@ -286,9 +286,9 @@
     {
       "id": "minotaur-dead",
       "w": 45,
-      "h": 15,
+      "h": 9,
       "beat": "f-thread",
-      "what": "The dead Minotaur in the closing tableau, on its front, dragged by a horn: its head and horns across the threshold, the rest in the vestibule in a reserved outline. Faces right; the game flips it to face left."
+      "what": "The dead Minotaur in the closing tableau, on its front, dragged by a horn: its head down across the threshold, the rest in the vestibule in a reserved outline. Drawn by code, facing left."
     }
   ]
 }

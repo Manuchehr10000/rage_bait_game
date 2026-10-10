@@ -11,59 +11,79 @@
 
 Asterius, the Minotaur: the face of a bull, and the rest of him human (Apollodorus 3.1.4). A
 bull's head (`minotaur-head`) on a man's body, all in flat glaze: a man's back, shoulders and hips,
-a neck 4 px thick, arms and legs 3 px thick, human hands (`minotaur-hand`), human feet. Every bent
-leg is a filled wedge, thigh and shin in one shape where they fold: never two strokes that read as
-a Z or a 2 (pillar 2). Two or three incisions, lines of reserved clay that cut the near arm and the
-near leg from the body; nothing models it.
+a neck 4 px thick, arms 4 px at the shoulder and 3 at the wrist, a thigh 6 px at the hip and 4 at
+the knee, human hands (`minotaur-hand`), human feet. Every bent leg is a filled wedge, thigh and
+shin in one shape where they fold: never two strokes that read as a Z or a 2 (pillar 2). Two
+incisions, lines of reserved clay: one round the near arm where it lies over the body, never
+round its root at the shoulder, and one up the front of the near thigh from the groin; nothing
+models it. Its shoulders are behind its head, which its neck holds out before them.
 
-This note is the body, which code draws; the head, the hands, the stones (`minotaur-stone`) and
-the heap (`minotaur-heap`) are sprites hung on it.
+This note is the body, which code draws (`src/render/bull.ts`): the back's top on the solid, the
+arms from the shoulders to the hands, the leg from the hip; the head, the hands, the stones
+(`minotaur-stone`) and the heap (`minotaur-heap`) are drawings hung on it. The far arm is always
+behind its body and its head (clawing, it comes up in front of its face from under its jaw, so
+the claw is never cut off from it); the near arm in front of everything, but behind its head
+while it thrashes about it.
 
 ## Where it stands in the game
 
 In the cell, on one clock from L, the frame the tourist comes down on its floor:
 
-- **Before the fight, and to L+40**: crouched at its bed facing the hatch, like a beast on all
-  fours, its hips up over its bent legs, its body x 114 to 144, its face at x 108, its back's top
-  20 px over the floor, a hand flat on each stone. It breathes on its own slow loop: all of it but
-  its hands up a pixel while the breath is out; the hands stay flat on their stones. Nothing of it
-  above y 688 before the fight (`tests/minotaur-fight.spec.ts`).
-- **The clap**, if it catches him to L+39: it rears up 12 px off its stones, a man for a moment;
-  its palms are together on him from the second frame of the catch, go down with him to its feet
-  from the sixth to the ninth, and are back on the stones by the fourteenth.
-- **The grip**, L+40 to 46: it lets go of its far stone with its right hand, takes the near one up
-  in its left and sinks onto its right knee, the far one; its back goes from 20 to 10.
+- **Before the fight, and to L+40**: crouched at its bed facing the hatch, its hips up over its
+  bent legs: on its feet, the knee forward and the foot flat on the floor under the hip, the toes
+  forward, its arms straight and braced from the shoulders to the stones. Its body x 114 to 144,
+  its face at x 108, its back's top 20 px over the floor, a hand flat on each stone. It breathes
+  on its own slow loop: all of it but its hands up a pixel while the breath is out; the hands
+  stay flat on their stones. Nothing of it above y 688 before the fight
+  (`tests/minotaur-fight.spec.ts`).
+- **The clap**, if it catches him to L+39: it rears up 12 px off its stones, a man for a moment,
+  up on its feet; its palms are together on him from the second frame of the catch, go down with
+  him to its feet from the sixth to the ninth, and are back on the stones by the fourteenth.
+- **The grip**, L+40 to 46: it takes the near stone up in its left hand, up before its face and
+  back over its head to its raised place over its shoulder, and sinks onto its knees; its right
+  hand leaves the far stone two frames on, as the near stone goes over, and rises to claw. Its
+  back goes from 20 to 10, the thigh folded over the shin, the knee on the floor ahead of the hip
+  and the foot behind, its sole turned up.
 - **L+46 to 67**: on its knee, the stone raised up and back in its left hand, its free right hand
-  clawing over its brow at the hero's hand on the horn, a loop of seven places, always within
-  x 100 to 112 and never crossing the stone's arc.
-- **The heave**, L+56 to 62: its back rises from 10 to 30 as it swings the stone over and down at
-  the ducking hero (the duck at L+58); held at 30 to L+68, back to 10 by L+74. It sets the stone
-  down before it, at x 98, and its free hand goes down to the floor once it stops clawing.
+  clawing at the hero's hand on the horn, its arm up in front of its face from an elbow under its
+  jaw, a loop of seven places in front of its brow, always within x 100 to 111 and on every frame
+  of the heave a pixel of clay at least from the stone and the hand that holds it
+  (`tests/minotaur-bull.spec.ts`).
+- **The heave**, L+56 to 62: its back rises from 10 to 30, up on its feet again, as it swings
+  the stone over its head and down at the ducking hero (the duck at L+58), the arm straight from
+  the shoulder; held at 30 to L+68, back to 10 by L+74. It sets the stone down before it, at x 98,
+  its hand flat on it, and its free hand goes back down flat on the far stone once it stops
+  clawing.
 - **The first blow**, L+76: to L+105 the struck body lurches on both knees to the left wall and
-  back, 46 px and back, thrashing, both hands flailing about its tossing head, two frames a place.
+  back, 46 px and back, thrashing, both hands flailing before its tossing head at the hero on its
+  horn, one high and one low, two frames a place, never both up over its horns.
 - **The toss**, if it has him: it rears up on its knees, up to 14 px, and tosses its head up at
-  him; where the lurch cannot reach him the head lunges out to him on a stretched neck (ruled
-  2026-10-09).
-- **L+105 to 130**: down on its hands.
+  him, its head tossed up while he is on its horns; where the lurch cannot reach him the head
+  lunges out to him on a stretched neck (ruled 2026-10-09).
+- **L+105 to 130**: down on its hands, flat on its stones.
 - **The second blow**, L+130: its head jerks up for 4 frames, and it sinks into the heap.
 
 ## Must be right
 
-- **A bull's head on a man's body** (`../LEVEL.md`, Must be right). It reads first as the
-  chapter's one bull, crouched; its oversized human hands, flat on pale stones, are the setup of
-  the hands, seen before the clap (ruled 2026-10-10: "the joke is that a man has hands").
+- **A bull's head on a man's body** (`../LEVEL.md`, Must be right), from the first frame it is on
+  screen: the chapter's one bull by its head and its lyre of horns, crouched; a man by his arms,
+  his folded leg and his flat foot, and by his oversized human hands, flat on pale stones, the
+  setup of the hands, seen before the clap (ruled 2026-10-10: "the joke is that a man has
+  hands"). (The art's brief, 2026-10-10; this read "It reads first as the chapter's one bull".)
 - **On its right knee with the stone raised in its left hand**: MFA 60.1's Minotaur kneels on its
   right knee and raises a stone in its left hand (the research). Facing left, its right side is
   the far side: the far leg kneels, the near hand holds the stone.
 - **The back drawn on its solid, every frame** from the grip: the top of its drawn back is the
-  top of the solid he stands on (20, then 10, 30, 10; the heap 24), never snapped to a held pose
-  (`tests/minotaur-fight.spec.ts`).
+  top of the solid he stands on (20, then 10, 30, 10; the heap 24), never snapped to a held pose:
+  its top row whole over the solid, no cut breaking it, and nothing of it on the solid behind
+  its shoulders (`tests/minotaur-bull.spec.ts`).
 - **Every frame of the fight at its true place.** No pose is held for looks: the claw's loop, the
   flails and the tossing head are the kills' own places. Only the crouch before L+40 is still,
   but for its breath.
 - **The clay-gap rule** (`../LEVEL.md`, Art, 2026-10-10): a line of clay wherever its glaze meets
-  Theseus's, its own near limbs, its hands on him, or the stone's contour. At the clap's catch
-  point, 8 px in front of its face, its palms, the tourist and Theseus are cut apart.
+  Theseus's, its own near limbs, its hands on him, a stone's contour or the masonry's lines (the
+  far wall's course lines at x 144). At the clap's catch point, 8 px in front of its face, its
+  palms, the tourist and Theseus are cut apart.
 - **The swat drawn where he is caught**, flat on its own brow between the horns if he was in the
   air, flat on the floor before its knee if not.
 - **The lurch on both knees, thrashing: never a step, a run or a turn toward the tourist**

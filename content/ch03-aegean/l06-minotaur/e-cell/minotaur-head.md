@@ -9,22 +9,27 @@
 
 ## What it is
 
-A bull's head in profile on the man's neck (`minotaur-body`): the muzzle forward and down, the
-nostril and the eye reserved in the clay, the eye large and high, an ear, and the horns, 2 px
-thick, up out of the head and forward at the tip, standing 5 px over its top. The frames:
+A bull's head in profile on the man's neck (`minotaur-body`): a long face to a broad muzzle, the
+nostril and the eye reserved in the clay, the eye high, an ear out behind, and the horns, 2 px
+at every row, up out of the poll in a lyre, apart, and forward at the tips, standing 5 px over its
+top, a pixel of clay between them over the brow. The frames:
 
 0. Level: its head on its neck as it crouches and fights.
-1. Tossed up: the muzzle raised and the horns hooking up and forward.
-2. Down: laid on the floor before its heap, the horns up.
+1. Tossed up: the muzzle raised and forward, the horns hooking up and forward.
+2. Down: lying on its cheek on the floor, the muzzle along it toward the front and the horns up
+   at the back, all of it in the box's lower 9 rows. (Drawn 2026-10-10. Drawn first as the
+   level head with its horns cut short, it read as a lump among the stones.)
 
 ## Where it stands in the game
 
 Its box's top-left is where the fight puts it: x 108 and y 712 crouched, with the back and the
 lurch, a pixel up with the breath, tossing 2 to 7 px from the first blow. Frame 0 throughout, but
-frame 1 when it tosses its head up at a tourist over its horns, and for the 4 frames its head
-jerks up at the second blow; frame 2 from then on, at x 101 on the floor, across both stones and
-in front of them, cut from their contours by clay (`minotaur-heap`). The neck between it and the
-shoulders is the body's, drawn by code, and stretches when the head lunges out.
+frame 1 while it has a tourist on its horns, tossing him up, and for the 4 frames its head jerks
+up at the second blow; frame 2 from then on, at x 101 on the floor, across both stones and
+in front of them (`minotaur-heap`), and in the closing tableau (`../f-thread/minotaur-dead.md`).
+The neck between it and the shoulders is the body's, drawn by code, and stretches when the head
+lunges out, or tosses up at a man high over it. The arms, raised to claw or thrashing, go behind
+it, so that it is always whole.
 
 ## Must be right
 
@@ -32,7 +37,9 @@ shoulders is the body's, drawn by code, and stretches when the head lunges out.
 - **Inside its box and its horns**: the head's 11 × 10 and the horns' 5 px over it are what reaches
   him, and what the toss hooks him with (`tests/minotaur-fight.spec.ts`).
 - **The near horn where the hero holds it**: in frames 0 and 1 it passes through 3 px in from the
-  box's left and 2 px over its top, where Theseus's left hand is.
+  box's left and 2 px over its top, where Theseus's left hand is (`tests/minotaur-bull.spec.ts`).
+  In frame 2 its near horn is 6 px in and on the box's top row, where his hand has it in the
+  tableau.
 - **A brow between the horns**, at its top's middle, flat enough for a swatted tourist to lie on.
 - Horns of 2 px, never the rough's 1 px antennae.
 - Nothing of it above y 688 before the fight.

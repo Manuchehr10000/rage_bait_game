@@ -4,32 +4,34 @@
 |---|---|
 | Id | `minotaur-dead` |
 | File | None, and none is wanted: drawn in code at 1 world px (`../LEVEL.md`, Art, ruled 2026-10-10) |
-| Size | 45 × 15 world px, 1 frame: its head's 11 × 10 and horns, and the body after it, on the floor; drawn facing right, and flipped by the game to face left |
+| Size | 45 × 9 world px, 1 frame: its head down, `../e-cell/minotaur-head.md` frame 2, 11 × 9, and the body after it, on the floor; drawn by code facing left |
 | Beat | `f-thread` |
 
 ## What it is
 
-The Minotaur dead on its front, dragged by a horn: its head down on its side at the front, the
-horns up, the muzzle toward whoever drags it; a man's shoulders, back and hips lying flat after it,
-an arm trailing back along the floor, the legs, and a sole turned up at the end. In flat glaze, the
-bull's head as `../e-cell/minotaur-head.md` draws it.
+The Minotaur dead on its front, dragged by a horn: its head down on its cheek at the front, the
+horns up at its back, the muzzle along the floor toward whoever drags it; a man's shoulders, back
+and hips lying flat after it, an arm trailing back along its side (an incised line from the
+shoulder), the legs, and a sole turned up at the end. In flat glaze, the bull's head as
+`../e-cell/minotaur-head.md` draws it down, frame 2, the same as the heap's.
 
 ## Where it stands in the game
 
 The closing tableau, a staged second copy while the heap stays in the cell. It comes out of the
 black vestibule after Theseus at 1 px a frame and stops with its head and horns across the
-threshold, the head's box x 82 to 93 (`tests/minotaur-out.spec.ts`), and the rest of it in the
-vestibule, to x 127. The door opening is the post, x 80 to 83, and then clay, x 84 to 95: the
-head's muzzle lies over the post's foot, x 82 and 83, and the rest of the head and the horns on
-the clay. Nothing of it is drawn in the passage behind.
+threshold, the head's box x 82 to 93, its rows y 151 to 159 (`tests/minotaur-out.spec.ts`), and the rest
+of it in the vestibule, to x 126. The door opening is the post, x 80 to 83, and then clay, x 84
+to 95: the head's muzzle lies over the post's foot, x 82 and 83, and the rest of the head and the
+horns on the clay, the near horn at x 88, where Theseus's hand has it. Nothing of it is drawn in
+the passage behind.
 
 It lies in front of the post and of the black, and wherever it lies over either it is drawn in a
 reserved outline, a 1 px line of clay round it, its corners included: over the post, where that line
 breaks the post's glaze edge at x 83 and is cut into its wash at x 81
-(`../a-door/labyrinth-doorpost.md`), and in the vestibule. The rough draws the outline in the
-vestibule only, as four copies offset a pixel, which leave its corners touching the black; it is
-whole, and reaches the post, when this is drawn. The thread and the knot lie over it, and the
-tourist is in front of it. It stays as he leaves.
+(`../a-door/labyrinth-doorpost.md`), and in the vestibule. The outline is whole, corners and all,
+and reaches the post (drawn 2026-10-10; the rough drew it as four copies offset a pixel, in the
+vestibule only). The head is cut from the body by the same line, but for its neck. The thread and
+the knot lie over it, and the tourist is in front of it. It stays as he leaves.
 
 ## Must be right
 
@@ -38,8 +40,7 @@ tourist is in front of it. It stays as he leaves.
 - **Its head across the threshold**, its muzzle over the post's foot and the rest on the clay of
   the door opening, which is plain; its horns read against the clay.
 - **Glaze never touches glaze** (`../LEVEL.md`, Art, 2026-10-10): its muzzle lies over the
-  post's glaze edge, and its near horn, with Theseus's hand on it at about x 84 and 85, lies
-  against it, so the reserved outline runs over the post as well as in the black.
+  post's glaze edge, so the reserved outline runs over the post as well as in the black.
 - **A body, never a sack**: the rough's read as one. The head, a man's shoulders and limbs.
 - **Seen in the black** by its reserved outline: the clay outline round it inside the vestibule
   must be clean, never the rough's zig-zag.

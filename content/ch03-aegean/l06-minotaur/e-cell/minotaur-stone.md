@@ -14,11 +14,15 @@ Minotaur's hand. Two, the same drawing.
 
 ## Where it stands in the game
 
-On the cell floor before its face, the near one at x 100 and the far one at x 110, y 732 to 736,
+On the cell floor before its face, the near one at x 100 and the far one at x 110, y 732 to 735,
 a hand flat on each while it crouches. At the grip the far one is let go and stays; the near one
-is taken up in its left hand, raised, swung at the ducking hero in the heave and set down before it
-at x 98. Both stay by the heap, behind it: its head, its arm and its body's front lie over them,
-cut from them by clay, and hide what they cover (`minotaur-heap`).
+is taken up in its left hand, up before its face and back over its head, raised over its
+shoulder, swung over its head at the ducking hero in the heave, and set down before it at x 98,
+the hand flat on it. On the floor the stones are behind everything of it: what comes down over
+them hides them, and where its glaze meets a stone's contour the contour gives way to clay. Both
+stay by the heap, behind its head and its arm (`minotaur-heap`). In its hand the stone is in
+front of it, its contour whole, cut from the body by clay, and the hand's fingers lie across its
+face (`minotaur-hand`, frame 1).
 
 ## Must be right
 
@@ -28,9 +32,10 @@ cut from them by clay, and hide what they cover (`minotaur-heap`).
 - **The two identical** (pillar 4).
 - **Never thrown** (designer, 2026-10-07): it never leaves its hand but to be set down.
 - Where a hand lies flat on it, its contour gives way to the hand, so that glaze never touches
-  glaze: the hand on y 729 to 731, straight on the stone's top row, which is cream from end to end
+  glaze: the hand on y 728 to 731, straight on the stone's top row, which is cream from end to end
   under it instead of contour; the side contours begin a row down, at y 733. The hand covers the
-  stone's whole length (`minotaur-hand`). When the hand leaves it, the contour is whole again.
+  stone's whole length (`minotaur-hand`). When the hand leaves it, the contour is whole again
+  (`tests/minotaur-bull.spec.ts`).
 - No dust ever reaches it: dust on cream is 1.20 to 1, and the dust is never in the cell.
 - 8 × 4, the stones of the level's data: the hands' height on them depends on it.
 

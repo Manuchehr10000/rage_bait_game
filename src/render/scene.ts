@@ -50,7 +50,8 @@ import { paint } from '../engine/assets';
 import { blit, blitFacing, frameOf, relief, silhouette, withLamp, type Frame, type ReliefTones } from './frame';
 import { SPLINTER, handStencils } from './hands';
 import { hash } from './hash';
-import { breathHeight, BULL_HEAD, HERO, heroHand, PERSIAN_COLUMN, PLUME, snortBody, TRAIN, type Dot, type Train } from '../engine/entities';
+import { bullHorn, bullPicture, CLAP, deadBull, deadHorn, type Masonry, type Pixels } from './bull';
+import { HERO, heroHand, PERSIAN_COLUMN, snortBody, TRAIN, type Dot, type Train } from '../engine/entities';
 import type { CavePanel } from '../engine/level';
 import { BEAR_STALAGMITE_SPRITE, SIGNAL_LAMP_SPRITE, STOP_SIGN_SPRITE, TRAIN_CAR_SPRITE, TRAIN_ENGINE_SPRITE, TRAIN_LAST_CAR_SPRITE } from './procedural';
 import {
@@ -2194,7 +2195,7 @@ function drawEntityBack(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): voi
       drawDust(ctx, (e as Ear).dust(s.player).behind);
       break;
     case 'fight':
-      drawBull(ctx, e as Fight);
+      drawBull(ctx, s, e as Fight);
       break;
     case 'tableau':
       drawTableau(ctx, e as Tableau, doorGlaze(s));
@@ -5405,337 +5406,79 @@ function drawSnorted(ctx: CanvasRenderingContext2D, s: Scene, death: { cause: De
 }
 
 // ---------------------------------------------------------------------------
-// The Minotaur: the fight in its cell, rough. A bull's head on a man's body, in black
-// glaze; its two stones in cream, the vases' added white, outlined in glaze.
+// The Minotaur: the fight in its cell. A bull's head on a man's body, in black glaze;
+// its two stones in cream, the vases' added white, outlined in glaze. The pixels are
+// bull.ts's: here they are filled, behind the tourist and, where its hands are on him,
+// over him.
 // ---------------------------------------------------------------------------
-
-/** The bull's far hand clawing over its brow at the hero's hand on the horn, a loop of seven frames: from its head's top-left. */
-const CLAW: readonly (readonly [number, number])[] = [
-  [9, -6],
-  [6, -11],
-  [1, -10],
-  [-3, -6],
-  [-4, -1],
-  [0, -3],
-  [5, -5],
-];
-/** Its hands thrashing as the struck body lurches: from its head's top-left, two frames each. */
-const FLAIL: readonly (readonly [number, number])[] = [
-  [-6, -2],
-  [-2, -12],
-  [-8, -7],
-  [1, -14],
-];
-/**
- * The clap, in frames from the catch: its palms reach him, are together on him from `on`,
- * go down with him to its feet from `drop` to `down`, and are back on the stones by `back`.
- * The death draws him to the same frames.
- */
-const CLAP = { on: 2, drop: 6, down: 9, back: 14 } as const;
-/** The near arm's angle over the forward line, in degrees: the stone raised up and back, and swung forward and down. */
-const STONE_RAISED = 115;
-const STONE_SWUNG = -10;
-
-/** Where the bull's parts are on this frame, for drawing it: crouched at its bed before the fight. */
-interface BullPose {
-  /** Its back's top, and its shoulders' and hips' ends, with the lurch. */
-  top: number;
-  x0: number;
-  x1: number;
-  head: { x: number; y: number };
-  /** Its head where it is on its lurch, its hands thrashing about it: Theseus's hand keeps its horn there while it tosses its head at the tourist. */
-  held: { x: number; y: number };
-  /** Its near hand, the left, which takes the stone up at the grip; and its far hand, the right. */
-  near: { x: number; y: number };
-  far: { x: number; y: number };
-  /** The near stone's top-left: under its hand, in it, or put down. */
-  stone: { x: number; y: number };
-  /** Its hands are on him: the palms of the clap, or the swat. Drawn over him. */
-  on: boolean;
-}
 
 const lerpPt = (a: { x: number; y: number }, b: { x: number; y: number }, t: number) => ({
   x: Math.round(a.x + (b.x - a.x) * t),
   y: Math.round(a.y + (b.y - a.y) * t),
 });
 
-function bullPose(f: Fight): BullPose {
-  const d = f.def;
-  const c = d.clock;
-  const F = d.floorY;
-  const st = d.stones;
-  const k = f.keyed ? f.k : -1;
-  const crouched = k < c.grip;
-  // Crouched, it breathes: its back up a pixel while the breath is out.
-  const bob = crouched && breathHeight(f.breath) > PLUME / 2 ? 1 : 0;
-  // Clapping, it stands up off its stones a man, for a moment: up to him, its palms
-  // together on him, down with him to its feet, and back. It is that, even into the grip.
-  const caught = f.caught;
-  const u = caught && k >= caught.k ? k - caught.k : -1;
-  const clapping = caught?.by === 'clap' && u >= 0 && u < CLAP.back;
-  let rear = 0;
-  if (clapping) rear = u < CLAP.on ? (u + 1) / CLAP.on : u < CLAP.down ? 1 : Math.max(0, (CLAP.back - u) / (CLAP.back - CLAP.down));
-  // Tossing, it rears up on its knees and tosses its head up at him, or out to him.
-  const toss = caught?.by === 'toss' && u >= 0 ? f.tossed(u) : null;
-  const up = toss ? toss.rear : Math.round(12 * rear);
-  const top = F - Math.round(f.backAt(k)) - bob - up;
-  const dx = f.lurchAt(k);
-  const x0 = d.body.x0 + dx;
-  const x1 = d.body.x1 + dx;
-  const hd = f.headAt(k);
-  const head = { x: hd.x, y: hd.y - bob - up };
-  const shoulder = { x: x0 + 3, y: top + 3 };
-  const onStone = (sx: number) => ({ x: sx + 3, y: F - st.h - 1 });
-  const swing = (deg: number) => ({
-    x: shoulder.x - Math.round(13 * Math.cos((deg * Math.PI) / 180)),
-    y: shoulder.y - Math.round(13 * Math.sin((deg * Math.PI) / 180)),
-  });
-  const claw = (kk: number) => {
-    const [cx, cy] = CLAW[(((kk - c.knee) % CLAW.length) + CLAW.length) % CLAW.length]!;
-    return { x: head.x + cx, y: head.y + cy };
-  };
-  const put = { x: d.body.face - 6, y: F - 3 };
-  let near: { x: number; y: number };
-  let far: { x: number; y: number };
-  let on = false;
-  if (clapping && caught) {
-    const him = { x: Math.round(caught.x) + 5, y: Math.round(caught.y) + 8 };
-    const feet = { x: d.clap.rect.x - 5, y: F - 3 };
-    const rest = crouched ? [onStone(st.near), onStone(st.far)] : [swing(STONE_RAISED), claw(k)];
-    if (u < CLAP.on) {
-      const t = (u + 1) / CLAP.on;
-      near = lerpPt(onStone(st.near), { x: him.x - 3, y: him.y }, t);
-      far = lerpPt(onStone(st.far), { x: him.x + 3, y: him.y }, t);
-    } else if (u < CLAP.drop) {
-      near = { x: him.x - 3, y: him.y };
-      far = { x: him.x + 3, y: him.y };
-      on = true;
-    } else if (u < CLAP.down) {
-      const t = (u - CLAP.drop + 1) / (CLAP.down - CLAP.drop);
-      near = lerpPt({ x: him.x - 3, y: him.y }, { x: feet.x - 3, y: feet.y }, t);
-      far = lerpPt({ x: him.x + 3, y: him.y }, { x: feet.x + 3, y: feet.y }, t);
-      on = true;
-    } else {
-      const t = (u - CLAP.down + 1) / (CLAP.back - CLAP.down);
-      near = lerpPt({ x: feet.x - 3, y: feet.y }, rest[0]!, t);
-      far = lerpPt({ x: feet.x + 3, y: feet.y }, rest[1]!, t);
-    }
-  } else if (crouched) {
-    near = onStone(st.near);
-    far = onStone(st.far);
-  } else if (k < c.knee) {
-    // The grip: it lets go of its far stone, and takes the near one up as it sinks to its knee.
-    const t = (k - c.grip + 1) / (c.knee - c.grip);
-    near = lerpPt(onStone(st.near), swing(STONE_RAISED), t);
-    far = lerpPt(onStone(st.far), claw(c.knee), t);
-  } else if (k < c.heave) {
-    near = swing(STONE_RAISED);
-    far = claw(k);
-  } else if (k <= c.heave + d.back.ease) {
-    // The heave: the stone swung over and down at the ducking hero.
-    const t = (k - c.heave + 1) / (d.back.ease + 1);
-    near = swing(STONE_RAISED + (STONE_SWUNG - STONE_RAISED) * t);
-    far = claw(k);
-  } else if (k < c.blow1) {
-    // The stone set down before it, the free hand down on the floor once it has stopped clawing.
-    near = lerpPt(swing(STONE_SWUNG), put, Math.min(1, (k - c.heave - d.back.ease) / 8));
-    far = k < d.swat.to ? claw(k) : { x: head.x - 1, y: F - 2 };
-  } else if (k < d.toss.to) {
-    // Struck: it thrashes, both hands, as it lurches on its knees.
-    const i = Math.floor((k - c.blow1) / 2) % FLAIL.length;
-    const [ax, ay] = FLAIL[i]!;
-    const [bx, by] = FLAIL[(i + 2) % FLAIL.length]!;
-    near = { x: head.x + ax, y: head.y + ay };
-    far = { x: head.x + bx + 3, y: head.y + by };
-  } else {
-    // Down on its hands before the second blow.
-    near = { x: head.x - 4, y: F - 2 };
-    far = { x: head.x + 2, y: F - 2 };
+/** A picture at 1 world px, filled in the vase's inks. */
+function fillPixels(ctx: CanvasRenderingContext2D, p: Pixels): void {
+  for (const r of p.runs()) {
+    ctx.fillStyle = r.ink === '#' ? MN.glaze : r.ink === 'o' ? MN.cream : MN.clay;
+    ctx.fillRect(r.x, r.y, r.w, 1);
   }
-  // The swat: its free hand on him, and down with him onto its brow, or onto the floor.
-  if (caught?.by === 'swat' && u >= 0 && u < 8) {
-    const him = { x: Math.round(caught.x) + 5, y: Math.round(caught.y) + 8 };
-    const to = caught.air ? f.browAt(k) : { x: him.x, y: F - 2 };
-    far = u < 2 ? him : lerpPt(him, to, Math.min(1, (u - 1) / 3));
-    on = true;
-  }
-  const stone =
-    k < c.grip ? { x: st.near, y: F - st.h } : k < c.blow1 ? { x: near.x - st.w / 2, y: near.y - st.h + 1 } : { x: put.x - st.w / 2, y: F - st.h };
-  return { top, x0, x1, head: toss?.head ?? head, held: head, near, far, stone, on };
-}
-
-/** Where Theseus's left hand has the bull's near horn this frame. */
-function bullHorn(f: Fight): { x: number; y: number } {
-  const h = bullPose(f).held;
-  return { x: h.x + 3, y: h.y - 2 };
-}
-
-/** A line `w` px thick, pixel by pixel. */
-function thickLine(ctx: CanvasRenderingContext2D, a: { x: number; y: number }, b: { x: number; y: number }, w: number): void {
-  for (let i = 0; i < w; i++) for (let j = 0; j < w; j++) pixelLine(ctx, a.x + i, a.y + j, b.x + i, b.y + j);
-}
-
-/** One of its stones: a flat block in cream, the vases' added white, outlined in glaze, its foot on the floor. */
-function drawBullStone(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number): void {
-  ctx.fillStyle = MN.glaze;
-  ctx.fillRect(Math.round(x), Math.round(y), w, h);
-  ctx.fillStyle = MN.cream;
-  ctx.fillRect(Math.round(x) + 1, Math.round(y) + 1, w - 2, h - 1);
-}
-
-/** A bull's head, facing left, its box's top-left at (hx, hy): the muzzle forward and down, the horns up and forward over the brow. Drawn in `ink`; its eye and nostril reserved only in the glaze. */
-function drawBullHead(ctx: CanvasRenderingContext2D, hx: number, hy: number, ink: string = MN.glaze): void {
-  ctx.fillStyle = ink;
-  ctx.fillRect(hx + 2, hy, 7, 6);
-  ctx.fillRect(hx, hy + 3, 5, 5);
-  ctx.fillRect(hx + 1, hy + 8, 3, 1);
-  ctx.fillRect(hx + 5, hy + 4, 6, 5);
-  ctx.fillRect(hx + 9, hy + 1, 2, 2);
-  // The horns, the near one in front: out of the head, up, and forward at the tip.
-  for (const [ox, oy] of [
-    [4, -1],
-    [3, -2],
-    [2, -3],
-    [2, -4],
-    [3, -5],
-    [7, -1],
-    [7, -2],
-    [6, -3],
-    [6, -4],
-    [7, -5],
-  ] as const)
-    ctx.fillRect(hx + ox, hy + oy, 1, 1);
-  ctx.fillRect(hx + 3, hy - 1, 2, 1);
-  if (ink !== MN.glaze) return;
-  // Its eye and its nostril, reserved in the clay.
-  ctx.fillStyle = MN.clay;
-  ctx.fillRect(hx + 3, hy + 2, 1, 1);
-  ctx.fillRect(hx + 1, hy + 5, 1, 1);
-}
-
-/** A limb in glaze through `pts`, `w` px thick; incised, with a reserved line of clay round it where it crosses the body. */
-function drawLimb(ctx: CanvasRenderingContext2D, pts: readonly { x: number; y: number }[], w: number, incised: boolean): void {
-  const draw = () => {
-    for (let i = 1; i < pts.length; i++) thickLine(ctx, pts[i - 1]!, pts[i]!, w);
-  };
-  if (incised) {
-    ctx.fillStyle = MN.clay;
-    for (const [dx, dy] of [
-      [-1, 0],
-      [1, 0],
-      [0, -1],
-      [0, 1],
-    ] as const) {
-      ctx.save();
-      ctx.translate(dx, dy);
-      draw();
-      ctx.restore();
-    }
-  }
-  ctx.fillStyle = MN.glaze;
-  draw();
-}
-
-/** An arm from the shoulder to the hand, bent at the elbow, which goes `bend` px back from the straight line. */
-function armPts(s: { x: number; y: number }, h: { x: number; y: number }, bend: number): { x: number; y: number }[] {
-  return [s, { x: Math.round((s.x + h.x) / 2) + bend, y: Math.round((s.y + h.y) / 2) }, h];
-}
-
-/** A man's hand, flat: four px of it forward from the wrist at `h`, the thumb under. */
-function drawBullHand(ctx: CanvasRenderingContext2D, h: { x: number; y: number }): void {
-  ctx.fillStyle = MN.glaze;
-  ctx.fillRect(h.x - 3, h.y, 5, 1);
-  ctx.fillRect(h.x - 1, h.y + 1, 3, 1);
 }
 
 /**
- * The bull in its cell, rough: a bull's head on a man's body, crouched at its bed facing
- * the hatch with a hand flat on each stone, breathing; and in the fight, on its knee with
- * the near stone raised and its free hand clawing, heaving the stone at the hero,
- * thrashing as it lurches after the first blow, rearing to toss its head at a tourist
- * over its horns, and a heap after the second. Its near
- * limbs are incised, as the vase painters cut a limb from a body. Nothing of it is above
- * y 688 until the fight.
+ * The labyrinth's lines in its masonry, by drawMasonry's rule: along the foot of each
+ * course and under any block over air, and the joints where two stones meet. The bull
+ * keeps a pixel of clay from them, as glaze keeps from glaze.
  */
-function drawBull(ctx: CanvasRenderingContext2D, f: Fight): void {
-  const d = f.def;
-  const F = d.floorY;
-  const st = d.stones;
-  const k = f.keyed ? f.k : -1;
+function masonryLine(level: Level): Masonry {
+  const stone = (i: number, j: number) => level.isSolid(i, j);
+  const under = (i: number, j: number) => j >= level.heightTiles || i < 0 || i >= level.widthTiles || level.isSolid(i, j);
+  return (x, y) => {
+    const tx = Math.floor(x / TILE);
+    const ty = Math.floor(y / TILE);
+    if (!stone(tx, ty)) return false;
+    const starts = (tx + Math.floor(ty / LABYRINTH_COURSE)) % 2 === 1;
+    const mate = starts ? tx + 1 : tx - 1;
+    if (y % TILE === TILE - 1 && (ty % LABYRINTH_COURSE === LABYRINTH_COURSE - 1 || !under(tx, ty + 1) || !under(mate, ty + 1))) return true;
+    return x % TILE === 0 && starts && stone(tx - 1, ty) && (y % TILE > 0 || stone(tx, ty - 1));
+  };
+}
+
+/** The bull's picture this frame, worked out once a frame and drawn twice: behind him and over him. */
+let bullDrawn: { f: Fight; k: number; t: number; caught: unknown; pic: ReturnType<typeof bullPicture> } | null = null;
+function bullNow(s: Scene, f: Fight): ReturnType<typeof bullPicture> {
+  if (bullDrawn && bullDrawn.f === f && bullDrawn.k === f.k && bullDrawn.t === f.t && bullDrawn.caught === f.caught) return bullDrawn.pic;
+  const pic = bullPicture(f, masonryLine(s.level));
+  bullDrawn = { f, k: f.k, t: f.t, caught: f.caught, pic };
+  return pic;
+}
+
+/**
+ * The bull in its cell (e-cell/minotaur-body.md and the notes it heads): crouched at its
+ * bed facing the hatch with a hand flat on each stone, breathing; and in the fight, on its
+ * knee with the near stone raised and its free hand clawing, heaving the stone at the
+ * hero, thrashing as it lurches after the first blow, rearing to toss its head at a
+ * tourist over its horns, and a heap after the second. Nothing of it is over the floor's
+ * face, nor above y 688 until the fight.
+ */
+function drawBull(ctx: CanvasRenderingContext2D, s: Scene, f: Fight): void {
   ctx.save();
-  // Nothing of it over the floor's face, the incisions included.
   ctx.beginPath();
-  ctx.rect(0, 0, VIEW_W * 4, F);
+  ctx.rect(0, 0, VIEW_W * 4, f.def.floorY);
   ctx.clip();
-  if (k >= d.clock.blow2) drawBullHeap(ctx, f);
-  else {
-    const b = bullPose(f);
-    const shoulder = { x: b.x0 + 4, y: b.top + 4 };
-    // The far stone stays where it is from the grip, when it lets go of it.
-    drawBullStone(ctx, st.far, F - st.h, st.w, st.h);
-    if (k < d.clock.grip) drawBullStone(ctx, b.stone.x, b.stone.y, st.w, st.h);
-    // The far arm, the right, behind it, and its hand.
-    drawLimb(ctx, armPts({ x: shoulder.x + 3, y: shoulder.y - 1 }, b.far, 2), 2, false);
-    drawBullHand(ctx, b.far);
-    // A man's back, bent over: his shoulders, his waist, his hips up over the knees.
-    ctx.fillStyle = MN.glaze;
-    const deep = (n: number) => Math.max(1, Math.min(n, F - b.top - 1));
-    ctx.fillRect(b.x0 + 1, b.top, 9, 1);
-    ctx.fillRect(b.x0, b.top + 1, 10, deep(9));
-    ctx.fillRect(b.x0 + 9, b.top + 1, b.x1 - b.x0 - 18, deep(6));
-    ctx.fillRect(b.x1 - 10, b.top - 1, 7, 1);
-    ctx.fillRect(b.x1 - 11, b.top, 9, deep(8));
-    // The neck, and a bull's head on it.
-    thickLine(ctx, { x: b.head.x + 7, y: b.head.y + 5 }, { x: shoulder.x - 2, y: shoulder.y - 1 }, 4);
-    drawBullHead(ctx, b.head.x, b.head.y);
-    // The near leg, folded under it: the thigh down to the knee on the floor, the shin
-    // back along it, and the sole of the foot up at the end.
-    const knee = { x: b.x1 - 13, y: F - 3 };
-    drawLimb(ctx, [{ x: b.x1 - 7, y: b.top + 3 }, knee, { x: b.x1 - 4, y: F - 3 }], 3, true);
-    ctx.fillRect(b.x1 - 3, F - 6, 2, 5);
-    // The near arm, the left, bent at the elbow; the stone in its hand from the grip.
-    drawLimb(ctx, armPts({ x: shoulder.x - 1, y: shoulder.y + 1 }, b.near, 2), 2, true);
-    if (k >= d.clock.grip) drawBullStone(ctx, b.stone.x, b.stone.y, st.w, st.h);
-    drawBullHand(ctx, b.near);
-  }
+  fillPixels(ctx, bullNow(s, f).body);
   ctx.restore();
 }
 
-/** The second blow, and the body sunk into a heap over its knees, its head down on the floor before it. It stays. */
-function drawBullHeap(ctx: CanvasRenderingContext2D, f: Fight): void {
-  const d = f.def;
-  const F = d.floorY;
-  const st = d.stones;
-  const x0 = d.body.x0;
-  const x1 = d.body.x1;
-  const top = F - d.back.heap;
-  drawBullStone(ctx, st.far, F - st.h, st.w, st.h);
-  drawBullStone(ctx, d.body.face - 6 - st.w / 2, F - st.h, st.w, st.h);
-  ctx.fillStyle = MN.glaze;
-  // Slumped over its knees: the hump of its back, the shoulder down in front, the hips behind.
-  ctx.fillRect(x0 + 9, top, 12, 2);
-  ctx.fillRect(x0 + 5, top + 2, 20, 3);
-  ctx.fillRect(x0 + 2, top + 5, 26, 5);
-  ctx.fillRect(x0, top + 10, x1 - x0, F - top - 10);
-  // Struck, the head goes up once; then it is down on the floor before it.
-  const head = f.headAt(f.k);
-  thickLine(ctx, { x: head.x + 7, y: head.y + 5 }, { x: x0 + 3, y: top + 9 }, 4);
-  drawBullHead(ctx, head.x, head.y);
-  // A leg folded under it, its sole up at the wall; an arm thrown out along the floor.
-  drawLimb(ctx, [{ x: x1 - 6, y: top + 8 }, { x: x1 - 14, y: F - 3 }, { x: x1 - 4, y: F - 3 }], 3, true);
-  ctx.fillRect(x1 - 3, F - 6, 2, 5);
-  drawLimb(ctx, [{ x: x0 + 3, y: top + 12 }, { x: x0 - 4, y: F - 3 }, { x: d.body.face - 16, y: F - 2 }], 2, true);
-  drawBullHand(ctx, { x: d.body.face - 16, y: F - 2 });
-}
-
-/** Its hands on him, over him: the palms of the clap, or the swat. */
+/** Its hands on him, over him: the palms of the clap, or the swat, cut from him by clay. */
 function drawBullHands(ctx: CanvasRenderingContext2D, s: Scene, f: Fight): void {
-  void s;
   if (!f.keyed || f.k >= f.def.clock.blow2) return;
-  const b = bullPose(f);
-  if (!b.on) return;
-  ctx.fillStyle = MN.glaze;
-  for (const h of f.caught?.by === 'clap' ? [b.near, b.far] : [b.far]) ctx.fillRect(h.x - 1, h.y - 3, 2, 6);
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(0, 0, VIEW_W * 4, f.def.floorY);
+  ctx.clip();
+  fillPixels(ctx, bullNow(s, f).over);
+  ctx.restore();
 }
 
 /** The dead frame laid down on its back, head to the left, pressed `w` long and `h` high, its middle at `cx`, on `floor`. */
@@ -5837,28 +5580,6 @@ function drawTossed(ctx: CanvasRenderingContext2D, s: Scene, death: { t: number;
 // ---------------------------------------------------------------------------
 
 /**
- * The dead Minotaur lying on its front, dragged by a horn, in `ink`: its head down on the
- * floor at `hx`, horns up, the muzzle toward whoever drags it; a man's shoulders, back
- * and hips after it, an arm trailing along the floor, the legs, and a sole turned up at
- * the end, BULL_HEAD.w + 34 px in all.
- */
-function drawDeadBull(ctx: CanvasRenderingContext2D, hx: number, floorY: number, ink: string): void {
-  const F = floorY;
-  drawBullHead(ctx, hx, F - BULL_HEAD.h + 1, ink);
-  ctx.fillStyle = ink;
-  ctx.fillRect(hx + 8, F - 6, 4, 5);
-  ctx.fillRect(hx + 12, F - 8, 7, 7);
-  ctx.fillRect(hx + 11, F - 7, 1, 6);
-  ctx.fillRect(hx + 19, F - 7, 8, 6);
-  ctx.fillRect(hx + 27, F - 6, 5, 5);
-  ctx.fillRect(hx + 32, F - 5, 6, 4);
-  ctx.fillRect(hx + 38, F - 4, 5, 3);
-  ctx.fillRect(hx + 43, F - 6, 2, 5);
-  // The arm, trailing back along the floor beside it.
-  ctx.fillRect(hx + 14, F - 1, 12, 1);
-}
-
-/**
  * The closing tableau (Tableau): Theseus dragging the dead Minotaur by a horn out of the
  * black vestibule and stopping at the post where he knelt, the body after him, its head
  * across the threshold on the clay of the door opening and the rest in the vestibule.
@@ -5886,19 +5607,19 @@ function drawTableau(ctx: CanvasRenderingContext2D, t: Tableau, doorway: readonl
     stride: t.stopped ? 0 : d.from - x,
   };
   const hx = Math.round(x + d.body.head);
-  const horn = { x: hx + 3, y: F - BULL_HEAD.h - 1 };
-  const both = (ink: string) => {
-    drawDeadBull(ctx, hx, F, ink);
-    drawHeroFigure(ctx, f, horn, ink);
-  };
+  const dead = deadBull(hx, F);
+  const horn = deadHorn(hx, F);
   ctx.save();
   ctx.beginPath();
   ctx.rect(0, 0, VESTIBULE.x + VESTIBULE.w, F);
   ctx.clip();
+  // Their reserved outlines, only where they lie over the black or the post: the body's a
+  // pixel all round it, corners included; his.
   ctx.save();
   ctx.beginPath();
   for (const r of doorway) ctx.rect(r.x, r.y, r.w, r.h);
   ctx.clip();
+  fillPixels(ctx, dead.outline());
   for (const [dx, dy] of [
     [-1, 0],
     [1, 0],
@@ -5907,11 +5628,12 @@ function drawTableau(ctx: CanvasRenderingContext2D, t: Tableau, doorway: readonl
   ] as const) {
     ctx.save();
     ctx.translate(dx, dy);
-    both(MN.clay);
+    drawHeroFigure(ctx, f, horn, MN.clay);
     ctx.restore();
   }
   ctx.restore();
-  both(MN.glaze);
+  fillPixels(ctx, dead);
+  drawHeroFigure(ctx, f, horn, MN.glaze);
   ctx.restore();
 }
 

@@ -163,6 +163,15 @@ Chosen in the asset notes (2026-10-10), where this file did not decide, for the 
   front of the post's foot in their reserved outline; the heap's head, body and arm lie in front of
   its stones. Each hand lies along the whole top of its own stone, x 100 to 107 and 110 to 117, so
   its anchor moves from the rough's to the stone's back end.
+- The bull, as drawn (2026-10-10, `e-cell` and `f-thread`): crouched on its feet, the knee forward
+  and the foot flat under the hip, its arms straight to the stones, its shoulders behind its head;
+  each hand 8 by 4, its fingers spread on the stone and its thumb parted by the one incision, four
+  touches and never a hoof's two; the stone held up with the fingers across its face; the far arm
+  always behind its body and head, the near one behind its head only while it thrashes; after the
+  swat its free hand back flat on its far stone, and down on its hands on its stones; the swat a
+  flat hand pressed on top of him, the palm the clap's only; the heap's arm thrown over its head,
+  and its head down lying on its cheek, horns up at its back, the same in the tableau, where
+  Theseus's hand has the horn at (88, 151), 3 px right of and 2 below where it was.
 
 ## The beats
 
@@ -798,11 +807,18 @@ Being built, in this order, as a stage in the dev build (`#minotaur`, in `STAGES
   `bull-leaper-clotheslined`. Pinned in `tests/minotaur-out.spec.ts` (the thirteen heads, Ariadne's
   facing) and `tests/minotaur-theseus.spec.ts` (the clothesline's frames).
 
+- **The bull, drawn** (2026-10-10, to the asset notes in `e-cell` and `f-thread`): its head, its
+  hands and its stones as drawings at 1 world px, its man's body laid between them by code on the
+  fight's own clock (`src/render/bull.ts`), every frame at its true place: the back's top on its
+  solid, the claw in the swat's column clear of the stone it heaves, the palms either side of him;
+  the heap and the dead body of the tableau. Nothing the fight kills with, carries or times moved.
+  Pinned in `tests/minotaur-bull.spec.ts`.
+
 Still to come:
 
 - **The black-figure figures** still rough: Theseus's poses in the fight (leap, grip, duck, draw
-  and blow), the bull, its heap and the dead body, and the other three deaths' drawings, to their
-  asset notes in the beat folders and `../shared`.
+  and blow), and the other three deaths' drawings, to their asset notes in the beat folders and
+  `../shared`.
   (`LevelData.tricks`, 'The knot', 'The snort', 'The hands', 'The horns', and `dropCause` and
   `fallCause` 'The labyrinth', unreachable, are made.)
 

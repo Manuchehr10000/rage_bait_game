@@ -12,8 +12,9 @@ hero, and jump off the risen back to the far wall. Stay too long and the first b
 tossing head: one full somersault with the kilt flying, dropped flat at the left wall. **Death
 label: "The horns".** The second blow sinks the body into a heap that stays, and opens the exit.
 
-Notes here: the hero's doorway; the Minotaur's body, which code draws, and its head, hands,
-stones and heap, which are drawn as sprites; and Theseus's poses in the fight: the leap, the
+Notes here: the hero's doorway; the Minotaur's body and its heap, which code draws
+(`src/render/bull.ts`), and its head, hands and stones, which are drawings hung on it; and
+Theseus's poses in the fight: the leap, the
 grip, the duck, the draw and the blow. The tourist's frames for the hands and the horns are the
 chapter's (`../../shared/bull-leaper-clapped.md`, `bull-leaper-pressed.md`,
 `bull-leaper-tumbling.md`). There is no dust in the cell: here the bull's breath is heard, and
