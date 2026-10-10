@@ -1,0 +1,56 @@
+# The labyrinth's outer face
+
+| | |
+|---|---|
+| Id | `labyrinth-face` |
+| File | None, and none is wanted: drawn in code at 1 world px (`../LEVEL.md`, Art, ruled 2026-10-10) |
+| Size | 240 × 64 world px, 1 frame, its top-left at (80, 16): lines only |
+| Beat | `a-door` |
+
+## What it is
+
+The outside of Daedalus's building, drawn as the vase painter draws an edge: a 1 px glaze
+contour where its stone meets the clay outside.
+
+- Down the outer face, x 80, from the roof at y 16 to the door's head at y 79.
+- Along the top of the roof, y 16, from x 80 to 319, under the clay over the roof.
+- The door's lintel: a 1 px glaze line along y 79, from x 80 to 94.
+
+The stone inside the contour is the masonry by its rule (`tile-labyrinth`). Under the lintel is
+the door opening, x 80 to 96: the post at its outer side (`labyrinth-doorpost`), then clay, then
+the black vestibule from x 96.
+
+## Where it stands in the game
+
+The face over the door and the lintel are on the first screen (y 53 to 80 of the face at the
+spawn). The roof's top is seen from G0 on the way out, when the camera is at the top of the
+level.
+
+## Must be right
+
+- **Outside and inside are told apart by the wall alone**, since both are clay. The rough build
+  read the clay door opening as a pilaster and the black vestibule as the door (its capture,
+  2026-10-09): the contour and the lintel make the opening an opening.
+- **The lintel stops at x 94**, a pixel short of the vestibule's black (x 96, y 80): two glaze
+  shapes never touch without 1 px of clay between them (`../LEVEL.md`, Art, 2026-10-10). With the
+  post's glaze edge it is one outline, the door's frame.
+- The tongues end at x 78, with clay at 79: they never touch it.
+- **Never Knossos**: no Knossian door, no red-and-black column, no light well, no meander
+  (`../LEVEL.md`, Deliberately wrong; `../../CHAPTER.md`, error dossier).
+- Nothing on the face: no ornament, no mark, no text (pillar 2).
+
+## Deliberately wrong
+
+- **The labyrinth's plan**, in plain masonry only (`../LEVEL.md`, Deliberately wrong), and its
+  outside drawn as a line on the section's stone.
+- **Drawn, not painted.** Flat, unlit pixel art in code at 1 world px: the level is exempt from
+  the painted style of `content/README.md` (`../LEVEL.md`, Art, 2026-10-10).
+
+## Sources
+
+None: no source describes the labyrinth's outside. Ovid's building of misleading ways
+(*Metamorphoses* 8.159–168, line numbers unverified) gives it no façade.
+
+## Confidence
+
+Invented, and a design choice.

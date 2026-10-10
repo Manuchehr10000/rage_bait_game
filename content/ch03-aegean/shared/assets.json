@@ -1,5 +1,5 @@
 {
-  "$comment": "Sizes are world pixels (320 x 180 view). Painted files are 4x. See content/README.md. The costume was designed on 2026-09-27: see bull-leaper.md.",
+  "$comment": "Sizes are world pixels (320 x 180 view). Painted files are 4x. See content/README.md. The costume was designed on 2026-09-27: see bull-leaper.md. The Minotaur's death frames were noted on 2026-10-10; in that level they are drawn in code at 1 world px, as its art is ruled (l06-minotaur/LEVEL.md, Art).",
   "level": "shared",
   "assets": [
     {
@@ -15,7 +15,7 @@
       "w": 12,
       "h": 16,
       "beat": "shared",
-      "what": "The same, the wig knocked down over his eyes. Used, stretched and rotated, by every death but the throne."
+      "what": "The same, the wig knocked down over his eyes. Used, stretched and rotated, by the chapter's deaths, but the throne and those the Minotaur draws with frames of their own; in the Minotaur only ever turned a whole quarter, flat on his back."
     },
     {
       "id": "bull-leaper-seated",
@@ -30,6 +30,42 @@
       "h": 16,
       "beat": "shared",
       "what": "Sitting in the throne at Knossos, facing out, at rest. The one death in the game with no physical cause."
+    },
+    {
+      "id": "bull-leaper-pasted",
+      "w": 18,
+      "h": 12,
+      "beat": "shared",
+      "what": "Pasted flat on a ceiling by the Minotaur's snort, face up against it, splayed and still, the wig over his eyes. Never turned."
+    },
+    {
+      "id": "bull-leaper-clotheslined",
+      "w": 18,
+      "h": 18,
+      "beat": "shared",
+      "what": "Caught by the throat by the Minotaur's knot, his feet flying out ahead of him, drawn tipped back at 45 degrees: the one frame between upright and flat on his back."
+    },
+    {
+      "id": "bull-leaper-tumbling",
+      "w": 18,
+      "h": 18,
+      "beat": "shared",
+      "what": "The jump frame, kilt flying, drawn tipped over at 45 degrees: the half-quarter of the Minotaur's somersault, turned by quarters for the other three."
+    },
+    {
+      "id": "bull-leaper-clapped",
+      "w": 4,
+      "h": 16,
+      "beat": "shared",
+      "what": "Clapped flat between the Minotaur's palms like a fly: edge-on, 4 px wide."
+    },
+    {
+      "id": "bull-leaper-pressed",
+      "w": 16,
+      "h": 4,
+      "frames": 2,
+      "beat": "shared",
+      "what": "Pressed flat, lying: on the floor where the Minotaur's clap drops him or its swat flattens him, and on its brow between the horns."
     }
   ]
 }

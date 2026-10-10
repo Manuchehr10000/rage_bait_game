@@ -1,0 +1,51 @@
+# The tourist's reserve
+
+| | |
+|---|---|
+| Id | `tourist-reserve` |
+| File | None, and none is wanted: drawn in code at 1 world px (`../LEVEL.md`, Art, ruled 2026-10-10) |
+| Size | 14 × 17 world px, 1 frame, from 1 px left of and 1 px over the tourist's 12 × 16 sprite |
+| Beat | `a-door`, and every beat |
+
+## What it is
+
+A 1 px line of the clay round the tourist's top and sides, never under his feet, drawn only
+where something of glaze is behind him. It is how the vase painters cut one figure from the next
+(the research), applied to the one figure in full colour.
+
+## Where it stands in the game
+
+Round whatever frame of him is drawn, his deaths included, clipped to the boxes of the glaze
+behind him: the vestibule; the hero's doorway, from L−8 only; Theseus; the queue and Ariadne; the
+bull, its hands and its heap; the tableau's Theseus and body; the knob on the passage's wall. On
+the clay and on the masonry's wash nothing is drawn: there it would be a halo. Pasted on the
+ceiling by the snort he needs none.
+
+## Must be right
+
+- **The costume's pixels untouched.** It is still the same costume (`../../shared/bull-leaper.md`);
+  the reserve is drawn round it, never on it.
+- **Never under his feet**, which would lift him off the floor.
+- **Only where glaze is behind him**, and exactly 1 px: the clay itself, never lighter.
+- **Nothing inside the hero's doorway, x 148 to 164, before L−8**, so that Theseus stays unseen
+  there (`../LEVEL.md`, Art, 2026-10-10).
+- It changes nothing he collides with (pillar 9).
+
+## Deliberately wrong
+
+- **A reserved line round a man who is not on the vase**, in this level alone.
+- **Drawn, not painted** (`../LEVEL.md`, Art, 2026-10-10).
+
+## Sources
+
+- Overlapping figures kept apart by incision: the Blanton's Leagros Group amphora, "overlapping
+  horses … laboriously rendered with incisions"
+  (https://blanton.emuseum.com/objects/15077/blackfigure-neck-amphora).
+- Why: against the glaze his wig is 1.03 to 1 and his outline 1.10, so on black he is a floating
+  face, sweatband and kilt (the research's contrast measures, 2026-10-10).
+
+## Confidence
+
+Design choice, recommended in the art conversation (2026-10-10) and not ruled by name: it applies
+the clay-gap rule, "two glaze shapes never touch without 1 px of clay between them", to the one
+figure that is not glaze, whose wig and outline are as dark as glaze.

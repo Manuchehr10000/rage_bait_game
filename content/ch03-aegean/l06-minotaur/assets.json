@@ -1,0 +1,294 @@
+{
+  "$comment": "Sizes are world pixels (320 x 180 view). This level is not painted: everything in it is flat, unlit pixel art drawn in code at 1 world px, black-figure on clay, exempt from the painted style of content/README.md (LEVEL.md, Art, ruled 2026-10-10). No entry has a file and none is wanted; each note is what the code must draw, written before it is drawn. dx and dy place a sprite from the box its entity moves: Theseus's 12 x 24, the bull's head's 11 x 10. Not listed: the holes, which are only the masonry's absence; the hatch, a plain hole like every other; the HUD and the map pin, which stay as they are (2026-10-10). The tourist's own frames, his deaths among them, are the chapter's, in ../shared.",
+  "level": "l06-minotaur",
+  "assets": [
+    {
+      "id": "labyrinth-clay",
+      "w": 320,
+      "h": 752,
+      "beat": "a-door",
+      "what": "The clay: the air of the whole level, outside the door and inside the labyrinth, one flat colour to the edges of the screen. No sky."
+    },
+    {
+      "id": "labyrinth-tongues",
+      "w": 80,
+      "h": 9,
+      "beat": "a-door",
+      "what": "A band of black and red tongues over the outside, out of his reach: the shoulder of the amphora whose panel the first screen is."
+    },
+    {
+      "id": "labyrinth-ground-line",
+      "w": 80,
+      "h": 3,
+      "beat": "a-door",
+      "what": "The glaze ground line the queue, Ariadne and the kneeling hero stand on, between two reserved lines: the panel's lower border."
+    },
+    {
+      "id": "labyrinth-lower-zone",
+      "w": 80,
+      "h": 48,
+      "beat": "a-door",
+      "what": "What lies under the ground line outside: the labyrinth's own masonry, by its rule. No earth, no turf, no rays, no black band."
+    },
+    {
+      "id": "labyrinth-face",
+      "w": 240,
+      "h": 64,
+      "beat": "a-door",
+      "what": "The labyrinth's outer face: a glaze contour down the wall over the door and along the top of the roof, and the door's lintel, so that outside and inside are told apart by the wall alone."
+    },
+    {
+      "id": "labyrinth-doorpost",
+      "w": 4,
+      "h": 80,
+      "beat": "a-door",
+      "what": "The post in the door's thickness that Theseus ties the thread to."
+    },
+    {
+      "id": "labyrinth-vestibule",
+      "w": 32,
+      "h": 80,
+      "beat": "a-door",
+      "what": "The black vestibule behind the door, in full glaze: the dark the hero walks into and the body is dragged out of."
+    },
+    {
+      "id": "tile-labyrinth",
+      "w": 16,
+      "h": 16,
+      "beat": "a-door",
+      "what": "The labyrinth's masonry, by rule: a dilute-glaze wash in courses three tiles high, blocks two tiles long, a full-glaze line at each course's foot and a joint only where two stones meet. Every solid tile in the level but the lip."
+    },
+    {
+      "id": "tile-labyrinth-top",
+      "w": 16,
+      "h": 16,
+      "beat": "a-door",
+      "what": "The same masonry with air over it: identical to tile-labyrinth, with no lit top."
+    },
+    {
+      "id": "queue-youth",
+      "w": 10,
+      "h": 24,
+      "beat": "a-door",
+      "what": "One of the six youths of the tribute, waiting in the file at the door: all glaze, beardless, a red fillet, empty hands. Faces right."
+    },
+    {
+      "id": "queue-maiden",
+      "w": 10,
+      "h": 24,
+      "beat": "a-door",
+      "what": "One of the seven maidens of the tribute, waiting in the file at the door: a peplos in glaze, her face, arm and feet in cream. Faces right."
+    },
+    {
+      "id": "ariadne",
+      "w": 10,
+      "h": 24,
+      "beat": "a-door",
+      "what": "Ariadne, apart from the file, facing the door from the first frame to the last: a maiden with added red on her fillet and her hem, her near hand open and empty. Faces right."
+    },
+    {
+      "id": "theseus-kneel",
+      "w": 16,
+      "h": 14,
+      "frames": 4,
+      "beat": "a-door",
+      "what": "Theseus on one knee at the doorpost, tying the thread: wrap over, wrap under, tug, pick. The figure every other Theseus pose is drawn from. Faces right."
+    },
+    {
+      "id": "tourist-reserve",
+      "w": 14,
+      "h": 17,
+      "dx": -1,
+      "dy": -1,
+      "beat": "a-door",
+      "what": "A 1 px line of reserved clay round the tourist's top and sides, drawn only where glaze is behind him, so that the one full-colour figure is cut from the black as the vase painters cut one figure from the next."
+    },
+    {
+      "id": "thread",
+      "w": 135,
+      "h": 12,
+      "beat": "b-passage",
+      "what": "Ariadne's thread, the one pure white in the level, in all its states: the knot on the post, the slack on the passage floor, the line rising and taut at y 149, let go, laid down the hero's route, the loops he paid out, the ball in his hand."
+    },
+    {
+      "id": "thread-ball",
+      "w": 6,
+      "h": 6,
+      "beat": "b-passage",
+      "what": "The ball of thread at the line's inner end, on the passage floor under O1, and later in the hero's doorway. Plain white."
+    },
+    {
+      "id": "boss",
+      "w": 9,
+      "h": 8,
+      "beat": "b-passage",
+      "what": "The knob on the passage's back wall that the hero's trailing foot pushes off as he mantles up O1: a glaze contour on the clay, reserved inside. Background, never rock."
+    },
+    {
+      "id": "theseus-lean",
+      "w": 22,
+      "h": 24,
+      "dx": -6,
+      "frames": 3,
+      "beat": "b-passage",
+      "what": "Theseus up from the knee and leaning back on the line to test his knot, both hands on it at the post: rising, half, and full, 6 px back at the head. Faces right."
+    },
+    {
+      "id": "theseus-stand",
+      "w": 12,
+      "h": 24,
+      "beat": "b-passage",
+      "what": "Theseus standing: a beardless youth in a short chiton, the sword at his hip in its scabbard. Faces right."
+    },
+    {
+      "id": "theseus-walk",
+      "w": 12,
+      "h": 24,
+      "frames": 4,
+      "beat": "b-passage",
+      "what": "Theseus walking and running: two strides looking ahead, and the same two with his head turned back over his shoulder at his knot. Faces right."
+    },
+    {
+      "id": "theseus-climb",
+      "w": 12,
+      "h": 24,
+      "frames": 2,
+      "beat": "b-passage",
+      "what": "Theseus mantling 80 px up O1, arms up over his head: with both legs under him, and with the near leg only, while the code draws the trailing one out to the boss. Faces right."
+    },
+    {
+      "id": "theseus-fall",
+      "w": 12,
+      "h": 24,
+      "beat": "c-way-down",
+      "what": "Theseus dropping straight down a shaft, feet first, never jumping. Faces right."
+    },
+    {
+      "id": "theseus-payout",
+      "w": 12,
+      "h": 24,
+      "frames": 4,
+      "beat": "c-way-down",
+      "what": "Theseus crouched on his heels where he landed, paying out a loop of thread: the arm at four quarters of its circle while the white loop grows. Faces right."
+    },
+    {
+      "id": "beast-dust",
+      "w": 14,
+      "h": 33,
+      "beat": "c-way-down",
+      "what": "The beast's breath: twin plumes of dust out of the hatch, or through the bed block's joint, rising 32 px and drawn back in; the puffs of its clock; the sniff, the jet and the settling of the snort. Grains, never a line or a solid."
+    },
+    {
+      "id": "tile-labyrinth-threshold",
+      "w": 16,
+      "h": 16,
+      "beat": "d-hatch",
+      "what": "The lip, buried: the dressed threshold with stone over it. The game asks for this id but never draws it here, since the lip always has air over it."
+    },
+    {
+      "id": "tile-labyrinth-threshold-top",
+      "w": 16,
+      "h": 16,
+      "beat": "d-hatch",
+      "what": "The lip: the one dressed stone in the floor, before the hatch, its top dished by two worn foot hollows where the tribute stood. Edged in glaze, so it reads as stone."
+    },
+    {
+      "id": "hero-doorway",
+      "w": 20,
+      "h": 30,
+      "beat": "e-cell",
+      "what": "The black doorway on row 5 where Theseus waits unseen for the fight, framed in a glaze line on the back wall. Background, never a ledge."
+    },
+    {
+      "id": "minotaur-body",
+      "w": 44,
+      "h": 30,
+      "beat": "e-cell",
+      "what": "The Minotaur's man's body, drawn by code in flat glaze: the back on its solid every frame, the neck, 3 px arms and legs, the folded leg a filled wedge; crouched, gripped, on its knee, heaving, lurching on both knees, tossing. Size as crouched, with its stones."
+    },
+    {
+      "id": "minotaur-head",
+      "w": 11,
+      "h": 15,
+      "dy": -5,
+      "frames": 3,
+      "beat": "e-cell",
+      "what": "The bull's head on the man's body, horns and all: level, tossed up, and down on the floor. Faces right; the game flips it to face left."
+    },
+    {
+      "id": "minotaur-hand",
+      "w": 8,
+      "h": 8,
+      "frames": 4,
+      "beat": "e-cell",
+      "what": "The Minotaur's hand, a man's, oversized: flat on a stone, holding the stone, clawing, and edge-on as a palm for the clap and the swat. Never a hoof. Faces right; the game flips it to face left."
+    },
+    {
+      "id": "minotaur-stone",
+      "w": 8,
+      "h": 4,
+      "beat": "e-cell",
+      "what": "One of the Minotaur's two stones, in cream outlined in glaze: a hand flat on each, the near one raised at the grip, swung at the hero and set down. Never thrown."
+    },
+    {
+      "id": "minotaur-heap",
+      "w": 54,
+      "h": 24,
+      "beat": "e-cell",
+      "what": "The Minotaur after the second blow: the body sunk in a 24 px heap over its knees, an arm thrown out along the floor. Bloodless. It stays. Faces right; the game flips it to face left."
+    },
+    {
+      "id": "theseus-leap",
+      "w": 12,
+      "h": 31,
+      "dy": -7,
+      "beat": "e-cell",
+      "what": "Theseus leaping low over the crouched bull onto its horn, the vases' warrior with his sword up over his head, never a bull-leaper. Faces right."
+    },
+    {
+      "id": "theseus-grip",
+      "w": 12,
+      "h": 24,
+      "beat": "e-cell",
+      "what": "Theseus braced at the bull's head, the horn in his left hand (drawn by code), the sword held up in his right. Faces right."
+    },
+    {
+      "id": "theseus-duck",
+      "w": 12,
+      "h": 24,
+      "beat": "e-cell",
+      "what": "Theseus down under the stone the bull heaves at him, still on the horn. Faces right."
+    },
+    {
+      "id": "theseus-draw",
+      "w": 17,
+      "h": 25,
+      "dx": -5,
+      "dy": -1,
+      "beat": "e-cell",
+      "what": "Theseus with the sword drawn back over his shoulder, against the clay, before each blow. Faces right."
+    },
+    {
+      "id": "theseus-blow",
+      "w": 21,
+      "h": 24,
+      "beat": "e-cell",
+      "what": "Theseus lunging, the sword struck home: each of the two blows. Faces right."
+    },
+    {
+      "id": "theseus-drag",
+      "w": 12,
+      "h": 24,
+      "frames": 2,
+      "beat": "f-thread",
+      "what": "Theseus in the closing tableau, leaning into the pull, the dead Minotaur's horn in his far hand behind him: two strides. Faces right; the game flips it to face left, the way he walks."
+    },
+    {
+      "id": "minotaur-dead",
+      "w": 45,
+      "h": 15,
+      "beat": "f-thread",
+      "what": "The dead Minotaur in the closing tableau, on its front, dragged by a horn: its head and horns across the threshold, the rest in the vestibule in a reserved outline. Faces right; the game flips it to face left."
+    }
+  ]
+}

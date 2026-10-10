@@ -29,13 +29,19 @@ maze would not baffle him (64.112–115). Ovid's Theseus finds the door again by
 thread, *filo relecto* (8.172–173).
 
 The **Attic vase painters** gave Theseus a sword and the Minotaur stones. On a black-figure amphora
-in Boston (MFA 60.1) Theseus holds a horn in his left hand and the Minotaur sinks on his right knee
-with a stone raised in his left; on Lydos's amphora (Getty 86.AE.60) he raises a rock; a hydria in
-Tampa is said to give him a pair. The Aison cup in Madrid shows Theseus dragging the dead Minotaur
-out of the labyrinth's door, with Athena by. Silver staters of Knossos of about 440 BC show the
-Minotaur kneeling and running. The designer chose the vases' sword over the fists (2026-10-06).
-Every source here was read at search-extract level at best, and some details only from memory
-(Confidence).
+in Boston (MFA 60.1) Theseus grips a horn with one hand and drives his sword into the Minotaur's
+side, and the Minotaur sinks on his right knee with a stone raised in his left; on a neck-amphora in
+the British Museum (1843,1103.21) the horn is in Theseus's left hand. On an amphora by Lydos or a
+painter near him (Getty 86.AE.60) Theseus drives his sword through the Minotaur's neck, gripping its
+arm, and it holds a rock in its raised hand; a hydria in Tampa (86.36) gives it a pair of stones,
+held. The Aison cup in Madrid (Museo Arqueológico Nacional 11365), which is red-figure, shows
+Theseus dragging the dead Minotaur from the labyrinth's gates, with Athena by. Silver staters of
+Knossos of about 440 BC show the Minotaur in the Knielauf, the archaic convention for running fast,
+not kneeling. (Corrected from the research, 2026-10-10: this read that MFA 60.1 shows the horn in
+his left hand, "Lydos's amphora" on which "he raises a rock", the cup as "Madrid (L196)", and
+staters showing the Minotaur "kneeling and running".) The designer chose the vases' sword over the
+fists (2026-10-06). Every source here was read at search-extract level at best, and some details
+only from memory (Confidence); nobody on the project has seen the vases.
 
 ## What this level is for
 
@@ -120,6 +126,27 @@ Decided while building, and not objected to (2026-10-10):
 - The stone boss of the stride drawn as background, never as rock he could stand on or walk
   through.
 
+Chosen in the asset notes (2026-10-10), where this file did not decide, for the designer to see:
+- The tongues over the outside only, x 0 to 78 and y 56 to 64: on the first screen, and out of
+  his reach. Under the ground line, the masonry; the ground line is glaze between two reserved
+  rows, so no glaze foot touches it.
+- The masonry's courses three tiles high, its blocks still two tiles long: a longer block would
+  lose the bed's joint at x 112. Every room's ceiling is the last row of a course, so the pinned
+  holes keep their course line.
+- The queue a figure every 3 px, each drawn over the one ahead so that every face is whole, its
+  front at about x 42; Ariadne moved to about x 45 to 55 (beat a).
+- A 1 px line of reserved clay round the tourist wherever glaze is behind him, never on the
+  costume and never inside the hero's doorway before L−8.
+- The boss drawn as a knob in outline, and the hero's doorway framed by a line, not the rough's
+  lintel of stone in row 5's air.
+- No added red on Theseus anywhere; the youths' red fillets tell them from him. The stones in
+  cream; the hands' one incision parts the thumb from the fingers. No tail. No dust in the cell,
+  and the dust in 2 × 2 grains, the jet in 1 px.
+- The deaths: the clothesline and the toss each have one drawn half-quarter frame and end with
+  the dead frame turned a quarter; the toss's end is no longer pressed flatter; the swat on the
+  floor shares the clap's flat frame; the swat in the air cuts to its flat frame instead of
+  squashing his.
+
 ## The beats
 
 | Beat | Folder | What the player meets | Death label | What is true |
@@ -131,8 +158,8 @@ Decided while building, and not objected to (2026-10-10):
 | e | `e-cell` | The chapter's one bull, crouched on two stones. Theseus leaps it and takes the horn; he must go with him, ride the heave and jump off the bull's back. **The tricks: 'The hands' and 'The horns'** | "The hands", "The horns" | A bull's face, the rest human; the horn, the knee, the stone; the horns tossed at the winds |
 | f | `f-thread` | Out by the thread, up four look-alike rooms and four shafts, back through the passage and out past the queue, Theseus dragging the body behind him. Nothing kills | — | Out by the thread; the dead Minotaur dragged from the door |
 
-The folders are proposed; none exists yet, and every asset gets its note there before it is
-painted.
+The folders exist, and every asset the level draws has its note in one (2026-10-10); the
+tourist's frames are the chapter's, in `../shared`.
 
 ### The section
 
@@ -184,10 +211,13 @@ He walks in on foot off the left edge onto the outside ground, and a retry start
 
 - **The thirteen**, six youths and seven maidens, stand in one file, a vase procession of
   overlapping figures, the maidens' cream alternating with the youths' black so the heads can be
-  counted. Its front is at about x 40; it may run off the left edge. They stand still, or loop
+  counted. Its front is at about x 42, a figure every 3 px, so that all thirteen heads are on
+  screen; the last may lose a pixel at the left edge, never its face. They stand still, or loop
   slowly well clear of x 56–80, and are still waiting at the end.
-- **Ariadne** stands apart at about x 42–52, hands empty, facing the door from first frame to last.
-  She never turns, so her look goes past him to the hero.
+- **Ariadne** stands apart at about x 45–55, clear of x 56, hands empty, facing the door from first
+  frame to last. She never turns, so her look goes past him to the hero. (Both moved in the asset
+  notes, 2026-10-10, from a front at x 40 and Ariadne at x 42–52, so that the overlapped file
+  fits.)
 - **Theseus** kneels at the doorpost, x 66–78, y 146–160, re-tying the thread in a fussy loop
   (wrap, tug, unpick, wrap), eyes on the knot: a solid box until the knot fires, the only solid
   person in the game. He jumps or hops the kneeling hero, who ignores him: the first bent figure he
@@ -311,10 +341,11 @@ this game a crack means "will give", and Persepolis's cracked column holds.
 - **The death**, inside the 45 frames of a death: 0–4, the sniff, the plumes drawn down past his
   legs into the hole (only the hatch ever draws dust past his legs); 5–8, massed twin columns of
   dots, never a solid black column, jet up and carry him to the ceiling; 9–44, pasted flat on it
-  over the hatch (x 48–58, y 528), face up, splayed and still, in full colour, the wig over his
-  eyes. The dots settle back into the hatch, since dust falls where smoke would rise, and by about
-  frame 40 to 44 a slow inhale draws a plume down and the snore starts again, silent since the
-  ring, so its return is new. No rotation and no kilt flying: those are the horns'. Nothing reacts.
+  over the hatch (his box x 48–58, y 528; the drawing, 18 × 12, reaches x 66), face up, splayed
+  and still, in full colour, the wig over his eyes. The dots settle back into the hatch, since dust
+  falls where smoke would rise, and by about frame 40 to 44 a slow inhale draws a plume down and
+  the snore starts again, silent since the ring, so its return is new. No rotation and no kilt
+  flying: those are the horns'. Nothing reacts.
 - **Second attempt.** Never touch the lip: a running leap from the plain block before it, left
   held, never a walk-off. The take-off band for his left edge, by frames of jump held (the physics
   check confirmed each): 1, never; 2, x 80–82.5 (1.7 frames of running); 3, 80–87 (4.7); 4, 80–90
@@ -345,8 +376,8 @@ this game a crack means "will give", and Persepolis's cracked column holds.
 ### e · The cell: the fight
 
 The third and fourth tricks, on one clock. The bull crouches with its body at x 114–144 and its
-face at x 108, facing the hatch, human hands flat on a stone each (the stones outlined in glaze),
-breathing on its own slow loop.
+face at x 108, facing the hatch, human hands flat on a stone each (the stones in cream, outlined in
+glaze, 2026-10-10), breathing on its own slow loop.
 
 - **The key.** When his feet are 61 px down the hatch the fight predicts his landing, L, exactly
   for 3,316 leap entries (4,453 in the physics check; in the game, every one of 49,060 steered and
@@ -584,8 +615,11 @@ Catullus 64.112–115; Ovid, *Met.* 8.172–173, line numbers unverified). Reser
   and through a joint; the sniff; the jet and the ceiling. Hunting by footsteps is a modern monster
   trope. Ovid's *caecis tectis* (a dark, windowless building) and *bis pastum* (fed twice) are from
   memory, lines unverified, and give no roof and no hatch.
-- **The Minotaur crouched** with a stone under each hand like forefeet, breathing. The Knossian
-  stater shows a kneeling-running man; the pair of stones is from the Tampa hydria, unverified.
+- **The Minotaur crouched** with a stone under each hand like forefeet, breathing. The vases found
+  give it stones held, never leaned on: one raised, or a pair (the Tampa hydria 86.36; Getty
+  85.AE.376). The Knossian staters' Minotaur runs, in the Knielauf, and supports neither the crouch
+  nor the lurch. (Corrected from the research, 2026-10-10: this read "the Knossian stater shows a
+  kneeling-running man; the pair of stones is from the Tampa hydria, unverified".)
 - **The clap** and its reach; **the free right hand** clawing over the brow, and the swat.
 - **Theseus leaping low over the bull** onto the horn, in the vases' dress with the sword, never as
   a bull-leaper. No vase shows it.
@@ -594,13 +628,17 @@ Catullus 64.112–115; Ovid, *Met.* 8.172–173, line numbers unverified). Reser
 - **The fight's end**: the struck body lurching on its knees across the cell, and a man on its back
   tossed to the left wall. Two bloodless sword blows, where the vases show one thrust. The body
   sinking into a 24 px heap.
+- **Bloodless.** Added red is never on a wound, a blow or the heap, though the vase painters
+  sometimes painted blood in it (Theoi describes blood on MFA 60.1). Moved here from Must be right,
+  from the research, 2026-10-10: it is the game's rule, not the vases'.
 - **The sword itself.** *Epitome* 1.9 has fists; the vases have the sword, and the designer chose
   them.
 - **The tourist standing on a bull's back.** The Bull-Leaping fresco's middle figure is in
   mid-vault.
 - **The closing tableau** as a staged second copy: Theseus dragging the body to the doorpost as the
-  tourist passes. The Aison cup shows the drag from the door; "by a horn" is unverified; Athena is
-  omitted. The cup is, from memory, red-figure (unverified), so black-figure is wrong on purpose.
+  tourist passes. The Aison cup shows the drag from the labyrinth's gates; "by a horn" is
+  unverified; Athena is omitted. The cup is red-figure (the research, 2026-10-10, at search-extract
+  level; this read "from memory, red-figure (unverified)"), so black-figure is wrong on purpose.
 - **Theseus as the only solid person** in the game, and only while he kneels at the door.
 - **The exit** is the game's, at the door he came in by, opened by the second blow.
 
@@ -617,22 +655,28 @@ Catullus 64.112–115; Ovid, *Met.* 8.172–173, line numbers unverified). Reser
   line numbers unverified):
   the cell is at the bottom, and the way out follows the thread.
 - The monster tossed its horns at the empty winds as Theseus laid it low (Catullus 64.110–111).
-- On the vases Theseus has a sword and holds a horn, and the Minotaur sinks on one knee with a
-  stone raised (MFA 60.1) or raises a rock (Lydos); Theseus drags him dead from the door (the Aison
-  cup).
+- On the vases Theseus has a sword and holds a horn (in his left hand on BM 1843,1103.21), and the
+  Minotaur sinks on one knee with a stone raised (MFA 60.1) or holds a rock in its raised hand (Getty
+  86.AE.60, by Lydos or a painter near him); Theseus drags him dead from the labyrinth's gates (the
+  Aison cup). (Corrected from the research, 2026-10-10: this read "raises a rock (Lydos)".)
 
 **Must be right.**
 
 - The Minotaur's form: a bull's head on a man's body.
 - Theseus as the vases draw him: a beardless youth in a short chiton, with a sword and scabbard
-  (from memory; verify against public-domain publications of the vases).
-- The horn in the hero's left hand, with MFA 60.1's knee and raised stone.
+  (the Met's olpe fragments 2011.604.3.769a–p show him "wearing a chitoniskos, with a scabbard",
+  at search-extract level; the research, 2026-10-10).
+- The horn in the hero's left hand, as on BM 1843,1103.21, with MFA 60.1's knee and raised stone.
+  (Corrected from the research, 2026-10-10: the left hand is the British Museum vase's; on MFA 60.1
+  he grips the horn with one hand, and which is not verified.)
 - The thread tied at the door (*Epitome* 1.9).
 - No Picasso, Renault or other modern Minotaurs. Draw from public-domain publications of the vases;
-  photographs are reference only.
-- No painted names (pillar 2): no inscriptions or kalos-names, though many Attic vases label their
-  figures (from memory).
-- Added red only on fillets, beards and garment borders, never on a wound, a blow or the heap.
+  photographs are reference only. (Drawn from the research, without images, ruled 2026-10-10.)
+- No painted names (pillar 2): no inscriptions or kalos-names, though Attic vases may label their
+  figures (Toledo's Tleson cup labels Theseus, at search-extract level; the research, 2026-10-10).
+- Added red only on fillets, garment borders and the tongues' band. (Corrected from the research,
+  2026-10-10: this read "fillets, beards and garment borders, never on a wound, a blow or the heap";
+  nobody here has a beard, and the rest is the game's rule, now under Deliberately wrong.)
 
 ## Not in the level
 
@@ -723,7 +767,8 @@ Being built, in this order, as a stage in the dev build (`#minotaur`, in `STAGES
 Still to come:
 
 - **The black-figure art**: the palette, the four deaths' drawings, and the queue, Ariadne and the
-  body as background figures, each with its asset note first. Everything above is drawn rough.
+  body as background figures, drawn to their asset notes, written 2026-10-10 in the beat folders and
+  `../shared`. Everything above is drawn rough.
   (`LevelData.tricks`, 'The knot', 'The snort', 'The hands', 'The horns', and `dropCause` and
   `fallCause` 'The labyrinth', unreachable, are made.)
 
@@ -790,9 +835,20 @@ read as hands and the queue overlapped; and the art drawn from the research, wit
   "Catullus 64", for the Latin of 64.110–111; R. F. Burton's translation.
 - Plutarch, *Theseus* 15–17 (tr. B. Perrin):
   https://fgh.perseids.org/read/greekLit/tlg0007/tlg001/perseus-eng3/15.1-16.1
-- The vases: the black-figure amphora MFA Boston 60.1 (collections.mfa.org); Lydos's amphora, Getty
-  86.AE.60; the Tampa hydria (unverified); the Aison cup, Madrid (L196). Draw from public-domain
-  publications of them; photographs are reference only. Silver staters of Knossos, about 440 BC.
+- The vases (the research, 2026-10-10, at search-extract level; no image seen): the black-figure
+  amphora MFA Boston 60.1, about 540 BC, BMN Painter or Nikosthenes Painter
+  (https://collections.mfa.org/objects/153420 · https://theoi.com/Gallery/T34.9.html); the British
+  Museum neck-amphora 1843,1103.21 (https://www.britishmuseum.org/collection/object/G_1843-1103-21);
+  the amphora by Lydos or a painter near him, Getty 86.AE.60, 550–540 BC
+  (https://www.getty.edu/art/collection/object/103VZJ · https://theoi.com/Gallery/T34.17.html); the
+  hydria by the Painter of Vatican G49, Tampa Museum of Art 86.36, about 490–480 BC
+  (https://theoi.com/Gallery/T34.18.html); Getty 85.AE.376; Met 56.171.12, its white stone
+  (https://www.metmuseum.org/art/collection/search/254870); the Aison cup, red-figure, Madrid, Museo
+  Arqueológico Nacional 11365, formerly L196, about 420–410 BC
+  (https://www.carc.ox.ac.uk/record/7B5ADE10-7A65-4DE2-800A-8D44A8AF65F1 ·
+  https://theoi.com/Gallery/T34.7.html), published by Leroux (1912), plates 25–28. Draw from
+  public-domain publications of them; photographs are reference only. Silver staters of Knossos,
+  about 440 BC (Svoronos 1 and 3; BMC Greek 1; Jameson 1317), the Minotaur in the Knielauf.
 - For the rejected ideas only: Plutarch, *Theseus* 3, and Apollodorus 3.15.7; Bacchylides 17;
   Hyginus, *Astronomica* 2.5; Apollodorus, *Epitome* 1.12.
 - Never: Mary Renault, *The King Must Die* (1958); Borges, "The House of Asterion" (1947); Picasso.
@@ -817,14 +873,22 @@ thread fastened to the door, the last part of the labyrinth, the fists, the way 
 64.110–115); in Ovid, *Met.* 8, the Maeander simile and *tanta est fallacia tecti*, the
 double form of bull and young man, the tribute fed on Athenian blood every nine years (in
 translation) and *filo relecto*, with every line number unverified; MFA 60.1's horn, knee and
-raised stone; Lydos's rock; the Knossian silver staters of about 440 BC, kneeling and running.
+raised stone, and the horn in one hand; the horn in Theseus's left hand on BM 1843,1103.21; the rock
+held up on the amphora by Lydos or a painter near him (Getty 86.AE.60); the Tampa hydria's pair of
+stones, held; the Aison cup, red-figure, Madrid 11365; Theseus's chitoniskos and scabbard (the Met's
+olpe fragments); the Knossian silver staters of about 440 BC, the Minotaur running, in the Knielauf
+(the research, 2026-10-10, which corrected this paragraph's "Lydos's rock" and "kneeling and
+running").
 
-**Unverified, so ask before painting:** Apollodorus 3.15.8's "fodder" (the design's readings disagree
-on whether it was read); Ovid's line numbers, and *caecis tectis* and *bis pastum*, from memory;
-Theseus's dress on the vases (beardless, short chiton, sword and scabbard); the Tampa hydria's pair
-of stones, and whether any vase shows the Minotaur crouched; the Aison cup's number, its red figure
-and "by a horn"; which vase gives the tribute and Ariadne in a file (the François Vase, from
-memory); Frazer's note that the thread was tied to the lintel.
+**Unverified, and drawn without it** (designer, 2026-10-10: the art is drawn from the research,
+without images): Apollodorus 3.15.8's "fodder" (the design's readings disagree on whether it was
+read); Ovid's line numbers, and *caecis tectis* and *bis pastum*, from memory; Theseus's dress beyond
+the Met's olpe fragments; which hand holds the horn on MFA 60.1; whether any vase shows the
+Minotaur crouched (none found: its stones are held); the Aison cup's "by a horn", and its number
+(11365 in the research, 11265 remembered in the art conversation); which vase gives the tribute and
+Ariadne in a file (the François Vase, from memory); Frazer's note that the thread was tied to the
+lintel; whether the vases' Minotaur has a tail, and the shape of its horns; the ground line;
+whether Attic white is laid over the glaze; whether each vase's images are in the public domain.
 
 **For playtests to settle.** The trickless way down, 7.83 s, replayed before every death after the
 knot, about 40 per cent of a first visit (ruling 25 names two levers, 64 px corridors at 7.50 s or
@@ -851,4 +915,4 @@ them, so the head lunges out on a stretched neck. The zone is kept (designer, on
 recommendation, 2026-10-09).
 
 **Not designed.** How Tiryns's grand feature hands him to the door; the room the chapter's lyre is
-heard in here (`../CHAPTER.md`, The sound); the asset notes.
+heard in here (`../CHAPTER.md`, The sound).
