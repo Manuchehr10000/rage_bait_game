@@ -1665,6 +1665,37 @@ export const BULL_LEAPER_PASTED = compile(
 );
 
 /**
+ * Clotheslined by the Minotaur's knot: caught by the throat, his feet flying out
+ * ahead of him, tipped back at 45 degrees, the wig still on and the kilt down. The one
+ * frame between upright and flat on his back, drawn at that angle and never his frame
+ * rotated, which drops and doubles pixels. 18 x 18; facing right he tips back to his
+ * left, his head to the top left and his face up to the right.
+ */
+export const BULL_LEAPER_CLOTHESLINED = compile(
+  [
+    '....OOO...........',
+    '...OKKKOO.........',
+    '..OKKKKKWO........',
+    '.OKKKKKWWSO.......',
+    'OKKKKKWWSESO......',
+    'OKKKKWWSSSSO......',
+    '.OKKKKWSSSSO......',
+    '.OKKKKOSSSO.......',
+    '..OKKKKOSOVO......',
+    '...OKKOOVVVVO.....',
+    '....OOVVVVVVSO....',
+    '......OVVVVVSO....',
+    '.......OAVVVAAO...',
+    '........OAAAARUO..',
+    '.........OAARRSSO.',
+    '..........ORRSOSSO',
+    '...........OOSSONN',
+    '.............ONNO.',
+  ],
+  BULL_LEAPER,
+);
+
+/**
  * In the throne, facing out, at rest: wig on and straight, hands on his knees, feet
  * on the floor. Never the slump of giving up and never a king. 12 x 16; the seat
  * line is row 10.
@@ -1690,6 +1721,437 @@ export const BULL_LEAPER_ENTHRONED = compile(
   ],
   BULL_LEAPER,
 );
+
+// ---------------------------------------------------------------------------
+// The Minotaur: the story's people, black-figure at 1 world px
+// (content/ch03-aegean/l06-minotaur/LEVEL.md, Art, and the notes in its beat
+// folders). Glaze silhouettes on the clay; incision is the clay itself, a pixel
+// that separates and never models; women's flesh in cream, the vases' added white;
+// added red only on fillets and hems. In profile, facing right; the game flips them.
+// '#' glaze, '_' clay, 'o' cream, 'r' red.
+// ---------------------------------------------------------------------------
+
+/** The vase's inks: the glaze, the clay reserved in it, added white as cream, added red. */
+export const VASE_INK = { glaze: '#1f140e', clay: '#c8743d', cream: '#f1dfb9', red: '#93321f' } as const;
+
+const VASE: Palette = { '#': VASE_INK.glaze, _: VASE_INK.clay, o: VASE_INK.cream, r: VASE_INK.red };
+
+/**
+ * A youth of the tribute, waiting in the file at the door (a-door/queue-youth.md): a
+ * beardless young man in a short chiton, all glaze, his hands empty at his sides. His
+ * eye a pixel of reserved clay, high and forward; a fillet of added red round his head,
+ * glaze over it and under it. His head is a row higher than a maiden's. 10 x 24.
+ */
+export const QUEUE_YOUTH_SPRITE = compile(
+  [
+    '.....###..',
+    '.....#rr#.',
+    '.....##_#.',
+    '.....###..',
+    '.....##...',
+    '.....##...',
+    '....#####.',
+    '...######.',
+    '...###_##.',
+    '...###_##.',
+    '...###_##.',
+    '...###_##.',
+    '...###_##.',
+    '...######.',
+    '...######.',
+    '...######.',
+    '....##.##.',
+    '....##.##.',
+    '....##.##.',
+    '....##.##.',
+    '....##.##.',
+    '....##.##.',
+    '....##.##.',
+    '....##.###',
+  ],
+  VASE,
+);
+
+/**
+ * A maiden of the tribute (a-door/queue-maiden.md): a peplos to her feet in glaze, her
+ * hair in glaze bound up behind, her face, her near arm and her feet in cream inside a
+ * line of the glaze, her eye a dot of glaze in the cream. 10 x 24.
+ */
+export const QUEUE_MAIDEN_SPRITE = compile(
+  [
+    '..........',
+    '...#####..',
+    '..######..',
+    '.####oo#..',
+    '..###o#o#.',
+    '...##ooo#.',
+    '....##o#..',
+    '....#####.',
+    '...####o#.',
+    '...####o#.',
+    '...####o#.',
+    '...####o#.',
+    '...####o#.',
+    '...####o#.',
+    '...####o#.',
+    '...######.',
+    '...######.',
+    '..#######.',
+    '..#######.',
+    '..#######.',
+    '..#######.',
+    '..#######.',
+    '..#oo##o#.',
+    '..#oo##o#.',
+  ],
+  VASE,
+);
+
+/**
+ * Ariadne (a-door/ariadne.md): a maiden apart, with added red on her fillet and along
+ * her hem, and her near hand open and a little forward, with nothing in it. 10 x 24.
+ */
+export const ARIADNE_SPRITE = compile(
+  [
+    '..........',
+    '...#####..',
+    '..#rrr##..',
+    '.####oo#..',
+    '..###o#o#.',
+    '...##ooo#.',
+    '....##o#..',
+    '....#####.',
+    '...####o#.',
+    '...####o#.',
+    '...####o#.',
+    '...#####o#',
+    '...######o',
+    '...######.',
+    '...######.',
+    '...######.',
+    '...######.',
+    '..#######.',
+    '..#######.',
+    '..#######.',
+    '..#rrrrr#.',
+    '..#######.',
+    '..#oo##o#.',
+    '..#oo##o#.',
+  ],
+  VASE,
+);
+
+/** Theseus's head in profile, rows 0 to 5 of his box, and turned back over his shoulder. */
+const THESEUS_HEAD = ['.....###....', '....#####...', '....###_##..', '....######..', '.....####...', '......##....'];
+const THESEUS_HEAD_BACK = ['....###.....', '...#####....', '..##_###....', '..######....', '...####.....', '.....##.....'];
+
+/**
+ * His body from the shoulders to the hem, rows 6 to 15: the short chiton belted, the
+ * baldric a reserved line from his right shoulder across his chest to his left hip, the
+ * sword's hilt in front of the belt and the scabbard behind him, his near arm at his
+ * side cut from his body by a line of the clay.
+ */
+const THESEUS_BODY = [
+  '....######..',
+  '...#######..',
+  '...###_.##..',
+  '...##_#.##..',
+  '...#_##.##..',
+  '..#_###.###.',
+  '..######.##.',
+  '.#######.##.',
+  '##.######...',
+  '#..######...',
+];
+const THESEUS_LEGS_STAND = ['....##.##...', '....##.##...', '....##.##...', '....##.##...', '....##.##...', '....##.##...', '....##.##...', '....##.###..'];
+const THESEUS_LEGS_STRIDE = ['...##..##...', '...##...##..', '..##....##..', '..##.....##.', '.##......##.', '.##.......##', '.##.......##', '.###......##'];
+const THESEUS_LEGS_PASS = ['....####....', '....####....', '....##.#....', '....##.##...', '....##.##...', '.....#.##...', '.....#.##...', '....##.###..'];
+
+/** Mantling: his head, both arms up in front of it to the lip, his shoulders and chest, rows 0 to 12. */
+const THESEUS_MANTLE = [
+  '.........##.',
+  '.........##.',
+  '....###..##.',
+  '...#####.##.',
+  '...###_#.##.',
+  '...####_###.',
+  '....####.##.',
+  '.....##.##..',
+  '...#######..',
+  '...#######..',
+  '...###_###..',
+  '...##_####..',
+  '..#_####....',
+];
+/** And from the belt to the hem, the scabbard behind him, rows 13 to 16. */
+const THESEUS_MANTLE_LOW = ['..######....', '.#######....', '##.######...', '#..######...'];
+
+/** The crouch he pays out the thread from, on his heels, his head low: everything but his near arm. */
+const THESEUS_CROUCH = [
+  ...Array<string>(9).fill('............'),
+  '.....###....',
+  '....#####...',
+  '....###_##..',
+  '....######..',
+  '.....####...',
+  '....#####...',
+  '...######...',
+  '..#######...',
+  '..######....',
+  '.#######....',
+  '.########...',
+  '..########..',
+  '..###..###..',
+  '..##...##...',
+  '.###..####..',
+];
+
+/** A copy of `rows` with glaze set at each [x, y]: an arm put on a body. */
+function withGlaze(rows: string[], at: [number, number][]): string[] {
+  const out = rows.map((r) => r.split(''));
+  for (const [x, y] of at) out[y]![x] = '#';
+  return out.map((r) => r.join(''));
+}
+
+/**
+ * Kneeling at the post on his left knee, his right foot forward, re-tying the thread,
+ * his eyes on the knot (a-door/theseus-kneel.md): 16 x 14, the solid box's 12 x 14 and
+ * his arm out of it to the knot at x 80 and 81. Everything but his arm.
+ */
+const THESEUS_KNEEL = [
+  '.....###........',
+  '....#####.......',
+  '....###_##......',
+  '....######......',
+  '.....####.......',
+  '......##........',
+  '....######......',
+  '...#######......',
+  '...######.#.....',
+  '.#.#######......',
+  '#.##########....',
+  '..###.....##....',
+  '####......##....',
+  '####......###...',
+];
+
+/**
+ * Theseus, black-figure (a-door/theseus-kneel.md, "Theseus, in every pose"): a
+ * beardless youth in a short chiton, his sword in its scabbard at his left hip, no
+ * added red on him anywhere. His poses at the door and down his route, each a drawing;
+ * the code draws only what moves against something else: the ball's white in his hand,
+ * the thread, the trailing leg on the knob, his far arm to the horn.
+ */
+export const THESEUS = {
+  /**
+   * Re-tying the knot: his hand over the top of the post, round under it, tugged back
+   * to his chest, picking at it. 16 x 14, at the solid box's top-left.
+   */
+  kneel: [
+    withGlaze(THESEUS_KNEEL, [[9, 6], [10, 6], [10, 5], [11, 5], [11, 4], [12, 4], [12, 3], [12, 2], [13, 2], [13, 1], [14, 1], [14, 0]]),
+    withGlaze(THESEUS_KNEEL, [[9, 6], [10, 6], [10, 7], [11, 7], [11, 6], [12, 6], [12, 5], [13, 5], [14, 5], [13, 6], [14, 6]]),
+    withGlaze(THESEUS_KNEEL, [[9, 6], [10, 6], [10, 7], [11, 7], [11, 6], [11, 5]]),
+    withGlaze(THESEUS_KNEEL, [[9, 6], [10, 6], [10, 5], [11, 5], [11, 4], [12, 4], [12, 3], [13, 3], [13, 4]]),
+  ].map((r) => compile(r, VASE)),
+  /**
+   * Up off his knee, testing the knot: upright with his hands on the line, half leaned,
+   * and full lean, his head 6 px back and his front leg braced. 22 x 24, from 6 px left
+   * of his box; his hands on the line just inside the post at x 79 to 81, y 149.
+   */
+  lean: [
+    [
+      '..........###.........',
+      '.........#####........',
+      '.........###_##.......',
+      '.........######.......',
+      '..........####........',
+      '...........##.........',
+      '.........######.......',
+      '........########......',
+      '........###_.####.....',
+      '........##_#..####....',
+      '........#_##...####...',
+      '.......#_###....####..',
+      '.......######....####.',
+      '......#######.....###.',
+      '.....##.######........',
+      '.....#..######........',
+      '.........##.##........',
+      '.........##..##.......',
+      '........##...##.......',
+      '........##....##......',
+      '.......##.....##......',
+      '.......##......##.....',
+      '.......##......##.....',
+      '.......###.....###....',
+    ],
+    [
+      '.......###............',
+      '......#####...........',
+      '......###_##..........',
+      '......######..........',
+      '.......####...........',
+      '........##............',
+      '.......######.........',
+      '.......#########......',
+      '.......##_#.#####.....',
+      '.......#_##...#####...',
+      '.......#_##.....#####.',
+      '......#_###.......####',
+      '......#####.........##',
+      '......######........##',
+      '.....#######..........',
+      '....##.######.........',
+      '....#....##.##........',
+      '.........##..##.......',
+      '........##....##......',
+      '........##.....##.....',
+      '.......##......##.....',
+      '.......##.......##....',
+      '.......##.......##....',
+      '.......###......###...',
+    ],
+    [
+      '....###...............',
+      '...#####..............',
+      '...###_##.............',
+      '...######.............',
+      '....####..............',
+      '.....###..............',
+      '.....######...........',
+      '.....#########........',
+      '......#_#.######......',
+      '......#_##..######....',
+      '......#_##....######..',
+      '.......####.....######',
+      '.......####.......####',
+      '......#####.........##',
+      '......######..........',
+      '.....#######..........',
+      '....##..#####.........',
+      '........##..##........',
+      '........##...##.......',
+      '.......##.....##......',
+      '.......##......##.....',
+      '.......##.......##....',
+      '.......##........##...',
+      '.......###........###.',
+    ],
+  ].map((r) => compile(r, VASE)),
+  /** At rest, his arms at his sides. 12 x 24, his box. */
+  stand: compile([...THESEUS_HEAD, ...THESEUS_BODY, ...THESEUS_LEGS_STAND], VASE),
+  /** At his pace: a stride and the other half of it, then both with his head turned back over his shoulder at his knot. 12 x 24. */
+  walk: [
+    [...THESEUS_HEAD, ...THESEUS_BODY, ...THESEUS_LEGS_STRIDE],
+    [...THESEUS_HEAD, ...THESEUS_BODY, ...THESEUS_LEGS_PASS],
+    [...THESEUS_HEAD_BACK, ...THESEUS_BODY, ...THESEUS_LEGS_STRIDE],
+    [...THESEUS_HEAD_BACK, ...THESEUS_BODY, ...THESEUS_LEGS_PASS],
+  ].map((r) => compile(r, VASE)),
+  /** Mantling up O1, both arms up in front of his face to the lip: both legs under him, and his near leg only. 12 x 24. */
+  climb: [
+    [...THESEUS_MANTLE, ...THESEUS_MANTLE_LOW, ...THESEUS_LEGS_STAND.slice(1)],
+    [...THESEUS_MANTLE, ...THESEUS_MANTLE_LOW, ...Array<string>(6).fill('.......##...'), '.......###..'],
+  ].map((r) => compile(r, VASE)),
+  /** Dropping down a shaft from rest, feet first, arms up and bent at the elbow. 12 x 24. */
+  fall: compile(
+    [
+      '.##......##.',
+      '.##......##.',
+      '..##.###.##.',
+      '..######.#..',
+      '...#.##_##..',
+      '....######..',
+      '.....####...',
+      '......##....',
+      '....######..',
+      '...#######..',
+      '...###_###..',
+      '...##_####..',
+      '..#_####....',
+      '..######....',
+      '.#######....',
+      '##.######...',
+      '#..######...',
+      '....####....',
+      '....####....',
+      '.....####...',
+      '.....####...',
+      '....####....',
+      '....####....',
+      '....#####...',
+    ],
+    VASE,
+  ),
+  /** Crouched on his heels paying out a loop, his near arm at the four quarters of its round: forward, down, back, up. 12 x 24. */
+  payout: [
+    withGlaze(THESEUS_CROUCH, [[9, 15], [10, 15], [10, 16], [11, 16]]),
+    withGlaze(THESEUS_CROUCH, [[9, 15], [9, 16], [10, 17], [10, 18]]),
+    withGlaze(THESEUS_CROUCH, [[8, 15], [9, 15], [9, 16], [8, 17]]),
+    withGlaze(THESEUS_CROUCH, [[9, 14], [10, 14], [10, 13], [11, 13]]),
+  ].map((r) => compile(r, VASE)),
+  /** Where his near hand is in each of the pay-out's frames, in his box: the loop grows from it. */
+  payoutHand: [
+    [11, 16],
+    [10, 18],
+    [8, 17],
+    [11, 13],
+  ] as const,
+  /** Dragging the body in the closing picture, leaning into the pull: a stride each way. His far arm, to the horn, is the code's. 12 x 24. */
+  drag: [
+    [
+      '......###...',
+      '.....#####..',
+      '.....###_##.',
+      '.....######.',
+      '......####..',
+      '......##....',
+      '....######..',
+      '...#######..',
+      '...###_.##..',
+      '..###_#..##.',
+      '..##_##...#.',
+      '.#_###......',
+      '.######.....',
+      '#######.....',
+      '.#######....',
+      '.#######....',
+      '...##.##....',
+      '..##...##...',
+      '..##...##...',
+      '.##.....##..',
+      '.##.....##..',
+      '##......##..',
+      '##.......##.',
+      '###......###',
+    ],
+    [
+      '......###...',
+      '.....#####..',
+      '.....###_##.',
+      '.....######.',
+      '......####..',
+      '......##....',
+      '....######..',
+      '...#######..',
+      '...###_.##..',
+      '..###_#.##..',
+      '..##_##.##..',
+      '.#_###..#...',
+      '.######.....',
+      '#######.....',
+      '.#######....',
+      '.#######....',
+      '....####....',
+      '....####....',
+      '....##.#....',
+      '....##.##...',
+      '....##.##...',
+      '.....#.##...',
+      '.....#.##...',
+      '....##.###..',
+    ],
+  ].map((r) => compile(r, VASE)),
+};
 
 // ---------------------------------------------------------------------------
 // Knossos.

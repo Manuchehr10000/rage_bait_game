@@ -17,7 +17,11 @@ eye a dot of glaze in the cream face. Standing still, facing the door, hands emp
 ## Where it stands in the game
 
 In the file of thirteen outside the door, alternating with the youths, a maiden at the front and
-one at the back (`queue-youth`, for the file's step, overlap and order).
+one at the back (`queue-youth`, for the file's step, overlap and order). As drawn (2026-10-10),
+what is seen of each maiden but the last is her face: three rows of cream with her eye, a dot of
+glaze, in the middle of it, the glaze of her profile in front, the youth behind her cut from it by
+a line of clay, and a pixel of her hair over it; and down her body, her cream arm. The last, at
+the screen's left edge, is seen whole but for the back of her hair.
 
 ## Must be right
 

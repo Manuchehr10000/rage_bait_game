@@ -116,8 +116,8 @@ test("the stage's data: the bull-leaper, the walk in, the camera on the spawn, t
   // post the knot is on, the boss his foot pushes off, his black doorway on row 5.
   expect(d.decor).toEqual([
     { kind: 'tongues', x0: 42, x1: 75, y: 56 },
-    { kind: 'queue', front: 39, step: 5, maidens: 7, youths: 6, floorY: DOOR_FLOOR },
-    { kind: 'ariadne', x0: 42, x1: 52, floorY: DOOR_FLOOR },
+    { kind: 'queue', front: 41, step: 3, maidens: 7, youths: 6, floorY: DOOR_FLOOR },
+    { kind: 'ariadne', x0: 45, x1: 55, floorY: DOOR_FLOOR },
     { kind: 'doorpost', x: 80, top: 80, floorY: DOOR_FLOOR },
     { kind: 'boss', rect: { x: 206, y: 140, w: 9, h: 8 } },
     { kind: 'blackDoorway', x: 148, w: 16, top: 628, floorY: 656 },

@@ -10,8 +10,9 @@
 ## What it is
 
 Theseus up off his knee at the post, testing his knot: both hands on the line just inside the
-post at (81, 149), his feet planted in his box, x 66 to 78, leaning back away from the post. The
-frames, counted from the yank (the line taut at 0):
+post, x 79 to 81 and y 147 to 149, his feet planted in his box, x 66 to 78, leaning back away from
+the post. The frames, counted from the yank (the line taut at 0), and drawn on the frames the lean
+always had (`drawHeroAtThePost`, scene.ts):
 
 0. Upright, his hands on the line, from −16 to −11.
 1. Half leaned, his head 3 px back, from −10 to −5.

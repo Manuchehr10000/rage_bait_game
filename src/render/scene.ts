@@ -54,6 +54,8 @@ import { breathHeight, BULL_HEAD, HERO, heroHand, PERSIAN_COLUMN, PLUME, snortBo
 import type { CavePanel } from '../engine/level';
 import { BEAR_STALAGMITE_SPRITE, SIGNAL_LAMP_SPRITE, STOP_SIGN_SPRITE, TRAIN_CAR_SPRITE, TRAIN_ENGINE_SPRITE, TRAIN_LAST_CAR_SPRITE } from './procedural';
 import {
+  ARIADNE_SPRITE,
+  BULL_LEAPER_CLOTHESLINED,
   BULL_LEAPER_ENTHRONED,
   BULL_LEAPER_FRAMES,
   BULL_LEAPER_PASTED,
@@ -70,8 +72,12 @@ import {
   LION_BULL_SPRITE,
   NOBLE_MEDIAN_SPRITE,
   NOBLE_PERSIAN_SPRITE,
+  QUEUE_MAIDEN_SPRITE,
+  QUEUE_YOUTH_SPRITE,
   SPHINX_SEATED_SPRITE,
+  THESEUS,
   USHER_SPRITE,
+  VASE_INK,
   WINGED_DISC_SPRITE,
   GIANT_PITHOS_SPRITE,
   GRIFFIN_SPRITE,
@@ -2181,7 +2187,7 @@ function drawEntityBack(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): voi
     case 'hero': {
       // In the fight, his left hand on the bull's near horn.
       const fight = s.entities.find((x): x is Fight => x.def.kind === 'fight');
-      drawHeroBack(ctx, e as Hero, fight?.keyed ? bullHorn(fight) : null);
+      drawHeroBack(ctx, e as Hero, fight?.keyed ? bullHorn(fight) : null, doorGlaze(s));
       break;
     }
     case 'ear':
@@ -2191,7 +2197,7 @@ function drawEntityBack(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): voi
       drawBull(ctx, e as Fight);
       break;
     case 'tableau':
-      drawTableau(ctx, e as Tableau);
+      drawTableau(ctx, e as Tableau, doorGlaze(s));
       break;
     default:
       break;
@@ -2727,12 +2733,14 @@ const COSTUMES: Record<
     enthroned?: HTMLCanvasElement;
     /** Flat on a ceiling, face up. Only the chapter with the snort in it has one. */
     pasted?: HTMLCanvasElement;
+    /** Tipped back at 45 degrees by a line at his throat. Only the chapter with the knot in it has one. */
+    clotheslined?: HTMLCanvasElement;
   }
 > = {
   // The lens sits at sprite column 10, row 4, of the right-facing hiker.
   hiker: { id: 'hiker', frames: HIKER_FRAMES, seated: HIKER_SEATED, lamp: { x: 10, y: 4 }, held: HIKER_HELD },
   pharaoh: { id: 'tourist', frames: TOURIST_FRAMES, seated: TOURIST_SEATED },
-  bullLeaper: { id: 'bull-leaper', frames: BULL_LEAPER_FRAMES, seated: BULL_LEAPER_SEATED, enthroned: BULL_LEAPER_ENTHRONED, pasted: BULL_LEAPER_PASTED },
+  bullLeaper: { id: 'bull-leaper', frames: BULL_LEAPER_FRAMES, seated: BULL_LEAPER_SEATED, enthroned: BULL_LEAPER_ENTHRONED, pasted: BULL_LEAPER_PASTED, clotheslined: BULL_LEAPER_CLOTHESLINED },
   falseBeard: { id: 'false-beard', frames: FALSE_BEARD_FRAMES, seated: FALSE_BEARD_SEATED },
 };
 
@@ -2878,8 +2886,8 @@ function drawDeath(ctx: CanvasRenderingContext2D, s: Scene, death: { cause: Deat
     case 'carved':
       drawCarved(ctx, s, death);
       break;
-    case 'trip':
-      drawTrip(ctx, s, death);
+    case 'clothesline':
+      drawClothesline(ctx, s, death);
       break;
     case 'snort':
       drawSnorted(ctx, s, death);
@@ -4550,19 +4558,19 @@ function drawCarved(ctx: CanvasRenderingContext2D, s: Scene, death: { cause: Dea
 
 const MN = {
   /** The clay: the vase's ground, which is the air, outside the door and in. Reserved lines are it. */
-  clay: '#c8743d',
+  clay: VASE_INK.clay,
   /** Dilute glaze, the masonry's wash, and the full glaze of its lines, the people and the dark. */
   wash: '#7b4527',
-  glaze: '#1f140e',
+  glaze: VASE_INK.glaze,
   /** The dressed threshold: the one fine stone, paler than the masonry; its worn hollows paler still. */
   dressed: '#a8693e',
   dressedWorn: '#c48552',
   /** Dust, breathed out of the floor. Never the thread's white. */
   dust: '#ecc999',
   /** Added white, cream: the women's flesh and the bull's stones, never the thread's white. */
-  cream: '#f1dfb9',
+  cream: VASE_INK.cream,
   /** Added red, only on fillets, garment borders and the tongues' band. */
-  red: '#93321f',
+  red: VASE_INK.red,
 };
 
 /** Where the door storey's outside ends: the outer face of the labyrinth, and the floor outside it. */
@@ -4575,6 +4583,14 @@ const VESTIBULE: Rect = { x: 96, y: 80, w: 32, h: 80 };
  * so that no line of the masonry touches it; the floor under it keeps its wash.
  */
 const VESTIBULE_RESERVE: Rect = { x: VESTIBULE.x - 1, y: VESTIBULE.y - 1, w: VESTIBULE.w + 2, h: VESTIBULE.h + 1 };
+/** The post in the door's thickness, its wash and its glaze edge, as the level places it. */
+function doorposts(s: Scene): Rect[] {
+  const out: Rect[] = [];
+  for (const d of s.level.data.decor) if (d.kind === 'doorpost') out.push({ x: d.x, y: d.top, w: 4, h: d.floorY - d.top });
+  return out;
+}
+/** The glaze at the door: the vestibule's black, and the post, which the story's people are cut from where they pass in front of them. */
+const doorGlaze = (s: Scene): Rect[] => [{ ...VESTIBULE }, ...doorposts(s)];
 /** The masonry's courses, in tiles: two tiles high, counted from the level's top; its blocks are as long. */
 const LABYRINTH_COURSE = 2;
 /** Outside the door: the open clay over the roof, and in front of the outer face down to the ground. */
@@ -4775,17 +4791,16 @@ function drawMinotaurDecor(ctx: CanvasRenderingContext2D, d: MinotaurDecor): voi
       drawTongues(ctx, d.x0, d.x1, d.y);
       break;
     case 'queue': {
-      // Back to front, each over the one behind it, cut from it by a reserved line of clay
-      // down its back, as the vase painters cut one figure from the next.
+      // Front to back, each over the one ahead of it and cut from it by a reserved line
+      // of clay along its own front and over and under it, as the vase painters cut one
+      // figure from the next: every face is whole, and the one ahead loses the back of its
+      // head.
       const file = queueFile(d.maidens, d.youths);
-      for (let i = file.length - 1; i >= 0; i--) {
-        const right = d.front - i * d.step;
-        drawVaseFigure(ctx, file[i]!, right - VASE_W, d.floorY, i < file.length - 1);
-      }
+      for (let i = 0; i < file.length; i++) drawVaseFigure(ctx, file[i]!, d.front - i * d.step - VASE_W, d.floorY, i > 0);
       break;
     }
     case 'ariadne':
-      drawVaseFigure(ctx, 'ariadne', d.x0 + Math.round((d.x1 - d.x0 - VASE_W) / 2), d.floorY, false);
+      drawVaseFigure(ctx, 'ariadne', d.x0, d.floorY, false);
       break;
   }
 }
@@ -4838,81 +4853,75 @@ function queueFile(maidens: number, youths: number): VaseWho[] {
   return file;
 }
 
-/** How wide a figure of the story at the door is drawn, 24 px tall like Theseus: its pixels, and the reserved line down its back, are within this of its box's left. */
+/** How wide a figure of the story at the door is drawn, 24 px tall like Theseus: its pixels are within this of its box's left, and its reserved line a pixel past its front. */
 const VASE_W = 10;
 
+/** Each of the story's people at the door as drawn (a-door/queue-youth.md, queue-maiden.md, ariadne.md). */
+function vaseFigure(who: VaseWho): Frame {
+  if (who === 'youth') return frameOf('queue-youth', 0, QUEUE_YOUTH_SPRITE);
+  if (who === 'maiden') return frameOf('queue-maiden', 0, QUEUE_MAIDEN_SPRITE);
+  return frameOf('ariadne', 0, ARIADNE_SPRITE);
+}
+
+/** Where a figure's reserved line of clay is set from it: along its front, and over and under it. */
+const VASE_CUT: readonly (readonly [number, number])[] = [
+  [1, 0],
+  [0, -1],
+  [0, 1],
+];
+
 /**
- * One figure of the story standing at the door, facing it (right), in the vases' colours:
- * rects of its box, its top-left at the top of its head, as [dx, dy, w, h, tone]. A youth
- * all glaze, in a short chiton, an eye reserved in the clay; a maiden in a peplos to her
- * feet, her face, arm and feet in cream; Ariadne a maiden with added red on her fillet and
- * her hem, her near hand open at her side, empty.
+ * A figure of the story at the door, facing it, its box's left at `x`, on the floor at
+ * `floorY`; `cut`, a reserved line of clay round its front, top and foot over whatever
+ * of the file ahead of it is already drawn.
  */
-function vaseFigure(who: VaseWho): readonly (readonly [number, number, number, number, 'glaze' | 'cream' | 'red' | 'clay'])[] {
-  if (who === 'youth')
-    return [
-      [3, 0, 5, 5, 'glaze'],
-      [8, 2, 1, 1, 'glaze'],
-      [4, 5, 3, 1, 'glaze'],
-      [2, 6, 7, 8, 'glaze'],
-      [1, 13, 8, 3, 'glaze'],
-      [3, 16, 2, 8, 'glaze'],
-      [6, 16, 2, 8, 'glaze'],
-      [1, 7, 1, 6, 'glaze'],
-      [9, 7, 1, 6, 'glaze'],
-      [6, 1, 1, 1, 'clay'],
-    ];
-  const red = who === 'ariadne';
-  return [
-    // Her head in glaze, bound up behind, and her face painted in cream over it inside a
-    // line of the glaze, the eye left in it; her neck.
-    [2, 0, 7, 6, 'glaze'],
-    [9, 2, 1, 2, 'glaze'],
-    [5, 1, 3, 4, 'cream'],
-    [8, 2, 1, 2, 'cream'],
-    [6, 2, 1, 1, 'glaze'],
-    ...(red ? [[2, 1, 3, 1, 'red'] as const] : []),
-    [5, 5, 2, 1, 'cream'],
-    // The peplos, from her shoulders to her feet, flaring.
-    [3, 6, 6, 8, 'glaze'],
-    [2, 14, 7, 8, 'glaze'],
-    ...(red ? [[2, 21, 7, 1, 'red'] as const] : []),
-    // Her near arm at her side; Ariadne's hand open and a little forward, with nothing in it.
-    ...(red
-      ? ([
-          [8, 7, 1, 5, 'cream'],
-          [9, 11, 1, 3, 'cream'],
-        ] as const)
-      : ([
-          [7, 7, 1, 6, 'cream'],
-          [7, 13, 1, 1, 'cream'],
-        ] as const)),
-    // Her feet under the hem.
-    [2, 22, 3, 2, 'cream'],
-    [6, 22, 3, 2, 'cream'],
-  ];
+function drawVaseFigure(ctx: CanvasRenderingContext2D, who: VaseWho, x: number, floorY: number, cut: boolean): void {
+  const f = vaseFigure(who);
+  const y = floorY - f.h;
+  if (cut) for (const [dx, dy] of VASE_CUT) blit(ctx, silhouette(f, MN.clay), x + dx, y + dy);
+  blit(ctx, f, x, y);
 }
 
-/** A figure of the story at the door, its box's left at `x`, on the floor at `floorY`; `cut`, a reserved line of clay down its back. */
-function drawVaseFigure(ctx: CanvasRenderingContext2D, who: VaseWho, x: number, floorY: number, cut: boolean): void {
-  const y = floorY - HERO.h;
-  const parts = vaseFigure(who);
-  if (cut) {
-    ctx.fillStyle = MN.clay;
-    for (const [dx, dy, w, h, tone] of parts) if (tone !== 'clay') ctx.fillRect(x + dx - 1, y + dy, w, h);
-  }
-  const ink = { glaze: MN.glaze, cream: MN.cream, red: MN.red, clay: MN.clay };
-  for (const [dx, dy, w, h, tone] of parts) {
-    ctx.fillStyle = ink[tone];
-    ctx.fillRect(x + dx, y + dy, w, h);
+/** Theseus's drawing on this frame, for the poses that are drawings (`THESEUS`), or null for the fight's. */
+function heroSprite(f: HeroFrame): Frame | null {
+  switch (f.pose) {
+    case 'stand':
+      return frameOf('theseus-stand', 0, THESEUS.stand);
+    case 'walk': {
+      const i = (Math.floor(f.stride / 9) % 2) + (f.lookBack ? 2 : 0);
+      return frameOf('theseus-walk', i, THESEUS.walk[i]!);
+    }
+    case 'climb': {
+      const i = f.foot ? 1 : 0;
+      return frameOf('theseus-climb', i, THESEUS.climb[i]!);
+    }
+    case 'fall':
+      return frameOf('theseus-fall', 0, THESEUS.fall);
+    case 'crouch': {
+      const i = payOutQuarter(f);
+      return frameOf('theseus-payout', i, THESEUS.payout[i]!);
+    }
+    case 'drag': {
+      const i = Math.floor(f.stride / 6) % 2;
+      return frameOf('theseus-drag', i, THESEUS.drag[i]!);
+    }
+    default:
+      return null;
   }
 }
+
+/** Which quarter of its round his arm is at, paying out: twice round in each pay-out. */
+const payOutQuarter = (f: HeroFrame) => Math.min(7, Math.floor(f.payOut * 8)) % 4;
+
+/** Where the ball is in his hand while he carries it, in his box as if he faced right: walking, climbing and falling. */
+const BALL_IN_HAND: Partial<Record<HeroFrame['pose'], readonly [number, number]>> = { stand: [10, 13], walk: [10, 13], climb: [9, 0], fall: [9, 0] };
 
 /**
- * Theseus, rough: a figure in black glaze the size of his box, facing `facing`, in the
- * pose of the frame. `dx` and `dy` place a rect in his box as if he faced right. In the
- * fight his far hand, the left, is on the bull's horn at `horn`. Drawn in `ink`; the
- * thread he carries only in the glaze.
+ * Theseus, in black glaze, facing `facing`, in the pose of the frame: a drawing at the
+ * door and down his route (a-door/theseus-kneel.md and the poses it heads), and, in the
+ * fight, the rough figure the fight's own stage redraws. `dx` and `dy` place a rect in
+ * his box as if he faced right. His far hand, the left, is on the bull's horn at `horn`.
+ * Drawn in `ink`; the thread he carries only in the glaze.
  */
 function drawHeroFigure(ctx: CanvasRenderingContext2D, f: HeroFrame, horn: { x: number; y: number } | null = null, ink: string = MN.glaze): void {
   const x0 = Math.round(f.x);
@@ -4925,6 +4934,50 @@ function drawHeroFigure(ctx: CanvasRenderingContext2D, f: HeroFrame, horn: { x: 
   const l = (ax: number, ay: number, bx: number, by: number) =>
     pixelLine(ctx, face === 1 ? x0 + ax : x0 + HERO.w - 1 - ax, y0 + ay, face === 1 ? x0 + bx : x0 + HERO.w - 1 - bx, y0 + by);
   ctx.fillStyle = ink;
+  const sprite = heroSprite(f);
+  if (sprite) {
+    blitFacing(ctx, glaze ? sprite : silhouette(sprite, ink), x0, y0, face);
+    ctx.fillStyle = ink;
+    if (f.pose === 'crouch') {
+      // Paying out: the loop grows from his hand to the floor, and the ball is in it.
+      if (!glaze) return;
+      const [hx0, hy0] = THESEUS.payoutHand[payOutQuarter(f)]!;
+      const hx = face === 1 ? x0 + hx0 : x0 + HERO.w - 1 - hx0;
+      const hy = y0 + hy0;
+      ctx.fillStyle = THREAD;
+      const feet = y0 + HERO.h;
+      const size = f.payOut;
+      pixelEllipse(ctx, hx + 2 * face * size, (hy + feet - 1) / 2, 1 + 3 * size, (feet - 1 - hy) / 2);
+      ctx.fillRect(face === 1 ? hx : hx - 1, hy, 2, 2);
+      return;
+    }
+    if (f.pose === 'climb' && f.foot) {
+      // The trailing leg, out from his hip to the knob, and its sole on the knob's top.
+      const hipX = x0 + HERO.w / 2;
+      const hipY = y0 + 16;
+      const fx = f.foot.x + 1;
+      const fy = f.foot.y + f.foot.h - 2;
+      pixelLine(ctx, hipX, hipY, fx, fy);
+      pixelLine(ctx, hipX, hipY + 1, fx, fy + 1);
+      ctx.fillRect(f.foot.x, f.foot.y + f.foot.h - 2, f.foot.w - 3, 2);
+    }
+    if (f.pose === 'drag') {
+      // His far arm, 2 px, back from his shoulder to the horn, and his hand on it.
+      if (horn) {
+        const sx = face === 1 ? x0 + 5 : x0 + HERO.w - 1 - 5;
+        pixelLine(ctx, sx, y0 + 7, horn.x, horn.y);
+        pixelLine(ctx, sx, y0 + 8, horn.x, horn.y + 1);
+        ctx.fillRect(horn.x - 1, horn.y - 1, 2, 2);
+      }
+      return;
+    }
+    const ball = BALL_IN_HAND[f.pose];
+    if (f.carrying && glaze && ball) {
+      ctx.fillStyle = THREAD;
+      r(ball[0], ball[1], 2, 2);
+    }
+    return;
+  }
   const head = (dy: number, back = false, dx = 4) => {
     r(dx, dy, 5, 5);
     // His nose, the way he is looking.
@@ -4938,62 +4991,6 @@ function drawHeroFigure(ctx: CanvasRenderingContext2D, f: HeroFrame, horn: { x: 
     ctx.fillRect(horn.x - 1, horn.y - 1, 2, 2);
   };
   switch (f.pose) {
-    case 'crouch': {
-      // Down on his heels, paying out a loop: the arm goes round and the loop grows.
-      head(9);
-      r(3, 14, 7, 6);
-      r(2, 20, 4, 4);
-      r(7, 20, 4, 4);
-      const hand = heroHand(f);
-      const a = f.payOut * Math.PI * 4;
-      const hx = hand.x + Math.round(Math.cos(a)) * face;
-      const hy = hand.y + Math.round(Math.sin(a));
-      pixelLine(ctx, x0 + 6 + 2 * face, y0 + 15, hx, hy);
-      if (!glaze) return;
-      ctx.fillStyle = THREAD;
-      const feet = f.y + HERO.h;
-      const size = f.payOut;
-      pixelEllipse(ctx, hx + 2 * face * size, (hy + feet - 1) / 2, 1 + 3 * size, (feet - 1 - hy) / 2);
-      ctx.fillRect(hx, hy, 2, 2);
-      return;
-    }
-    case 'climb': {
-      // Arms up over his head, at the lip; the trailing foot, where it is on the boss.
-      head(3);
-      r(3, 8, 7, 9);
-      r(2, 15, 9, 2);
-      r(4, 17, 2, 7);
-      r(7, 17, 2, 5);
-      r(3, 0, 1, 8);
-      r(9, 0, 1, 8);
-      if (f.foot) {
-        const hipX = x0 + HERO.w / 2;
-        const hipY = y0 + 16;
-        const fx = f.foot.x + 1;
-        const fy = f.foot.y + f.foot.h - 2;
-        pixelLine(ctx, hipX, hipY, fx, fy);
-        pixelLine(ctx, hipX, hipY + 1, fx, fy + 1);
-        ctx.fillRect(f.foot.x, f.foot.y + f.foot.h - 2, f.foot.w - 3, 2);
-      }
-      if (f.carrying && glaze) {
-        ctx.fillStyle = THREAD;
-        r(9, 0, 2, 2);
-      }
-      return;
-    }
-    case 'fall':
-      head(1);
-      r(3, 6, 7, 10);
-      r(2, 13, 9, 3);
-      r(4, 16, 2, 8);
-      r(7, 16, 2, 8);
-      r(2, 0, 1, 7);
-      r(10, 0, 1, 7);
-      if (f.carrying && glaze) {
-        ctx.fillStyle = THREAD;
-        r(10, 0, 2, 2);
-      }
-      return;
     case 'leap':
       // Low over the bull, the vases' warrior: leaning into it, his front knee up, the
       // sword up over his head in his right hand. Never a bull-leaper's vault.
@@ -5054,56 +5051,6 @@ function drawHeroFigure(ctx: CanvasRenderingContext2D, f: HeroFrame, horn: { x: 
       }
       return;
     }
-    case 'drag': {
-      // Leaning into the pull, the horn in his far hand behind him; walking, his legs
-      // scissor, and his near hand swings forward with the pull.
-      head(1, false, 5);
-      r(6, 6, 3, 1);
-      r(4, 7, 7, 7);
-      r(3, 13, 9, 3);
-      const step = Math.floor(f.stride / 6) % 2;
-      if (step === 0) {
-        r(3, 16, 2, 8);
-        r(8, 16, 2, 8);
-      } else {
-        r(5, 16, 2, 8);
-        r(6, 16, 2, 8);
-      }
-      l(9, 8, 11, 12);
-      toHorn(5, 8);
-      // The sword at his hip.
-      r(1, 12, 4, 1);
-      return;
-    }
-    case 'hold':
-    case 'stand':
-    case 'walk': {
-      // The short chiton, bare legs, arms at his sides; walking, his legs scissor.
-      head(0, f.lookBack);
-      r(5, 5, 3, 1);
-      r(3, 6, 7, 8);
-      r(2, 13, 9, 3);
-      const step = f.pose === 'walk' ? Math.floor(f.stride / 9) % 2 : -1;
-      if (step === 0) {
-        r(2, 16, 2, 8);
-        r(8, 16, 2, 8);
-      } else if (step === 1) {
-        r(4, 16, 2, 8);
-        r(6, 16, 2, 8);
-      } else {
-        r(4, 16, 2, 8);
-        r(7, 16, 2, 8);
-      }
-      r(2, 7, 1, 6);
-      r(10, 7, 1, 6);
-      // The sword at his hip.
-      r(1, 12, 4, 1);
-      if (f.carrying && glaze) {
-        ctx.fillStyle = THREAD;
-        r(10, 12, 2, 2);
-      }
-      return;
-    }
   }
 }
 
@@ -5127,66 +5074,41 @@ function drawHeroIncised(ctx: CanvasRenderingContext2D, f: HeroFrame, horn: { x:
   drawHeroFigure(ctx, f, horn);
 }
 
+/** The re-tie loop at the post, in frames: wrap over, wrap under, tug, pick, and round again. */
+const RETIE = [8, 8, 8, 16] as const;
+const RETIE_LOOP = RETIE.reduce((a, b) => a + b, 0);
+
 /**
- * Theseus at the post: kneeling at the knot, the fussy loop (wrap round the post, tug,
- * unpick, and wrap again); then up, and leaning back on the line until it has held.
- * The kneeling box is the def's.
+ * The lean's three drawings, by frames into his 20 of leaning: still on his knee for 4,
+ * upright from 4, half leaned from 10, and the full lean from 16, held while he holds
+ * the line: from the yank, -16, -10 and -4.
+ */
+const LEAN_FROM = [4, 10, 16] as const;
+
+/** How far left of his box the lean's drawing begins: room for his head, 6 px back at the full lean. */
+const THESEUS_LEAN_BACK = 6;
+
+/**
+ * Theseus at the post (a-door/theseus-kneel.md, b-passage/theseus-lean.md): kneeling at
+ * the knot in the fussy loop, the solid box's drawing at its top-left; then up, and
+ * leaning back on the line until it has held, 6 px left of the box, his feet in it and
+ * his hands on the line at the knot. The lean's drawings change on the frames the lean
+ * always had, so nothing about the knot's windows moves.
  */
 function drawHeroAtThePost(ctx: CanvasRenderingContext2D, h: Hero): void {
   const d = h.def;
   const k = d.kneel;
-  ctx.fillStyle = MN.glaze;
-  if (h.state === 'kneel' || h.k < -d.lean + 4) {
-    // Kneeling on his left knee, his right foot forward, at the post.
-    const x = k.x;
-    const y = k.y;
-    ctx.fillRect(x + 5, y, 5, 5);
-    ctx.fillRect(x + 10, y + 2, 1, 1);
-    ctx.fillRect(x + 3, y + 5, 7, 5);
-    ctx.fillRect(x, y + 10, 7, 4);
-    ctx.fillRect(x + 7, y + 9, 4, 2);
-    ctx.fillRect(x + 9, y + 11, 2, 3);
-    // The arm, at the knot: round the post, a tug back, picking at it, round again.
-    const phase = h.t % 40;
-    let hx: number;
-    let hy: number;
-    if (phase < 16) {
-      const a = (phase / 16) * Math.PI * 2;
-      hx = d.knot.x + Math.round(Math.cos(a) * 2);
-      hy = d.knot.y + Math.round(Math.sin(a) * 2);
-    } else if (phase < 24) {
-      hx = d.knot.x - 4;
-      hy = d.knot.y + 1;
-    } else {
-      hx = d.knot.x - 1 + (phase % 2);
-      hy = d.knot.y - 1 + (Math.floor(phase / 3) % 2);
-    }
-    pixelLine(ctx, x + 8, y + 6, hx, hy);
-    pixelLine(ctx, x + 8, y + 7, hx, hy + 1);
+  const into = h.k + d.lean;
+  if (h.state === 'kneel' || into < LEAN_FROM[0]) {
+    let phase = h.t % RETIE_LOOP;
+    let i = 0;
+    while (phase >= RETIE[i]!) phase -= RETIE[i++]!;
+    blit(ctx, frameOf('theseus-kneel', i, THESEUS.kneel[i]!), k.x, k.y);
     return;
   }
-  // Up, and leaning back on the line, away from the post.
-  const lean = Math.min(1, (h.k + d.lean) / (d.lean - 4));
-  const slant = Math.round(3 * lean);
-  const x = k.x;
-  const feet = k.y + k.h;
-  const y = feet - HERO.h;
-  for (let row = 0; row < HERO.h; row++) {
-    // Each row of him moved back by how high it is, his feet planted.
-    const off = -Math.round((slant * (HERO.h - row)) / HERO.h);
-    if (row < 5) ctx.fillRect(x + 4 + off, y + row, 5, 1);
-    else if (row < 6) ctx.fillRect(x + 5 + off, y + row, 3, 1);
-    else if (row < 13) ctx.fillRect(x + 3 + off, y + row, 7, 1);
-    else if (row < 16) ctx.fillRect(x + 2 + off, y + row, 9, 1);
-    else {
-      ctx.fillRect(x + 4 + off, y + row, 2, 1);
-      ctx.fillRect(x + 7 + off + 1, y + row, 2, 1);
-    }
-  }
-  ctx.fillRect(x + 9 - slant, y + 2, 1, 1);
-  // Both arms out to the line, just inside the post.
-  pixelLine(ctx, x + 8 - slant, y + 8, d.knot.x + 1, d.knot.y);
-  pixelLine(ctx, x + 8 - slant, y + 9, d.knot.x + 1, d.knot.y + 1);
+  const i = into >= LEAN_FROM[2] ? 2 : into >= LEAN_FROM[1] ? 1 : 0;
+  const f = frameOf('theseus-lean', i, THESEUS.lean[i]!);
+  blit(ctx, f, k.x - THESEUS_LEAN_BACK, k.y + k.h - f.h);
 }
 
 /**
@@ -5333,7 +5255,7 @@ function drawLaidThread(ctx: CanvasRenderingContext2D, h: Hero, f: HeroFrame): v
  * unless he is climbing. In the fight the thread ends at the ball he left in his doorway,
  * and his left hand is on the bull's horn at `horn`.
  */
-function drawHeroBack(ctx: CanvasRenderingContext2D, h: Hero, horn: { x: number; y: number } | null): void {
+function drawHeroBack(ctx: CanvasRenderingContext2D, h: Hero, horn: { x: number; y: number } | null, doorway: readonly Rect[]): void {
   const d = h.def;
   const f = h.frame;
   if (h.stepped) {
@@ -5350,7 +5272,38 @@ function drawHeroBack(ctx: CanvasRenderingContext2D, h: Hero, horn: { x: number;
   ctx.fillRect(d.knot.x, d.knot.y - 1, 2, 3);
   if (!f || f.pose === 'hold') drawHeroAtThePost(ctx, h);
   else if (h.stepped) drawHeroIncised(ctx, f, horn);
-  else if (!f.front && !f.unseen) drawHeroFigure(ctx, f);
+  else if (!f.front && !f.unseen) {
+    // Through the door and the black vestibule, cut from them by a reserved line.
+    drawHeroReserve(ctx, f, doorway);
+    drawHeroFigure(ctx, f);
+  }
+}
+
+/**
+ * A reserved line of clay round Theseus as he is drawn this frame, a pixel left, right,
+ * up and down, only on `on`: the glaze he passes in front of, where nothing else would
+ * part him from it. Over the clay it is the clay.
+ */
+function drawHeroReserve(ctx: CanvasRenderingContext2D, f: HeroFrame, on: readonly Rect[]): void {
+  const box: Rect = { x: Math.round(f.x) - 2, y: Math.round(f.y) - 2, w: HERO.w + 4, h: HERO.h + 4 };
+  const clip = on.flatMap((r) => overlap(r, box) ?? []);
+  if (!clip.length) return;
+  ctx.save();
+  ctx.beginPath();
+  for (const r of clip) ctx.rect(r.x, r.y, r.w, r.h);
+  ctx.clip();
+  for (const [dx, dy] of [
+    [-1, 0],
+    [1, 0],
+    [0, -1],
+    [0, 1],
+  ] as const) {
+    ctx.save();
+    ctx.translate(dx, dy);
+    drawHeroFigure(ctx, f, null, MN.clay);
+    ctx.restore();
+  }
+  ctx.restore();
 }
 
 /** Theseus climbing: in front of the tourist. */
@@ -5360,19 +5313,33 @@ function drawHeroFront(ctx: CanvasRenderingContext2D, h: Hero): void {
 }
 
 /**
- * Tripped over the line: he pitches forward over his front foot, onto the floor under
- * him, and lies face down, the wig over his eyes.
+ * The clothesline's frames (content/ch03-aegean/shared/bull-leaper-clotheslined.md): his
+ * own frame, upright, for the first 3, the line across his throat; then the drawn frame
+ * tipped back at 45 degrees, his feet flying out ahead of him, coming down to the floor;
+ * and from frame 8, as the knock is heard (audio.ts, onHisBack), flat on his back.
  */
-function drawTrip(ctx: CanvasRenderingContext2D, s: Scene, death: { cause: DeathCause; t: number }): void {
+const CLOTHESLINE = { tipped: 3, flat: 8 } as const;
+
+/** Where his throat is in his own frame, and in the drawn frame tipped back. */
+const THROAT = { upright: { x: 6, y: 8 }, tipped: { x: 8, y: 8 } } as const;
+
+/**
+ * Clotheslined by the knot: the line takes him by the throat, his feet fly out ahead of
+ * him, and he lands flat on his back on the floor under it, the wig over his eyes, his
+ * head behind him toward the post and his face up. Turned only by quarters, with one
+ * drawn half-quarter between, never rotated by less, which drops and doubles pixels.
+ * Drawn facing right, and flipped about his middle when he faces left.
+ */
+function drawClothesline(ctx: CanvasRenderingContext2D, s: Scene, death: { cause: DeathCause; t: number }): void {
   const p = s.player;
   const costume = s.level.data.costume;
   const c = COSTUMES[costume];
-  const idle = tourist(costume, 'jump');
-  const dead = frameOf(`${c.id}-dead`, 0, c.frames.dead);
-  const x = Math.round(p.x) - 1;
-  const feet = p.y + p.h;
+  const frame = Math.round(death.t * DEATH_FRAMES);
+  const sx = Math.round(p.x) - 1;
+  const sy = Math.round(p.y);
   // The floor under his middle.
-  let floor = feet;
+  const feet = p.y + p.h;
+  let floor = Math.round(feet);
   const tx = Math.floor((p.x + p.w / 2) / TILE);
   for (let ty = Math.floor((feet - 0.01) / TILE) + 1; ty < s.level.heightTiles; ty++) {
     if (s.level.isSolid(tx, ty)) {
@@ -5380,14 +5347,32 @@ function drawTrip(ctx: CanvasRenderingContext2D, s: Scene, death: { cause: Death
       break;
     }
   }
-  const k = Math.min(1, death.t / 0.3);
-  const angle = (k * k * Math.PI) / 2;
-  const y = Math.round(feet + (floor - feet) * k * k);
-  const w = idle.w;
   ctx.save();
-  ctx.translate(p.facing === 1 ? x + w : x, y);
-  ctx.rotate(p.facing * angle);
-  blitFacing(ctx, k >= 1 ? dead : idle, p.facing === 1 ? -w : 0, -16, p.facing);
+  if (p.facing === -1) {
+    // Flipped about his middle: the same death, the other way.
+    ctx.translate(2 * (sx + 6), 0);
+    ctx.scale(-1, 1);
+  }
+  if (frame < CLOTHESLINE.tipped || !c.clotheslined) {
+    blit(ctx, tourist(costume, p.animFrame()), sx, sy);
+  } else if (frame < CLOTHESLINE.flat) {
+    // Tipped back from where the line took his throat, and coming down to the floor.
+    const tipped = frameOf(`${c.id}-clotheslined`, 0, c.clotheslined);
+    const hero = s.entities.find((e): e is Hero => e.def.kind === 'hero');
+    const line = hero ? hero.def.line.y : null;
+    const throat = line !== null && line >= p.y && line < feet ? line : sy + THROAT.upright.y;
+    const from = Math.min(throat - THROAT.tipped.y, floor - tipped.h);
+    const to = floor - tipped.h;
+    const k = (frame - CLOTHESLINE.tipped) / (CLOTHESLINE.flat - CLOTHESLINE.tipped);
+    blit(ctx, tipped, sx + THROAT.upright.x - THROAT.tipped.x, Math.round(from + (to - from) * k * k));
+  } else {
+    // A quarter turn back, flat on the floor: the dead frame's rows run left to right,
+    // its neck's row where his throat was, his head behind it and his feet ahead.
+    const dead = frameOf(`${c.id}-dead`, 0, c.frames.dead);
+    ctx.translate(sx + THROAT.upright.x - THROAT.upright.y, floor);
+    ctx.rotate(-Math.PI / 2);
+    blit(ctx, dead, 0, 0);
+  }
   ctx.restore();
 }
 
@@ -5875,10 +5860,10 @@ function drawDeadBull(ctx: CanvasRenderingContext2D, hx: number, floorY: number,
  * The closing tableau (Tableau): Theseus dragging the dead Minotaur by a horn out of the
  * black vestibule and stopping at the post where he knelt, the body after him, its head
  * across the threshold on the clay of the door opening and the rest in the vestibule.
- * Both are drawn with a reserved outline where they are in the black; nothing of them is
- * drawn in the passage behind it, out of which they come.
+ * Both are drawn with a reserved outline where they are in the black or in front of the
+ * post; nothing of them is drawn in the passage behind it, out of which they come.
  */
-function drawTableau(ctx: CanvasRenderingContext2D, t: Tableau): void {
+function drawTableau(ctx: CanvasRenderingContext2D, t: Tableau, doorway: readonly Rect[]): void {
   if (!t.begun) return;
   const d = t.def;
   const F = d.floorY;
@@ -5910,7 +5895,7 @@ function drawTableau(ctx: CanvasRenderingContext2D, t: Tableau): void {
   ctx.clip();
   ctx.save();
   ctx.beginPath();
-  ctx.rect(VESTIBULE.x, VESTIBULE.y, VESTIBULE.w, VESTIBULE.h);
+  for (const r of doorway) ctx.rect(r.x, r.y, r.w, r.h);
   ctx.clip();
   for (const [dx, dy] of [
     [-1, 0],
@@ -6010,8 +5995,7 @@ function drawTouristReserve(ctx: CanvasRenderingContext2D, s: Scene): void {
   const cy = s.camera.iy;
   // Where he can be drawn and a pixel round it: his sprite, or, dying, anywhere in the view.
   const him: Rect = s.death ? { x: cx, y: cy, w: VIEW_W, h: VIEW_H } : { x: Math.round(p.x) - 2, y: Math.round(p.y) - 1, w: 14, h: 17 };
-  const stone: Rect[] = [];
-  for (const d of s.level.data.decor) if (d.kind === 'doorpost') stone.push({ x: d.x, y: d.top, w: 4, h: d.floorY - d.top });
+  const stone = doorposts(s);
   const clip: Rect[] = [];
   for (const b of glazeBehind(s)) {
     const r = overlap(b, him);

@@ -140,7 +140,11 @@ Chosen in the asset notes (2026-10-10), where this file did not decide, for the 
   one against each end wall, keep the same line. (When the world was drawn, 2026-10-10: the notes
   first had courses three tiles high, and blocks 32 px long and 48 high read as planks.)
 - The queue a figure every 3 px, each drawn over the one ahead so that every face is whole, its
-  front at about x 42; Ariadne moved to about x 45 to 55 (beat a).
+  front at about x 42; Ariadne moved to about x 45 to 55 (beat a). (When the people at the door
+  were drawn, 2026-10-10: the front's box ends at x 41 and its face at x 39, the last box begins
+  at x −5 with its face whole at the screen's edge, and each figure's reserved line runs over and
+  under it as well as down its front. At this step the heads are counted by the alternation of
+  seven cream faces and six red fillets, each with its eye, not at a glance.)
 - A 1 px line of reserved clay round the tourist wherever glaze is behind him, never on the
   costume and never inside the hero's doorway before L−8.
 - The boss drawn as a small round knob of filled glaze, 5 by 3, and the hero's doorway framed by
@@ -224,10 +228,10 @@ He walks in on foot off the left edge onto the outside ground, and a retry start
 
 - **The thirteen**, six youths and seven maidens, stand in one file, a vase procession of
   overlapping figures, the maidens' cream alternating with the youths' black so the heads can be
-  counted. Its front is at about x 42, a figure every 3 px, so that all thirteen heads are on
-  screen; the last may lose a pixel at the left edge, never its face. They stand still, or loop
-  slowly well clear of x 56–80, and are still waiting at the end.
-- **Ariadne** stands apart at about x 45–55, clear of x 56, hands empty, facing the door from first
+  counted. Its front is at about x 42 (the front's box ends at x 41, its face at x 39), a figure
+  every 3 px, so that all thirteen heads are on screen; the last loses the back of her hair at the
+  left edge, never her face. They stand still, clear of x 56–80, and are still waiting at the end.
+- **Ariadne** stands apart, her box x 45–55, clear of x 56, hands empty, facing the door from first
   frame to last. She never turns, so her look goes past him to the hero. (Both moved in the asset
   notes, 2026-10-10, from a front at x 40 and Ariadne at x 42–52, so that the overlapped file
   fits.)
@@ -784,12 +788,21 @@ Being built, in this order, as a stage in the dev build (`#minotaur`, in `STAGES
   ball; the thread's states drawn by hand; the dust in grains (`Ear.dust`, each grain with its
   size); and the tourist's reserve, a pixel of clay round him wherever glaze is behind him, his
   deaths included, never inside the hero's doorway before L−8.
+- **The people at the door, Theseus's poses, and the knot's clothesline** (2026-10-10, to the
+  asset notes): the youth, the maiden and Ariadne drawn at 1 world px, the file overlapped at a
+  3 px step with every head on the first screen; Theseus drawn kneeling (the re-tie loop's four
+  frames), leaning (three, on the lean's own frames, so no window of the knot moves), standing,
+  walking (looking back by his head alone), mantling, falling, paying out and dragging, and cut
+  by a reserved line from the vestibule and the post where he passes them; and the knot's death a
+  clothesline, `DEATH_ANIM` 'clothesline' and its knock `onHisBack`, with the drawn half-quarter
+  `bull-leaper-clotheslined`. Pinned in `tests/minotaur-out.spec.ts` (the thirteen heads, Ariadne's
+  facing) and `tests/minotaur-theseus.spec.ts` (the clothesline's frames).
 
 Still to come:
 
-- **The black-figure figures**: the four deaths' drawings, Theseus's poses, the bull, and the
-  queue, Ariadne and the body as background figures, drawn to their asset notes in the beat
-  folders and `../shared`. They are drawn rough.
+- **The black-figure figures** still rough: Theseus's poses in the fight (leap, grip, duck, draw
+  and blow), the bull, its heap and the dead body, and the other three deaths' drawings, to their
+  asset notes in the beat folders and `../shared`.
   (`LevelData.tricks`, 'The knot', 'The snort', 'The hands', 'The horns', and `dropCause` and
   `fallCause` 'The labyrinth', unreachable, are made.)
 

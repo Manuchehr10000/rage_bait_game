@@ -53,10 +53,16 @@ This note is the figure every other Theseus pose is drawn from: `../b-passage/th
 
 At the post from the first frame of every attempt until the knot fires, when the tourist's centre
 reaches x 144. His body fills the solid box, x 66 to 78 and y 146 to 160: he is the only solid
-person in the game, and a tourist who jumps onto him stands on his drawn back at y 146. Only his
-arm leaves the box, to the knot at x 80 to 81, and it reaches x 81 at most: the post's wash, a
-pixel short of its glaze edge at x 83. His knee and foot rest on y 159, over the ground line's
-clay.
+person in the game, and a tourist who jumps onto him stands on the box's top at y 146, level with
+the top of his head.
+Only his arm leaves the box, to the knot at x 80 to 81, and it reaches x 80 at most: the post's
+wash, short of its glaze edge at x 83. His knee and foot rest on y 159, over the ground line's
+clay. The fussy loop stays on his first 4 frames of leaning, before he is up
+(`../b-passage/theseus-lean.md`).
+
+As drawn (2026-10-10): upright on his left knee, as the vases kneel an archer, his head level and
+his eye on the knot; the hilt of his sword a pixel in front of his belt and the scabbard's end
+behind his hip. His arm is 2 px, a staircase where it slants.
 
 ## Must be right
 

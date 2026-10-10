@@ -11,8 +11,9 @@
 
 Theseus crouched on his heels where he landed, paying out a loop of thread from the ball: his
 head low (its top at row 9 of his box), his near arm going round. The four frames are the arm at
-the four quarters of its circle: forward, down, back, up. The loop itself, white and growing every
-frame, is the thread's (`../b-passage/thread.md`).
+the four quarters of its circle: forward, down, back, up, his hand at (11, 16), (10, 18), (8, 17)
+and (11, 13) of his box, where the ball is drawn and the loop grows from. The loop itself, white
+and growing every frame, is the thread's (`../b-passage/thread.md`).
 
 ## Where it stands in the game
 

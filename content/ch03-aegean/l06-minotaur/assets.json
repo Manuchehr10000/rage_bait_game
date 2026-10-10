@@ -131,7 +131,7 @@
       "dx": -6,
       "frames": 3,
       "beat": "b-passage",
-      "what": "Theseus up from the knee and leaning back on the line to test his knot, both hands on it at the post: rising, half, and full, 6 px back at the head. Faces right."
+      "what": "Theseus up from the knee and leaning back on the line to test his knot, both hands on it at the post: upright, half, and full, 6 px back at the head and his front leg braced. Faces right."
     },
     {
       "id": "theseus-stand",
@@ -154,14 +154,14 @@
       "h": 24,
       "frames": 2,
       "beat": "b-passage",
-      "what": "Theseus mantling 80 px up O1, arms up over his head: with both legs under him, and with the near leg only, while the code draws the trailing one out to the boss. Faces right."
+      "what": "Theseus mantling 80 px up O1, both arms up in front of his face to the lip: with both legs under him, and with the near leg only, while the code draws the trailing one out to the boss. Faces right."
     },
     {
       "id": "theseus-fall",
       "w": 12,
       "h": 24,
       "beat": "c-way-down",
-      "what": "Theseus dropping straight down a shaft, feet first, never jumping. Faces right."
+      "what": "Theseus dropping straight down a shaft, feet first, arms up and bent at the elbow, never jumping. Faces right."
     },
     {
       "id": "theseus-payout",

@@ -18,13 +18,17 @@ drawing of him at that angle, never his frame rotated.
 The Minotaur, beat b, under the taut line at y 149, a hero's shin and the tourist's throat:
 
 - Frames 0 to 2: his own frame as he was, upright, the line across his throat.
-- From frame 3 until he reaches the floor: this frame, falling, his head back at the line and his
-  feet ahead, the way he was going.
-- From the floor to the end: `bull-leaper-dead` turned a quarter, flat on his back, his head
-  behind him toward the post and his face up, the wig over his eyes, with one dry knock as he
-  lands.
+- Frames 3 to 7: this frame, its throat (8, 8) where the line took his, his head back over the
+  line and his feet ahead off the floor, the way he was going, coming down to the floor, its
+  bottom never below it. Caught in the air by a jump timed wrong, it starts from his own throat.
+- From frame 8 to the end: `bull-leaper-dead` turned a quarter, flat on his back on the passage
+  floor, 16 × 11, his neck where his throat was, his head behind him toward the post and his face
+  up, the wig over his eyes; and on frame 8 one dry knock as he lands (`onHisBack` in
+  `src/engine/audio.ts`, 8/60 s after the kill). Lying, his front is on the line's row, y 149,
+  so the taut line runs on behind him at the top of his body until it is let go.
 
-Facing right he turns back to his left; facing left the game flips it.
+Facing right he turns back to his left; facing left the game flips it about his middle
+(`tests/minotaur-theseus.spec.ts` pins the frames).
 
 ## Must be right
 

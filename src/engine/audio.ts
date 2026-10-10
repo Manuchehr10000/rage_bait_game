@@ -56,7 +56,7 @@ export const SFX = [
   'clack',
   'creak',
   'footfall',
-  'faceDown',
+  'onHisBack',
   'ring',
   'hollow',
   'drag',
@@ -347,10 +347,11 @@ export class GameAudio {
         this.burst(t, 240, 'lowpass', 0.07, 0.16);
         this.tone(t, 'sine', 75, 45, 0.09, 0.09);
         break;
-      case 'faceDown':
-        // A man face down on stone, once, a beat after his shins go: one dry knock.
-        this.tone(t + 0.22, 'sine', 210, 90, 0.07, 0.16);
-        this.burst(t + 0.22, 900, 'bandpass', 0.025, 0.14);
+      case 'onHisBack':
+        // A man flat on his back on stone, once, as he lands, 8 frames after the line
+        // takes his throat (scene.ts, CLOTHESLINE): one dry knock.
+        this.tone(t + 8 / 60, 'sine', 210, 90, 0.07, 0.16);
+        this.burst(t + 8 / 60, 900, 'bandpass', 0.025, 0.14);
         break;
       case 'ring':
         // A foot on the dressed threshold: a slab of fine stone over a hollow, ringing

@@ -21,9 +21,9 @@ frame: at the post 45 frames after the tourist's left edge passes x 80, and ther
 stride's first frame held. In the vestibule he is drawn in a reserved outline, and nothing of him
 is drawn in the passage behind it (`tests/minotaur-out.spec.ts`). Behind the tourist.
 
-Stopped at the post, his far arm reaches back across it to the horn: in the rough, from his far
-shoulder at about (72, 144) to the horn at (85, 149), crossing the post, x 80 to 83, at about
-y 146 to 149, its 2 × 2 hand on the horn at x 84 and 85. The arm is in front of the post, and a 1 px
+Stopped at the post, his far arm reaches back across it to the horn: from his far shoulder at
+(72, 143), 2 px, to the horn at (85, 149), crossing the post, x 80 to 83, at about y 146 to 150,
+its 2 × 2 hand on the horn at x 84 and 85 (as drawn, 2026-10-10). The arm is in front of the post, and a 1 px
 line of reserved clay round it, corners included, his reserved outline carried over the post, breaks
 the post's glaze edge at x 83 where it crosses and is cut into its wash
 (`../a-door/labyrinth-doorpost.md`). The knot, on the post at x 80 and 81, y 148 to 150, and the

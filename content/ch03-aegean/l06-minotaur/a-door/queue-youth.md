@@ -17,14 +17,21 @@ all the story's people are, against the tourist's 16 (ruled 2026-10-10: they sta
 
 ## Where it stands in the game
 
-In the file of thirteen outside the door, x about −4 to 42 on the outside floor (y 136 to 160),
-on the ground line: maidens and youths alternately, a maiden at the front and one at the back,
-one figure every 3 px, overlapping as a vase procession does (ruled 2026-10-10). Each figure is
-drawn over the one ahead of it and cut from it by a reserved line of clay down its own front, so
-that every face is whole and the one ahead loses only the back of its head. The rearmost head may
-lose a pixel or two at the screen's edge, never its face. The front figure's box ends at about
-x 42, and nothing of the file is at x 56 or more. They stand still from the first frame to the
-last, and are still waiting when he leaves.
+In the file of thirteen outside the door, on the outside floor (y 136 to 160), on the ground
+line: maidens and youths alternately, a maiden at the front and one at the back, one figure every
+3 px, overlapping as a vase procession does (ruled 2026-10-10). Each figure is drawn over the one
+ahead of it and cut from it by a reserved line of clay down its own front, and over and under it,
+so that every face is whole and the one ahead loses the back of its head. The front figure's box
+ends at x 41, its face at x 39, and the rearmost box begins at x −5: the last maiden loses the
+back of her hair at the screen's edge, never her face. Nothing of the file is at x 40 or more.
+They stand still from the first frame to the last, and are still waiting when he leaves.
+
+As drawn (2026-10-10), every youth stands behind a maiden, so what is seen of him is his head's
+front: the glaze over his fillet, the fillet's two pixels of red with the glaze under them, his
+eye of clay with the glaze either side, his nose and his mouth. His chin and the back of his head
+are under the maiden behind him, and of his body a strip 2 px wide. The heads count, along the
+file at the spawn, as seven faces of cream and six fillets of red, each with its eye
+(`tests/minotaur-out.spec.ts`).
 
 ## Must be right
 
@@ -48,7 +55,9 @@ last, and are still waiting when he leaves.
 - **The queue** at the labyrinth's door (designer, 2026-10-07): the vases put youths at the fight,
   as witnesses (the research: Getty 86.AE.60, Met 56.171.12, the Tampa hydria, Met 09.221.39).
   Drawn as one vase file.
-- **The step and the overlap**, 3 px, to fit thirteen on screen.
+- **The step and the overlap**, 3 px, to fit thirteen on screen. At this step the file reads as a
+  dense vase file whose heads are counted by the alternation of cream and red, not at a glance:
+  a youth's head shows about 3 px of itself, a maiden's face about 4.
 - **The red fillet**, to tell the youths from Theseus and to count their heads.
 - **One youth, six times.**
 - **Drawn, not painted.** Flat, unlit pixel art in code at 1 world px: the level is exempt from the

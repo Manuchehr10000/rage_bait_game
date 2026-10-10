@@ -15,21 +15,21 @@ she has given the thread.
 
 ## Where it stands in the game
 
-Apart from the file, her box at about x 45 to 55 on the outside floor (y 136 to 160), her pixels
-within x 47 to 54: at least 5 px of clay between her and the file's front, and clear of x 56.
+Apart from the file, her box x 45 to 55 on the outside floor (y 136 to 160), her pixels within
+x 46 to 54 (the back of her hair at x 46): 6 px of clay, x 40 to 45, between her and the file's
+front face, and clear of x 56.
 Facing the door from the first frame to the last. She never turns, so her look goes past him to
 the hero (`../LEVEL.md`, beat a). In the closing tableau she looks past the tourist again.
 
-Her place moves from the rough build's x 42 to 52 to about 45 to 55, so that the file can overlap
-with all thirteen heads on screen and she still stands apart (the asset notes, 2026-10-10;
-`../LEVEL.md`, beat a). The level's data, and the test that pins her box at x 42, move with her
-when she is drawn.
+Her place moved from the rough build's x 42 to 52 to 45 to 55, so that the file can overlap with
+all thirteen heads on screen and she still stands apart (the asset notes, 2026-10-10; `../LEVEL.md`,
+beat a); the level's data and its tests moved with her when she was drawn.
 
 ## Must be right
 
 - **Clear of x 56** (2026-10-10), with the file, so that the hero's post, x 56 to 80, is his alone.
 - **Facing the door on every frame** (`tests/minotaur-out.spec.ts`: her cream face is to the right
-  of her glaze hair on her eye's row).
+  of her glaze hair on her eye's row, y 140).
 - **Hands empty.** She never holds the ball: the thread is the hero's from the first frame.
 - Apart, not the file's front: the rough had her 3 px from it, and she read as its first figure.
 - Added red only on her fillet and her hem, over glaze; cream face, arm and feet in a line of

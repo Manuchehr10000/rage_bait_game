@@ -120,13 +120,19 @@ test('the closing tableau, the queue and Ariadne: where each stands, and none of
   const e = createEntity(t, LEVEL);
   expect(e.solids).toBeUndefined();
   // The thirteen and Ariadne are decor: drawn, never collided with. Six youths and seven
-  // maidens in one file, its front at x 39, a figure every 5 px back from it, running off
-  // the left edge; Ariadne apart, x 42 to 52. Both well clear of x 56 to 80.
+  // maidens in one file, overlapping as a vase procession does: the front's box ends at
+  // x 41 and a figure stands every 3 px back from it, so the last box begins at x -5 and
+  // every head is on the first screen; Ariadne apart, her box x 45 to 55. Both clear of
+  // x 56 to 80. (The rough build had the front at x 39, a figure every 5 px running off
+  // the left edge, and Ariadne at x 42 to 52.)
   const people = MINOTAUR.decor.filter((d) => d.kind === 'queue' || d.kind === 'ariadne');
   expect(people).toEqual([
-    { kind: 'queue', front: 39, step: 5, maidens: 7, youths: 6, floorY: DOOR_FLOOR },
-    { kind: 'ariadne', x0: 42, x1: 52, floorY: DOOR_FLOOR },
+    { kind: 'queue', front: 41, step: 3, maidens: 7, youths: 6, floorY: DOOR_FLOOR },
+    { kind: 'ariadne', x0: 45, x1: 55, floorY: DOOR_FLOOR },
   ]);
+  const queue = people[0]!;
+  if (queue.kind !== 'queue') throw new Error('no queue');
+  expect(queue.front - 12 * queue.step - 10).toBe(-5);
 });
 
 // ---------------------------------------------------------------------------
@@ -685,6 +691,53 @@ test('in the game: the queue and Ariadne stand behind him and never over x 56; A
       const queue = diff(all, without(['queue'], draw));
       const ariadne = diff(all, without(['ariadne'], draw));
       const span = (q: { x: number; y: number }[]) => [Math.min(...q.map((p) => p.x)), Math.max(...q.map((p) => p.x)), Math.min(...q.map((p) => p.y)), Math.max(...q.map((p) => p.y))];
+      // The heads, at the spawn, a world pixel at a time on the rows of the file's heads,
+      // y 136 to 142: each maiden's face a patch of cream and each youth's fillet a patch of
+      // red, among the file's own pixels; each youth's eye a pixel of clay with glaze either
+      // side of it and under it and his fillet over it, each maiden's a pixel of glaze with
+      // her cream either side.
+      const iy = g.camera.iy;
+      const toneAt = (x: number, y: number) => {
+        const i = (((y - iy) * 4 + 1) * W4 + x * 4 + 1) * 4;
+        return `${all[i]},${all[i + 1]},${all[i + 2]}`;
+      };
+      const CREAM = '241,223,185';
+      const RED = '147,50,31';
+      const GLAZE = '31,20,14';
+      const CLAY = '200,116,61';
+      const file = new Set(queue.map((q) => `${Math.floor(q.x)},${Math.floor(q.y)}`));
+      const HEADS = { y0: 136, y1: 142, x1: 42 };
+      /** Patches of `ink` among the file's pixels on the heads' rows, touching at a side or a corner: where each begins. */
+      const patches = (ink: string) => {
+        const seen = new Set<string>();
+        const at: number[] = [];
+        for (let y = HEADS.y0; y <= HEADS.y1; y++) {
+          for (let x = 0; x < HEADS.x1; x++) {
+            const key = `${x},${y}`;
+            if (seen.has(key) || !file.has(key) || toneAt(x, y) !== ink) continue;
+            at.push(x);
+            const todo = [[x, y]];
+            seen.add(key);
+            while (todo.length) {
+              const [a, b] = todo.pop()!;
+              for (let dy = -1; dy <= 1; dy++)
+                for (let dx = -1; dx <= 1; dx++) {
+                  const q = `${a! + dx},${b! + dy}`;
+                  if (b! + dy < HEADS.y0 || b! + dy > HEADS.y1 || seen.has(q) || !file.has(q) || toneAt(a! + dx, b! + dy) !== ink) continue;
+                  seen.add(q);
+                  todo.push([a! + dx, b! + dy]);
+                }
+            }
+          }
+        }
+        return at;
+      };
+      const eyes = { youths: [] as number[], maidens: [] as number[] };
+      for (let x = 1; x < HEADS.x1; x++) {
+        if (toneAt(x, 138) === CLAY && toneAt(x - 1, 138) === GLAZE && toneAt(x + 1, 138) === GLAZE && toneAt(x, 139) === GLAZE && toneAt(x, 137) === RED) eyes.youths.push(x);
+        if (toneAt(x, 140) === GLAZE && toneAt(x - 1, 140) === CREAM && toneAt(x + 1, 140) === CREAM) eyes.maidens.push(x);
+      }
+      const heads = { faces: patches(CREAM), fillets: patches(RED), eyes, view: [iy, iy + 180] };
       // Him, at the spawn, in front of the file: his own pixels are the same whether it is
       // there or not.
       const p = g.player;
@@ -701,11 +754,11 @@ test('in the game: the queue and Ariadne stand behind him and never over x 56; A
       // hair, in glaze, on the row of her eye.
       const mask = ariadne;
       const tone = (i: number) => `${all[i]},${all[i + 1]},${all[i + 2]}`;
-      const row = mask.filter((q) => q.y === 138);
+      const row = mask.filter((q) => q.y === 140);
       const cream = row.filter((q) => tone(q.i) === '241,223,185').map((q) => q.x);
       const glaze = row.filter((q) => tone(q.i) === '31,20,14').map((q) => q.x);
       const looks = Math.min(...cream) > Math.min(...glaze) ? 'right' : 'left';
-      const herBox = { x: 42, y: 136, w: 10, h: 24 };
+      const herBox = { x: 45, y: 136, w: 10, h: 24 };
       /** Her own pixels on this frame, from her box alone, as they were on the first. */
       const theSame = (iy: number) => {
         const box = ctx.getImageData(herBox.x * 4, (herBox.y - iy) * 4, herBox.w * 4, herBox.h * 4).data;
@@ -743,15 +796,22 @@ test('in the game: the queue and Ariadne stand behind him and never over x 56; A
         walk.push({ y: p.y, ground: p.onGround, state: g.state });
       }
       key('ArrowRight', false);
-      return { queue: span(queue), ariadne: span(ariadne), hidden, him: him.length, looks, frames, turned, state: g.state, walkedTo: p.x, walk, spawnY: g.levelData.spawn.y };
+      return { queue: span(queue), ariadne: span(ariadne), heads, hidden, him: him.length, looks, frames, turned, state: g.state, walkedTo: p.x, walk, spawnY: g.levelData.spawn.y };
     },
     { presses: cleanPresses() },
   );
-  // The file from off the left edge to x 38, Ariadne over x 44 to 51: nothing at x 56 or more.
+  // The file from the left edge to x 39, Ariadne over x 46 to 54: nothing at x 56 or more.
   expect(r.queue[0]).toBe(0);
-  expect(r.queue[1]).toBeLessThan(40);
-  expect([r.ariadne[0], r.ariadne[1]]).toEqual([44, 51.75]);
+  expect(r.queue[1]).toBe(39.75);
+  expect([r.ariadne[0], r.ariadne[1]]).toEqual([46, 54.75]);
   expect([r.queue[3], r.ariadne[3]]).toEqual([159.75, 159.75]);
+  // All thirteen heads on the first screen, and countable: seven faces of cream, the last
+  // whole at the screen's left edge, and six fillets of red, alternating, a head every
+  // 3 px; an eye in every one.
+  expect(r.heads.view[0]).toBeLessThanOrEqual(136);
+  expect(r.heads.faces).toEqual([0, 7, 13, 19, 25, 31, 37]);
+  expect(r.heads.fillets).toEqual([4, 10, 16, 22, 28, 34]);
+  expect(r.heads.eyes).toEqual({ youths: [5, 11, 17, 23, 29, 35], maidens: [1, 7, 13, 19, 25, 31, 37] });
   // Behind him: nothing of the file is drawn over his own pixels.
   expect(r.him).toBeGreaterThan(100);
   expect(r.hidden).toBe(0);

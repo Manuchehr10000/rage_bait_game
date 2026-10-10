@@ -389,11 +389,13 @@ export const MINOTAUR: LevelData = {
     // knot. Out of his reach: nothing of him rises above y 68.2, even off the kneeling
     // hero's back.
     { kind: 'tongues', x0: 42, x1: 75, y: 56 },
-    // The thirteen at the door, six youths and seven maidens in one file facing it, its
-    // front at x 39 and running off the left edge; Ariadne apart, x 42 to 52, facing it.
-    // Both well clear of the hero at the post, x 56 to 80.
-    { kind: 'queue', front: 39, step: 5, maidens: 7, youths: 6, floorY: DOOR_FLOOR },
-    { kind: 'ariadne', x0: 42, x1: 52, floorY: DOOR_FLOOR },
+    // The thirteen at the door, six youths and seven maidens in one file facing it, a
+    // figure every 3 px, each over the one ahead: the front's box ends at x 41, its face
+    // at x 39, and the last face is whole at the screen's left edge, so every head is on
+    // the first screen. Ariadne apart, her box x 45 to 55, facing the door. Both clear of
+    // the hero at the post, x 56 to 80.
+    { kind: 'queue', front: 41, step: 3, maidens: 7, youths: 6, floorY: DOOR_FLOOR },
+    { kind: 'ariadne', x0: 45, x1: 55, floorY: DOOR_FLOOR },
     // The post the knot is tied to, in the door's thickness.
     { kind: 'doorpost', x: 80, top: 80, floorY: DOOR_FLOOR },
     // On P's back wall at head height, just right of O1: what his foot pushes off.

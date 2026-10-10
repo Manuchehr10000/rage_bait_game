@@ -124,8 +124,9 @@ test('the line kills from the yank for 22 frames, frames 0 to 21: a 1 px line at
   expect(killsAt(0, at(150, 149.01))).toBe(true);
   expect(killsAt(0, at(150, 165.99))).toBe(true);
   expect(killsAt(0, at(150, 166))).toBe(false);
-  expect(DEATH_ANIM['The knot']).toBe('trip');
-  expect(DEATH_SOUND['The knot']).toBe('faceDown');
+  // A clothesline, never a trip: the line takes him by the throat and he lands on his back.
+  expect(DEATH_ANIM['The knot']).toBe('clothesline');
+  expect(DEATH_SOUND['The knot']).toBe('onHisBack');
 });
 
 /** The clean approach to the knot: the clean run, as far as `ticks` before the yank. */
@@ -716,4 +717,96 @@ test("in the game: the knot kills as 'The knot', the level's first trick, and ev
   expect(r.died).toEqual({ state: 'dead', cause: 'The knot', at: 111, k: 0 });
   expect(r.again).toEqual({ state: 'playing', kneeling: 'kneel', solid: 1, x: MINOTAUR.spawn.x });
   expect(r.tricks).toEqual({ met: 1, of: 4 });
+});
+
+test("in the game: the knot's clothesline as drawn: upright with the line at his throat for 3 frames, tipped back at 45 degrees with his feet off the floor for 5, then flat on his back on the passage floor, never in it; facing left, the same flipped", async ({ page }) => {
+  await open(page);
+  const r = await page.evaluate(() => {
+    const g = (window as unknown as W).__game;
+    const key = (c: string, d: boolean) => window.dispatchEvent(new KeyboardEvent(d ? 'keydown' : 'keyup', { code: c }));
+    g.titleTimer = 0;
+    g.dev.on = false;
+    g.resetRun();
+    // Run at the door, vault him, and run on into the line, as the knot's first death.
+    key('ArrowRight', true);
+    for (let t = 0; t < 200 && g.state === 'playing'; t++) {
+      key('Space', t >= 25 && t < 45);
+      g.tick();
+    }
+    key('ArrowRight', false);
+    key('Space', false);
+    const p = g.player;
+    const ctx = g.world.getContext('2d') as CanvasRenderingContext2D;
+    const box = { x: Math.round(p.x) - 12, y: 130, w: 40, h: 34 };
+    /** The world pixels of the region, one per world pixel. */
+    const grab = () => {
+      g.draw();
+      const d = ctx.getImageData(box.x * 4, (box.y - g.camera.iy) * 4, box.w * 4, box.h * 4).data;
+      const out: string[] = [];
+      for (let y = 0; y < box.h; y++) for (let x = 0; x < box.w; x++) {
+        const i = ((y * 4 + 1) * box.w * 4 + x * 4 + 1) * 4;
+        out.push(`${d[i]},${d[i + 1]},${d[i + 2]}`);
+      }
+      return out;
+    };
+    /** What is drawn of him on this frame, facing `facing`: where the picture differs from the same frame with him drawn far off to the right. */
+    const him = (facing: 1 | -1) => {
+      const was = { x: p.x, facing: p.facing };
+      p.facing = facing;
+      const on = grab();
+      p.x = 300;
+      const off = grab();
+      Object.assign(p, was);
+      const px: { x: number; y: number; tone: string }[] = [];
+      on.forEach((t, i) => {
+        if (t !== off[i]) px.push({ x: box.x + (i % box.w), y: box.y + Math.floor(i / box.w), tone: t });
+      });
+      const xs = px.map((q) => q.x);
+      const ys = px.map((q) => q.y);
+      // The wig under his head and his skin over it, on his back; his trainers at the far end.
+      const mean = (tone: string, half: (x: number) => boolean) => {
+        const q = px.filter((v) => v.tone === tone && half(v.x));
+        return q.length ? q.reduce((a, v) => a + v.y, 0) / q.length : null;
+      };
+      const mid = (Math.min(...xs) + Math.max(...xs)) / 2;
+      const head = (x: number) => (facing === 1 ? x < mid : x > mid);
+      const trainers = px.filter((v) => v.tone === '236,235,230').map((v) => v.x);
+      return {
+        x0: Math.min(...xs),
+        x1: Math.max(...xs),
+        y0: Math.min(...ys),
+        y1: Math.max(...ys),
+        wigUnder: (mean('29,25,23', head) ?? 0) > (mean('230,180,140', head) ?? 999),
+        trainers: trainers.length ? (facing === 1 ? Math.min(...trainers) > mid : Math.max(...trainers) < mid) : null,
+      };
+    };
+    const cause = g.deathCause;
+    const at: Record<number, { right: ReturnType<typeof him>; left: ReturnType<typeof him> }> = {};
+    const sx = Math.round(p.x) - 1;
+    for (let f = 0; f < 45 && g.state === 'dead'; f++) {
+      if ([0, 2, 3, 7, 8, 44].includes(f)) at[f] = { right: him(1), left: him(-1) };
+      g.tick();
+    }
+    return { cause, sx, at };
+  });
+  expect(r.cause).toBe('The knot');
+  const { sx, at } = r;
+  // Upright, his own frame where the line took him, running, on the floor at y 160.
+  for (const f of [0, 2]) expect(at[f]!.right).toMatchObject({ x0: sx, x1: sx + 10, y0: 144, y1: 159 });
+  // Tipped back, the drawn half-quarter: 18 px each way, his head over the line at y 149,
+  // his feet off the floor and coming down to it; never below it.
+  expect(at[3]!.right).toMatchObject({ x0: sx - 2, x1: sx + 15, y0: 141, y1: 158 });
+  expect(at[7]!.right).toMatchObject({ x0: sx - 2, x1: sx + 15, y0: 142, y1: 159 });
+  // Flat on his back from frame 8, the dead frame turned a quarter: 16 long and 11 high,
+  // his head behind him where his throat was, on the passage floor and never in it; the
+  // wig under his head and his face up, his trainers at the far end.
+  for (const f of [8, 44]) expect(at[f]!.right).toEqual({ x0: sx - 2, x1: sx + 13, y0: 149, y1: 159, wigUnder: true, trainers: true });
+  // Facing left, every frame the same, flipped about his middle.
+  for (const f of [0, 3, 8]) {
+    const a = at[f]!.right;
+    const b = at[f]!.left;
+    expect([b.y0, b.y1]).toEqual([a.y0, a.y1]);
+    expect([b.x0, b.x1]).toEqual([2 * (sx + 6) - 1 - a.x1, 2 * (sx + 6) - 1 - a.x0]);
+  }
+  expect(at[8]!.left).toMatchObject({ wigUnder: true, trainers: true });
 });

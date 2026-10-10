@@ -65,7 +65,7 @@ export type DeathCause =
   | 'Gave up';
 
 /** How each death is drawn. */
-export type DeathAnim = 'crush' | 'plank' | 'drown' | 'burn' | 'snap' | 'swept' | 'gone' | 'sit' | 'flat' | 'enthroned' | 'carved' | 'trip' | 'snort' | 'hands' | 'horns';
+export type DeathAnim = 'crush' | 'plank' | 'drown' | 'burn' | 'snap' | 'swept' | 'gone' | 'sit' | 'flat' | 'enthroned' | 'carved' | 'clothesline' | 'snort' | 'hands' | 'horns';
 
 export const DEATH_ANIM: Record<DeathCause, DeathAnim> = {
   'The Beune': 'drown',
@@ -118,9 +118,10 @@ export const DEATH_ANIM: Record<DeathCause, DeathAnim> = {
   // stood: upright, in profile, facing the centre like the guards round him, in stone.
   'The audience': 'carved',
   // The Minotaur, each by its own death (content/ch03-aegean/l06-minotaur/LEVEL.md).
-  // The line takes his shins: he pitches forward over it and lands face down, the wig
-  // over his eyes, on the floor under him.
-  'The knot': 'trip',
+  // The line, at a hero's shin height, takes him by the throat: his feet fly out ahead
+  // of him and he lands flat on his back on the floor under it, the wig over his eyes.
+  // Turned by quarters, with one drawn half-quarter between.
+  'The knot': 'clothesline',
   // Sniffed where he is, then snorted back up the hatch and pasted face up on the
   // ceiling over it, which is not where he died: the kill says where.
   'The snort': 'snort',
@@ -142,7 +143,7 @@ export const DEATH_ANIM: Record<DeathCause, DeathAnim> = {
  */
 export const DEATH_SOUND: Record<
   DeathCause,
-  'squish' | 'bonk' | 'drown' | 'burn' | 'snap' | 'whoosh' | 'fallAway' | 'sigh' | 'thud' | 'click' | 'blast' | 'sitStone' | 'knock' | 'faceDown' | 'snort' | 'toss' | null
+  'squish' | 'bonk' | 'drown' | 'burn' | 'snap' | 'whoosh' | 'fallAway' | 'sigh' | 'thud' | 'click' | 'blast' | 'sitStone' | 'knock' | 'onHisBack' | 'snort' | 'toss' | null
 > = {
   'The Beune': 'drown',
   'The cast': 'thud',
@@ -187,8 +188,8 @@ export const DEATH_SOUND: Record<
   'The column': 'squish',
   // A body against a stone wall, once.
   'The audience': 'thud',
-  // The Minotaur. One dry knock, a man face down on stone.
-  'The knot': 'faceDown',
+  // The Minotaur. One dry knock, a man flat on his back on stone.
+  'The knot': 'onHisBack',
   // The sniff, the snort up the hatch, and him against the ceiling.
   'The snort': 'snort',
   // The palms, or the free hand: the fight sounds which.

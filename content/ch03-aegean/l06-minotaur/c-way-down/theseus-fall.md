@@ -10,8 +10,9 @@
 ## What it is
 
 Theseus dropping straight down, feet first, from rest under the game's gravity: legs together and
-a little bent, arms out from his sides and bent up at the elbow, the sword at his hip, the ball
-in his upper hand while he carries it. The figure of `../a-door/theseus-kneel.md`.
+a little bent, arms up from his sides and bent at the elbow, 2 px, his head between them, the sword
+at his hip, the ball in his front hand while he carries it. The figure of
+`../a-door/theseus-kneel.md`.
 
 ## Where it stands in the game
 

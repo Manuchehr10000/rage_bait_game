@@ -9,8 +9,9 @@
 
 ## What it is
 
-Theseus going 80 px up the mouth O1, from the passage floor onto G0's, arms up over his head at
-the lip, the ball in his upper hand. The frames:
+Theseus going 80 px up the mouth O1, from the passage floor onto G0's, both arms up in front of
+his face to the lip, together, as the vases draw a man reaching, the ball in his hand at the top.
+The frames:
 
 0. Arms up, both legs under him.
 1. Arms up, his near leg only. While his trailing foot is on the knob, at frames 68 to 70 of his
@@ -24,8 +25,9 @@ way up (`tests/minotaur-theseus.spec.ts`). Frame 1 at 68 to 70, frame 0 at the r
 
 ## Must be right
 
-- **Arms of 2 px, bent at the elbow, at the lip.** The rough's two 1 px arms straight up read as
-  rabbit ears, or a bin's handles.
+- **Arms of 2 px at the lip.** The rough's two 1 px arms straight up read as rabbit ears, or a
+  bin's handles; as drawn (2026-10-10), both go up together in front of his face, in profile, cut
+  from it by a line of the clay, and nothing stands up behind his head.
 - **The trailing foot over a resting tourist's head**, on the knob's top, within its width, at 68
   to 70 and at no other frame; frame for frame the same with or without him under it
   (`tests/minotaur-theseus.spec.ts`). It moves nothing and kills nothing.
