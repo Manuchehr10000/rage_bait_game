@@ -33,6 +33,12 @@ and reaches the post (drawn 2026-10-10; the rough drew it as four copies offset 
 vestibule only). The head is cut from the body by the same line, but for its neck. The thread and
 the knot lie over it, and the tourist is in front of it. It stays as he leaves.
 
+Theseus's arm and his hand on its horn lie in front of it, and it gives way round them by a line
+of clay, corners included, wherever they meet it, so his hand has the horn's tip and nothing of
+its glaze touches his (`giveWay`, `src/render/bull.ts`; `tests/minotaur-bull.spec.ts`, at every
+step of the drag). (After a check of the drawn bull, 2026-10-10: his hand met the horn with no clay
+between, outside the vestibule.)
+
 ## Must be right
 
 - **Dead, and dragged from the door** (the Aison cup: Theseus drags the dead Minotaur from the gates

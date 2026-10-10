@@ -19,6 +19,13 @@ the horn is. The figure of `../a-door/theseus-kneel.md`.
 At the horn, his box x 94 to 106 before its face, from the grip at L+40, between the duck and the
 blows, and on the horn as the struck body lurches, carried with it to the left wall and back.
 
+In every pose of the fight he stands between the bull's body and its near arm: in front of its
+body, its head and its far arm, cut from them by his reserved line, corners included, and never
+into the floor he stands on; behind its near arm, the hand on it and the near stone, which are
+cut from him by theirs (`minotaur-body`, Against Theseus). His arm and hand on the horn are in
+front of all of it. (After a check of the drawn bull, 2026-10-10: his line went only left, right,
+up and down, and the bull's glaze met his at the corners.)
+
 ## Must be right
 
 - **The horn in his left hand** (`../LEVEL.md`, Must be right), as on the British Museum's
@@ -26,7 +33,8 @@ blows, and on the horn as the struck body lurches, carried with it to the left w
   verified.
 - **The sword's blade a line of reserved clay** where it lies over his own glaze body.
 - **His far arm 2 px**, never the rough's 1 px line, and cut by clay where it crosses the bull.
-- Clay between him and the bull everywhere they meet.
+- Clay between him and the bull everywhere they meet, corners included
+  (`tests/minotaur-bull.spec.ts`).
 - As `../a-door/theseus-kneel.md`, "Theseus, in every pose".
 
 ## Deliberately wrong

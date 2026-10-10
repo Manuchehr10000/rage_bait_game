@@ -38,6 +38,10 @@ When the camera goes on up with the tourist, two frames after the head is down, 
 the head on it leave the view (`Entity.keepsInView`): what is seen of the heap from then on is
 its top.
 
+Theseus stands over it, in front of all of it, cut from it by his reserved line, corners
+included; the hand of its thrown arm lies on the floor behind his feet, its fingers under the
+floor's line (`minotaur-hand`, frame 0).
+
 ## Must be right
 
 - **Its top drawn on its solid**: the heap's 24 px over x 114 to 144 is what he stands on, its top

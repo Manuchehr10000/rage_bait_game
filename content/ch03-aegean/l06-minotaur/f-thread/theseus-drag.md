@@ -30,7 +30,9 @@ line of reserved clay round it, corners included, his reserved outline carried o
 the post's glaze edge at x 83 where it crosses and is cut into its wash
 (`../a-door/labyrinth-doorpost.md`). The knot, on the post at x 80 and 81, y 148 to 150, and the
 thread stay drawn over the arm, white on glaze: the knot he walks past on the way out is never
-hidden.
+hidden. Past the post his arm and hand lie in front of the dead head, which gives way round them
+by a line of clay, corners included (`minotaur-dead`; added after a check of the drawn bull,
+2026-10-10, when his hand met the horn with no clay between).
 
 ## Must be right
 

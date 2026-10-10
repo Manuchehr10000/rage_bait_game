@@ -204,7 +204,7 @@
       "w": 44,
       "h": 30,
       "beat": "e-cell",
-      "what": "The Minotaur's man's body, drawn by code in flat glaze: the back on its solid every frame, the neck, arms 4 px at the shoulder and 3 at the wrist, the folded leg a filled wedge; crouched, gripped, on its knee, heaving, lurching on both knees, tossing. Size as crouched, with its stones."
+      "what": "The Minotaur's man's body, drawn by code in flat glaze: the back on its solid every frame, the neck, arms 4 px at the shoulder and 3 at the wrist, the folded leg a filled wedge, never a letter or a digit; crouched, gripped, on its knee, heaving, lurching on both knees, tossing. Theseus stands between its body and its near arm. Size as crouched, with its stones."
     },
     {
       "id": "minotaur-head",
@@ -219,9 +219,9 @@
       "id": "minotaur-hand",
       "w": 8,
       "h": 12,
-      "frames": 4,
+      "frames": 5,
       "beat": "e-cell",
-      "what": "The Minotaur's hand, a man's, oversized: flat on a stone with its fingers spread and its thumb parted by the one incision, holding the stone up with its fingers across its face, clawing, and upright and edge-on as a palm for the clap. Never a hoof. Up to 8 x 12 a frame. Faces right; the game flips it to face left."
+      "what": "The Minotaur's hand, a man's, oversized: flat on a stone, gripping it, its palm on the top, its fingers down the stone's face and its thumb laid forward along the top, parted by the one incision; holding the stone up with its fingers across its face; clawing; upright and edge-on as a palm for the clap; and reaching, the claw upside down. Never a hoof, never a rake. Up to 8 x 12 a frame. Faces right; the game flips it to face left."
     },
     {
       "id": "minotaur-stone",

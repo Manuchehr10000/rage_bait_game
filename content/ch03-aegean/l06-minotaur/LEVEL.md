@@ -164,14 +164,21 @@ Chosen in the asset notes (2026-10-10), where this file did not decide, for the 
   its stones. Each hand lies along the whole top of its own stone, x 100 to 107 and 110 to 117, so
   its anchor moves from the rough's to the stone's back end.
 - The bull, as drawn (2026-10-10, `e-cell` and `f-thread`): crouched on its feet, the knee forward
-  and the foot flat under the hip, its arms straight to the stones, its shoulders behind its head;
-  each hand 8 by 4, its fingers spread on the stone and its thumb parted by the one incision, four
-  touches and never a hoof's two; the stone held up with the fingers across its face; the far arm
-  always behind its body and head, the near one behind its head only while it thrashes; after the
-  swat its free hand back flat on its far stone, and down on its hands on its stones; the swat a
-  flat hand pressed on top of him, the palm the clap's only; the heap's arm thrown over its head,
-  and its head down lying on its cheek, horns up at its back, the same in the tableau, where
-  Theseus's hand has the horn at (88, 151), 3 px right of and 2 below where it was.
+  under its chest, the toes forward under the knee and the heel under the rump, which is rounded
+  down into it, its arms straight to the stones, its shoulders behind its head; each hand gripping
+  its stone, the palm on its top, three fingers down its face and the thumb laid forward along the
+  top, parted by the one incision, never a hoof's two and never a rake; the stone held up with the
+  fingers across its face; the far arm always behind its body and head, raised from behind its
+  head to claw over its brow and above the hero's head, the near one behind its head only while it
+  thrashes, reaching up at his chest; after the swat its free hand back flat on its far stone, and
+  down on its hands on its stones; the swat a flat hand pressed on top of him, the palm the clap's
+  only; the heap's arm thrown over its head, and its head down lying on its cheek, horns up at its
+  back, the same in the tableau, where Theseus's hand has the horn at (88, 151), 3 px right of and
+  2 below where it was. Theseus stands between its body and its near arm: in front of its body,
+  head and far arm, behind its near arm, its hand and the near stone, each cut from the other by
+  clay, corners included, and his hand on the horn in front of it. (After a check of the drawn
+  bull, the same day: the crouched leg read as the digit 4, the flat hands as rakes, and its glaze
+  met Theseus's at the corners on every frame from L+31.)
 
 ## The beats
 
@@ -812,7 +819,11 @@ Being built, in this order, as a stage in the dev build (`#minotaur`, in `STAGES
   fight's own clock (`src/render/bull.ts`), every frame at its true place: the back's top on its
   solid, the claw in the swat's column clear of the stone it heaves, the palms either side of him;
   the heap and the dead body of the tableau. Nothing the fight kills with, carries or times moved.
-  Pinned in `tests/minotaur-bull.spec.ts`.
+  Pinned in `tests/minotaur-bull.spec.ts`. Then, after a check, the same day: the crouched leg one
+  mass, the hands gripping their stones, Theseus between its body and its near arm (its near arm
+  and stone drawn again in front of him, `front`; his reserved line corners included), the claw
+  and the flails where he does not hide them; no glaze of it touches his on any frame of the clean
+  run's fight, the clap, the swat or the toss, or in the tableau, pinned in the same file.
 
 Still to come:
 

@@ -50,7 +50,7 @@ import { paint } from '../engine/assets';
 import { blit, blitFacing, frameOf, relief, silhouette, withLamp, type Frame, type ReliefTones } from './frame';
 import { SPLINTER, handStencils } from './hands';
 import { hash } from './hash';
-import { bullHorn, bullPicture, CLAP, deadBull, deadHorn, type Masonry, type Pixels } from './bull';
+import { bullHorn, bullPicture, CLAP, deadBull, deadHorn, giveWay, heroGrip, type Masonry, type Pixels } from './bull';
 import { HERO, heroHand, PERSIAN_COLUMN, snortBody, TRAIN, type Dot, type Train } from '../engine/entities';
 import type { CavePanel } from '../engine/level';
 import { BEAR_STALAGMITE_SPRITE, SIGNAL_LAMP_SPRITE, STOP_SIGN_SPRITE, TRAIN_CAR_SPRITE, TRAIN_ENGINE_SPRITE, TRAIN_LAST_CAR_SPRITE } from './procedural';
@@ -2506,7 +2506,6 @@ function drawHalf(ctx: CanvasRenderingContext2D, f: Frame, sx: number, sy: numbe
 }
 
 function drawEntityFront(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): void {
-  void s;
   const d = e.def;
   switch (d.kind) {
     case 'falling': {
@@ -2548,6 +2547,10 @@ function drawEntityFront(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): vo
     case 'trapColumn':
       // Behind him, in front of the crush he is flattened in.
       drawTrapColumn(ctx, e as TrapColumn);
+      break;
+    case 'fight':
+      // Its near arm and stone, in front of Theseus.
+      drawBullFront(ctx, s, e as Fight);
       break;
     default:
       break;
@@ -4917,6 +4920,11 @@ const payOutQuarter = (f: HeroFrame) => Math.min(7, Math.floor(f.payOut * 8)) % 
 /** Where the ball is in his hand while he carries it, in his box as if he faced right: walking, climbing and falling. */
 const BALL_IN_HAND: Partial<Record<HeroFrame['pose'], readonly [number, number]>> = { stand: [10, 13], walk: [10, 13], climb: [9, 0], fall: [10, 0] };
 
+/** His far arm to the horn in his left hand and his hand on it, in the ink he is being drawn in. */
+function fillGrip(ctx: CanvasRenderingContext2D, f: HeroFrame, horn: { x: number; y: number }): void {
+  for (const { x, y } of heroGrip(f, horn)?.each() ?? []) ctx.fillRect(x, y, 1, 1);
+}
+
 /**
  * Theseus, in black glaze, facing `facing`, in the pose of the frame: a drawing at the
  * door and down his route (a-door/theseus-kneel.md and the poses it heads), and, in the
@@ -4964,12 +4972,7 @@ function drawHeroFigure(ctx: CanvasRenderingContext2D, f: HeroFrame, horn: { x: 
     }
     if (f.pose === 'drag') {
       // His far arm, 2 px, back from his shoulder to the horn, and his hand on it.
-      if (horn) {
-        const sx = face === 1 ? x0 + 5 : x0 + HERO.w - 1 - 5;
-        pixelLine(ctx, sx, y0 + 7, horn.x, horn.y);
-        pixelLine(ctx, sx, y0 + 8, horn.x, horn.y + 1);
-        ctx.fillRect(horn.x - 1, horn.y - 1, 2, 2);
-      }
+      if (horn) fillGrip(ctx, f, horn);
       return;
     }
     const ball = BALL_IN_HAND[f.pose];
@@ -4985,11 +4988,10 @@ function drawHeroFigure(ctx: CanvasRenderingContext2D, f: HeroFrame, horn: { x: 
     if (back) r(dx - 1, dy + 2, 1, 1);
     else r(dx + 5, dy + 2, 1, 1);
   };
-  /** His far arm, from the shoulder at (sx, sy) to the horn in his left hand; with no bull, held out. */
+  /** His far arm, from the shoulder at (sx, sy) to the horn in his left hand (bull.ts, heroGrip); with no bull, held out. */
   const toHorn = (sx: number, sy: number) => {
     if (!horn) return l(sx, sy, sx + 3, sy + 1);
-    pixelLine(ctx, face === 1 ? x0 + sx : x0 + HERO.w - 1 - sx, y0 + sy, horn.x, horn.y);
-    ctx.fillRect(horn.x - 1, horn.y - 1, 2, 2);
+    fillGrip(ctx, f, horn);
   };
   switch (f.pose) {
     case 'leap':
@@ -5055,23 +5057,39 @@ function drawHeroFigure(ctx: CanvasRenderingContext2D, f: HeroFrame, horn: { x: 
   }
 }
 
+/** The eight pixels round one, corners included. */
+const ROUND = [
+  [-1, -1],
+  [0, -1],
+  [1, -1],
+  [-1, 0],
+  [1, 0],
+  [-1, 1],
+  [0, 1],
+  [1, 1],
+] as const;
+
 /**
  * Theseus in the fight, or stepping out of his black doorway: incised, a reserved line
- * of clay round him, so that he reads against the bull and the black, as the vase
- * painters cut one figure from another; against the clay it does not show.
+ * of clay round him, corners included, so that he reads against the bull and the black,
+ * as the vase painters cut one figure from another; against the clay it does not show.
+ * He is drawn after the bull, in front of it.
  */
 function drawHeroIncised(ctx: CanvasRenderingContext2D, f: HeroFrame, horn: { x: number; y: number } | null): void {
-  for (const [dx, dy] of [
-    [-1, 0],
-    [1, 0],
-    [0, -1],
-    [0, 1],
-  ] as const) {
+  ctx.save();
+  if (f.grounded) {
+    // Never into the floor he stands on: nothing of the line below his feet.
+    ctx.beginPath();
+    ctx.rect(Math.round(f.x) - 2 * HERO.w, Math.round(f.y) - HERO.h, 5 * HERO.w, 2 * HERO.h);
+    ctx.clip();
+  }
+  for (const [dx, dy] of ROUND) {
     ctx.save();
     ctx.translate(dx, dy);
     drawHeroFigure(ctx, f, horn, MN.clay);
     ctx.restore();
   }
+  ctx.restore();
   drawHeroFigure(ctx, f, horn);
 }
 
@@ -5470,6 +5488,16 @@ function drawBull(ctx: CanvasRenderingContext2D, s: Scene, f: Fight): void {
   ctx.restore();
 }
 
+/** Its near arm, its hand and the near stone, in front of Theseus, who stands between them and the rest of it. */
+function drawBullFront(ctx: CanvasRenderingContext2D, s: Scene, f: Fight): void {
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(0, 0, VIEW_W * 4, f.def.floorY);
+  ctx.clip();
+  fillPixels(ctx, bullNow(s, f).front);
+  ctx.restore();
+}
+
 /** Its hands on him, over him: the palms of the clap, or the swat, cut from him by clay. */
 function drawBullHands(ctx: CanvasRenderingContext2D, s: Scene, f: Fight): void {
   if (!f.keyed || f.k >= f.def.clock.blow2) return;
@@ -5609,6 +5637,9 @@ function drawTableau(ctx: CanvasRenderingContext2D, t: Tableau, doorway: readonl
   const hx = Math.round(x + d.body.head);
   const dead = deadBull(hx, F);
   const horn = deadHorn(hx, F);
+  // His arm and his hand on its horn are in front of it, cut from it by clay.
+  const grip = heroGrip(f, horn);
+  if (grip) giveWay(dead, grip);
   ctx.save();
   ctx.beginPath();
   ctx.rect(0, 0, VESTIBULE.x + VESTIBULE.w, F);

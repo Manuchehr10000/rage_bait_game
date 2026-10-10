@@ -22,7 +22,9 @@ the hand flat on it. On the floor the stones are behind everything of it: what c
 them hides them, and where its glaze meets a stone's contour the contour gives way to clay. Both
 stay by the heap, behind its head and its arm (`minotaur-heap`). In its hand the stone is in
 front of it, its contour whole, cut from the body by clay, and the hand's fingers lie across its
-face (`minotaur-hand`, frame 1).
+face (`minotaur-hand`, frame 1). The near stone, on the floor or in its hand, is in front of
+Theseus, who stands by it at the bull's head, with a line of clay round it (`minotaur-body`,
+Against Theseus); the far one is behind him.
 
 ## Must be right
 
@@ -32,10 +34,11 @@ face (`minotaur-hand`, frame 1).
 - **The two identical** (pillar 4).
 - **Never thrown** (designer, 2026-10-07): it never leaves its hand but to be set down.
 - Where a hand lies flat on it, its contour gives way to the hand, so that glaze never touches
-  glaze: the hand on y 728 to 731, straight on the stone's top row, which is cream from end to end
-  under it instead of contour; the side contours begin a row down, at y 733. The hand covers the
-  stone's whole length (`minotaur-hand`). When the hand leaves it, the contour is whole again
-  (`tests/minotaur-bull.spec.ts`).
+  glaze: the hand's palm on y 728 to 731, straight on the stone's top row, which is cream under it
+  instead of contour but where the fingers go over the edge and down its face; the side contours
+  begin a row down, at y 733, and give way to clay where the last finger comes by one. The hand
+  covers the stone's whole length (`minotaur-hand`). When the hand leaves it, the contour is whole
+  again (`tests/minotaur-bull.spec.ts`).
 - No dust ever reaches it: dust on cream is 1.20 to 1, and the dust is never in the cell.
 - 8 × 4, the stones of the level's data: the hands' height on them depends on it.
 

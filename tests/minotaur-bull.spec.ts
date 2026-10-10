@@ -1,9 +1,10 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 import { MINOTAUR } from '../src/levels/ch03-aegean/l06-minotaur';
-import type { FightDef } from '../src/engine/level';
-import { BREATH, BULL_HEAD, createEntity, STRUCK, type Fight } from '../src/engine/entities';
-import { BULL_HAND_FRAMES, BULL_HEAD_FRAMES, bullPicture, bullPose, clapHeld, CLAP, HAND_CLAW, HAND_FLAT, HAND_PALM, handBox, type Pixels } from '../src/render/bull';
-import { CELL_FLOOR, LEVEL } from './minotaur-run';
+import type { FightDef, TableauDef } from '../src/engine/level';
+import { BREATH, BULL_HEAD, createEntity, HERO, STRUCK, type Fight, type HeroFrame } from '../src/engine/entities';
+import { VIEW_H, VIEW_W } from '../src/engine/types';
+import { BULL_HAND_FRAMES, BULL_HEAD_FRAMES, bullPicture, bullPose, clapHeld, CLAP, deadBull, deadHorn, FLAT_ON, giveWay, HAND_CLAW, HAND_FLAT, HAND_PALM, HAND_REACH, handBox, heroGrip, type Pixels } from '../src/render/bull';
+import { CELL_FLOOR, cleanPresses, LEVEL } from './minotaur-run';
 
 /**
  * The bull as drawn (src/render/bull.ts), held to its notes in
@@ -11,12 +12,14 @@ import { CELL_FLOOR, LEVEL } from './minotaur-run';
  * with a hand flat on each stone through its breath; its back on its solid on every frame
  * from the grip, and its heap's; its free hand clawing in the swat's column, clear of the
  * stone it heaves; the clap's palms either side of him. In Node, on the fight's own clock.
+ * And in the game, a line of clay between it and Theseus on every frame he is by it.
  */
 
 const FIGHT = MINOTAUR.entities.find((e): e is FightDef => e.kind === 'fight')!;
 const C = FIGHT.clock;
 const F = CELL_FLOOR;
 const ST = FIGHT.stones;
+const TABLEAU = MINOTAUR.entities.find((e): e is TableauDef => e.kind === 'tableau')!;
 
 /** The fight at frame `k` of its clock (or not keyed), `t` ticks into the attempt. */
 function at(k: number | null, t = 0): Fight {
@@ -52,39 +55,82 @@ test("its drawings: a bull's head whose horns are 2 px and whose near horn is wh
   // x 101 to 111 and y 727 to 735 (headAt).
   expect(down!.slice(0, 5).every((r) => !r.includes('#'))).toBe(true);
   expect(down![14]!.includes('#')).toBe(false);
-  // The flat hand: 8 long, the thumb parted from the fingers by the one incision, and on
-  // the stone the fingers spread and the thumb: four touches, never a hoof's two.
+  // The flat hand: 8 long, its palm in the rows over the stone; its thumb laid forward
+  // along the top, parted from the hand by the one incision, glaze before it and after it;
+  // its palm's last row on the stone the length of it but for the thumb's end; and its
+  // fingers over the edge and down the stone's face, three apart, each a pixel wide, never
+  // a hoof's two and never at the stone's ends.
   const flat = left(BULL_HAND_FRAMES[HAND_FLAT]!.rows);
-  expect(flat.map((r) => r.length)).toEqual([8, 8, 8, 8]);
+  expect(flat.map((r) => r.length)).toEqual(flat.map(() => 8));
   expect(flat.join('').split('_').length - 1).toBe(1);
-  expect(runs(flat[flat.length - 1]!).length).toBe(4);
-  // The claw spread too, and the palm upright, as tall as half of him or more.
+  const thumb = flat.findIndex((r) => r.includes('_'));
+  expect(thumb).toBeLessThan(FLAT_ON);
+  expect(flat[thumb]!.slice(0, flat[thumb]!.indexOf('_'))).toMatch(/^#{2,}$/);
+  expect(flat[thumb]!.slice(flat[thumb]!.indexOf('_') + 1)).toMatch(/^#/);
+  expect(flat[FLAT_ON - 1]!.slice(2)).toBe('######');
+  const fingers = flat.slice(FLAT_ON);
+  expect(fingers.length).toBeGreaterThanOrEqual(1);
+  expect(runs(fingers[0]!)).toEqual(['#', '#', '#']);
+  for (const r of fingers) expect([r[0], r[7]]).toEqual(['.', '.']);
+  // The claw spread too; reaching, the claw upside down; and the palm upright, as tall as
+  // half of him or more.
   expect(runs(left(BULL_HAND_FRAMES[HAND_CLAW]!.rows).at(-1)!).length).toBeGreaterThanOrEqual(3);
+  expect(BULL_HAND_FRAMES[HAND_REACH]!.rows).toEqual([...BULL_HAND_FRAMES[HAND_CLAW]!.rows].reverse());
   expect(BULL_HAND_FRAMES[HAND_PALM]!.rows.length).toBeGreaterThanOrEqual(8);
 });
 
 test('crouched: a hand flat along the whole top of each stone, put through its whole breath while the rest of it rises a pixel; the two stones the same', () => {
   const tops = new Set<number>();
   const breath = BREATH.out + BREATH.hold + BREATH.in + BREATH.rest;
+  const hand = left(BULL_HAND_FRAMES[HAND_FLAT]!.rows);
   for (let t = 0; t < breath; t++) {
     const f = at(null, t);
     const b = bullPose(f);
     expect([handBox(b.near), handBox(b.far)]).toEqual([
-      { x: ST.near, y: F - ST.h - 4, w: 8, h: 4 },
-      { x: ST.far, y: F - ST.h - 4, w: 8, h: 4 },
+      { x: ST.near, y: F - ST.h - FLAT_ON, w: 8, h: hand.length },
+      { x: ST.far, y: F - ST.h - FLAT_ON, w: 8, h: hand.length },
     ]);
     tops.add(b.top);
-    // Under each hand the stone's top is cream from end to end, and nothing of its glaze
-    // touches the hand's: its sides begin a row down.
+    // Under each hand the stone's top is cream from end to end but where a finger goes
+    // over it, its sides begin a row down, and nothing of its glaze touches the hand's: the
+    // side gives way to clay where a finger comes by it.
     const { body } = picture(f);
     for (const sx of [ST.near, ST.far]) {
-      for (let i = 0; i < ST.w; i++) expect(body.get(sx + i, F - ST.h)).toBe('o');
-      expect([glaze(body, sx, F - ST.h + 1), glaze(body, sx + ST.w - 1, F - ST.h + 1)]).toEqual([true, true]);
+      const mine = (x: number, y: number) => hand[y - (F - ST.h - FLAT_ON)]?.[x - sx] === '#';
+      for (let i = 0; i < ST.w; i++) expect(body.get(sx + i, F - ST.h)).toBe(mine(sx + i, F - ST.h) ? '#' : 'o');
+      for (let y = F - ST.h + 1; y < F; y++) {
+        for (const x of [sx, sx + ST.w - 1]) {
+          const near = [-1, 0, 1].some((dx) => [-1, 0, 1].some((dy) => mine(x + dx, y + dy)));
+          expect(body.get(x, y)).toBe(near ? '_' : '#');
+        }
+      }
     }
     // The stones, pixel for pixel the same (pillar 4).
     for (let j = 0; j < ST.h; j++) for (let i = 0; i < ST.w; i++) expect(body.get(ST.near + i, F - ST.h + j)).toBe(body.get(ST.far + i, F - ST.h + j));
   }
   expect([...tops].sort()).toEqual([F - FIGHT.back.crouch - 1, F - FIGHT.back.crouch]);
+});
+
+test('crouched, its leg one mass: the rump rounded down into the heel, nothing under it standing apart, and the thigh incised only near the groin', () => {
+  for (const t of [0, BREATH.out + 1]) {
+    const f = at(null, t);
+    const b = bullPose(f);
+    const { body } = picture(f);
+    // From under the rump to the floor the back of the leg is glaze: no clay behind the
+    // heel to stand a shin and a foot apart from it.
+    for (let y = b.top + 9; y < F; y++) expect(glaze(body, b.x1 - 4, y)).toBe(true);
+    // Every row of the leg below the knee is one run of glaze, from the toes' or the shin's
+    // front back to the heel: no notch under the knee, no bar over a stem.
+    for (let y = b.top + 12; y < F; y++) {
+      let x = b.x1 - 4;
+      while (glaze(body, x - 1, y)) x--;
+      expect(body.get(x - 1, y), `row ${y}`).toBeUndefined();
+    }
+    // The one incision in the leg runs above the knee's row.
+    const cuts = [...body.each()].filter((p) => p.ink === '_' && p.x >= b.x1 - 20 && p.y > b.top + 4);
+    expect(cuts.length).toBeGreaterThan(0);
+    for (const c of cuts) expect(c.y).toBeLessThan(b.top + 10);
+  }
 });
 
 test('its back drawn on its solid on every frame from the grip, pinned, heaved and sunk; and its heap on the heap', () => {
@@ -138,5 +184,172 @@ test('the clap: its palms either side of him, a pixel of clay between, from the 
     expect([n.x + n.w, r.x]).toEqual([s.x - 1, s.x + 5]);
     const { over } = picture(f);
     for (let y = n.y; y < n.y + n.h; y++) expect([over.get(s.x - 1, y), over.get(s.x + 4, y)]).toEqual(['_', '_']);
+  }
+});
+
+test('the closing tableau: his arm and his hand on its horn are in front of the dead body, a line of clay round them, at every step of the drag', () => {
+  const F0 = TABLEAU.floorY;
+  const wrong: string[] = [];
+  for (let x = TABLEAU.from; x >= TABLEAU.to; x--) {
+    const hx = Math.round(x + TABLEAU.body.head);
+    const f = { x, y: F0 - HERO.h, pose: 'drag', facing: -1 } as HeroFrame;
+    const grip = heroGrip(f, deadHorn(hx, F0))!;
+    const dead = deadBull(hx, F0);
+    giveWay(dead, grip);
+    for (const { x: gx, y: gy } of grip.each()) {
+      if (dead.get(gx, gy)) wrong.push(`x ${x}: the body under his hand at (${gx}, ${gy})`);
+      for (const [dx, dy] of [[-1, -1], [0, -1], [1, -1], [-1, 0], [1, 0], [-1, 1], [0, 1], [1, 1]] as const) {
+        if (!grip.get(gx + dx, gy + dy) && dead.get(gx + dx, gy + dy) === '#') wrong.push(`x ${x}: (${gx + dx}, ${gy + dy}) against his hand`);
+      }
+    }
+  }
+  expect(wrong).toEqual([]);
+});
+
+// ---------------------------------------------------------------------------
+// In the game.
+// ---------------------------------------------------------------------------
+
+/** Inside page.evaluate: the type is erased, so it survives the trip into the page. */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type W = Window & { __game: any };
+
+async function open(page: Page): Promise<void> {
+  const errors: string[] = [];
+  page.on('pageerror', (e) => errors.push(String(e)));
+  await page.goto('/#minotaur');
+  expect(await page.locator('#stamp').textContent(), 'a local build: a stage is entered only where there are dev tools').not.toMatch(/^prod/);
+  await page.waitForFunction(() => (window as unknown as Partial<W>).__game?.levelData.id === 'minotaur');
+  // Stop the loop, and let a frame already queued run out: only the test ticks.
+  await page.evaluate(async () => {
+    const raf = window.requestAnimationFrame.bind(window);
+    window.requestAnimationFrame = () => 0;
+    await new Promise((done) => raf(() => raf(done)));
+  });
+  expect(errors).toEqual([]);
+}
+
+/** Every frame of an attempt from L - 8 on, and of its death: Theseus's glaze, the bull's and where they touch. */
+async function looked(page: Page, name: string, hands: string | null): Promise<{ cause: string | null; frames: number; bull: number; him: number; touches: string[] }> {
+  await open(page);
+  return page.evaluate(
+    ({ presses, floor, view, glaze, name, hands }) => {
+      const g = (window as unknown as W).__game;
+      g.titleTimer = 0;
+      const fight = () => g.entities.find((e: { def: { kind: string } }) => e.def.kind === 'fight');
+      const key = (c: string, d: boolean) => window.dispatchEvent(new KeyboardEvent(d ? 'keydown' : 'keyup', { code: c }));
+      const press = (p: { dir: number; jump: boolean }) => {
+        key('ArrowRight', p.dir > 0);
+        key('ArrowLeft', p.dir < 0);
+        key('Space', p.jump);
+        g.tick();
+      };
+      // eslint-disable-next-line no-new-func
+      const by = hands ? (new Function('k', `return (${hands})(k);`) as (k: number) => { dir: number; jump: boolean } | null) : null;
+      // Tell the two glazes apart: the bull is drawn inside its own clip, the rect from the
+      // world's left to its floor, and while it is, every glaze fill is made green.
+      const ctx = g.world.getContext('2d') as CanvasRenderingContext2D;
+      const P = CanvasRenderingContext2D.prototype;
+      const s = ctx.canvas.width / view.w;
+      let depth = 0;
+      let bull = -1;
+      let mark = false;
+      ctx.save = function () {
+        depth++;
+        P.save.call(this);
+      };
+      ctx.restore = function () {
+        depth--;
+        if (bull >= 0 && depth < bull) bull = -1;
+        P.restore.call(this);
+      };
+      ctx.rect = function (x: number, y: number, w: number, h: number) {
+        if (x === 0 && y === 0 && w === view.w * 4 && h === floor) bull = depth;
+        P.rect.call(this, x, y, w, h);
+      };
+      ctx.fillRect = function (x: number, y: number, w: number, h: number) {
+        if (mark && bull >= 0 && this.fillStyle === glaze) {
+          this.fillStyle = '#00ff00';
+          P.fillRect.call(this, x, y, w, h);
+          this.fillStyle = glaze;
+          return;
+        }
+        P.fillRect.call(this, x, y, w, h);
+      };
+      const ink = (d: Uint8ClampedArray, i: number, j: number) => {
+        const o = ((j * s + 1) * ctx.canvas.width + i * s + 1) * 4;
+        return (d[o]! << 16) | (d[o + 1]! << 8) | d[o + 2]!;
+      };
+      const GL = parseInt(glaze.slice(1), 16);
+      const GREEN = 0x00ff00;
+      const seen = { frames: 0, bull: 0, him: 0, touches: [] as string[] };
+      /** This frame: the bull's glaze, green, against his, which is the glaze that goes when he does. */
+      const look = (at: string) => {
+        mark = true;
+        g.draw();
+        const all = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height).data;
+        const keep = g.entities;
+        g.entities = keep.filter((e: { def: { kind: string } }) => e.def.kind !== 'hero');
+        g.draw();
+        const without = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height).data;
+        g.entities = keep;
+        mark = false;
+        seen.frames++;
+        for (let j = 1; j < view.h - 1; j++) {
+          for (let i = 1; i < view.w - 1; i++) {
+            const c = ink(all, i, j);
+            if (c === GL && ink(without, i, j) !== GL) seen.him++;
+            if (c !== GREEN) continue;
+            seen.bull++;
+            for (const [dx, dy] of [[-1, -1], [0, -1], [1, -1], [-1, 0], [1, 0], [-1, 1], [0, 1], [1, 1]] as const) {
+              if (ink(all, i + dx, j + dy) === GL && ink(without, i + dx, j + dy) !== GL) seen.touches.push(`${at}: (${i}, ${j + g.camera.iy})`);
+            }
+          }
+        }
+      };
+      for (let i = 0; i < 4000 && g.state === 'playing'; i++) {
+        const f = fight();
+        const k = f.keyed ? f.k + 1 : -99;
+        press((by && k >= 0 ? by(k) : null) ?? presses[i] ?? { dir: 0, jump: false });
+        if (fight().keyed && fight().k >= -8) look(`${name}, L + ${fight().k}`);
+        if (fight().keyed && fight().k >= 150) break;
+      }
+      const cause = g.state === 'dead' ? (g.deathCause as string) : null;
+      for (let j = 0; j < 46 && g.state === 'dead'; j++) {
+        press({ dir: 0, jump: false });
+        look(`${name}, dead ${j}`);
+      }
+      key('ArrowLeft', false);
+      key('ArrowRight', false);
+      key('Space', false);
+      return { cause, ...seen, touches: seen.touches.slice(0, 20) };
+    },
+    // The vase's glaze (VASE_INK.glaze, src/render/procedural.ts), as the canvas gives it back.
+    { presses: cleanPresses(), floor: F, view: { w: VIEW_W, h: VIEW_H }, glaze: '#1f140e', name, hands },
+  );
+}
+
+test("in the game: no glaze of the bull's touches Theseus's, corners included, on any frame of the clean run's fight, the clap, the swat or the toss", async ({ context }) => {
+  test.setTimeout(120_000);
+  // From L on, by the fight's clock: these hands, or the clean run's own where they give none.
+  const attempts: [string, string | null, string | null][] = [
+    ['the clean run', null, null],
+    ['the clap', '() => ({ dir: 1, jump: false })', 'The hands'],
+    ['the clap in the air', '(k) => ({ dir: 1, jump: k >= 2 && k < 8 })', 'The hands'],
+    ['the swat in the air', '(k) => ({ dir: k >= 24 ? 1 : 0, jump: k >= 44 && k < 60 })', 'The hands'],
+    ['the swat on the floor', '(k) => ({ dir: k >= 34 ? 1 : 0, jump: false })', 'The hands'],
+    ['the horns on its back', '(k) => (k < 59 ? null : { dir: 0, jump: false })', 'The horns'],
+    ['the horns at the wall', '() => ({ dir: -1, jump: false })', 'The horns'],
+  ];
+  for (const [name, hands, cause] of attempts) {
+    // A fresh page each time: the clean run's hands are the first attempt's, from the spawn.
+    const page = await context.newPage();
+    const r = await looked(page, name, hands);
+    await page.close();
+    expect(r.cause, name).toBe(cause);
+    // Both are seen, on every frame from L - 8, and never touch.
+    expect(r.frames, name).toBeGreaterThan(cause ? 60 : 150);
+    expect([r.bull > 0, r.him > 0], name).toEqual([true, true]);
+    expect(r.touches, name).toEqual([]);
   }
 });
