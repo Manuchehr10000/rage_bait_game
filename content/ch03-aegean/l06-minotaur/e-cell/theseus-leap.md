@@ -13,6 +13,12 @@ Theseus leaping low over the crouched bull from row 5's edge to the floor before
 into it, his front knee up and his back leg trailing, his sword up over his head in his right
 hand. The figure of `../a-door/theseus-kneel.md`.
 
+As drawn (2026-10-10): his right arm raised straight up behind his head, 2 px of clay from it, the
+fist over the back of his head and the blade, 6 px, up and back from it, away from the tourist
+leaping the other way over the bull; his far arm out ahead of him at his shoulder; his head forward
+and down; his front thigh level and its shin down; his back leg trailing down behind. One drawing
+for the whole leap, turned to face left, the way he goes.
+
 ## Where it stands in the game
 
 From L+4, out of his box at x 140 on row 5, about 6 px of rise, down to x 94 on the cell floor.
@@ -26,7 +32,8 @@ bull (`../b-passage/theseus-stand.md`) and takes the horn at the grip.
 - **Low**, about 6 px of rise: the tourist's own leap after his is the hands' answer, and his must
   read as the one to follow.
 - The sword 1 px, held up clear of the bull, a line of clay where it crosses any glaze.
-- Cut from the bull's glaze by reserved clay as he passes over it.
+- Cut from the bull's glaze by reserved clay as he passes over it: over its head to its face, and
+  nothing of him down on its back (`tests/minotaur-bull.spec.ts`).
 - As `../a-door/theseus-kneel.md`, "Theseus, in every pose".
 
 ## Deliberately wrong

@@ -1,9 +1,9 @@
-import { breathHeight, HERO, PLUME, STRUCK, type Fight, type HeroFrame, type HeroPose } from '../engine/entities';
+import { breathHeight, HERO, PLUME, STRUCK, type Fight, type HeroFrame } from '../engine/entities';
 
 /**
  * The Minotaur, as pixels at 1 world px (content/ch03-aegean/l06-minotaur/e-cell and
- * f-thread): a bull's head on a man's body, black-figure on the clay. Kept apart from the
- * drawing, so that a test can hold the bull to its notes.
+ * f-thread): a bull's head on a man's body, black-figure on the clay; and Theseus against it
+ * in the fight. Kept apart from the drawing, so that a test can hold them to their notes.
  *
  * The code keeps the skeleton and the drawings hang on it. The fight's clock says where
  * its back, its head and its hands are on every frame (`Fight.backAt`, `headAt`,
@@ -593,8 +593,12 @@ export function swatWrist(f: Fight, u: number): Pt {
   return { x: q.x + 4, y: q.y - tall(u) - 5 };
 }
 
-/** Where Theseus's left hand has the bull's near horn this frame: 3 px in from its box's left, 2 over its top. */
-export function bullHorn(f: Fight): Pt {
+/**
+ * Where Theseus's left hand has the bull's near horn this frame: 3 px in from its box's
+ * left, 2 over its top. Null once its head is down on the floor, after the second blow.
+ */
+export function bullHorn(f: Fight): Pt | null {
+  if (f.k >= f.def.clock.blow2 + STRUCK) return null;
   const h = bullPose(f).held;
   return { x: h.x + 3, y: h.y - 2 };
 }
@@ -603,14 +607,8 @@ export function bullHorn(f: Fight): Pt {
 // Theseus against it: his hand on its horn, in front of it.
 // ---------------------------------------------------------------------------
 
-/** His far shoulder, the left, where his arm to its horn starts, by his pose: in his box as if he faced right. */
-const GRIP_SHOULDER: Partial<Record<HeroPose, Pt>> = {
-  grip: { x: 9, y: 8 },
-  draw: { x: 8, y: 8 },
-  blow: { x: 10, y: 8 },
-  duck: { x: 9, y: 15 },
-  drag: { x: 5, y: 7 },
-};
+/** His far shoulder, the left, where his arm to the dead body's horn starts as he drags it: in his box as if he faced right. */
+const DRAG_SHOULDER: Pt = { x: 5, y: 7 };
 
 /** A 1 px line from `a` to `b`, the pixels the game's own line puts down (scene.ts, pixelLine). */
 function line(p: Pixels, a: Pt, b: Pt): void {
@@ -639,19 +637,20 @@ function line(p: Pixels, a: Pt, b: Pt): void {
 }
 
 /**
- * Theseus's far arm, his left, from his shoulder to the horn in his hand at `horn`, and his
- * hand on it, 2 px: in the fight and dragging the dead body (scene.ts draws him with it).
- * Two lines for the drag's arm, one in the fight's. Null in a pose that holds no horn.
+ * Theseus's far arm, his left, dragging the dead body by the horn at `horn`
+ * (f-thread/theseus-drag.md): two lines from his shoulder, and his hand on it, 2 × 2 (scene.ts
+ * draws him with it). Null in any other pose: in the fight his arm is his picture's
+ * (`heroPicture`).
  */
 export function heroGrip(f: HeroFrame, horn: Pt): Pixels | null {
-  const s = GRIP_SHOULDER[f.pose];
-  if (!s) return null;
+  if (f.pose !== 'drag') return null;
+  const s = DRAG_SHOULDER;
   const x0 = Math.round(f.x);
   const y0 = Math.round(f.y);
   const sx = f.facing === 1 ? x0 + s.x : x0 + HERO.w - 1 - s.x;
   const p = new Pixels();
   line(p, { x: sx, y: y0 + s.y }, horn);
-  if (f.pose === 'drag') line(p, { x: sx, y: y0 + s.y + 1 }, { x: horn.x, y: horn.y + 1 });
+  line(p, { x: sx, y: y0 + s.y + 1 }, { x: horn.x, y: horn.y + 1 });
   p.rect(horn.x - 1, horn.y - 1, 2, 2);
   return p;
 }
@@ -668,6 +667,465 @@ export function giveWay(p: Pixels, front: Pixels): void {
     for (const [dx, dy] of N8) if (!front.get(x + dx, y + dy) && p.get(x + dx, y + dy) === '#') ring.push({ x: x + dx, y: y + dy });
   }
   for (const q of ring) p.put(q.x, q.y, '_');
+}
+
+// ---------------------------------------------------------------------------
+// Theseus in the fight: his drawings, and his picture against it.
+// ---------------------------------------------------------------------------
+
+/**
+ * One of his drawings in the fight (e-cell/theseus-*.md), facing right as every figure of
+ * the vase is drawn: the figure of a-door/theseus-kneel.md, in glaze, its incisions the
+ * clay. What moves against something else is the code's: his far arm to the horn, from
+ * `shoulder`, and his sword's blade, `blade`, from the hilt in his fist to its point.
+ */
+export interface HeroDrawing {
+  /** '#' glaze, '_' clay, '.' nothing. */
+  rows: readonly string[];
+  /** Where the drawing's top-left is from his box's, as if he faced right. */
+  dx: number;
+  dy: number;
+  /** His far shoulder, in his box: null where he has no horn in his hand. */
+  shoulder: Pt | null;
+  /** His blade, from the hilt to the point, in his box: null where it is in its scabbard. */
+  blade: readonly [Pt, Pt] | null;
+  /** Lunging in past its reach: all of him in front of its near arm, not behind it. */
+  before?: boolean;
+}
+
+/** Where he is against the bull on a frame of the fight (scene.ts gives it). */
+export interface HeroAgainst {
+  /** Its near horn, which his far hand has while it is in reach; null once its head is down. */
+  horn: Pt | null;
+  /** The bull drawn behind him, and its near arm and stone, drawn in front of him. */
+  behind: Pixels;
+  front: Pixels;
+  /** Carried on the horn by the struck body's lurch. */
+  shoved: boolean;
+  /** Sunk into its heap: the second blow goes in over it. */
+  heap: boolean;
+  /** Its hands on the tourist, the clap's palms or the swat, with their line of clay: he gives way round them by a pixel more. */
+  over: Pixels;
+}
+
+/** His head in profile, rows 0 to 5 of his box: the same head as at the door. */
+const HERO_HEAD = ['.....###....', '....#####...', '....###_##..', '....######..', '.....####...', '......##....'];
+
+/**
+ * His drawings in the fight. At guard, on his feet or walking out of his doorway: the sword
+ * upright in his right fist before his belt, its blade up along his body. Leaping: low,
+ * leaning into it, his front knee up and his back leg trailing, the sword up over his head
+ * and back, his far arm out ahead. At the horn: braced, feet apart; shoved, leaning into it
+ * as the struck body lurches, his back leg braced behind; ducking, his head low under the
+ * stone, the sword low; drawing back, the sword over his shoulder pointing back; and the
+ * two blows, lunging in past its near arm, the sword struck home under its jaw, and rising
+ * into the throat of the head the second jerks up. One sword in every drawing, a 6 px blade.
+ */
+export const HERO_FIGHT = {
+  stand: {
+    rows: [
+      ...HERO_HEAD,
+      '....######..',
+      '...#######..',
+      '...###_.##..',
+      '...##_#.##..',
+      '...#_##.##..',
+      '..#_###.####',
+      '..######..##',
+      '.#######...#',
+      '##.######...',
+      '#..######...',
+      '....##.##...',
+      '....##.##...',
+      '....##.##...',
+      '....##.##...',
+      '....##.##...',
+      '....##.##...',
+      '....##.##...',
+      '....##.###..',
+    ],
+    dx: 0,
+    dy: 0,
+    shoulder: null,
+    blade: [
+      { x: 11, y: 10 },
+      { x: 11, y: 5 },
+    ],
+  },
+  leap: {
+    rows: [
+      '............',
+      '............',
+      '............',
+      '............',
+      '............',
+      '............',
+      '............',
+      '..##........',
+      '..##........',
+      '.##...###...',
+      '.##..#####..',
+      '.##..###_##.',
+      '..#..######.',
+      '..##..####..',
+      '...##..##...',
+      '....#######.',
+      '...#########',
+      '...######.##',
+      '..######....',
+      '.#######....',
+      '##.######...',
+      '#..#########',
+      '...##..#####',
+      '..##.....##.',
+      '.##......##.',
+      '##.......##.',
+      '#........###',
+      '............',
+      '............',
+      '............',
+      '............',
+    ],
+    dx: 0,
+    dy: -7,
+    shoulder: null,
+    blade: [
+      { x: 2, y: -1 },
+      { x: 0, y: -6 },
+    ],
+  },
+  grip: {
+    rows: [
+      ...HERO_HEAD,
+      '....######..',
+      '...#######..',
+      '...###_.##..',
+      '...##_#.##..',
+      '...#_##.##..',
+      '..#_###.####',
+      '..######..##',
+      '.#######...#',
+      '##.######...',
+      '#..######...',
+      '...##..##...',
+      '...##...##..',
+      '..##....##..',
+      '..##.....##.',
+      '.##......##.',
+      '.##......##.',
+      '.##......##.',
+      '###......###',
+    ],
+    dx: 0,
+    dy: 0,
+    shoulder: { x: 9, y: 7 },
+    blade: [
+      { x: 11, y: 10 },
+      { x: 11, y: 5 },
+    ],
+  },
+  shoved: {
+    rows: [
+      ...HERO_HEAD,
+      '....######..',
+      '...#######..',
+      '...###_.##..',
+      '..##_#.##...',
+      '..#_##.##...',
+      '.#_###.#####',
+      '.######...##',
+      '.#######...#',
+      '.#.######...',
+      '...######...',
+      '..##..##....',
+      '.##....##...',
+      '.##.....##..',
+      '.#......##..',
+      '.#.......##.',
+      '.#.......##.',
+      '.#.......##.',
+      '.##......###',
+    ],
+    dx: 0,
+    dy: 0,
+    shoulder: { x: 9, y: 7 },
+    blade: [
+      { x: 11, y: 10 },
+      { x: 11, y: 5 },
+    ],
+  },
+  duck: {
+    rows: [
+      '............',
+      '............',
+      '............',
+      '............',
+      '............',
+      '............',
+      '............',
+      '............',
+      '............',
+      '......###...',
+      '.....#####..',
+      '.....###_##.',
+      '.....######.',
+      '...#######..',
+      '..########..',
+      '.##_######..',
+      '.#_#####.##.',
+      '##.####..##.',
+      '#..######...',
+      '..##...##...',
+      '..##....##..',
+      '..##....##..',
+      '..##....##..',
+      '.###....###.',
+    ],
+    dx: 0,
+    dy: 0,
+    shoulder: null,
+    blade: [
+      { x: 11, y: 18 },
+      { x: 11, y: 23 },
+    ],
+  },
+  draw: {
+    rows: [
+      '..................',
+      '..................',
+      '..................',
+      '..........###.....',
+      '.........#####....',
+      '......##.###_##...',
+      '......##.######...',
+      '......##..####....',
+      '......##...##.....',
+      '......###.######..',
+      '.......#########..',
+      '.........###_###..',
+      '.........##_###...',
+      '.........#_###....',
+      '........#_###.....',
+      '........######....',
+      '.......#######....',
+      '......##.######...',
+      '......#..######...',
+      '.........##..##...',
+      '.........##...##..',
+      '........##....##..',
+      '........##.....##.',
+      '.......##......##.',
+      '.......##......##.',
+      '.......##......##.',
+      '......###......###',
+    ],
+    dx: -6,
+    dy: -3,
+    shoulder: { x: 9, y: 7 },
+    blade: [
+      { x: -1, y: 2 },
+      { x: -6, y: -3 },
+    ],
+  },
+  blow: [
+    {
+      rows: [
+        '.......###...........',
+        '......#####..........',
+        '......###_##.........',
+        '......######.........',
+        '.......####..........',
+        '........##...........',
+        '......######.........',
+        '.....#######.........',
+        '.....###_###.........',
+        '....###_###..........',
+        '....##_#####.........',
+        '....#_##..####.......',
+        '...######..##........',
+        '..########...........',
+        '.##.######...........',
+        '.#..######...........',
+        '....##..###..........',
+        '...##....###.........',
+        '..##......##.........',
+        '.##........##........',
+        '.##........##........',
+        '##.........##........',
+        '##.........##........',
+        '###........###.......',
+      ],
+      dx: 0,
+      dy: 0,
+      before: true,
+      shoulder: { x: 10, y: 7 },
+      blade: [
+        { x: 14, y: 12 },
+        { x: 19, y: 14 },
+      ],
+    },
+    {
+      rows: [
+        '.....................',
+        '.....................',
+        '.....................',
+        '.....................',
+        '.....................',
+        '.....................',
+        '....###.....##.......',
+        '...#####...###.......',
+        '...###_##.###........',
+        '...######.##.........',
+        '....####.##..........',
+        '.....##.##...........',
+        '....#######..........',
+        '...#######...........',
+        '...###_##............',
+        '...##_###............',
+        '...#_###.............',
+        '..#_###..............',
+        '..######.............',
+        '.########............',
+        '##.#######...........',
+        '#..#######...........',
+        '...###..###..........',
+        '..##.....###.........',
+        '..##......##.........',
+        '.##........##........',
+        '.##........##........',
+        '##.........##........',
+        '##.........##........',
+        '###........###.......',
+      ],
+      dx: 0,
+      dy: -6,
+      before: true,
+      shoulder: { x: 9, y: 7 },
+      blade: [
+        { x: 14, y: -1 },
+        { x: 18, y: -6 },
+      ],
+    },
+  ],
+} as const satisfies Record<string, HeroDrawing | readonly HeroDrawing[]>;
+
+/**
+ * Walking out of his doorway at guard: the guard's head and body on the walk's two strides
+ * (b-passage/theseus-walk.md), every 9 px he goes.
+ */
+const HERO_WALK: readonly HeroDrawing[] = [
+  ['...##..##...', '...##...##..', '..##....##..', '..##.....##.', '.##......##.', '.##.......##', '.##.......##', '.###......##'],
+  ['....####....', '....####....', '....##.#....', '....##.##...', '....##.##...', '.....#.##...', '.....#.##...', '....##.###..'],
+].map((legs) => ({ ...HERO_FIGHT.stand, rows: [...HERO_FIGHT.stand.rows.slice(0, 16), ...legs] }));
+
+/** His drawing on this frame of the fight. */
+export function heroDrawing(f: HeroFrame, a: HeroAgainst | null): HeroDrawing {
+  switch (f.pose) {
+    case 'walk':
+      return HERO_WALK[Math.floor(f.stride / 9) % 2]!;
+    case 'leap':
+      return HERO_FIGHT.leap;
+    case 'grip':
+      return a?.shoved ? HERO_FIGHT.shoved : HERO_FIGHT.grip;
+    case 'duck':
+      return HERO_FIGHT.duck;
+    case 'draw':
+      return HERO_FIGHT.draw;
+    case 'blow':
+      return a?.heap ? HERO_FIGHT.blow[1] : HERO_FIGHT.blow[0];
+    default:
+      return HERO_FIGHT.stand;
+  }
+}
+
+/** His blade's pixels on this frame, from the hilt to the point, in the world: the game's own 1 px line. */
+export function heroBlade(f: HeroFrame, d: HeroDrawing): Pt[] {
+  if (!d.blade) return [];
+  const x0 = Math.round(f.x);
+  const y0 = Math.round(f.y);
+  const at = (p: Pt): Pt => ({ x: f.facing === 1 ? x0 + p.x : x0 + HERO.w - 1 - p.x, y: y0 + p.y });
+  const run = new Pixels();
+  line(run, at(d.blade[0]), at(d.blade[1]));
+  return [...run.each()].map(({ x, y }) => ({ x, y }));
+}
+
+/**
+ * How far his far hand reaches from his shoulder, in px: a straight arm. The horn is in his
+ * hand only while it is in reach; when the heave or the second blow lifts it out, he has let
+ * go, and his far arm is behind him.
+ */
+export const HERO_REACH = 14;
+
+/** His far arm, 2 px, from his shoulder at `s` to the horn at `horn`, and his hand on it, 2 × 2. */
+function farArm(p: Pixels, s: Pt, horn: Pt): void {
+  line(p, s, horn);
+  // The second pixel of its thickness beside the first: under it where it runs across, behind it where it runs up.
+  const across = Math.abs(horn.x - s.x) >= Math.abs(horn.y - s.y);
+  const step = horn.x >= s.x ? -1 : 1;
+  line(p, across ? { x: s.x, y: s.y + 1 } : { x: s.x + step, y: s.y }, across ? { x: horn.x, y: horn.y + 1 } : { x: horn.x + step, y: horn.y });
+  p.rect(horn.x - 1, horn.y - 1, 2, 2);
+}
+
+/**
+ * Theseus on this frame of the fight, at 1 world px (e-cell/theseus-*.md): his drawing,
+ * turned the way he faces; his far arm to the horn, where his hand has it; his blade, glaze
+ * over the clay and a line of reserved clay wherever it lies over glaze, his own or the
+ * bull's, as a black-figure painter incises a weapon over a body; and a line of clay round
+ * all of it, corners included, which cuts him from the bull and the black behind him, but
+ * never into the floor he stands on, never over cream, and never round the blade where it is
+ * clay. `back` is drawn behind the bull's near arm, and `front`, where he lunges in past it,
+ * after it.
+ */
+export function heroPicture(f: HeroFrame, a: HeroAgainst | null): { back: Pixels; front: Pixels } {
+  const d = heroDrawing(f, a);
+  const x0 = Math.round(f.x);
+  const y0 = Math.round(f.y);
+  const at = (p: Pt): Pt => ({ x: f.facing === 1 ? x0 + p.x : x0 + HERO.w - 1 - p.x, y: y0 + p.y });
+  const fig = new Pixels();
+  d.rows.forEach((row, j) => {
+    for (let i = 0; i < row.length; i++) {
+      const c = row[i]!;
+      if (c === '.') continue;
+      const q = at({ x: d.dx + i, y: d.dy + j });
+      fig.put(q.x, q.y, c as Ink);
+    }
+  });
+  const s = d.shoulder && at(d.shoulder);
+  const horn = a?.horn;
+  if (s && horn && Math.hypot(horn.x - s.x, horn.y - s.y) <= HERO_REACH) farArm(fig, s, horn);
+  // Where its hands are on the tourist, clear clay: he gives way a pixel more than their line.
+  const clear = new Pixels();
+  for (const { x, y } of a?.over.each() ?? []) for (const [ex, ey] of [[0, 0], ...N8] as const) clear.put(x + ex, y + ey, '_');
+  const gone = new Pixels();
+  for (const { x, y } of [...fig.each()]) {
+    if (!clear.get(x, y)) continue;
+    fig.delete(x, y);
+    gone.put(x, y, '_');
+  }
+  const floor = f.grounded ? y0 + HERO.h : Infinity;
+  const glazeAt = (x: number, y: number, over: boolean) => fig.get(x, y) === '#' || a?.behind.get(x, y) === '#' || (over && a?.front.get(x, y) === '#');
+  const creamAt = (x: number, y: number, over: boolean) => a?.behind.get(x, y) === 'o' || (over && a?.front.get(x, y) === 'o');
+  /** His glaze in `part`, and its blade over whatever is there, with the clay round them. */
+  const picture = (part: Pixels, over: boolean): Pixels => {
+    const blade = new Pixels();
+    for (const { x, y } of heroBlade(f, d)) if (!clear.get(x, y)) blade.put(x, y, glazeAt(x, y, over) ? '_' : '#');
+    const pic = new Pixels();
+    for (const p of [part, blade]) {
+      for (const { x, y, ink } of p.each()) {
+        if (ink !== '#') continue;
+        for (const [ex, ey] of N8) {
+          const q = { x: x + ex, y: y + ey };
+          if (part.get(q.x, q.y) || blade.get(q.x, q.y) || q.y >= floor || creamAt(q.x, q.y, over)) continue;
+          pic.put(q.x, q.y, '_');
+        }
+      }
+    }
+    pic.lay(part);
+    pic.lay(blade);
+    if (!over) for (const { x, y } of gone.each()) if (!a?.over.get(x, y)) pic.put(x, y, '_');
+    return pic;
+  };
+  return { back: picture(fig, false), front: d.before ? picture(fig, true) : new Pixels() };
 }
 
 // ---------------------------------------------------------------------------

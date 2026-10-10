@@ -53,6 +53,9 @@ floor beyond its stones, has its fingers under the floor's line, unseen.
 
 The near hand, on its stone or holding it, is in front of Theseus, who stands at the bull's head
 with his feet by the near stone; the far hand is behind him (`minotaur-body`, Against Theseus).
+Thrashing at his chest, the near hand is in front of him but for his two blows, when he lunges
+in past it (`theseus-blow`). Its palms on the tourist, in the clap, have two pixels of clear clay
+between them and Theseus.
 
 The rough's anchor on a stone, the stone's x + 3 (`onStone` in `bullPose`, `src/render/scene.ts`),
 was the place of its 5 px hand: an 8 px hand hung from it would overhang the near stone by 4 px

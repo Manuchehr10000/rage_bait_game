@@ -10,8 +10,13 @@
 ## What it is
 
 Theseus down under the stone the bull heaves at him: on bent legs, his head low (its top at row 9
-of his box), his back bent, his far hand still on the horn (the code's far arm, as
-`theseus-grip`), the sword low in his right hand. The figure of `../a-door/theseus-kneel.md`.
+of his box), his back bent, his far hand off the horn, the sword low in his right hand, its point
+to the floor before his front foot. The figure of `../a-door/theseus-kneel.md`.
+
+(Drawn 2026-10-10. The notes had his far hand still on the horn: the heave lifts the horn from
+y 710 to 700 as he ducks, and his arm to it from a ducking shoulder was 19 to 27 px, a rope rather
+than an arm, crossing the stone's arc. He lets go of it to duck, and takes it again at the draw;
+`theseus-grip`, the horn while it is in his reach.)
 
 ## Where it stands in the game
 
@@ -21,7 +26,9 @@ At the horn, from L+58 for 5 frames, while the stone swings over him.
 
 - **A pose that reads: a man ducking**, never the rough's small black block.
 - **His head under the stone's arc**, with clay between them: the stone is swung at him and misses
-  him.
+  him. On every frame of the duck his head's top is more than a pixel under the stone and the hand
+  that holds it (`tests/minotaur-bull.spec.ts`).
+- **Nothing of him across the stone's arc**: no arm up to the horn through it.
 - Clay between him and the bull everywhere they meet.
 - As `../a-door/theseus-kneel.md`, "Theseus, in every pose".
 

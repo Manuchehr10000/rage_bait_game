@@ -35,7 +35,10 @@ him by his reserved line, corners included; its near arm, the hand on it and the
 drawn again in front of him with a line of clay round them, corners included, never across the
 arm's root at the shoulder, never over cream and never into the floor (`front`,
 `src/render/bull.ts`); and his arm and hand on its horn are in front of it. So no glaze of it ever
-touches his, and the hands on the stones stay whole in front of his feet.
+touches his, and the hands on the stones stay whole in front of his feet. In his two blows he
+lunges in past its near arm, and all of him is drawn in front of it, cut from it by his line of
+clay, his blade a line of clay where it goes into it (`theseus-blow`; 2026-10-10, after Theseus was
+drawn: behind the hand thrashing at his chest, his sword arm and blade were hidden at the first).
 
 ## Where it stands in the game
 
@@ -102,7 +105,9 @@ In the cell, on one clock from L, the frame the tourist comes down on its floor:
 - **The clay-gap rule** (`../LEVEL.md`, Art, 2026-10-10): a line of clay wherever its glaze meets
   Theseus's, its own near limbs, its hands on him, a stone's contour or the masonry's lines (the
   far wall's course lines at x 144). At the clap's catch point, 8 px in front of its face, its
-  palms, the tourist and Theseus are cut apart. Against Theseus, corners included, on every frame
+  palms, the tourist and Theseus are cut apart: Theseus gives way round its palms on him by a
+  pixel more than their own line, so that two pixels of clear clay lie between them, whatever of
+  him is behind (2026-10-10; `tests/minotaur-bull.spec.ts`). Against Theseus, corners included, on every frame
   of the clean run's fight, the clap, the swat and the toss (`tests/minotaur-bull.spec.ts`).
 - **Its folded leg never a letter or a digit**: crouched, the rump runs down into the heel and
   every row of the leg below the knee is one run of glaze (`tests/minotaur-bull.spec.ts`).

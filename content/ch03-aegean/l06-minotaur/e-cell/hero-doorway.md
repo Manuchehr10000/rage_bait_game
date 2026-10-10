@@ -18,7 +18,8 @@ reserved clay between it and the black.
 
 On row 5 from the first frame, behind everything. Theseus walks into it at frame 402 of his route
 and is unseen there until the fight steps him out at L−8; the thread he laid leads into it, and
-from the step-out the ball lies on its floor. In the clean run the tourist stands on row 5 at
+from the step-out the ball lies on its floor, at his heels as he steps out, drawn over him: the
+clay round him is for glaze, and never bites the thread's white (2026-10-10). In the clean run the tourist stands on row 5 at
 x 147, in front of it, after L.
 
 ## Must be right

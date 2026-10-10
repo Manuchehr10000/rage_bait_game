@@ -32,8 +32,9 @@ This note is the figure every other Theseus pose is drawn from: `../b-passage/th
 - **In profile.** His eye a dot of reserved clay, high and forward and large, as an archaic eye
   is; his hair short, in glaze. No beard, no helmet, no cloak.
 - **His sword in its scabbard** at his left hip on a baldric, the scabbard behind him as he faces
-  right; in the fight the sword is in his right hand. The baldric is a 1 px reserved line across
-  his chest. The blade is a 1 px glaze line, and a line of reserved clay wherever it lies over
+  right; in the fight the sword is in his right hand, drawn from the step out of his doorway. The
+  baldric is a 1 px reserved line across his chest. The blade is 6 px in every drawing (drawn
+  2026-10-10), a 1 px glaze line, and a line of reserved clay wherever it lies over
   glaze.
 - **No added red on him anywhere**, so that he is the same inside the labyrinth and out, and red
   never comes near a blow.

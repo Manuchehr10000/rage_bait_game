@@ -179,6 +179,18 @@ Chosen in the asset notes (2026-10-10), where this file did not decide, for the 
   clay, corners included, and his hand on the horn in front of it. (After a check of the drawn
   bull, the same day: the crouched leg read as the digit 4, the flat hands as rakes, and its glaze
   met Theseus's at the corners on every frame from L+31.)
+- Theseus in the fight, as drawn (2026-10-10, `e-cell`, and the stand and the walk in `b-passage`):
+  his sword drawn from the step out of his doorway, a 6 px blade in every drawing, glaze over the
+  clay and a line of clay over glaze; at guard on his feet and walking out, the sword upright in
+  his fist before his belt; the leap one drawing, the sword up and back away from the tourist, his
+  far arm ahead; shoved, a second drawing of the grip, for the lurch. The horn is in his hand only
+  while it is within 14 px of his far shoulder: he lets go of it to duck, takes it again with the
+  draw at L+70, and the second blow jerks the head out of his hand, so it is his from L+40 to 57
+  and L+70 to 129 (drawn holding it through the heave, his arm was 20 px). In his two blows he
+  lunges in past the bull's near arm and is in front of all of it; the first goes under its jaw
+  into its throat, the second rises into the throat of the jerked-up head. He gives way round the
+  clap's palms by two pixels of clay; the ball is drawn over his heels as he steps out; and the
+  tourist's reserve goes under him too while he is off his feet, in the air or tossed.
 
 ## The beats
 
@@ -825,11 +837,19 @@ Being built, in this order, as a stage in the dev build (`#minotaur`, in `STAGES
   and the flails where he does not hide them; no glaze of it touches his on any frame of the clean
   run's fight, the clap, the swat or the toss, or in the tableau, pinned in the same file.
 
+- **Theseus in the fight, drawn** (2026-10-10, to the asset notes in `e-cell` and `b-passage`):
+  his drawings and his picture against the bull at 1 world px (`HERO_FIGHT`, `heroPicture`,
+  `src/render/bull.ts`), on the fight's own clock and his own frames, none of which moved: the
+  step out of the black, at guard; the low leap; the grip, braced and shoved; the duck; the draw;
+  the two blows, in front of its near arm; and at guard over the heap. His blade is reserved clay
+  over glaze; his hand has the horn while it is in reach; his line of clay round him never bites
+  the floor, cream or the thread. The tourist's reserve goes under him off his feet. Pinned in
+  `tests/minotaur-bull.spec.ts`.
+
 Still to come:
 
-- **The black-figure figures** still rough: Theseus's poses in the fight (leap, grip, duck, draw
-  and blow), and the other three deaths' drawings, to their asset notes in the beat folders and
-  `../shared`.
+- **The black-figure figures** still rough: the other three deaths' drawings, to their asset
+  notes in the beat folders and `../shared`.
   (`LevelData.tricks`, 'The knot', 'The snort', 'The hands', 'The horns', and `dropCause` and
   `fallCause` 'The labyrinth', unreachable, are made.)
 

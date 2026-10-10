@@ -4,13 +4,24 @@
 |---|---|
 | Id | `theseus-blow` |
 | File | None, and none is wanted: drawn in code at 1 world px (`../LEVEL.md`, Art, ruled 2026-10-10) |
-| Size | 21 × 24 world px, 1 frame: his box and 9 px of sword before it; faces right |
+| Size | 21 × 30 world px, 2 frames: his box, and 9 px of sword before it and 6 over it; faces right |
 | Beat | `e-cell` |
 
 ## What it is
 
 Theseus lunging, his front foot forward, the horn in his far hand (the code's far arm), his sword
-thrust home into the bull. The figure of `../a-door/theseus-kneel.md`.
+thrust home into the bull. The figure of `../a-door/theseus-kneel.md`. The frames, each in his
+box's lower 24 rows but for the second's blade:
+
+0. The first blow: his right arm down and forward from his chest, under his far arm on the horn,
+   and the blade, 6 px, on down from his fist under its jaw into its throat.
+1. The second: leaning back, his right arm up and forward past his face, a rising thrust, the
+   blade up into the throat of the head its second blow jerks up; the head jerks out of his far
+   hand (`theseus-grip`).
+
+**In front of its near arm** (2026-10-10): lunging in, he is past the reach of its near arm, and
+all of him is drawn after it, cut from it by his line of clay. Behind it, as in his other poses,
+the hand thrashing at his chest hid his sword arm and the blade at the first blow.
 
 ## Where it stands in the game
 
@@ -20,7 +31,8 @@ grip again, and after the second he stands over the heap.
 ## Must be right
 
 - **The blade over the bull's body is a line of reserved clay**, as a black-figure painter incises a
-  weapon over a body (the research).
+  weapon over a body (the research), and glaze where it is over the clay: its point 3 px or more
+  into its glaze at each blow (`tests/minotaur-bull.spec.ts`).
 - **Bloodless**: no added red at the blow, on him or on the bull (`../LEVEL.md`).
 - As `../a-door/theseus-kneel.md`, "Theseus, in every pose".
 

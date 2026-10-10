@@ -4,13 +4,14 @@
 |---|---|
 | Id | `tourist-reserve` |
 | File | None, and none is wanted: drawn in code at 1 world px (`../LEVEL.md`, Art, ruled 2026-10-10) |
-| Size | 14 × 17 world px, 1 frame, from 1 px left of and 1 px over the tourist's 12 × 16 sprite |
+| Size | 14 × 18 world px, 1 frame, from 1 px left of and 1 px over the tourist's 12 × 16 sprite, and 1 px under it off his feet |
 | Beat | `a-door`, and every beat |
 
 ## What it is
 
-A 1 px line of the clay round the tourist's top and sides, never under his feet, drawn only
-where something of glaze is behind him. It is how the vase painters cut one figure from the next
+A 1 px line of the clay round the tourist's top and sides, never under his feet while he is on
+them, drawn only where something of glaze is behind him. Off his feet, in the air or hooked and
+thrown by the horns, it goes under him too. It is how the vase painters cut one figure from the next
 (the research), applied to the one figure in full colour.
 
 ## Where it stands in the game
@@ -27,7 +28,11 @@ the thread too, a pixel each side of him.
 
 - **The costume's pixels untouched.** It is still the same costume (`../../shared/bull-leaper.md`);
   the reserve is drawn round it, never on it.
-- **Never under his feet**, which would lift him off the floor.
+- **Never under his feet while he stands**, which would lift him off the floor or the bull's back.
+  Off his feet it goes under him, so that his feet and his dark outline never touch the glaze of
+  Theseus or the bull he passes over: leaping onto the back past the stone raised over its
+  shoulder, his trainers met its hand's glaze (after a check of Theseus in the fight, 2026-10-10;
+  `tests/minotaur-bull.spec.ts`).
 - **Only where glaze is behind him**, and exactly 1 px: the clay itself, never lighter.
 - **Nothing inside the hero's doorway, x 148 to 164, before L−8**, so that Theseus stays unseen
   there (`../LEVEL.md`, Art, 2026-10-10).

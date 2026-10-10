@@ -97,11 +97,11 @@
     {
       "id": "tourist-reserve",
       "w": 14,
-      "h": 17,
+      "h": 18,
       "dx": -1,
       "dy": -1,
       "beat": "a-door",
-      "what": "A 1 px line of reserved clay round the tourist's top and sides, drawn only where glaze is behind him, so that the one full-colour figure is cut from the black as the vase painters cut one figure from the next."
+      "what": "A 1 px line of reserved clay round the tourist's top and sides, and under him only while he is off his feet, drawn only where glaze is behind him, so that the one full-colour figure is cut from the black as the vase painters cut one figure from the next."
     },
     {
       "id": "thread",
@@ -137,16 +137,17 @@
       "id": "theseus-stand",
       "w": 12,
       "h": 24,
+      "frames": 2,
       "beat": "b-passage",
-      "what": "Theseus standing: a beardless youth in a short chiton, the sword at his hip in its scabbard. Faces right."
+      "what": "Theseus standing: a beardless youth in a short chiton, the sword at his hip in its scabbard; and at guard in the fight, the sword drawn and upright in his right fist. Faces right."
     },
     {
       "id": "theseus-walk",
       "w": 12,
       "h": 24,
-      "frames": 4,
+      "frames": 6,
       "beat": "b-passage",
-      "what": "Theseus walking and running: two strides looking ahead, and the same two with his head turned back over his shoulder at his knot. Faces right."
+      "what": "Theseus walking and running: two strides looking ahead, the same two with his head turned back over his shoulder at his knot, and the same two at guard as he steps out of his doorway into the fight. Faces right."
     },
     {
       "id": "theseus-climb",
@@ -243,37 +244,40 @@
       "h": 31,
       "dy": -7,
       "beat": "e-cell",
-      "what": "Theseus leaping low over the crouched bull onto its horn, the vases' warrior with his sword up over his head, never a bull-leaper. Faces right."
+      "what": "Theseus leaping low over the crouched bull onto its horn, the vases' warrior with his sword up over his head and back, his far arm out ahead, never a bull-leaper. Faces right."
     },
     {
       "id": "theseus-grip",
       "w": 12,
       "h": 24,
+      "frames": 2,
       "beat": "e-cell",
-      "what": "Theseus braced at the bull's head, the horn in his left hand (drawn by code), the sword held up in his right. Faces right."
+      "what": "Theseus braced at the bull's head, the horn in his left hand while it is in his reach (drawn by code), the sword held up in his right; and shoved, leaning into it as the struck body's lurch carries him. Faces right."
     },
     {
       "id": "theseus-duck",
       "w": 12,
       "h": 24,
       "beat": "e-cell",
-      "what": "Theseus down under the stone the bull heaves at him, still on the horn. Faces right."
+      "what": "Theseus down under the stone the bull heaves at him, his head under its arc, his hand let go of the horn, the sword low. Faces right."
     },
     {
       "id": "theseus-draw",
-      "w": 17,
-      "h": 25,
-      "dx": -5,
-      "dy": -1,
+      "w": 18,
+      "h": 27,
+      "dx": -6,
+      "dy": -3,
       "beat": "e-cell",
       "what": "Theseus with the sword drawn back over his shoulder, against the clay, before each blow. Faces right."
     },
     {
       "id": "theseus-blow",
       "w": 21,
-      "h": 24,
+      "h": 30,
+      "dy": -6,
+      "frames": 2,
       "beat": "e-cell",
-      "what": "Theseus lunging, the sword struck home: each of the two blows. Faces right."
+      "what": "Theseus lunging in past the bull's near arm, the sword struck home: the first blow under its jaw into its throat, and the second rising into the throat of its jerked-up head. Faces right."
     },
     {
       "id": "theseus-drag",

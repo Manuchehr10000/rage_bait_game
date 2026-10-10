@@ -4,7 +4,7 @@
 |---|---|
 | Id | `theseus-walk` |
 | File | None, and none is wanted: drawn in code at 1 world px (`../LEVEL.md`, Art, ruled 2026-10-10) |
-| Size | 12 × 24 world px per frame, 4 frames in a horizontal strip, his box; faces right |
+| Size | 12 × 24 world px per frame, 6 frames in a horizontal strip, his box; faces right |
 | Beat | `b-passage` |
 
 ## What it is
@@ -16,6 +16,9 @@ frames:
 1. The other half of it, his legs together.
 2. Frame 0 with his head turned back over his shoulder.
 3. Frame 1 with his head turned back.
+4. Frame 0 at guard, his sword drawn and upright in his right fist before his belt
+   (`../e-cell/theseus-grip.md`, frame 0).
+5. Frame 1 at guard.
 
 The stride changes every 9 px he goes, every 3 frames.
 
@@ -25,7 +28,9 @@ The stride changes every 9 px he goes, every 3 frames.
   10 frames (frames 2 and 3), and through the vestibule, cut from its black by a reserved line.
 - Along G0 overhead, heard; along each pillar top and room to the next way down; along row 5 and
   into his doorway.
-- In the fight, out to the edge of row 5 after he steps out.
+- In the fight, out to the edge of row 5 after he steps out, at guard (frames 4 and 5): he comes
+  out of the black with his sword drawn (drawn 2026-10-10; the notes did not say, and the sword in
+  its scabbard there would have come into his hand between his stand on the edge and his leap).
 
 While he carries the ball, the thread's 2 × 2 of white is in his hand (`thread`).
 

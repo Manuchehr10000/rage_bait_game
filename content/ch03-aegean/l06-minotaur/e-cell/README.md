@@ -15,7 +15,9 @@ label: "The horns".** The second blow sinks the body into a heap that stays, and
 Notes here: the hero's doorway; the Minotaur's body and its heap, which code draws
 (`src/render/bull.ts`), and its head, hands and stones, which are drawings hung on it; and
 Theseus's poses in the fight: the leap, the
-grip, the duck, the draw and the blow. The tourist's frames for the hands and the horns are the
+grip (braced, and shoved as the struck body lurches), the duck, the draw and the blow (the
+first and the second). He stands and walks at guard, his sword drawn, in the frames of
+`../b-passage/theseus-stand.md` and `-walk.md`. The tourist's frames for the hands and the horns are the
 chapter's (`../../shared/bull-leaper-clapped.md`, `bull-leaper-pressed.md`,
 `bull-leaper-tumbling.md`). There is no dust in the cell: here the bull's breath is heard, and
 seen only as its back rising a pixel.

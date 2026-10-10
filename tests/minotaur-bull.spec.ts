@@ -1,9 +1,35 @@
 import { expect, test, type Page } from '@playwright/test';
 import { MINOTAUR } from '../src/levels/ch03-aegean/l06-minotaur';
-import type { FightDef, TableauDef } from '../src/engine/level';
-import { BREATH, BULL_HEAD, createEntity, HERO, STRUCK, type Fight, type HeroFrame } from '../src/engine/entities';
+import type { FightDef, HeroDef, TableauDef } from '../src/engine/level';
+import { BREATH, BULL_HEAD, createEntity, HERO, STRUCK, type Fight, type Hero, type HeroFrame } from '../src/engine/entities';
 import { VIEW_H, VIEW_W } from '../src/engine/types';
-import { BULL_HAND_FRAMES, BULL_HEAD_FRAMES, bullPicture, bullPose, clapHeld, CLAP, deadBull, deadHorn, FLAT_ON, giveWay, HAND_CLAW, HAND_FLAT, HAND_PALM, HAND_REACH, handBox, heroGrip, type Pixels } from '../src/render/bull';
+import {
+  BULL_HAND_FRAMES,
+  BULL_HEAD_FRAMES,
+  bullHorn,
+  bullPicture,
+  bullPose,
+  clapHeld,
+  CLAP,
+  deadBull,
+  deadHorn,
+  FLAT_ON,
+  giveWay,
+  HAND_CLAW,
+  HAND_FLAT,
+  HAND_PALM,
+  HAND_REACH,
+  handBox,
+  HERO_FIGHT,
+  HERO_REACH,
+  heroBlade,
+  heroDrawing,
+  heroGrip,
+  heroPicture,
+  type HeroAgainst,
+  type HeroDrawing,
+  type Pixels,
+} from '../src/render/bull';
 import { CELL_FLOOR, cleanPresses, LEVEL } from './minotaur-run';
 
 /**
@@ -20,6 +46,7 @@ const C = FIGHT.clock;
 const F = CELL_FLOOR;
 const ST = FIGHT.stones;
 const TABLEAU = MINOTAUR.entities.find((e): e is TableauDef => e.kind === 'tableau')!;
+const THESEUS = MINOTAUR.entities.find((e): e is HeroDef => e.kind === 'hero')!;
 
 /** The fight at frame `k` of its clock (or not keyed), `t` ticks into the attempt. */
 function at(k: number | null, t = 0): Fight {
@@ -207,6 +234,166 @@ test('the closing tableau: his arm and his hand on its horn are in front of the 
 });
 
 // ---------------------------------------------------------------------------
+// Theseus in the fight (e-cell/theseus-*.md).
+// ---------------------------------------------------------------------------
+
+/** Theseus's frames after his wait, from L - 8: his frame on the fight's frame `k`, and at the end of them he stays. */
+const AFTER = (createEntity(THESEUS, LEVEL) as Hero).track.after;
+const heroAt = (k: number): HeroFrame => AFTER[Math.min(k - C.stepOut, AFTER.length - 1)]!;
+
+/** Where he is against the bull of `f`, as the scene gives it, with no masonry near. */
+function against(f: Fight): HeroAgainst {
+  const pic = picture(f);
+  return { horn: bullHorn(f), behind: pic.body, front: pic.front, shoved: f.lurchAt(f.k) !== 0, heap: f.k >= C.blow2, over: pic.over };
+}
+
+/** His glaze in a picture of him. */
+const hisGlaze = (p: Pixels) => [...p.each()].filter((q) => q.ink === '#');
+
+/** His drawing's pixels and blade in his box, as if he faced right. */
+function extent(d: HeroDrawing): { x0: number; x1: number; y0: number; y1: number } {
+  const pts: { x: number; y: number }[] = [];
+  d.rows.forEach((r, j) => [...r].forEach((c, i) => c !== '.' && pts.push({ x: d.dx + i, y: d.dy + j })));
+  if (d.blade) pts.push(...d.blade);
+  const xs = pts.map((p) => p.x);
+  const ys = pts.map((p) => p.y);
+  return { x0: Math.min(...xs), x1: Math.max(...xs), y0: Math.min(...ys), y1: Math.max(...ys) };
+}
+
+test("Theseus's drawings in the fight: inside the sizes of their notes, on his box's floor row when he stands, the duck's head from row 9, and never a bull-leaper's hands", () => {
+  const box = (x0: number, y0: number, w: number, h: number) => ({ x0, x1: x0 + w - 1, y0, y1: y0 + h - 1 });
+  const inside = (d: HeroDrawing, b: ReturnType<typeof box>) => {
+    const e = extent(d);
+    return e.x0 >= b.x0 && e.x1 <= b.x1 && e.y0 >= b.y0 && e.y1 <= b.y1;
+  };
+  // theseus-stand, -grip (braced and shoved) and -duck: his box, 12 x 24; -leap 12 x 31 from 7 px
+  // over it; -draw 18 x 27 from 6 px behind it and 3 over; -blow 21 x 30, 9 px before it and 6 over.
+  const his = box(0, 0, HERO.w, HERO.h);
+  for (const d of [HERO_FIGHT.stand, HERO_FIGHT.grip, HERO_FIGHT.shoved, HERO_FIGHT.duck]) expect(inside(d, his)).toBe(true);
+  expect(inside(HERO_FIGHT.leap, box(0, -7, 12, 31))).toBe(true);
+  expect(inside(HERO_FIGHT.draw, box(-6, -3, 18, 27))).toBe(true);
+  for (const d of HERO_FIGHT.blow) expect(inside(d, box(0, -6, 21, 30))).toBe(true);
+  // One sword in every drawing: a blade of 6 px from the hilt in his fist.
+  for (const d of [HERO_FIGHT.stand, HERO_FIGHT.leap, HERO_FIGHT.grip, HERO_FIGHT.shoved, HERO_FIGHT.duck, HERO_FIGHT.draw, ...HERO_FIGHT.blow]) {
+    expect(heroBlade({ ...heroAt(C.grip), facing: 1 }, d).length).toBe(6);
+  }
+  // Walking out at guard, on the walk's strides.
+  for (const stride of [0, 9]) expect(inside(heroDrawing({ ...heroAt(C.stepOut), stride }, null), his)).toBe(true);
+  // On his feet, his feet on his box's floor row.
+  for (const d of [HERO_FIGHT.stand, HERO_FIGHT.grip, HERO_FIGHT.shoved, HERO_FIGHT.duck, HERO_FIGHT.draw, ...HERO_FIGHT.blow]) {
+    expect(d.rows[HERO.h - 1 - d.dy]!.includes('#')).toBe(true);
+  }
+  // Ducking, his head's top at row 9; drawn back, the sword and the arm behind him.
+  expect(HERO_FIGHT.duck.rows.findIndex((r) => r.includes('#'))).toBe(9);
+  expect(Math.max(HERO_FIGHT.draw.blade![0].x, HERO_FIGHT.draw.blade![1].x)).toBeLessThan(0);
+  // Never a bull-leaper: he goes over its head to its face, and on no frame of his leap is
+  // anything of him down on its back, no hand and no foot.
+  let leapt = 0;
+  for (let k = C.leap; k < C.grip; k++) {
+    const h = heroAt(k);
+    if (h.pose !== 'leap') continue;
+    leapt++;
+    const f = at(k);
+    const top = F - FIGHT.back.crouch - 1;
+    for (const q of hisGlaze(heroPicture(h, against(f)).back)) if (q.x >= FIGHT.body.x0 && q.y >= top - 1) throw new Error(`L+${k}: on its back at (${q.x}, ${q.y})`);
+  }
+  expect(leapt).toBeGreaterThan(20);
+});
+
+test('his sword: glaze over the clay and a line of reserved clay over glaze, his own or the bull\'s; drawn back over the clay, clear of the bull; struck home into it, bloodless', () => {
+  const wrong: string[] = [];
+  for (let k = C.stepOut; k < C.blow2 + 10; k++) {
+    const h = heroAt(k);
+    const f = at(k);
+    const a = against(f);
+    const d = heroDrawing(h, a);
+    const pic = heroPicture(h, a);
+    const drawn = d.before ? pic.front : pic.back;
+    for (const q of heroBlade(h, d)) {
+      const ink = drawn.get(q.x, q.y);
+      if (a.behind.get(q.x, q.y) === '#' || (d.before && a.front.get(q.x, q.y) === '#')) {
+        if (ink !== '_') wrong.push(`L+${k}: (${q.x}, ${q.y}) over the bull is ${ink}`);
+      } else if (ink === undefined) wrong.push(`L+${k}: no blade at (${q.x}, ${q.y})`);
+    }
+    // Drawn back before each blow: all of the blade glaze on the clay, and nothing of the bull within a pixel of it.
+    if (h.pose === 'draw') {
+      for (const q of heroBlade(h, d)) {
+        if (drawn.get(q.x, q.y) !== '#') wrong.push(`L+${k}: the drawn blade not glaze at (${q.x}, ${q.y})`);
+        for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) if (a.behind.get(q.x + dx, q.y + dy) === '#') wrong.push(`L+${k}: the bull by the drawn blade at (${q.x}, ${q.y})`);
+      }
+    }
+  }
+  expect(wrong).toEqual([]);
+  // Each blow goes home: its blade's point is a line of clay in the bull's glaze.
+  for (const k of [C.blow1, C.blow2]) {
+    const h = heroAt(k);
+    const a = against(at(k));
+    const d = heroDrawing(h, a);
+    const blade = heroBlade(h, d);
+    const inIt = blade.filter((q) => a.behind.get(q.x, q.y) === '#' || a.front.get(q.x, q.y) === '#');
+    expect(inIt.length, `L+${k}`).toBeGreaterThanOrEqual(3);
+    expect(inIt).toContainEqual(blade[blade.length - 1]);
+  }
+  // Bloodless: the vase's added red is nowhere in his drawings.
+  for (const d of [HERO_FIGHT.stand, HERO_FIGHT.leap, HERO_FIGHT.grip, HERO_FIGHT.shoved, HERO_FIGHT.duck, HERO_FIGHT.draw, ...HERO_FIGHT.blow]) {
+    expect(d.rows.join('')).toMatch(/^[#_.]+$/);
+  }
+});
+
+test('the horn in his left hand, 2 px of arm and his hand on it, while it is in his reach: from the grip to the duck, and from the draw to the second blow, which jerks it out of his hand', () => {
+  const held: number[] = [];
+  for (let k = C.stepOut; k < C.blow2 + 10; k++) {
+    const h = heroAt(k);
+    const f = at(k);
+    const a = against(f);
+    const horn = bullHorn(f);
+    const pic = heroPicture(h, a).back;
+    if (!horn || pic.get(horn.x, horn.y) !== '#') continue;
+    held.push(k);
+    // His hand on it, 2 x 2, and his arm from his far shoulder, never longer than his reach.
+    for (const [dx, dy] of [[-1, -1], [0, -1], [-1, 0], [0, 0]] as const) expect(pic.get(horn.x + dx, horn.y + dy)).toBe('#');
+    const s = heroDrawing(h, a).shoulder!;
+    const sx = h.facing === 1 ? Math.round(h.x) + s.x : Math.round(h.x) + HERO.w - 1 - s.x;
+    expect(Math.hypot(horn.x - sx, horn.y - (Math.round(h.y) + s.y))).toBeLessThanOrEqual(HERO_REACH);
+  }
+  const span = (a: number, b: number) => Array.from({ length: b - a + 1 }, (_, i) => a + i);
+  expect(held).toEqual([...span(C.grip, C.duck - 1), ...span(C.blow1 - 6, C.blow2 - 1)]);
+  // Its head down on the floor, there is no horn to have.
+  expect(bullHorn(at(C.blow2 + STRUCK))).toBeNull();
+});
+
+test("the duck: his head under the stone's arc with clay between, on every frame of it", () => {
+  for (let k = C.duck; k < C.duck + 5; k++) {
+    const h = heroAt(k);
+    expect(h.pose).toBe('duck');
+    const f = at(k);
+    const b = bullPose(f);
+    expect(b.stoneHeld).toBe(true);
+    const top = Math.min(...hisGlaze(heroPicture(h, against(f)).back).map((q) => q.y));
+    const hand = handBox(b.near);
+    expect(top, `L+${k}`).toBeGreaterThan(Math.max(b.stone.y + ST.h - 1, hand.y + hand.h - 1) + 1);
+  }
+});
+
+test("the clap's catch point: two pixels of clear clay round its palms on him, whatever of Theseus is behind them", () => {
+  // Walked up from the wall and clapped before its face at L + 31, as Theseus lands there.
+  const f = at(31);
+  f.caught = { by: 'clap', k: 31, x: 91.17, y: F - 16, w: 10, h: 16, vx: 0, vy: 0, air: false };
+  let seen = 0;
+  for (let k = 31; k < 31 + CLAP.back; k++) {
+    f.k = k;
+    const a = against(f);
+    const palms = [...a.over.each()].filter((q) => q.ink === '#');
+    if (!palms.length) continue;
+    const him = hisGlaze(heroPicture(heroAt(k), a).back);
+    for (const p of palms) for (const q of him) if (Math.max(Math.abs(p.x - q.x), Math.abs(p.y - q.y)) < 3) throw new Error(`L+${k}: his (${q.x}, ${q.y}) by its palm at (${p.x}, ${p.y})`);
+    seen++;
+  }
+  // From the frame its palms are on him to his drop at its feet.
+  expect(seen).toBe(CLAP.down - CLAP.on + 1);
+});
+
+// ---------------------------------------------------------------------------
 // In the game.
 // ---------------------------------------------------------------------------
 
@@ -352,4 +539,81 @@ test("in the game: no glaze of the bull's touches Theseus's, corners included, o
     expect([r.bull > 0, r.him > 0], name).toEqual([true, true]);
     expect(r.touches, name).toEqual([]);
   }
+});
+
+test('in the game: off his feet, in the air or hooked and thrown by the horns, the tourist has his pixel of clay under him too, so nothing of him touches the glaze of Theseus or the bull', async ({ page }) => {
+  test.setTimeout(120_000);
+  await open(page);
+  const r = await page.evaluate(
+    ({ presses, glaze, colours, cell }) => {
+      const g = (window as unknown as W).__game;
+      g.titleTimer = 0;
+      const fight = () => g.entities.find((e: { def: { kind: string } }) => e.def.kind === 'fight');
+      const key = (c: string, d: boolean) => window.dispatchEvent(new KeyboardEvent(d ? 'keydown' : 'keyup', { code: c }));
+      const press = (p: { dir: number; jump: boolean }) => {
+        key('ArrowRight', p.dir > 0);
+        key('ArrowLeft', p.dir < 0);
+        key('Space', p.jump);
+        g.tick();
+      };
+      const ctx = g.world.getContext('2d') as CanvasRenderingContext2D;
+      const W4 = ctx.canvas.width;
+      const s = W4 / 320;
+      const GL = parseInt(glaze.slice(1), 16);
+      const HIS = new Set(colours.map((c: string) => parseInt(c.slice(1), 16)));
+      const out = { frames: 0, his: 0, touches: [] as string[] };
+      /** This frame: every pixel of his, at the canvas's own scale, and the glaze a world pixel from it in the cell. */
+      const look = (at: string) => {
+        g.draw();
+        const d = ctx.getImageData(0, 0, W4, ctx.canvas.height).data;
+        const ink = (i: number, j: number) => (i < 0 || j < 0 || i >= W4 || j >= ctx.canvas.height ? -1 : (d[(j * W4 + i) * 4]! << 16) | (d[(j * W4 + i) * 4 + 1]! << 8) | d[(j * W4 + i) * 4 + 2]!);
+        out.frames++;
+        for (let j = 0; j < ctx.canvas.height; j++) {
+          for (let i = 0; i < W4; i++) {
+            if (!HIS.has(ink(i, j))) continue;
+            out.his++;
+            for (const [dx, dy] of [[-s, 0], [s, 0], [0, -s], [0, s]] as const) {
+              const x = (i + dx) / s;
+              const y = (j + dy) / s + g.camera.iy;
+              if (x < cell.x0 || x >= cell.x1 || y < cell.y0 || y >= cell.y1) continue;
+              if (ink(i + dx, j + dy) === GL && out.touches.length < 20) out.touches.push(`${at}: (${Math.floor(x)}, ${Math.floor(y)})`);
+            }
+          }
+        }
+      };
+      // The clean run's leap over the bull to its back, and, from the next attempt's same
+      // leap, staying on the back until the horns have him, hooked and thrown.
+      for (let i = 0; i < 4000 && g.state === 'playing'; i++) {
+        press(presses[i] ?? { dir: 0, jump: false });
+        const f = fight();
+        if (f.keyed && f.k > 18 && f.k < 57 && !g.player.onGround) look(`in the air, L + ${f.k}`);
+        if (f.keyed && f.k >= 57) break;
+      }
+      g.resetLevel();
+      for (let i = 0; i < 4000 && g.state === 'playing'; i++) {
+        const f = fight();
+        press(f.keyed && f.k + 1 >= 59 ? { dir: 0, jump: false } : (presses[i] ?? { dir: 0, jump: false }));
+      }
+      for (let j = 0; j < 46 && g.state === 'dead'; j++) {
+        press({ dir: 0, jump: false });
+        const f = fight();
+        const pose = f.caught?.by === 'toss' ? f.tossed(Math.round((1 - g.deathTimer / 0.75) * 45)).pose : null;
+        if (pose === 'hooked' || pose === 'thrown') look(`${pose}, dead ${j}`);
+      }
+      key('ArrowLeft', false);
+      key('ArrowRight', false);
+      key('Space', false);
+      return out;
+    },
+    {
+      presses: cleanPresses(),
+      glaze: '#1f140e',
+      // His costume's inks (content/ch03-aegean/shared/bull-leaper.md; src/render/procedural.ts, BULL_LEAPER).
+      colours: ['#2b1d10', '#1d1917', '#b08850', '#f4f1ea', '#e6b48c', '#1c1c1c', '#b5d93b', '#d6ae45', '#b4392b', '#2f5f9a', '#2d3a66', '#ecebe6'],
+      cell: { x0: FIGHT.toss.rect.x, x1: FIGHT.toss.rect.x + FIGHT.toss.rect.w, y0: F - 80, y1: F },
+    },
+  );
+  expect(r.frames).toBeGreaterThan(40);
+  expect(r.his).toBeGreaterThan(0);
+  expect(r.touches).toEqual([]);
 });
