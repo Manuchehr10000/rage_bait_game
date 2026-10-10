@@ -2035,7 +2035,7 @@ export class Ear implements Entity {
   dead = false;
   /** The tick it snorted him on, or -1. */
   snortAt = -1;
-  /** How far into its breath it was when it snorted him: the plume he stepped into, which the sniff draws down. */
+  /** How far into its breath it was when it snorted him: a frame on from the plume he stepped into, which the sniff draws down. */
   private snortBreath: number = BREATH.out;
   /** The stone it heard him on last, and whether he was on the ground: his steps. */
   private stone: 'lip' | 'bed' | 'plain' | null = null;
@@ -2177,10 +2177,11 @@ export class Ear implements Entity {
     const full = plumeDots(hx, floor, BREATH.out);
     if (f < SNORT.sniff) {
       // The sniff: the dust over the hatch pulled in and down into it, past his legs, faster
-      // each frame: the plume he stepped into, as it stood, or the whole plume if it stood
-      // under half its height.
-      const b = this.snortBreath;
-      const stood = b < BREATH.out + BREATH.hold && breathHeight(b) >= PLUME / 2 ? plumeDots(hx, floor, b) : full;
+      // each frame: the plume he stepped into, as it was seen on the frame before, whatever
+      // its height and but for what he hid, so nothing of it ever first rises or comes from
+      // nowhere; none, if none was seen.
+      const b = (this.snortBreath - 1 + BREATH_PERIOD) % BREATH_PERIOD;
+      const stood = plumeDots(hx, floor, b).filter((q) => !overlaps({ x: q.x, y: q.y, w: q.s, h: q.s }, him));
       const down = Math.round(((f + 1) * (f + 2) * PLUME) / 30);
       const pulled: Dot[] = [];
       for (const q of stood) {

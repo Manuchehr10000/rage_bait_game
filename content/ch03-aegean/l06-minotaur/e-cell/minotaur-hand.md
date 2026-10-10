@@ -59,7 +59,12 @@ it lay on his back and hips, and its fingers and their clay cut his kilt into a 
 wall it went into the stone. A check of the hero stage found it, 2026-10-10.) The swat's hand is frame 0, flat
 on top of him, carried down with him onto its brow or the floor, with a line of clay round it and
 between its fingertips and him, until it leaves him on frame 8 of his death
-(`../../shared/bull-leaper-pressed.md`).
+(`../../shared/bull-leaper-pressed.md`). On a man on the floor it is never over Theseus, who
+stands in front of its far arm: on his head while he stands, its last column at x 95 at most,
+short of Theseus's head from x 98; on his face and chest once he lies flat at its feet, x 80 to
+87, its forearm seen for 4 px going in behind Theseus's foot, from x 94
+(`tests/minotaur-bull.spec.ts`). (After a check of the deaths, 2026-10-10: laid on him where he
+stood, it came over Theseus's legs, and Theseus, giving way round it, stood a torso on a hand.)
 The free hand, once it has stopped clawing, goes down behind its head, unseen, and once the near
 one has set the stone down, flat on its far stone; from then both hands are flat on their stones,
 the near one on the stone where it set it. The heap's hand, flat on the floor beyond its stones,

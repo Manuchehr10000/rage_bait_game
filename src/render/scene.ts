@@ -50,7 +50,7 @@ import { paint } from '../engine/assets';
 import { blit, blitFacing, frameOf, relief, silhouette, withLamp, type Frame, type ReliefTones } from './frame';
 import { SPLINTER, handStencils } from './hands';
 import { hash } from './hash';
-import { bullHorn, bullPicture, CLAP, clapHeld, deadBull, deadHorn, giveWay, heroGrip, heroPicture, SWAT, swatHeld, type HeroAgainst, type Masonry, type Pixels } from './bull';
+import { bullHorn, bullPicture, CLAP, clapHeld, deadBull, deadHorn, giveWay, heroGrip, heroPicture, SWAT, swatHeld, swatUp, type HeroAgainst, type Masonry, type Pixels } from './bull';
 import { HERO, heroHand, PERSIAN_COLUMN, snortBody, TRAIN, type Dot, type Train } from '../engine/entities';
 import type { CavePanel } from '../engine/level';
 import { BEAR_STALAGMITE_SPRITE, SIGNAL_LAMP_SPRITE, STOP_SIGN_SPRITE, TRAIN_CAR_SPRITE, TRAIN_ENGINE_SPRITE, TRAIN_LAST_CAR_SPRITE } from './procedural';
@@ -5507,9 +5507,10 @@ function blitOnHisBack(ctx: CanvasRenderingContext2D, dead: Frame, x: number, fl
  * The hands (content/ch03-aegean/shared/bull-leaper-clapped.md, -pressed.md): his own frame
  * as he was for the first frames, as its hands come onto him. Clapped, edge-on between its
  * palms like a fly where they caught him, carried down with them, and dropped flat on the
- * floor at its feet. Swatted, pressed flat under its hand: on the floor where he stood if
- * he was not in the air; carried down with it onto its own brow if he was, riding its head
- * after. Flat, he lies face up with his head to the left, whichever way he faced.
+ * floor at its feet, before Theseus's. Swatted, pressed flat under its hand: on the floor
+ * at its feet, where the clap lays him, if he stood on the floor; carried down with it onto
+ * its own brow if he was off it, in the air or on its back, riding its head after. Flat,
+ * he lies face up with his head to the left, whichever way he faced.
  */
 function drawHanded(ctx: CanvasRenderingContext2D, s: Scene, death: { t: number; at?: { x: number; y: number } | null }): void {
   const p = s.player;
@@ -5542,7 +5543,7 @@ function drawHanded(ctx: CanvasRenderingContext2D, s: Scene, death: { t: number;
     return;
   }
   const q = swatHeld(fight, f);
-  const lie = flat(caught.air ? 1 : 0);
+  const lie = flat(swatUp(fight) ? 1 : 0);
   blit(ctx, lie, q.x - lie.w / 2, q.y - lie.h);
 }
 
@@ -5795,11 +5796,20 @@ function drawTouristReserve(ctx: CanvasRenderingContext2D, s: Scene): void {
   ctx.restore();
 }
 
-/** Whether he is off his feet: in the air, alive, or hooked and thrown by the horns. */
+/**
+ * Whether he is off his feet: in the air, alive; in its hands off the floor, caught in the
+ * air or held up between its palms, until he is down at its feet or on its brow; or hooked
+ * and thrown by the horns.
+ */
 function aloft(s: Scene): boolean {
   if (!s.death) return !s.player.onGround;
   const fight = s.entities.find((e): e is Fight => e.def.kind === 'fight');
-  if (!fight || s.death.cause !== fight.def.horns || fight.caught?.by !== 'toss') return false;
-  const pose = fight.tossed(Math.round(s.death.t * DEATH_FRAMES)).pose;
+  const c = fight?.caught;
+  if (!fight || !c) return false;
+  const u = Math.round(s.death.t * DEATH_FRAMES);
+  if (s.death.cause === fight.def.hands && c.by === 'clap') return u < CLAP.on ? c.air : u < CLAP.down && clapHeld(fight, u).y + c.h < fight.def.floorY;
+  if (s.death.cause === fight.def.hands && c.by === 'swat') return c.air && u < SWAT.brow;
+  if (s.death.cause !== fight.def.horns || c.by !== 'toss') return false;
+  const pose = fight.tossed(u).pose;
   return pose === 'hooked' || pose === 'thrown';
 }

@@ -504,6 +504,36 @@ test("the clap's catch point: two pixels of clear clay round its palms on him, w
   expect(seen).toBe(CLAP.down - CLAP.on + 1);
 });
 
+test("the swat on a man on the floor: its hand on his head, then on him flat at its feet, never over Theseus, who stands whole in front of its far arm on every frame it is on him; and never on the near stone", () => {
+  // Caught anywhere on the floor in its column, on any frame of the swat, facing either
+  // way: Theseus's glaze on each frame its hand is on him is all there, as in the fight
+  // with nobody caught, but for his blade, a line of clay wherever it lies over its glaze;
+  // its hand, and its line of clay, short of both places of the near stone, where it rests
+  // (x 100) and where it is set down (x 98).
+  const wrong: string[] = [];
+  const his = (f: Fight) => {
+    const a = against(f);
+    const blade = new Set(heroBlade(heroAt(f.k), heroDrawing(heroAt(f.k), a)).map((q) => `${q.x},${q.y}`));
+    return new Set(hisGlaze(heroPicture(heroAt(f.k), a).back).map((q) => `${q.x},${q.y}`).filter((q) => !blade.has(q)));
+  };
+  for (let k = C.knee; k < FIGHT.swat.to; k++) {
+    for (const x of [90.06, 90.94, 91.17, 93.5, 97, 100.5, 104]) {
+      for (let u = 0; u < SWAT.off; u++) {
+        const caught = at(k + u);
+        caught.caught = { by: 'swat', k, x, y: F - 16, w: 10, h: 16, vx: 0, vy: 0, air: false };
+        const whole = his(at(k + u));
+        const now = his(caught);
+        for (const q of whole) if (!now.has(q)) wrong.push(`caught at L+${k}, x ${x}, frame ${u}: his (${q}) gone`);
+        const b = bullPose(caught);
+        expect(b.on, `caught at L+${k}, frame ${u}`).toBe('swat');
+        const hand = handBox(b.far);
+        if (hand.x + hand.w + 1 > FIGHT.body.face - 6 - ST.w / 2) wrong.push(`caught at L+${k}, x ${x}, frame ${u}: its hand to x ${hand.x + hand.w - 1}`);
+      }
+    }
+  }
+  expect(wrong.slice(0, 20)).toEqual([]);
+});
+
 // ---------------------------------------------------------------------------
 // In the game.
 // ---------------------------------------------------------------------------
@@ -753,6 +783,13 @@ const CLAY = 0xc8743d;
 const GLAZE = 0x1f140e;
 const TRAINERS = 0xecebe6;
 
+/**
+ * Where he lies flat on its floor, clapped or swatted, his outline's first and last
+ * columns: at its feet, before Theseus's, who stands at its head from x 94, and clear of
+ * the near stone where it rests (x 100) and where it is set down (x 98).
+ */
+const AT_ITS_FEET = [76, 91];
+
 /** What is drawn of him on a frame: his pixels by his inks, in world px, each with its ink. */
 type Him = { x: number; y: number; ink: number }[];
 
@@ -863,7 +900,7 @@ async function dying(page: Page, hands: string, air: number | null) {
   );
 }
 
-test("in the game: the hands as drawn: clapped edge-on between its palms, 4 px wide and his full 16, a pixel of clay either side, carried down to its feet, then flat on the floor face up, 16 by 4, his head to the left; swatted, flat under its hand from frame 2, on the floor where he stood or on its brow, 14 by 4, between its horns' tips", async ({ context }) => {
+test("in the game: the hands as drawn: clapped edge-on between its palms, 4 px wide and his full 16, a pixel of clay either side, carried down to its feet, then flat on the floor face up, 16 by 4, his head to the left, at x 76 to 91; swatted, flat under its hand from frame 2, on the floor at x 76 to 91 if he stood on it, or on its brow, 14 by 4, between its horns' tips, if he was in the air or on its back", async ({ context }) => {
   test.setTimeout(120_000);
   for (const [name, hands, air] of [
     ['the clap', '() => ({ dir: 1, jump: false })', false],
@@ -888,21 +925,27 @@ test("in the game: the hands as drawn: clapped edge-on between its palms, 4 px w
         for (const [l, r] of q.beside.slice(2, 14)) expect([l, r], `${name}, frame ${q.u}`).toEqual([CLAY, CLAY]);
         if (q.u === CLAP.down - 1) expect(y0 + 16, name).toBe(F);
       } else {
-        // Dropped flat at its feet, face up, his head to the left and his trainers at the far end.
+        // Dropped flat at its feet, face up, his head to the left and his trainers at the far
+        // end: before Theseus's feet, from x 94, with two pixels of clay, and clear of the
+        // near stone where it rests (x 100) and where it is set down (x 98).
         expect([s.w, s.h], `${name}, frame ${q.u}`).toEqual([16, 4]);
         expect(Math.max(...q.him.map((v) => v.y)), name).toBe(F - 1);
         expect(mean(q.him, WIG, 'x'), name).toBeLessThan(mean(q.him, TRAINERS, 'x'));
+        expect([Math.min(...q.him.map((v) => v.x)), Math.max(...q.him.map((v) => v.x))], `${name}, frame ${q.u}`).toEqual(AT_ITS_FEET);
       }
     }
   }
-  for (const [name, hands, air] of [
-    ['the swat on the floor', '(k) => ({ dir: k >= 34 ? 1 : 0, jump: false })', false],
-    ['the swat in the air', '(k) => ({ dir: k >= 24 ? 1 : 0, jump: k >= 44 && k < 60 })', true],
+  for (const [name, hands, air, brow] of [
+    ['the swat on the floor', '(k) => ({ dir: k >= 34 ? 1 : 0, jump: false })', false, false],
+    ['the swat in the air', '(k) => ({ dir: k >= 24 ? 1 : 0, jump: k >= 44 && k < 60 })', true, true],
+    // Down on its back from the clean run's leap, and walking left off it at its head.
+    ['the swat on its back', '(k) => (k < 46 ? null : { dir: -1, jump: false })', false, true],
   ] as const) {
     const page = await context.newPage();
     const r = await dying(page, hands, null);
     await page.close();
     expect([r.cause, r.caught.by, r.caught.air], name).toEqual(['The hands', 'swat', air]);
+    if (!air) expect(r.caught.y + r.caught.h < F - 1, name).toBe(brow);
     for (const q of r.frames) {
       const s = shape(q.him);
       // His own frame under its hand for two frames, never squashed: then pressed flat.
@@ -910,11 +953,14 @@ test("in the game: the hands as drawn: clapped edge-on between its palms, 4 px w
         expect(s.h, `${name}, frame ${q.u}`).toBe(16);
         continue;
       }
-      expect([s.w, s.h], `${name}, frame ${q.u}`).toEqual(air ? [14, 4] : [16, 4]);
+      expect([s.w, s.h], `${name}, frame ${q.u}`).toEqual(brow ? [14, 4] : [16, 4]);
       expect(mean(q.him, WIG, 'x'), name).toBeLessThan(mean(q.him, TRAINERS, 'x'));
       const y1 = Math.max(...q.him.map((v) => v.y));
-      if (!air) expect(y1, `${name}, frame ${q.u}`).toBe(F - 1);
-      else if (q.u >= 5) {
+      if (!brow) {
+        // Flat on the floor at its feet, where the clap lays him: never moved there from its back.
+        expect(y1, `${name}, frame ${q.u}`).toBe(F - 1);
+        expect([Math.min(...q.him.map((v) => v.x)), Math.max(...q.him.map((v) => v.x))], `${name}, frame ${q.u}`).toEqual(AT_ITS_FEET);
+      } else if (q.u >= 5) {
         // On its brow from frame 5, riding its head after, pressed into its poll so that
         // its horns' tips stand up behind him either side.
         expect(y1, `${name}, frame ${q.u}`).toBe(q.head.y + 1);
@@ -927,6 +973,85 @@ test("in the game: the hands as drawn: clapped edge-on between its palms, 4 px w
         if (q.u >= SWAT.off && q.k < C.blow1 - 6) expect(near, `${name}, frame ${q.u}`).toEqual([GLAZE, GLAZE, GLAZE, GLAZE]);
       }
     }
+  }
+});
+
+test('in the game: in its hands off the floor, clapped out of the air or swatted in it, the tourist has his pixel of clay under him too, until he is down at its feet or on its brow, so nothing of him touches the glaze of Theseus or the bull', async ({ context }) => {
+  test.setTimeout(120_000);
+  // From L on, by the fight's clock: these hands, or the clean run's own where they give
+  // none; and the frames of his death that he is off the floor in its hands.
+  for (const [name, hands, by, upto] of [
+    ['the clap in the air', '(k) => ({ dir: 1, jump: k >= 2 && k < 22 })', 'clap', CLAP.down],
+    ['the clap in the air, facing left', '(k) => ({ dir: k < 30 ? 1 : -1, jump: k >= 28 })', 'clap', CLAP.down],
+    ['the swat in the air', '(k) => ({ dir: k >= 24 ? 1 : 0, jump: k >= 44 && k < 60 })', 'swat', SWAT.brow],
+  ] as const) {
+    const page = await context.newPage();
+    await open(page);
+    const r = await page.evaluate(
+      ({ presses, hands, glaze, colours, cell, upto }) => {
+        const g = (window as unknown as W).__game;
+        g.titleTimer = 0;
+        const fight = () => g.entities.find((e: { def: { kind: string } }) => e.def.kind === 'fight');
+        const key = (c: string, d: boolean) => window.dispatchEvent(new KeyboardEvent(d ? 'keydown' : 'keyup', { code: c }));
+        const press = (p: { dir: number; jump: boolean }) => {
+          key('ArrowRight', p.dir > 0);
+          key('ArrowLeft', p.dir < 0);
+          key('Space', p.jump);
+          g.tick();
+        };
+        // eslint-disable-next-line no-new-func
+        const by = new Function('k', `return (${hands})(k);`) as (k: number) => { dir: number; jump: boolean } | null;
+        const ctx = g.world.getContext('2d') as CanvasRenderingContext2D;
+        const W4 = ctx.canvas.width;
+        const s = W4 / 320;
+        const GL = parseInt(glaze.slice(1), 16);
+        const HIS = new Set(colours.map((c: string) => parseInt(c.slice(1), 16)));
+        const out = { frames: 0, his: 0, touches: [] as string[] };
+        for (let i = 0; i < 4000 && g.state === 'playing'; i++) {
+          const f = fight();
+          const k = f.keyed ? f.k + 1 : -99;
+          press((k >= 0 ? by(k) : null) ?? presses[i] ?? { dir: 0, jump: false });
+        }
+        const caught = fight().caught;
+        for (let u = 0; u < upto && g.state === 'dead'; u++) {
+          g.draw();
+          const d = ctx.getImageData(0, 0, W4, ctx.canvas.height).data;
+          const ink = (i: number, j: number) => (i < 0 || j < 0 || i >= W4 || j >= ctx.canvas.height ? -1 : (d[(j * W4 + i) * 4]! << 16) | (d[(j * W4 + i) * 4 + 1]! << 8) | d[(j * W4 + i) * 4 + 2]!);
+          out.frames++;
+          for (let j = 0; j < ctx.canvas.height; j++) {
+            for (let i = 0; i < W4; i++) {
+              if (!HIS.has(ink(i, j))) continue;
+              out.his++;
+              for (const [dx, dy] of [[-s, 0], [s, 0], [0, -s], [0, s]] as const) {
+                const x = (i + dx) / s;
+                const y = (j + dy) / s + g.camera.iy;
+                if (x < cell.x0 || x >= cell.x1 || y < cell.y0 || y >= cell.y1) continue;
+                if (ink(i + dx, j + dy) === GL && out.touches.length < 20) out.touches.push(`frame ${u}: (${Math.floor(x)}, ${Math.floor(y)})`);
+              }
+            }
+          }
+          press({ dir: 0, jump: false });
+        }
+        key('ArrowLeft', false);
+        key('ArrowRight', false);
+        key('Space', false);
+        return { ...out, cause: g.deathCause as string, caught, facing: g.player.facing };
+      },
+      {
+        presses: cleanPresses(),
+        hands,
+        glaze: '#1f140e',
+        colours: HIS,
+        cell: { x0: FIGHT.toss.rect.x, x1: FIGHT.toss.rect.x + FIGHT.toss.rect.w, y0: F - 80, y1: F },
+        upto,
+      },
+    );
+    await page.close();
+    expect([r.cause, r.caught.by, r.caught.air], name).toEqual(['The hands', by, true]);
+    if (name.endsWith('left')) expect(r.facing, name).toBe(-1);
+    expect(r.frames, name).toBe(upto);
+    expect(r.his, name).toBeGreaterThan(0);
+    expect(r.touches, name).toEqual([]);
   }
 });
 

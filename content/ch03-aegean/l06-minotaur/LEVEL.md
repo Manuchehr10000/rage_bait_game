@@ -205,7 +205,22 @@ Chosen in the asset notes (2026-10-10), where this file did not decide, for the 
   its poll, so that its horns' tips stand up behind him; the somersault goes round
   counter-clockwise, his head first to the wall, facing left in his own frames mirrored, ends
   upright when it comes full circle, and is kept out of the cell's wall and floor; and the sniff
-  draws down the plume he stepped into, as it stood, so the dust never first rises.
+  draws down the plume he stepped into, as he saw it on the frame before, so the dust never first
+  rises. (After a check of the deaths, the same day: the sniff after a lip landing drew a whole
+  plume up out of nothing; it now draws down only what was seen, after a quick lip landing
+  little or nothing, and is heard.)
+- Where he lies flat, and the swat's hand on him (after the same check, `../shared`,
+  `e-cell/minotaur-hand.md`): clapped or swatted on the floor, at its feet, x 76 to 91, the same
+  place for both, before Theseus's feet (from x 94) with two pixels of clay, and clear of the near
+  stone where it rests (x 100) and where it is set down (x 98); so a man swatted on the floor goes
+  down a few pixels back from where he stood, and a floor clap carries him 12 px along the floor
+  between its palms. The swat's hand on a man on the floor is never over Theseus, who stands in
+  front of its far arm: on his head short of Theseus's head, then on his face and chest, its
+  forearm going in behind Theseus's foot. A man swatted standing on its back is off the floor,
+  and goes onto its brow as a man in the air does. In its hands off the floor, his reserve goes
+  under him. (Laid where he stood, he and the swat's hand covered the near stone and Theseus's
+  legs, and Theseus stood a torso on a hand; swatted on its back, he dropped 27 px onto its far
+  stone; clapped out of the air, his trainers stood on its rising arm.)
 
 ## The beats
 
@@ -399,7 +414,8 @@ this game a crack means "will give", and Persepolis's cracked column holds.
   again under him. Label: **The snort.** A walk-off dies 17 ticks after the ring, a leap that lands
   on the lip 1 to 17.
 - **The death**, inside the 45 frames of a death: 0–4, the sniff, the plumes drawn down past his
-  legs into the hole (only the hatch ever draws dust past his legs); 5–8, massed twin columns of
+  legs into the hole (only the hatch ever draws dust past his legs), as much of them as stood
+  there, after a quick lip landing little or none (as drawn, 2026-10-10); 5–8, massed twin columns of
   dots, never a solid black column, jet up and carry him to the ceiling; 9–44, pasted flat on it
   over the hatch (his box x 48–58, y 528; the drawing, 18 × 12, reaches x 66), face up, splayed
   and still, in full colour, the wig over his eyes. The dots settle back into the hatch, since dust
@@ -554,7 +570,8 @@ lets go of the stones, claps him out of the air between its palms, flat like a f
 at its feet. The joke is not that it was a man, which every player knows, but that a man has hands.
 Its late edge: held by one horn, a stone raised in its left hand, it still has a free right hand,
 and from L+46 to 67 it swats whatever is at its face or over its head, flat on its own brow between
-the horns if he is in the air, flat on the floor before its knee if he is not.
+the horns if he is off the floor, in the air or on its back, flat on the floor at its feet if he is
+not (as drawn, 2026-10-10: this read "in the air" and "before its knee").
 
 - **A surprise the first time.** Five levels with no bull, a kilt bought to leap one, and at the
   door a kneeling figure he vaulted that ignored him.
@@ -867,12 +884,16 @@ Being built, in this order, as a stage in the dev build (`#minotaur`, in `STAGES
 
 - **The tourist's last three deaths, drawn** (2026-10-10, to the notes in `../shared`): clapped
   edge-on between its palms (`bull-leaper-clapped`) and dropped flat at its feet; pressed flat
-  (`bull-leaper-pressed`), on the floor where he stood, or on its brow, sunk into its poll between
+  (`bull-leaper-pressed`), on the floor at its feet, or on its brow, sunk into its poll between
   its horns' tips; hooked and thrown round in eighths, the jump frame and its drawn half-quarter
   (`bull-leaper-tumbling`) turned only by quarters, and flat on his back at the left wall, the dead
   frame turned a quarter; pasted on the ceiling, 18 wide as its note decided; and the sniff drawing
-  down the plume he stepped into, as it stood. Nothing that kills, carries or times moved. Pinned in
-  `tests/minotaur-bull.spec.ts` and `tests/minotaur-snort.spec.ts`.
+  down the plume he stepped into, as he saw it. Nothing that kills, carries or times moved. Pinned in
+  `tests/minotaur-bull.spec.ts` and `tests/minotaur-snort.spec.ts`. Then, after a check, the same
+  day: flat at its feet, x 76 to 91, clap and swat alike, clear of the near stone and of Theseus;
+  the swat's hand on a man on the floor never over Theseus, whose every pixel stays on every
+  frame it is on him; a man swatted on its back onto its brow; his reserve under him in its hands
+  off the floor; and the sniff never first rising after a lip landing (pinned in the same files).
 
 Still to come: nothing the notes ask the drawing for. (`LevelData.tricks`, 'The knot', 'The
 snort', 'The hands', 'The horns', and `dropCause` and `fallCause` 'The labyrinth', unreachable,

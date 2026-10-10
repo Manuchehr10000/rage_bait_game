@@ -117,8 +117,10 @@ In the cell, on one clock from L, the frame the tourist comes down on its floor:
   of the clean run's fight, the clap, the swat and the toss (`tests/minotaur-bull.spec.ts`).
 - **Its folded leg never a letter or a digit**: crouched, the rump runs down into the heel and
   every row of the leg below the knee is one run of glaze (`tests/minotaur-bull.spec.ts`).
-- **The swat drawn where he is caught**, flat on its own brow between the horns if he was in the
-  air, flat on the floor before its knee if not.
+- **The swat drawn where he is caught**, flat on its own brow between the horns if he was off the
+  floor, in the air or standing on its back, flat on the floor at its feet if he stood on it, where
+  the clap lays him, before Theseus's feet and clear of the near stone
+  (`../../shared/bull-leaper-pressed.md`).
 - **The lurch on both knees, thrashing: never a step, a run or a turn toward the tourist**
   (`content/research/arc.md`, section 4). A Minotaur that charges is Karnak's scarab.
 - **The stone is never thrown**, and never brought down on the hero: swung at him over his

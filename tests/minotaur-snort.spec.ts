@@ -621,10 +621,11 @@ test("the snort's death: sniffed where he is for 5 frames, carried up the hatch 
   expect(frames.slice(0, SNORT.sniff).some((q) => pastLegs(q.dust.front))).toBe(true);
   const lowest = (dots: Dot[]) => Math.max(...dots.map((q) => q.y + q.s - 1));
   expect(lowest(frames[SNORT.sniff - 1]!.dust.front)).toBeGreaterThan(r.p.y + r.p.h);
-  // It draws down the plume he stepped into, as it stood when it snorted him, which never
-  // first rises: on frame 0 the top of its dust is that plume's top, 2 px down. The ring
-  // brought it back under the hatch breathing from nothing, 17 frames before.
-  const stood = plumeDots((BEAST.hatch.x0 + BEAST.hatch.x1) / 2, T_END_FLOOR, r.died - ring);
+  // It draws down the plume he stepped into, as he saw it on the frame before, but for
+  // what he hid, which never first rises: on frame 0 the top of its dust is that plume's
+  // top, 2 px down. The ring brought it back under the hatch breathing from nothing, 17
+  // frames before he died, so it was 16 frames into its breath on the frame before.
+  const stood = plumeDots((BEAST.hatch.x0 + BEAST.hatch.x1) / 2, T_END_FLOOR, r.died - ring - 1).filter((q) => !overlaps({ x: q.x, y: q.y, w: q.s, h: q.s }, r.p));
   expect(PLUME - (T_END_FLOOR - Math.min(...stood.map((q) => q.y)))).toBeGreaterThan(0);
   const top = (dots: Dot[]) => Math.min(...dots.map((q) => q.y));
   expect(top(frames[0]!.dust.front)).toBe(top(stood) + 2);
@@ -654,6 +655,39 @@ test("the snort's death: sniffed where he is for 5 frames, carried up the hatch 
     expect(q.dust.behind, `frame ${q.f}`).toEqual(plumeDots(hx, T_END_FLOOR, BREATH.out + BREATH.hold + q.f - SNORT.again));
     expect(q.dust.behind.some((d) => overlaps({ x: d.x, y: d.y, w: d.s, h: d.s }, r.p)), `frame ${q.f}`).toBe(true);
   }
+});
+
+test('the sniff never first rises: at whatever breath it snorts him, the dust on its first frame is the plume he saw on the frame before, 2 px down, none above its top and none where none was seen', () => {
+  // Wherever his box can be when his feet go in, x 48 to 54 (LEVEL.md, beat d): a lip
+  // landing goes in from 1 to 17 frames after the ring, a walk-off 17, and a man who came
+  // back after its clock at any point of a breath.
+  const period = BREATH.out + BREATH.hold + BREATH.in + BREATH.rest;
+  const top = (dots: Dot[]) => Math.min(...dots.map((q) => q.y));
+  const wrong: string[] = [];
+  let seen = 0;
+  for (let x = BEAST.hatch.x0; x <= BEAST.hatch.x1 - 10; x++) {
+    for (let b = 0; b < period; b++) {
+      const e = new Ear(BEAST);
+      e.t = 1000;
+      e.breathFrom = e.t - b;
+      const p = new Player();
+      p.spawnAt(x, BEAST.inY + 0.5 - 16);
+      const before = e.dust(p).behind;
+      const w = { level: LEVEL, player: p, cameraX: 0, events: new Set(), alive: true, kill: () => {}, sound: () => {} } as unknown as World;
+      e.update(w);
+      if (e.snortFrame !== 0) throw new Error(`x ${x}, breath ${b}: not snorted`);
+      const sniffed = e.dust(p).front;
+      if (!before.length) {
+        if (sniffed.length) wrong.push(`x ${x}, breath ${b}: ${sniffed.length} grains from nowhere`);
+        continue;
+      }
+      seen++;
+      if (top(sniffed) < top(before)) wrong.push(`x ${x}, breath ${b}: up from ${top(before)} to ${top(sniffed)}`);
+      if (sniffed.length > before.length) wrong.push(`x ${x}, breath ${b}: ${before.length} grains seen, ${sniffed.length} sniffed`);
+    }
+  }
+  expect(wrong).toEqual([]);
+  expect(seen).toBeGreaterThan(0);
 });
 
 test("the beast's breath: twin plumes out of the hatch, rising 32 px and drawn back in; through the bed block's joint at x 112 when it is at its bed, drawn behind him and never over his legs", () => {
@@ -1036,4 +1070,63 @@ test("in the game: the joint's plume is drawn behind him, and never over his leg
   // None in his legs, ever; and round him and over his head, it breathes.
   expect(r.legs).toBe(0);
   expect(r.round).toBeGreaterThan(1000);
+});
+
+test('in the game: landed on the lip and straight on into the hatch, he is sniffed, and the dust over the hatch never first rises on the frame it is drawn in', async ({ page }) => {
+  await open(page);
+  // Put down on T_end at x 145, running left, and leaping from x 104, 100 or 95 for 5
+  // frames: down on the lip, which rings, and on into the hatch while the plume over it is
+  // still low. The dust's own colour over the hatch, its top, on the frame before he dies
+  // and on the first frame of his death.
+  const r = await page.evaluate(
+    ({ floor }) => {
+      const g = (window as unknown as W).__game;
+      g.titleTimer = 0;
+      const key = (c: string, d: boolean) => window.dispatchEvent(new KeyboardEvent(d ? 'keydown' : 'keyup', { code: c }));
+      const ctx = g.world.getContext('2d') as CanvasRenderingContext2D;
+      const dustTop = () => {
+        g.draw();
+        const x0 = 36;
+        const y0 = floor - 48;
+        const d = ctx.getImageData(x0 * 4, (y0 - g.camera.iy) * 4, 40 * 4, 64 * 4).data;
+        for (let j = 0; j < 64 * 4; j++) for (let i = 0; i < 40 * 4; i++) {
+          const o = (j * 160 + i) * 4;
+          if (d[o] === 0xec && d[o + 1] === 0xc9 && d[o + 2] === 0x99) return y0 + Math.floor(j / 4);
+        }
+        return null;
+      };
+      const out: { from: number; cause: string | null; rung: boolean; before: number | null; sniffed: number | null }[] = [];
+      for (const from of [104, 100, 95]) {
+        g.startAt(150, floor);
+        let leapt = -1;
+        let rung = false;
+        let before: number | null = null;
+        const play = g.audio.play.bind(g.audio);
+        g.audio.play = (n: string) => {
+          if (n === 'ring') rung = true;
+          play(n);
+        };
+        for (let t = 0; t < 200 && g.state === 'playing'; t++) {
+          if (leapt < 0 && g.player.x <= from) leapt = t;
+          key('ArrowLeft', true);
+          key('Space', leapt >= 0 && t - leapt < 5);
+          g.tick();
+          if (g.state === 'playing') before = dustTop();
+        }
+        key('ArrowLeft', false);
+        key('Space', false);
+        g.audio.play = play;
+        out.push({ from, cause: g.deathCause, rung, before, sniffed: dustTop() });
+        for (let i = 0; i < 60 && g.state === 'dead'; i++) g.tick();
+      }
+      return out;
+    },
+    { floor: T_END_FLOOR },
+  );
+  for (const q of r) {
+    expect([q.cause, q.rung], `from x ${q.from}`).toEqual(['The snort', true]);
+    // None above the highest grain he saw, and none where none was seen.
+    if (q.before === null) expect(q.sniffed, `from x ${q.from}`).toBeNull();
+    else if (q.sniffed !== null) expect(q.sniffed, `from x ${q.from}`).toBeGreaterThanOrEqual(q.before);
+  }
 });

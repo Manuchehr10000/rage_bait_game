@@ -10,9 +10,9 @@
 ## What it is
 
 A 1 px line of the clay round the tourist's top and sides, never under his feet while he is on
-them, drawn only where something of glaze is behind him. Off his feet, in the air or hooked and
-thrown by the horns, it goes under him too. It is how the vase painters cut one figure from the next
-(the research), applied to the one figure in full colour.
+them, drawn only where something of glaze is behind him. Off his feet, in the air, in the bull's
+hands off the floor or hooked and thrown by the horns, it goes under him too. It is how the vase
+painters cut one figure from the next (the research), applied to the one figure in full colour.
 
 ## Where it stands in the game
 
@@ -32,7 +32,12 @@ the thread too, a pixel each side of him.
   Off his feet it goes under him, so that his feet and his dark outline never touch the glaze of
   Theseus or the bull he passes over: leaping onto the back past the stone raised over its
   shoulder, his trainers met its hand's glaze (after a check of Theseus in the fight, 2026-10-10;
-  `tests/minotaur-bull.spec.ts`).
+  `tests/minotaur-bull.spec.ts`). In its hands he is off his feet until he is down: caught in the
+  air, his own frame under its palms or its hand; clapped, his sliver held up between its palms
+  and carried down, until it is on the floor at its feet; swatted in the air, carried down to its
+  brow, until he lies on it. (After a check of the deaths, the same day: clapped out of the air,
+  his trainers stood on its rising arm, and carried down past Theseus his sliver's foot lay on
+  Theseus's head.)
 - **Only where glaze is behind him**, and exactly 1 px: the clay itself, never lighter.
 - **Nothing inside the hero's doorway, x 148 to 164, before L−8**, so that Theseus stays unseen
   there (`../LEVEL.md`, Art, 2026-10-10).

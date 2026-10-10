@@ -449,12 +449,25 @@ function handAt(frame: number, box: Pt, right = false): Hand {
   return { frame, wrist: { x: box.x + (right ? w - 1 - f.wrist.x : f.wrist.x), y: box.y + f.wrist.y }, right };
 }
 
-/** Where the clap holds him on frame `u` of his death, the top-left of his sliver between its palms: where it caught him, carried down to its feet. */
+/**
+ * Where it lays him flat on its floor, clapped or swatted: at its feet, before Theseus's,
+ * who stands at its head from L + 36 with his feet from x 94: the flat frame's left, this
+ * far short of the clap's reach (x 76, his trainers' outline at x 91). So two pixels of
+ * clay lie between him and Theseus's foot, its palms and its hand on him come no nearer
+ * Theseus than that, and nothing of him lies on the near stone, where it rests (x 100) or
+ * where it is set down (x 98).
+ */
+const FLAT_SHORT = 24;
+
+/** The left of his flat frame on its floor (`FLAT_SHORT`). */
+const flatAt = (f: Fight): number => f.def.clap.rect.x - FLAT_SHORT;
+
+/** Where the clap holds him on frame `u` of his death, the top-left of his sliver between its palms: where it caught him, carried down to its feet, over the middle of where he will lie. */
 export function clapHeld(f: Fight, u: number): Pt {
   const c = f.caught!;
   const cx = Math.round(c.x) + 5;
   const from = { x: cx - 2, y: Math.round(c.y) };
-  const to = { x: Math.round(f.def.clap.rect.x - c.w) + 5 - 2, y: Math.round(f.def.floorY - c.h) };
+  const to = { x: flatAt(f) + PRESSED_W / 2 - 2, y: Math.round(f.def.floorY - c.h) };
   if (u < CLAP.drop) return from;
   if (u < CLAP.down) return at(lerp(from, to, (u - CLAP.drop + 1) / (CLAP.down - CLAP.drop)));
   return to;
@@ -621,21 +634,30 @@ export function bullPose(f: Fight): BullPose {
 /**
  * The swat, in frames from the catch: its hand is on him, his own frame under it, until
  * `flat`, when he is pressed flat; carried down with it onto its brow by `brow` if he was
- * in the air; and its hand leaves him at `off`. The death draws him to the same frames.
+ * off the floor; and its hand leaves him at `off`. The death draws him to the same frames.
  */
 export const SWAT = { flat: 2, brow: 5, off: 8 } as const;
 
 /**
+ * Whether the swat carries him onto its brow: caught off its floor, in the air or standing
+ * on its back behind its head. Only a man on the floor is pressed flat on the floor.
+ */
+export function swatUp(f: Fight): boolean {
+  const c = f.caught!;
+  return c.air || c.y + c.h < f.def.floorY - 1;
+}
+
+/**
  * Where the swat has him on frame `u` of his death: the middle of his underside, and how
- * tall he is drawn, his own 16 or pressed flat to 4. Where it caught him; pressed flat
- * there, on the floor where he stood if he was not in the air; or carried down with its
- * hand onto its brow, and riding its head after.
+ * tall he is drawn, his own 16 or pressed flat to 4. Where it caught him; pressed flat on
+ * the floor at its feet, where the clap lays him (`flatAt`), if he stood on the floor; or
+ * carried down with its hand onto its brow, and riding its head after.
  */
 export function swatHeld(f: Fight, u: number): { x: number; y: number; tall: number } {
   const c = f.caught!;
   const from = { x: Math.round(c.x) + 5, y: Math.round(c.y) + c.h };
   if (u < SWAT.flat) return { ...from, tall: c.h };
-  if (!c.air) return { x: from.x, y: f.def.floorY, tall: PRESSED_TALL };
+  if (!swatUp(f)) return { x: flatAt(f) + PRESSED_W / 2, y: f.def.floorY, tall: PRESSED_TALL };
   const brow = f.browAt(f.k);
   const q = at(lerp(from, { x: brow.x, y: brow.y + SUNK }, Math.min(1, (u - SWAT.flat) / (SWAT.brow - SWAT.flat))));
   return { ...q, tall: PRESSED_TALL };
@@ -644,18 +666,34 @@ export function swatHeld(f: Fight, u: number): { x: number; y: number; tall: num
 /** How far he is pressed down into its poll on its brow, so that its horns' tips stand up behind him either side, in px. */
 const SUNK = 2;
 
-/** How tall he is pressed flat, in px (content/ch03-aegean/shared/bull-leaper-pressed.md). */
+/** How long and how tall he is pressed flat on the floor, in px (content/ch03-aegean/shared/bull-leaper-pressed.md). */
+const PRESSED_W = 16;
 const PRESSED_TALL = 4;
 
 /**
- * The swat's hand on frame `u` of his death, its wrist: flat on top of him where it
- * caught him, its line of clay between its fingertips and him, and down with him onto its
- * brow if he was in the air, or onto the floor where he stood (the hands' death, in
- * scene.ts).
+ * The swat's hand on a man on the floor, never over Theseus, who stands at its head: while
+ * he stands, on his head, its last column this far short of the clap's reach (x 95), short
+ * of Theseus's head, from x 98; once he is flat, on his face and chest, its drawing this far
+ * into his flat frame (x 80 to 87), so that its forearm is seen for 4 px going in behind
+ * Theseus's foot, from x 94. Neither its line of clay nor the pixel more that Theseus
+ * gives way round it ever reaches him: he stands whole in front of its far arm.
+ */
+const SWAT_FLOOR = { short: 5, on: 4 } as const;
+
+/**
+ * The swat's hand on frame `u` of his death, its wrist: flat on top of him, its line of
+ * clay between its fingertips and him; down with him onto its brow if he was off the
+ * floor; or, if he stood on it, on his head and then on him flat at its feet, clear of
+ * Theseus (`SWAT_FLOOR`) (the hands' death, in scene.ts).
  */
 export function swatWrist(f: Fight, u: number): Pt {
   const q = swatHeld(f, u);
-  return { x: q.x + 4, y: q.y - q.tall - 1 - BULL_HAND_FRAMES[HAND_FLAT]!.rows.length };
+  const flat = BULL_HAND_FRAMES[HAND_FLAT]!;
+  const w = Math.max(...flat.rows.map((r) => r.length));
+  const y = q.y - q.tall - 1 - flat.rows.length;
+  if (swatUp(f)) return { x: q.x + 4, y };
+  if (u >= SWAT.flat) return { x: flatAt(f) + SWAT_FLOOR.on + flat.wrist.x, y };
+  return { x: Math.min(q.x + 4, f.def.clap.rect.x - SWAT_FLOOR.short - (w - 1) + flat.wrist.x), y };
 }
 
 /**
