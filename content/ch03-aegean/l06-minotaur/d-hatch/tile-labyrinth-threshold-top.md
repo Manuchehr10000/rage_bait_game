@@ -10,12 +10,12 @@
 ## What it is
 
 The dressed threshold before the hatch, the only fine stone in T_end's floor: one smooth block,
-not coursed, in the dressed stone's paler tones (`#a8693e`, its top `#c48552`), edged in a 1 px
-glaze contour. Its top edge is dished by two worn foot hollows, 5 px wide and 2 deep, at 2 and
-9 px from its left: the contour along its top dips into each, and the air in the dip is clay. Its
-edge at the hatch is cut square, the contour down x 64; along its underside, over the cell, the
-contour is where the stone ends. Its right side is the plain block's joint at x 80, as every
-block's is.
+not coursed, in the dressed stone's paler tone (`#a8693e`), edged in a 1 px glaze contour. Its
+top edge is dished by two worn foot hollows, 5 px wide and 2 deep, at 2 and 9 px from its left:
+the contour along its top dips into each, 3 px across its floor, the air in the dip is clay, and
+the stone under each dip is worn paler (`#c48552`), a crescent under the contour. Its edge at the
+hatch is cut square, the contour down x 64; along its underside, over the cell, the contour is
+where the stone ends. Its right side is the plain block's joint at x 80, as every block's is.
 
 ## Where it stands in the game
 

@@ -133,6 +133,26 @@ test('the closing tableau, the queue and Ariadne: where each stands, and none of
 // The way out: the turnings, the niches and the climbs.
 // ---------------------------------------------------------------------------
 
+test("the tongues over the outside are out of his reach: a full jump off the kneeling hero's back, the highest he can stand outside, brings his head to y 68.2, under the band's foot at y 64", () => {
+  const band = MINOTAUR.decor.find((d) => d.kind === 'tongues')!;
+  if (band.kind !== 'tongues') throw new Error('no tongues');
+  const hero = MINOTAUR.entities.find((e): e is HeroDef => e.kind === 'hero')!;
+  let top = Infinity;
+  for (let x = hero.kneel.x - 8; x <= hero.kneel.x + hero.kneel.w - 2; x += 2) {
+    for (const hold of [1, 5, 10, FULL]) {
+      const r = new Run();
+      r.p.spawnAt(x, hero.kneel.y - 16);
+      r.play((q) => ({ dir: 0, jump: q.t < hold }), () => false, 90);
+      expect(r.cause).toBeNull();
+      top = Math.min(top, ...r.log.map((l) => l.y));
+    }
+  }
+  expect(top).toBeCloseTo(68.2, 1);
+  // Nine rows of tongues hang from y 56: their feet on y 64, 4 px over his highest head.
+  expect(band.y + 9).toBeLessThan(top);
+  expect(band.x1).toBeLessThan(80);
+});
+
 test("Daedalus's turnings: two 16 px holes in each room's ceiling, one against each end wall; the thread goes up one, and the other is a niche, closed above", () => {
   const hero = new Hero(HERO_DEF, LEVEL);
   /** Every point of the thread as laid, a pixel apart. */

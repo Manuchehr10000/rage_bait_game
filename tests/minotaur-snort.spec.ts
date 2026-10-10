@@ -1,7 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 import { MINOTAUR } from '../src/levels/ch03-aegean/l06-minotaur';
 import type { EarDef } from '../src/engine/level';
-import { BREATH, Ear, PLUME, plumeDots, SNORT, snortBody, type World } from '../src/engine/entities';
+import { BREATH, Ear, GRAIN, PLUME, plumeDots, SNORT, snortBody, type Dot, type World } from '../src/engine/entities';
 import { PHYS, Player } from '../src/engine/player';
 import type { Input } from '../src/engine/input';
 import { DEATH_ANIM, DEATH_SOUND, overlaps, VIEW_H, type Rect } from '../src/engine/types';
@@ -615,10 +615,11 @@ test("the snort's death: sniffed where he is for 5 frames, carried up the hatch 
   // The sniff: the dust over the hatch drawn down in front of him, past his legs, into the
   // hole: only the hatch ever draws dust past his legs, and only here.
   const legs: Rect = { x: r.p.x, y: r.p.y + r.p.h - 6, w: r.p.w, h: 6 };
-  const pastLegs = (dots: { x: number; y: number }[]) => dots.some((q) => overlaps({ x: q.x, y: q.y, w: 1, h: 1 }, legs));
+  // Each grain as it is drawn, `s` px square: 2, or 1 in the jet.
+  const pastLegs = (dots: Dot[]) => dots.some((q) => overlaps({ x: q.x, y: q.y, w: q.s, h: q.s }, legs));
   expect(frames.slice(0, SNORT.sniff).every((q) => q.dust.front.length > 0)).toBe(true);
   expect(frames.slice(0, SNORT.sniff).some((q) => pastLegs(q.dust.front))).toBe(true);
-  const lowest = (dots: { y: number }[]) => Math.max(...dots.map((q) => q.y));
+  const lowest = (dots: Dot[]) => Math.max(...dots.map((q) => q.y + q.s - 1));
   expect(lowest(frames[SNORT.sniff - 1]!.dust.front)).toBeGreaterThan(r.p.y + r.p.h);
   // The jet: massed twin columns of dots, never a solid column, out of the hole and up to
   // his feet as he rises.
@@ -635,7 +636,7 @@ test("the snort's death: sniffed where he is for 5 frames, carried up the hatch 
   }
   // From 9 on nothing is in front of him, and the dust is back over the hatch by 40: then the in-breath draws it down.
   for (const q of frames.slice(SNORT.sniff + SNORT.jet)) expect(q.dust.front).toEqual([]);
-  expect(frames[SNORT.again]!.dust.behind.every((d) => d.x >= BEAST.hatch.x0 && d.x < BEAST.hatch.x1 && d.y >= T_END_FLOOR - PLUME && d.y < T_END_FLOOR)).toBe(true);
+  expect(frames[SNORT.again]!.dust.behind.every((d) => d.x >= BEAST.hatch.x0 && d.x + d.s <= BEAST.hatch.x1 && d.y >= T_END_FLOOR - PLUME && d.y + d.s <= T_END_FLOOR)).toBe(true);
   expect(lowest(frames[44]!.dust.behind) - Math.min(...frames[44]!.dust.behind.map((d) => d.y))).toBeLessThan(PLUME);
   // The in-breath is drawn whole, down into the hatch, as the settled dust was on 39: he is
   // on the ceiling, and nothing of it is cut round the box he died in.
@@ -644,7 +645,7 @@ test("the snort's death: sniffed where he is for 5 frames, carried up the hatch 
   const hx = (BEAST.hatch.x0 + BEAST.hatch.x1) / 2;
   for (const q of frames.slice(SNORT.again)) {
     expect(q.dust.behind, `frame ${q.f}`).toEqual(plumeDots(hx, T_END_FLOOR, BREATH.out + BREATH.hold + q.f - SNORT.again));
-    expect(q.dust.behind.some((d) => overlaps({ x: d.x, y: d.y, w: 1, h: 1 }, r.p)), `frame ${q.f}`).toBe(true);
+    expect(q.dust.behind.some((d) => overlaps({ x: d.x, y: d.y, w: d.s, h: d.s }, r.p)), `frame ${q.f}`).toBe(true);
   }
 });
 
@@ -658,9 +659,20 @@ test("the beast's breath: twin plumes out of the hatch, rising 32 px and drawn b
   expect(Math.max(...tops)).toBe(PLUME);
   expect(tops.indexOf(PLUME)).toBeLessThan(BREATH.out);
   expect(tops.slice(BREATH.out + BREATH.hold + BREATH.in)).toEqual(Array(BREATH.rest).fill(0));
-  // Twin: as many dots each side of where it breathes from, and never on it.
+  // Twin: as many grains each side of where it breathes from, and none across it.
   const out = plumeDots(56, T_END_FLOOR, BREATH.out);
-  expect(out.filter((d) => d.x < 56).length).toBe(out.filter((d) => d.x > 56).length);
+  const left = out.filter((d) => d.x + d.s <= 56);
+  expect(left.length * 2).toBe(out.length);
+  expect(out.filter((d) => d.x >= 56)).toHaveLength(left.length);
+  // Grains, never a line, a rope or a solid: each 2 px square, with a pixel of clay between
+  // any two, corners included, at every frame of a breath.
+  for (let b = 0; b < BREATH.out + BREATH.hold + BREATH.in + BREATH.rest; b++) {
+    const dots = plumeDots(56, T_END_FLOOR, b);
+    for (const [i, a] of dots.entries()) {
+      expect(a.s).toBe(GRAIN);
+      for (const c of dots.slice(i + 1)) expect(a.x > c.x + c.s || c.x > a.x + a.s || a.y > c.y + c.s || c.y > a.y + a.s, `grains touch at ${b}`).toBe(true);
+    }
+  }
   // A man standing over the joint for two whole breaths, and then walking on off the bed
   // and stopping: the joint's plume is behind him, and none of it is ever where he is.
   const r = overTheBed();
@@ -670,7 +682,7 @@ test("the beast's breath: twin plumes out of the hatch, rising 32 px and drawn b
     r.tick({ dir: i >= 200 && i < 212 ? -1 : 0, jump: false });
     const { behind, front } = r.ear.dust(r.p);
     expect(front).toEqual([]);
-    for (const d of behind) expect(overlaps({ x: d.x, y: d.y, w: 1, h: 1 }, r.p), `over him at ${d.x},${d.y}`).toBe(false);
+    for (const d of behind) expect(overlaps({ x: d.x, y: d.y, w: d.s, h: d.s }, r.p), `over him at ${d.x},${d.y}`).toBe(false);
     if (r.ear.breathX === BEAST.joint && behind.some((d) => d.y < r.p.y)) rose++;
   }
   expect(r.p.x).toBeGreaterThan(BEAST.lip.x1);

@@ -4,15 +4,17 @@
 |---|---|
 | Id | `boss` |
 | File | None, and none is wanted: drawn in code at 1 world px (`../LEVEL.md`, Art, ruled 2026-10-10) |
-| Size | 9 × 8 world px, 1 frame, its top-left at (206, 140) |
+| Size | 5 × 4 world px, 1 frame, its top-left at (208, 141), in the stride's 9 × 8 rect at (206, 140) |
 | Beat | `b-passage` |
 
 ## What it is
 
 A small round knob on the passage's back wall, at head height just right of O1: what Theseus's
 trailing foot pushes off at frames 68 to 70 as he mantles up. Drawn in outline: a 1 px glaze
-contour, round, its inside reserved clay. The contour begins a row under the rect's top (y 141),
-its top row about 5 px wide, so that the sole on y 140 is cut from it by a row of clay.
+contour, round, its inside reserved clay, 5 px wide and 4 high, x 208 to 212 and y 141 to 144,
+in the middle of the stride's 9 × 8 rect. Its top row is 3 px, its corners cut: no flat top. It
+begins a row under the rect's top, so that the sole over it, on y 139, is cut from it by a row
+of clay.
 
 ## Where it stands in the game
 
@@ -42,4 +44,6 @@ None: invented for the stride (designer, 2026-10-08).
 
 ## Confidence
 
-Design choice.
+Design choice. Drawn about 5 px, as the stage's direction gave it (2026-10-10); this note first
+had its top row about 5 px wide in the whole 9 × 8 rect. **To watch:** a ring this small could be
+taken for a letter o (pillar 2); wider than it is high, it reads as a knob or a ring on the wall.

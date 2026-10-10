@@ -11,21 +11,24 @@
 
 The breath of the beast under T_end's floor, which is never seen: dust, `#ecc999`, in grains.
 
-- **The plume**: twin columns of grains rising out of the floor, leaning out as they rise, up to
-  32 px, carried up on the out-breath and drawn back down on the in-breath (36 frames out, 8 held,
-  36 in, 12 at rest). Out of the hatch while it sleeps there; through the bed block's plain joint
-  at x 112 when it is at its bed.
+- **The plume**: twin columns of grains rising out of the floor, a grain at the mouth and over it
+  a grain every 3 px up each column, leaning out as they rise and wavering from side to side, never
+  more than 8 px out, so that out of the hatch it stays over the hole; up to 32 px, carried up on
+  the out-breath and drawn back down on the in-breath (36 frames out, 8 held, 36 in, 12 at rest).
+  Out of the hatch while it sleeps there; through the bed block's plain joint at x 112 when it is
+  at its bed.
 - **The puffs** of its clock: 3 or 4 grains rising and spreading for 14 frames, at the joint at
   x 80 at 40 frames, at the lip at 45.
 - **The sniff**, frames 0 to 4 of the snort: the plume over the hatch drawn down into it past his
   legs, faster each frame.
-- **The jet**, frames 5 to 8: two massed columns, out of the hole and up under his feet to the
-  ceiling.
+- **The jet**, frames 5 to 8: two massed columns, each 6 px wide with 2 px of clay between them,
+  out of the hole and up under his feet to the ceiling, inside the hatch's 16 px.
 - **The settling**, from frame 9: the jet's dust comes back down from under him over 22 frames and
   hangs over the hatch, until a slow in-breath draws a plume down and the snore starts again.
 
-The grains are 2 × 2, a pixel of clay between neighbours, in the plume, the puffs, the sniff and
-the settling; the jet is 1 px grains in a checker, massed.
+The grains are 2 × 2, a pixel of clay between any two, corners included, in the plume, the
+puffs, the sniff and the settling; where the sniff or the settling would bring two together, the
+later is not drawn. The jet is 1 px grains in a checker, massed.
 
 ## Where it stands in the game
 
@@ -64,5 +67,6 @@ hatch and no breath.
 
 ## Confidence
 
-Invented, said plainly. The grain size and the 1 px jet are chosen here: the plume's step up each
-column may widen from 2 px so that grains never touch; its height, twinning and place are pinned.
+Invented, said plainly. The grain size and the 1 px jet are chosen here; the plume's step up
+each column widened from 2 px to 3 so that grains never touch (2026-10-10, when it was drawn).
+Its height, twinning, place and spacing are pinned (`tests/minotaur-snort.spec.ts`).

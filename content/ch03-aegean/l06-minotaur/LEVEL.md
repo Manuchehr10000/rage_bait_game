@@ -127,12 +127,15 @@ Decided while building, and not objected to (2026-10-10):
   through.
 
 Chosen in the asset notes (2026-10-10), where this file did not decide, for the designer to see:
-- The tongues over the outside only, x 0 to 78 and y 56 to 64: on the first screen, and out of
-  his reach. Under the ground line, the masonry; the ground line is glaze between two reserved
-  rows, so no glaze foot touches it.
-- The masonry's courses three tiles high, its blocks still two tiles long: a longer block would
-  lose the bed's joint at x 112. Every room's ceiling is the last row of a course, so the pinned
-  holes keep their course line.
+- The tongues over the outside only, x 0 to 75 and y 56 to 64: on the first screen, and out of
+  his reach; they hang, with no line over them. Under the ground line, a plain band of the wash
+  with no joints, the outer face going on down beside it at x 80 (when the world was drawn,
+  2026-10-10: the notes first had the masonry there); the ground line is glaze between two
+  reserved rows, so no glaze foot touches it.
+- The masonry's blocks square, two tiles each way: a longer block would lose the bed's joint at
+  x 112. A line runs under any block over air, its whole length, so the two holes in each room,
+  one against each end wall, keep the same line. (When the world was drawn, 2026-10-10: the notes
+  first had courses three tiles high, and blocks 32 px long and 48 high read as planks.)
 - The queue a figure every 3 px, each drawn over the one ahead so that every face is whole, its
   front at about x 42; Ariadne moved to about x 45 to 55 (beat a).
 - A 1 px line of reserved clay round the tourist wherever glaze is behind him, never on the
@@ -770,11 +773,19 @@ Being built, in this order, as a stage in the dev build (`#minotaur`, in `STAGES
   which opens the exit. Made 2026-10-09 (`tests/minotaur-out.spec.ts`), with the masonry's joints
   drawn only where two stones meet, so the two holes in each room are pixel-identical.
 
+- **The world, drawn by rule, and the door storey as a vase panel** (2026-10-10, to the asset
+  notes): the palette; clay to the screen's edges, the tongues over the outside (a decor,
+  `tongues`), the ground line and the band under it; the masonry and the outer face by rule,
+  with the clay round the vestibule's black; the hero's doorway framed; the lip; the knob; the
+  ball; the thread's states drawn by hand; the dust in grains (`Ear.dust`, each grain with its
+  size); and the tourist's reserve, a pixel of clay round him wherever glaze is behind him, his
+  deaths included, never inside the hero's doorway before L−8.
+
 Still to come:
 
-- **The black-figure art**: the palette, the four deaths' drawings, and the queue, Ariadne and the
-  body as background figures, drawn to their asset notes, written 2026-10-10 in the beat folders and
-  `../shared`. Everything above is drawn rough.
+- **The black-figure figures**: the four deaths' drawings, Theseus's poses, the bull, and the
+  queue, Ariadne and the body as background figures, drawn to their asset notes in the beat
+  folders and `../shared`. They are drawn rough.
   (`LevelData.tricks`, 'The knot', 'The snort', 'The hands', 'The horns', and `dropCause` and
   `fallCause` 'The labyrinth', unreachable, are made.)
 

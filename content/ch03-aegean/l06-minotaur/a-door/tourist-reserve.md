@@ -17,9 +17,11 @@ where something of glaze is behind him. It is how the vase painters cut one figu
 
 Round whatever frame of him is drawn, his deaths included, clipped to the boxes of the glaze
 behind him: the vestibule; the hero's doorway, from L−8 only; Theseus; the queue and Ariadne; the
-bull, its hands and its heap; the tableau's Theseus and body; the knob on the passage's wall. On
-the clay and on the masonry's wash nothing is drawn: there it would be a halo. Pasted on the
-ceiling by the snort he needs none.
+bull, its hands and its heap; the tableau's Theseus and body; the knob on the passage's wall.
+Never on a tile of stone or on the doorpost, so it never notches the masonry. On the clay it is
+clay and does not show; on the stone nothing is drawn. Pasted on the ceiling by the snort he
+needs none. Whatever lies behind him in those boxes is cut by it as the glaze is: the white of
+the thread too, a pixel each side of him.
 
 ## Must be right
 

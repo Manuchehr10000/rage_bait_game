@@ -4,23 +4,23 @@
 |---|---|
 | Id | `labyrinth-tongues` |
 | File | None, and none is wanted: drawn in code at 1 world px (`../LEVEL.md`, Art, ruled 2026-10-10) |
-| Size | 80 × 9 world px, 1 frame, its top-left at (0, 56) |
+| Size | 76 × 9 world px, 1 frame, its top-left at (0, 56) |
 | Beat | `a-door` |
 
 ## What it is
 
-A band of tongues, alternately black glaze and added red, hanging from a glaze line, as on the
+A band of tongues, alternately black glaze and added red, hanging over the outside as on the
 shoulder of an amphora over its figure panel. With the ground line under the figures, it frames
 the first screen as the panel: a tourist in full colour walking into a museum vase.
 
-- A 1 px glaze line along y 56, from x 0 to 78.
-- A row of clay at y 57.
-- Sixteen tongues from y 58 to 64, each 4 px wide with a pixel of clay between, x 0 to 78, the
-  first (x 0 to 3) glaze and then alternately red and glaze. Each is rounded at its foot: its
-  last row 2 px wide.
+- Eleven tongues from y 56 to 64, each 6 px wide with a pixel of clay between, x 0 to 75, the
+  first (x 0 to 5) glaze and then alternately red and glaze. x 76 to 79 is clay, so that the band
+  never comes near the outer face's contour at x 80.
+- Each hangs: straight sides for seven rows, then its foot rounded over two, 4 px and then 2.
+  Nothing over them: no line, no bar, no flat top across the band to read as a ledge; the band's
+  top is the tongues' own tops, a pixel of clay between each.
 - A red tongue is added red over the glaze, as on the vases: red (`#93321f`) inside a 1 px glaze
-  contour.
-- x 79 is clay, so that the band never touches the outer face's contour at x 80.
+  contour down its sides and round its foot, open at its top.
 
 ## Where it stands in the game
 
@@ -31,10 +31,11 @@ its death counter lies over the band's left end, as it lies over the top left of
 
 ## Must be right
 
-- **Out of his reach** (ruled 2026-10-10). Nothing of him rises above y 68.2 (a full jump from
-  the back of the kneeling hero, his box's top at 146) or y 82.2 from the floor, so a band whose
-  foot is at y 64 can never be touched, and is never a ledge to try. It is not solid.
-- **The outside only**, x 0 to 78. Never over the labyrinth: over the vestibule and the passage it
+- **Out of his reach, and never a ledge** (ruled 2026-10-10). Nothing of him rises above y 68.2
+  (a full jump from the back of the kneeling hero, his box's top at 146) or y 82.2 from the
+  floor, so a band whose foot is at y 64 can never be touched. It is not solid, and nothing about
+  it says it is: tongues hang, with no line or flat top over them.
+- **The outside only**, x 0 to 75. Never over the labyrinth: over the vestibule and the passage it
   would lie on the section's stone, and in G0 a man standing on its floor has his head at y 64.
 - **Tongues, never a meander.** The meander is the labyrinth on the reverse of the Knossian
   staters (the research), and the labyrinth is never Knossos (`../../CHAPTER.md`, error dossier).
@@ -62,4 +63,8 @@ its death counter lies over the band's left end, as it lies over the top left of
 
 The layout: at search-extract level, from records not opened. No vase was looked at (designer's
 ruling, 2026-10-10). **Not verified:** the tongues' shape and proportions on any particular vase;
-the number, width and length here are the game's.
+the number, width and length here are the game's. This note first gave sixteen tongues 4 px
+wide hanging from a glaze line. When the band was drawn (2026-10-10) the line went, for the
+stage's direction that the tongues hang with no flat top (a thin line over clay is the shape of
+a ledge he might jump to); drawn 4 px wide, the tongues read as a row of pills, so they were
+made 6 px wide, their feet rounded over two rows.

@@ -11,7 +11,7 @@
     },
     {
       "id": "labyrinth-tongues",
-      "w": 80,
+      "w": 76,
       "h": 9,
       "beat": "a-door",
       "what": "A band of black and red tongues over the outside, out of his reach: the shoulder of the amphora whose panel the first screen is."
@@ -26,16 +26,16 @@
     {
       "id": "labyrinth-lower-zone",
       "w": 80,
-      "h": 48,
+      "h": 32,
       "beat": "a-door",
-      "what": "What lies under the ground line outside: the labyrinth's own masonry, by its rule. No earth, no turf, no rays, no black band."
+      "what": "The band under the ground line outside: the masonry's wash, plain, with no joints, to its course line, the outer face beside it at x 80. Distinct from the labyrinth's masonry; no earth, no turf, no rays, no black band."
     },
     {
       "id": "labyrinth-face",
       "w": 240,
-      "h": 64,
+      "h": 176,
       "beat": "a-door",
-      "what": "The labyrinth's outer face: a glaze contour down the wall over the door and along the top of the roof, and the door's lintel, so that outside and inside are told apart by the wall alone."
+      "what": "The labyrinth's outer face: a glaze contour down the wall over the door, along the top of the roof and down beside the band under the ground line, and the door's lintel, so that outside and inside are told apart by the wall alone."
     },
     {
       "id": "labyrinth-doorpost",
@@ -56,7 +56,7 @@
       "w": 16,
       "h": 16,
       "beat": "a-door",
-      "what": "The labyrinth's masonry, by rule: a dilute-glaze wash in courses three tiles high, blocks two tiles long, a full-glaze line at each course's foot and a joint only where two stones meet. Every solid tile in the level but the lip."
+      "what": "The labyrinth's masonry, by rule: a dilute-glaze wash in square blocks two tiles each way, a full-glaze line at each course's foot and under any block over air, and a joint only where two stones meet. Every solid tile in the level but the lip."
     },
     {
       "id": "tile-labyrinth-top",
@@ -119,8 +119,8 @@
     },
     {
       "id": "boss",
-      "w": 9,
-      "h": 8,
+      "w": 5,
+      "h": 4,
       "beat": "b-passage",
       "what": "The knob on the passage's back wall that the hero's trailing foot pushes off as he mantles up O1: a glaze contour on the clay, reserved inside. Background, never rock."
     },

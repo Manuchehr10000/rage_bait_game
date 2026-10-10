@@ -50,7 +50,7 @@ import { paint } from '../engine/assets';
 import { blit, blitFacing, frameOf, relief, silhouette, withLamp, type Frame, type ReliefTones } from './frame';
 import { SPLINTER, handStencils } from './hands';
 import { hash } from './hash';
-import { breathHeight, BULL_HEAD, HERO, heroHand, PERSIAN_COLUMN, PLUME, snortBody, TRAIN, type Train } from '../engine/entities';
+import { breathHeight, BULL_HEAD, HERO, heroHand, PERSIAN_COLUMN, PLUME, snortBody, TRAIN, type Dot, type Train } from '../engine/entities';
 import type { CavePanel } from '../engine/level';
 import { BEAR_STALAGMITE_SPRITE, SIGNAL_LAMP_SPRITE, STOP_SIGN_SPRITE, TRAIN_CAR_SPRITE, TRAIN_ENGINE_SPRITE, TRAIN_LAST_CAR_SPRITE } from './procedural';
 import {
@@ -261,7 +261,7 @@ export function renderWorld(ctx: CanvasRenderingContext2D, s: Scene): void {
   if (theme === 'dendera') drawDenderaSky(ctx, s, cy);
   else if (theme === 'knossos') drawKnossosSky(ctx, cy);
   else if (theme === 'persepolis') drawPersepolisSky(ctx, cy);
-  else if (theme === 'minotaur') drawMinotaurSky(ctx);
+  else if (theme === 'minotaur') drawMinotaurClay(ctx);
   else drawSky(ctx, cy, theme);
   if (theme === 'capBlanc') drawFarBeune(ctx, cx, cy);
   else if (theme === 'rocAuxSorciers') drawFarAnglin(ctx, cx, cy);
@@ -278,7 +278,7 @@ export function renderWorld(ctx: CanvasRenderingContext2D, s: Scene): void {
 
   if (theme === 'abuSimbel') drawRock(ctx, s, cx, cy);
   else if (theme === 'philae') drawRiverbed(ctx, s, cx, cy);
-  else if (theme === 'minotaur') drawLabyrinthAir(ctx, s);
+  else if (theme === 'minotaur') drawVestibule(ctx);
   else if (theme !== 'dendera' && theme !== 'knossos' && theme !== 'persepolis') drawKarnakGround(ctx, s, cx, cy);
   for (const d of level.data.decor) drawDecor(ctx, s, d);
   drawTiles(ctx, level, cx, cy);
@@ -287,6 +287,7 @@ export function renderWorld(ctx: CanvasRenderingContext2D, s: Scene): void {
   for (const e of s.entities) drawEntityFront(ctx, s, e);
   drawCoins(ctx, s);
   if (level.data.exit && !level.data.exitHidden) drawExit(ctx, level.data.exit);
+  if (theme === 'minotaur' && (!s.death || DEATH_ANIM[s.death.cause] !== 'crush')) drawTouristReserve(ctx, s);
   if (!s.death) drawPlayer(ctx, s.player, level.data.costume, lampLit(s));
   else if (DEATH_ANIM[s.death.cause] !== 'crush') drawDeath(ctx, s, s.death);
   for (const e of s.entities) drawEntityOverlay(ctx, s, e);
@@ -1503,6 +1504,7 @@ function drawDecor(ctx: CanvasRenderingContext2D, s: Scene, d: DecorDef): void {
     case 'doorpost':
     case 'boss':
     case 'blackDoorway':
+    case 'tongues':
     case 'queue':
     case 'ariadne':
       drawMinotaurDecor(ctx, d);
@@ -1653,7 +1655,7 @@ function drawTileAt(
     return;
   }
   if (theme === 'minotaur' && (c === '#' || c === '%')) {
-    drawMasonry(ctx, tx, ty, x, y, open, level.isSolid(tx - 1, ty));
+    drawMasonry(ctx, level, tx, ty, x, y);
     return;
   }
   if (c === '=') {
@@ -4539,29 +4541,27 @@ function drawCarved(ctx: CanvasRenderingContext2D, s: Scene, death: { cause: Dea
 }
 
 // ---------------------------------------------------------------------------
-// The Minotaur: the labyrinth in section, rough. Black-figure on orange clay, as on
-// the Attic vases (its LEVEL.md, Art): clay air, the masonry a dilute-glaze wash with
-// full-glaze courses, black glaze only for the vestibule. Outside the door, the sky.
+// The Minotaur: the labyrinth in section, drawn as a vase (its LEVEL.md, Art, and the
+// notes in its beat folders). Flat, unlit pixel art at 1 world px: black-figure on orange
+// clay, clay to the edges of the screen; the masonry a dilute-glaze wash with full-glaze
+// course lines, laid by rule; black glaze for the vestibule and the hero's doorway. Two
+// glaze shapes never touch without a pixel of clay between them.
 // ---------------------------------------------------------------------------
 
 const MN = {
-  /** The open sky outside the door, over the clay. */
-  skyTop: '#efd2a6',
-  skyBottom: '#e3b47c',
-  /** The clay: the air inside the labyrinth. */
+  /** The clay: the vase's ground, which is the air, outside the door and in. Reserved lines are it. */
   clay: '#c8743d',
-  /** Dilute glaze, the masonry's wash, and the full glaze of its courses. */
+  /** Dilute glaze, the masonry's wash, and the full glaze of its lines, the people and the dark. */
   wash: '#7b4527',
-  washLight: '#8d5330',
   glaze: '#1f140e',
-  /** The dressed threshold: the one fine stone, paler and smoother than the masonry. */
+  /** The dressed threshold: the one fine stone, paler than the masonry; its worn hollows paler still. */
   dressed: '#a8693e',
-  dressedLight: '#c48552',
+  dressedWorn: '#c48552',
   /** Dust, breathed out of the floor. Never the thread's white. */
   dust: '#ecc999',
-  /** The women's flesh: cream, as the vase painters' added white, and never the thread's white. */
+  /** Added white, cream: the women's flesh and the bull's stones, never the thread's white. */
   cream: '#f1dfb9',
-  /** Added red, only on fillets and garment borders. */
+  /** Added red, only on fillets, garment borders and the tongues' band. */
   red: '#93321f',
 };
 
@@ -4570,75 +4570,129 @@ const LABYRINTH_FACE = 80;
 const LABYRINTH_DOOR_FLOOR = 160;
 /** The vestibule behind the door, in black glaze, from the door's lintel to its floor. */
 const VESTIBULE: Rect = { x: 96, y: 80, w: 32, h: 80 };
+/**
+ * The pixel of clay the stone keeps round the vestibule's black, over it and beside it,
+ * so that no line of the masonry touches it; the floor under it keeps its wash.
+ */
+const VESTIBULE_RESERVE: Rect = { x: VESTIBULE.x - 1, y: VESTIBULE.y - 1, w: VESTIBULE.w + 2, h: VESTIBULE.h + 1 };
+/** The masonry's courses, in tiles: two tiles high, counted from the level's top; its blocks are as long. */
+const LABYRINTH_COURSE = 2;
+/** Outside the door: the open clay over the roof, and in front of the outer face down to the ground. */
+const outsideAir = (tx: number, ty: number) => ty < 1 || (tx * TILE < LABYRINTH_FACE && ty * TILE < LABYRINTH_DOOR_FLOOR);
+/** The zone under the ground line outside: the stone of the door storey's floor course, in front of the outer face. */
+const lowerZone = (tx: number, ty: number) => tx * TILE < LABYRINTH_FACE && ty * TILE >= LABYRINTH_DOOR_FLOOR && Math.floor(ty / LABYRINTH_COURSE) === Math.floor(LABYRINTH_DOOR_FLOOR / TILE / LABYRINTH_COURSE);
 
-function drawMinotaurSky(ctx: CanvasRenderingContext2D): void {
-  const bands = 6;
-  for (let i = 0; i < bands; i++) {
-    ctx.fillStyle = mix(MN.skyTop, MN.skyBottom, i / (bands - 1));
-    ctx.fillRect(0, (i * VIEW_H) / bands, VIEW_W, VIEW_H / bands + 1);
-  }
+/** The vase's ground, flat clay to the edges of the screen: no sky, no light, no grain. */
+function drawMinotaurClay(ctx: CanvasRenderingContext2D): void {
+  ctx.fillStyle = MN.clay;
+  ctx.fillRect(0, 0, VIEW_W, VIEW_H);
 }
 
-/**
- * The air inside the labyrinth, in clay: everything behind its outer face and under
- * the floor outside, but the sky over its roof. The vestibule in black glaze.
- */
-function drawLabyrinthAir(ctx: CanvasRenderingContext2D, s: Scene): void {
-  const { widthPx, heightPx } = s.level;
-  ctx.fillStyle = MN.clay;
-  ctx.fillRect(LABYRINTH_FACE, TILE, widthPx - LABYRINTH_FACE, heightPx - TILE);
-  ctx.fillRect(0, LABYRINTH_DOOR_FLOOR, LABYRINTH_FACE, heightPx - LABYRINTH_DOOR_FLOOR);
+/** The vestibule, in black glaze: the dark behind the door. */
+function drawVestibule(ctx: CanvasRenderingContext2D): void {
   ctx.fillStyle = MN.glaze;
   ctx.fillRect(VESTIBULE.x, VESTIBULE.y, VESTIBULE.w, VESTIBULE.h);
 }
 
 /**
- * A tile of the labyrinth's masonry: a wash with a full-glaze course under it. Its blocks
- * are two tiles long, each course's joints half a block along from the one under it, so
- * every joint is a tile's edge: on the last corridor's floor, x 80, 112, 144 and 176.
- * Every block is the same, joints and all; none is cracked. `stoneLeft`: the tile to its
- * left is stone too, so that there is a joint between them to draw.
+ * A tile of the labyrinth's masonry, by rule, so that identical places are identical by
+ * construction (content/ch03-aegean/l06-minotaur/a-door/tile-labyrinth.md). The wash all
+ * over, and square blocks two tiles each way, each course's joints half a block along from
+ * the next: on the last corridor's floor the joints fall at x 80, 112, 144 and 176. A
+ * glaze line along the foot of each course; along the underside of any block over air,
+ * the whole block's length, so that a ceiling's line runs on over the wall to the block's
+ * end and the two holes of each of Daedalus's rooms, one against each end wall, carry the
+ * same line; and a joint only where two stones meet and, under air, from a pixel down, so
+ * a floor's top is wash from end to end. No lit top, no grain, no crack.
+ *
+ * Where the stone meets the outside's clay it has a glaze contour, the outer face: down
+ * the wall over the door, and along the roof. Under the ground line outside it is the
+ * lower zone, the panel's band: the wash and its course line, no joints, the ground line
+ * over it, glaze between two reserved rows, and the outer face going on down beside it.
+ * Round the vestibule's black the stone keeps a pixel of clay.
  */
-function drawMasonry(ctx: CanvasRenderingContext2D, tx: number, ty: number, x: number, y: number, open: boolean, stoneLeft: boolean): void {
+function drawMasonry(ctx: CanvasRenderingContext2D, level: Level, tx: number, ty: number, x: number, y: number): void {
+  const stone = (i: number, j: number) => level.isSolid(i, j);
+  // Under the level and beside it is stone: no line is drawn along its edges.
+  const under = (i: number, j: number) => j >= level.heightTiles || i < 0 || i >= level.widthTiles || level.isSolid(i, j);
+  const airAbove = !stone(tx, ty - 1);
+  const course = Math.floor(ty / LABYRINTH_COURSE);
+  // The block this tile is half of: it starts here where the course's joints fall.
+  const starts = (tx + course) % 2 === 1;
+  const mate = starts ? tx + 1 : tx - 1;
   ctx.fillStyle = MN.wash;
   ctx.fillRect(x, y, TILE, TILE);
-  if (open) {
-    ctx.fillStyle = MN.washLight;
-    ctx.fillRect(x, y, TILE, 2);
-  }
   ctx.fillStyle = MN.glaze;
-  ctx.fillRect(x, y + TILE - 1, TILE, 1);
+  if (ty % LABYRINTH_COURSE === LABYRINTH_COURSE - 1 || !under(tx, ty + 1) || !under(mate, ty + 1)) ctx.fillRect(x, y + TILE - 1, TILE, 1);
+  if (lowerZone(tx, ty)) {
+    if (airAbove) {
+      // The ground line the figures outside stand on, a pixel under their feet.
+      ctx.fillRect(x, y + 1, TILE, 1);
+      ctx.fillStyle = MN.clay;
+      ctx.fillRect(x, y, TILE, 1);
+      ctx.fillRect(x, y + 2, TILE, 1);
+    }
+    return;
+  }
+  // The outer face where the stone meets the outside: along the roof, and down the wall.
+  if (airAbove && outsideAir(tx, ty - 1)) ctx.fillRect(x, y, TILE, 1);
+  if (!stone(tx - 1, ty) && outsideAir(tx - 1, ty)) ctx.fillRect(x, y, 1, TILE);
+  // Going on down past the threshold, beside the lower zone, to its course line.
+  if (lowerZone(tx - 1, ty)) {
+    const from = stone(tx - 1, ty - 1) ? 0 : 3;
+    ctx.fillRect(x, y + from, 1, TILE - from);
+  }
   // A joint is where two stones meet: where the stone ends on air there is none, so a
   // hole's two jambs are alike whichever course it is cut through.
-  if ((tx + ty) % 2 === 1 && stoneLeft) ctx.fillRect(x, y, 1, TILE - 1);
+  else if (starts && stone(tx - 1, ty)) {
+    const from = airAbove ? 1 : 0;
+    ctx.fillRect(x, y + from, 1, TILE - from);
+  }
+  // A pixel of clay between the stone and the vestibule's black, its lines included.
+  const r = VESTIBULE_RESERVE;
+  const x0 = Math.max(x, r.x);
+  const y0 = Math.max(y, r.y);
+  const x1 = Math.min(x + TILE, r.x + r.w);
+  const y1 = Math.min(y + TILE, r.y + r.h);
+  if (x1 > x0 && y1 > y0) {
+    ctx.fillStyle = MN.clay;
+    ctx.fillRect(x0, y0, x1 - x0, y1 - y0);
+  }
 }
 
 /**
- * The dressed threshold before the hatch, the only fine stone in the floor: smooth and
- * pale, no course line, a fine arris along its top, and its top dished by two worn foot
- * hollows where the tribute stood before it went in.
+ * The dressed threshold before the hatch, the lip: the only fine stone in the floor, one
+ * smooth block, not coursed, in the dressed stone's tone, edged in a glaze contour. Its
+ * top is dished by two worn foot hollows, 5 px wide and 2 deep, where the tribute stood
+ * before it went in: the contour dips into each, the air in the dip is clay, and the
+ * stone under the dip is worn paler, so that they read as worn stone and never as holes.
+ * Its edge at the hatch is cut square; along its underside the contour is where the
+ * stone ends. Its right side is the next block's joint. No crack. Buried, which it never
+ * is, it would be the same stone with no hollows and no contour along its top.
  */
 function drawThreshold(ctx: CanvasRenderingContext2D, x: number, y: number, open: boolean): void {
   ctx.fillStyle = MN.dressed;
   ctx.fillRect(x, y, TILE, TILE);
   ctx.fillStyle = MN.glaze;
   ctx.fillRect(x, y + TILE - 1, TILE, 1);
+  ctx.fillRect(x, y, 1, TILE);
   if (!open) return;
-  ctx.fillStyle = MN.dressedLight;
   ctx.fillRect(x, y, TILE, 1);
-  // The two hollows, dished into the top, their floors in the arris's light.
   for (const h of [2, 9]) {
+    // The dip: clay where the stone is worn away, the contour following it down, and
+    // the worn stone under the contour.
     ctx.fillStyle = MN.clay;
     ctx.fillRect(x + h, y, 5, 1);
     ctx.fillRect(x + h + 1, y + 1, 3, 1);
-    ctx.fillStyle = MN.dressedLight;
+    ctx.fillStyle = MN.glaze;
     ctx.fillRect(x + h, y + 1, 1, 1);
     ctx.fillRect(x + h + 4, y + 1, 1, 1);
     ctx.fillRect(x + h + 1, y + 2, 3, 1);
+    ctx.fillStyle = MN.dressedWorn;
+    ctx.fillRect(x + h + 1, y + 3, 3, 1);
+    ctx.fillRect(x + h, y + 2, 1, 1);
+    ctx.fillRect(x + h + 4, y + 2, 1, 1);
   }
-  // Its edge at the hatch, cut square.
-  ctx.fillStyle = MN.glaze;
-  ctx.fillRect(x, y + 1, 1, TILE - 2);
 }
 
 /** The thread: the one pure white in the level. */
@@ -4695,21 +4749,30 @@ function drawMinotaurDecor(ctx: CanvasRenderingContext2D, d: MinotaurDecor): voi
       ctx.fillRect(d.x + 3, d.top, 1, d.floorY - d.top);
       break;
     case 'boss': {
+      // A knob on the far wall, drawn as the vase painter draws a thing on the ground: a
+      // round glaze contour, its inside reserved clay. Never the wash, which in the section
+      // is rock he would walk through; no flat top; its top a row under the sole that
+      // pushes off it.
       const r = d.rect;
+      const x = r.x + Math.floor((r.w - KNOB[0]!.length) / 2);
       ctx.fillStyle = MN.glaze;
-      ctx.fillRect(r.x + 1, r.y, r.w - 2, r.h);
-      ctx.fillRect(r.x, r.y + 1, r.w, r.h - 2);
-      ctx.fillStyle = MN.wash;
-      ctx.fillRect(r.x + 1, r.y + 1, r.w - 2, r.h - 2);
-      ctx.fillStyle = MN.washLight;
-      ctx.fillRect(r.x + 2, r.y + 1, r.w - 4, 2);
+      KNOB.forEach((row, i) => {
+        for (let j = 0; j < row.length; j++) if (row[j] === '#') ctx.fillRect(x + j, r.y + 1 + i, 1, 1);
+      });
       break;
     }
     case 'blackDoorway':
+      // An opening in full glaze on the back wall, framed by the vase painter's line with a
+      // pixel of clay between: a line, never a lintel to stand on.
+      ctx.fillStyle = MN.glaze;
+      ctx.fillRect(d.x - 2, d.top - 2, d.w + 4, d.floorY - d.top + 2);
+      ctx.fillStyle = MN.clay;
+      ctx.fillRect(d.x - 1, d.top - 1, d.w + 2, d.floorY - d.top + 1);
       ctx.fillStyle = MN.glaze;
       ctx.fillRect(d.x, d.top, d.w, d.floorY - d.top);
-      ctx.fillStyle = MN.wash;
-      ctx.fillRect(d.x - 2, d.top - 2, d.w + 4, 2);
+      break;
+    case 'tongues':
+      drawTongues(ctx, d.x0, d.x1, d.y);
       break;
     case 'queue': {
       // Back to front, each over the one behind it, cut from it by a reserved line of clay
@@ -4727,7 +4790,35 @@ function drawMinotaurDecor(ctx: CanvasRenderingContext2D, d: MinotaurDecor): voi
   }
 }
 
-type MinotaurDecor = Extract<DecorDef, { kind: 'doorpost' | 'boss' | 'blackDoorway' | 'queue' | 'ariadne' }>;
+type MinotaurDecor = Extract<DecorDef, { kind: 'doorpost' | 'boss' | 'blackDoorway' | 'tongues' | 'queue' | 'ariadne' }>;
+
+/** The knob on the passage's far wall, a row at a time: its glaze contour, reserved clay inside, its top 3 px. */
+const KNOB = ['.###.', '#...#', '#...#', '.###.'];
+
+/** How wide each tongue is, with the pixel of clay after it; how long, its foot included. */
+const TONGUE = { w: 6, step: 7, h: 9 } as const;
+
+/**
+ * The band of tongues over the door storey, the amphora's shoulder over its panel: from
+ * x `x0` to `x1`, hanging from y `y`, alternately black glaze and added red, the first
+ * black. Each hangs, its foot rounded, with nothing over it: no line, no bar, no flat top
+ * to stand on. A red tongue is red inside a pixel of glaze, as added red lies on the
+ * glaze. Every black tongue is the same, and every red one.
+ */
+function drawTongues(ctx: CanvasRenderingContext2D, x0: number, x1: number, y: number): void {
+  const { w, step, h } = TONGUE;
+  for (let i = 0, x = x0; x + w - 1 <= x1; i++, x += step) {
+    ctx.fillStyle = MN.glaze;
+    ctx.fillRect(x, y, w, h - 2);
+    ctx.fillRect(x + 1, y + h - 2, w - 2, 1);
+    ctx.fillRect(x + 2, y + h - 1, w - 4, 1);
+    if (i % 2 === 1) {
+      ctx.fillStyle = MN.red;
+      ctx.fillRect(x + 1, y, w - 2, h - 3);
+      ctx.fillRect(x + 2, y + h - 3, w - 4, 1);
+    }
+  }
+}
 
 /** Who stands at the door: a youth, a maiden, and Ariadne. */
 type VaseWho = 'youth' | 'maiden' | 'ariadne';
@@ -5098,68 +5189,133 @@ function drawHeroAtThePost(ctx: CanvasRenderingContext2D, h: Hero): void {
   pixelLine(ctx, x + 8 - slant, y + 9, d.knot.x + 1, d.knot.y + 1);
 }
 
-/** The line from the knot to the ball, before he takes it: slack, coming taut, taut, let go. */
+/**
+ * The slack, drawn by hand: from the knot it hangs down to the passage floor, then lies
+ * along the floor's last row of air to the ball in long flat runs and a few low curves,
+ * 1 or 2 px off it, stepped by single pixels on the slant, and comes out of the ball's
+ * side. As [px along from the knot, px over the floor] at each point where it bends,
+ * straight between them; the hang is its first four.
+ */
+const SLACK: readonly (readonly [number, number])[] = [
+  [2, 8],
+  [3, 4],
+  [4, 1],
+  [6, 0],
+  [18, 0],
+  [22, 1],
+  [26, 2],
+  [38, 2],
+  [42, 1],
+  [46, 0],
+  [66, 0],
+  [70, 1],
+  [84, 1],
+  [88, 0],
+  [100, 0],
+  [104, 1],
+  [108, 2],
+  [114, 2],
+  [118, 1],
+  [122, 0],
+  [125, 0],
+  [128, 3],
+];
+/** How far along from the knot the slack's hang ends and it lies on the floor. */
+const SLACK_HANG = 6;
+
+/** The slack's height over the floor `dx` px along from the knot, between the points it bends at. */
+function slackAt(dx: number): number {
+  for (let i = 1; i < SLACK.length; i++) {
+    const [x1, h1] = SLACK[i]!;
+    if (dx > x1) continue;
+    const [x0, h0] = SLACK[i - 1]!;
+    return h0 + ((h1 - h0) * (dx - x0)) / (x1 - x0);
+  }
+  return SLACK[SLACK.length - 1]![1];
+}
+
+/** A 1 px line through each column's y in turn, from x `x0`: every pixel joined to the one before. */
+function pixelRun(ctx: CanvasRenderingContext2D, x0: number, ys: readonly number[]): void {
+  for (let i = 0; i < ys.length; i++) {
+    const y = Math.round(ys[i]!);
+    if (i === 0) ctx.fillRect(x0, y, 1, 1);
+    else pixelLine(ctx, x0 + i - 1, Math.round(ys[i - 1]!), x0 + i, y);
+  }
+}
+
+/**
+ * The line from the knot to the ball, before he takes it. Slack, as it lies; rising, the
+ * 20 frames of his lean, each point of it coming up toward the shin's row slowly and then
+ * fast, its curves flattening as it rises; taut, the 22 frames he holds it, a straight row
+ * at y 149 from the post to x 208, where it kills, and down into the ball's top; let go,
+ * 4 frames, dropping back to the floor straight; and then lying straight along it.
+ */
 function drawKnotLine(ctx: CanvasRenderingContext2D, h: Hero): void {
   const d = h.def;
   const floor = d.ball.y - 1;
-  const x0 = d.knot.x + 4;
+  const x0 = d.knot.x + 2;
   const x1 = d.ball.x;
-  ctx.fillStyle = THREAD;
-  // How taut: 0 lying in loose curves, 1 at shin height.
+  // How far up: 0 lying, 1 at the shin's row; and how flat its curves have gone.
   let u = 0;
-  let curve = 1;
+  let flat = 0;
   if (h.state === 'up') {
     if (h.k < 0) {
       const k = (h.k + d.lean) / d.lean;
       u = k * k;
-      curve = 1 - k;
+      flat = k;
     } else if (h.taut) {
       u = 1;
-      curve = 0;
+      flat = 1;
     } else {
-      // Let go: it drops back to the floor, straight.
       u = Math.max(0, 1 - (h.k - d.hold) / 4);
-      curve = 0;
+      flat = 1;
     }
   }
   const taut = d.line.y;
-  const yAt = (x: number) => {
-    const slack = floor - 1 + Math.sin((x - x0) / 6) * 1.5 * curve;
-    return slack + (taut - slack) * u;
-  };
-  pixelLine(ctx, d.knot.x, d.knot.y, x0, yAt(x0));
-  let px = x0;
-  let py = yAt(x0);
-  for (let x = x0 + 2; x <= x1; x += 2) {
-    const y = yAt(x);
-    pixelLine(ctx, px, py, x, y);
-    px = x;
-    py = y;
+  const ys: number[] = [];
+  for (let x = x0; x <= x1; x++) {
+    const dx = x - d.knot.x;
+    const lying = slackAt(dx);
+    const y = floor - (dx < SLACK_HANG ? lying : lying * (1 - flat));
+    ys.push(y + (taut - y) * u);
   }
-  pixelLine(ctx, px, py, x1 + 2, d.ball.y - 6);
+  ctx.fillStyle = THREAD;
+  pixelRun(ctx, x0, ys);
+  const end = Math.round(ys[ys.length - 1]!);
+  if (end < d.ball.y - 5) pixelLine(ctx, x1, end, x1, d.ball.y - 5);
 }
 
-/** The ball, wedged on the floor at the line's inner end: thread wound on itself. */
+/** The ball, wedged on the floor at the line's inner end: thread wound on itself, plain white, round, with no mark on it. */
 function drawBall(ctx: CanvasRenderingContext2D, x: number, floor: number): void {
   ctx.fillStyle = THREAD;
   ctx.fillRect(x + 1, floor - 6, 4, 6);
   ctx.fillRect(x, floor - 5, 6, 4);
-  ctx.fillStyle = MN.glaze;
-  ctx.fillRect(x + 1, floor - 4, 4, 1);
-  ctx.fillRect(x + 2, floor - 2, 3, 1);
 }
 
-/** The thread he has laid: from the knot along the passage, up, along and down his route, to him. */
+/** A loop of thread lying on the floor, its bottom on the floor's last row of air at `y`: a flat oval, 9 by 3. */
+function drawLoop(ctx: CanvasRenderingContext2D, x: number, y: number): void {
+  ctx.fillRect(x - 3, y - 2, 7, 1);
+  ctx.fillRect(x - 4, y - 1, 1, 1);
+  ctx.fillRect(x + 4, y - 1, 1, 1);
+  ctx.fillRect(x - 3, y, 7, 1);
+}
+
+/**
+ * The thread he has laid: from the knot down to the passage floor as the slack hung, along
+ * the floor, then up, along and down his route, to him; over every edge down at 45 degrees
+ * to the line it lands on, so it never lies across a gap like a floor. The loops he paid
+ * out lie where he crouched.
+ */
 function drawLaidThread(ctx: CanvasRenderingContext2D, h: Hero, f: HeroFrame): void {
   const d = h.def;
   const t = h.track;
   const k = h.k;
   ctx.fillStyle = THREAD;
   const floor = d.ball.y - 1;
-  const pts: { x: number; y: number }[] = [
-    { x: d.knot.x, y: d.knot.y },
-    { x: d.knot.x + 4, y: floor },
-  ];
+  const pts: { x: number; y: number }[] = SLACK.slice(0, SLACK.findIndex(([dx]) => dx === SLACK_HANG) + 1).map(([dx, up]) => ({
+    x: d.knot.x + dx,
+    y: floor - up,
+  }));
   for (const p of t.thread) if (p.at <= k) pts.push(p);
   if (!f.unseen) {
     const hand = heroHand(f);
@@ -5169,8 +5325,7 @@ function drawLaidThread(ctx: CanvasRenderingContext2D, h: Hero, f: HeroFrame): v
     pts.push({ x: f.x + HERO.w / 2, y: f.y + HERO.h - 1 });
   }
   for (let i = 1; i < pts.length; i++) pixelLine(ctx, pts[i - 1]!.x, pts[i - 1]!.y, pts[i]!.x, pts[i]!.y);
-  // The loops he paid out, lying where he crouched.
-  for (const l of t.loops) if (k > l.to) pixelEllipse(ctx, l.x, l.y - 1, 4, 1);
+  for (const l of t.loops) if (k > l.to) drawLoop(ctx, Math.round(l.x), l.y);
 }
 
 /**
@@ -5236,10 +5391,10 @@ function drawTrip(ctx: CanvasRenderingContext2D, s: Scene, death: { cause: Death
   ctx.restore();
 }
 
-/** The beast's dust: dots, never a solid column. */
-function drawDust(ctx: CanvasRenderingContext2D, dots: readonly { x: number; y: number }[]): void {
+/** The beast's dust: grains, a pixel of clay between any two, never a line, a rope or a solid column. */
+function drawDust(ctx: CanvasRenderingContext2D, dots: readonly Dot[]): void {
   ctx.fillStyle = MN.dust;
-  for (const q of dots) ctx.fillRect(q.x, q.y, 1, 1);
+  for (const q of dots) ctx.fillRect(q.x, q.y, q.s, q.s);
 }
 
 /**
@@ -5264,7 +5419,7 @@ function drawSnorted(ctx: CanvasRenderingContext2D, s: Scene, death: { cause: De
 
 // ---------------------------------------------------------------------------
 // The Minotaur: the fight in its cell, rough. A bull's head on a man's body, in black
-// glaze; its two stones in the masonry's wash, outlined in glaze.
+// glaze; its two stones in cream, the vases' added white, outlined in glaze.
 // ---------------------------------------------------------------------------
 
 /** The bull's far hand clawing over its brow at the hero's hand on the horn, a loop of seven frames: from its head's top-left. */
@@ -5433,11 +5588,11 @@ function thickLine(ctx: CanvasRenderingContext2D, a: { x: number; y: number }, b
   for (let i = 0; i < w; i++) for (let j = 0; j < w; j++) pixelLine(ctx, a.x + i, a.y + j, b.x + i, b.y + j);
 }
 
-/** One of its stones: a flat block in the masonry's wash, outlined in glaze, its foot on the floor. */
+/** One of its stones: a flat block in cream, the vases' added white, outlined in glaze, its foot on the floor. */
 function drawBullStone(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number): void {
   ctx.fillStyle = MN.glaze;
   ctx.fillRect(Math.round(x), Math.round(y), w, h);
-  ctx.fillStyle = MN.washLight;
+  ctx.fillStyle = MN.cream;
   ctx.fillRect(Math.round(x) + 1, Math.round(y) + 1, w - 2, h - 1);
 }
 
@@ -5770,5 +5925,141 @@ function drawTableau(ctx: CanvasRenderingContext2D, t: Tableau): void {
   }
   ctx.restore();
   both(MN.glaze);
+  ctx.restore();
+}
+
+// ---------------------------------------------------------------------------
+// The Minotaur: the tourist's reserve.
+// ---------------------------------------------------------------------------
+
+/** Where two rects overlap, or null. */
+function overlap(a: Rect, b: Rect): Rect | null {
+  const x = Math.max(a.x, b.x);
+  const y = Math.max(a.y, b.y);
+  const w = Math.min(a.x + a.w, b.x + b.w) - x;
+  const h = Math.min(a.y + a.h, b.y + b.h) - y;
+  return w > 0 && h > 0 ? { x, y, w, h } : null;
+}
+
+/** What is left of `r` with `cut` taken out of it: up to four rects. */
+function without(r: Rect, cut: Rect): Rect[] {
+  const o = overlap(r, cut);
+  if (!o) return [r];
+  const out: Rect[] = [];
+  if (o.y > r.y) out.push({ x: r.x, y: r.y, w: r.w, h: o.y - r.y });
+  if (o.y + o.h < r.y + r.h) out.push({ x: r.x, y: o.y + o.h, w: r.w, h: r.y + r.h - o.y - o.h });
+  if (o.x > r.x) out.push({ x: r.x, y: o.y, w: o.x - r.x, h: o.h });
+  if (o.x + o.w < r.x + r.w) out.push({ x: o.x + o.w, y: o.y, w: r.x + r.w - o.x - o.w, h: o.h });
+  return out;
+}
+
+/**
+ * Where something of glaze may be behind the tourist this frame, as boxes: the vestibule;
+ * Theseus wherever he is seen; the queue and Ariadne; the knob; the bull in its cell, as
+ * it lurches and as a heap; the closing tableau; and the hero's doorway once he has
+ * stepped out of it, never before, so that he waits there unseen. Over the clay a box
+ * costs nothing: the reserve is clay.
+ */
+function glazeBehind(s: Scene): Rect[] {
+  const boxes: Rect[] = [{ ...VESTIBULE }];
+  let doorway: Rect | null = null;
+  for (const d of s.level.data.decor) {
+    if (d.kind === 'queue') {
+      const x = d.front - (d.maidens + d.youths - 1) * d.step - VASE_W - 1;
+      boxes.push({ x, y: d.floorY - HERO.h, w: d.front - x, h: HERO.h });
+    } else if (d.kind === 'ariadne') boxes.push({ x: d.x0, y: d.floorY - HERO.h, w: d.x1 - d.x0, h: HERO.h });
+    else if (d.kind === 'boss') boxes.push({ ...d.rect });
+    else if (d.kind === 'blackDoorway') doorway = { x: d.x - 2, y: d.top - 2, w: d.w + 4, h: d.floorY - d.top + 2 };
+  }
+  for (const e of s.entities) {
+    if (e.def.kind === 'hero') {
+      const h = e as Hero;
+      const f = h.frame;
+      if (!f || f.pose === 'hold') {
+        // At the post, kneeling or leaning back on the line, his hands at the knot.
+        const k = h.def.kneel;
+        boxes.push({ x: k.x - 6, y: k.y + k.h - HERO.h - 2, w: k.w + 12, h: HERO.h + 2 });
+      } else if (!f.unseen) boxes.push({ x: Math.round(f.x) - 8, y: Math.round(f.y) - 10, w: HERO.w + 16, h: HERO.h + 10 });
+      if (h.stepped && doorway) boxes.push(doorway);
+    } else if (e.def.kind === 'fight') {
+      const d = (e as Fight).def;
+      boxes.push({ x: d.toss.rect.x, y: d.floorY - 80, w: d.toss.rect.w, h: 80 });
+    } else if (e.def.kind === 'tableau') {
+      const t = e as Tableau;
+      const d = t.def;
+      if (t.begun) boxes.push({ x: Math.round(t.x) - 4, y: d.floorY - HERO.h - 2, w: d.body.head + d.body.w + 8, h: HERO.h + 2 });
+    }
+  }
+  return boxes;
+}
+
+/** A canvas the tourist is drawn into to take his shape for the reserve: the world canvas's size. */
+let reserveLayer: HTMLCanvasElement | null = null;
+
+/**
+ * The tourist's reserve (content/ch03-aegean/l06-minotaur/a-door/tourist-reserve.md): a
+ * pixel of clay round his top and sides, never under his feet, wherever something of
+ * glaze is behind him, as the vase painters cut one figure from the next. His shape is
+ * whatever is drawn of him this frame, his deaths included, set a pixel left, right and
+ * up in clay, and clipped to the glaze boxes: never on the stone or the post, so it never
+ * notches the masonry, and never on the costume, which is drawn over it.
+ */
+function drawTouristReserve(ctx: CanvasRenderingContext2D, s: Scene): void {
+  const p = s.player;
+  const cx = s.camera.ix;
+  const cy = s.camera.iy;
+  // Where he can be drawn and a pixel round it: his sprite, or, dying, anywhere in the view.
+  const him: Rect = s.death ? { x: cx, y: cy, w: VIEW_W, h: VIEW_H } : { x: Math.round(p.x) - 2, y: Math.round(p.y) - 1, w: 14, h: 17 };
+  const stone: Rect[] = [];
+  for (const d of s.level.data.decor) if (d.kind === 'doorpost') stone.push({ x: d.x, y: d.top, w: 4, h: d.floorY - d.top });
+  const clip: Rect[] = [];
+  for (const b of glazeBehind(s)) {
+    const r = overlap(b, him);
+    if (!r) continue;
+    for (let ty = Math.floor(r.y / TILE); ty * TILE < r.y + r.h; ty++) {
+      for (let tx = Math.floor(r.x / TILE); tx * TILE < r.x + r.w; tx++) {
+        if (s.level.isSolid(tx, ty)) continue;
+        const q = overlap(r, { x: tx * TILE, y: ty * TILE, w: TILE, h: TILE });
+        if (!q) continue;
+        let parts = [q];
+        for (const c of stone) parts = parts.flatMap((part) => without(part, c));
+        clip.push(...parts);
+      }
+    }
+  }
+  if (!clip.length) return;
+  // His shape in clay, drawn as he is drawn.
+  const t = ctx.getTransform();
+  if (!reserveLayer || reserveLayer.width !== ctx.canvas.width || reserveLayer.height !== ctx.canvas.height) {
+    reserveLayer = document.createElement('canvas');
+    reserveLayer.width = ctx.canvas.width;
+    reserveLayer.height = ctx.canvas.height;
+  }
+  const lctx = reserveLayer.getContext('2d');
+  if (!lctx) return;
+  lctx.save();
+  lctx.setTransform(t);
+  lctx.imageSmoothingEnabled = false;
+  lctx.clearRect(him.x, him.y, him.w, him.h);
+  if (s.death) drawDeath(lctx, s, s.death);
+  else drawPlayer(lctx, p, s.level.data.costume, lampLit(s));
+  lctx.globalCompositeOperation = 'source-in';
+  lctx.fillStyle = MN.clay;
+  lctx.fillRect(him.x, him.y, him.w, him.h);
+  lctx.restore();
+  // Set a pixel left, right and up, never down, where the glaze is.
+  ctx.save();
+  ctx.beginPath();
+  for (const r of clip) ctx.rect(r.x, r.y, r.w, r.h);
+  ctx.clip();
+  const sx = t.a * him.x + t.e;
+  const sy = t.d * him.y + t.f;
+  for (const [dx, dy] of [
+    [-1, 0],
+    [1, 0],
+    [0, -1],
+  ] as const) {
+    ctx.drawImage(reserveLayer, sx, sy, t.a * him.w, t.d * him.h, him.x + dx, him.y + dy, him.w, him.h);
+  }
   ctx.restore();
 }

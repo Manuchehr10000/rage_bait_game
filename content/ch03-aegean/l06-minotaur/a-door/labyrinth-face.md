@@ -4,7 +4,7 @@
 |---|---|
 | Id | `labyrinth-face` |
 | File | None, and none is wanted: drawn in code at 1 world px (`../LEVEL.md`, Art, ruled 2026-10-10) |
-| Size | 240 × 64 world px, 1 frame, its top-left at (80, 16): lines only |
+| Size | 240 × 176 world px, 1 frame, its top-left at (80, 16): lines only, down to y 191 |
 | Beat | `a-door` |
 
 ## What it is
@@ -17,6 +17,9 @@ contour where its stone meets the clay outside.
 - The door's lintel, which this drawing does not draw: the masonry's own underside line over the
   door opening (`tile-labyrinth`), 1 px of glaze along y 79 from x 80 to 94. From x 95 the
   stone's bottom row is reserved clay over the vestibule's black, which stops it there.
+- Under the threshold, down x 80 from y 163 to the course line at y 191, beside the band under
+  the ground line outside (`labyrinth-lower-zone`): the labyrinth's wall going on down into the
+  ground. It starts a row under the ground line's last clay row, so it never touches its glaze.
 
 The stone inside the contour is the masonry by its rule (`tile-labyrinth`). Under the lintel is
 the door opening, x 80 to 96: the post at its outer side (`labyrinth-doorpost`), then clay, then

@@ -1906,7 +1906,23 @@ export const SNORT = { sniff: 5, jet: 4, again: 40 } as const;
 /** How long a puff of dust rises before it is gone, in frames. */
 export const PUFF = 14;
 
-type Dot = { x: number; y: number };
+/**
+ * A grain of its dust: its top-left, and its size, `s` px square. Grains are GRAIN px, a
+ * pixel of clay between any two; only the jet's are 1 px, massed in a checker.
+ */
+export type Dot = { x: number; y: number; s: number };
+/** The size of a grain of its dust, in px. */
+export const GRAIN = 2;
+
+/** Whether two grains touch or overlap: closer than a pixel of clay, corners included. */
+const touching = (a: Dot, b: Dot) => a.x <= b.x + b.s && b.x <= a.x + a.s && a.y <= b.y + b.s && b.y <= a.y + a.s;
+
+/** The grains in order, each dropped if it would touch one kept before it. */
+function apart(dots: readonly Dot[]): Dot[] {
+  const kept: Dot[] = [];
+  for (const q of dots) if (!kept.some((k) => touching(k, q))) kept.push(q);
+  return kept;
+}
 
 /** How high its breath stands over the floor `b` frames into a breath: out, held, drawn back in, and none. */
 export function breathHeight(b: number): number {
@@ -1927,39 +1943,53 @@ export function breathFlow(b: number): { flow: number; inward: boolean } {
 }
 
 /**
+ * A grain `d` px out from `x` on `side`, its top `u` px over the floor: the two sides
+ * mirror each other about `x`.
+ */
+const grainAt = (x: number, floorY: number, side: number, d: number, u: number): Dot => ({
+  x: side > 0 ? x + d : x - d - GRAIN,
+  y: floorY - u,
+  s: GRAIN,
+});
+
+/**
  * The dust of one breath, `b` frames into it, rising out of the floor at `x` as twin
- * plumes: a dot every 2 px up each, leaning out as it rises, carried up on the out-breath
- * and back down on the in-breath. The same through the hatch and through a joint.
+ * plumes of grains: a grain at the mouth, and over it a grain every 3 px up each column to
+ * the breath's top, carried up on the out-breath and back down on the in-breath, leaning
+ * out as it rises and wavering from side to side, never more than 8 px out, so that out
+ * of the hatch it stays over the hole. The same through the hatch and through a joint.
  */
 export function plumeDots(x: number, floorY: number, b: number): Dot[] {
-  const h = breathHeight(b);
+  const top = Math.round(breathHeight(b));
   const dots: Dot[] = [];
-  if (h < 1) return dots;
+  if (top < GRAIN) return dots;
   // How far the dust has been carried: up while it breathes out, back down while it breathes in.
   const carried = b < BREATH.out + BREATH.hold ? Math.min(b, BREATH.out) : 2 * BREATH.out + BREATH.hold - b;
-  const shift = Math.floor(carried * 0.9) % 2;
+  const shift = Math.floor(carried * 0.9) % (GRAIN + 1);
+  const ups = [GRAIN];
+  for (let u = 2 * GRAIN + 1 + shift; u <= top; u += GRAIN + 1) ups.push(u);
   for (const side of [-1, 1]) {
-    for (let u = 1 + shift; u <= h; u += 2) {
-      const lean = 2 + Math.floor((3 * u) / PLUME);
-      const waver = (Math.floor((u - shift) / 2) + (side > 0 ? 1 : 0)) % 2;
-      dots.push({ x: x + side * (lean + waver), y: floorY - u });
-    }
+    ups.forEach((u, k) => {
+      const lean = 1 + Math.floor((3 * u) / PLUME);
+      const waver = (k + (side > 0 ? 1 : 0)) % 2 === 0 ? 0 : 2;
+      dots.push(grainAt(x, floorY, side, lean + waver, u));
+    });
   }
   return dots;
 }
 
-/** One puff of dust out of the floor at `x`, `f` frames after it: a few dots rising and spreading, and gone. */
+/** One puff of dust out of the floor at `x`, `f` frames after it: a few grains rising and spreading, and gone. */
 export function puffDots(x: number, floorY: number, f: number): Dot[] {
   if (f < 0 || f >= PUFF) return [];
-  const up = 2 + Math.floor(f * 0.9);
+  const up = 3 + Math.floor(f * 0.9);
   const spread = Math.floor(f / 4);
   const dots: Dot[] = [
-    { x: x - 1 - spread, y: floorY - up },
-    { x: x + 1 + spread, y: floorY - up - 1 },
-    { x, y: floorY - up - 3 },
+    { x: x - 3 - spread, y: floorY - up, s: GRAIN },
+    { x: x + 1 + spread, y: floorY - up - 1, s: GRAIN },
+    { x: x - 1, y: floorY - up - 4, s: GRAIN },
   ];
-  if (f < PUFF - 4) dots.push({ x: x + (f % 2 ? 1 : -1), y: floorY - Math.max(1, up - 3) });
-  return dots;
+  if (f < PUFF - 4) dots.push({ x: x + (f % 2 ? 1 : -3), y: floorY - Math.max(GRAIN, up - 3), s: GRAIN });
+  return apart(dots);
 }
 
 /**
@@ -2121,11 +2151,11 @@ export class Ear implements Entity {
 
   /**
    * Its dust this frame, with him at `him`. Behind him: its breath, as twin plumes out of
-   * the hatch or through the joint, never where he stands; the puffs of its way back; and
-   * after the snort, the dust settling back over the hatch. In front of him, only in the
-   * snort: the sniff, drawn down past his legs into the hole, and the jet up it. Once it
-   * has snorted him, `him` is where he died, and he is on the ceiling: its breath is
-   * whole down into the hatch.
+   * the hatch or through the joint, never a grain of it where he stands; the puffs of its
+   * way back; and after the snort, the dust settling back over the hatch. In front of
+   * him, only in the snort: the sniff, drawn down past his legs into the hole, and the jet
+   * up it. Once it has snorted him, `him` is where he died, and he is on the ceiling: its
+   * breath is whole down into the hatch. No grain goes below the hole's 16 px.
    */
   dust(him: Rect): { behind: Dot[]; front: Dot[] } {
     const d = this.def;
@@ -2135,33 +2165,40 @@ export class Ear implements Entity {
     const front: Dot[] = [];
     const x = this.breathX;
     const stands = this.snortAt < 0;
-    if (x !== null) for (const q of plumeDots(x, floor, this.breath)) if (!stands || !overlaps({ x: q.x, y: q.y, w: 1, h: 1 }, him)) behind.push(q);
+    if (x !== null) for (const q of plumeDots(x, floor, this.breath)) if (!stands || !overlaps({ x: q.x, y: q.y, w: q.s, h: q.s }, him)) behind.push(q);
     for (const q of this.puffs) behind.push(...puffDots(q.x, floor, this.t - q.from));
     const f = this.snortFrame;
     if (f < 0 || f >= SNORT.again) return { behind, front };
     const full = plumeDots(hx, floor, BREATH.out);
     if (f < SNORT.sniff) {
-      // The sniff: the dust over the hatch pulled down into it, past his legs, faster each frame.
+      // The sniff: the dust over the hatch pulled in and down into it, past his legs, faster each frame.
+      const down = Math.round(((f + 1) * (f + 2) * PLUME) / 30);
+      const pulled: Dot[] = [];
       for (const q of full) {
-        const y = q.y + Math.round(((f + 1) * (f + 2) * PLUME) / 30);
-        if (y < floor + TILE) front.push({ x: Math.round(hx + (q.x - hx) * 0.6), y });
+        const y = q.y + down;
+        const cx = hx + (q.x + q.s / 2 - hx) * 0.6;
+        if (y + q.s <= floor + TILE) pulled.push({ x: Math.round(cx - q.s / 2), y, s: q.s });
       }
+      front.push(...apart(pulled));
     } else if (f < SNORT.sniff + SNORT.jet) {
-      // The jet: twin columns of dust, massed, out of the hole and up under his feet to the ceiling.
+      // The jet: twin columns of dust, massed in a checker of single grains, never solid,
+      // out of the hole and up under his feet to the ceiling.
       const feet = Math.round(snortBody(him, d.ceiling, f).y) + him.h;
       for (const side of [-1, 1]) {
         for (let y = feet; y < floor + TILE; y++) {
-          for (let i = 2; i <= 5; i++) if ((i + y + f) % 2 === 0) front.push({ x: hx + side * i - (side > 0 ? 1 : 0), y });
+          for (let i = 2; i <= 7; i++) if ((i + y + f) % 2 === 0) front.push({ x: hx + side * i - (side > 0 ? 1 : 0), y, s: 1 });
         }
       }
     } else {
       // Settling: the jet's dust comes back down from under him, flat on the ceiling, and
       // hangs over the hatch.
       const k = Math.min(1, (f - SNORT.sniff - SNORT.jet) / 22);
+      const settling: Dot[] = [];
       for (const [i, q] of full.entries()) {
         const fromY = d.ceiling.y + 13 + ((i * 7) % 9);
-        behind.push({ x: q.x + ((i % 3) - 1) * Math.round(3 * (1 - k)), y: Math.round(fromY + (q.y - fromY) * k) });
+        settling.push({ x: q.x + ((i % 3) - 1) * Math.round(3 * (1 - k)), y: Math.round(fromY + (q.y - fromY) * k), s: q.s });
       }
+      behind.push(...apart(settling));
     }
     return { behind, front };
   }
