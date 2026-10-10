@@ -150,7 +150,7 @@ and still gets to the beast first. It is a boss fight he cannot win: Theseus kil
 a sword, on his own clock, and the tourist gets out by the thread the hero laid, through look-alike
 turnings where the thread chooses.
 
-Four tricks: **'The knot'** (the hero tests his knot and the line takes his shins), **'The snort'**
+Four tricks: **'The knot'** (the hero tests his knot and the line, at a hero's shins, takes the tourist's throat), **'The snort'**
 (a beast under the floor goes to its bed at his step, and the tribute's threshold rings it back),
 **'The hands'** (the chapter's one bull stands up a man and claps him out of the air) and **'The
 horns'** (on its back, the bull-leap the kilt was bought for is done to him). The five levels that

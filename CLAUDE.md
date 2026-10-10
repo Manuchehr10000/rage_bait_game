@@ -44,7 +44,8 @@ notes describe the levels as they were built.
 - **Level 6, the legend**: a story people told about the chapter's places (myth, folk tale
   or fiction), public domain, beaten the way the story beats it, never by the tourist's
   strength. Its own gate is in `arc.md` section 1. Every chapter has one; a chapter with
-  none that passes is changed.
+  none that passes is changed. It is drawn by default in the medium that told its story (the
+  Minotaur as Attic black-figure; designer, 2026-10-10, `arc.md` section 4).
 - **Order is locked** in the game: a level opens once every level before it is cleared.
   Deep links still open any level in dev and local builds.
 - **Chapters 1 to 4 are the game for now.** 5 to 12 are hidden (`SHOWN_CHAPTERS` in

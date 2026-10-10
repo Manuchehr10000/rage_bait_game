@@ -96,12 +96,36 @@ outlined 1 px dark; clay air, masonry in a dilute-glaze wash with full-glaze cou
 only for the vestibule and the hero's doorway; the thread the one pure white. Every tell reads in
 silhouette.
 
+Ruled (designer, on recommendations, 2026-10-10), after the art conversation:
+- **The level is the vase.** Clay to the edges of the screen and no sky. Over the door storey, out
+  of his reach, a band of black and red tongues, and under the figures outside, a glaze ground
+  line, so the first screen reads as an amphora's panel: a tourist in full colour walking into a
+  museum vase.
+- **The bull's hands read as hands** before the clap: human, oversized, flat on pale stones. The
+  joke is that a man has hands, so the setup is seen.
+- **The queue overlaps** as a vase procession does, so all thirteen heads are on screen and can be
+  counted.
+- **Drawn from the research, without images of the vases.** Nobody on the project has seen MFA
+  60.1 or the others; what the research could not verify stays marked so in each note.
+
+Decided while building, and not objected to (2026-10-10):
+- Flat, unlit pixel art drawn in code at 1 world px. The level is exempt from the painted style
+  of `content/README.md` (soft interiors, light from the upper right), which black-figure is not.
+- Two glaze shapes never touch without 1 px of clay between them, except in the black doorway,
+  where Theseus stays unseen until he steps out.
+- Masonry by rule, in fewer and longer courses, with no lit tops, so that identical things stay
+  identical by construction.
+- The bull redrawn in code with its head, hands and stones drawn; Theseus in drawn poses.
+- The tourist's deaths turn in 90-degree steps with a drawn in-between, never rotated pixels.
+- The stone boss of the stride drawn as background, never as rock he could stand on or walk
+  through.
+
 ## The beats
 
 | Beat | Folder | What the player meets | Death label | What is true |
 |---|---|---|---|---|
 | a | `a-door` | He walks in past the queue and Ariadne. Theseus kneels at the doorpost re-tying the thread; he jumps the hero, who ignores him, and goes in first. Nothing kills | — | The thread fastened to the door; Theseus the seventh youth |
-| b | `b-passage` | The thread's slack in loose curves along the passage floor. The hero finishes, stands and leans back to test his knot, and the line comes taut at shin height. **The trick: 'The knot'** | "The knot" | Theseus fastened the thread to the door and drew it after him |
+| b | `b-passage` | The thread's slack in loose curves along the passage floor. The hero finishes, stands and leans back to test his knot, and the line comes taut at the hero's shin height, which is the tourist's throat. **The trick: 'The knot'** | "The knot" | Theseus fastened the thread to the door and drew it after him |
 | c | `c-way-down` | Down five corridors through five plain holes. A snore under the floor; a storey below, a hatch breathing dust. Beside him through the rock, Theseus drops four shafts and four rooms paying out thread, and wins the race. Nothing kills | — | The labyrinth's misleading ways; the thread drawn after him |
 | d | `d-hatch` | The last corridor: a plain block that knocks hollow, breath through its joint, and before the hatch the one dressed stone, dished by two foot hollows. Step on it and he is sniffed and snorted back up the hole. **The trick: 'The snort'** | "The snort" | The tribute sent in as fodder (Apollodorus 3.15.8, unverified), every nine years (Ovid) |
 | e | `e-cell` | The chapter's one bull, crouched on two stones. Theseus leaps it and takes the horn; he must go with him, ride the heave and jump off the bull's back. **The tricks: 'The hands' and 'The horns'** | "The hands", "The horns" | A bull's face, the rest human; the horn, the knee, the stone; the horns tossed at the winds |
@@ -176,10 +200,13 @@ The level's first trick. The thread's slack lies in loose curves along P's floor
 x 208, under O1.
 
 - **It fires** when his centre reaches x 144 (1.50 s). Theseus finishes, stands and leans back on
-  the line for 20 frames, with a creak, while the slack runs out; then the line holds taut at shin
-  height for 22 frames (1.83 to 2.20 s), a 1 px kill rect at y 149 from x 80 to 208.
-- **First attempt.** He trips forward over the white line and lands face down, the wig over his
-  eyes, with one dry knock. Theseus lets the line go slack and walks in, looking back at his knot.
+  the line for 20 frames, with a creak, while the slack runs out; then the line holds taut at the
+  hero's shin height for 22 frames (1.83 to 2.20 s), a 1 px kill rect at y 149 from x 80 to 208.
+  The story's people are 24 px tall and the tourist 16, so a hero's shin is the tourist's throat.
+- **First attempt.** The line takes him by the throat, a clothesline: his feet fly out ahead of him
+  and he lands flat on his back, the wig over his eyes, with one dry knock. Until 2026-10-10 this
+  read "trips forward over the line and lands face down", which was a hero's fall; the line was
+  always at y 149 (designer, on a recommendation, 2026-10-10). Theseus lets the line go slack and walks in, looking back at his knot.
   Nothing reacts. Label: **The knot.**
 - **Second attempt.** A jump timed to the lean. Measured in the game (2026-10-09), the press
   window by hold is 5 frames at a hold of 11 or more, 6 at 10, 9 at 9, 7 at 8, 5 at 7, 3 at 6, 1 at
@@ -377,8 +404,8 @@ He leaves first, the queue still waits, and Ariadne looks past him. The exit car
 
 All four are claimed in `content/tricks.md`, as tricks of a level designed and not yet built.
 
-**'The knot'** (beats a and b). The kneeling hero he vaulted tests his knot, and the line takes the
-shins of the man who pushed in front of him.
+**'The knot'** (beats a and b). The kneeling hero he vaulted tests his knot, and the line, at a
+hero's shins, takes the throat of the man who pushed in front of him.
 
 - **A surprise the first time.** A second ago he jumped the same man and nothing happened. Nothing
   about a thread on a floor says danger: the most competent man in the myth, doing his most
@@ -545,7 +572,7 @@ Catullus 64.112–115; Ovid, *Met.* 8.172–173, line numbers unverified). Reser
   the section and the thread in the vases' palette are the game's.
 - **The thread** as the one pure white line, hanging straight past the ledges the hero never
   needed.
-- **The knot test**: the lean, the slack running out, the line rising to shin height, the ball
+- **The knot test**: the lean, the slack running out, the line rising to a hero's shin height and the tourist's throat, the ball
   wedged at the inner end, the creak; the re-tie loop; the knot on the doorpost, where *Epitome*
   1.9 says only "the door". A yanked thread lying on a floor would drag its ball, not rise.
 - **The hero's pace**: the 80 px mantle, the straight 96 px drops, the crouches paying out thread,
@@ -744,6 +771,11 @@ ruling 7, the stone's label, became moot when the stone stopped killing.
 Three more on 2026-10-09, after the rough build, on recommendations: the toss's zone stays the
 whole cell, drawn with the bull reaching him; the knot's 9-frame window at a hold of 9 stays; and
 the level stays a dev stage, off the map, for now.
+
+Five on 2026-10-10, after the art conversation, on recommendations: the knot's clothesline (the
+line stays at y 149, a hero's shin and the tourist's throat); the level drawn as the vase; every
+legend drawn by default in the medium that told its story (`arc.md` section 4); the bull's hands
+read as hands and the queue overlapped; and the art drawn from the research, without images.
 
 ## Sources
 
