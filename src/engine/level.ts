@@ -548,10 +548,10 @@ export type HeroMove =
   | { do: 'go'; x: number; air?: number; at?: number; lookBack?: number; steps?: boolean; quiet?: boolean }
   /**
    * Climbs, from frame `at`: his feet go straight from each point of `path` to the next,
-   * `f` frames after `at`. Drawn in front of the tourist. `foot`: from frame `from` to
-   * `to` of the climb his trailing foot pushes off the wall at `rect`, which is a drawing
-   * and nothing more. `takes`: he picks up the ball as he starts, and from then on the thread is
-   * laid behind him.
+   * `f` frames after `at`. Drawn in front of the tourist, except where he would come over
+   * him: there, behind him. `foot`: from frame `from` to `to` of the climb his trailing foot
+   * pushes off the wall at `rect`, which is a drawing and nothing more. `takes`: he picks up
+   * the ball as he starts, and from then on the thread is laid behind him.
    */
   | {
       do: 'climb';

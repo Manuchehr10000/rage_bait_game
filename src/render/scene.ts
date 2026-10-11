@@ -2188,7 +2188,10 @@ function drawEntityBack(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): voi
       break;
     case 'hero': {
       // In the fight, against the bull: his left hand on its near horn, his blade over it.
-      drawHeroBack(ctx, s.level, e as Hero, heroAgainst(s), doorGlaze(s), heroDoorway(s));
+      // Climbing, here only where he would come over the tourist.
+      const h = e as Hero;
+      const f = h.frame;
+      drawHeroBack(ctx, s.level, h, heroAgainst(s), doorGlaze(s), heroDoorway(s), !!f && f.front && !f.unseen && climbsOver(s, f));
       break;
     }
     case 'ear':
@@ -2563,7 +2566,7 @@ function drawEntityFront(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): vo
 
 function drawEntityOverlay(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): void {
   const d = e.def;
-  if (d.kind === 'hero') drawHeroFront(ctx, e as Hero);
+  if (d.kind === 'hero') drawHeroFront(ctx, s, e as Hero);
   else if (d.kind === 'ear') drawDust(ctx, (e as Ear).dust(s.player).front);
   else if (d.kind === 'fight') drawBullHands(ctx, s, e as Fight);
   else if (d.kind === 'water') {
@@ -4772,23 +4775,20 @@ function drawRays(ctx: CanvasRenderingContext2D, x: number, y: number): void {
 }
 
 /**
- * The lip's worn top, in px along it (d-hatch/tile-labyrinth-threshold-top.md): its ends
- * stand `rim` wide at the stone's full height, and between them the top is worn down a
- * pixel, one shallow dish; in it two foot hollows, `foot` wide from each of `hollows`,
- * worn paler under the contour.
+ * The lip's worn top, in px along it (d-hatch/tile-labyrinth-threshold-top.md): two foot
+ * hollows, `foot` wide from each of `hollows`, worn paler under its level contour.
  */
-const LIP = { rim: 2, hollows: [3, 9], foot: 4 } as const;
+const LIP = { hollows: [3, 9], foot: 4 } as const;
 
 /**
  * The dressed threshold before the hatch, the lip: the only fine stone in the floor, one
  * smooth block, not coursed, in the dressed stone's tone, edged in a glaze contour. Its
- * top is worn into one shallow dish, a pixel deep between its square ends, where the
- * tribute stood before it went in: the contour goes down into it, the air over it is
- * clay, and two foot hollows in it are worn paler under the contour, so that it reads as
- * worn stone, never as a hole and never as a notched edge, which read as a W or a crown.
- * Its edge at the hatch is cut square; along its underside the contour is where the
- * stone ends. Its right side is the next block's joint. No crack. Buried, which it never
- * is, it would be the same stone with no hollows and no contour along its top.
+ * top contour is level all along, the floor's top row, which his feet stand on; under it
+ * two foot hollows are worn paler where the tribute stood before it went in, so that it
+ * reads as worn stone, never as a hole and never as a notched edge, which read as a W or
+ * a crown. Its edge at the hatch is cut square; along its underside the contour is where
+ * the stone ends. Its right side is the next block's joint. No crack. Buried, which it
+ * never is, it would be the same stone with no hollows and no contour along its top.
  */
 function drawThreshold(ctx: CanvasRenderingContext2D, x: number, y: number, open: boolean): void {
   ctx.fillStyle = MN.dressed;
@@ -4797,17 +4797,10 @@ function drawThreshold(ctx: CanvasRenderingContext2D, x: number, y: number, open
   ctx.fillRect(x, y + TILE - 1, TILE, 1);
   ctx.fillRect(x, y, 1, TILE);
   if (!open) return;
-  // The contour along its top: on its ends at the top row, and a row down over the dish,
-  // with clay over it where the stone is worn away.
-  const dish = TILE - 2 * LIP.rim;
-  ctx.fillRect(x, y, LIP.rim, 1);
-  ctx.fillRect(x + TILE - LIP.rim, y, LIP.rim, 1);
-  ctx.fillRect(x + LIP.rim, y + 1, dish, 1);
-  ctx.fillStyle = MN.clay;
-  ctx.fillRect(x + LIP.rim, y, dish, 1);
-  // The two foot hollows, worn paler under it.
+  // The contour along its top, level, and the two foot hollows worn paler under it.
+  ctx.fillRect(x, y, TILE, 1);
   ctx.fillStyle = MN.dressedWorn;
-  for (const h of LIP.hollows) ctx.fillRect(x + h, y + 2, LIP.foot, 1);
+  for (const h of LIP.hollows) ctx.fillRect(x + h, y + 1, LIP.foot, 1);
 }
 
 /** The thread: the one pure white in the level. */
@@ -5283,10 +5276,12 @@ function drawLaidThread(ctx: CanvasRenderingContext2D, h: Hero, f: HeroFrame): v
 
 /**
  * The knot, the line, the ball and the thread: behind everything that moves. And Theseus,
- * unless he is climbing. In the fight he is drawn against the bull, `against`, and then
- * the thread, which ends at the ball he left in his doorway.
+ * unless he is climbing in front of the tourist; `climbingBehind`, he is climbing where he
+ * would come over him (`climbsOver`), and is drawn here, behind him. In the fight he is
+ * drawn against the bull, `against`, and then the thread, which ends at the ball he left
+ * in his doorway.
  */
-function drawHeroBack(ctx: CanvasRenderingContext2D, level: Level, h: Hero, against: HeroAgainst | null, doorway: readonly Rect[], his: { black: Rect; frame: Rect[] } | null): void {
+function drawHeroBack(ctx: CanvasRenderingContext2D, level: Level, h: Hero, against: HeroAgainst | null, doorway: readonly Rect[], his: { black: Rect; frame: Rect[] } | null, climbingBehind: boolean): void {
   const d = h.def;
   const f = h.frame;
   // Through the door and the black vestibule, cut from them by a reserved line; and into his
@@ -5312,6 +5307,7 @@ function drawHeroBack(ctx: CanvasRenderingContext2D, level: Level, h: Hero, agai
   ctx.fillRect(d.knot.x, d.knot.y - 1, 2, 3);
   if (!f || f.pose === 'hold') drawHeroAtThePost(ctx, h);
   else if (walking) drawHeroFigure(ctx, walking, null, MN.glaze, his?.black);
+  else if (climbingBehind) drawHeroFigure(ctx, f);
 }
 
 /**
@@ -5367,10 +5363,33 @@ function drawHeroReserve(ctx: CanvasRenderingContext2D, f: HeroFrame, on: readon
   ctx.restore();
 }
 
-/** Theseus climbing: in front of the tourist. */
-function drawHeroFront(ctx: CanvasRenderingContext2D, h: Hero): void {
+/** Theseus climbing: in front of the tourist, unless he would come over him (`climbsOver`). */
+function drawHeroFront(ctx: CanvasRenderingContext2D, s: Scene, h: Hero): void {
   const f = h.frame;
-  if (f && f.front && !f.unseen) drawHeroFigure(ctx, f);
+  if (f && f.front && !f.unseen && !climbsOver(s, f)) drawHeroFigure(ctx, f);
+}
+
+/**
+ * Whether Theseus, climbing O1, would come over the tourist this frame or within a pixel
+ * of him (b-passage/theseus-climb.md): his box, or his trailing leg out to its sole,
+ * against where the tourist is drawn and his reserve (`touristReach`). Then he is drawn
+ * behind him, as everywhere else on his route, and the tourist's reserve parts them;
+ * elsewhere he is in front, as the stride was ruled, where in front and behind draw the
+ * same. A man who stops under the mouth never has the hero's body over him or his near leg
+ * coming down over his face: the hero treading on him is the sandal, not in the level.
+ */
+function climbsOver(s: Scene, f: HeroFrame): boolean {
+  const reach = touristReach(s);
+  const x0 = Math.round(f.x);
+  const y0 = Math.round(f.y);
+  if (overlap({ x: x0, y: y0, w: HERO.w, h: HERO.h }, reach)) return true;
+  if (!f.foot) return false;
+  // The trailing leg, from his hip (drawHeroFigure) out to the sole on the wall.
+  const hipX = x0 + HERO.w / 2;
+  const hipY = y0 + 16;
+  const x = Math.min(hipX, f.foot.x);
+  const y = Math.min(hipY, f.foot.y);
+  return !!overlap({ x, y, w: Math.max(hipX + 1, f.foot.x + f.foot.w) - x, h: Math.max(hipY + 2, f.foot.y + f.foot.h) - y }, reach);
 }
 
 /**
@@ -5845,6 +5864,15 @@ function glazeBehind(s: Scene): Rect[] {
   return boxes;
 }
 
+/**
+ * Where the tourist can be drawn this frame and a pixel round it, his reserve: his sprite,
+ * a pixel either way off a wall's stone (`touristLeft`), or, dying, anywhere in the view.
+ */
+function touristReach(s: Scene): Rect {
+  const p = s.player;
+  return s.death ? { x: s.camera.ix, y: s.camera.iy, w: VIEW_W, h: VIEW_H } : { x: Math.round(p.x) - 3, y: Math.round(p.y) - 1, w: 16, h: 18 };
+}
+
 /** A canvas the tourist is drawn into to take his shape for the reserve: the world canvas's size. */
 let reserveLayer: HTMLCanvasElement | null = null;
 /** Where his shape is in the reserve's layer this frame, or null: what is drawn over him afterwards cuts its line of clay there. */
@@ -5861,11 +5889,7 @@ let reserveShape: Rect | null = null;
 function drawTouristReserve(ctx: CanvasRenderingContext2D, s: Scene): void {
   reserveShape = null;
   const p = s.player;
-  const cx = s.camera.ix;
-  const cy = s.camera.iy;
-  // Where he can be drawn and a pixel round it: his sprite, a pixel either way off a wall's
-  // stone (`touristLeft`), or, dying, anywhere in the view.
-  const him: Rect = s.death ? { x: cx, y: cy, w: VIEW_W, h: VIEW_H } : { x: Math.round(p.x) - 3, y: Math.round(p.y) - 1, w: 16, h: 18 };
+  const him = touristReach(s);
   const stone = doorposts(s);
   const clip: Rect[] = [];
   for (const b of glazeBehind(s)) {

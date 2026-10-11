@@ -25,7 +25,16 @@ The frames:
 ## Where it stands in the game
 
 In O1, his box at x 194 to 206, frames 66 to 85 of his route, drawn in front of the tourist all the
-way up (`tests/minotaur-theseus.spec.ts`). Frame 1 at 68 to 70, frame 0 at the rest.
+way up, except where any of him, his trailing leg and its sole included, would come over the
+tourist or within a pixel of him: there he is drawn behind him, as he is everywhere else on his
+route, and the tourist's reserve cuts him (`../a-door/tourist-reserve.md`;
+`tests/minotaur-theseus.spec.ts`). Frame 1 at 68 to 70, frame 0 at the rest. (Chosen 2026-10-11,
+after a check of the stride: drawn in front of a man who stopped under the mouth, at x 190 to
+206, his body covered him at 66 and 67, his near leg came down over his face at 68, and his near
+foot stood at his crown at 69: the hero treading on him, the sandal, `../LEVEL.md`, Not in the
+level. Since the drawing is the same in front or behind wherever the two do not meet, the
+designer's "drawn in front" still holds everywhere it shows; a survivor who rests at x 207.4 to
+219.4 sees the foot as before, four rows of clay over his head.)
 
 ## Must be right
 
@@ -38,7 +47,11 @@ way up (`tests/minotaur-theseus.spec.ts`). Frame 1 at 68 to 70, frame 0 at the r
   to 143, part the sole from the head of a man who stopped under it, so it never reads as the
   hero treading on him, the sandal ruled out (`../LEVEL.md`, Not in the level).
 - **Nothing on the wall under the foot** (designer, 2026-10-11): no boss, knob or ledge.
-- **In front of the tourist**, the only pose that is.
+- **In front of the tourist**, the only pose that is, **but never over him**: wherever he would
+  come over the tourist or within a pixel of him, he is behind him, cut from him by the
+  tourist's reserve, so that nothing of him, below his hip or above it, is ever drawn on a man
+  under the mouth, at frames 66 to 70 wherever he rests from x 190 to 206
+  (`tests/minotaur-theseus.spec.ts`).
 - The ball's white in his upper hand is the thread's (`thread`).
 - As `../a-door/theseus-kneel.md`, "Theseus, in every pose".
 

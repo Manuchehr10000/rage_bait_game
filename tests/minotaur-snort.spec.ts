@@ -1036,10 +1036,11 @@ test("in the game: T_end's floor is plain blocks, pixel for pixel the same, join
   const lip = await grab(page, 64, T_END_FLOOR, 16, 16);
   expect(lip).not.toEqual(await grab(page, 96, T_END_FLOOR, 16, 16));
   // As drawn, a world pixel at a time: glaze '#', clay '_', the dressed stone 'd' and its
-  // worn hollows '+'. Its ends square at the top row; between them the top worn a pixel
-  // down into one shallow dish, clay over it, and in it two foot hollows worn paler under
-  // the contour. (Until 2026-10-11 each hollow dipped 2 px into the edge and the edge
-  // read as a W or a crown, pillar 2; the designer ruled it redrawn.)
+  // worn hollows '+'. Its top contour level all along the floor's top row, which his feet
+  // stand on, and under it two foot hollows worn paler. (Until 2026-10-11 each hollow
+  // dipped 2 px into the edge, which read as a W or a crown, pillar 2, and the designer
+  // ruled it redrawn; redrawn first the same day as one shallow dish a pixel deep with
+  // clay over it, it left a man standing in it a row of clay over its contour.)
   const ink: Record<string, string> = { '31,20,14': '#', '200,116,61': '_', '168,105,62': 'd', '196,133,82': '+' };
   const rows: string[] = [];
   for (let j = 0; j < 16; j++) {
@@ -1050,13 +1051,7 @@ test("in the game: T_end's floor is plain blocks, pixel for pixel the same, join
     }
     rows.push(row);
   }
-  expect(rows).toEqual([
-    '##' + '_'.repeat(12) + '##',
-    '#d' + '#'.repeat(12) + 'dd',
-    '#dd++++dd++++ddd',
-    ...Array(12).fill('#' + 'd'.repeat(15)),
-    '#'.repeat(16),
-  ]);
+  expect(rows).toEqual(['#'.repeat(16), '#dd++++dd++++ddd', ...Array(13).fill('#' + 'd'.repeat(15)), '#'.repeat(16)]);
 });
 
 test("in the game: the joint's plume is drawn behind him, and never over his legs", async ({ page }) => {

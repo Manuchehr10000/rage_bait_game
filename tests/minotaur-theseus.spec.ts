@@ -242,7 +242,8 @@ test("the stride: at frames 68 to 70 the hero's trailing foot pushes off the wal
   const from = approach(30);
   const hero = from.hero;
   const track = hero.track.frames;
-  // Off the wall at 68 to 70 and at no other frame; in front of the tourist all the way up O1.
+  // Off the wall at 68 to 70 and at no other frame; in front of the tourist all the way up O1,
+  // but where he would come over him, behind him (the last test in this file).
   const footAt = track.flatMap((f, k) => (f.foot ? [k] : []));
   expect(footAt).toEqual([68, 69, 70]);
   // Just right of the mouth, x 192 to 208, at head height: on the passage's back wall,
@@ -362,7 +363,8 @@ test("the hero's route: never in rock, at his pace, never jumping, falling from 
     expect(on, `on the floor at ${x},${feet}`).toBeGreaterThanOrEqual(8);
   }
   // Holding the line at the post, 0 to 21; the passage, 22 on, looking back for 10
-  // frames; up O1, 66 to 85, in front of the tourist; along G0 from 86, and off its end at 105.
+  // frames; up O1, 66 to 85, in front of the tourist but where he would come over him;
+  // along G0 from 86, and off its end at 105.
   const span = (a: number, b: number) => Array.from({ length: b - a + 1 }, (_, i) => a + i);
   const poses = (p: string) => frames.flatMap((f, k) => (f.pose === p ? [k] : []));
   expect(poses('hold')).toEqual(span(0, 21));
@@ -1010,4 +1012,103 @@ test("in the game: on his way down nothing of Theseus touches the masonry's line
   // Over the floor's rows, from his head down, never more white than the ball in his hand
   // and the pixel of thread at it: no ring stood up.
   expect(r.upright).toBeLessThanOrEqual(6);
+});
+
+test("in the game: climbing O1 at frames 66 to 70, Theseus never comes over a man who stopped under its mouth: wherever he rests from x 190 to 206, every pixel of him is drawn as without the hero, and none of the hero's glaze is on him, within a pixel of him, or between his pixels on his head's rows", async ({ page }) => {
+  await open(page);
+  const r = await page.evaluate(
+    ({ presses, glaze, floor }) => {
+      const g = (window as unknown as W).__game;
+      g.titleTimer = 0;
+      const hero = () => g.entities.find((e: { def: { kind: string } }) => e.def.kind === 'hero');
+      const key = (c: string, d: boolean) => window.dispatchEvent(new KeyboardEvent(d ? 'keydown' : 'keyup', { code: c }));
+      const press = (p: { dir: number; jump: boolean }) => {
+        key('ArrowRight', p.dir > 0);
+        key('ArrowLeft', p.dir < 0);
+        key('Space', p.jump);
+      };
+      // The clean run over the line, and he lets go the frame he lands, and slides to a stop.
+      let air = false;
+      let landed = false;
+      for (let i = 0; hero().k < 66; i++) {
+        press(landed ? { dir: 0, jump: false } : presses[i]!);
+        g.tick();
+        if (hero().state !== 'kneel' && !g.player.onGround) air = true;
+        if (air && g.player.onGround) landed = true;
+      }
+      press({ dir: 0, jump: false });
+      const ctx = g.world.getContext('2d') as CanvasRenderingContext2D;
+      const s = ctx.canvas.width / 320;
+      const GL = parseInt(glaze.slice(1), 16);
+      // Round O1's mouth, from over the hero's head at 70 to the floor.
+      const box = { x: 176, y: floor - 56, w: 48, h: 58 };
+      const read = () => {
+        g.draw();
+        const d = ctx.getImageData(box.x * s, (box.y - g.camera.iy) * s, box.w * s, box.h * s).data;
+        const out = new Int32Array(box.w * box.h);
+        for (let j = 0; j < box.h; j++) for (let i = 0; i < box.w; i++) {
+          const o = ((j * s + 1) * box.w * s + i * s + 1) * 4;
+          out[j * box.w + i] = (d[o]! << 16) | (d[o + 1]! << 8) | d[o + 2]!;
+        }
+        return out;
+      };
+      const out = { frames: 0, hers: [] as number[], changed: [] as string[], near: [] as string[], head: [] as string[] };
+      const rest = g.player.x;
+      const all = g.entities;
+      const places = Array.from({ length: 17 }, (_, i) => 190 + i);
+      // Without the hero, nothing here moves from frame to frame: drawn once without him and
+      // without the tourist, and once with the tourist at each place.
+      g.entities = all.filter((e: unknown) => e !== hero());
+      g.player.x = 100;
+      const neither = read();
+      const alone = places.map((x) => ((g.player.x = x), read()));
+      g.entities = all;
+      for (let k = 66; k <= 70; k++) {
+        if (hero().k !== k) return { ...out, k: hero().k };
+        for (const [n, x] of places.entries()) {
+          g.player.x = x;
+          const withHim = read();
+          out.frames++;
+          const his = (i: number) => alone[n]![i] !== neither[i];
+          let theirs = 0;
+          for (let j = 0; j < box.h; j++) {
+            const wy = box.y + j;
+            // His head's rows, from the first of his pixels on the row to the last.
+            let first = box.w;
+            let last = -1;
+            if (wy >= floor - 16 && wy < floor - 8) for (let i = 0; i < box.w; i++) if (his(j * box.w + i)) (first = Math.min(first, i)), (last = i);
+            for (let i = 0; i < box.w; i++) {
+              const at = j * box.w + i;
+              const wx = box.x + i;
+              if (his(at) && withHim[at] !== alone[n]![at]) out.changed.push(`k ${k}, x ${x}: (${wx}, ${wy})`);
+              if (withHim[at] !== GL || alone[n]![at] === GL) continue;
+              theirs++;
+              if (i >= first && i <= last) out.head.push(`k ${k}, x ${x}: (${wx}, ${wy})`);
+              for (const [dx, dy] of [[-1, -1], [0, -1], [1, -1], [-1, 0], [1, 0], [-1, 1], [0, 1], [1, 1]] as const) {
+                const ii = i + dx;
+                const jj = j + dy;
+                if (ii >= 0 && jj >= 0 && ii < box.w && jj < box.h && his(jj * box.w + ii)) out.near.push(`k ${k}, x ${x}: (${wx}, ${wy})`);
+              }
+            }
+          }
+          out.hers.push(theirs);
+        }
+        g.player.x = rest;
+        g.tick();
+      }
+      return { ...out, k: hero().k };
+    },
+    { presses: cleanPresses(), glaze: '#1f140e', floor: DOOR_FLOOR },
+  );
+  // Five frames, seventeen places (after a check of the stride, 2026-10-11: drawn in front of
+  // a man who stopped under the mouth, his body covered him at 66 and 67, his near leg came
+  // down over his face at 68 and his near foot stood at his crown at 69, the sandal, which is
+  // not in the level). Behind him there, cut from him by his reserve; and the hero drawn
+  // every time, round him.
+  expect(r.k).toBe(71);
+  expect(r.frames).toBe(5 * 17);
+  expect(Math.min(...r.hers)).toBeGreaterThan(25);
+  expect(r.changed.slice(0, 10)).toEqual([]);
+  expect(r.near.slice(0, 10)).toEqual([]);
+  expect(r.head.slice(0, 10)).toEqual([]);
 });

@@ -1531,7 +1531,7 @@ export interface HeroFrame {
   grounded: boolean;
   /** Walking with his head turned back over his shoulder, at his knot. */
   lookBack: boolean;
-  /** Drawn in front of the tourist. Only the climb is. */
+  /** Drawn in front of the tourist, except where he would come over him: there, behind him. Only the climb is. */
   front: boolean;
   /** In a black doorway, and not drawn. */
   unseen: boolean;

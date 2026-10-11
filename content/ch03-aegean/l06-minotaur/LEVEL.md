@@ -311,7 +311,7 @@ Chosen in the asset notes (2026-10-10), where this file did not decide, for the 
 | a | `a-door` | He walks in past the queue and Ariadne. Theseus kneels at the doorpost re-tying the thread; he jumps the hero, who ignores him, and goes in first. Nothing kills | — | The thread fastened to the door; Theseus the seventh youth |
 | b | `b-passage` | The thread's slack in loose curves along the passage floor. The hero finishes, stands and leans back to test his knot, and the line comes taut at the hero's shin height, which is the tourist's throat. **The trick: 'The knot'** | "The knot" | Theseus fastened the thread to the door and drew it after him |
 | c | `c-way-down` | Down five corridors through five plain holes. A snore under the floor; a storey below, a hatch breathing dust. Beside him through the rock, Theseus drops four shafts and four rooms paying out thread, and wins the race. Nothing kills | — | The labyrinth's misleading ways; the thread drawn after him |
-| d | `d-hatch` | The last corridor: a plain block that knocks hollow, breath through its joint, and before the hatch the one dressed stone, dished by two foot hollows. Step on it and he is sniffed and snorted back up the hole. **The trick: 'The snort'** | "The snort" | The tribute sent in as fodder (Apollodorus 3.15.8, unverified), every nine years (Ovid) |
+| d | `d-hatch` | The last corridor: a plain block that knocks hollow, breath through its joint, and before the hatch the one dressed stone, its top worn by two foot hollows. Step on it and he is sniffed and snorted back up the hole. **The trick: 'The snort'** | "The snort" | The tribute sent in as fodder (Apollodorus 3.15.8, unverified), every nine years (Ovid) |
 | e | `e-cell` | The chapter's one bull, crouched on two stones. Theseus leaps it and takes the horn; he must go with him, ride the heave and jump off the bull's back. **The tricks: 'The hands' and 'The horns'** | "The hands", "The horns" | A bull's face, the rest human; the horn, the knee, the stone; the horns tossed at the winds |
 | f | `f-thread` | Out by the thread, up four look-alike rooms and four shafts, back through the passage and out past the queue, Theseus dragging the body behind him. Nothing kills | — | Out by the thread; the dead Minotaur dragged from the door |
 
@@ -406,9 +406,15 @@ x 208, under O1.
   them in the game, no death, the worst fall 143.44 px.
 - **The stride** (designer, on a recommendation, 2026-10-08), a picture, never a trap. Theseus walks
   P at 180 px/s, non-solid and a plane behind, then mantles 80 px up O1 (hero frames 66–85), drawn
-  in front. At frames 68–70 his trailing foot pushes off the wall at O1's mouth, P's back wall, at
-  head height just right of the mouth: the foot at x 206–215, y 136–140, with nothing on the wall
-  under it, and its sole held there while he rises. A knot survivor who stops on landing rests at
+  in front, except where any of him would come over the tourist or within a pixel of him: there
+  he is behind him, cut from him by the tourist's reserve (chosen in `b-passage/theseus-climb.md`,
+  2026-10-11, after a check of the stride: drawn in front of a man who stopped under the mouth,
+  at x 190 to 206, his body covered him at 66 and 67, his near leg came down over his face at 68
+  and his near foot stood at his crown at 69, the hero treading on him, the sandal, which is Not
+  in the level; wherever the two do not meet, in front and behind draw the same). At frames
+  68–70 his trailing foot pushes off the wall at O1's mouth, P's back wall, at head height just
+  right of the mouth: the foot at x 206–215, y 136–140, with nothing on the wall under it, and
+  its sole held there while he rises. A knot survivor who stops on landing rests at
   x 207.42–219.42 in the game, and the foot is over 57 of the 61 measured, four rows of clay over
   his head. He is frame-identical with or without Theseus, who moves nothing and kills nothing,
   and nothing reacts. (Until 2026-10-11 the foot pushed off a small stone boss on the wall,
@@ -476,9 +482,11 @@ T, by the physics check).
 ### d · T_end and the hatch
 
 The level's second trick. T_end's floor, from the left: the hatch, x 48–64; **the lip**, x 64–80, a
-dressed threshold, the only fine stone in the floor, its top worn into a shallow dish with two
-foot hollows where the tribute stood before it went in (redrawn 2026-10-11: its edge, notched by
-two hollows 2 px deep, read as a W or a crown); then plain blocks, x 80–112, **the bed block** x 112–144
+dressed threshold, the only fine stone in the floor, its top worn by two foot hollows where the
+tribute stood before it went in, paler under its level contour, which his feet stand on
+(redrawn 2026-10-11: its edge, notched by two hollows 2 px deep, read as a W or a crown; redrawn
+first as a shallow dish a pixel deep, it left a man standing in it a row of clay over its
+contour; both superseded); then plain blocks, x 80–112, **the bed block** x 112–144
 over the beast's bed, 144–176 and 176–192, pixel-identical, joints and all. No crack anywhere: in
 this game a crack means "will give", and Persepolis's cracked column holds.
 
@@ -773,7 +781,8 @@ Catullus 64.112–115; Ovid, *Met.* 8.172–173, line numbers unverified). Reser
 - **The hero's pace**: the 80 px mantle, the straight 96 px drops, the crouches paying out thread,
   180 px/s, a route that always arrives first, and the unseen wait in the black doorway.
 - **The stride**: the hero's foot pushing off the wall at head height beside O1's mouth, and the
-  hero drawn in front during the mantle. (The stone boss it pushed off was dropped, 2026-10-11.)
+  hero drawn in front during the mantle, except where he would come over the tourist, where he is
+  behind him (2026-10-11). (The stone boss it pushed off was dropped, 2026-10-11.)
 - **The snort, all invented**: hearing through the floor; the sleep and the snore; knowing one
   sound; the feeding hatch; the dressed threshold and its two foot hollows; the bed under the floor
   and the beast's clock; the hollow knock and the ring; the drag; the twin plumes through the hatch
@@ -911,8 +920,9 @@ Being built, in this order, as a stage in the dev build (`#minotaur`, in `STAGES
   then pasted on the ceiling at y 528. It needs a death-frame position that differs from where he
   died: made 2026-10-09 as `World.kill(cause, at)`, which no other level passes.
 - **The hero**, one scripted, non-solid entity replaying the harness's route frame for frame: drawn
-  in front during the mantle, the foot pushing off the wall at frames 68–70 (off a boss until
-  2026-10-11), the pay-outs animated,
+  in front during the mantle (behind a man under O1's mouth where he would come over him, since
+  2026-10-11), the foot pushing off the wall at frames 68–70 (off a boss until 2026-10-11), the
+  pay-outs animated,
   footfalls down to J3 and none from J2, in the doorway from frame 402. Solid only while he kneels
   at the door. Made 2026-10-09 with the knot and the thread (`tests/minotaur-theseus.spec.ts`); his
   route is data, a list of moves, and a fall can steer for the next hole once he is out of the one
@@ -1022,12 +1032,17 @@ Being built, in this order, as a stage in the dev build (`#minotaur`, in `STAGES
   strip under the ground line outside the masonry's wash, the rays glaze on it, the ground line
   keeping its two rows of clay; the stride's stone boss removed, its decor, drawing, note,
   manifest entry and pins, and Theseus's foot pushing off the wall at O1's mouth on the same
-  frames, his route unchanged; the lip's top worn into one shallow dish with two foot hollows
-  paler in it, never notched; and the death counter over the rays accepted as built. Nothing that
+  frames, his route unchanged; the lip's top worn by two foot hollows paler under its level
+  contour, never notched; and the death counter over the rays accepted as built. Nothing that
   kills, carries, times or sounds moved. Pinned in `tests/minotaur-out.spec.ts` (the floor course
   outside pixel for pixel, the counter's frames), `tests/minotaur-snort.spec.ts` (the lip pixel
   for pixel), `tests/minotaur-theseus.spec.ts` (the stride) and `tests/minotaur.spec.ts` (the
-  decor, with no boss).
+  decor, with no boss). Then, after a check of it, the same day: the lip's top kept level, since
+  the shallow dish it was worn into first left a man standing in it a row of clay over its
+  contour; and Theseus mantling up O1 drawn behind a man who stopped under its mouth wherever he
+  would come over him, cut from him by his reserve, never treading on him (`climbsOver`,
+  `src/render/scene.ts`). Pinned in `tests/minotaur-snort.spec.ts` (the lip) and
+  `tests/minotaur-theseus.spec.ts` (frames 66 to 70, a man at rest from x 190 to 206).
 
 Still to come: nothing the notes ask the drawing for. (`LevelData.tricks`, 'The knot', 'The
 snort', 'The hands', 'The horns', and `dropCause` and `fallCause` 'The labyrinth', unreachable,
@@ -1082,7 +1097,13 @@ the level stays a dev stage, off the map, for now.
 Five on 2026-10-10, after the art conversation, on recommendations: the knot's clothesline (the
 line stays at y 149, a hero's shin and the tourist's throat); the level drawn as the vase; every
 legend drawn by default in the medium that told its story (`arc.md` section 4); the bull's hands
-read as hands and the queue overlapped; and the art drawn from the research, without images.
+read as hands and the queue opened, a figure every 5 to 6 px (ruled first as overlapped, and
+replaced the same day); and the art drawn from the research, without images. The same day, on a
+recommendation, the rays at the vase's foot replaced the band of tongues.
+
+Six on 2026-10-11, after the third art pass, on recommendations: the rays on stone; the hands
+oversized; nothing inside the black outlined; the stride's boss dropped; no shape reading as a
+character; the counter over the rays accepted.
 
 ## Sources
 
