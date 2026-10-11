@@ -1,8 +1,8 @@
 # Beat d · T_end and the hatch
 
 The level's second trick. T_end's floor, from the left: the hatch; the lip, the one dressed
-stone, its top dished by two worn foot hollows where the tribute stood; then plain blocks, the
-bed block among them, pixel for pixel the same, joints and all. His feet on the bed block knock
+stone, its top worn into a shallow dish with two foot hollows where the tribute stood; then
+plain blocks, the bed block among them, pixel for pixel the same, joints and all. His feet on the bed block knock
 hollow: the snore stops, the hatch goes still, and the same breath comes up through the block's
 plain joint at x 112, just ahead of him. He runs through it and it is behind him. A step on the
 lip rings and brings the beast back at once; as his feet go into the hatch he is sniffed, then

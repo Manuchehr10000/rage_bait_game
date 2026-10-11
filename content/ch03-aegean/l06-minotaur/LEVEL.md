@@ -143,26 +143,28 @@ Decided while building, and not objected to (2026-10-10):
 - The bull redrawn in code with its head, hands and stones drawn; Theseus in drawn poses.
 - The tourist's deaths turn in 90-degree steps with a drawn in-between, never rotated pixels.
 - The stone boss of the stride drawn as background, never as rock he could stand on or walk
-  through.
+  through. (Superseded 2026-10-11: the boss is dropped, and his foot pushes off the wall itself.)
 
 Chosen in the asset notes (2026-10-10), where this file did not decide, for the designer to see:
 - The rays at the vase's foot (`a-door/labyrinth-rays.md`, after the ruling that replaced the
   tongues, 2026-10-10): ten, each 7 px wide at its base and 26 rows tall, one every 8 px from the
-  screen's edge, on clay in the floor course outside, x 0 to 78 and y 164 to 189. They stand on
-  the course line at y 191 with a row of clay between, their points a row under the heavier
-  ground line, 2 px of glaze on y 161 and 162 between reserved rows, so no glaze foot touches
-  it; the last a pixel of clay short of the outer face, which now starts a row lower, at y 164.
+  screen's edge, in the floor course outside, x 0 to 78 and y 164 to 189, glaze on the ground's
+  stone since the ruling of 2026-10-11 (on clay until then). They stand on the course line at
+  y 191 with a row of the stone between, their points a row under the heavier ground line, 2 px
+  of glaze on y 161 and 162 between reserved rows of clay, so no glaze foot touches it; the last
+  a pixel of the stone short of the outer face, which now starts a row lower, at y 164.
   Each widens a pixel at a time, on its left and then its right, so that its sides are straight
   slopes, not a stack of blocks. (Built first, the same day: five tongues over the outside at
   x 42 to 75 and y 56 to 64, right of the death counter's column, and under a 1 px ground line a
   plain band of the wash.) The camera keeps the band whole however high he goes, its course line
   and two rows under it, so its top never rises over y 14 (`LevelData.cameraKeeps`, after a check
   of the rays: rising to y 1 over the vault and 0 along G0, it cut the rays into spikes at the
-  screen's bottom edge). **For the designer**, from the same check: the death counter lies on the
-  ground line and the first four rays while the camera looks down at Z1, about 1.9 s of every
-  way down, and on the climb out, left as built until ruled (accept it, or start the rays at x 32,
-  clear of the counter's column); and at the spawn the clay between the rays, the air's colour,
-  can read as a pit of spikes under a ledge (`a-door/labyrinth-rays.md`).
+  screen's bottom edge). From the same check, for the designer, and ruled 2026-10-11: the death
+  counter lies on the ground line and the first four rays while the camera looks down at Z1,
+  about 1.9 s of every way down, and on the climb out, and is accepted as built (the HUD sits
+  over the background everywhere in the game); and at the spawn the clay between the rays, the
+  air's colour, read as a pit of spikes under a ledge, so the rays now stand on the ground's
+  stone (`a-door/labyrinth-rays.md`).
 - The masonry's blocks square, two tiles each way: a longer block would lose the bed's joint at
   x 112. A line runs under any block over air, its whole length, so the two holes in each room,
   one against each end wall, keep the same line. (When the world was drawn, 2026-10-10: the notes
@@ -187,9 +189,10 @@ Chosen in the asset notes (2026-10-10), where this file did not decide, for the 
   under it and growing every frame after the first to the whole 9 × 3 oval he leaves there
   (`b-passage/thread.md`, item 7; after the final review, 2026-10-10: grown as an upright closed
   ring from his hand to the floor, they read as a white 0 or O beside him).
-- The boss drawn as a small round knob of filled glaze, 5 by 3, and the hero's doorway framed by
-  a line, not the rough's lintel of stone in row 5's air. (Drawn first in outline, as a ring, the
-  knob read as the letter o beside the ball; a check of the stage filled it, 2026-10-10.)
+- The hero's doorway framed by a line, not the rough's lintel of stone in row 5's air. (The boss
+  was drawn as a small round knob of filled glaze, 5 by 3; drawn first in outline, as a ring, it
+  read as the letter o beside the ball, and a check of the stage filled it, 2026-10-10. Filled, it
+  read as a minus sign, and it was dropped, designer, on a recommendation, 2026-10-11.)
 - No added red on Theseus anywhere; the youths' red fillets tell them from him. The stones in
   cream; the hands' one incision parts the thumb from the fingers. No tail. No dust in the cell,
   and the dust in 2 × 2 grains, the jet in 1 px.
@@ -403,10 +406,14 @@ x 208, under O1.
   them in the game, no death, the worst fall 143.44 px.
 - **The stride** (designer, on a recommendation, 2026-10-08), a picture, never a trap. Theseus walks
   P at 180 px/s, non-solid and a plane behind, then mantles 80 px up O1 (hero frames 66–85), drawn
-  in front. At frames 68–70 his trailing foot pushes off a small stone boss on P's back wall,
-  x 206–215, y 140–148, head height just right of O1. A knot survivor who stops on landing rests
-  at x 207.42–219.42 in the game, and the foot is over 57 of the 61 measured. It is frame-identical with or
-  without him, moves nothing and kills nothing, and nothing reacts.
+  in front. At frames 68–70 his trailing foot pushes off the wall at O1's mouth, P's back wall, at
+  head height just right of the mouth: the foot at x 206–215, y 136–140, with nothing on the wall
+  under it, and its sole held there while he rises. A knot survivor who stops on landing rests at
+  x 207.42–219.42 in the game, and the foot is over 57 of the 61 measured, four rows of clay over
+  his head. He is frame-identical with or without Theseus, who moves nothing and kills nothing,
+  and nothing reacts. (Until 2026-10-11 the foot pushed off a small stone boss on the wall,
+  x 206–215, y 140–148; the designer dropped it, on a recommendation: drawn, it read first as a
+  letter o, then as a minus sign.)
 
 ### c · The way down and the race
 
@@ -469,8 +476,9 @@ T, by the physics check).
 ### d · T_end and the hatch
 
 The level's second trick. T_end's floor, from the left: the hatch, x 48–64; **the lip**, x 64–80, a
-dressed threshold, the only fine stone in the floor, its top edge dished by two worn foot hollows
-where the tribute stood before it went in; then plain blocks, x 80–112, **the bed block** x 112–144
+dressed threshold, the only fine stone in the floor, its top worn into a shallow dish with two
+foot hollows where the tribute stood before it went in (redrawn 2026-10-11: its edge, notched by
+two hollows 2 px deep, read as a W or a crown); then plain blocks, x 80–112, **the bed block** x 112–144
 over the beast's bed, 144–176 and 176–192, pixel-identical, joints and all. No crack anywhere: in
 this game a crack means "will give", and Persepolis's cracked column holds.
 
@@ -764,7 +772,8 @@ Catullus 64.112–115; Ovid, *Met.* 8.172–173, line numbers unverified). Reser
   1.9 says only "the door". A yanked thread lying on a floor would drag its ball, not rise.
 - **The hero's pace**: the 80 px mantle, the straight 96 px drops, the crouches paying out thread,
   180 px/s, a route that always arrives first, and the unseen wait in the black doorway.
-- **The stride**: the boss at head height beside O1, and the hero drawn in front during the mantle.
+- **The stride**: the hero's foot pushing off the wall at head height beside O1's mouth, and the
+  hero drawn in front during the mantle. (The stone boss it pushed off was dropped, 2026-10-11.)
 - **The snort, all invented**: hearing through the floor; the sleep and the snore; knowing one
   sound; the feeding hatch; the dressed threshold and its two foot hollows; the bed under the floor
   and the beast's clock; the hollow knock and the ring; the drag; the twin plumes through the hatch
@@ -902,7 +911,8 @@ Being built, in this order, as a stage in the dev build (`#minotaur`, in `STAGES
   then pasted on the ceiling at y 528. It needs a death-frame position that differs from where he
   died: made 2026-10-09 as `World.kill(cause, at)`, which no other level passes.
 - **The hero**, one scripted, non-solid entity replaying the harness's route frame for frame: drawn
-  in front during the mantle, the foot on the boss at frames 68–70, the pay-outs animated,
+  in front during the mantle, the foot pushing off the wall at frames 68–70 (off a boss until
+  2026-10-11), the pay-outs animated,
   footfalls down to J3 and none from J2, in the doorway from frame 402. Solid only while he kneels
   at the door. Made 2026-10-09 with the knot and the thread (`tests/minotaur-theseus.spec.ts`); his
   route is data, a list of moves, and a fall can steer for the next hole once he is out of the one
@@ -925,7 +935,7 @@ Being built, in this order, as a stage in the dev build (`#minotaur`, in `STAGES
   notes): the palette; clay to the screen's edges, the tongues over the outside (a decor,
   `tongues`, since replaced by the rays), the ground line and the band under it; the masonry and
   the outer face by rule, with the clay round the vestibule's black; the hero's doorway framed;
-  the lip; the knob; the ball; the thread's states drawn by hand; the dust in grains
+  the lip; the knob (dropped 2026-10-11); the ball; the thread's states drawn by hand; the dust in grains
   (`Ear.dust`, each grain with its size); and the tourist's reserve, a pixel of clay round him
   wherever glaze is behind him, his deaths included, never inside the hero's doorway before L−8.
 - **The people at the door, Theseus's poses, and the knot's clothesline** (2026-10-10, to the
@@ -978,15 +988,15 @@ Being built, in this order, as a stage in the dev build (`#minotaur`, in `STAGES
 
 - **The rays at the vase's foot, and the queue opened** (2026-10-10, on the designer's rulings, to
   the notes in `a-door`): the band of tongues removed, its decor, drawing, note and tests; the
-  ground line 2 px; the rays drawn by the masonry's rule in the floor course outside, on clay,
-  the outer face beside them a row shorter; the file a figure every 6 px, the youth redrawn whole,
+  ground line 2 px; the rays drawn by the masonry's rule in the floor course outside, on clay
+  (on the ground's stone since 2026-10-11), the outer face beside them a row shorter; the file a figure every 6 px, the youth redrawn whole,
   and the reserved line between figures carried round their corners. Nothing that kills, carries
   or times moved. Pinned in `tests/minotaur-out.spec.ts` (the file's data, the eyes on the first
   screen, and the floor course outside pixel for pixel). Then, after a check, the same day: a
   level's own line for the camera to keep in view (`LevelData.cameraKeeps`, as an entity's
   `keepsInView` but on every frame), here y 194, so the band is never cut at the bottom of the
   screen; and Theseus's outline in the tableau with its corners. Pinned in the same file, with
-  where the death counter lies on the band, which is the designer's to rule.
+  where the death counter lies on the band, which the designer accepted as built (2026-10-11).
 
 - **The review's polish** (2026-10-10, to the notes in `e-cell`, `f-thread`, `a-door` and
   `../shared/bull-leaper-tumbling.md`): the arms pixelled, the horns a lyre, the crouched thumbs
@@ -1007,6 +1017,18 @@ Being built, in this order, as a stage in the dev build (`#minotaur`, in `STAGES
   notches. Nothing that kills, carries, times or sounds moved. Pinned in
   `tests/minotaur-bull.spec.ts` and `tests/minotaur-fight.spec.ts`.
 
+- **The rays on stone, the boss dropped, the threshold worn** (2026-10-11, on the designer's
+  rulings after the third art pass, to the notes in `a-door`, `b-passage` and `d-hatch`): the
+  strip under the ground line outside the masonry's wash, the rays glaze on it, the ground line
+  keeping its two rows of clay; the stride's stone boss removed, its decor, drawing, note,
+  manifest entry and pins, and Theseus's foot pushing off the wall at O1's mouth on the same
+  frames, his route unchanged; the lip's top worn into one shallow dish with two foot hollows
+  paler in it, never notched; and the death counter over the rays accepted as built. Nothing that
+  kills, carries, times or sounds moved. Pinned in `tests/minotaur-out.spec.ts` (the floor course
+  outside pixel for pixel, the counter's frames), `tests/minotaur-snort.spec.ts` (the lip pixel
+  for pixel), `tests/minotaur-theseus.spec.ts` (the stride) and `tests/minotaur.spec.ts` (the
+  decor, with no boss).
+
 Still to come: nothing the notes ask the drawing for. (`LevelData.tricks`, 'The knot', 'The
 snort', 'The hands', 'The horns', and `dropCause` and `fallCause` 'The labyrinth', unreachable,
 are made.)
@@ -1019,8 +1041,9 @@ tricks. Above all:
 - **The map**, cell for cell.
 - **The falls**: none over 192 px anywhere, and none over 145 on the way out.
 - **The knot's windows**, by hold.
-- **The stride**: the foot over a resting head at frames 68–70, the hero frame-identical with and
-  without him.
+- **The stride**: the foot over a resting head at frames 68–70, pushing off the wall at O1's mouth
+  with nothing on the wall there (no boss since 2026-10-11), and the tourist frame-identical with
+  and without the hero.
 - **The ear's rule** on the tick before, never on exact contact, and the take-off bands.
 - **No skip**: 39.00 px from the floor and 40.50 from the probe's stance, and x 165.69.
 - **The clock**: its 50 frames, with its drag and never the ring, and its puffs; the runners,
@@ -1146,8 +1169,8 @@ first step on the bed (yank + 360) comes while the hero is still visibly droppin
 no-skip margin is 1.5 px in the game; the race margin rests on heuristic beams. The design parts from the checks
 in three places: the clock's 34 to 42 frames for runners (the physics check: 34 to 38; hold 5's far
 take-off measures 42); the runner's 15 to 16 frames (L+7 to 21 from the x 84 entry, 22 from the
-clean run's landing); the boss at x 206–215 (the comedy check: 206–214), to cover 30 of 31
-survivors. In the game the toss's zone is the whole cell up to 64 px from L+76 to 105, but the
+clean run's landing); the boss at x 206–215 (the comedy check: 206–214; dropped 2026-10-11, and
+the stride's foot keeps its place), to cover 30 of 31 survivors. In the game the toss's zone is the whole cell up to 64 px from L+76 to 105, but the
 lurch never sweeps all of it: a man who jumps off the back too late waits by the far wall about
 24 frames for the back to come round, and 17 of 2,044 retreat runs land where nothing reaches
 them, so the head lunges out on a stretched neck. The zone is kept (designer, on a

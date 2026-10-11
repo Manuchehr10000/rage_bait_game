@@ -21,7 +21,7 @@
       "w": 80,
       "h": 28,
       "beat": "a-door",
-      "what": "A band of black rays rising from below, as at an amphora's foot, in the strip of ground outside the door under the ground line: ten tall glaze triangles, points up, standing on the course line with clay between them. Never spikes, a hazard or a platform."
+      "what": "A band of black rays rising from below, as at an amphora's foot, in the strip of ground outside the door under the ground line: ten tall glaze triangles, points up, glaze on the ground's stone, standing on the course line with the stone between them. Never spikes, a hazard or a platform."
     },
     {
       "id": "labyrinth-face",
@@ -111,13 +111,6 @@
       "what": "The ball of thread at the line's inner end, on the passage floor under O1, and later in the hero's doorway. Plain white."
     },
     {
-      "id": "boss",
-      "w": 5,
-      "h": 3,
-      "beat": "b-passage",
-      "what": "The knob on the passage's back wall that the hero's trailing foot pushes off as he mantles up O1: a small glaze silhouette on the clay, round and filled, never a ring. Background, never rock."
-    },
-    {
       "id": "theseus-lean",
       "w": 22,
       "h": 24,
@@ -148,7 +141,7 @@
       "h": 24,
       "frames": 2,
       "beat": "b-passage",
-      "what": "Theseus mantling 80 px up O1, both arms up in front of his face to the lip: with both legs under him, and with the near leg only, while the code draws the trailing one out to the boss. Faces right."
+      "what": "Theseus mantling 80 px up O1, both arms up in front of his face to the lip: with both legs under him, and with the near leg only, while the code draws the trailing one out, its foot pushing off the wall at O1's mouth. Faces right."
     },
     {
       "id": "theseus-fall",
@@ -184,7 +177,7 @@
       "w": 16,
       "h": 16,
       "beat": "d-hatch",
-      "what": "The lip: the one dressed stone in the floor, before the hatch, its top dished by two worn foot hollows where the tribute stood. Edged in glaze, so it reads as stone."
+      "what": "The lip: the one dressed stone in the floor, before the hatch, its top worn into one shallow dish with two foot hollows worn paler in it, where the tribute stood; no notch in its edge. Edged in glaze, so it reads as stone."
     },
     {
       "id": "hero-doorway",

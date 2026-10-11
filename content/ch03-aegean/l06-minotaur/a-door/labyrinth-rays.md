@@ -11,9 +11,15 @@
 
 A band of black rays rising from below, as above the foot of an amphora, in the strip of ground
 outside the door: under the ground line the figures stand on (`labyrinth-ground-line`), from the
-screen's left edge to the labyrinth's outer face at x 80 (`labyrinth-face`). With the ground line,
-it makes the first screen an amphora's panel: figures on their ground line over a band of rays,
-and a tourist in full colour walking into it.
+screen's left edge to the labyrinth's outer face at x 80 (`labyrinth-face`), glaze on the ground's
+stone. With the ground line, it makes the first screen an amphora's panel: figures on their ground
+line over a band of rays, and a tourist in full colour walking into it.
+
+- **On stone** (designer, on a recommendation, 2026-10-11): the strip, x 0 to 79 and y 164 to 190,
+  is the ground's stone, the masonry's wash (`tile-labyrinth`), not the clay of the air, so the
+  rays read as ornament on solid ground and never as spikes in a pit. The ground line keeps its
+  two rows of clay, y 160 and 163, the only clay in the strip. (Built on clay, 2026-10-10: see
+  "What this note replaces", below.)
 
 - Ten rays, tall triangles of glaze, points up: each 7 px wide at its base and 1 px at its point,
   26 rows tall, its point on y 164 and its base on y 189. One every 8 px from x 0: bases x 0 to
@@ -23,10 +29,10 @@ and a tourist in full colour walking into it.
   step from the other's, and no row widens on both sides at once: a ray, not a stack of blocks.
   No curve, no shading.
 - They stand on a lower line, the masonry's course line along y 191 (`tile-labyrinth`), with a
-  row of clay, y 190, between their bases and it. Their points stop under a row of clay, y 163,
-  under the ground line's glaze.
-- Clay between them, as on the vase: a pixel between their bases, widening to 7 at their points;
-  x 79 is clay, beside the outer face.
+  row of the stone, y 190, between their bases and it. Their points stop under the ground line's
+  lower row of clay, y 163.
+- The stone between them: a pixel between their bases, widening to 7 at their points; x 79 is
+  the stone, beside the outer face.
 
 ## Where it stands in the game
 
@@ -50,7 +56,8 @@ was wrong.) The camera keeps nothing else from view but the top 14 rows of the l
 roof and outside. It moves nothing and times nothing: every position of the clean run is the same
 with it.
 
-**The death counter on the band: open, for the designer** (the same check, 2026-10-10). The
+**The death counter on the band: accepted** (designer, on a recommendation, 2026-10-11: the HUD
+sits over the background everywhere in the game). Found by the same check, 2026-10-10. The
 counter's ink is the top left of every screen, view x 5.6 to 29.1 and y 5.2 to 27.1 at up to 99
 deaths, in the font this Chromium sets for Georgia. Wherever he is on the door storey or over it,
 the camera's top is y 14 to 53, and the counter is on the clay over the queue, 80 rows or more over
@@ -58,32 +65,32 @@ the ground line. But looking down at Z1 the band is at the top of the screen, an
 on the ground line and the upper halves of the first four rays, x 0 to 30: in the clean run for 116
 frames, about 1.9 s, from the drop into D0 (frames 167 to 282), and for 32 more on the climb from
 the ledge at 320 to L_B (1037 to 1068); the way down is replayed before every death after the knot.
-Its cream outline keeps it legible, but the ground line runs through "DEATHS" and the numeral stands
-on the rays: the counter and the ornament meet, as they did when the tongues beside it read as
-bunting. Left as built until the designer rules: accept it; or keep the counter's column clear,
-which would start the rays at x 32, six of them, and not at the screen's edge. Pinned as built in
-`tests/minotaur-out.spec.ts`.
+Its cream outline keeps it legible; the ground line runs through "DEATHS" and the numeral stands on
+the rays. Left to the designer as built (accept it, or start the rays at x 32, clear of the
+counter's column), it was accepted as built: the rays still start at the screen's edge. Pinned as
+built in `tests/minotaur-out.spec.ts`, the frames it lies on included.
 
-**The reading at the spawn, for the designer** (the same check). The clay between the rays is the
-air's colour, so with the band whole the 2 px ground line can read as a ledge over a pit of spikes,
-though the ground line, the course line and the outer face close the band in (`labyrinth-clay`, its
-one place of clay in solid ground). Not changed: it is the ruled picture, black rays on the vase's
-clay, and the band of glaze the research puts with the rays was left out because in the ground it
-would read as a hole (Deliberately wrong).
+**The reading at the spawn** (the same check, 2026-10-10). With the clay of the air between the
+rays, the band whole under the 2 px ground line read as a ledge over a pit of spikes, though the
+ground line, the course line and the outer face closed it in. The designer ruled the strip the
+ground's stone (2026-10-11), and on the stone, at the spawn on the screen canvas at window scales 3
+and 5, the floor outside reads as solid ground with a band on it.
 
 ## Must be right
 
 - **A band of black rays rising from below, as at an amphora's foot** (ruled 2026-10-10): tall
-  glaze triangles, points up, standing on a lower line, with clay between them.
-- **Never spikes, a hazard or a platform.** They are in the ground, under the floor he stands on
-  from the first frame; the outside's floor is solid over the whole band, so nothing of him or of
-  anyone reaches them. They are tall, 26 px against his 16, and slender, as many as fit, a frieze
+  glaze triangles, points up, standing on a lower line, with the ground's stone between them
+  (ruled 2026-10-11; "with clay between them", as on the vase, is superseded).
+- **Never spikes, a hazard or a platform.** They are in the ground, glaze on its stone, under the
+  floor he stands on from the first frame; the outside's floor is solid over the whole band, so
+  nothing of him or of anyone reaches them. The stone between them, never the clay of the air,
+  which made them spikes in a pit (2026-10-11). They are tall, 26 px against his 16, and slender, as many as fit, a frieze
   closed by the ground line over them, the course line under them and the outer face beside them.
   Nothing level runs across their points: no line, bar or flat top of their own to read as a
   ledge, and no gap in the ground line over them.
-- **Never touching the outer face's glaze**, or any other glaze, corners included: x 79 is clay
-  beside the face at x 80; a row of clay under the ground line and one over the course line; a
-  pixel of clay between every two bases.
+- **Never touching the outer face's glaze**, or any other glaze, corners included: x 79 is the
+  stone beside the face at x 80; the ground line's row of clay over their points and a row of the
+  stone over the course line; a pixel of the stone between every two bases.
 - **Whole on the screen** at the spawn's camera and however high he goes: never cut into spikes
   at the screen's bottom edge, its course line never the screen's last row (the camera's
   `cameraKeeps`, above).
@@ -95,9 +102,10 @@ would read as a hole (Deliberately wrong).
 
 ## Deliberately wrong
 
-- **A vase's foot ornament as the ground outside a building**, under the panel's ground line, with
-  the clay that is the level's air between its rays in solid ground (ruled 2026-10-10, "the level
-  is the vase").
+- **A vase's foot ornament as the ground outside a building**, under the panel's ground line (ruled
+  2026-10-10, "the level is the vase"), and painted on the ground's stone, not on the vase's clay
+  (ruled 2026-10-11, "the rays stand on stone"): on the vase the ground between the rays is the
+  clay, and here that clay is the level's air.
 - **No black band.** The research puts a black band with the rays above an amphora's foot; here
   the heavier ground line over the rays is the only band, since a band of glaze in the ground
   would read as a hole.
@@ -131,3 +139,10 @@ blocks, a pagoda.
   decor, its drawing, its note, its manifest entry and its tests went with it.
 - `labyrinth-lower-zone`: the same strip as plain wash with no joints, which ruled rays out as
   reading as spikes. The designer ruled the rays in (2026-10-10), and the strip is theirs.
+
+**What the rulings of 2026-10-11 replaced.** Built on 2026-10-10, the strip between the rays was
+clay, the vase's ground and the level's air, a row of it over the course line and x 79 beside the
+face; with the band whole at the spawn the ground line read as a ledge over a pit of spikes. The
+designer ruled the rays onto the ground's stone (2026-10-11), keeping their number, size, spacing
+and place, and the ground line its two rows of clay. The same day the death counter over the band,
+left open, was accepted as built.

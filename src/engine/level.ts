@@ -549,8 +549,8 @@ export type HeroMove =
   /**
    * Climbs, from frame `at`: his feet go straight from each point of `path` to the next,
    * `f` frames after `at`. Drawn in front of the tourist. `foot`: from frame `from` to
-   * `to` of the climb his trailing foot is on `rect`, which is a drawing and nothing
-   * more. `takes`: he picks up the ball as he starts, and from then on the thread is
+   * `to` of the climb his trailing foot pushes off the wall at `rect`, which is a drawing
+   * and nothing more. `takes`: he picks up the ball as he starts, and from then on the thread is
    * laid behind him.
    */
   | {
@@ -965,8 +965,6 @@ export type DecorDef =
   // The Minotaur.
   /** The post of the labyrinth's door, in the thickness of its wall: what the thread is tied to. */
   | { kind: 'doorpost'; x: number; top: number; floorY: number }
-  /** A small stone boss on a back wall. A drawing: it holds up nothing and nobody stands on it. */
-  | { kind: 'boss'; rect: Rect }
   /** A doorway in a back wall, in black glaze. Whatever goes into it is not seen. */
   | { kind: 'blackDoorway'; x: number; w: number; top: number; floorY: number }
   /**

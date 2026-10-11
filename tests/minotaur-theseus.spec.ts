@@ -238,22 +238,16 @@ test('a relieved second jump into D0 lives: every survivor of the knot, jumping 
   expect(worst).toBeCloseTo(143.44, 2);
 });
 
-test("the stride: at frames 68 to 70 the hero's trailing foot is on the boss, over the head of a knot survivor who stopped on landing, and he is frame for frame the man he would be without him", () => {
+test("the stride: at frames 68 to 70 the hero's trailing foot pushes off the wall at O1's mouth, over the head of a knot survivor who stopped on landing, and he is frame for frame the man he would be without him", () => {
   const from = approach(30);
   const hero = from.hero;
   const track = hero.track.frames;
-  // On the boss at 68 to 70 and at no other frame; in front of the tourist all the way up O1.
+  // Off the wall at 68 to 70 and at no other frame; in front of the tourist all the way up O1.
   const footAt = track.flatMap((f, k) => (f.foot ? [k] : []));
   expect(footAt).toEqual([68, 69, 70]);
-  const boss = MINOTAUR.decor.find((d) => d.kind === 'boss')!;
-  if (boss.kind !== 'boss') throw new Error('no boss');
-  for (const k of footAt) {
-    const foot = track[k]!.foot!;
-    // On the boss's top, within its width.
-    expect(foot.y + foot.h).toBe(boss.rect.y);
-    expect(foot.x).toBeGreaterThanOrEqual(boss.rect.x);
-    expect(foot.x + foot.w).toBeLessThanOrEqual(boss.rect.x + boss.rect.w);
-  }
+  // Just right of the mouth, x 192 to 208, at head height: on the passage's back wall,
+  // with nothing on it there (the stone boss it pushed off was dropped, designer, 2026-10-11).
+  for (const k of footAt) expect(track[k]!.foot).toEqual({ x: 206, y: 136, w: 9, h: 4 });
   expect(track.flatMap((f, k) => (f.front ? [k] : []))).toEqual(Array.from({ length: 20 }, (_, i) => 66 + i));
   let rested = 0;
   let under = 0;

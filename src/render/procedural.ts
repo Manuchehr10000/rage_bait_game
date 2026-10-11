@@ -1994,7 +1994,7 @@ const THESEUS_KNEEL = [
  * beardless youth in a short chiton, his sword in its scabbard at his left hip, no
  * added red on him anywhere. His poses at the door and down his route, each a drawing;
  * the code draws only what moves against something else: the ball's white in his hand,
- * the thread, the trailing leg on the knob, his far arm to the horn.
+ * the thread, the trailing leg pushing off the wall, his far arm to the horn.
  */
 export const THESEUS = {
   /**

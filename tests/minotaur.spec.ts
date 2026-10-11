@@ -112,13 +112,13 @@ test("the stage's data: the bull-leaper, the walk in, the camera on the spawn, t
     cause: 'The knot',
   });
   // The queue and Ariadne at the door (tests/minotaur-out.spec.ts); the post the knot is
-  // on, the boss his foot pushes off, his black doorway on row 5. The ground line and the
-  // rays under it are the masonry's, by rule, and no decor.
+  // on, his black doorway on row 5. The ground line and the rays under it are the
+  // masonry's, by rule, and no decor; and no boss on the passage's wall, which the stride
+  // pushed off until it was dropped (designer, 2026-10-11).
   expect(d.decor).toEqual([
     { kind: 'queue', front: 41, step: 6, maidens: 7, youths: 6, floorY: DOOR_FLOOR },
     { kind: 'ariadne', x0: 45, x1: 55, floorY: DOOR_FLOOR },
     { kind: 'doorpost', x: 80, top: 80, floorY: DOOR_FLOOR },
-    { kind: 'boss', rect: { x: 206, y: 140, w: 9, h: 8 } },
     { kind: 'blackDoorway', x: 148, w: 16, top: 628, floorY: 656 },
   ]);
   // The four tricks, in the order he meets them; the labyrinth's fall is none of them.

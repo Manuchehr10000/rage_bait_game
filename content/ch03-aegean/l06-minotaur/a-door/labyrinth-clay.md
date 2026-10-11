@@ -28,12 +28,14 @@ the screen: the camera stops there to keep the vase's foot whole (`labyrinth-ray
   texture, no grain: flat, as the vase's ground is.
 - **One clay, outside and in.** The wall alone tells the outside from the inside
   (`labyrinth-face`).
-- **Air is clay, and only air, reserved lines and the vase's foot are.** Stone is the masonry's
-  wash, people are glaze or cream, the dark is glaze, the tourist is in full colour and the thread
-  is white. A reserved line is this clay and never a lighter or darker one: an incision is the
-  clay showing through. The one place clay is in solid ground is the band of rays under the
-  ground line outside (`labyrinth-rays`, ruled 2026-10-10), the ground of the vase's ornament
-  between its rays, closed by the ground line, the course line and the outer face.
+- **Air is clay, and only air and reserved lines are.** Stone is the masonry's wash, people are
+  glaze or cream, the dark is glaze, the tourist is in full colour and the thread is white. A
+  reserved line is this clay and never a lighter or darker one: an incision is the clay showing
+  through; in the ground outside, the two rows over and under the ground line's glaze are
+  (`labyrinth-ground-line`). The band of rays under it stands on the ground's stone, never on
+  clay (designer, on a recommendation, 2026-10-11): this note's exception for that strip, the
+  clay of the vase's ornament between its rays in solid ground, read as a pit of spikes under a
+  ledge, and is superseded.
 - Never the thread's white and never the women's cream.
 
 ## Deliberately wrong

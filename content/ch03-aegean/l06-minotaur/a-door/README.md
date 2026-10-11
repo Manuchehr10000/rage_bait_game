@@ -9,8 +9,9 @@ here. It is the first bent figure he vaults, and the plant for the hands.
 
 The first screen is the vase (`../LEVEL.md`, Art, ruled 2026-10-10): clay to the edges of the
 screen and no sky, a heavier glaze ground line under the figures, and under it, in the strip of
-ground outside the door, a band of black rays rising from below, as at an amphora's foot, so
-that it reads as an amphora's panel: a tourist in full colour walking into a museum vase. The
+ground outside the door, a band of black rays rising from below, as at an amphora's foot, on the
+ground's stone (ruled 2026-10-11; on the clay of the air they read as spikes in a pit), so that
+it reads as an amphora's panel: a tourist in full colour walking into a museum vase. The
 file stands a figure every 6 px, each one a person, about eight on the screen with Ariadne and
 the rest off its left edge. Since the air is clay outside and in, the labyrinth's outer face,
 its lintel and the post tell the one from the other by the wall alone.

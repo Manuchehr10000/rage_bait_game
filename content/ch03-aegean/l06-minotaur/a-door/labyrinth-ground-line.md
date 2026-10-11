@@ -15,7 +15,8 @@ between two reserved lines of clay, over the outside's floor.
 - y 160, the floor's top row: clay.
 - y 161 and 162: glaze.
 - y 163: clay.
-- From x 0 to 79. Under it, the band of rays at the vase's foot (`labyrinth-rays`).
+- From x 0 to 79. Under it, the band of rays at the vase's foot, on the ground's stone
+  (`labyrinth-rays`).
 
 ## Where it stands in the game
 

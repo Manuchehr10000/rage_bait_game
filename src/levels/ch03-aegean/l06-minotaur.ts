@@ -165,10 +165,11 @@ const G0_FLOOR = 80;
  * the doorpost until the tourist's centre reaches x 144, leans back on the line for 20
  * frames while the slack runs out, and holds it taut at shin height for 22: a 1 px line
  * at y 149 from the post to the ball at x 208. Then he walks the passage, looking back at
- * his knot; mantles 80 px up O1, his trailing foot pushing off the boss at frames 68 to
- * 70; runs G0, heard overhead; drops the four shafts onto their pillars, crouching on
- * each to pay out a loop; and goes down Daedalus's turnings by the thread holes, silent
- * from his drop into J2, along row 5 and into the black doorway, where he waits.
+ * his knot; mantles 80 px up O1, his trailing foot pushing off the wall at its mouth at
+ * frames 68 to 70; runs G0, heard overhead; drops the four shafts onto their pillars,
+ * crouching on each to pay out a loop; and goes down Daedalus's turnings by the thread
+ * holes, silent from his drop into J2, along row 5 and into the black doorway, where he
+ * waits.
  *
  * Each `go` lands him on the side of the pillar or the room nearest the next way down,
  * and his clock is LEVEL.md's to the frame (tests/minotaur-theseus.spec.ts pins it). In
@@ -207,6 +208,8 @@ const THESEUS: HeroDef = {
         { f: 14, x: 194, feet: G0_FLOOR },
         { f: 19, x: 197, feet: G0_FLOOR },
       ],
+      // At 68 to 70 his trailing foot pushes off the wall at O1's mouth, at head height
+      // over a man who stopped under it after the knot. Nothing is on the wall there.
       foot: { from: 2, to: 4, rect: { x: 206, y: 136, w: 9, h: 4 } },
     },
     // G0, overhead, and down shaft A onto L_A; then B onto L_B, C onto L_C, D into J4.
@@ -399,8 +402,6 @@ export const MINOTAUR: LevelData = {
     { kind: 'ariadne', x0: 45, x1: 55, floorY: DOOR_FLOOR },
     // The post the knot is tied to, in the door's thickness.
     { kind: 'doorpost', x: 80, top: 80, floorY: DOOR_FLOOR },
-    // On P's back wall at head height, just right of O1: what his foot pushes off.
-    { kind: 'boss', rect: { x: 206, y: 140, w: 9, h: 8 } },
     // The hero's doorway on row 5, where he waits for the fight.
     { kind: 'blackDoorway', x: 148, w: 16, top: 628, floorY: 656 },
   ],

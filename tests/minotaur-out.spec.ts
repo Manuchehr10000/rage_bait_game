@@ -756,19 +756,22 @@ test('in the game: the queue and Ariadne stand behind him and never over x 56, s
   expect(r.heads.view[0]).toBeLessThanOrEqual(136);
   expect(r.heads.eyes).toEqual({ youths: [7, 19, 31], maidens: [1, 13, 25, 37] });
   // Under them the vase's foot, on the first screen: the ground line, two rows of glaze
-  // between rows of clay, and under it ten rays, points up, standing on the course line
-  // at y 191, every one the same. A row of clay between them and the ground line, and
-  // between them and the course line; a pixel of clay between every two, and between
-  // the last and the outer face at x 80, which starts a row under the ground line's clay.
+  // between rows of clay, and under it, on the ground's stone, ten rays, points up,
+  // standing on the course line at y 191, every one the same. The ground line's row of
+  // clay over their points; a row of the stone between them and the course line, a
+  // pixel of it between every two, and between the last and the outer face at x 80,
+  // which starts a row under the ground line's clay. (Until 2026-10-11 the band was the
+  // clay of the air, and read as spikes in a pit under a ledge: the designer ruled the
+  // rays onto stone.)
   expect(r.heads.view[1]).toBeGreaterThanOrEqual(192);
   const RAY = [
-    ...Array(3).fill('___#____'),
-    ...Array(4).fill('__##____'),
-    ...Array(4).fill('__###___'),
-    ...Array(4).fill('_####___'),
-    ...Array(4).fill('_#####__'),
-    ...Array(4).fill('######__'),
-    ...Array(3).fill('#######_'),
+    ...Array(3).fill('www#wwww'),
+    ...Array(4).fill('ww##wwww'),
+    ...Array(4).fill('ww###www'),
+    ...Array(4).fill('w####www'),
+    ...Array(4).fill('w#####ww'),
+    ...Array(4).fill('######ww'),
+    ...Array(3).fill('#######w'),
   ];
   expect(r.band).toEqual([
     '_'.repeat(80) + 'ww',
@@ -776,7 +779,7 @@ test('in the game: the queue and Ariadne stand behind him and never over x 56, s
     '#'.repeat(80) + 'ww',
     '_'.repeat(80) + 'ww',
     ...RAY.map((row) => row.repeat(10) + '#w'),
-    '_'.repeat(80) + '#w',
+    'w'.repeat(80) + '#w',
     '#'.repeat(82),
   ]);
   // Behind him: nothing of the file is drawn over his own pixels.
@@ -791,7 +794,7 @@ test('in the game: the queue and Ariadne stand behind him and never over x 56, s
   for (const f of r.walk) expect(f).toEqual({ y: r.spawnY, ground: true, state: 'playing' });
 });
 
-test('in the game: the death counter lies on the band of rays only while the camera looks down at Z1 and at the climb out, never while he is on the door storey or over it; open, for the designer', async ({ page }) => {
+test('in the game: the death counter lies on the band of rays only while the camera looks down at Z1 and at the climb out, never while he is on the door storey or over it; as built, and accepted by the designer', async ({ page }) => {
   await open(page);
   const ink = await page.evaluate(() => {
     const g = (window as unknown as W).__game;
@@ -847,8 +850,9 @@ test('in the game: the death counter lies on the band of rays only while the cam
   // the ground line. Looking down at Z1, from the drop into D0, and on the climb from the
   // ledge at 320 to L_B, the band is at the top of the screen and the counter lies on the
   // ground line and the first four rays: 116 frames and 32 of the clean run, and the way
-  // down is replayed before every death after the knot. Left as built, for the designer to
-  // accept or to rule the counter's column clear of it (a-door/labyrinth-rays.md).
+  // down is replayed before every death after the knot. Accepted as built (designer, on a
+  // recommendation, 2026-10-11): the HUD sits over the background everywhere in the game
+  // (a-door/labyrinth-rays.md). A change to the counter, the band or the camera moves these.
   expect(on.filter((l) => l.y + 16 <= DOOR_FLOOR)).toEqual([]);
   expect(spans).toEqual([
     [167, 282],

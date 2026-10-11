@@ -1535,7 +1535,7 @@ export interface HeroFrame {
   front: boolean;
   /** In a black doorway, and not drawn. */
   unseen: boolean;
-  /** His trailing foot, where it is on something that is not his floor: the stride. A drawing. */
+  /** His trailing foot, where it pushes off the wall and not his floor: the stride. A drawing. */
   foot: Rect | null;
   /** He has the ball, and the thread is laid behind him. */
   carrying: boolean;

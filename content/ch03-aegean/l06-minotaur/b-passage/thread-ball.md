@@ -22,8 +22,9 @@ doorway on row 5, where he left it; it is drawn there only once he has stepped o
 
 - **Plain.** The rough's two stripes read as a face, or a marshmallow.
 - **The thread's white**, the only white: it is the thread.
-- **Clear of the knob over it** (`boss`), 10 px of clay between, y 144 to 153, so the two never
-  stack into one thing.
+- **Nothing on the wall over it.** It was kept clear of the knob over it, 10 px of clay between,
+  until the stride's stone boss was dropped (designer, on a recommendation, 2026-10-11); the
+  wall at O1's mouth is now plain clay.
 - Nothing in the doorway before L−8: Theseus waits there unseen.
 
 ## Deliberately wrong

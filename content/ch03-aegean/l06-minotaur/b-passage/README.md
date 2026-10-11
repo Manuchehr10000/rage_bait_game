@@ -7,9 +7,11 @@ test his knot, with a creak; the slack runs out, and the line holds taut at the 
 height, y 149, for 22 frames: the tourist's throat. It clotheslines him: his feet fly out ahead
 of him and he lands flat on his back, the wig over his eyes, with one dry knock. **Death label:
 "The knot".** A jump timed to the lean clears it. Then the hero walks the passage looking back
-at his knot, takes the ball and mantles 80 px up O1, his trailing foot pushing off a knob on the
-back wall over the head of a man who stopped there: a picture, never a trap.
+at his knot, takes the ball and mantles 80 px up O1, his trailing foot pushing off the wall at
+O1's mouth over the head of a man who stopped there: a picture, never a trap.
 
-Notes here: the thread, in all its states, the knot on the post among them; the ball; the knob;
-and Theseus standing, walking, leaning on the line and climbing. The clothesline's frame is the
+Notes here: the thread, in all its states, the knot on the post among them; the ball; and Theseus
+standing, walking, leaning on the line and climbing. (The stone boss his foot pushed off, `boss`,
+a knob on the back wall, was dropped with its note, designer, on a recommendation, 2026-10-11: it
+read first as a letter o, then as a minus sign.) The clothesline's frame is the
 chapter's (`../../shared/bull-leaper-clotheslined.md`). The passage's stone is beat a's masonry.

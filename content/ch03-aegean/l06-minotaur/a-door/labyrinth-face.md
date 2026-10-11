@@ -19,9 +19,11 @@ contour where its stone meets the clay outside.
   stone's bottom row is reserved clay over the vestibule's black, which stops it there.
 - Under the threshold, down x 80 from y 164 to the course line at y 191, beside the band of
   rays under the ground line outside (`labyrinth-rays`): the labyrinth's wall going on down into
-  the ground, and the rays' band's edge. It starts a row under the ground line's last clay row,
-  y 163, so it never touches its glaze, not even at the corner (79, 162); it started on y 163
-  while the ground line was 1 px (2026-10-10).
+  the ground, and the rays' band's edge. There it is not stone against clay but the
+  labyrinth's stone against the ground's, since the rays stand on stone (designer, on a
+  recommendation, 2026-10-11), and it closes the band on its right. It starts a row under the
+  ground line's last clay row, y 163, so it never touches its glaze, not even at the corner
+  (79, 162); it started on y 163 while the ground line was 1 px (2026-10-10).
 
 The stone inside the contour is the masonry by its rule (`tile-labyrinth`). Under the lintel is
 the door opening, x 80 to 96: the post at its outer side (`labyrinth-doorpost`), then clay, then
@@ -44,7 +46,8 @@ whole on the screen (`labyrinth-rays`, 2026-10-10).
   2026-10-10). It is the masonry's underside line, and the masonry's rule stops it: y 79 is
   reserved clay from x 95 to 128 (`tile-labyrinth`, against the black). With the post's glaze
   edge it is one outline, the door's frame.
-- The rays end at x 78, with clay at 79: they never touch it (`labyrinth-rays`).
+- The rays end at x 78, with the ground's stone at 79: they never touch it (`labyrinth-rays`;
+  clay at 79 until 2026-10-11).
 - **Never Knossos**: no Knossian door, no red-and-black column, no light well, no meander
   (`../LEVEL.md`, Deliberately wrong; `../../CHAPTER.md`, error dossier).
 - Nothing on the face: no ornament, no mark, no text (pillar 2).
