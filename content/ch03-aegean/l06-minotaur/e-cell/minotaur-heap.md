@@ -48,7 +48,8 @@ blow, whom the heap's solid lifts, it is the heap from L+130, its head jerked up
 before its shoulders for those frames, so that he stands on its drawn back.
 
 **How it lies against its stones.** Front to back: its head and neck, its near arm and the hand
-on its stone, its body, then the stones.
+on its stone, its body, then the stones; the near stone, where it is seen, and its hand and its
+arm from the elbow are drawn again in front of Theseus (below).
 The head, `minotaur-head` frame 2, lies on the floor, its pixels within x 105 to 115 and y 727 to
 735 (`headAt`, `src/engine/entities.ts`), clear of Theseus's feet, which come to x 103, and over
 the far stone where it was let go, x 110 to 117; the near one, where it was set down, x 98 to 105,
@@ -67,8 +68,20 @@ When the camera goes on up with the tourist, two frames after the head is down, 
 the head on it leave the view (`Entity.keepsInView`): what is seen of the heap from then on is
 its top.
 
-Theseus stands over it, in front of all of it, cut from it by his reserved line, corners
-included, his feet before its head.
+Theseus stands at guard over it between its body and its near arm, as through its kneel
+(`minotaur-body`, Against Theseus): in front of its body, head and far arm, cut from them by his
+reserved line, corners included, his feet before its head; behind its near arm from its elbow, its
+hand and the near stone, which are drawn again in front of him with a line of clay round them,
+corners included, but where its head lies over them, never across the elbow, never over cream and
+never into the floor (`nearer`, `src/render/bull.ts`). Its upper arm is one mass with its shoulder
+and is not drawn again. So its hand lies flat on its stone in front of his shins from L+106 to the
+end, as through the kneel, but in the second blow's lunge, when all of him is in front of it
+(`theseus-blow`). At guard over it his feet are apart, as he planted them to draw and strike
+(`../b-passage/theseus-stand.md`, frame 2): his back leg clear of the hand, down to the floor, and
+his front foot behind the stone, never past x 103 (`tests/minotaur-bull.spec.ts`). (After the final
+review of the art, 2026-10-11, superseded: he stood in front of all of it, on his guard's feet
+together, and from L+136 his legs hid its hand and the stone, its arm a stub pointing at his hip;
+drawn in front of him on those feet, the hand and the stone hid both his legs, a torso on a hand.)
 
 ## Must be right
 
@@ -78,9 +91,10 @@ included, his feet before its head.
   rump comes up onto the solid (`tests/minotaur-bull.spec.ts`).
 - **A body, never a rock, and never a character** (pillar 2; ruled 2026-10-11): a man's back bowed
   over his folded leg, his near arm out to his stone and his hand flat on it, the bull's head on
-  the floor before it, read whole whenever the floor is in view, at 1x, 2x and 3x; from its top to
-  12 px over the floor every row of it one run of glaze from x 118 to 141, no notch cut into it
-  from either side (`tests/minotaur-bull.spec.ts`).
+  the floor before it, read whole whenever the floor is in view, at 1x, 2x and 3x, the hand and
+  the stone in front of Theseus at guard over it; from its top to 12 px over the floor every row
+  of it one run of glaze from x 118 to 141, no notch cut into it from either side
+  (`tests/minotaur-bull.spec.ts`).
 - **Bloodless, and no added red** on it (`../LEVEL.md`): its damage shows only in how it lies.
 - **It stays**, and nothing of it moves after its head has gone down.
 - **The head whole**: the bull's head in front of everything else of it, so that the heap reads as

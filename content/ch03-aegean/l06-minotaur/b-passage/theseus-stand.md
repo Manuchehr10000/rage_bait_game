@@ -4,7 +4,7 @@
 |---|---|
 | Id | `theseus-stand` |
 | File | None, and none is wanted: drawn in code at 1 world px (`../LEVEL.md`, Art, ruled 2026-10-10) |
-| Size | 12 × 24 world px, 2 frames, his box; faces right |
+| Size | 12 × 24 world px, 3 frames, his box; faces right |
 | Beat | `b-passage` |
 
 ## What it is
@@ -16,13 +16,21 @@ feet. The frames:
 1. At guard: his sword drawn, upright in his right fist before his belt, its blade 6 px up in front
    of his chest and face with a pixel of clay between, its pommel under his fist: `../e-cell/theseus-grip.md`
    frame 0 with no horn in his hand.
+2. At guard over the heap: frame 1's head, body and sword on his feet apart, as he planted them to
+   draw and strike (`../e-cell/theseus-draw.md`): his back leg out from under his hem and slanting
+   back to the floor, his front leg forward under it, the front foot never past x 103, short of the
+   bull's head on the floor at x 105 (`../e-cell/minotaur-heap.md`). Its near arm, its hand flat on
+   the near stone and the stone lie in front of his shins and his front leg, as through its kneel;
+   his back leg is seen clear of them, so he is never a torso on a hand. (Added after the final
+   review of the art, 2026-10-11: on frame 1's feet together the hand and the stone hid both his
+   legs.)
 
 ## Where it stands in the game
 
 Frame 0 down his route, where he stops. Frame 1 in the fight, from his step out of his doorway
 on: at the edge of row 5 before his leap, facing the hatch; landed before its face, and facing the
-bull from L+38, when he turns to it at the horn, until the grip; and from the second blow on, over
-the heap. (Drawn 2026-10-10: the note had him at rest, his sword in its scabbard, between a leap
+bull from L+38, when he turns to it at the horn, until the grip. Frame 2 from the second blow on,
+over the heap (until 2026-10-11 frame 1, superseded after the final review of the art). (Drawn 2026-10-10: the note had him at rest, his sword in its scabbard, between a leap
 and a grip that both have it in his hand.) His box is the hero's 12 × 24.
 
 ## Must be right

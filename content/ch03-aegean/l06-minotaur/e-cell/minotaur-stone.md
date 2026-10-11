@@ -51,9 +51,11 @@ of Theseus, is drawn again in front of him only where it is seen (after the whol
 2026-10-10: as the struck body lurched over it where it was set down, its place was drawn again in
 the body's glaze with a line of clay round it, a box stamped on the body;
 `tests/minotaur-bull.spec.ts`). Both stay by the heap, behind its head, the near one with its
-hand still flat on it (`minotaur-heap`). In its hand the stone is in front of it, the far stone included, its contour
-whole, cut from the body by clay, and nothing lies on it but its own hand: held up on its fist,
-the fist under it and its thumb up the stone's front end, the arm behind the stone and the fist in
+hand still flat on it, the near one and its hand in front of Theseus at guard over the heap
+(`minotaur-heap`; until 2026-10-11, after the final review of the art, the heap's stones were
+behind him, and his legs hid the near one). In its hand the stone is in front of it, the far
+stone included, its contour whole, cut from the body by clay, and nothing lies on it but its own
+hand: held up on its fist, the fist under it and its thumb up the stone's front end, the arm behind the stone and the fist in
 front of it (`minotaur-hand`, frame 1), while the stone's top is 2 px over its shoulder or more,
 and on every frame it is brought down; gripping it from above, the palm on its top and the fingers
 down its face (frame 0), while it is taken up lower, the arm to the wrist over it. (Until 2026-10-11 two fingertips lay up on its face from the

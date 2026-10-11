@@ -1302,6 +1302,29 @@ const HERO_WALK: readonly HeroDrawing[] = [
   ['....####....', '....####....', '....##.#....', '....##.##...', '....##.##...', '.....#.##...', '.....#.##...', '....##.###..'],
 ].map((legs) => ({ ...HERO_FIGHT.stand, rows: [...HERO_FIGHT.stand.rows.slice(0, 16), ...legs] }));
 
+/**
+ * At guard over the heap (e-cell/minotaur-heap.md): the guard's head and body, his feet apart
+ * as he planted them to draw and strike, his back leg out from under his hem and clear of
+ * its near hand on its stone, which lie in front of his shins as through its kneel, and his
+ * front foot behind them, never past x 103, short of its head on the floor. On the guard's
+ * feet together, the hand and the stone hid both his legs: a torso on a hand.
+ */
+const HERO_GUARD: HeroDrawing = {
+  ...HERO_FIGHT.stand,
+  rows: [
+    ...HERO_FIGHT.stand.rows.slice(0, 15),
+    '#.#######...',
+    '..##...##...',
+    '.##....##...',
+    '.##....##...',
+    '.##.....##..',
+    '.##.....##..',
+    '.##.....##..',
+    '.##.....##..',
+    '###....###..',
+  ],
+};
+
 /** His drawing on this frame of the fight. */
 export function heroDrawing(f: HeroFrame, a: HeroAgainst | null): HeroDrawing {
   switch (f.pose) {
@@ -1318,7 +1341,7 @@ export function heroDrawing(f: HeroFrame, a: HeroAgainst | null): HeroDrawing {
     case 'blow':
       return a?.heap ? HERO_FIGHT.blow[1] : HERO_FIGHT.blow[0];
     default:
-      return HERO_FIGHT.stand;
+      return a?.heap ? HERO_GUARD : HERO_FIGHT.stand;
   }
 }
 
@@ -1426,6 +1449,11 @@ export function heroPicture(f: HeroFrame, a: HeroAgainst | null): { back: Pixels
 function armTo(p: Pixels, s: Pt, h: Hand, withHand = true, elbowAt?: Pt): void {
   const e = elbowAt ?? elbowOf(s, h.wrist);
   p.taper(s, e, 5, 4);
+  forearmTo(p, e, h, withHand);
+}
+
+/** The forearm from the elbow `e`, narrowed to a wrist of 2 px, and its hand. */
+function forearmTo(p: Pixels, e: Pt, h: Hand, withHand = true): void {
   p.taper(e, h.wrist, 3.8, 2.2);
   if (withHand) handInto(p, h);
 }
@@ -1622,7 +1650,7 @@ export function bullPicture(f: Fight, masonry: Masonry, ridden = false): { body:
   let front = new Pixels();
   const over = new Pixels();
   let tips = new Pixels();
-  if (k >= d.clock.blow2 && !holdsKneel(f, ridden)) heap(body, f);
+  if (k >= d.clock.blow2 && !holdsKneel(f, ridden)) front = heap(body, f);
   else {
     const b = bullPose(f, ridden);
     const { near: sn, far: sf } = shoulders(b.x0, b.top, F, b.kneel);
@@ -1790,8 +1818,10 @@ function clear(p: Pixels, masonry: Masonry): void {
  * a man on its back (`holdsKneel`), where it is the heap from the blow. Front to back: the
  * head and neck, the near arm, the body, the stones; the head and the arm cut from what is
  * behind them by clay, and nothing incised across the body, where a line reads as a sword cut.
+ * Returns what of it is drawn again in front of Theseus at guard over it: its near arm from
+ * its elbow, its hand and the near stone, as through its kneel (`nearer`).
  */
-function heap(p: Pixels, f: Fight): void {
+function heap(p: Pixels, f: Fight): Pixels {
   const d = f.def;
   const F = d.floorY;
   const st = d.stones;
@@ -1800,7 +1830,8 @@ function heap(p: Pixels, f: Fight): void {
   const top = F - d.back.heap;
   const struck = f.k - d.clock.blow2 < STRUCK;
   const put = { x: d.body.face - 6 - st.w / 2, y: F - st.h };
-  const floor = [stone(st.far, F - st.h, st.w, st.h, false), stone(put.x, put.y, st.w, st.h, true)];
+  const nearStone = stone(put.x, put.y, st.w, st.h, true);
+  const floor = [stone(st.far, F - st.h, st.w, st.h, false), nearStone];
   const sn = { x: x0 + 3, y: top + 6 };
   // Sunk over its knees, its back on the solid; its far arm under it.
   const body = new Pixels();
@@ -1809,7 +1840,8 @@ function heap(p: Pixels, f: Fight): void {
   // Its near arm still out to its stone, its hand flat on it as through its kneel, in front
   // of its body and cut from it but at its root.
   const nearArm = new Pixels();
-  armTo(nearArm, sn, handAt(HAND_FLAT, { x: put.x, y: F - st.h - FLAT_ON }));
+  const hand = handAt(HAND_FLAT, { x: put.x, y: F - st.h - FLAT_ON });
+  armTo(nearArm, sn, hand);
   p.lay(nearArm, 'reserve', sn);
   // Its head jerked up once, on its neck; then down on the floor before it, the neck down to it.
   const head = f.headAt(f.k);
@@ -1822,8 +1854,20 @@ function heap(p: Pixels, f: Fight): void {
   // Bowed down, the neck comes out of its chest at its root: over the root the chest is one
   // mass of glaze, with no line of the neck's clay left in it.
   if (!struck) for (const { x, y } of body.each()) if (y < neck.y && !part.get(x, y) && p.get(x, y) === '_') p.put(x, y);
+  // On the floor the near stone is behind everything of it: what is seen of it is only
+  // where nothing of it lies over it.
+  const seen = new Pixels();
+  for (const { x, y, ink } of nearStone.each()) if (!p.get(x, y)) seen.put(x, y, ink);
   behind(p, floor);
   onTheSolid(p, x0, x1, top);
+  // Its near arm from its elbow, its hand and the near stone, what is seen of it, are in
+  // front of Theseus, who stands at guard between them and the rest of it, as through its
+  // kneel: but where its head lies over them. Its upper arm is one mass with its shoulder.
+  const elbow = elbowOf(sn, hand.wrist);
+  const near = new Pixels();
+  forearmTo(near, elbow, hand);
+  for (const { x, y } of seen.each()) near.put(x, y);
+  return nearer(p, near, part, elbow, F);
 }
 
 /** Nothing of `p` over its back behind its shoulders, where a man may stand on it. */

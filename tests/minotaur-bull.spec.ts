@@ -674,6 +674,48 @@ test('struck, its near hand reaches up at his chest in front of him, between him
   expect(wrong).toEqual([]);
 });
 
+test("at guard over its heap: its near hand flat on the near stone, and the stone, in front of his shins as through its kneel, whole but where its head lies over them, cut from him by clay, corners included; his back leg clear of them and his feet short of its head", () => {
+  // After the final review of the art, 2026-10-11: the heap was drawn all behind him, so that
+  // at guard his legs hid its hand and the stone, and its arm read as a stub at his hip.
+  const hand = new Map<string, { x: number; y: number }>();
+  const put = FIGHT.body.face - 6 - ST.w / 2;
+  left(BULL_HAND_FRAMES[HAND_FLAT]!.rows).forEach((r, j) => [...r].forEach((c, i) => c === '#' && hand.set(`${put + i},${F - ST.h - FLAT_ON + j}`, { x: put + i, y: F - ST.h - FLAT_ON + j })));
+  const wrong: string[] = [];
+  let guard = 0;
+  for (let k = C.blow2 + STRUCK; k < C.blow2 + 120; k++) {
+    const f = at(k);
+    const a = against(f);
+    const h = heroAt(k);
+    const pic = heroPicture(h, a);
+    if (h.pose !== 'stand') continue;
+    guard++;
+    // As drawn: the heap, him, its near arm, hand and stone, and him again where he lunges.
+    const seen = new Map<string, { ink: string; his: boolean }>();
+    for (const [p, his] of [[a.behind, false], [pic.back, true], [a.front, false], [pic.front, true]] as const) for (const q of p.each()) seen.set(`${q.x},${q.y}`, { ink: q.ink, his });
+    // Its head on the floor, and a pixel round it: in front of its hand.
+    const hd = f.headAt(k);
+    const head = new Set<string>();
+    left(BULL_HEAD_FRAMES[2]!).forEach((r, j) => [...r].forEach((c, i) => c === '#' && [-1, 0, 1].forEach((dx) => [-1, 0, 1].forEach((dy) => head.add(`${hd.x + i + dx},${hd.y - 5 + j + dy}`)))));
+    for (const [at0, q] of hand) if (!head.has(at0) && a.front.get(q.x, q.y) !== '#') wrong.push(`L+${k}: its hand not in front of him at (${q.x}, ${q.y})`);
+    for (let i = 1; i < ST.w - 1; i++) for (let y = F - ST.h + 1; y < F; y++) if (!hand.has(`${put + i},${y}`) && !head.has(`${put + i},${y}`) && a.front.get(put + i, y) !== 'o') wrong.push(`L+${k}: the stone not in front of him at (${put + i}, ${y})`);
+    // Nothing of his glaze, as seen, within a pixel of its glaze, corners included.
+    for (const [key, s] of seen) {
+      if (!s.his || s.ink !== '#') continue;
+      const [x, y] = key.split(',').map(Number) as [number, number];
+      for (const [dx, dy] of [[-1, -1], [0, -1], [1, -1], [-1, 0], [1, 0], [-1, 1], [0, 1], [1, 1]] as const) {
+        const n = seen.get(`${x + dx},${y + dy}`);
+        if (n && !n.his && n.ink === '#') wrong.push(`L+${k}: his (${x}, ${y}) against its (${x + dx}, ${y + dy})`);
+      }
+    }
+    // His back leg seen whole down to the floor, left of the hand's line of clay: never a torso on a hand.
+    for (let y = F - 8; y < F; y++) if (![...Array(put - 1 - Math.round(h.x)).keys()].some((i) => seen.get(`${Math.round(h.x) + i},${y}`)?.his && seen.get(`${Math.round(h.x) + i},${y}`)?.ink === '#')) wrong.push(`L+${k}: no back leg at y ${y}`);
+    // His feet come to x 103, short of its head on the floor at x 105.
+    for (const q of hisGlaze(pic.back)) if (q.y >= F - 2 && q.x > 103) wrong.push(`L+${k}: his foot at (${q.x}, ${q.y})`);
+  }
+  expect(guard).toBeGreaterThan(100);
+  expect(wrong.slice(0, 20)).toEqual([]);
+});
+
 test('the clap into the grip: the near stone stays on the floor under its hand till the palm is back on it, then goes up in it; never on the floor while the hand holds it, never moving but in its hand, and the claw clear of it', () => {
   // Its hand has the stone: under it, holding it up, or flat on it, gripping it.
   const inHand = (b: BullPose) => {

@@ -123,9 +123,9 @@
       "id": "theseus-stand",
       "w": 12,
       "h": 24,
-      "frames": 2,
+      "frames": 3,
       "beat": "b-passage",
-      "what": "Theseus standing: a beardless youth in a short chiton, the sword at his hip in its scabbard; and at guard in the fight, the sword drawn and upright in his right fist. Faces right."
+      "what": "Theseus standing: a beardless youth in a short chiton, the sword at his hip in its scabbard; at guard in the fight, the sword drawn and upright in his right fist; and at guard over the heap, the same on his feet apart, his back leg clear of the heap's near hand on its stone, which lie in front of his shins. Faces right."
     },
     {
       "id": "theseus-walk",

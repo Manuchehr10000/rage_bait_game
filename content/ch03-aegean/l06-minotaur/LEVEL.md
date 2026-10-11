@@ -260,7 +260,10 @@ Chosen in the asset notes (2026-10-10), where this file did not decide, for the 
   shoulder, an arm trailing and a knee bent, its shin up, unseen where it lies in the vestibule's
   black (since 2026-10-11). Theseus stands between its body and its near arm: in front of its
   body, head and far arm, behind its near arm, its hand and the near stone, each cut from the other
-  by clay, corners included, and his hand on the horn in front of it. (After a check of the drawn
+  by clay, corners included, and his hand on the horn in front of it; and so over its heap, its arm
+  there from the elbow, its hand and the stone in front of his shins to the end (after the final
+  review of the art, 2026-10-11, superseded: the heap was drawn all behind him, and at guard his
+  legs hid its hand and the stone, its arm a stub at his hip). (After a check of the drawn
   bull, the same day: the crouched leg read as the digit 4, the flat hands as rakes, and its glaze
   met Theseus's at the corners on every frame from L+31. After the whole-level review, the same
   day: the claw and the reach were rows of four like prongs, a rake over its brow and a grille on
@@ -280,8 +283,11 @@ Chosen in the asset notes (2026-10-10), where this file did not decide, for the 
 - Theseus in the fight, as drawn (2026-10-10, `e-cell`, and the stand and the walk in `b-passage`):
   his sword drawn from the step out of his doorway, a 6 px blade in every drawing, glaze over the
   clay and a line of clay over glaze; at guard on his feet and walking out, the sword upright in
-  his fist before his belt; the leap one drawing, the sword up and back away from the tourist, his
-  far arm ahead; shoved, a second drawing of the grip, for the lurch. The horn is in his hand only
+  his fist before his belt; at guard over the heap, his feet apart as he planted them to draw and
+  strike, his back leg clear of its near hand on its stone, which lie in front of his shins, and
+  his front foot behind them, never past x 103 (after the final review of the art, 2026-10-11: on
+  his guard's feet together the hand hid both his legs, a torso on a hand); the leap one drawing,
+  the sword up and back away from the tourist, his far arm ahead; shoved, a second drawing of the grip, for the lurch. The horn is in his hand only
   while it is within 14 px of his far shoulder: he lets go of it to duck, takes it again with the
   draw at L+70, and the second blow jerks the head out of his hand, so it is his from L+40 to 57
   and L+70 to 129 (drawn holding it through the heave, his arm was 20 px). In his two blows he
@@ -1133,6 +1139,21 @@ Being built, in this order, as a stage in the dev build (`#minotaur`, in `STAGES
   horn, and is out of its arm's 22 px over them; and held under the back's top the stone is not
   raised (beat e; MFA 60.1). "The stone's arc never crosses a live tourist" (The tricks, 'The
   horns') holds at its face and over its head, not on its back.
+
+- **The heap's hand in front of him** (2026-10-11, after the final review of the art, to the notes
+  in `e-cell` and `b-passage/theseus-stand.md`): at guard over the heap, from L+134 to the end, its
+  near arm from its elbow, its hand flat on the near stone and the stone, where they are seen, are
+  drawn again in front of Theseus with a line of clay round them, corners included, but where its
+  head lies over them, as through its kneel (`nearer`, `src/render/bull.ts`); its upper arm stays
+  one mass with its shoulder. The heap's branch had left them all behind him, so that his legs hid
+  its hand and the stone whenever the floor was in view with him at guard, its arm a stub pointing
+  at his hip, and the notes disagreed with each other and the drawing. At guard over it he stands
+  on his feet apart, as he planted them to draw and strike (`theseus-stand`, frame 2, `HERO_GUARD`):
+  drawn on the guard's feet together behind the hand, the hand and the stone hid both his legs, a
+  torso on a hand. Nothing that kills, carries, times or sounds moved, and none of his frames.
+  Pinned in `tests/minotaur-bull.spec.ts` (at guard over the heap, the hand's pixels and the stone's
+  cream in front of him but where its head lies over them, his glaze nowhere against its, his back
+  leg seen to the floor, his feet to x 103).
 
 Still to come: nothing the notes ask the drawing for. (`LevelData.tricks`, 'The knot', 'The
 snort', 'The hands', 'The horns', and `dropCause` and `fallCause` 'The labyrinth', unreachable,

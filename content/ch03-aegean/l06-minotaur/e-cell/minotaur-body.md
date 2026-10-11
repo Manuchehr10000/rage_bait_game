@@ -41,10 +41,15 @@ him by his reserved line, corners included; its near arm, the hand on it and the
 drawn again in front of him with a line of clay round them, corners included, never across the
 arm's root at the shoulder, never over cream and never into the floor (`front`,
 `src/render/bull.ts`); and his arm and hand on its horn are in front of it. So no glaze of it ever
-touches his, and the hands on the stones stay whole in front of his feet. In his two blows he
-lunges in past its near arm, and all of him is drawn in front of it, cut from it by his line of
-clay, his blade a line of clay where it goes into it (`theseus-blow`; 2026-10-10, after Theseus was
-drawn: behind the hand thrashing at his chest, his sword arm and blade were hidden at the first).
+touches his, and the hands on the stones stay whole in front of his feet. Over its heap too, from
+L+134 to the end, he stands between them, its near arm drawn again from its elbow, its upper arm
+one mass with its shoulder, and its hand and the near stone in front of his shins, his feet apart
+so that his back leg is seen clear of them (`minotaur-heap`; after the final review of the art,
+2026-10-11, superseded: the heap was drawn all behind him, and at guard his legs hid its hand and
+the stone). In his two blows he lunges in past its near arm, and all of him is drawn in front of
+it, cut from it by his line of clay, his blade a line of clay where it goes into it
+(`theseus-blow`; 2026-10-10, after Theseus was drawn: behind the hand thrashing at his chest, his
+sword arm and blade were hidden at the first).
 
 ## Where it stands in the game
 
