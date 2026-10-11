@@ -9,7 +9,9 @@
 
 ## What it is
 
-Clapped flat between two palms like a fly: him seen edge-on, a sliver 4 px wide and his full 16
+Clapped flat between two palms like a fly, two open hands, each 7 × 13, most of his height
+(`../l06-minotaur/e-cell/minotaur-hand.md`, frame 3; oversized since 2026-10-11, when they were
+5 × 12 and edge-on): him seen edge-on, a sliver 4 px wide and his full 16
 high, his colours in their order down it (the wig, the sweatband, his face, the lime vest, the
 gold belt, the red kilt, his legs, the trainers).
 
@@ -27,7 +29,8 @@ them to its feet by frame 8; from frame 9 `bull-leaper-pressed`, flat on the flo
 was.
 
 Its feet, where he is dropped, are x 76 to 91, his flat frame's outline from end to end, and his
-sliver comes down over its middle, x 82 to 85, its palms at x 76 to 80 and 87 to 91. (Chosen
+sliver comes down over its middle, x 82 to 85, its palms at x 74 to 80 and 87 to 93 (at x 76 to
+80 and 87 to 91 until the palms were drawn oversized, 2026-10-11). (Chosen
 after a check of the deaths, 2026-10-10: dropped under the palms' first place, x 87 to 102, he
 lay over the near stone, at x 100 where it rests and at x 98 where it is set down, cutting it to
 a few pixels of cream, his trainers inside it; and its far palm, at the floor, came over

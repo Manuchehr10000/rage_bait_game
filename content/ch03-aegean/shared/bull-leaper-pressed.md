@@ -49,10 +49,13 @@ The Minotaur, beat e, the hands:
   hid them; it read as a flat man on a lump, not on its brow. After the check of the deaths, the
   same day: caught standing on its back he was first dropped 27 px to the floor, under its raised
   belly, onto its far stone.)
-- The swat's hand is flat on top of him, a line of clay between its fingertips and him, from the
-  catch to frame 8, when it leaves him (`../l06-minotaur/e-cell/minotaur-hand.md`). On a man on
-  the floor it is never over Theseus: on his head while he stands, short of Theseus's head; on his
-  face and chest once he is flat, its forearm going in behind Theseus's foot.
+- The swat's hand is flat on top of him, its fingers down onto him, a line of clay between its
+  fingertips and him, from the catch to frame 8, when it leaves him
+  (`../l06-minotaur/e-cell/minotaur-hand.md`), its arm coming down onto it from above, the elbow
+  raised. On a man on the floor it is never over Theseus: on his head while he stands, short of
+  Theseus's head; on his face and chest once he is flat, x 80 to 88, its arm arched over
+  Theseus's head and behind him (until 2026-10-11, when the hand was drawn oversized, its forearm
+  went in behind Theseus's foot).
   The rough build squashed his frame from 13 × 14 to 17 × 6 over those frames; squashed pixels are
   rotated pixels' cousin, and the drawn frame replaces them.
 

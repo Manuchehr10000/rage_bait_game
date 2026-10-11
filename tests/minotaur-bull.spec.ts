@@ -114,23 +114,29 @@ test("its drawings: a bull's head whose horns are 2 px and whose near horn is wh
   expect(down!.slice(0, 5).every((r) => !r.includes('#'))).toBe(true);
   expect(down![14]!.includes('#')).toBe(false);
   expect(down![5]![6]).toBe('#');
-  // The flat hand: 8 long, its palm in the rows over the stone; its thumb laid forward
-  // along the stone's top on the palm's last row, never a spur over it, parted from the hand
-  // by the one incision, glaze before it and after it, so that the row lies the stone's
-  // whole length but for that incision; and its fingers over the edge and down the stone's
-  // face, three apart, each a pixel wide, never a hoof's two and never at the stone's ends.
+  // The flat hand, oversized (ruled 2026-10-11): 9 across, over the stone's 8 and a pixel
+  // past its back end, and 12 from its wrist to its middle finger's tip; its wrist at its top,
+  // 3 px, and the hand under it 8 or more across at its widest; the one incision parting the
+  // thumb at its front, which goes on down the stone's front end to the row over its top, a
+  // line of clay between it and the hand; and its fingers over the stone's top edge and down
+  // its face, three on its top row, never at its front end and never a hoof's two, the
+  // middle one the longest, so that no two are alike.
   const flat = left(BULL_HAND_FRAMES[HAND_FLAT]!.rows);
-  expect(flat.map((r) => r.length)).toEqual(flat.map(() => 8));
+  expect(flat.map((r) => r.length)).toEqual(flat.map(() => 9));
+  expect(flat.length).toBe(12);
+  expect(runs(flat[0]!).map((r) => r.length)).toEqual([3]);
+  expect(Math.max(...flat.map((r) => Math.max(...runs(r).map((run) => run.length))))).toBeGreaterThanOrEqual(8);
   expect(flat.join('').split('_').length - 1).toBe(1);
-  const thumb = flat.findIndex((r) => r.includes('_'));
-  expect(thumb).toBe(FLAT_ON - 1);
-  expect(flat[thumb]!.slice(0, flat[thumb]!.indexOf('_'))).toMatch(/^#{2,}$/);
-  expect(flat[thumb]!.slice(flat[thumb]!.indexOf('_') + 1)).toMatch(/^#/);
-  expect(flat[thumb]!.replace('_', '#')).toBe('########');
-  const fingers = flat.slice(FLAT_ON);
-  expect(fingers.length).toBeGreaterThanOrEqual(1);
-  expect(runs(fingers[0]!)).toEqual(['#', '#', '#']);
-  for (const r of fingers) expect([r[0], r[7]]).toEqual(['.', '.']);
+  const cut = flat.findIndex((r) => r.includes('_'));
+  expect(flat[cut]!.slice(0, flat[cut]!.indexOf('_'))).toMatch(/^#{2,}$/);
+  for (let y = cut + 1; y < FLAT_ON; y++) expect(flat[y]!.slice(0, 2), `row ${y}`).toBe('#.');
+  expect(flat[FLAT_ON]![0]).toBe('.');
+  const tips = runs(flat[FLAT_ON]!);
+  expect(tips.length).toBe(3);
+  const depth = [...flat[FLAT_ON]!].map((c, x) => (c === '#' ? flat.slice(FLAT_ON).findIndex((r) => r[x] !== '#') : -1));
+  const fingers = [...flat[FLAT_ON]!.matchAll(/#+/g)].map((m) => Math.max(...depth.slice(m.index!, m.index! + m[0].length).map((d) => (d < 0 ? flat.length - FLAT_ON : d))));
+  expect(new Set(fingers).size, String(fingers)).toBe(3);
+  expect(Math.max(...fingers)).toBe(fingers[1]);
   // No hand is a rake: no row of any of them has four like prongs.
   for (const f of BULL_HAND_FRAMES) for (const r of f.rows) expect(runs(r).length, r).toBeLessThanOrEqual(3);
   // The thumb goes one way and the fingers another: the glaze just in front of the one
@@ -157,20 +163,40 @@ test("its drawings: a bull's head whose horns are 2 px and whose near horn is wh
   const reach = left(BULL_HAND_FRAMES[HAND_REACH]!.rows);
   for (const r of reach) expect(runs(r).length, r).toBeLessThanOrEqual(2);
   thumbOf(reach);
-  // And the palm upright, as tall as half of him or more.
-  expect(BULL_HAND_FRAMES[HAND_PALM]!.rows.length).toBeGreaterThanOrEqual(8);
+  // The palm, the clap's, an open hand upright beside him, 13 of his 16 tall since the hands
+  // were drawn oversized (2026-10-11; 12 before, and ruled first "as tall as half of him or
+  // more"): three fingers up, a pixel apart, the middle one the tallest, and the thumb out on
+  // its outer side.
+  const palm = left(BULL_HAND_FRAMES[HAND_PALM]!.rows);
+  expect(palm.length).toBe(13);
+  expect(runs(palm[0]!)).toEqual(['#']);
+  expect(runs(palm[1]!)).toEqual(['#', '#', '#']);
+  expect(palm[0]!.indexOf('#')).toBe(palm[1]!.indexOf('#', palm[1]!.indexOf('#') + 1));
+  thumbOf(palm);
+  // Holding the stone up: a fist under it, 8 across, its thumb up the stone's front end over
+  // the fist, parted by the one incision, and its wrist at its back, where the arm comes up
+  // behind the stone; never fingertips across the stone's face, which read as crenellations
+  // and then as teeth.
+  const hold = left(BULL_HAND_FRAMES[HAND_HOLD]!.rows);
+  expect(hold.join('').split('_').length - 1).toBe(1);
+  const knuckles = hold.findIndex((r) => r.includes('_'));
+  for (const r of hold.slice(0, knuckles)) expect(r, r).toBe('#' + '.'.repeat(r.length - 1));
+  expect(hold[knuckles]!.slice(0, hold[knuckles]!.indexOf('_'))).toMatch(/^#{2,}$/);
+  expect(Math.max(...hold.map((r) => Math.max(0, ...runs(r).map((run) => run.length))))).toBeGreaterThanOrEqual(7);
+  expect(BULL_HAND_FRAMES[HAND_HOLD]!.wrist).toEqual({ x: hold[0]!.length - 2, y: hold.length - 1 });
 });
 
 test('crouched: a hand flat along the whole top of each stone, put through its whole breath while the rest of it rises a pixel; the two stones the same', () => {
   const tops = new Set<number>();
   const breath = BREATH.out + BREATH.hold + BREATH.in + BREATH.rest;
   const hand = left(BULL_HAND_FRAMES[HAND_FLAT]!.rows);
+  const before: string[] = [];
   for (let t = 0; t < breath; t++) {
     const f = at(null, t);
     const b = bullPose(f);
     expect([handBox(b.near), handBox(b.far)]).toEqual([
-      { x: ST.near, y: F - ST.h - FLAT_ON, w: 8, h: hand.length },
-      { x: ST.far, y: F - ST.h - FLAT_ON, w: 8, h: hand.length },
+      { x: ST.near, y: F - ST.h - FLAT_ON, w: 9, h: hand.length },
+      { x: ST.far, y: F - ST.h - FLAT_ON, w: 9, h: hand.length },
     ]);
     tops.add(b.top);
     // Under each hand the stone's top is cream from end to end but where a finger goes
@@ -189,8 +215,13 @@ test('crouched: a hand flat along the whole top of each stone, put through its w
     }
     // The stones, pixel for pixel the same (pillar 4).
     for (let j = 0; j < ST.h; j++) for (let i = 0; i < ST.w; i++) expect(body.get(ST.near + i, F - ST.h + j)).toBe(body.get(ST.far + i, F - ST.h + j));
+    for (const q of body.each()) if (q.ink === '#' && q.x < FIGHT.clap.rect.x) before.push(`t ${t}: (${q.x}, ${q.y})`);
   }
   expect([...tops].sort()).toEqual([F - FIGHT.back.crouch - 1, F - FIGHT.back.crouch]);
+  // Oversized, its hands spill over the back ends of their stones, never forward of the near
+  // one's front: nothing of its glaze before x 100, the clap's catch point, 8 px in front of
+  // its face, where a man who stops short lives (2026-10-11).
+  expect(before).toEqual([]);
 });
 
 test('crouched, its leg one mass: the rump rounded down into the heel, nothing under it standing apart, and the thigh incised only near the groin', () => {
@@ -283,6 +314,53 @@ test('its back drawn on its solid on every frame from the grip, pinned, heaved a
   for (let x = 105; x <= 115; x++) for (let y = F - 9; y < F; y++) if (left(BULL_HEAD_FRAMES[2]!)[y - head.y + 5]![x - head.x] === '#') expect(down.get(x, y)).toBe('#');
 });
 
+test('never a character (pillar 2): risen on its feet, its leg a mass under its rump, never a stroke under the bar of its back; and its heap one mass from its shoulders to its rump', () => {
+  const wrong: string[] = [];
+  // Risen, its back 20 px or more over the floor, in the heave and in the clap: from 8 px
+  // under its back to 6 px over the floor, its body through 4 px in from its rump is 15 px
+  // across or more, half its back's length, its incision included, which lies inside it
+  // (after the third art pass, 2026-10-11: a thin back on a leg as thin as a stroke read as
+  // a 7 from L + 56 to 74).
+  const clapped = (k: number): Fight => {
+    const f = at(k);
+    f.caught = { by: 'clap', k: 10, x: 120, y: 700, w: 10, h: 16, vx: 0, vy: 0, air: true };
+    return f;
+  };
+  const frames: [string, Fight][] = [];
+  for (let k = C.heave; k <= C.heave + 3 * FIGHT.back.ease; k++) frames.push([`L+${k}`, at(k)]);
+  for (let u = 0; u < CLAP.back; u++) frames.push([`clapped, frame ${u}`, clapped(10 + u)]);
+  let risen = 0;
+  for (const [when, f] of frames) {
+    const b = bullPose(f);
+    if (F - b.top < 20) continue;
+    risen++;
+    const { body } = picture(f);
+    for (let y = b.top + 8; y <= F - 6; y++) {
+      const x = b.x1 - 4;
+      if (!body.get(x, y)) {
+        wrong.push(`${when}: nothing under its rump at (${x}, ${y})`);
+        continue;
+      }
+      let a = x;
+      let c = x;
+      while (body.get(a - 1, y) && body.get(a - 1, y) !== 'o') a--;
+      while (body.get(c + 1, y) && body.get(c + 1, y) !== 'o') c++;
+      if (c - a + 1 < 15) wrong.push(`${when}: its leg ${c - a + 1} px across at y ${y}`);
+    }
+  }
+  expect(risen).toBeGreaterThan(20);
+  // The heap, from the second blow: from its top to 12 px over the floor, every row of it
+  // one run of glaze from x 118 to 141, its shoulders, back and rump one mass, no notch cut
+  // into it from either side; only under that its knee before and its heel behind (after the
+  // third art pass, 2026-10-11: notched under its chest and over its heel, a bar over a
+  // diagonal over a bar, it read as a Z).
+  for (let k = C.blow2 + STRUCK; k < C.blow2 + 30; k++) {
+    const { body } = picture(at(k));
+    for (let y = F - FIGHT.back.heap; y < F - 12; y++) for (let x = 118; x <= 141; x++) if (!glaze(body, x, y)) wrong.push(`L+${k}: the heap notched at (${x}, ${y})`);
+  }
+  expect(wrong.slice(0, 20)).toEqual([]);
+});
+
 test("its free hand claws in the swat's column, x 100 to 111, from L + 46 to 67, and never touches the stone it heaves over its head", () => {
   const out: string[] = [];
   for (let k = C.knee; k < FIGHT.swat.to; k++) {
@@ -309,8 +387,14 @@ test('the clap: its palms either side of him, a pixel of clay between, from the 
     // His sliver is 4 px, x s.x to s.x + 3: the near palm ends 2 px short of it, the far
     // begins 2 px past it, and the line of clay between is drawn over him.
     expect([n.x + n.w, r.x]).toEqual([s.x - 1, s.x + 5]);
+    // Down the length of their inner edges, open hands since 2026-10-11 (edge-on, the whole
+    // of each palm was its inner edge), and a row over and under: 12 rows of him or more.
     const { over } = picture(f);
-    for (let y = n.y; y < n.y + n.h; y++) expect([over.get(s.x - 1, y), over.get(s.x + 4, y)]).toEqual(['_', '_']);
+    const edge = (x: number) => [...Array(n.h).keys()].map((j) => n.y + j).filter((y) => over.get(x, y) === '#');
+    const [inner, outer] = [edge(s.x - 2), edge(s.x + 5)];
+    expect(inner).toEqual(outer);
+    expect(inner.length).toBeGreaterThanOrEqual(10);
+    for (let y = inner[0]! - 1; y <= inner[inner.length - 1]! + 1; y++) expect([over.get(s.x - 1, y), over.get(s.x + 4, y)]).toEqual(['_', '_']);
   }
 });
 
@@ -536,10 +620,11 @@ test('struck, its near hand reaches up at his chest in front of him, between him
     const y = Math.round(h.y);
     const n = handBox(b.near);
     if (b.near.frame !== HAND_REACH) wrong.push(`L+${k}: not reaching`);
-    // His front half is the box's columns 6 to 11; its thumb may come a pixel past it, short of its muzzle.
-    if (n.x < x + 6 || n.x + n.w - 1 > x + 12) wrong.push(`L+${k}: the hand over his columns ${n.x - x} to ${n.x + n.w - 1 - x}`);
-    // His neck is row 5 of his box, and his hips rows 12 to 15: the hand from row 8 to 13.
-    if (n.y < y + 8 || n.y + n.h - 1 > y + 13) wrong.push(`L+${k}: the hand over his rows ${n.y - y} to ${n.y + n.h - 1 - y}`);
+    // His front half is the box's columns 6 to 11: the hand, 8 across since it was drawn
+    // oversized (2026-10-11), a pixel either side of it, its thumb short of its muzzle.
+    if (n.x < x + 5 || n.x + n.w - 1 > x + 12) wrong.push(`L+${k}: the hand over his columns ${n.x - x} to ${n.x + n.w - 1 - x}`);
+    // His neck is row 5 of his box, and his hips rows 12 to 15: the hand, 6 tall, from row 7 to 13.
+    if (n.y < y + 7 || n.y + n.h - 1 > y + 13) wrong.push(`L+${k}: the hand over his rows ${n.y - y} to ${n.y + n.h - 1 - y}`);
     // Of its arm, nothing in his box but its wrist, a pixel from its hand.
     for (const q of picture(f).front.each()) {
       if (q.ink === '_' || q.x < x || q.x >= x + HERO.w || q.y < y || q.y >= y + HERO.h) continue;

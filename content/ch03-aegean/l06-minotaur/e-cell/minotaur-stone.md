@@ -21,8 +21,10 @@ never over its face, right of Theseus, who stands before it, and raised over its
 fist (after the whole-level review, 2026-10-10: taken up over its face, it hid its head at L+40
 and 41); swung over its head at the ducking hero in
 the heave, to the end of its reach in front of its face, over him; then, missed, drawn back in
-front of its own chest, x 107 or more, brought down there, and only at the floor slid along it, in
-front of the far stone, to where it is set down before it at x 98 on L+74, the hand flat on it. So
+front of its own chest, x 107 or more, brought down there, and only at the floor put down before
+it, in front of the far stone, at x 98 on L+74, the hand flat on it: from x 108 on the floor to
+x 98 in one frame (slid over three until 2026-10-11, when the hand gripping it, grown 12 tall,
+would have come over Theseus's thigh and his hand on the horn). So
 nothing of the stone, its hand or its arm comes over Theseus above his knees on any frame it is in
 its hand (`tests/minotaur-bull.spec.ts`); its arm crosses only his shins, as the stones on the
 floor do. (Drawn first, 2026-10-10, it was taken up straight before its face and brought down from
@@ -40,14 +42,14 @@ and where its glaze meets a stone's contour the contour gives way to clay. The n
 of Theseus, is drawn again in front of him only where it is seen (after the whole-level review,
 2026-10-10: as the struck body lurched over it where it was set down, its place was drawn again in
 the body's glaze with a line of clay round it, a box stamped on the body;
-`tests/minotaur-bull.spec.ts`). Both stay by the heap, behind its head and its arm
-(`minotaur-heap`). In its hand the stone is in front of it, the far stone included, its contour
+`tests/minotaur-bull.spec.ts`). Both stay by the heap, behind its head, the near one with its
+hand still flat on it (`minotaur-heap`). In its hand the stone is in front of it, the far stone included, its contour
 whole, cut from the body by clay, and nothing lies on it but its own hand: held up on its fist,
-the fist under its front end and two fingertips up on its face, the arm behind the stone and the
-fist in front of it (`minotaur-hand`, frame 1), while it is up at its shoulder or over it, or no
-more than 4 px under it; gripping it
-from above, the palm on its top and the fingers down its face (frame 0), while it is lower, the arm
-straight down to it. The near stone, on the floor or in its hand, is in front of Theseus, who
+the fist under it and its thumb up the stone's front end, the arm behind the stone and the fist in
+front of it (`minotaur-hand`, frame 1), while the stone's top is 2 px over its shoulder or more;
+gripping it from above, the palm on its top and the fingers down its face (frame 0), while it is
+lower, the arm to the wrist over it. (Until 2026-10-11 two fingertips lay up on its face from the
+fist; drawn oversized, they read as teeth in a cup.) The near stone, on the floor or in its hand, is in front of Theseus, who
 stands by it at the bull's head, with a line of clay round it (`minotaur-body`, Against Theseus);
 the far one is behind him.
 
@@ -61,10 +63,10 @@ the far one is behind him.
 - **Swung at him and never brought down on him**: whole in its hand on every frame, and never
   over Theseus above his knees (`tests/minotaur-bull.spec.ts`).
 - Where a hand lies flat on it, its contour gives way to the hand, so that glaze never touches
-  glaze: the hand's palm on y 728 to 731, straight on the stone's top row, which is cream under it
+  glaze: the hand's knuckles on y 731, straight over the stone's top row, which is cream under it
   instead of contour but where the fingers go over the edge and down its face; the side contours
-  begin a row down, at y 733, and give way to clay where the last finger comes by one. The hand
-  covers the stone's whole length (`minotaur-hand`). When the hand leaves it, the contour is whole
+  begin a row down, at y 733, and give way to clay where a finger comes by one. The hand
+  covers the stone's whole length and spills over its back end (`minotaur-hand`). When the hand leaves it, the contour is whole
   again (`tests/minotaur-bull.spec.ts`).
 - No dust ever reaches it: dust on cream is 1.20 to 1, and the dust is never in the cell.
 - 8 × 4, the stones of the level's data: the hands' height on them depends on it.

@@ -208,15 +208,22 @@ Chosen in the asset notes (2026-10-10), where this file did not decide, for the 
   reserved from it by a row and a column of clay; the tableau's head and Theseus's far arm lie in
   front of the post's foot in their reserved outline, corners included (his had none until a check
   of the door stage, 2026-10-10, and met the post's edge at a corner); the heap's head and body
-  lie in front of its stones. Each hand lies along the whole top of its own stone, x 100 to 107 and
-  110 to 117, so its anchor moves from the rough's to the stone's back end.
+  lie in front of its stones. Each hand lies along the whole top of its own stone and a pixel past
+  its back end, x 100 to 108 and 110 to 118 (x 100 to 107 and 110 to 117 until the hands were
+  drawn oversized, 2026-10-11), so its anchor moves from the rough's to the stone's back end.
 - The bull, as drawn (2026-10-10, `e-cell` and `f-thread`): crouched on its feet, the knee forward
   under its chest, the toes forward under the knee and the heel under the rump, which is rounded
   down into it, its arms straight to the stones, its shoulders behind its head; each hand gripping
-  its stone, the palm on its top, three fingers down its face and the thumb laid forward along the
-  stone's top on the palm's last row, parted by the one incision, never a hoof's two and never a
-  rake; the stone held up on its fist, its arm behind the stone, and gripped from above, the arm
-  straight down to it, wherever it is more than 4 px under the shoulder; taken up under its face
+  its stone from above, oversized (ruled 2026-10-11), 9 across and 12 from its wrist to its middle
+  finger's tip, the back of the hand to us, its knuckles over the stone's top, three fingers of
+  three lengths down its face, the last in the gap behind it, and the thumb down the stone's front
+  end, parted by the one incision, never a hoof's two, a rake, a comb or a crown, and never forward
+  of x 100, the clap's catch point (superseded 2026-10-11: 8 × 6, its palm on the stone's top,
+  three fingers down its face and the thumb laid forward along its top, at the stones' 8 px read
+  as crowns or combs); the stone held up on its fist, its thumb up the stone's front end, its arm
+  behind the stone (two fingertips on its face until 2026-10-11, which, oversized, read as teeth in
+  a cup), and gripped from above, the arm to its wrist over the stone, wherever the stone's top is
+  less than 2 px over its shoulder (this read "more than 4 px under the shoulder", of the fist); taken up under its face
   and up behind its head, never over its face, and after the heave set down in front of its own
   chest, right of Theseus, so that nothing of it comes over him above his knees, and swung at him
   over his ducked head; its arms pixelled as the people are, the upper arm thicker than the
@@ -226,15 +233,22 @@ Chosen in the asset notes (2026-10-10), where this file did not decide, for the 
   reaching up at the front of his chest, under his neck and over his hips; after the swat its free
   hand down behind its head, then back flat on its far stone, and down on its hands on its stones,
   where they stay through the first blow's 4 frames, clear of the sword arm, before it thrashes;
-  kneeling up from L+106 to 129, its rump on its heels on its 10 px solid and its shoulders up at
-  29 px, its knee short of the far stone so that both stones and both hands are seen, taller than
-  the heap it slumps into; holding the kneel through the 4 frames the second blow jerks its head
+  risen on its feet in the heave, and as it rears to clap, a man bent over, its chest
+  hanging deeper the higher its back and its leg a mass under its rump, half its back's length
+  across, never a stroke under the bar of its back (ruled 2026-10-11: risen as a thin back on a
+  leg as thin as a stroke, it read as a 7 from L+56 to 74); kneeling up from L+106 to 129, its
+  rump on its heels on its 10 px solid and its shoulders up at 29 px, its knee short of the far
+  stone so that both stones and both hands are seen, taller than the heap it slumps into; holding the kneel through the 4 frames the second blow jerks its head
   up, and slumping into the heap at L+134 as its head goes down, but the heap from the blow under
   a man standing on its back, whom the heap's solid lifts;
-  nothing of it ever on the cell's stone; the swat a flat hand pressed on top of him, the palm the
-  clap's only; the heap bowed over its folded leg, its arms under it, nothing incised across it, and
-  its head down before it lying on its cheek, at x 105, clear of Theseus's feet, horns up at its
-  back; the same head in the tableau, where Theseus's hand has the horn at (88, 151), 3 px right
+  nothing of it ever on the cell's stone; the swat a flat hand pressed on top of him, its arm brought down onto it from above, the palm the
+  clap's only, an open hand on either side of him (edge-on until 2026-10-11, when, oversized, the
+  two read as posts); the heap bowed over its folded leg, one mass from its shoulders to its rump,
+  its near arm out to its stone and its hand still flat on it, its far arm under it, nothing
+  incised across it, and its head down before it lying on its cheek, at x 105, clear of Theseus's
+  feet, horns up at its back (ruled 2026-10-11, never a character: its arms both under it, it
+  was notched under its chest and over its heel, a bar over a diagonal over a bar, which read as a
+  Z or a 7); the same head in the tableau, where Theseus's hand has the horn at (88, 151), 3 px right
   of and 2 below where it was, and the dead body after it a man's silhouette in its outline, a
   shoulder, an arm trailing and a knee bent, its shin up, unseen where it lies in the vestibule's
   black (since 2026-10-11). Theseus stands between its body and its near arm: in front of its
@@ -305,7 +319,8 @@ Chosen in the asset notes (2026-10-10), where this file did not decide, for the 
   down a few pixels back from where he stood, and a floor clap carries him 12 px along the floor
   between its palms. The swat's hand on a man on the floor is never over Theseus, who stands in
   front of its far arm: on his head short of Theseus's head, then on his face and chest, its
-  forearm going in behind Theseus's foot. A man swatted standing on its back is off the floor,
+  arm arched over Theseus's head and behind him (until 2026-10-11, when the hand was drawn
+  oversized and its wrist came to its top, its forearm went in behind Theseus's foot). A man swatted standing on its back is off the floor,
   and goes onto its brow as a man in the air does. In its hands off the floor, his reserve goes
   under him. (Laid where he stood, he and the swat's hand covered the near stone and Theseus's
   legs, and Theseus stood a torso on a hand; swatted on its back, he dropped 27 px onto its far
@@ -1067,6 +1082,25 @@ Being built, in this order, as a stage in the dev build (`#minotaur`, in `STAGES
   `tests/minotaur-theseus.spec.ts` (the vestibule after the knot, frames 22 to 46 of his route;
   the doorway, 395 to 401 and L−8 to L+8, never the ball) and `tests/minotaur-out.spec.ts` (the
   tableau: nothing of it in the vestibule on any frame, its picture short of x 96).
+
+- **The hands oversized, the heap and the heave never characters** (2026-10-11, on the designer's
+  rulings after the third art pass, to the notes in `e-cell` and `../shared/bull-leaper-clapped.md`
+  and `-pressed.md`): every frame of the hand redrawn at the ruled scale. Flat, it grips its stone
+  from above, 9 across and 12 from its wrist to its fingertips, the back of the hand to us,
+  spilling over the stone's back end and down its face, never forward of x 100, the clap's catch
+  point: 9, not 11, across, since the stones are 10 px apart and a pixel of clay lies between the
+  hands; 12 long. The fist under the raised stone has its thumb up the stone's front end; the claw
+  is 8 × 9, its loop in x 100 to 111 for its width and, through the heave, clear of the stone; the
+  clap's palms are open hands, 7 × 13, turned to us; the reach 8 × 6; the swat's hand is the flat
+  one on him, its arm brought down onto it from above, arched over Theseus's head on a man at its
+  feet. The free hand behind its head is no longer drawn there; the far hand flat on its stone is
+  under the body as the lurch comes over it in the first blow; the kneel's knee comes to x 120; and
+  the stone is put down at x 98 in one frame from x 108 on the floor. Risen in the heave and as it
+  rears to clap, its chest hangs deeper and its leg is a mass under its rump; the heap is one mass
+  from its shoulders to its rump, its near arm out to its stone and its hand still flat on it.
+  Nothing that kills, carries, times or sounds moved. Pinned in `tests/minotaur-bull.spec.ts` (the
+  hands' drawings, nothing of them before x 100, the palms' line of clay, the reach over his
+  columns 5 to 12 and rows 7 to 13, the risen leg and the heap's one mass).
 
 Still to come: nothing the notes ask the drawing for. (`LevelData.tricks`, 'The knot', 'The
 snort', 'The hands', 'The horns', and `dropCause` and `fallCause` 'The labyrinth', unreachable,

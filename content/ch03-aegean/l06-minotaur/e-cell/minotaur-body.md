@@ -82,14 +82,24 @@ In the cell, on one clock from L, the frame the tourist comes down on its floor:
   under its jaw, in front of its brow, the claw lay behind the hero's head, hidden.)
 - **The heave**, L+56 to 62: its back rises from 10 to 30, up on its feet again, as it swings
   the stone over its head and down at the ducking hero (the duck at L+58), the arm straight from
-  the shoulder; held at 30 to L+68, back to 10 by L+74. Missed, it draws the stone back in front
-  of its own chest, clear of the hero, brings it down there and slides it along the floor to
-  where it sets it down before it, at x 98, on L+74, its hand flat on it: nothing of the stone,
+  the shoulder; held at 30 to L+68, back to 10 by L+74. Risen, a man bent over: the higher its
+  back over its crouch's 20 px, the deeper its chest hangs under its shoulders (to 6 px more at
+  30) and the lower its belly, and its leg a mass under its rump, the knee forward under its
+  belly and the heel back under the rump, so that from 8 px under its back to 6 px over the
+  floor its body through its rump is 15 px across or more, half its back's length; never a thin
+  bar on a leg as thin as a stroke, which read as a 7 from L+56 to 74 (ruled 2026-10-11; the
+  same as it rears to clap). Missed, it draws the stone back in front
+  of its own chest, clear of the hero, brings it down there and puts it down before it, at x 98,
+  on L+74, its hand flat on it, the last 10 px along the floor in one frame (over three until
+  2026-10-11, when its hand, grown 12 tall, would have come over Theseus's thigh and his hand on
+  the horn): nothing of the stone,
   the hand or the arm comes over him above his knees (`minotaur-stone`). Its free hand goes down
-  behind its head once it stops clawing, and flat on the far stone once the near one is set down.
+  behind its head once it stops clawing, unseen, its arm going in behind its head, and flat on the
+  far stone once the near one is set down.
 - **The first blow**, L+76: to L+105 the struck body lurches on both knees to the left wall and
   back, 46 px and back. For the blow's own 4 frames, L+76 to 79, its hands are still flat on their
-  stones, nothing of it near his sword arm, so that the blow is seen going home under its jaw
+  stones, the far one under the body where the lurch comes over it, nothing of it over its back,
+  and nothing of it near his sword arm, so that the blow is seen going home under its jaw
   (after the whole-level review, 2026-10-10: thrashing from L+76, its claw and its reaching hand
   lay over his arm, and the blow could not be read). Then it thrashes, both hands flailing at the
   hero on its horn, two frames a place: the near one low, reaching up at his chest in front of
@@ -121,15 +131,17 @@ In the cell, on one clock from L, the frame the tourist comes down on its floor:
   horns' tips, taller than the heap's 24, so that the second blow lets it slump down into the heap.
   Its rump keeps to its back's solid, still 10 px, the solid never moving: nothing of it is over
   that solid behind its shoulders, and its top is whole over the rest. Its knee comes forward
-  only to x 119, a pixel of clay short of the far stone and the hand flat on it, x 110 to 117, so
-  that both stones and both hands are seen from L+107. Where a man it caught late is still on its
+  only to x 120, a pixel of clay short of the far stone and the hand flat on it, x 110 to 118, so
+  that both stones and both hands are seen from L+107 (x 119 and 117 until 2026-10-11, when the
+  hands were drawn oversized). Where a man it caught late is still on its
   horns at L+106, it kneels up once it has thrown him. (After the whole-level review, 2026-10-10:
   down on its hands, 10 px tall, the second blow raised it in one frame to the 24 px heap, so
   that "sinks into the heap" read as rising. After a check of the polish, the same day: its knee
   came forward to x 108 and hid the far stone and its hand from L+106 to 129.)
 - **The second blow**, L+130: for the 4 frames its head jerks up, the sword in its throat, it
   holds its kneel, nothing of it from its shoulders back any higher; at L+134 it slumps into the
-  heap, its head down on the floor, its highest pixel lower than the kneel's. Under a man who
+  heap, its head down on the floor, its highest pixel lower than the kneel's, its near hand still
+  flat on its stone (`minotaur-heap`). Under a man who
   stands on its back at the blow, whom the heap's solid lifts 14 px, it is the heap from L+130,
   its head jerked up before it, so that he never stands over its drawn back. (After a check of the
   polish, 2026-10-10: the heap came at the blow itself, the head jerking up over the kneel and the
@@ -162,11 +174,15 @@ In the cell, on one clock from L, the frame the tourist comes down on its floor:
   him is behind (2026-10-10; `tests/minotaur-bull.spec.ts`). Against Theseus, corners included, on every frame
   of the clean run's fight, the clap, the swat and the toss (`tests/minotaur-bull.spec.ts`).
 - **Its folded leg never a letter or a digit**: crouched, the rump runs down into the heel and
-  every row of the leg below the knee is one run of glaze (`tests/minotaur-bull.spec.ts`).
+  every row of the leg below the knee is one run of glaze; risen, its leg is a mass half its
+  back's length across under its rump, never a stroke under the bar of its back; and the heap is
+  one mass from its shoulders to its rump (`minotaur-heap`; `tests/minotaur-bull.spec.ts`).
 - **The swat drawn where he is caught**, flat on its own brow between the horns if he was off the
   floor, in the air or standing on its back, flat on the floor at its feet if he stood on it, where
   the clap lays him, before Theseus's feet and clear of the near stone
-  (`../../shared/bull-leaper-pressed.md`).
+  (`../../shared/bull-leaper-pressed.md`); its arm comes down onto its hand from above, the elbow
+  raised, and on a man at its feet arches over Theseus's head and behind him (2026-10-11: with its
+  wrist at the top of its 12 px hand, an arm brought straight in lay across his chest).
 - **The lurch on both knees, thrashing: never a step, a run or a turn toward the tourist**
   (`content/research/arc.md`, section 4). A Minotaur that charges is Karnak's scarab.
 - **The stone is never thrown**, and never brought down on the hero: swung at him over his
