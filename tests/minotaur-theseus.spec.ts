@@ -841,7 +841,7 @@ test("in the game: a jump timed wrong, caught by the line at his feet, tips back
   for (const f of frames) for (const side of ['right', 'left'] as const) expect(at[f]![side].y1, `frame ${f}, ${side}`).toBeLessThanOrEqual(159);
 });
 
-test("in the game: Theseus goes into his black doorway edge by edge, the last frames before it, 395 to 401: nothing of him but glaze in its black, and a line of clay between him and its frame, corners included", async ({ page }) => {
+test("in the game: Theseus goes into his black doorway edge by edge, the last frames before it, 395 to 401, and out of it edge by edge at L - 8, unseen in it on that frame: nothing in its black but glaze and the thread, no line of clay, no eye and never the ball; and a line of clay between him and its frame, corners included", async ({ page }) => {
   await open(page);
   const door = MINOTAUR.decor.find((d) => d.kind === 'blackDoorway');
   if (!door || door.kind !== 'blackDoorway') throw new Error('no doorway');
@@ -850,6 +850,7 @@ test("in the game: Theseus goes into his black doorway edge by edge, the last fr
       const g = (window as unknown as W).__game;
       g.titleTimer = 0;
       const hero = () => g.entities.find((e: { def: { kind: string } }) => e.def.kind === 'hero');
+      const fight = () => g.entities.find((e: { def: { kind: string } }) => e.def.kind === 'fight');
       const key = (c: string, d: boolean) => window.dispatchEvent(new KeyboardEvent(d ? 'keydown' : 'keyup', { code: c }));
       const ctx = g.world.getContext('2d') as CanvasRenderingContext2D;
       const s = ctx.canvas.width / 320;
@@ -870,17 +871,9 @@ test("in the game: Theseus goes into his black doorway edge by edge, the last fr
       // and the lintel with the pixel of clay inside them.
       const frame = { x0: door.x - 2, x1: door.x + door.w + 1, y0: door.top - 2, y1: door.floorY - 1 };
       const black = (x: number, y: number) => x >= door.x && x < door.x + door.w && y >= door.top && y < door.floorY;
-      const out = { frames: 0, seen: 0, inBlack: [] as string[], touches: [] as string[] };
-      for (let i = 0; i < 700; i++) {
-        const p = presses[i] ?? { dir: 0, jump: false };
-        key('ArrowRight', p.dir > 0);
-        key('ArrowLeft', p.dir < 0);
-        key('Space', p.jump);
-        g.tick();
-        const k = hero().k;
-        if (k < 395) continue;
-        if (k > 401) break;
-        out.frames++;
+      const out = { frames: { in: 0, out: 0 }, seen: { in: 0, out: 0 }, stepOut: [] as number[], inBlack: [] as string[], ball: [] as string[], touches: [] as string[] };
+      const look = (at: string, way: 'in' | 'out') => {
+        out.frames[way]++;
         const all = shot();
         const keep = g.entities;
         g.entities = keep.filter((e: { def: { kind: string } }) => e.def.kind !== 'hero');
@@ -893,20 +886,42 @@ test("in the game: Theseus goes into his black doorway edge by edge, the last fr
         const withHim = shot();
         g.level.data.decor = decor;
         const his = (x: number, y: number) => withHim(x, y) === GL && bare(x, y) !== GL;
+        let seen = 0;
         for (let y = frame.y0; y <= frame.y1; y++) {
           for (let x = frame.x0; x <= frame.x1; x++) {
             const c = all(x, y);
             if (c < 0) continue;
-            if (his(x, y)) out.seen++;
-            // In its black, only black, or the thread he lays into it.
-            if (black(x, y) && c !== GL && c !== 0xffffff) out.inBlack.push(`hero ${k}: (${x}, ${y}) #${c.toString(16)}`);
+            // Seen: his glaze where the doorway's is not, which is out of its black.
+            if (his(x, y) && !black(x, y)) seen++;
+            // In its black, only black, or the thread laid into it: never his line of clay or his eye.
+            if (black(x, y) && c !== GL && c !== 0xffffff) out.inBlack.push(`${at}: (${x}, ${y}) #${c.toString(16)}`);
+            // Never the ball, in his hand or on its floor: a square of white 2 by 2, which the thread's 1 px line never is.
+            if (black(x, y) && [c, all(x + 1, y), all(x, y + 1), all(x + 1, y + 1)].every((q) => q === 0xffffff)) out.ball.push(`${at}: (${x}, ${y})`);
             // On its frame, the glaze left of it never touches his.
             if (black(x, y) || his(x, y) || c !== GL || without(x, y) !== GL) continue;
             for (const [dx, dy] of [[-1, -1], [0, -1], [1, -1], [-1, 0], [1, 0], [-1, 1], [0, 1], [1, 1]] as const) {
-              if (!black(x + dx, y + dy) && his(x + dx, y + dy)) out.touches.push(`hero ${k}: (${x}, ${y}) by (${x + dx}, ${y + dy})`);
+              if (!black(x + dx, y + dy) && his(x + dx, y + dy)) out.touches.push(`${at}: (${x}, ${y}) by (${x + dx}, ${y + dy})`);
             }
           }
         }
+        out.seen[way] += seen;
+        if (way === 'out') out.stepOut.push(seen);
+      };
+      for (let i = 0; i < 900; i++) {
+        const p = presses[i] ?? { dir: 0, jump: false };
+        key('ArrowRight', p.dir > 0);
+        key('ArrowLeft', p.dir < 0);
+        key('Space', p.jump);
+        g.tick();
+        const k = hero().k;
+        const f = fight();
+        if (!h0(k) && !f.keyed) continue;
+        if (h0(k)) look(`hero ${k}`, 'in');
+        else if (f.k >= -8 && f.k <= 8) look(`L + ${f.k}`, 'out');
+        if (f.keyed && f.k > 8) break;
+      }
+      function h0(k: number) {
+        return k >= 395 && k <= 401 && !fight().keyed;
       }
       key('ArrowLeft', false);
       key('ArrowRight', false);
@@ -916,9 +931,99 @@ test("in the game: Theseus goes into his black doorway edge by edge, the last fr
     // The vase's glaze (VASE_INK.glaze, src/render/procedural.ts), as the canvas gives it back.
     { presses: cleanPresses(), glaze: '#1f140e', door: { x: door.x, w: door.w, top: door.top, floorY: door.floorY } },
   );
-  // Every frame from 395 to 401 is looked at, with the doorway on screen and him at it.
-  expect(r.frames).toBe(7);
-  expect(r.seen).toBeGreaterThan(0);
+  // Every frame from 395 to 401 is looked at, with the doorway on screen and him at it; and
+  // every frame of the step out, L - 8 to L + 8.
+  expect(r.frames).toEqual({ in: 7, out: 17 });
+  expect(r.seen.in).toBeGreaterThan(0);
+  // At L - 8 all of him is in its black, and unseen; from L - 7 he comes out of it edge by
+  // edge, more of him on its clay every frame (19, 27 and 40 px of his glaze, measured).
+  expect(r.stepOut[0]).toBe(0);
+  for (let i = 1; i < 4; i++) expect(r.stepOut[i]!, `L - ${8 - i}`).toBeGreaterThan(r.stepOut[i - 1]!);
+  expect(r.inBlack).toEqual([]);
+  expect(r.ball).toEqual([]);
+  expect(r.touches).toEqual([]);
+});
+
+test("in the game: after the knot Theseus walks into the black vestibule edge by edge, vanishes in it and comes out onto the passage's clay: nothing in its black but glaze and the thread, never his line of clay or his eye; and past the post, a line of clay between him and its glaze, corners included", async ({ page }) => {
+  await open(page);
+  const post = MINOTAUR.decor.find((d) => d.kind === 'doorpost');
+  if (!post || post.kind !== 'doorpost') throw new Error('no post');
+  const r = await page.evaluate(
+    ({ presses, glaze, post }) => {
+      const g = (window as unknown as W).__game;
+      g.titleTimer = 0;
+      const hero = () => g.entities.find((e: { def: { kind: string } }) => e.def.kind === 'hero');
+      const key = (c: string, d: boolean) => window.dispatchEvent(new KeyboardEvent(d ? 'keydown' : 'keyup', { code: c }));
+      const ctx = g.world.getContext('2d') as CanvasRenderingContext2D;
+      const s = ctx.canvas.width / 320;
+      const GL = parseInt(glaze.slice(1), 16);
+      const shot = () => {
+        g.draw();
+        const d = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height).data;
+        const cy = g.camera.iy;
+        return (x: number, y: number) => {
+          const j = y - cy;
+          if (x < 0 || x >= 320 || j < 0 || j >= 180) return -1;
+          const o = ((j * s + 1) * ctx.canvas.width + x * s + 1) * 4;
+          return (d[o]! << 16) | (d[o + 1]! << 8) | d[o + 2]!;
+        };
+      };
+      // The vestibule's black, x 96 to 127 and y 80 to 159 (a-door/labyrinth-vestibule.md);
+      // his rows, y 136 to 159, from the post to the passage.
+      const black = (x: number, y: number) => x >= 96 && x < 128 && y >= 80 && y < 160;
+      const onPost = (x: number, y: number) => x >= post.x && x < post.x + 4 && y >= post.top && y < post.floorY;
+      const out = { frames: 0, seen: [] as number[], inBlack: [] as string[], touches: [] as string[] };
+      for (let i = 0; i < 300; i++) {
+        const p = presses[i] ?? { dir: 0, jump: false };
+        key('ArrowRight', p.dir > 0);
+        key('ArrowLeft', p.dir < 0);
+        key('Space', p.jump);
+        g.tick();
+        const k = hero().k;
+        if (hero().state !== 'up' || k < 22) continue;
+        if (k > 46) break;
+        out.frames++;
+        const all = shot();
+        // His glaze, told from the post's by drawing him with no post there, and the same with no him.
+        const decor = g.level.data.decor;
+        g.level.data.decor = decor.filter((d: { kind: string }) => d.kind !== 'doorpost');
+        const withHim = shot();
+        const keep = g.entities;
+        g.entities = keep.filter((e: { def: { kind: string } }) => e.def.kind !== 'hero');
+        const bare = shot();
+        g.entities = keep;
+        g.level.data.decor = decor;
+        const his = (x: number, y: number) => withHim(x, y) === GL && bare(x, y) !== GL;
+        let seen = 0;
+        for (let y = 132; y < 160; y++) {
+          for (let x = 60; x < 150; x++) {
+            const c = all(x, y);
+            if (c < 0) continue;
+            if (his(x, y) && c === GL && !black(x, y)) seen++;
+            if (black(x, y) && c !== GL && c !== 0xffffff) out.inBlack.push(`hero ${k}: (${x}, ${y}) #${c.toString(16)}`);
+            // The post's glaze never touches his.
+            if (!onPost(x, y) || his(x, y) || c !== GL) continue;
+            for (const [dx, dy] of [[-1, -1], [0, -1], [1, -1], [-1, 0], [1, 0], [-1, 1], [0, 1], [1, 1]] as const) {
+              if (his(x + dx, y + dy) && all(x + dx, y + dy) === GL) out.touches.push(`hero ${k}: (${x}, ${y}) by (${x + dx}, ${y + dy})`);
+            }
+          }
+        }
+        out.seen.push(seen);
+      }
+      key('ArrowLeft', false);
+      key('ArrowRight', false);
+      key('Space', false);
+      return out;
+    },
+    { presses: cleanPresses(), glaze: '#1f140e', post: { x: post.x, top: post.top, floorY: post.floorY } },
+  );
+  // From his first step off the post, frame 22 of his route, to 46, past the vestibule.
+  expect(r.frames).toBe(25);
+  // Seen at the post and in the door, then wholly in the black, unseen, and out on the
+  // passage's clay (until 2026-10-11 he was drawn in the black in a reserved outline).
+  const gone = r.seen.findIndex((n) => n === 0);
+  expect(gone).toBeGreaterThan(0);
+  expect(r.seen.slice(gone).some((n) => n > 0)).toBe(true);
   expect(r.inBlack).toEqual([]);
   expect(r.touches).toEqual([]);
 });

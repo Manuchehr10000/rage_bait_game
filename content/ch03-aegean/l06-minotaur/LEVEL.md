@@ -136,8 +136,11 @@ Ruled (designer, on recommendations, 2026-10-11), after the third art pass:
 Decided while building, and not objected to (2026-10-10):
 - Flat, unlit pixel art drawn in code at 1 world px. The level is exempt from the painted style
   of `content/README.md` (soft interiors, light from the upper right), which black-figure is not.
-- Two glaze shapes never touch without 1 px of clay between them, except in the black doorway,
-  where Theseus stays unseen until he steps out.
+- Two glaze shapes never touch without 1 px of clay between them, except in the black, the
+  vestibule and the hero's doorway, where nothing is drawn and a figure goes in and comes out
+  edge by edge, black from black (since 2026-10-11, when nothing inside the black was to be
+  outlined; until then the exception was the black doorway alone, where Theseus stayed unseen
+  until he stepped out).
 - Masonry by rule, in fewer and longer courses, with no lit tops, so that identical things stay
   identical by construction.
 - The bull redrawn in code with its head, hands and stones drawn; Theseus in drawn poses.
@@ -233,7 +236,8 @@ Chosen in the asset notes (2026-10-10), where this file did not decide, for the 
   its head down before it lying on its cheek, at x 105, clear of Theseus's feet, horns up at its
   back; the same head in the tableau, where Theseus's hand has the horn at (88, 151), 3 px right
   of and 2 below where it was, and the dead body after it a man's silhouette in its outline, a
-  shoulder, an arm trailing and a knee bent, its shin up. Theseus stands between its body and its near arm: in front of its
+  shoulder, an arm trailing and a knee bent, its shin up, unseen where it lies in the vestibule's
+  black (since 2026-10-11). Theseus stands between its body and its near arm: in front of its
   body, head and far arm, behind its near arm, its hand and the near stone, each cut from the other
   by clay, corners included, and his hand on the horn in front of it. (After a check of the drawn
   bull, the same day: the crouched leg read as the digit 4, the flat hands as rakes, and its glaze
@@ -262,13 +266,16 @@ Chosen in the asset notes (2026-10-10), where this file did not decide, for the 
   and L+70 to 129 (drawn holding it through the heave, his arm was 20 px). In his two blows he
   lunges in past the bull's near arm and is in front of all of it; the first goes under its jaw
   into its throat, the second rises into the throat of the jerked-up head. He gives way round the
-  clap's palms by two pixels of clay; the ball is drawn over his heels as he steps out; and the
-  tourist's reserve goes under him too while he is off his feet, in the air or tossed. Walking
-  into his doorway he is cut from its frame by a line of clay, corners included, and black in its
-  black, eye and incisions too: he goes into it edge by edge (`e-cell/hero-doorway.md`). (After a
-  check of the hero stage, 2026-10-10: the stone came down through him after the duck, the near
-  hand lay on his back in the lurch and went into the wall, and his glaze joined the doorway's
-  black to its jamb.)
+  clap's palms by two pixels of clay; the ball lies at his heels as he steps out, unseen in the
+  doorway's black; and the tourist's reserve goes under him too while he is off his feet, in the
+  air or tossed. Walking into his doorway he is cut from its frame by a line of clay, corners
+  included, and nothing of him is drawn in its black, his eye, incisions and line of clay
+  included: he goes into it edge by edge, and comes out of it so, unseen at L−8
+  (`e-cell/hero-doorway.md`). (After a check of the hero stage, 2026-10-10: the stone came down
+  through him after the duck, the near hand lay on his back in the lurch and went into the wall,
+  and his glaze joined the doorway's black to its jamb. Superseded 2026-10-11, when nothing inside
+  the black was to be outlined: the ball was drawn over his heels as he stepped out, and he was
+  drawn black in its black walking in, and from L−8 whole in it, ringed by his line of clay.)
 - The tourist's last three deaths, as drawn (2026-10-10, `../shared`): pressed flat, he lies face
   up with his head to the left whichever way he faced; swatted in the air, he is pressed 2 px into
   its poll, so that its horns' tips stand up behind him; the somersault goes round
@@ -597,8 +604,10 @@ Honest, and never replayed: the way of winning.
 When his left edge passes x 80 after blow 2, a staged second copy, while the heap stays in the
 cell: Theseus comes out of the black vestibule dragging the dead Minotaur and stops at the post
 where he knelt, x 64–80, within 45 frames, the head and horns across the threshold, over the
-post's foot and the clay of the door opening, the rest in the vestibule in a reserved outline. He
-is non-solid and drawn behind the tourist. The clean run takes 49 frames from the trigger to the exit; the fastest walk takes 50 (49 or 50 in the game, by where in his stride he crosses x 80, so Theseus is always at the post first).
+post's foot and the clay of the door opening, the rest unseen in the vestibule's black. Both come
+out of it edge by edge, nothing of them drawn in it, so the body is pulled out of the dark
+(designer, on a recommendation, 2026-10-11; "the rest in the vestibule in a reserved outline" is
+superseded: it read as a chalk outline). He is non-solid and drawn behind the tourist. The clean run takes 49 frames from the trigger to the exit; the fastest walk takes 50 (49 or 50 in the game, by where in his stride he crosses x 80, so Theseus is always at the post first).
 He leaves first, the queue still waits, and Ariadne looks past him. The exit card is anchored right
 (view x 136–316), so at 0 to 4 rows of causes it covers neither the door nor Theseus with the body.
 
@@ -953,7 +962,8 @@ Being built, in this order, as a stage in the dev build (`#minotaur`, in `STAGES
   3 px step with every head on the first screen (since opened to 6 px); Theseus drawn kneeling
   (the re-tie loop's four frames), leaning (three, on the lean's own frames, so no window of the
   knot moves), standing, walking (looking back by his head alone), mantling, falling, paying out
-  and dragging, and cut by a reserved line from the vestibule and the post where he passes them;
+  and dragging, and cut by a reserved line from the vestibule (until 2026-10-11) and the post
+  where he passes them;
   and the knot's death a clothesline, `DEATH_ANIM` 'clothesline' and its knock `onHisBack`, with
   the drawn half-quarter `bull-leaper-clotheslined`. Pinned in `tests/minotaur-out.spec.ts` (the
   thirteen heads, since the eyes on the first screen, Ariadne's facing) and
@@ -1043,6 +1053,20 @@ Being built, in this order, as a stage in the dev build (`#minotaur`, in `STAGES
   would come over him, cut from him by his reserve, never treading on him (`climbsOver`,
   `src/render/scene.ts`). Pinned in `tests/minotaur-snort.spec.ts` (the lip) and
   `tests/minotaur-theseus.spec.ts` (frames 66 to 70, a man at rest from x 190 to 206).
+
+- **Nothing in the black outlined** (2026-10-11, on the designer's ruling after the third art
+  pass, to the notes in `a-door`, `b-passage`, `e-cell` and `f-thread`): nothing is drawn inside
+  the vestibule's black or the hero's doorway's but the thread. Theseus walking through the
+  vestibule after the knot, into his doorway and out of it at L−8, and in the tableau, is drawn
+  only out of the black, with no line of clay, eye or incision in it, and comes out of it edge by
+  edge, unseen at L−8; the ball, in his hand or at his heels, is never drawn in it; the dead body
+  in the tableau shows only where it lies on the clay and over the post, its head and horns, and
+  is pulled out of the dark; the thread is drawn whole over the black where he is (`darkOf`,
+  `clipOutside`, `outOfTheDark`, `src/render/scene.ts`). The tourist in front of the black keeps
+  his reserve. Nothing that kills, carries, times or sounds moved. Pinned in
+  `tests/minotaur-theseus.spec.ts` (the vestibule after the knot, frames 22 to 46 of his route;
+  the doorway, 395 to 401 and L−8 to L+8, never the ball) and `tests/minotaur-out.spec.ts` (the
+  tableau: nothing of it in the vestibule on any frame, its picture short of x 96).
 
 Still to come: nothing the notes ask the drawing for. (`LevelData.tricks`, 'The knot', 'The
 snort', 'The hands', 'The horns', and `dropCause` and `fallCause` 'The labyrinth', unreachable,

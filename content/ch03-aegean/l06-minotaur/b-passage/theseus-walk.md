@@ -25,15 +25,20 @@ The stride changes every 9 px he goes, every 3 frames.
 ## Where it stands in the game
 
 - Along the passage after the knot, from the post to O1, looking back at his knot for his first
-  10 frames (frames 2 and 3), and through the vestibule, cut from its black and the post by a
-  reserved line, corners included (2026-10-10: drawn a pixel left, right, up and down only, it left
-  his glaze touching the black at the corners).
+  10 frames (frames 2 and 3): past the post, cut from it by a reserved line, corners included;
+  into the vestibule's black edge by edge, unseen in it, where nothing of him is drawn, and out
+  onto P's clay edge by edge, the thread drawn whole over the black where he is
+  (`../a-door/labyrinth-vestibule.md`, `tests/minotaur-theseus.spec.ts`). (2026-10-10: drawn a
+  pixel left, right, up and down only, his line left his glaze touching the black at the
+  corners. Superseded 2026-10-11: until then he was seen in the vestibule, cut from its black by
+  his line of clay, his eye and incisions drawn.)
 - Along G0 overhead, heard; along each pillar top and room to the next way down; along row 5 and
-  into his doorway, cut from its frame by the same line and black in its black
-  (`../e-cell/hero-doorway.md`).
+  into his doorway, cut from its frame by the same line, and edge by edge into its black, where
+  nothing of him is drawn, the ball in his hand included (`../e-cell/hero-doorway.md`).
 - In the fight, out to the edge of row 5 after he steps out, at guard (frames 4 and 5): he comes
-  out of the black with his sword drawn (drawn 2026-10-10; the notes did not say, and the sword in
-  its scabbard there would have come into his hand between his stand on the edge and his leap).
+  out of the black edge by edge, unseen at L−8, with his sword drawn (drawn 2026-10-10; the notes
+  did not say, and the sword in its scabbard there would have come into his hand between his stand
+  on the edge and his leap).
 
 While he carries the ball, the thread's 2 × 2 of white is in his hand (`thread`).
 

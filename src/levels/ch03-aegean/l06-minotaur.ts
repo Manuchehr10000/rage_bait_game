@@ -345,8 +345,9 @@ const FIGHT: FightDef = {
  * the black, at a dragging pace of 1 px a frame, he stops at the post where he knelt, x 66
  * to 78, 44 frames on, 45 after the line: nobody is out of the door sooner than 49. The
  * head and horns lie across the threshold, x 82 to 93 on the clay of the door opening;
- * the rest in the vestibule, to x 127. Drawn behind the tourist; he leaves first, the
- * queue still waits, and Ariadne looks past him.
+ * the rest in the vestibule, to x 127, unseen in its black, out of which both come edge by
+ * edge. Drawn behind the tourist; he leaves first, the queue still waits, and Ariadne looks
+ * past him.
  */
 const TABLEAU: TableauDef = {
   kind: 'tableau',

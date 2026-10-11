@@ -40,13 +40,17 @@ states:
 8. **In his hand**, while he carries it: 2 × 2 at his hand. Dropping down a shaft, up in his
    front hand before his face (`../c-way-down/theseus-fall.md`), and the laid thread runs down to
    it, never into his head; its bend over the edge is laid as that hand comes down past it.
-9. **In the fight and after**, the laid thread ends at the ball he left in his doorway
-   (`thread-ball`).
+   Never in the black: walking into his doorway, the ball in his hand is not drawn over its
+   black, and the thread is, to his hand (2026-10-11).
+9. **In the fight and after**, the laid thread ends at the ball he left in his doorway, unseen in
+   its black: the thread runs into the dark (`thread-ball`).
 
 ## Where it stands in the game
 
-Behind the tourist and behind Theseus, always. Over the clay it is 3.5 to 1; across the
-vestibule's black at y 149 it is 18 to 1, its best read.
+Behind the tourist and behind Theseus, always; but in the black, the vestibule and his doorway,
+where nothing of him is drawn, it is drawn whole over the black where he is, the one thing
+drawn there (2026-10-11). Over the clay it is 3.5 to 1; across the vestibule's black at y 149 it
+is 18 to 1, its best read.
 
 ## Must be right
 

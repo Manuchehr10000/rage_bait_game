@@ -48,7 +48,11 @@ This note is the figure every other Theseus pose is drawn from: `../b-passage/th
   **from the Minotaur** by a man's head.
 - **Behind the tourist**, except while he mantles up O1 (frames 66 to 85 of his route). Cut by a
   reserved line of clay from any glaze he is in front of or behind (`../LEVEL.md`, Art,
-  2026-10-10), except in his black doorway, where he is unseen until he steps out.
+  2026-10-10), except in the black, the vestibule and his doorway, where nothing of him is drawn,
+  his line of clay, his eye and the ball in his hand included: he goes into it and comes out of
+  it edge by edge, black from black (designer, on a recommendation, 2026-10-11). (Superseded
+  2026-10-11: the exception was his doorway alone, and in the vestibule, and stepping out of his
+  doorway, he was drawn in the black ringed by his line of clay.)
 - **Against a wall's stone, a pixel off it**, on his way down: where the stone is against his
   frame's last column and not its first, his frame is drawn a pixel left, and the other way
   about a pixel right, the ball in his hand and the thread to it with him, so that nothing of

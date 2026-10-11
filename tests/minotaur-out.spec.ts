@@ -109,7 +109,7 @@ test('the closing tableau, the queue and Ariadne: where each stands, and none of
   expect([t.to, t.to + THESEUS.w]).toEqual([66, 78]);
   expect((t.from - t.to) / t.pace).toBe(44);
   // There the head and horns lie across the threshold, x 82 to 93 on the clay of the door
-  // opening, and the rest of the body in the vestibule, to x 126.
+  // opening, and the rest of the body in the vestibule, to x 126, unseen in its black.
   const head = t.to + t.body.head;
   expect([head, head + BULL_HEAD.w]).toEqual([82, 93]);
   expect(head).toBeGreaterThanOrEqual(DOOR.x0);
@@ -888,10 +888,23 @@ test('in the game: the clean run goes out at the door at frame 1346 with Theseus
       // touching it at a side or a corner.
       const touches: string[] = [];
       let crossing = 0;
+      // The vestibule's black on their rows, x 96 to 127 and y 136 to 159, as drawn now.
+      const V = { x: 96, y: 136, w: 32, h: 24 };
+      const vestibule = () => {
+        g.draw();
+        return wctx.getImageData(V.x * 4, (V.y - g.camera.iy) * 4, V.w * 4, V.h * 4).data.join();
+      };
+      let inBlack = 0;
       const look = (t: number) => {
         const p = g.player;
         const px = p.x;
         p.x = 200;
+        // Nothing of them is drawn in the black: the same with the tableau as without it.
+        const withIt = vestibule();
+        const keep = g.entities;
+        g.entities = keep.filter((e: unknown) => e !== tableau);
+        if (vestibule() !== withIt) inBlack++;
+        g.entities = keep;
         const all = glaze();
         const kept = decor.splice(0, decor.length);
         decor.push(...kept.filter((d) => d !== post));
@@ -1016,18 +1029,23 @@ test('in the game: the clean run goes out at the door at frame 1346 with Theseus
         return rects[0]!;
       };
       const cards = [0, 1, 2, 3, 4].map(card);
-      return { out, began, state: g.state, k: tableau.k, x: tableau.x, picture: { x0, x1, y0, y1 }, camY: g.camera.iy, him, covered, cards, touches, crossing, top, reserved };
+      return { out, began, state: g.state, k: tableau.k, x: tableau.x, picture: { x0, x1, y0, y1 }, camY: g.camera.iy, him, covered, cards, touches, crossing, top, reserved, inBlack };
     },
     // His costume's inks (content/ch03-aegean/shared/bull-leaper.md; src/render/procedural.ts, BULL_LEAPER).
     { presses: cleanPresses(), colours: ['#2b1d10', '#1d1917', '#b08850', '#f4f1ea', '#e6b48c', '#1c1c1c', '#b5d93b', '#d6ae45', '#b4392b', '#2f5f9a', '#2d3a66', '#ecebe6'] },
   );
   expect(r.reserved).toEqual([]);
   expect({ out: r.out, began: r.began, state: r.state, k: r.k, x: r.x }).toEqual({ out: 1346, began: 1298, state: 'complete', k: 48, x: 66 });
-  // Theseus at the post, x 66, and the body to x 127: in the view, the camera never moving
-  // sideways, from x 66 to under 128, on the door storey.
+  // Theseus at the post, x 66, and the body's head and horns across the threshold: in the
+  // view, the camera never moving sideways, from x 66 to under 96, on the door storey. The
+  // rest of the body, to x 126, is in the vestibule's black, and nothing of it is drawn there:
+  // it is pulled out of the dark (ruled 2026-10-11; until then it was drawn in the black in a
+  // reserved outline, to under 128).
   expect(r.camY).toBe(53);
   expect(r.picture.x0).toBe(66);
-  expect(r.picture.x1).toBeLessThanOrEqual(VESTIBULE.x1);
+  expect(r.picture.x1).toBeLessThanOrEqual(VESTIBULE.x0);
+  // And on every frame of the drag, out of the black edge by edge.
+  expect(r.inBlack).toBe(0);
   expect(r.picture.y1).toBeLessThanOrEqual(DOOR_FLOOR - r.camY);
   expect(r.him).toBeGreaterThan(50);
   expect(r.covered).toBe(0);

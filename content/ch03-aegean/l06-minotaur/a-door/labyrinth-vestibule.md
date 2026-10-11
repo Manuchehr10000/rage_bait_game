@@ -22,11 +22,22 @@ last.
 
 - **One of the two places where black glaze is the dark**, with the hero's doorway (`../LEVEL.md`,
   Art).
-- **Whatever passes in front of it is cut from it by reserved clay**, so nothing is lost in it:
-  - the tourist, by his reserve (`tourist-reserve`);
-  - Theseus, walking through it after the knot, by a reserved line round him: the clay-gap rule's
-    one exception is the hero's doorway, not this room;
-  - the tableau's Theseus and the dead body, in a reserved outline (`../f-thread/minotaur-dead.md`).
+- **Nothing inside it is drawn, or outlined** (designer, on a recommendation, 2026-10-11;
+  `../LEVEL.md`, Art). A figure goes into it and comes out of it edge by edge, black from black,
+  its line of clay only where it is out of it:
+  - Theseus, walking through it after the knot, vanishes into it and comes out onto P's clay
+    (`../b-passage/theseus-walk.md`);
+  - the tableau's Theseus comes out of it onto the clay of the door opening, and the dead body
+    shows only where it lies on that clay, its head and horns across the threshold: the rest is
+    unseen in the black, so that the body is pulled out of the dark
+    (`../f-thread/theseus-drag.md`, `../f-thread/minotaur-dead.md`).
+  With the hero's doorway it is the clay-gap rule's one exception: there a figure's glaze meets
+  the black. The thread, the one pure white, is the only thing drawn over it.
+- **The tourist keeps his reserve in front of it** (`tourist-reserve`): he is in front of the
+  black, never in it, so nothing of him is lost in it.
+- (Superseded 2026-10-11: whatever passed in front of it was cut from it by reserved clay,
+  Theseus walking through it by a reserved line round him, and the tableau's Theseus and the dead
+  body in a reserved outline, which read as a chalk outline.)
 - **No line of the masonry touches it**, not even at a corner (`tile-labyrinth`, against the
   black). It stays a plain rectangle, x 96 to 127 and y 80 to 159, and the stone gives way round
   it: the stone over it has its bottom row in reserved clay, y 79 from x 95 to 128, so its
