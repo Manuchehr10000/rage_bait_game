@@ -63,7 +63,8 @@ notes describe the levels as they were built.
   overhead; and the resolveY fix is made game-wide, with every built level re-tested (on
   a recommendation, 2026-10-08; made 2026-10-09). It is being built as a dev stage
   (`#minotaur`, `STAGES` in `src/levels/index.ts`): all four tricks, the way out and the closing
-  tableau are in, playable start to exit, with rough art; the black-figure art is not. It moves
+  tableau are in, playable start to exit, drawn in black-figure (three passes, 2026-10-10 and 11;
+  a fourth after the designer's rulings of 2026-10-11). It moves
   to LEVELS and the map on the designer's word.
 - **Open:** Apep or Sekhmet for chapter 2's legend; whether Karnak's exit has already spent
   the false completion (pillar 10, `content/tricks.md`).

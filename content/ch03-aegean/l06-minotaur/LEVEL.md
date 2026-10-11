@@ -118,6 +118,21 @@ Ruled (designer, on recommendations, 2026-10-10), after the art conversation:
 - **Drawn from the research, without images of the vases.** Nobody on the project has seen MFA
   60.1 or the others; what the research could not verify stays marked so in each note.
 
+Ruled (designer, on recommendations, 2026-10-11), after the third art pass:
+- **The rays stand on stone**: the strip under the ground line outside is the ground's stone, not
+  the clay of the air, so the rays read as ornament on solid ground, never as spikes in a pit.
+- **The hands are oversized**, about 11 px, spilling over their stones, as the ruling of
+  2026-10-10 asked; at the stones' 8 px they read as crowns or combs.
+- **Nothing inside the black is outlined.** Theseus is unseen in his doorway and in the vestibule,
+  and appears edge by edge as he crosses onto clay; the dead Minotaur in the tableau shows only
+  where it lies on clay, never as a reserved outline in the black, which read as a chalk outline.
+- **The stride's stone boss is dropped**: Theseus's foot pushes off the wall at O1's mouth. The
+  boss read first as a letter o, then as a minus sign.
+- **No shape reads as a character** (pillar 2): the heap, the risen back and the threshold's
+  notched edge are redrawn, since they read as a Z or a 7, a 7, and a W.
+- **The death counter over the rays** while he is in Z1 is accepted: the HUD sits over the
+  background everywhere in the game.
+
 Decided while building, and not objected to (2026-10-10):
 - Flat, unlit pixel art drawn in code at 1 world px. The level is exempt from the painted style
   of `content/README.md` (soft interiors, light from the upper right), which black-figure is not.
