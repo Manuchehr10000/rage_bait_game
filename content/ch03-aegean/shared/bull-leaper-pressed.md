@@ -52,7 +52,9 @@ The Minotaur, beat e, the hands:
 - The swat's hand is flat on top of him, its fingers down onto him, a line of clay between its
   fingertips and him, from the catch to frame 8, when it leaves him
   (`../l06-minotaur/e-cell/minotaur-hand.md`), its arm coming down onto it from above, the elbow
-  raised. On a man on the floor it is never over Theseus: on his head while he stands, short of
+  raised, a little over the line onto him in the air or on its back, the arm whole from its
+  shoulder to its hand (arched up over its back until a check of the oversized hands, 2026-10-11,
+  when the arm was cut there and its forearm floated over him; superseded). On a man on the floor it is never over Theseus: on his head while he stands, short of
   Theseus's head; on his face and chest once he is flat, x 80 to 88, its arm arched over
   Theseus's head and behind him (until 2026-10-11, when the hand was drawn oversized, its forearm
   went in behind Theseus's foot).

@@ -29,6 +29,7 @@ import {
   heroPicture,
   HOLD_WRIST,
   SWAT,
+  swatElbow,
   type BullPose,
   type Hand,
   type HeroAgainst,
@@ -593,14 +594,52 @@ test("the stone in its hand, from the grip until it is set down: whole on every 
     // Nothing of its near arm, its hand or the stone, nor their line of clay, over him above
     // his knees: the arm crosses only his shins, as the stones on the floor do.
     for (const q of hisGlaze(heroPicture(heroAt(k), against(f)).back)) if (q.y < knees && front.get(q.x, q.y)) wrong.push(`L+${k}: over him at (${q.x}, ${q.y})`);
+    // Nothing of it forward of x 100, the clap's catch point, where a man who stopped short is
+    // alive: swung over the ducking hero, the stone and the fist under it stop short of it
+    // (after a check of the oversized hands, 2026-10-11: swung by the wrist, they came 3 px
+    // over it on L + 61 and 62).
+    for (const p of [body, front]) for (const q of p.each()) if (q.ink !== '_' && q.x < FIGHT.clap.rect.x) wrong.push(`L+${k}: its ${q.ink === 'o' ? 'cream' : 'glaze'} at (${q.x}, ${q.y})`);
   }
   expect(wrong).toEqual([]);
-  // In its hand from the grip; set down on L + 74, before the first blow, before its face
-  // at x 98, its hand flat on it.
-  expect(k).toBe(C.heave + FIGHT.back.ease + 12);
+  // In its hand from the grip; set down on L + 72, before the first blow, before its face
+  // at x 98, its hand flat on it: before its head, sinking with its back, is down to the
+  // stone (on L + 74 until 2026-10-11).
+  expect(k).toBe(C.heave + FIGHT.back.ease + 10);
   const set = bullPose(at(k));
   expect(set.stone).toEqual({ x: FIGHT.body.face - 6 - ST.w / 2, y: F - ST.h });
   expect(handBox(set.near)).toMatchObject({ x: set.stone.x, y: set.stone.y - FLAT_ON });
+});
+
+test("its face whole while its hand has the stone: from the grip to the swing, and from the swing's end to the set-down, nothing of its hand or its arm over its head, and no line of clay across it", () => {
+  // Taken up from the floor under its face, its head is bowed over the hand gripping the stone
+  // (L + 40 and 41); held up on its fist behind its head; and, missed, brought down on its fist
+  // under its chin as its head sinks, and put down before its head is down to it. Only the
+  // heave, L + 56 to 62, swings the arm over its head. (After a check of the oversized hands,
+  // 2026-10-11: the hand gripping it from above, 12 tall, came up over its face from L + 63,
+  // its palm over its muzzle and its line of clay across its face.)
+  const wrong: string[] = [];
+  const swing = (k: number) => k >= C.heave && k <= C.heave + FIGHT.back.ease;
+  let k = C.grip;
+  for (; k < C.blow1; k++) {
+    const f = at(k);
+    const b = bullPose(f);
+    if (!b.stoneHeld) break;
+    if (swing(k)) continue;
+    const { body } = picture(f);
+    const rows = left(BULL_HEAD_FRAMES[b.headFrame]!);
+    const horns = rows.length - BULL_HEAD.h;
+    rows.forEach((row, j) => {
+      for (let i = 0; i < row.length; i++) {
+        const c = row[i]!;
+        if (c === '.') continue;
+        const x = b.head.x + i;
+        const y = b.head.y - horns + j;
+        if (body.get(x, y) !== c) wrong.push(`L+${k}: its head at (${x}, ${y}) is ${body.get(x, y) ?? 'clay'}, drawn ${c}`);
+      }
+    });
+  }
+  expect(wrong).toEqual([]);
+  expect(k).toBe(C.heave + FIGHT.back.ease + 10);
 });
 
 test('struck, its near hand reaches up at his chest in front of him, between him and its head: in his front half, under his neck and over his hips, on every frame of the lurch; and its arm never crosses him', () => {
@@ -781,6 +820,38 @@ test("the clap's catch point: two pixels of clear clay round its palms on him, w
   }
   // From the frame its palms are on him to his drop at its feet.
   expect(seen).toBe(CLAP.down - CLAP.on + 1);
+});
+
+test("the swat: its far arm whole from its shoulder to its hand on him, on every frame its hand is on him, wherever in its column it caught him; nothing of it cut away to the clay", () => {
+  // Along the middle of the arm, its shoulder to its elbow to its wrist, every pixel is drawn:
+  // its own glaze, or whatever of it lies in front of it with its line of clay; never nothing.
+  // (After a check of the oversized hands, 2026-10-11: arched onto a man off the floor, its
+  // elbow stood up over its back and was cut off the solid, its forearm floating in the clay.)
+  const wrong: string[] = [];
+  for (const ck of [C.knee, 51, C.heave, 61, FIGHT.swat.to - 1]) {
+    for (const x of [91, 98, 105, 111]) {
+      for (const y of [F - 79, F - 64, F - 49, F - 34, F - HERO.h]) {
+        for (let u = 0; u < SWAT.off; u++) {
+          const f = at(ck + u);
+          f.caught = { by: 'swat', k: ck, x, y, w: HERO.w, h: HERO.h, vx: 0, vy: 0, air: y < F - HERO.h };
+          const b = bullPose(f);
+          expect(b.on).toBe('swat');
+          const { body } = picture(f);
+          const s = { x: b.x0 + 9, y: b.top + 4 };
+          const e = swatElbow(f, s, b.far.wrist);
+          for (const [p, q] of [[s, e], [e, b.far.wrist]] as const) {
+            const n = Math.ceil(4 * Math.hypot(q.x - p.x, q.y - p.y));
+            for (let i = 0; i <= n; i++) {
+              const px = Math.floor(p.x + ((q.x - p.x) * i) / n);
+              const py = Math.floor(p.y + ((q.y - p.y) * i) / n);
+              if (!body.get(px, py)) wrong.push(`caught L+${ck} at (${x}, ${y}), frame ${u}: the arm cut at (${px}, ${py})`);
+            }
+          }
+        }
+      }
+    }
+  }
+  expect(wrong.slice(0, 10)).toEqual([]);
 });
 
 test("the swat on a man on the floor: its hand on his head, then on him flat at its feet, never over Theseus, who stands whole in front of its far arm on every frame it is on him; and never on the near stone", () => {

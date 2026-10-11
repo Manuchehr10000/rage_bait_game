@@ -1,4 +1,4 @@
-import { BLOW, breathHeight, HERO, PLUME, STRUCK, type Fight, type HeroFrame } from '../engine/entities';
+import { BLOW, breathHeight, BULL_HEAD, HERO, PLUME, STRUCK, type Fight, type HeroFrame } from '../engine/entities';
 import { DEATH_FRAMES } from '../engine/types';
 
 /**
@@ -419,6 +419,14 @@ const LIFT: readonly { t: number; x: number; y: number }[] = [
 const HOLD_ARM = 11;
 const SWING_R = 18;
 /**
+ * The point of the stone its arm swings round its shoulder, from the stone's top-left: under
+ * its front end, and not the wrist, which is under its back end (`HOLD_WRIST`). So, swung
+ * forward over the ducking hero, the stone and the fist under it stop in the swat's column,
+ * never forward of x 100, where a man who stopped short is alive (after a check of the
+ * oversized hands, 2026-10-11: swung by the wrist, they came 3 px forward of it).
+ */
+const SWUNG_BY = { x: 1, y: 6 };
+/**
  * Its angle over the forward line, in degrees: the stone raised up and back, and swung
  * forward over the ducking hero to the end of its reach, in front of its face, where the
  * hand under it is still clear of it.
@@ -428,19 +436,21 @@ const STONE_SWUNG = 4;
 /**
  * Missed, it brings the stone back in and sets it down: the stone's top-left by frames from
  * the swing's end, in px from where it is set down. Drawn back in front of its own chest,
- * clear of the hero, and brought down there, gripped from above; only at the floor is it
- * put in its place, in front of the far stone, in one frame, so that nothing of it, nor of
- * the hand gripping it, 12 px tall, comes down over him above his knees or over his hand on
- * the horn.
+ * clear of the hero, and brought down there on its fist, under its chin with a row of clay
+ * between, as its head sinks with its back; and put in its place on the floor, in front of
+ * the far stone, in one frame, before its head is down to the stone, so that nothing of it,
+ * nor of its hand, comes down over him above his knees or over his hand on the horn, and
+ * nothing of either comes over its own face. (Gripped from above until 2026-10-11, the hand,
+ * grown 12 tall, came up over its face from L+63, its fingers on the stone under its muzzle
+ * a mouth full of teeth.)
  */
 const SET_DOWN: readonly { f: number; x: number; y: number }[] = [
-  { f: 1, x: 9, y: -22 },
-  { f: 2, x: 9, y: -17 },
+  { f: 1, x: 10, y: -19 },
+  { f: 2, x: 10, y: -17 },
   { f: 5, x: 10, y: -14 },
   { f: 7, x: 10, y: -10 },
-  { f: 9, x: 9, y: -4 },
-  { f: 11, x: 10, y: 0 },
-  { f: 12, x: 0, y: 0 },
+  { f: 9, x: 10, y: -5 },
+  { f: 10, x: 0, y: 0 },
 ];
 
 /**
@@ -630,20 +640,20 @@ export function bullPose(f: Fight, ridden = false): BullPose {
   const sn = shoulders(x0, top, F, kneel).near;
   // Flat on a stone: the hand along its whole top, the wrist over its back end.
   const flatOn = (sx: number): Hand => handAt(HAND_FLAT, { x: sx, y: F - st.h - FLAT_ON });
-  // The stone up in its hand, the hand's wrist `deg` round from the forward line at the
-  // shoulder: the stone's top-left.
+  // The stone up in its hand, swung `deg` round from the forward line at the shoulder
+  // (`SWUNG_BY`): the stone's top-left.
   const raised = (deg: number): Pt => ({
-    x: Math.round(sn.x - SWING_R * Math.cos((deg * Math.PI) / 180)) - HOLD_WRIST.x,
-    y: Math.round(sn.y - SWING_R * Math.sin((deg * Math.PI) / 180)) - HOLD_WRIST.y,
+    x: Math.round(sn.x - SWING_R * Math.cos((deg * Math.PI) / 180)) - SWUNG_BY.x,
+    y: Math.round(sn.y - SWING_R * Math.sin((deg * Math.PI) / 180)) - SWUNG_BY.y,
   });
-  // Its hand on the stone at `s`: a fist under it, while the stone's top is `FIST_OVER` over
-  // its shoulder or more, so that the arm comes up to it from below, behind the stone;
-  // gripping it from above, the palm on its top and the fingers down its face, while it is
-  // lower, so that the arm comes to it over the stone and never across it; and so too on the
-  // floor.
+  // Its hand on the stone at `s`, taking it up and swinging it: a fist under it, while the
+  // stone's top is `FIST_OVER` over its shoulder or more, so that the arm comes up to it from
+  // below, behind the stone; gripping it from above, the palm on its top and the fingers down
+  // its face, while it is lower, so that the arm comes to it over the stone and never across
+  // it; and so too on the floor. Setting it down, on its fist (`SET_DOWN`).
   const gripping = (s: Pt): Hand => handAt(HAND_FLAT, { x: s.x, y: s.y - FLAT_ON });
-  const holding = (s: Pt): Hand =>
-    sn.y < s.y + FIST_OVER || s.y + HOLD_WRIST.y > F - 1 ? gripping(s) : { frame: HAND_HOLD, wrist: { x: s.x + HOLD_WRIST.x, y: s.y + HOLD_WRIST.y } };
+  const fistUnder = (s: Pt): Hand => ({ frame: HAND_HOLD, wrist: { x: s.x + HOLD_WRIST.x, y: s.y + HOLD_WRIST.y } });
+  const holding = (s: Pt): Hand => (sn.y < s.y + FIST_OVER || s.y + HOLD_WRIST.y > F - 1 ? gripping(s) : fistUnder(s));
   const claw = (kk: number): Hand => {
     const p = CLAW[(((kk - c.knee) % CLAW.length) + CLAW.length) % CLAW.length]!;
     return handAt(HAND_CLAW, { x: head.x + p.x, y: head.y + p.y });
@@ -690,10 +700,10 @@ export function bullPose(f: Fight, ridden = false): BullPose {
     near = holding(stoneAt);
     far = claw(k);
   } else if (k < c.blow1) {
-    // Missed: the stone drawn back in front of its chest, gripped from above, brought down
-    // there and slid along the floor to where it is set down, the hand flat on it. The free
-    // hand goes down behind its head once it has stopped clawing, and flat on its far stone
-    // once the near one is set down.
+    // Missed: the stone drawn back in front of its chest on its fist, brought down there
+    // under its chin and put where it is set down, the hand flat on it. The free hand goes
+    // down behind its head once it has stopped clawing, and flat on its far stone once the
+    // near one is set down.
     const f = k - c.heave - d.back.ease;
     const i = SET_DOWN.findIndex((p) => p.f >= f);
     const there = (p: { f: number; x: number; y: number }) => ({ f: p.f, x: put.x + p.x, y: put.y + p.y });
@@ -704,7 +714,7 @@ export function bullPose(f: Fight, ridden = false): BullPose {
       stoneAt = at(lerp(a, b, (f - a.f) / (b.f - a.f)));
     }
     carried = stoneAt.x !== put.x || stoneAt.y !== put.y;
-    near = holding(stoneAt);
+    near = carried ? fistUnder(stoneAt) : flatOn(put.x);
     // Behind its head, its hand is unseen: its arm goes in behind its head, and no hand is drawn.
     far = k < d.swat.to ? claw(k) : carried ? { frame: HAND_FLAT, wrist: { x: head.x + 5, y: head.y + 5 } } : flatOn(st.far);
     farHid = k >= d.swat.to && carried;
@@ -837,8 +847,19 @@ const PRESSED_TALL = 4;
  */
 const SWAT_FLOOR = { short: 5, on: 4 } as const;
 
-/** Each half of the swatting arm, as a share of the reach from its shoulder to its wrist: bent, its elbow raised over the line. */
+/** Each half of the swatting arm onto a man on the floor, as a share of the reach from its shoulder to its wrist: arched, its elbow raised high over the line. */
 const SWAT_ARM = 0.6;
+
+/**
+ * Where the swatting arm, from its far shoulder `s` to its wrist `w`, bends: its elbow
+ * raised over the line, arched over Theseus's head onto a man on the floor, and a little
+ * over it onto a man off the floor. (Arched onto him too until a check of the oversized
+ * hands, 2026-10-11: its elbow stood up over its back, behind its shoulders, where the arm
+ * was cut off the solid and its forearm floated.)
+ */
+export function swatElbow(f: Fight, s: Pt, w: Pt): Pt {
+  return elbowOf(s, w, swatUp(f) ? 0 : SWAT_ARM * Math.hypot(w.x - s.x, w.y - s.y), true);
+}
 
 /**
  * The swat's hand on frame `u` of his death, its wrist: flat on top of him, its line of
@@ -1614,12 +1635,16 @@ export function bullPicture(f: Fight, masonry: Masonry, ridden = false): { body:
     // forward over its brow.
     const farArm = new Pixels();
     const clawing = b.far.frame === HAND_CLAW && k >= d.clock.knee && k < d.swat.to;
-    // Swatting, the arm comes down onto him from above, its elbow raised, as a hand is slammed down.
-    const swatting = b.on === 'swat' ? elbowOf(sf, b.far.wrist, SWAT_ARM * Math.hypot(b.far.wrist.x - sf.x, b.far.wrist.y - sf.y), true) : undefined;
+    // Swatting, the arm comes down onto him from above, its elbow raised over the line from
+    // its shoulder, as a hand is slammed down: arched over Theseus's head onto a man on the
+    // floor (SWAT_ARM), and a little over it up to a man off the floor, in the air or on its
+    // back, so that it never stands up over its back, nor behind the stone held up there.
+    const swatting = b.on === 'swat' ? swatElbow(f, sf, b.far.wrist) : undefined;
     armTo(farArm, sf, b.far, !b.on && !b.farHid, clawing ? { x: b.head.x + 8, y: b.head.y } : swatting);
     // Flat on its far stone as the lurching body comes over it, its hand is under the body:
-    // nothing of it over the back, where a man may stand.
-    if (k >= d.clock.grip) offTheSolid(farArm, b.x0, b.x1, b.top);
+    // nothing of it over the back, where a man may stand. Never while its hand is on him, when
+    // nobody stands there and the arm is whole from its shoulder to him.
+    if (k >= d.clock.grip && !b.on) offTheSolid(farArm, b.x0, b.x1, b.top);
     body.lay(farArm);
     if (b.kneel) kneeling(body, b.x0, F, b.kneel);
     else {
@@ -1646,7 +1671,12 @@ export function bullPicture(f: Fight, masonry: Masonry, ridden = false): { body:
     // Thrashing, or kneeling up with its head down before its shoulders, its near arm is
     // behind its head.
     const thrashing = b.near.frame === HAND_CLAW || b.near.frame === HAND_REACH;
-    const under = thrashing || b.kneel > 0;
+    // Taking the stone up from the floor under its face, gripped from above, its hand comes up
+    // to its chin: its head is bowed over the hand, in front of it, and the hand on the stone.
+    const hb = handBox(b.near);
+    const bowed = gripped && hb.y < b.head.y + BULL_HEAD.h && hb.x < b.head.x + BULL_HEAD.w && hb.x + hb.w > b.head.x;
+    const under = thrashing || b.kneel > 0 || bowed;
+    if (bowed) body.lay(nearStone, 'reserve');
     if (under) body.lay(nearArm, 'reserve', sn);
     // The neck, and a bull's head on it, out to it on a stretched neck where it lunges.
     const head = new Pixels();
@@ -1658,7 +1688,7 @@ export function bullPicture(f: Fight, masonry: Masonry, ridden = false): { body:
       body.lay(nearStone, 'reserve');
       body.lay(hand, 'reserve');
     } else {
-      if (b.stoneHeld) body.lay(nearStone, 'reserve');
+      if (b.stoneHeld && !bowed) body.lay(nearStone, 'reserve');
       if (!under) body.lay(nearArm, 'reserve', sn);
     }
     // On the floor the near stone is behind everything of it: what is seen of it is only

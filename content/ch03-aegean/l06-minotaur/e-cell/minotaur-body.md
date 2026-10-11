@@ -88,12 +88,18 @@ In the cell, on one clock from L, the frame the tourist comes down on its floor:
   belly and the heel back under the rump, so that from 8 px under its back to 6 px over the
   floor its body through its rump is 15 px across or more, half its back's length; never a thin
   bar on a leg as thin as a stroke, which read as a 7 from L+56 to 74 (ruled 2026-10-11; the
-  same as it rears to clap). Missed, it draws the stone back in front
-  of its own chest, clear of the hero, brings it down there and puts it down before it, at x 98,
-  on L+74, its hand flat on it, the last 10 px along the floor in one frame (over three until
-  2026-10-11, when its hand, grown 12 tall, would have come over Theseus's thigh and his hand on
-  the horn): nothing of the stone,
-  the hand or the arm comes over him above his knees (`minotaur-stone`). Its free hand goes down
+  same as it rears to clap). The stone is swung round its shoulder by a point under its front
+  end, so that at the swing's end the stone and its fist are at x 102 and 101, short of x 100.
+  Missed, it draws the stone back in front of its own chest on its fist, clear of the hero, under
+  its chin with a row of clay between, brings it down there as its head sinks with its back, and
+  puts it down before it, at x 98, on L+72, before its head is down to the stone, its hand flat on
+  it, the last 10 px in one frame from 5 px over its place: nothing of the stone, the hand or the
+  arm comes over him above his knees, and nothing of the hand over its own face
+  (`minotaur-stone`). (After a check of the oversized hands, 2026-10-11, superseded: brought down
+  gripped from above, its 12 px hand covered its face from L+63, and it was put down on L+74 from
+  the floor; swung by the fist's wrist, the stone and the fist came to x 98 and 97. Slid along the
+  floor over three frames until earlier that day, when its hand, grown 12 tall, would have come
+  over Theseus's thigh and his hand on the horn.) Its free hand goes down
   behind its head once it stops clawing, unseen, its arm going in behind its head, and flat on the
   far stone once the near one is set down.
 - **The first blow**, L+76: to L+105 the struck body lurches on both knees to the left wall and
@@ -181,8 +187,12 @@ In the cell, on one clock from L, the frame the tourist comes down on its floor:
   floor, in the air or standing on its back, flat on the floor at its feet if he stood on it, where
   the clap lays him, before Theseus's feet and clear of the near stone
   (`../../shared/bull-leaper-pressed.md`); its arm comes down onto its hand from above, the elbow
-  raised, and on a man at its feet arches over Theseus's head and behind him (2026-10-11: with its
-  wrist at the top of its 12 px hand, an arm brought straight in lay across his chest).
+  raised a little over the line onto a man off the floor, and on a man at its feet arches over
+  Theseus's head and behind him (2026-10-11: with its wrist at the top of its 12 px hand, an arm
+  brought straight in lay across his chest). The arm is whole from its shoulder to its hand on
+  every frame it is on him (after a check of the oversized hands, 2026-10-11: arched onto a man
+  off the floor too, its elbow stood up over its back and was cut off the solid there, and its
+  forearm floated in the clay, a \ over an l).
 - **The lurch on both knees, thrashing: never a step, a run or a turn toward the tourist**
   (`content/research/arc.md`, section 4). A Minotaur that charges is Karnak's scarab.
 - **The stone is never thrown**, and never brought down on the hero: swung at him over his

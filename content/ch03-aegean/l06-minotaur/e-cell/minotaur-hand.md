@@ -79,11 +79,22 @@ y 732 and 733, and the hands 2 px apart.)
 
 From the grip until it sets it down, the near hand has the stone (where a clap runs into the
 grip, its palm comes back flat on the stone first and takes it up from there, `minotaur-stone`):
-frame 1, a fist under it, while the stone's top is 2 px over its shoulder or more, so that the
-arm comes up to it from below, behind the stone; frame 0, gripping it from above, the palm on its
-top and the fingers down its face, while it is lower, the arm to its wrist over the stone, so
-that no arm or elbow ever lies across the stone (2026-10-10: held under it below the shoulder,
-the arm came down over the stone and left a few cream pixels of it). Frame 2 for the free right
+taking it up and swinging it, frame 1, a fist under it, while the stone's top is 2 px over its
+shoulder or more, so that the arm comes up to it from below, behind the stone; frame 0, gripping
+it from above, the palm on its top and the fingers down its face, while it is lower, the arm to
+its wrist over the stone, so that no arm or elbow ever lies across the stone (2026-10-10: held
+under it below the shoulder, the arm came down over the stone and left a few cream pixels of
+it). Gripping it from above as it takes it up from the floor under its face, L+40 and 41, the
+hand comes up to its chin: its head is bowed over it, in front of the hand and cut from it by
+clay, and the hand lies on the stone, so that its face is whole. Setting it down, frame 1 on
+every frame, the stone on its fist under its chin, the arm bent down behind the stone to the
+wrist under its back end, and frame 0 only on the floor, where it is put. (Gripped from above
+through the set-down until a check of the oversized hands, 2026-10-11: 12 tall, the hand came up
+over its face from L+63, its palm over its muzzle and its line of clay across its face, the
+stone and the fingers under it a mouth full of teeth; superseded. The same check found the
+swung stone and the fist 3 px forward of x 100 on L+61 and 62, swung round the shoulder by the
+fist's wrist; it is swung by a point under the stone's front end, as before 2026-10-11, and
+nothing of it comes forward of x 100 from the grip to the set-down, `tests/minotaur-bull.spec.ts`.) Frame 2 for the free right
 hand from L+46 to 67, and the far hand's in the flails from L+80; frame 3 on him in the clap, one
 either side of him, with a line of clay between them and him; frame 4 the near hand's in the
 flails from L+80, after the first blow's 4 frames, when both hands are still flat on their
@@ -101,7 +112,14 @@ The swat's hand is frame 0, flat on top of him, its fingers down onto him, carri
 onto its brow or the floor, with a line of clay round it and between its fingertips and him,
 until it leaves him on frame 8 of his death (`../../shared/bull-leaper-pressed.md`); its arm comes
 down onto it from above, the elbow raised over the line from its shoulder, as a hand is slammed
-down. On a man on the floor it is never over Theseus, who stands in front of its far arm: on his
+down: a little over it onto a man off the floor, in the air or on its back, and arched high over
+it onto a man on the floor. The arm is whole from its shoulder to its hand on every frame it is on
+him, cut only by the line of clay round what is in front of it (`tests/minotaur-bull.spec.ts`).
+(Arched onto a man off the floor too until a check of the oversized hands, 2026-10-11: its elbow
+stood up over its back, behind its shoulders, where nothing of the far arm is drawn over the
+solid, and the forearm floated in the clay from the elbow, a \ over an l; superseded. Nothing of
+the far arm is drawn over its back while its hand is flat on its far stone, under the lurching
+body; never while its hand is on him.) On a man on the floor it is never over Theseus, who stands in front of its far arm: on his
 head while he stands, its last column at x 95 at most, short of Theseus's head from x 98; on his
 face and chest once he lies flat at its feet, x 80 to 88, its arm arched over Theseus's head and
 behind him (`tests/minotaur-bull.spec.ts`). (Until 2026-10-11 the hand on him was 8 × 6, x 80 to
@@ -127,7 +145,7 @@ be seen hooking him (`minotaur-body`, the toss).
 The near hand, on its stone or holding it, is in front of Theseus, who stands at the bull's head
 with his feet by the near stone; the far hand is behind him (`minotaur-body`, Against Theseus).
 Oversized, the near hand on its stone covers his legs from his thighs down while he stands at its
-head, L+36 to 39, and on the stone where it is set down, L+74 to 79 and 106 to 133: the hand is
+head, L+36 to 39, and on the stone where it is set down, L+72 to 79 and 106 to 133: the hand is
 seen whole and he is seen standing behind it. Thrashing at his chest, the near hand is in front of
 him but for his two blows, when he lunges in past it (`theseus-blow`). Its palms on the tourist,
 in the clap, have two pixels of clear clay between them and Theseus.
