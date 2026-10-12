@@ -7,11 +7,11 @@
 > Tricks already spent are in `content/tricks.md`. The summary is in `CLAUDE.md`.
 
 > Level 6, the legend: the Minotaur, exempt from the no-bull ruling (`arc.md` section 4).
-> Designed 2026-10-08, being built as a dev stage: `l06-minotaur/LEVEL.md`.
+> Designed 2026-10-08, built 2026-10-09, on the map after Knossos since 2026-10-12: `l06-minotaur/LEVEL.md`.
 
 Source: `content/research/arc.md`, chapter 3. Dates 1900 to 1200 BC. Runs Crete to
 mainland, Minoan giving way to Mycenaean. Status: locked in the research. Levels 1, 2 and 6 are
-designed; level 1 is built, rough, drawn by code.
+designed; levels 1 and 6 are built, rough, drawn by code.
 
 | Level | Site | Place | Period | Designed | Built |
 |---|---|---|---|---|---|
@@ -20,7 +20,7 @@ designed; level 1 is built, rough, drawn by code.
 | 3 | Akrotiri | Thera (Santorini) | Buried by eruption, late 17th c. BC | not yet | not yet |
 | 4 | Mycenae | Argolid | Peak c. 1350–1200 BC | not yet | not yet |
 | 5 | Tiryns | Argolid | Circuit and palace c. 1400–1200 BC | not yet | not yet |
-| 6 | The legend: the Minotaur | Daedalus's labyrinth, in the myth | Greek myth, as the Attic vases, Catullus, Ovid, Plutarch and Apollodorus tell it | yes | not yet |
+| 6 | The legend: the Minotaur | Daedalus's labyrinth, in the myth | Greek myth, as the Attic vases, Catullus, Ovid, Plutarch and Apollodorus tell it | yes | rough |
 
 - **Costume:** bull-leaper kit, badly tied and slipping.
 - **Vocabulary:** light wells, multi-storey interiors and stairs, corbelled domes and
@@ -137,7 +137,7 @@ two levels leave it:
 
 ## Level 6 · The Minotaur
 
-Designed 2026-10-08; built rough 2026-10-09 as a dev stage, playable start to exit, the black-figure art still to come; see `l06-minotaur/LEVEL.md`.
+Designed 2026-10-08; built rough 2026-10-09 as a dev stage, playable start to exit, and drawn in black-figure 2026-10-10 to 12. On the map since 2026-10-12 (the designer: "put it on the map"): in the tour after Knossos and before Persepolis, so in the prod build it opens once Knossos is cleared. See `l06-minotaur/LEVEL.md`.
 
 > The Minotaur: he pushed in to be eaten first, and nobody wants him.
 

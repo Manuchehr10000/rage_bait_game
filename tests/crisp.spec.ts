@@ -20,7 +20,7 @@ async function open(page: Page, hash: string): Promise<void> {
   const errors: string[] = [];
   page.on('pageerror', (e) => errors.push(String(e)));
   await page.goto(`/#${hash}`);
-  expect(await page.locator('#stamp').textContent(), 'a local build: a stage is entered only where there are dev tools').not.toMatch(/^prod/);
+  expect(await page.locator('#stamp').textContent(), 'a local build: in prod a deep link opens only a level the tour has reached').not.toMatch(/^prod/);
   await page.waitForFunction((id) => (window as unknown as Partial<W>).__game?.levelData.id === id, hash);
   // Stop the loop, and let a frame already queued run out: only the test ticks.
   await page.evaluate(async () => {
@@ -79,8 +79,7 @@ const HELPERS = `
 `;
 
 test('the Minotaur is drawn crisp, and no other level is', () => {
-  expect(STAGES.filter((d) => d.crisp).map((d) => d.id)).toEqual(['minotaur']);
-  expect(LEVELS.filter((d) => d.crisp !== undefined).map((d) => d.id)).toEqual([]);
+  expect([...LEVELS, ...STAGES].filter((d) => d.crisp !== undefined).map((d) => [d.id, d.crisp])).toEqual([['minotaur', true]]);
 });
 
 test('in the game: the Minotaur at window scales 2, 3 and 5 is its world px each one whole s × s square in its colour; at 4, as it was', async ({ page }) => {

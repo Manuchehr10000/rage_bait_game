@@ -7,7 +7,7 @@ import { DEATH_ANIM, DEATH_SOUND, DT, overlaps, TILE, VIEW_H, type Rect } from '
 import { CELL_FLOOR, cleanPresses, cleanRun, DOOR_FLOOR, first, FULL, inAir, LEVEL, on, onFloor, Run, T_END_FLOOR, type Hands, type Tick } from './minotaur-run';
 
 /**
- * Theseus in the Minotaur's stage (content/ch03-aegean/l06-minotaur/LEVEL.md, beats a to
+ * Theseus in the Minotaur (content/ch03-aegean/l06-minotaur/LEVEL.md, beats a to
  * c): kneeling at the doorpost, the knot and its windows, the stride, his route down to
  * his doorway and the thread he lays on it, the race to the cell, and the clean run as
  * far as the cell floor (tests/minotaur-fight.spec.ts and tests/minotaur-out.spec.ts carry
@@ -30,7 +30,7 @@ async function open(page: Page): Promise<void> {
   const errors: string[] = [];
   page.on('pageerror', (e) => errors.push(String(e)));
   await page.goto('/#minotaur');
-  expect(await page.locator('#stamp').textContent(), 'a local build: a stage is entered only where there are dev tools').not.toMatch(/^prod/);
+  expect(await page.locator('#stamp').textContent(), 'a local build: in prod a deep link opens only a level the tour has reached').not.toMatch(/^prod/);
   await page.waitForFunction(() => (window as unknown as Partial<W>).__game?.levelData.id === 'minotaur');
   // Stop the loop, and let a frame already queued run out: only the test ticks.
   await page.evaluate(async () => {

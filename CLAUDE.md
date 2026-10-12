@@ -58,14 +58,14 @@ notes describe the levels as they were built.
   2026-10-06); the shrine is never part of the level, and whether it is seen is decided
   when Susa is designed (`arc.md` section 4).
 - **Chapter 3's legend, the Minotaur,** was designed 2026-10-06 to 2026-10-08: four tricks,
-  about 22 s clean, not yet playable (`content/ch03-aegean/l06-minotaur/LEVEL.md`). Two of its
+  about 22 s clean (`content/ch03-aegean/l06-minotaur/LEVEL.md`). Two of its
   rulings bind every level (`arc.md` section 4): the sandal is the touchstone cows' fifth told
   overhead; and the resolveY fix is made game-wide, with every built level re-tested (on
-  a recommendation, 2026-10-08; made 2026-10-09). It is being built as a dev stage
-  (`#minotaur`, `STAGES` in `src/levels/index.ts`): all four tricks, the way out and the closing
-  tableau are in, playable start to exit, drawn in black-figure (three passes, 2026-10-10 and 11;
-  a fourth after the designer's rulings of 2026-10-11). It moves
-  to LEVELS and the map on the designer's word.
+  a recommendation, 2026-10-08; made 2026-10-09). Built as a dev stage from 2026-10-09: all
+  four tricks, the way out and the closing tableau, playable start to exit, drawn in
+  black-figure (three passes, 2026-10-10 and 11; a fourth after the designer's rulings of
+  2026-10-11). On the map since the designer's word of 2026-10-12, no longer a stage: in the
+  tour after Knossos and before Persepolis (`LEVELS`).
 - **Open:** Apep or Sekhmet for chapter 2's legend; whether Karnak's exit has already spent
   the false completion (pillar 10, `content/tricks.md`).
 

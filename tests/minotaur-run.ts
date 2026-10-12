@@ -7,7 +7,7 @@ import type { Input } from '../src/engine/input';
 import { overlaps } from '../src/engine/types';
 
 /**
- * The Minotaur's stage in Node, for its specs (tests/minotaur*.spec.ts): an attempt on
+ * The Minotaur in Node, for its specs (tests/minotaur*.spec.ts): an attempt on
  * the game's own entities and physics, ticked the way game.ts ticks them: the entities
  * see where he was, then he moves, then the camera follows him, and he is out if he has
  * reached the open exit. And the clean run's hands. Not a spec: nothing here is a test.

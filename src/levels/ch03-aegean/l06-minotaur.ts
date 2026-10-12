@@ -2,14 +2,14 @@ import { Grid, type EarDef, type FightDef, type HeroDef, type LevelData, type Ta
 import { TILE } from '../../engine/types';
 
 /**
- * Chapter 3, Level 6 — The Minotaur, the chapter's legend. A stage: the labyrinth in
+ * Chapter 3, Level 6 — The Minotaur, the chapter's legend: the labyrinth in
  * section, cell for cell as its map, and Theseus in it, at the door with his knot and
  * then down his route to the cell, laying the thread; the beast under the last
  * corridor's floor, heard and breathed, never seen, which snorts him back up the hatch;
  * the fight in its cell, where the bull claps him, swats him and tosses him while the
  * hero kills it; and the way out by the thread, past the queue and Ariadne at the door,
- * with the closing picture. Rough art; it takes its place in LEVELS when the designer
- * says. Design: content/ch03-aegean/l06-minotaur/LEVEL.md.
+ * with the closing picture. On the map, after Knossos in the tour (designer,
+ * 2026-10-12). Design: content/ch03-aegean/l06-minotaur/LEVEL.md.
  *
  * One screen wide and 47 tiles deep, every solid on the grid; the camera never moves
  * sideways, and it starts on the spawn. The spawn floor is y 160, so a designer's
@@ -382,7 +382,7 @@ export const MINOTAUR: LevelData = {
   // Drawn in code at 1 world px, black-figure: never softened at any window scale.
   crisp: true,
   // Four tricks (pillar 8), in the order he meets them. Each kills him itself: nothing
-  // needs to claim a death. The knot and the snort are built.
+  // needs to claim a death.
   tricks: ['The knot', 'The snort', 'The hands', 'The horns'],
   // No fall in the level kills, and nothing leaves by the bottom: never on the label.
   dropCause: 'The labyrinth',

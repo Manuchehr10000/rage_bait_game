@@ -942,7 +942,7 @@ Catullus 64.112–115; Ovid, *Met.* 8.172–173, line numbers unverified). Reser
 
 ## New in the engine
 
-Being built, in this order, as a stage in the dev build (`#minotaur`, in `STAGES`, not on the map). Made so far, 2026-10-09, with rough art:
+Built, in this order, as a stage in the dev build (`#minotaur`, in `STAGES`, off the map), and on the map since 2026-10-12, in `LEVELS` after Knossos (the designer: "put it on the map"). Made first, 2026-10-09, with rough art:
 
 - **The resolveY fix, game-wide, first.** In `physics.ts`, a dynamic solid rising into a body whose
   old bottom was at or above the solid's old top puts the body on top, whatever the sign of his own
@@ -1247,6 +1247,10 @@ Six on 2026-10-11, after the third art pass, on recommendations: the rays on sto
 oversized; nothing inside the black outlined; the stride's boss dropped; no shape reading as a
 character; the counter over the rays accepted.
 
+On 2026-10-12, the designer: "put it on the map". It takes its place in the tour after Knossos
+and before Persepolis, so in the prod build it opens once Knossos is cleared, and Persepolis once
+it is.
+
 ## Sources
 
 - Apollodorus, *Library* 3.1.4 and 3.15.8, and *Epitome* 1.9 (tr. J. G. Frazer, 1921):
@@ -1288,8 +1292,8 @@ resolveY fix, driven by a scripted harness that is not in the repository. Three 
 (rules; comedy and myth; physics) checked the final draft; the physics check wrote its own harness
 from the draft's text and matched the map cell for cell and the clean run to the frame. The
 revision made after the checks (the swat's noun and the counts by noun, the boss at x 206–215, the
-clock's puffs, the snore held back from the ring) was re-run on the designer's harness only. Nothing is built, and nothing is pinned in
-Node.
+clock's puffs, the snore held back from the ring) was re-run on the designer's harness only. Nothing was built then, and nothing pinned in
+Node; what the build measured is under New in the engine.
 
 **Solid, at search-extract level.** The Minotaur's form and the labyrinth (Apollodorus 3.1.4); the
 thread fastened to the door, the last part of the labyrinth, the fists, the way out (*Epitome*

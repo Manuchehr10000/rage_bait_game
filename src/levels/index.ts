@@ -12,8 +12,11 @@ import { KNOSSOS } from './ch03-aegean/l01-knossos';
 import { MINOTAUR } from './ch03-aegean/l06-minotaur';
 import { PERSEPOLIS } from './ch04-persia/l01-persepolis';
 
-/** Every level in tour order: chapter 1, then chapter 2 south to north along the Nile, then the Aegean, then Persia. */
-export const LEVELS: LevelData[] = [CAP_BLANC, ROC_AUX_SORCIERS, PECH_MERLE, ROUFFIGNAC, GARGAS, ABU_SIMBEL, PHILAE, KARNAK, DENDERA, KNOSSOS, PERSEPOLIS];
+/**
+ * Every level in tour order: chapter 1, then chapter 2 south to north along the Nile, then
+ * the Aegean and its legend, the Minotaur (designer, 2026-10-12), then Persia.
+ */
+export const LEVELS: LevelData[] = [CAP_BLANC, ROC_AUX_SORCIERS, PECH_MERLE, ROUFFIGNAC, GARGAS, ABU_SIMBEL, PHILAE, KARNAK, DENDERA, KNOSSOS, MINOTAUR, PERSEPOLIS];
 
 /**
  * Stages: a site built as it is, with its artifacts in place and no traps, for the
@@ -21,7 +24,7 @@ export const LEVELS: LevelData[] = [CAP_BLANC, ROC_AUX_SORCIERS, PECH_MERLE, ROU
  * Not on the map and not in prod: the dev and local builds open one by its deep link,
  * `#<id>`. When its traps are in, it takes its level's place in LEVELS.
  */
-export const STAGES: LevelData[] = [MINOTAUR];
+export const STAGES: LevelData[] = [];
 
 /** `list` is what the game can enter: LEVELS, and the stages too where there are dev tools. */
 export function levelIndexFromHash(hash: string, list: readonly LevelData[] = LEVELS): number {

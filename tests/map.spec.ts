@@ -48,6 +48,8 @@ const SHOWN = 4;
 
 /** Chapter 1's levels, for tests that need a chapter cleared. */
 const CHAPTER_1 = ['cap-blanc', 'roc-aux-sorciers', 'pech-merle', 'rouffignac', 'gargas'];
+/** Chapter 2's. */
+const CHAPTER_2 = ['abu-simbel', 'philae', 'karnak', 'dendera'];
 
 async function seed(page: Page, cleared: string[]): Promise<void> {
   // Entering a level puts it in the URL; take it out, or the reload goes back into it.
@@ -272,6 +274,30 @@ test('in prod the tour is played in order: a level opens once every level before
   expect(ids.filter((id) => progress.isOpen(id))).toEqual(ids.slice(0, 2));
 });
 
+test('in prod the Minotaur opens once Knossos is cleared, and Persepolis once the Minotaur is', () => {
+  const ids = LEVELS.map((l) => l.id);
+  const progress = new Progress(ids, true);
+  for (const id of ids.slice(0, ids.indexOf('knossos'))) progress.markCleared(id);
+  const open = () => ['knossos', 'minotaur', 'persepolis'].filter((id) => progress.isOpen(id));
+  expect(open()).toEqual(['knossos']);
+  progress.markCleared('knossos');
+  expect(open()).toEqual(['knossos', 'minotaur']);
+  progress.markCleared('minotaur');
+  expect(open()).toEqual(['knossos', 'minotaur', 'persepolis']);
+});
+
+test('in prod a visitor who cleared Persepolis before the Minotaur was on the map finds it closed until he clears the Minotaur', () => {
+  // The rule as it stands (engine/progress.ts): a level opens once every level before it
+  // is cleared, whether or not it has been cleared itself.
+  const ids = LEVELS.map((l) => l.id);
+  const progress = new Progress(ids, true);
+  for (const id of ids) if (id !== 'minotaur') progress.markCleared(id);
+  expect(progress.isCleared('persepolis')).toBe(true);
+  expect(ids.filter((id) => !progress.isOpen(id))).toEqual(['persepolis']);
+  progress.markCleared('minotaur');
+  expect(ids.filter((id) => !progress.isOpen(id))).toEqual([]);
+});
+
 test('a deep link still opens a level directly, and the exit leads to the next site', async ({ page }) => {
   await page.goto('/#karnak');
   await page.reload();
@@ -283,6 +309,88 @@ test('a deep link still opens a level directly, and the exit leads to the next s
   const s = await snap(page);
   expect(s.level).toBe('karnak');
   expect(s.onGround).toBe(true);
+});
+
+test('chapter 3 opens on the Minotaur once Knossos is cleared, and its pin walks him in under its title card', async ({ page }) => {
+  await seed(page, [...CHAPTER_1, ...CHAPTER_2, 'knossos']);
+  await press(page, 'ArrowRight');
+  await press(page, 'ArrowRight');
+  await press(page, 'Enter');
+  let s = await snap(page);
+  expect(s.view).toBe('chapter');
+  expect(s.chapter).toBe(2);
+  // The next unfinished stop: the legend, sixth.
+  expect(s.site).toBe(5);
+  await press(page, 'Enter');
+  s = await snap(page);
+  expect(s.screen).toBe('level');
+  expect(s.level).toBe('minotaur');
+  expect(s.arriving).toBe(true);
+  expect(s.x).toBeLessThan(0);
+  const titled = () => page.evaluate(() => (window as unknown as { __game: { titleTimer: number } }).__game.titleTimer > 0);
+  expect(await titled()).toBe(true);
+  await ticks(page, 120);
+  s = await snap(page);
+  expect(s.arriving).toBe(false);
+  expect(s.onGround).toBe(true);
+  expect(s.deaths).toBe(0);
+
+  // And the mouse, on the legend's own pin.
+  await seed(page, [...CHAPTER_1, ...CHAPTER_2, 'knossos']);
+  const box = await page.locator('#game').boundingBox();
+  if (!box) throw new Error('no canvas');
+  await press(page, 'ArrowRight');
+  await press(page, 'ArrowRight');
+  await press(page, 'Enter');
+  const pin = await page.evaluate(() => (window as unknown as { __game: { mapScreen: { sitePin(i: number): { x: number; y: number } } } }).__game.mapScreen.sitePin(5));
+  await page.mouse.click(box.x + (pin.x / 320) * box.width, box.y + (pin.y / 180) * box.height);
+  await ticks(page, 1);
+  s = await snap(page);
+  expect(s.screen).toBe('level');
+  expect(s.level).toBe('minotaur');
+  expect(s.arriving).toBe(true);
+});
+
+test('chapter 3 is stamped on the world once Knossos and the Minotaur are both cleared, and not for either alone', async ({ page }) => {
+  const walked = () => page.evaluate(() => (window as unknown as { __game: { mapScreen: { view: string; walked(): number } } }).__game.mapScreen.walked());
+  await seed(page, [...CHAPTER_1, ...CHAPTER_2, 'knossos']);
+  expect((await snap(page)).view).toBe('world');
+  expect(await walked()).toBe(2);
+  await seed(page, [...CHAPTER_1, ...CHAPTER_2, 'minotaur']);
+  expect(await walked()).toBe(2);
+  await seed(page, [...CHAPTER_1, ...CHAPTER_2, 'knossos', 'minotaur']);
+  expect(await walked()).toBe(3);
+});
+
+test("Knossos's exit card leads on to the Minotaur; the Minotaur's, at the end of its chapter, to the map", async ({ page }) => {
+  await page.goto('/#knossos');
+  await page.reload();
+  await page.waitForFunction(() => (window as unknown as { __game?: { currentScreen: string } }).__game?.currentScreen === 'level');
+  await page.evaluate(() => {
+    window.requestAnimationFrame = () => 0;
+  });
+  // At the exit: the card's "Enter for the next site" or "Enter for the map" is whether there is a next.
+  const done = () =>
+    page.evaluate(() => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const g = (window as unknown as { __game: any }).__game;
+      g.state = 'complete';
+      return g.nextLevelIndex() !== null;
+    });
+  expect((await snap(page)).level).toBe('knossos');
+  expect(await done()).toBe(true);
+  await press(page, 'Enter');
+  let s = await snap(page);
+  expect(s.screen).toBe('level');
+  expect(s.level).toBe('minotaur');
+  expect(s.arriving).toBe(true);
+  expect(await done()).toBe(false);
+  await press(page, 'Enter');
+  s = await snap(page);
+  expect(s.screen).toBe('map');
+  expect(s.view).toBe('chapter');
+  expect(s.chapter).toBe(2);
+  expect(s.site).toBe(5);
 });
 
 test('the itinerary ribbon is one straight rule, left to right, with every stop on it', async ({ page }) => {
@@ -551,6 +659,11 @@ test('in a chapter every pin carries its number, the same as its bead on the rib
   expect(printed.got['ch2 sel1 site4']).toBe('4:route');
   expect(printed.got['ch2 sel1 site5']).toBe('dot');
   expect(printed.got['ch2 sel4 site4']).toBe('4:card');
+  // Chapter 3's legend has a level: with Knossos selected, its diamond carries its 6, and
+  // Tiryns, beside it, is a dot.
+  expect(printed.got['ch3 sel1 site6']).toBe('6:route');
+  expect(printed.got['ch3 sel1 site5']).toBe('dot');
+  expect(printed.got['ch3 sel6 site6']).toBe('6:card');
   // Chapter 4 has one level: Persepolis is a pin, and its neighbours in Fars, nudged off
   // it, are dots until they are selected.
   expect(printed.got['ch4 sel1 site1']).toBe('1:card');

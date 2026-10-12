@@ -1,7 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import { MINOTAUR } from '../src/levels/ch03-aegean/l06-minotaur';
-import { LEVELS, STAGES } from '../src/levels';
+import { LEVELS, STAGES, levelIndexFromHash } from '../src/levels';
 import { CHAPTERS } from '../src/map/atlas';
 import { Level, type HeroDef } from '../src/engine/level';
 import { PHYS, Player } from '../src/engine/player';
@@ -9,7 +9,7 @@ import type { Input } from '../src/engine/input';
 import { DEATH_ANIM, DEATH_SOUND, overlaps, TILE, type DeathCause, type Rect } from '../src/engine/types';
 
 /**
- * The Minotaur's stage: the labyrinth built cell for cell from its design,
+ * The Minotaur: the labyrinth built cell for cell from its design,
  * content/ch03-aegean/l06-minotaur/LEVEL.md. What is pinned here is the ground every
  * trap will stand on: the map, the walk-in, the falls, and the route rule, which keeps
  * the tourist's way down and the hero's route apart until the cell. The physics is the
@@ -71,17 +71,24 @@ test("the labyrinth is LEVEL.md's map, cell for cell: 320 by 752 px, 20 by 47 ti
   expect(new Set(MINOTAUR.rows.join(''))).toEqual(new Set(['#', ' ', '=']));
 });
 
-test('a stage, not a level: off the map and out of the tour, entered by its deep link', () => {
-  expect(STAGES).toContain(MINOTAUR);
-  expect(LEVELS).not.toContain(MINOTAUR);
-  expect([...LEVELS, ...STAGES].filter((l) => l.id === 'minotaur')).toHaveLength(1);
-  // The chapter's legend is on the map as a pin with no level behind it, until the designer promotes it.
-  const pins = CHAPTERS.flatMap((c) => c.sites);
-  expect(pins.some((s) => s.level === 'minotaur')).toBe(false);
-  expect(pins.find((s) => s.name === 'The Minotaur')?.legend).toBe(true);
+test('a level on the map: chapter 3\'s legend, in the tour after Knossos and before Persepolis, entered by its pin or its deep link', () => {
+  // A dev stage until the designer's word, 2026-10-12: "put it on the map".
+  expect(STAGES).not.toContain(MINOTAUR);
+  const ids = LEVELS.map((l) => l.id);
+  expect(ids.filter((id) => id === 'minotaur')).toHaveLength(1);
+  const i = ids.indexOf('minotaur');
+  expect(ids.slice(i - 1, i + 2)).toEqual(['knossos', 'minotaur', 'persepolis']);
+  // The chapter's legend, its last stop: the pin with the level behind it, and the
+  // only one but Knossos's in the chapter.
+  const aegean = CHAPTERS.find((c) => c.number === 3)!;
+  expect(aegean.sites[aegean.sites.length - 1]).toMatchObject({ name: 'The Minotaur', level: 'minotaur', legend: true });
+  expect(aegean.sites.flatMap((s) => (s.level ? [s.level] : []))).toEqual(['knossos', 'minotaur']);
+  expect(CHAPTERS.flatMap((c) => c.sites).filter((s) => s.level === 'minotaur')).toHaveLength(1);
+  // Its deep link names it in LEVELS, which is all the prod build can enter.
+  expect(levelIndexFromHash('#minotaur', LEVELS)).toBe(i);
 });
 
-test("the stage's data: the bull-leaper, the walk in, the camera on the spawn, the four tricks, the gated exit on the left", () => {
+test("the level's data: the bull-leaper, the walk in, the camera on the spawn, the four tricks, the gated exit on the left", () => {
   const d = MINOTAUR;
   expect({ id: d.id, name: d.name, theme: d.theme, costume: d.costume, arrival: d.arrival }).toEqual({
     id: 'minotaur',
@@ -207,12 +214,12 @@ const COYOTE = [1, 3, 5];
 /**
  * How high over the floor he stands to jump: on it, and as high as the game lets him
  * stand. The 1 px ground probe stands him on a floor from the frame his feet come within
- * a pixel of it, and a jump pressed before he lands goes from there. In this stage every
+ * a pixel of it, and a jump pressed before he lands goes from there. In this level every
  * y is a whole number of eighteenths of a pixel (every frame's rise or fall is, and every
  * stop is on a whole pixel), so the highest is 17/18 px.
  */
 const STANCES = [0, 17 / 18];
-/** Eighteenths of a pixel, the grid every y in the stage is on. */
+/** Eighteenths of a pixel, the grid every y in the level is on. */
 const onGrid = (y: number) => Math.abs(y * 18 - Math.round(y * 18)) < 1e-6;
 
 interface Plan {
@@ -398,7 +405,7 @@ test('the route rule: from the cell floor alone, with nothing in the cell, row 5
   expect([...s.onHero]).toEqual([]);
 });
 
-test('no reachable fall in the stage is more than 200 px from the top of the arc: the way down', () => {
+test('no reachable fall in the level is more than 200 px from the top of the arc: the way down', () => {
   const s = wayDown();
   expect(s.worst).toBeLessThan(PHYS.fatalFall);
   // Each is capped by the roof over the corridor he leapt from: the relieved jump into D0
@@ -424,7 +431,7 @@ test('no reachable fall in the stage is more than 200 px from the top of the arc
   expect(new Set(s.worstOn.keys())).toEqual(new Set([DOOR_STOREY, ...Object.keys(caps)]));
 });
 
-test('no reachable fall in the stage is more than 200 px from the top of the arc: up the hero\'s route to the door', () => {
+test('no reachable fall in the level is more than 200 px from the top of the arc: up the hero\'s route to the door', () => {
   // The way out, from row 5, where the fight leaves him: he climbs the turnings and the
   // column by 48 px steps to G0, down O1 into the passage, and out of the door. Back down
   // the way down from the passage is the way down's business.
@@ -456,7 +463,7 @@ async function open(page: Page): Promise<void> {
   const errors: string[] = [];
   page.on('pageerror', (e) => errors.push(String(e)));
   await page.goto('/#minotaur');
-  expect(await page.locator('#stamp').textContent(), 'a local build: a stage is entered only where there are dev tools').not.toMatch(/^prod/);
+  expect(await page.locator('#stamp').textContent(), 'a local build: in prod a deep link opens only a level the tour has reached').not.toMatch(/^prod/);
   await page.waitForFunction(() => (window as unknown as Partial<W>).__game?.levelData.id === 'minotaur');
   // Stop the loop, and let a frame already queued run out: only the test ticks.
   await page.evaluate(async () => {

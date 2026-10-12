@@ -566,7 +566,7 @@ async function open(page: Page): Promise<void> {
   const errors: string[] = [];
   page.on('pageerror', (e) => errors.push(String(e)));
   await page.goto('/#minotaur');
-  expect(await page.locator('#stamp').textContent(), 'a local build: a stage is entered only where there are dev tools').not.toMatch(/^prod/);
+  expect(await page.locator('#stamp').textContent(), 'a local build: in prod a deep link opens only a level the tour has reached').not.toMatch(/^prod/);
   await page.waitForFunction(() => (window as unknown as Partial<W>).__game?.levelData.id === 'minotaur');
   // Stop the loop, and let a frame already queued run out: only the test ticks.
   await page.evaluate(async () => {
