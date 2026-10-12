@@ -133,6 +133,16 @@ Ruled (designer, on recommendations, 2026-10-11), after the third art pass:
 - **The death counter over the rays** while he is in Z1 is accepted: the HUD sits over the
   background everywhere in the game.
 
+Ruled (designer, on recommendations, 2026-10-12), after the fourth art pass:
+- **The raised stone over a man on its back** stays: behind him, cut from him by clay, for at
+  most about a fifth of a second (The tricks, 'The horns').
+- **Theseus behind a man under O1's mouth** while he mantles, wherever any of him would come over
+  or within a pixel of him; in front everywhere else, as the stride was ruled. Without it, his
+  near leg came down over the man's face: the sandal, ruled out of the level.
+- **This level is drawn crisp** at every window scale: no smoothing when the screen is scaled,
+  since its art is pixel art at 1 world px. An engine option the level declares; every other
+  level is drawn as before.
+
 Decided while building, and not objected to (2026-10-10):
 - Flat, unlit pixel art drawn in code at 1 world px. The level is exempt from the painted style
   of `content/README.md` (soft interiors, light from the upper right), which black-figure is not.
@@ -764,8 +774,11 @@ he is dropped flat; the lurch on the knees reaches the left wall within the toss
   L+61 to 68. Every retreat family escapes 0 times. Mashers: leap-then-mash 174 of 1,080,
   back-hoppers 7 of 56, rhythmic 927 of 2,560 (36.2 per cent). In the game: 31 of 1,080, 14 of 56
   and 912 of 2,560 (35.6); the design's copy counted a key still held as a new press, and the game
-  does not. The stone's arc never crosses a live tourist: anyone at the face or
-  over the head from L+46 has been swatted.
+  does not. The stone's arc never crosses a live tourist at its face or over its head: anyone
+  there from L+46 has been swatted. On its back it may: held up behind its head from L+45 and
+  swung over the front of its back to L+58, it is drawn behind a man standing there, with his
+  line of clay between, for at most about a fifth of a second, and never touches him (designer,
+  on a recommendation, 2026-10-12; no raised stone clears a man on its back).
 - **Only here.** Catullus 64.110–111, and MFA 60.1's horn, knee and raised stone. Only a
   bull-headed man held by one horn can do this.
 - **The closest tricks.** The opposite of "the ledge that goes a beat after you land": stay until
