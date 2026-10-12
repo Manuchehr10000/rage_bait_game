@@ -35,7 +35,7 @@ Arrows or WASD to move, Space to jump, L to switch the headlamp off and on in th
 where it runs down (it only runs down while it burns), R to give up (it counts), M to mute, Enter for the
 next level at the exit label. Esc returns to the map. Open `#cap-blanc`,
 `#roc-aux-sorciers`, `#pech-merle`, `#rouffignac`, `#gargas`, `#abu-simbel`, `#philae`,
-`#karnak`, `#dendera`, `#knossos` or `#persepolis` in the URL to start at that level.
+`#karnak`, `#dendera`, `#knossos`, `#minotaur` or `#persepolis` in the URL to start at that level.
 
 A level is entered on foot: from the map or the exit label, the tourist walks in from off
 the left edge of the screen, and the controls are his as soon as all of him is on it
@@ -152,9 +152,9 @@ Rendering: the world is 320 × 180 units, rendered onto a canvas four times that
 
 ## Status
 
-Eleven levels playable end to end: the five of chapter 1 (Cap Blanc, Roc-aux-Sorciers, Pech
+Twelve levels playable end to end: the five of chapter 1 (Cap Blanc, Roc-aux-Sorciers, Pech
 Merle, Rouffignac, Gargas), the first four of chapter 2 (Abu Simbel, Philae, Karnak,
-Dendera), the first of chapter 3 (Knossos) and the first of chapter 4 (Persepolis), with
-code-drawn art and procedural sound, from a tour map start screen. Chapter 4 has no music
-yet: Persepolis is heard with the wind alone.
+Dendera), the first and the sixth of chapter 3 (Knossos, and its legend, the Minotaur) and
+the first of chapter 4 (Persepolis), with code-drawn art and procedural sound, from a tour
+map start screen. Chapter 4 has no music yet: Persepolis is heard with the wind alone.
 Painted art arrives per asset through `content/`. No menu yet.

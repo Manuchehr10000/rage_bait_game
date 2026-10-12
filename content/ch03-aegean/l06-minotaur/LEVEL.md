@@ -651,7 +651,8 @@ He leaves first, the queue still waits, and Ariadne looks past him. The exit car
 
 ## The tricks
 
-All four are claimed in `content/tricks.md`, as tricks of a level designed and not yet built.
+All four are claimed in `content/tricks.md`: claimed while the level was designed, confirmed when it
+was built (2026-10-09); on the map since 2026-10-12.
 
 **'The knot'** (beats a and b). The kneeling hero he vaulted tests his knot, and the line, at a
 hero's shins, takes the throat of the man who pushed in front of him.
