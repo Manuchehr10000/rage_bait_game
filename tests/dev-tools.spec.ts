@@ -533,6 +533,60 @@ test('Alt+wheel looks up and down a tall level', async ({ page }) => {
   expect(t.paused).toBe(true);
 });
 
+test('Shift+wheel looks up and down, and a click with Shift still held starts him down there', async ({ page }) => {
+  await open(page, 'pech-merle');
+  // Held halfway: room to look a hundred up and a hundred down.
+  const lowest = await page.evaluate(() => {
+    const g = (window as unknown as W).__game;
+    g.camera.y = 150;
+    return g.levelData.cameraBottom - 180;
+  });
+  expect(lowest).toBeGreaterThan(250);
+  const t0 = await tourist(page);
+  expect(t0.camY).toBe(150);
+  await hover(page, t0.camX + 160, t0.camY + 90); // the middle of the view
+
+  await page.keyboard.down('Shift');
+  await wheel(page, 0, -200); // two notches: 100 world px up
+  let t = await tourist(page);
+  expect(t.camY).toBe(t0.camY - 100);
+  expect(t.camX, 'not along').toBe(t0.camX);
+  expect(t.paused).toBe(true);
+  await wheel(page, 0, 400);
+  t = await tourist(page);
+  expect(t.camY).toBe(t0.camY + 100);
+  expect(t.camX).toBe(t0.camX);
+  // A Shift+wheel the browser or the OS has already turned sideways still goes up and down.
+  await wheel(page, -200, 0);
+  t = await tourist(page);
+  expect(t.camY).toBe(t0.camY);
+  expect(t.camX).toBe(t0.camX);
+
+  // As low as it goes, into the lower gallery, and a floor there read from the tiles.
+  await wheel(page, 0, 1000);
+  expect((await tourist(page)).camY).toBe(lowest);
+  const spot = await page.evaluate(() => {
+    const g = (window as unknown as W).__game;
+    const L = g.level;
+    const floor = g.levelData.spawn.y + g.player.h;
+    for (let tx = Math.ceil((g.camera.ix + 40) / 16); (tx + 1) * 16 < g.camera.ix + 300; tx++) {
+      for (let ty = Math.ceil((g.camera.iy + 40) / 16); ty * 16 < g.camera.iy + 170; ty++) {
+        if (ty * 16 > floor && L.isSolid(tx, ty) && !L.isSolid(tx, ty - 1) && !L.isSolid(tx, ty - 2)) return { x: tx * 16 + 8, y: ty * 16 };
+      }
+    }
+    return null;
+  });
+  expect(spot, 'a floor below the one he spawns on, on screen').not.toBeNull();
+  await hover(page, spot!.x, spot!.y);
+  const at = await mouseAt(page, spot!.x, spot!.y);
+  await page.mouse.click(at.x, at.y);
+  await page.keyboard.up('Shift');
+  t = await tourist(page);
+  expect(t.paused).toBe(false);
+  expect(t.midX).toBe(spot!.x);
+  expect(t.feet).toBe(spot!.y);
+});
+
 test('leaving the level forgets the spot; hidden with G, neither the wheel nor Shift+click does anything', async ({ page }) => {
   await open(page, 'karnak');
   const floor = (await tourist(page)).floor;

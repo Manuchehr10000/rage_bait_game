@@ -66,7 +66,7 @@ export class DevBar {
     }
     const hint = document.createElement('span');
     hint.className = 'hint';
-    hint.textContent = 'wheel: look · shift+click: start here · click: copy';
+    hint.textContent = 'wheel: look · shift+wheel: up and down · shift+click: start here · click: copy';
     this.el.append(hint);
     under.after(this.el);
   }
