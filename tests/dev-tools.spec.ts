@@ -516,7 +516,7 @@ test('looking far along and Shift+clicking there puts him there', async ({ page 
   expect(t.camX).toBeLessThanOrEqual(far!);
 });
 
-test('Alt+wheel looks up and down a tall level', async ({ page }) => {
+test('Alt+wheel looks up and down a tall level, and along it with the wheel turned sideways', async ({ page }) => {
   await open(page, 'pech-merle');
   const y0 = (await tourist(page)).camY;
   // Over the middle of the view, wherever the camera stopped. It is still rising from the
@@ -526,24 +526,30 @@ test('Alt+wheel looks up and down a tall level', async ({ page }) => {
   await hover(page, 100, y0 + 90);
   await page.keyboard.down('Alt');
   await wheel(page, 0, -200);
-  await page.keyboard.up('Alt');
-  const t = await tourist(page);
+  let t = await tourist(page);
   expect(t.camY).toBe(Math.max(0, y0 - 100));
   expect(t.camX).toBe(0);
   expect(t.paused).toBe(true);
+  // Each way as the wheel goes: a trackpad's sideways swipe looks along.
+  await wheel(page, 200, 0);
+  await page.keyboard.up('Alt');
+  t = await tourist(page);
+  expect(t.camX).toBe(100);
+  expect(t.camY).toBe(Math.max(0, y0 - 100));
 });
 
-test('Shift+wheel looks up and down, and a click with Shift still held starts him down there', async ({ page }) => {
+test('Shift+wheel looks up and down, and a click with Shift still held starts him there', async ({ page }) => {
   await open(page, 'pech-merle');
-  // Held halfway: room to look a hundred up and a hundred down.
+  // Held where there is room every way, so a look that leaks along shows as well as one up or down.
   const lowest = await page.evaluate(() => {
     const g = (window as unknown as W).__game;
+    g.camera.x = 100;
     g.camera.y = 150;
     return g.levelData.cameraBottom - 180;
   });
   expect(lowest).toBeGreaterThan(250);
   const t0 = await tourist(page);
-  expect(t0.camY).toBe(150);
+  expect(t0).toMatchObject({ camX: 100, camY: 150 });
   await hover(page, t0.camX + 160, t0.camY + 90); // the middle of the view
 
   await page.keyboard.down('Shift');
@@ -562,21 +568,24 @@ test('Shift+wheel looks up and down, and a click with Shift still held starts hi
   expect(t.camY).toBe(t0.camY);
   expect(t.camX).toBe(t0.camX);
 
-  // As low as it goes, into the lower gallery, and a floor there read from the tiles.
+  // As low as it goes, then back up, and a floor on screen there read from the tiles.
   await wheel(page, 0, 1000);
   expect((await tourist(page)).camY).toBe(lowest);
+  await wheel(page, 0, -400);
+  t = await tourist(page);
+  expect(t.camY).toBe(lowest - 200);
+  expect(t.camX).toBe(t0.camX);
   const spot = await page.evaluate(() => {
     const g = (window as unknown as W).__game;
     const L = g.level;
-    const floor = g.levelData.spawn.y + g.player.h;
     for (let tx = Math.ceil((g.camera.ix + 40) / 16); (tx + 1) * 16 < g.camera.ix + 300; tx++) {
       for (let ty = Math.ceil((g.camera.iy + 40) / 16); ty * 16 < g.camera.iy + 170; ty++) {
-        if (ty * 16 > floor && L.isSolid(tx, ty) && !L.isSolid(tx, ty - 1) && !L.isSolid(tx, ty - 2)) return { x: tx * 16 + 8, y: ty * 16 };
+        if (L.isSolid(tx, ty) && !L.isSolid(tx, ty - 1) && !L.isSolid(tx, ty - 2)) return { x: tx * 16 + 8, y: ty * 16 };
       }
     }
     return null;
   });
-  expect(spot, 'a floor below the one he spawns on, on screen').not.toBeNull();
+  expect(spot, 'a floor on screen').not.toBeNull();
   await hover(page, spot!.x, spot!.y);
   const at = await mouseAt(page, spot!.x, spot!.y);
   await page.mouse.click(at.x, at.y);
@@ -585,6 +594,39 @@ test('Shift+wheel looks up and down, and a click with Shift still held starts hi
   expect(t.paused).toBe(false);
   expect(t.midX).toBe(spot!.x);
   expect(t.feet).toBe(spot!.y);
+  // And standing there, alive: not put down on something that kills him.
+  await ticks(page, 30);
+  t = await tourist(page);
+  expect(t.onGround).toBe(true);
+  expect(t.deaths).toBe(0);
+  expect(t.midX).toBe(spot!.x);
+  expect(t.feet).toBe(spot!.y);
+});
+
+test('on a level one screen wide the plain wheel looks up and down: the Minotaur', async ({ page }) => {
+  await open(page, 'minotaur');
+  const level = await page.evaluate(() => {
+    const g = (window as unknown as W).__game;
+    g.camera.y = 200;
+    return { w: g.camera.levelW, lowest: g.levelData.cameraBottom - 180 };
+  });
+  expect(level.w, 'one screen wide').toBe(320);
+  expect(level.lowest).toBeGreaterThan(500);
+  await hover(page, 160, 290); // the middle of the view
+  await wheel(page, 0, 200);
+  let t = await tourist(page);
+  expect(t.camY).toBe(300);
+  expect(t.camX).toBe(0);
+  expect(t.paused).toBe(true);
+  await wheel(page, 0, -200);
+  expect((await tourist(page)).camY).toBe(200);
+  // A wheel that counts in pages moves a screen's height up and down, not its width.
+  await page.evaluate(() =>
+    document.getElementById('game')!.dispatchEvent(new WheelEvent('wheel', { deltaY: 1, deltaMode: WheelEvent.DOM_DELTA_PAGE, cancelable: true })),
+  );
+  t = await tourist(page);
+  expect(t.camY).toBe(380);
+  expect(t.camX).toBe(0);
 });
 
 test('leaving the level forgets the spot; hidden with G, neither the wheel nor Shift+click does anything', async ({ page }) => {

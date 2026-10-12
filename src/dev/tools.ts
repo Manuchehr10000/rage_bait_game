@@ -36,11 +36,11 @@ export interface DevHost {
  * build refuses a bundle with anything from this folder in it (vite.config.ts),
  * so no player ever sees or downloads them.
  *
- * Put him anywhere: the wheel looks along the level, Shift+wheel up and down it
- * (Alt+wheel both, on a trackpad), and the game stands still while it does;
- * Shift+click starts the level again with him standing on that point, so Shift
- * held finds the height and the click puts him there; any key stops looking and
- * puts the view back.
+ * Put him anywhere: the wheel looks along the level (up and down one that is a
+ * screen wide), Shift+wheel up and down it (Alt+wheel both, on a trackpad), and the
+ * game stands still while it does; Shift+click starts the level again with him
+ * standing on that point, so Shift held finds the height and the click puts him
+ * there; any key stops looking and puts the view back.
  *
  * H draws what the level hides and how far he can jump from where he stands
  * (overlay.ts). T runs the game at a quarter speed; P stops it, and full stop
@@ -188,22 +188,27 @@ export class DevTools {
 
   /**
    * The wheel moves the view along the level, Shift+wheel up and down it, and
-   * Alt+wheel each way as the wheel goes, which on a trackpad is both at once.
-   * The game stands still.
+   * Alt+wheel each way as the wheel goes, which on a trackpad is both at once. A
+   * level one screen wide has nowhere along to go, so there the wheel goes up and
+   * down. The game stands still.
    */
   private look(e: WheelEvent): void {
     const cam = this.host.camera();
     if (!this.on || !cam) return;
     e.preventDefault();
     if (!this.looking) this.looking = { x: cam.x, y: cam.y };
-    const [across, down] = e.shiftKey
-      ? [0, e.deltaX + e.deltaY] // the browser, or the OS, may already have turned a Shift+wheel sideways
-      : e.altKey
-        ? [e.deltaX, e.deltaY]
-        : [e.deltaX + e.deltaY, 0];
+    // Read before either delta: once a delta is read first, Firefox hands a wheel that
+    // counts in lines over in px, a different number of them each way, and calls it px.
+    const mode = e.deltaMode;
+    const [across, down] =
+      e.shiftKey || cam.levelW <= VIEW_W
+        ? [0, e.deltaX + e.deltaY] // the browser, or the OS, may already have turned a Shift+wheel sideways
+        : e.altKey
+          ? [e.deltaX, e.deltaY]
+          : [e.deltaX + e.deltaY, 0];
     // A wheel that counts in lines moves a tile a line; in pages, a screen that way.
     const unit = (screen: number) =>
-      e.deltaMode === WheelEvent.DOM_DELTA_LINE ? 16 : e.deltaMode === WheelEvent.DOM_DELTA_PAGE ? screen : LOOK_PER_WHEEL_PX;
+      mode === WheelEvent.DOM_DELTA_LINE ? 16 : mode === WheelEvent.DOM_DELTA_PAGE ? screen : LOOK_PER_WHEEL_PX;
     cam.x = Math.min(cam.levelW - VIEW_W, Math.max(0, cam.x + across * unit(VIEW_W)));
     cam.y = Math.min(cam.levelH - VIEW_H, Math.max(0, cam.y + down * unit(VIEW_H)));
   }
