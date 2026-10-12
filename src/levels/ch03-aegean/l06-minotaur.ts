@@ -379,6 +379,8 @@ export const MINOTAUR: LevelData = {
   // over the roof's line at y 16: the band is never cut into spikes at the bottom of the
   // screen, and the roof's top still shows from G0.
   cameraKeeps: DOOR_FLOOR + px(2) + 2,
+  // Drawn in code at 1 world px, black-figure: never softened at any window scale.
+  crisp: true,
   // Four tricks (pillar 8), in the order he meets them. Each kills him itself: nothing
   // needs to claim a death. The knot and the snort are built.
   tricks: ['The knot', 'The snort', 'The hands', 'The horns'],

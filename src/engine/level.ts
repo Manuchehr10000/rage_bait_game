@@ -1031,6 +1031,14 @@ export interface LevelData {
    * stands on its first screen, which the camera rising after him is never to cut.
    */
   cameraKeeps?: number;
+  /**
+   * The level's art is pixel art at 1 world px, drawn whole: at every window scale
+   * its world is blown up with no smoothing, each world px a whole square of the
+   * screen's, nothing blended. Without it the world is smoothed at every scale but
+   * ART_SCALE, where it lands pixel for pixel, which painted art wants. Only the
+   * world: what is drawn over it on the screen is drawn as in every level.
+   */
+  crisp?: boolean;
   /** Floors that are ramps: stairs whose risers are too low to step over one by one. */
   slopes?: readonly SlopeDef[];
   /** Where the hill begins for the Abu Simbel backdrop, in px. */

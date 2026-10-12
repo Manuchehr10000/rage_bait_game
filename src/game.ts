@@ -349,7 +349,8 @@ export class Game {
     this.scale = s;
     this.canvas.width = VIEW_W * s;
     this.canvas.height = VIEW_H * s;
-    // The world canvas is ART_SCALE times the view; at any other window scale it is resampled.
+    // The world canvas is ART_SCALE times the view; at any other window scale it is resampled,
+    // smoothed but for a crisp level's world (draw).
     this.ctx.imageSmoothingEnabled = s !== ART_SCALE;
   }
 
@@ -719,7 +720,13 @@ export class Game {
     };
     renderWorld(this.wctx, scene);
 
+    // A crisp level's world is blown up unsmoothed at every scale. At a whole scale every
+    // screen pixel's middle falls inside its own world px, so each world px is a whole
+    // s × s square, as long as the world is drawn on whole world px; the Minotaur's is.
+    const smooth = this.ctx.imageSmoothingEnabled;
+    if (this.level.data.crisp) this.ctx.imageSmoothingEnabled = false;
     this.ctx.drawImage(this.world, 0, 0, this.canvas.width, this.canvas.height);
+    this.ctx.imageSmoothingEnabled = smooth;
     renderHud(this.ctx, this.scale, {
       stats: this.stats,
       texts: this.texts,

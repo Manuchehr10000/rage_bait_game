@@ -1168,6 +1168,24 @@ Being built, in this order, as a stage in the dev build (`#minotaur`, in `STAGES
   cream in front of him but where its head lies over them, his glaze nowhere against its, his back
   leg seen to the floor, his feet to x 103).
 
+- **Drawn crisp** (2026-10-12, on the designer's ruling after the fourth art pass): a level can
+  declare `LevelData.crisp`, and only this one does. Its world is drawn as every level's is, on
+  the world canvas at 4 times the view, and blitted to the screen with no smoothing at every
+  window scale; at a whole scale each screen pixel's middle falls inside its own world pixel, so
+  each world pixel is a whole s × s square in its own colour, none dropped or doubled. That holds
+  because everything here is drawn on whole world pixels (the camera, the tourist's frames, the
+  bull and Theseus laid pixel by pixel in code, the dust's grains, the thread): no 4 × 4 block
+  of the world canvas was ever two colours in 8,668 frames measured (every frame of the clean
+  run, the four tricks' deaths, 30 random plays). Before it, at window scales 5 and 6 about
+  10,000 of the 57,600 world pixels were blended at their edges; at 2 and 3 Chromium's smoothed
+  shrink happened to stay inside each world pixel, as it may not in another browser; at 4 it
+  landed pixel for pixel, and still does. The HUD, the title and exit cards and the dev tools
+  are drawn over it as before, and the map and every other level are drawn as they were. Nothing
+  reads worse for it: the thread's diagonals and the rays' slopes were stairs of whole pixels
+  before, with soft edges at 5. Pinned in `tests/crisp.spec.ts` (at 2, 3 and 5 every world
+  pixel one square in its colour, at the spawn, the knot, L+58 and the tableau under the card;
+  at 4 the screen as it was; Persepolis and the map at 3 blitted as before).
+
 Still to come: nothing the notes ask the drawing for. (`LevelData.tricks`, 'The knot', 'The
 snort', 'The hands', 'The horns', and `dropCause` and `fallCause` 'The labyrinth', unreachable,
 are made.)

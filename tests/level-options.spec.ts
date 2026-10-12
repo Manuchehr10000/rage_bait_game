@@ -11,7 +11,8 @@ import { VIEW_H } from '../src/engine/types';
  * it says on a level that takes it. In the browser a built level takes it for the
  * length of a test, in that page only. A fourth, a line the camera keeps in view
  * (`cameraKeeps`), is pinned where the Minotaur takes it (tests/minotaur-out.spec.ts);
- * here, only that no built level does.
+ * here, only that no built level does. A fifth, the world drawn crisp (`crisp`), is
+ * pinned in tests/crisp.spec.ts.
  */
 
 /** Inside page.evaluate: the type is erased, so it survives the trip into the page. */

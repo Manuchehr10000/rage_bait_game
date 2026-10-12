@@ -51,7 +51,10 @@ correct. A history teacher playing this should find the jokes and no mistakes.
    folder, has the history.
 2. Paint it at **4 times** the world size. A 64 × 112 colossus is a 256 × 448 file.
    The game renders at 4x internally, so one painted pixel is one screen pixel at the
-   common window size. The number 4 is `ART_SCALE` in `src/engine/types.ts`.
+   common window size. The number 4 is `ART_SCALE` in `src/engine/types.ts`. At any
+   other window size the world is smoothed to fit, except in a level drawn crisp
+   (`LevelData.crisp`): the Minotaur, pixel art drawn in code at 1 world pixel, is blown
+   up with no smoothing at every window size, each world pixel a whole square.
 3. Export a PNG with transparency, named `<id>.png`, into the beat's folder, next to its
    `.md`. Keep the `.aseprite` file in the same folder; commit both.
 4. Add `"file": "<beat>/<id>.png"` to the entry in `assets.json`.
