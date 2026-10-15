@@ -652,7 +652,8 @@ He leaves first, the queue still waits, and Ariadne looks past him. The exit car
 ## The tricks
 
 All four are claimed in `content/tricks.md`: claimed while the level was designed, confirmed when it
-was built (2026-10-09); on the map since 2026-10-12.
+was built (2026-10-09); on the map since 2026-10-12, in the dev and local builds only since
+2026-10-15.
 
 **'The knot'** (beats a and b). The kneeling hero he vaulted tests his knot, and the line, at a
 hero's shins, takes the throat of the man who pushed in front of him.
@@ -1251,6 +1252,13 @@ character; the counter over the rays accepted.
 On 2026-10-12, the designer: "put it on the map". It takes its place in the tour after Knossos
 and before Persepolis, so in the prod build it opens once Knossos is cleared, and Persepolis once
 it is.
+
+On 2026-10-15, the designer: "push to main everything except Minotaur level". It is held back
+from prod (`HELD` in `src/levels/index.ts`): on the map in the dev and local builds as before;
+prod's tour has no place for it, its map shows its pin closed, its bundle does not carry its
+level file (`src/levels/held-files.ts`, which vite.config.ts checks), and Persepolis there opens
+once Knossos is cleared. Released by writing it into `PROD_LEVELS` after Knossos and taking it
+out of `HELD` and `held-files.ts`.
 
 ## Sources
 

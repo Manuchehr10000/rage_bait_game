@@ -1,6 +1,7 @@
 import { defineConfig, normalizePath, type Plugin } from 'vite';
 // @ts-expect-error -- plain JS, and the config is the only thing that loads it.
 import { png, svg, check } from './tools/favicon.mjs';
+import { HELD_FILES } from './src/levels/held-files';
 
 // Stamped into the page footer so the dev and prod links are telling the truth
 // about what they are. Set by the deploy workflow; harmless when unset.
@@ -52,35 +53,53 @@ function indexingRules(): Plugin {
 }
 
 /**
- * The tools for building the game live in src/dev/ and never reach a player.
- * dev and main are one history, promoted by fast-forward, so the source goes to
- * main with everything else; what must not go is the code in the prod bundle.
- * The game only makes them outside prod and the bundler drops them from it.
- * This is the check that it did: a prod bundle with any of src/dev/ in it is
- * not a build.
+ * The tools for building the game live in src/dev/ and never reach a player, and
+ * nor do the levels held back from prod. dev and main are one history, promoted
+ * by fast-forward, so their source goes to main with everything else; what must
+ * not go is their code in the prod bundle. The game only reads them outside prod
+ * and the bundler drops them from it. This is the check that it did: a prod
+ * bundle with any of src/dev/, or any held level's file (src/levels/held-files.ts),
+ * in it is not a build.
  */
-function noDevToolsInProd(): Plugin {
+function nothingHeldInProd(): Plugin {
   let devDir = '';
+  let held: string[] = [];
   return {
-    name: 'lost-tourist-no-dev-tools',
+    name: 'lost-tourist-nothing-held-in-prod',
     apply: 'build',
 
     configResolved(config) {
-      devDir = `${normalizePath(config.root)}/src/dev/`;
+      const root = normalizePath(config.root);
+      devDir = `${root}/src/dev/`;
+      held = HELD_FILES.map((f) => `${root}/${f}`);
+    },
+
+    // A level's file only builds its own data, its grid among it, at the top level, which
+    // the bundler cannot tell from a side effect. Say so for a held one in prod, so it is
+    // dropped once nothing reads it; if anything does, it stays in, and the check fails.
+    transform(code, id) {
+      if (isProd && held.includes(normalizePath(id))) return { code, map: null, moduleSideEffects: false };
     },
 
     generateBundle(_, bundle) {
       if (!isProd) return;
-      const leaked: string[] = [];
+      const tools: string[] = [];
+      const levels: string[] = [];
       for (const chunk of Object.values(bundle)) {
         if (chunk.type !== 'chunk') continue;
         // A module the bundler dropped is not listed at all. Anything listed is in,
         // even at no length: a stylesheet imported from here is listed that way.
         for (const id of Object.keys(chunk.modules)) {
-          if (normalizePath(id).startsWith(devDir)) leaked.push(id);
+          const path = normalizePath(id);
+          if (path.startsWith(devDir)) tools.push(id);
+          if (held.includes(path)) levels.push(id);
         }
       }
-      if (leaked.length) this.error(`dev tools in the prod bundle:\n  ${leaked.join('\n  ')}`);
+      const leaks = [
+        ...(tools.length ? [`dev tools in the prod bundle:\n  ${tools.join('\n  ')}`] : []),
+        ...(levels.length ? [`levels held back from prod in its bundle (HELD, src/levels/index.ts):\n  ${levels.join('\n  ')}`] : []),
+      ];
+      if (leaks.length) this.error(leaks.join('\n'));
     },
   };
 }
@@ -126,7 +145,7 @@ function favicon(): Plugin {
 }
 
 export default defineConfig({
-  plugins: [favicon(), indexingRules(), noDevToolsInProd()],
+  plugins: [favicon(), indexingRules(), nothingHeldInProd()],
   define: {
     __BUILD_ENV__: JSON.stringify(buildEnv),
     __COMMIT__: JSON.stringify(commit),

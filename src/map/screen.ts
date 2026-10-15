@@ -29,7 +29,7 @@ import type { Progress } from '../engine/progress';
 import { VIEW_H, VIEW_W } from '../engine/types';
 import { blitFacing } from '../render/frame';
 import { tourist } from '../render/scene';
-import { CHAPTERS, chapterMonumentSite, chapterOpen, monumentArtId, type Chapter } from './atlas';
+import { chapterMonumentSite, chapterOpen, monumentArtId, type Chapter } from './atlas';
 
 /** The title card counts the chapters the game shows, in words. */
 const COUNT: Record<number, string> = { 1: 'one', 2: 'two', 3: 'three', 4: 'four', 5: 'five', 6: 'six', 7: 'seven', 8: 'eight', 9: 'nine', 10: 'ten', 11: 'eleven', 12: 'twelve' };
@@ -114,7 +114,11 @@ export class MapScreen {
   site = 0;
   private t = 0;
 
-  constructor(private readonly progress: Progress) {}
+  /** `chapters` is the atlas as this build shows it (atlas.ts, chaptersFor). */
+  constructor(
+    private readonly progress: Progress,
+    private readonly chapters: readonly Chapter[],
+  ) {}
 
   /** Show the world, keeping the last selected chapter. */
   openWorld(): void {
@@ -123,7 +127,7 @@ export class MapScreen {
 
   /** Show a chapter with the next unfinished site selected. */
   openChapter(index: number): void {
-    const c = CHAPTERS[index];
+    const c = this.chapters[index];
     if (!c) return;
     this.chapter = index;
     this.view = 'chapter';
@@ -134,8 +138,8 @@ export class MapScreen {
 
   /** Select the chapter and site a level belongs to, for returning from it. */
   showLevel(levelId: string): void {
-    for (let i = 0; i < CHAPTERS.length; i++) {
-      const c = CHAPTERS[i];
+    for (let i = 0; i < this.chapters.length; i++) {
+      const c = this.chapters[i];
       const j = c?.sites.findIndex((s) => s.level === levelId) ?? -1;
       if (c && j >= 0) {
         this.chapter = i;
@@ -147,12 +151,12 @@ export class MapScreen {
   }
 
   get current(): Chapter {
-    return CHAPTERS[this.chapter] ?? CHAPTERS[0]!;
+    return this.chapters[this.chapter] ?? this.chapters[0]!;
   }
 
   /** How many stops the ribbon is showing. */
   private get stops(): number {
-    return this.view === 'world' ? CHAPTERS.length : this.current.sites.length;
+    return this.view === 'world' ? this.chapters.length : this.current.sites.length;
   }
 
   /** The selected stop's index in whichever view is up. */
@@ -170,7 +174,7 @@ export class MapScreen {
 
   /** Position of a chapter's badge on the world map. For tests and the mouse. */
   worldBadge(i: number): { x: number; y: number } {
-    const c = CHAPTERS[i];
+    const c = this.chapters[i];
     if (!c) return { x: 0, y: 0 };
     const a = c.sites[c.anchor] ?? c.sites[0]!;
     const p = worldProject(a.lon, a.lat);
@@ -203,8 +207,8 @@ export class MapScreen {
     const back = input.takePressed('Escape');
     input.takeRestartPressed();
     if (this.view === 'world') {
-      if (left) return this.select((this.chapter + CHAPTERS.length - 1) % CHAPTERS.length);
-      if (right) return this.select((this.chapter + 1) % CHAPTERS.length);
+      if (left) return this.select((this.chapter + this.chapters.length - 1) % this.chapters.length);
+      if (right) return this.select((this.chapter + 1) % this.chapters.length);
       if (confirm) return this.enterChapter(this.chapter);
       return null;
     }
@@ -261,7 +265,7 @@ export class MapScreen {
   }
 
   private enterChapter(i: number): MapAction {
-    const c = CHAPTERS[i];
+    const c = this.chapters[i];
     if (!c || !chapterOpen(c)) return { kind: 'closed' };
     this.openChapter(i);
     return { kind: 'move' };
@@ -291,7 +295,7 @@ export class MapScreen {
       drawCompass(ctx, 158, 112);
     }
     // No leg here: from one chapter to the next is a jump in time, not a road.
-    CHAPTERS.forEach((c, i) => {
+    this.chapters.forEach((c, i) => {
       const p = this.worldBadge(i);
       const selected = i === this.chapter;
       if (!chapterOpen(c) && !selected) {
@@ -464,7 +468,7 @@ export class MapScreen {
       const p = this.ribbonStop(i);
       const selected = i === this.selected;
       const stamped = this.stampedAt(i);
-      const open = this.view === 'world' ? chapterOpen(CHAPTERS[i]!) : !!this.current.sites[i]?.level;
+      const open = this.view === 'world' ? chapterOpen(this.chapters[i]!) : !!this.current.sites[i]?.level;
       const legend = this.view === 'chapter' && !!this.current.sites[i]?.legend;
       if (stamped) marker(ctx, p.x, p.y, 5.5, INK, INK, legend);
       else if (open) marker(ctx, p.x, p.y, 5.5, CARD, ROUTE, legend);
@@ -486,7 +490,7 @@ export class MapScreen {
 
   private stampedAt(i: number): boolean {
     if (this.view === 'chapter') return this.siteCleared(i);
-    const c = CHAPTERS[i];
+    const c = this.chapters[i];
     return !!c && chapterStamped(c, this.progress);
   }
 
@@ -511,7 +515,7 @@ export class MapScreen {
     if (this.view === 'world') {
       labelBox(ctx, s, TITLE.x, TITLE.y, [
         { text: 'LOST TOURIST', font: `bold ${7 * s}px ${FONT}`, color: INK },
-        { text: `A guided tour in ${COUNT[CHAPTERS.length] ?? CHAPTERS.length} chapters`, font: `italic ${5 * s}px ${FONT}`, color: INK_SOFT },
+        { text: `A guided tour in ${COUNT[this.chapters.length] ?? this.chapters.length} chapters`, font: `italic ${5 * s}px ${FONT}`, color: INK_SOFT },
       ]);
       // The panel names the chapter; the map and the ribbon do not.
       ctx.font = `${4.5 * s}px ${FONT}`;
@@ -559,7 +563,8 @@ export class MapScreen {
       ctx.fillText(open ? 'Enter to visit' : 'Closed', px, 127 * s);
     } else {
       const sel = c.sites[this.site];
-      // Built but not reached yet is 'Not yet' (only in the prod build, engine/progress.ts); never built is 'Closed'.
+      // Built but not reached yet is 'Not yet' (only in the prod build, engine/progress.ts); never
+      // built, or held back from this build (atlas.ts, chaptersFor), is 'Closed'.
       const reached = !!sel?.level && this.progress.isOpen(sel.level);
       const hint = !sel?.level ? 'Closed' : this.progress.isCleared(sel.level) ? 'Enter to visit again' : reached ? 'Enter to visit' : 'Not yet';
       ctx.fillStyle = LAND_LINE;
@@ -587,7 +592,7 @@ export class MapScreen {
     for (let i = 0; i < n; i++) {
       const p = this.ribbonStop(i);
       const stamped = this.stampedAt(i);
-      const open = this.view === 'world' ? chapterOpen(CHAPTERS[i]!) : !!this.current.sites[i]?.level;
+      const open = this.view === 'world' ? chapterOpen(this.chapters[i]!) : !!this.current.sites[i]?.level;
       ctx.font = `bold ${5 * s}px ${FONT}`;
       ctx.fillStyle = stamped ? CARD : open ? ROUTE : INK_SOFT;
       ctx.fillText(String(i + 1), p.x * s, (p.y + 0.3) * s);

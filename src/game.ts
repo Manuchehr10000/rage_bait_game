@@ -5,11 +5,11 @@ import type { Stats } from './render/hud';
 import { renderHud } from './render/hud';
 import { Input } from './engine/input';
 import { Level, type LevelData, type Theme } from './engine/level';
-import { LEVELS, STAGES, levelIndexFromHash } from './levels/index';
+import { LEVELS, PROD_LEVELS, STAGES, levelIndexFromHash } from './levels/index';
 import { PHYS, Player, type MovingSolid } from './engine/player';
 import { slopeTop } from './engine/physics';
 import { Progress } from './engine/progress';
-import { locate } from './map/atlas';
+import { chaptersFor, locate } from './map/atlas';
 import { MapScreen } from './map/screen';
 import { renderWorld, type Scene, type WorldText } from './render/scene';
 import { DevTools } from './dev/tools';
@@ -31,8 +31,17 @@ type Screen = 'map' | 'level';
  */
 const DEV_TOOLS = __BUILD_ENV__ !== 'prod';
 
+/**
+ * The tour this build plays. Prod's, which main deploys, leaves out the levels held back from
+ * it (src/levels/index.ts); LEVELS is read only outside prod, so its bundle does not carry their files.
+ */
+const TOUR: readonly LevelData[] = __BUILD_ENV__ === 'prod' ? PROD_LEVELS : LEVELS;
+
+/** The atlas as this build shows it: a site whose level is not in its tour is closed. */
+const MAP_CHAPTERS = chaptersFor(TOUR.map((l) => l.id));
+
 /** What the game can enter: the tour, and where there are dev tools the stages after it (deep link only). */
-const PLAYABLE: readonly LevelData[] = DEV_TOOLS ? [...LEVELS, ...STAGES] : LEVELS;
+const PLAYABLE: readonly LevelData[] = DEV_TOOLS ? [...TOUR, ...STAGES] : TOUR;
 
 /**
  * How far off the left edge of the screen the tourist starts when he walks into a
@@ -87,10 +96,10 @@ export class Game {
   private readonly audio = new GameAudio();
   /** In order for players (the prod build, from main); every built level open in every other build. */
   private readonly progress = new Progress(
-    LEVELS.map((l) => l.id),
+    TOUR.map((l) => l.id),
     __BUILD_ENV__ === 'prod',
   );
-  private readonly map = new MapScreen(this.progress);
+  private readonly map = new MapScreen(this.progress, MAP_CHAPTERS);
   private screen: Screen = 'map';
   /** Escape was pressed mid-level: after the death plays, go back to the map. */
   private leaveAfterDeath = false;
@@ -328,9 +337,9 @@ export class Game {
 
   /** The next site of this chapter that has a level, or null at the end of the chapter. */
   private nextLevelIndex(): number | null {
-    const here = locate(this.level.data.id);
+    const here = locate(this.level.data.id, MAP_CHAPTERS);
     // A stage is on no map: its exit leads back to the map.
-    if (!here) return this.levelIndex + 1 < LEVELS.length ? this.levelIndex + 1 : null;
+    if (!here) return this.levelIndex + 1 < TOUR.length ? this.levelIndex + 1 : null;
     for (let i = here.site + 1; i < here.chapter.sites.length; i++) {
       const id = here.chapter.sites[i]?.level;
       if (!id) continue;

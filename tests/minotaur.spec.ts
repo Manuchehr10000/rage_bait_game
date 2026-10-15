@@ -1,8 +1,8 @@
 import { expect, test, type Page } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import { MINOTAUR } from '../src/levels/ch03-aegean/l06-minotaur';
-import { LEVELS, STAGES, levelIndexFromHash } from '../src/levels';
-import { CHAPTERS } from '../src/map/atlas';
+import { LEVELS, PROD_LEVELS, STAGES, levelIndexFromHash } from '../src/levels';
+import { CHAPTERS, chaptersFor } from '../src/map/atlas';
 import { Level, type HeroDef } from '../src/engine/level';
 import { PHYS, Player } from '../src/engine/player';
 import type { Input } from '../src/engine/input';
@@ -71,7 +71,7 @@ test("the labyrinth is LEVEL.md's map, cell for cell: 320 by 752 px, 20 by 47 ti
   expect(new Set(MINOTAUR.rows.join(''))).toEqual(new Set(['#', ' ', '=']));
 });
 
-test('a level on the map: chapter 3\'s legend, in the tour after Knossos and before Persepolis, entered by its pin or its deep link', () => {
+test('a level on the map of the dev and local builds: chapter 3\'s legend, in the tour after Knossos and before Persepolis, entered by its pin or its deep link; held back from prod', () => {
   // A dev stage until the designer's word, 2026-10-12: "put it on the map".
   expect(STAGES).not.toContain(MINOTAUR);
   const ids = LEVELS.map((l) => l.id);
@@ -84,8 +84,11 @@ test('a level on the map: chapter 3\'s legend, in the tour after Knossos and bef
   expect(aegean.sites[aegean.sites.length - 1]).toMatchObject({ name: 'The Minotaur', level: 'minotaur', legend: true });
   expect(aegean.sites.flatMap((s) => (s.level ? [s.level] : []))).toEqual(['knossos', 'minotaur']);
   expect(CHAPTERS.flatMap((c) => c.sites).filter((s) => s.level === 'minotaur')).toHaveLength(1);
-  // Its deep link names it in LEVELS, which is all the prod build can enter.
+  // Its deep link names it in LEVELS, the tour of every build but prod.
   expect(levelIndexFromHash('#minotaur', LEVELS)).toBe(i);
+  // Held back from prod (designer, 2026-10-15): not in its tour, and no pin on its map.
+  expect(PROD_LEVELS).not.toContain(MINOTAUR);
+  expect(chaptersFor(PROD_LEVELS.map((l) => l.id)).flatMap((c) => c.sites).filter((s) => s.level === 'minotaur')).toEqual([]);
 });
 
 test("the level's data: the bull-leaper, the walk in, the camera on the spawn, the four tricks, the gated exit on the left", () => {

@@ -32,9 +32,10 @@ jobs:
       - run: npm ci
       - run: npm run typecheck
       - run: npm run assets:check
-      # The build main deploys, which refuses to carry anything from src/dev/.
+      # The build main deploys, which refuses to carry anything from src/dev/, or a
+      # level held back from prod (src/levels/index.ts).
       # Here, so a leak fails on the way into dev and not on the way out to prod.
-      - name: Prod build carries no dev tools
+      - name: Prod build carries no dev tools and no held-back level
         run: npx vite build
         env:
           BUILD_ENV: prod

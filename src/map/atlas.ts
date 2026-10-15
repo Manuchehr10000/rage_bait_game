@@ -105,7 +105,8 @@ const TOUR: Chapter[] = [
       { name: 'Mycenae', lat: 37.73, lon: 22.76 },
       { name: 'Tiryns', lat: 37.6, lon: 22.8 },
       // Greek myth; Theseus gets out by Ariadne's thread. Exempt from the chapter's no-bull ruling (arc.md, section 4).
-      // On the map, after Knossos in the tour, by the designer's word (2026-10-12).
+      // On the map, after Knossos in the tour, by the designer's word (2026-10-12); held back
+      // from prod since 2026-10-15 (HELD, src/levels/index.ts), whose map shows this pin closed.
       { name: 'The Minotaur', lat: 37.6, lon: 22.8, level: 'minotaur', pin: { dx: -14, dy: 6 }, legend: true },
     ],
   },
@@ -262,8 +263,25 @@ const TOUR: Chapter[] = [
  */
 export const SHOWN_CHAPTERS = 4;
 
-/** The chapters the game shows, in tour order. */
+/** The chapters the game shows, in tour order, with every built level on them. */
 export const CHAPTERS: Chapter[] = TOUR.slice(0, SHOWN_CHAPTERS);
+
+/**
+ * The chapters as a build shows them, given the levels in its tour: a site whose level the
+ * build does not carry has no level there, and is drawn and treated as closed. That is a
+ * level held back from prod (src/levels/index.ts) on prod's map; in every other build the
+ * tour has every level the atlas names, and these are CHAPTERS.
+ */
+export function chaptersFor(tour: readonly string[]): Chapter[] {
+  return CHAPTERS.map((c) => ({
+    ...c,
+    sites: c.sites.map((s) => {
+      if (!s.level || tour.includes(s.level)) return s;
+      const { level: _held, ...closed } = s;
+      return closed;
+    }),
+  }));
+}
 
 /** True if any level of the chapter exists in the game. */
 export function chapterOpen(c: Chapter): boolean {
@@ -280,9 +298,9 @@ export function monumentArtId(c: Chapter): string {
   return `map-monument-ch${String(c.number).padStart(2, '0')}-${c.slug}`;
 }
 
-/** The chapter and site index a level belongs to. */
-export function locate(levelId: string): { chapter: Chapter; site: number } | null {
-  for (const c of CHAPTERS) {
+/** The chapter and site index a level belongs to, on `chapters`. */
+export function locate(levelId: string, chapters: readonly Chapter[] = CHAPTERS): { chapter: Chapter; site: number } | null {
+  for (const c of chapters) {
     const i = c.sites.findIndex((s) => s.level === levelId);
     if (i >= 0) return { chapter: c, site: i };
   }

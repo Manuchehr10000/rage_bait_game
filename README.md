@@ -35,7 +35,8 @@ Arrows or WASD to move, Space to jump, L to switch the headlamp off and on in th
 where it runs down (it only runs down while it burns), R to give up (it counts), M to mute, Enter for the
 next level at the exit label. Esc returns to the map. Open `#cap-blanc`,
 `#roc-aux-sorciers`, `#pech-merle`, `#rouffignac`, `#gargas`, `#abu-simbel`, `#philae`,
-`#karnak`, `#dendera`, `#knossos`, `#minotaur` or `#persepolis` in the URL to start at that level.
+`#karnak`, `#dendera`, `#knossos`, `#minotaur` or `#persepolis` in the URL to start at that level
+(`#minotaur` outside prod only: it is held back from it, below).
 
 A level is entered on foot: from the map or the exit label, the tourist walks in from off
 the left edge of the screen, and the controls are his as soon as all of him is on it
@@ -49,6 +50,12 @@ so do the levels inside each. Every other build, dev included, opens every built
 the start. Either way a cleared level is stamped and can be visited again, and a chapter
 opens on its first level not yet cleared. A deep link opens any level in dev and local
 builds, and in prod only one the tour has reached.
+
+A built level can be held back from prod (`HELD` in `src/levels/index.ts`, its file in
+`src/levels/held-files.ts`): it is on the map of the dev and local builds, and prod's tour
+and map leave it out, so its pin there is a closed one, and prod's bundle does not carry its
+level file. The Minotaur is, by the designer's word of 2026-10-15; in prod, Persepolis opens
+once Knossos is cleared.
 
 Dev tools, in every build except prod, so a point on screen can be named: a ruler on the
 edges of a level, and the exact point under the mouse as `(X, Y)`. A click copies it with
@@ -84,8 +91,8 @@ screen at 4x without it draws at 3x with it.
 
 They live in `src/dev/` and never reach a player. dev and main are one history, so the
 source goes to main when dev is promoted; the code does not go to prod. The prod build
-refuses to finish if anything from `src/dev/` is in its bundle, and CI builds prod on every
-push to prove it.
+refuses to finish if anything from `src/dev/`, or a level held back from prod, is in its
+bundle, and CI builds prod on every push to prove it.
 
 `npm test` runs scripted playthroughs in headless Chromium. Each one checks a design
 contract: the trap fires for the naive player and can be avoided by the one who remembers.
@@ -155,7 +162,7 @@ Rendering: the world is 320 × 180 units, rendered onto a canvas four times that
 
 Twelve levels playable end to end: the five of chapter 1 (Cap Blanc, Roc-aux-Sorciers, Pech
 Merle, Rouffignac, Gargas), the first four of chapter 2 (Abu Simbel, Philae, Karnak,
-Dendera), the first and the sixth of chapter 3 (Knossos, and its legend, the Minotaur) and
-the first of chapter 4 (Persepolis), with code-drawn art and procedural sound, from a tour
-map start screen. Chapter 4 has no music yet: Persepolis is heard with the wind alone.
-Painted art arrives per asset through `content/`. No menu yet.
+Dendera), the first and the sixth of chapter 3 (Knossos, and its legend, the Minotaur, held
+back from prod) and the first of chapter 4 (Persepolis), with code-drawn art and procedural
+sound, from a tour map start screen. Chapter 4 has no music yet: Persepolis is heard with
+the wind alone. Painted art arrives per asset through `content/`. No menu yet.

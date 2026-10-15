@@ -66,7 +66,12 @@ notes describe the levels as they were built.
   four tricks, the way out and the closing tableau, playable start to exit, drawn in
   black-figure (three passes, 2026-10-10 and 11; a fourth after the designer's rulings of
   2026-10-11). On the map since the designer's word of 2026-10-12, no longer a stage: in the
-  tour after Knossos and before Persepolis (`LEVELS`).
+  tour after Knossos and before Persepolis (`LEVELS`). Held back from prod by the designer's
+  word of 2026-10-15 ("push to main everything except Minotaur level"): on the map in the dev
+  and local builds only; prod's tour and map leave it out, and its bundle does not carry its
+  level file (`HELD` in `src/levels/index.ts`, its file in `src/levels/held-files.ts`, checked
+  by vite.config.ts). Released by writing it into `PROD_LEVELS` after Knossos and taking it out
+  of `HELD` and `held-files.ts`.
 - **Open:** Apep or Sekhmet for chapter 2's legend; whether Karnak's exit has already spent
   the false completion (pillar 10, `content/tricks.md`).
 
@@ -82,5 +87,6 @@ Conventions:
   world y = that level's spawn floor (`spawn.y + 16`) − Y.
 - Dev tools live in `src/dev/` and never reach prod. game.ts makes them only when
   `__BUILD_ENV__ !== 'prod'`; nothing else imports them. The prod build fails if any of
-  `src/dev/` is in its bundle (vite.config.ts), and CI builds prod to check. Promoting dev
-  to main carries the source, never the code a player downloads.
+  `src/dev/`, or a level held back from prod, is in its bundle (vite.config.ts), and CI
+  builds prod to check. Promoting dev to main carries the source, never the code a player
+  downloads.
