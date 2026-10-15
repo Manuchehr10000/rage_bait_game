@@ -4,7 +4,9 @@
  *
  * In order, the tour is played in order: a level opens once every level before it
  * in `order` is cleared, which locks the chapters in order and the levels inside
- * each one with one rule. That is the prod build, which main deploys. Every other
+ * each one with one rule, and a level he has cleared stays open, so a level added
+ * to the tour before one he has already played never locks him out of it
+ * (designer, 2026-10-15). That is the prod build, which main deploys. Every other
  * build, dev included, opens every built level from the start, so the designer can
  * play any of them (designer ruling, 2026-10-03). game.ts decides which.
  */
@@ -64,10 +66,10 @@ export class Progress {
     return this.cleared.has(levelId);
   }
 
-  /** Whether this level can be entered: any built level, or in order, one the tour has reached. */
+  /** Whether this level can be entered: any built level, or in order, one the tour has reached or he has cleared. */
   isOpen(levelId: string): boolean {
     const i = this.order.indexOf(levelId);
-    return i >= 0 && (!this.inOrder || this.order.slice(0, i).every((id) => this.cleared.has(id)));
+    return i >= 0 && (!this.inOrder || this.cleared.has(levelId) || this.order.slice(0, i).every((id) => this.cleared.has(id)));
   }
 
   markCleared(levelId: string): void {

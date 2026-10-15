@@ -46,8 +46,9 @@ notes describe the levels as they were built.
   strength. Its own gate is in `arc.md` section 1. Every chapter has one; a chapter with
   none that passes is changed. It is drawn by default in the medium that told its story (the
   Minotaur as Attic black-figure; designer, 2026-10-10, `arc.md` section 4).
-- **Order is locked** in the game: a level opens once every level before it is cleared.
-  Deep links still open any level in dev and local builds.
+- **Order is locked** in the game: a level opens once every level before it is cleared,
+  and a level he has cleared stays open (designer, 2026-10-15). Deep links still open any
+  level in dev and local builds.
 - **Chapters 1 to 4 are the game for now.** 5 to 12 are hidden (`SHOWN_CHAPTERS` in
   `src/map/atlas.ts`) and are thought about later.
 - **Chapter 4** (ruled 2026-10-03, on the designer's delegation, `arc.md` sections 3 and 4):

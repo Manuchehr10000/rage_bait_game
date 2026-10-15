@@ -269,9 +269,9 @@ test('in prod the tour is played in order: a level opens once every level before
   expect(ids.filter((id) => progress.isOpen(id))).toEqual([ids[0]]);
   progress.markCleared(ids[0]!);
   expect(ids.filter((id) => progress.isOpen(id))).toEqual(ids.slice(0, 2));
-  // Clearing a later level out of turn opens nothing past the gap.
+  // Clearing a later level out of turn opens nothing past the gap but that level itself.
   progress.markCleared(ids[3]!);
-  expect(ids.filter((id) => progress.isOpen(id))).toEqual(ids.slice(0, 2));
+  expect(ids.filter((id) => progress.isOpen(id))).toEqual([...ids.slice(0, 2), ids[3]]);
 });
 
 test('in prod the Minotaur opens once Knossos is cleared, and Persepolis once the Minotaur is', () => {
@@ -286,16 +286,24 @@ test('in prod the Minotaur opens once Knossos is cleared, and Persepolis once th
   expect(open()).toEqual(['knossos', 'minotaur', 'persepolis']);
 });
 
-test('in prod a visitor who cleared Persepolis before the Minotaur was on the map finds it closed until he clears the Minotaur', () => {
-  // The rule as it stands (engine/progress.ts): a level opens once every level before it
-  // is cleared, whether or not it has been cleared itself.
+test('in prod a visitor who cleared Persepolis before the Minotaur was on the map can still go back to it', () => {
+  // A level he has cleared stays open (engine/progress.ts; designer, 2026-10-15), so a level
+  // added to the tour before it never locks him out. The Minotaur itself is open: Knossos is cleared.
   const ids = LEVELS.map((l) => l.id);
   const progress = new Progress(ids, true);
   for (const id of ids) if (id !== 'minotaur') progress.markCleared(id);
   expect(progress.isCleared('persepolis')).toBe(true);
-  expect(ids.filter((id) => !progress.isOpen(id))).toEqual(['persepolis']);
-  progress.markCleared('minotaur');
+  expect(progress.isCleared('minotaur')).toBe(false);
   expect(ids.filter((id) => !progress.isOpen(id))).toEqual([]);
+});
+
+test('in prod a level he has not cleared stays locked behind the first one he has not', () => {
+  // The one exception to the order is a level already cleared; nothing else past a gap opens.
+  const ids = LEVELS.map((l) => l.id);
+  const progress = new Progress(ids, true);
+  for (const id of ids.slice(0, ids.indexOf('knossos') + 1)) progress.markCleared(id);
+  expect(progress.isOpen('minotaur')).toBe(true);
+  expect(progress.isOpen('persepolis')).toBe(false);
 });
 
 test('a deep link still opens a level directly, and the exit leads to the next site', async ({ page }) => {
