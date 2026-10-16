@@ -9,9 +9,8 @@ import { TILE } from '../../engine/types';
  * the fight in its cell, where the bull claps him, swats him and tosses him while the
  * hero kills it; and the way out by the thread, past the queue and Ariadne at the door,
  * with the closing picture. On the map, after Knossos in the tour (designer,
- * 2026-10-12); held back from prod since 2026-10-15 (HELD, src/levels/index.ts), whose
- * build fails if this file is in its bundle (vite.config.ts). Design:
- * content/ch03-aegean/l06-minotaur/LEVEL.md.
+ * 2026-10-12); held back from prod on 2026-10-15 and released to it on 2026-10-16
+ * (src/levels/index.ts). Design: content/ch03-aegean/l06-minotaur/LEVEL.md.
  *
  * One screen wide and 47 tiles deep, every solid on the grid; the camera never moves
  * sideways, and it starts on the spawn. The spawn floor is y 160, so a designer's

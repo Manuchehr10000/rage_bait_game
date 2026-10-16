@@ -106,7 +106,7 @@ const TOUR: Chapter[] = [
       { name: 'Tiryns', lat: 37.6, lon: 22.8 },
       // Greek myth; Theseus gets out by Ariadne's thread. Exempt from the chapter's no-bull ruling (arc.md, section 4).
       // On the map, after Knossos in the tour, by the designer's word (2026-10-12); held back
-      // from prod since 2026-10-15 (HELD, src/levels/index.ts), whose map shows this pin closed.
+      // from prod on 2026-10-15 and released to it on 2026-10-16 (src/levels/index.ts).
       { name: 'The Minotaur', lat: 37.6, lon: 22.8, level: 'minotaur', pin: { dx: -14, dy: 6 }, legend: true },
     ],
   },

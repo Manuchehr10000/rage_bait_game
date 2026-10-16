@@ -277,8 +277,9 @@ test('in prod the tour is played in order: a level opens once every level before
 });
 
 test('prod\'s tour is every level but the ones held back from it, and the others\' tour puts each back after the level it follows', () => {
+  // None is held back since the Minotaur was released (designer, 2026-10-16), so every tour is the same.
   const held = HELD.map((h) => h.level.id);
-  expect(held).toEqual(['minotaur']);
+  expect(held).toEqual([]);
   const prod = PROD_LEVELS.map((l) => l.id);
   for (const id of held) expect(prod).not.toContain(id);
   // Every held level goes back in: none is lost to an `after` prod's tour does not have.
@@ -294,40 +295,21 @@ test('the prod build keeps out the file of every held level, and of nothing else
   for (const f of HELD_FILES) expect(existsSync(new URL(`../${f}`, import.meta.url)), f).toBe(true);
 });
 
-test('in prod the Minotaur is held back: Persepolis opens once Knossos is cleared, and the Minotaur never does', () => {
-  const ids = PROD_LEVELS.map((l) => l.id);
-  const progress = new Progress(ids, true);
-  for (const id of ids.slice(0, ids.indexOf('knossos'))) progress.markCleared(id);
-  const open = () => ['knossos', 'minotaur', 'persepolis'].filter((id) => progress.isOpen(id));
-  expect(open()).toEqual(['knossos']);
-  progress.markCleared('knossos');
-  expect(open()).toEqual(['knossos', 'persepolis']);
-  // A cleared id outside prod's tour opens nothing and moves nothing. (Prod and the dev link
-  // keep separate storage, so this only guards the rule.)
-  progress.markCleared('minotaur');
-  expect(open()).toEqual(['knossos', 'persepolis']);
-});
-
-test('on prod\'s map the Minotaur is a closed legend, chapter 3 is Knossos alone, and Knossos\'s exit leads to the map', () => {
+test('on prod\'s map the Minotaur is chapter 3\'s legend, after Knossos, and every build\'s map is the atlas', () => {
+  // Released to prod by the designer, 2026-10-16: "Make all levels available on main".
   const prod = chaptersFor(PROD_LEVELS.map((l) => l.id));
   const aegean = prod.find((c) => c.number === 3)!;
-  const legend = aegean.sites[aegean.sites.length - 1]!;
-  expect(legend).toMatchObject({ name: 'The Minotaur', legend: true });
-  expect(legend.level).toBeUndefined();
-  expect(aegean.sites.flatMap((s) => (s.level ? [s.level] : []))).toEqual(['knossos']);
-  expect(locate('minotaur', prod)).toBeNull();
-  // Knossos is the last of its chapter with a level, so its exit card leads to the map (game.ts, nextLevelIndex).
+  expect(aegean.sites[aegean.sites.length - 1]).toMatchObject({ name: 'The Minotaur', level: 'minotaur', legend: true });
+  expect(aegean.sites.flatMap((s) => (s.level ? [s.level] : []))).toEqual(['knossos', 'minotaur']);
+  // Knossos's exit card leads to the next site with a level, the Minotaur (game.ts, nextLevelIndex).
   const here = locate('knossos', prod)!;
-  expect(here.chapter.sites.slice(here.site + 1).filter((s) => s.level)).toEqual([]);
-  // Nothing else moves: every other site is as the atlas has it.
-  const strip = (cs: typeof CHAPTERS) => cs.map((c) => ({ ...c, sites: c.sites.map((s) => (s.level === 'minotaur' ? { ...s, level: undefined } : s)) }));
-  expect(JSON.parse(JSON.stringify(prod))).toEqual(JSON.parse(JSON.stringify(strip(CHAPTERS))));
-  // Every other build's tour carries every level the atlas names, so its map is the atlas.
+  expect(here.chapter.sites.slice(here.site + 1).find((s) => s.level)?.level).toBe('minotaur');
+  expect(prod).toEqual(CHAPTERS);
   expect(chaptersFor(LEVELS.map((l) => l.id))).toEqual(CHAPTERS);
 });
 
-test('in order, with the Minotaur in the tour, it opens once Knossos is cleared, and Persepolis once the Minotaur is: prod\'s, once it is released', () => {
-  const ids = LEVELS.map((l) => l.id);
+test('in prod the Minotaur opens once Knossos is cleared, and Persepolis once the Minotaur is', () => {
+  const ids = PROD_LEVELS.map((l) => l.id);
   const progress = new Progress(ids, true);
   for (const id of ids.slice(0, ids.indexOf('knossos'))) progress.markCleared(id);
   const open = () => ['knossos', 'minotaur', 'persepolis'].filter((id) => progress.isOpen(id));
@@ -338,10 +320,10 @@ test('in order, with the Minotaur in the tour, it opens once Knossos is cleared,
   expect(open()).toEqual(['knossos', 'minotaur', 'persepolis']);
 });
 
-test('once the Minotaur is released to prod, a visitor who cleared Persepolis before it can still go back to it', () => {
+test('in prod a visitor who cleared Persepolis before the Minotaur was released can still go back to it', () => {
   // A level he has cleared stays open (engine/progress.ts; designer, 2026-10-15), so a level
   // added to the tour before it never locks him out. The Minotaur itself is open: Knossos is cleared.
-  const ids = LEVELS.map((l) => l.id);
+  const ids = PROD_LEVELS.map((l) => l.id);
   const progress = new Progress(ids, true);
   for (const id of ids) if (id !== 'minotaur') progress.markCleared(id);
   expect(progress.isCleared('persepolis')).toBe(true);
@@ -349,9 +331,9 @@ test('once the Minotaur is released to prod, a visitor who cleared Persepolis be
   expect(ids.filter((id) => !progress.isOpen(id))).toEqual([]);
 });
 
-test('in order, with the Minotaur in the tour, a level he has not cleared stays locked behind the first one he has not', () => {
+test('in prod a level he has not cleared stays locked behind the first one he has not', () => {
   // The one exception to the order is a level already cleared; nothing else past a gap opens.
-  const ids = LEVELS.map((l) => l.id);
+  const ids = PROD_LEVELS.map((l) => l.id);
   const progress = new Progress(ids, true);
   for (const id of ids.slice(0, ids.indexOf('knossos') + 1)) progress.markCleared(id);
   expect(progress.isOpen('minotaur')).toBe(true);
