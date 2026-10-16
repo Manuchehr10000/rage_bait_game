@@ -72,6 +72,13 @@ notes describe the levels as they were built.
   level file (`HELD` in `src/levels/index.ts`, its file in `src/levels/held-files.ts`, checked
   by vite.config.ts). Released by writing it into `PROD_LEVELS` after Knossos and taking it out
   of `HELD` and `held-files.ts`.
+- **Accounts** (designer, 2026-10-16): a visitor keeps his tour by signing in, with Google
+  or with a code sent by email; there is no sign-up, only Continue. A guest's tour lasts
+  until the tab closes, and signing in carries it into the account. Cloudflare Pages
+  Functions and D1 (`functions/api/`, `server/`; the page's side in `src/account/`). Dev
+  only first: prod keeps the tour in localStorage, carries no account code (checked by
+  vite.config.ts), and has no database bound, so its `/api` answers 404. How to run it and
+  what to configure: README, "Accounts".
 - **Open:** Apep or Sekhmet for chapter 2's legend; whether Karnak's exit has already spent
   the false completion (pillar 10, `content/tricks.md`).
 

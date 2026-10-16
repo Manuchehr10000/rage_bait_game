@@ -101,6 +101,52 @@ It builds the game first, every time, so it always tests the source as it is; so
 
 `npm run assets:check` validates every art manifest against the files on disk.
 
+## Accounts
+
+An account keeps a visitor's tour: the levels he has cleared, the tricks that have killed
+him and his deaths, on every device he signs in on. He signs in with Google or with a
+six-digit code sent by email. There is no sign-up: an address or a Google account becomes
+an account the first time it is used, and one used both ways is one account. A guest plays
+as before, but his tour lasts until the tab closes (a reload keeps it); signing in carries
+it into the account. The link that signs him in is under the screen, on the map only.
+
+Dev only first (designer, 2026-10-16). Prod keeps the tour in localStorage, as it always
+has, and carries no account code: the page's side is all in `src/account/`, which only
+`src/game.ts` loads, outside prod, and the prod build refuses to finish with any of it in
+its bundle. The API is Cloudflare Pages Functions and D1: `functions/api/[[path]].ts` hands
+every `/api` request to `server/`, which answers 404 wherever no database is bound, and
+prod has none. A page with no API behind it (a 404, or no answer within four seconds)
+has no accounts, and everyone on it is a guest; `npm run dev` is such a page.
+
+To run it on this machine, with a local D1 kept in `.wrangler/state`:
+
+```
+cp .dev.vars.example .dev.vars    # fill in what you have; it is never committed
+npm run api                       # builds, then serves the game and the API on http://localhost:8788
+```
+
+`npm test` runs it too: `tests/accounts.spec.ts` plays against `wrangler pages dev` with an
+empty local D1, and stand-ins for Resend and Google (`tests/support/providers.mjs`), and
+`tests/server/` checks the API without a browser. Neither reads `.dev.vars`.
+
+What it needs, outside the repo:
+
+- **Cloudflare**, in the `lost-tourist` Pages project's settings, for the Preview
+  environment only, which is where dev deploys: a D1 database bound as `DB`;
+  `GOOGLE_CLIENT_ID`; `EMAIL_FROM` (e.g. `Lost Tourist <tickets@losttourist.online>`); and
+  `RESEND_API_KEY`, as a secret. `EMAIL_DAILY_CAP` (default 90 codes a day, all addresses
+  together) and `EMAIL_IP_HOURLY` (default 20 an hour per IP) are optional. The API makes
+  its own tables the first time it is asked. Production gets none of these, so prod stays
+  without accounts. Pages gives bindings and variables only to deployments made after
+  they were added: once they are in, redeploy dev (push to `dev`, or run the CI workflow on
+  `dev` again), or dev's `/api` keeps answering 404.
+- **Resend**: the domain `EMAIL_FROM` sends from, verified, and the API key.
+- **Google Cloud**: an OAuth client of the Web application type. Its authorised JavaScript
+  origins: `https://dev.losttourist.online`, `https://losttourist.online` (for when
+  accounts reach prod), `http://localhost` and `http://localhost:8788`. Its client id is
+  `GOOGLE_CLIENT_ID`. Its secret is not needed: the API only checks Google's signature on
+  the token the button hands the page.
+
 ## Layout
 
 The engine knows nothing about Egypt. The levels are data. The art is files.

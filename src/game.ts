@@ -8,18 +8,18 @@ import { Level, type LevelData, type Theme } from './engine/level';
 import { LEVELS, PROD_LEVELS, STAGES, levelIndexFromHash } from './levels/index';
 import { PHYS, Player, type MovingSolid } from './engine/player';
 import { slopeTop } from './engine/physics';
-import { Progress } from './engine/progress';
+import { LocalStore, Progress } from './engine/progress';
 import { chaptersFor, locate } from './map/atlas';
 import { MapScreen } from './map/screen';
 import { renderWorld, type Scene, type WorldText } from './render/scene';
 import { DevTools } from './dev/tools';
+import { Account, GuestStore } from './account';
 import type { RulerView } from './dev/ruler';
 import { ART_SCALE, DEATH_SOUND, DT, overlaps, TILE, VIEW_H, VIEW_W, type DeathCause, type Rect } from './engine/types';
 
 /** How long a death plays before the reset. The world keeps moving through it. */
 const DEATH_TIME = 0.75;
 const TITLE_TIME = 2.2;
-const LIFETIME_KEY = 'lostTourist.lifetimeDeaths';
 
 type State = 'playing' | 'dead' | 'complete';
 type Screen = 'map' | 'level';
@@ -30,6 +30,13 @@ type Screen = 'map' | 'level';
  * which does not even carry the code.
  */
 const DEV_TOOLS = __BUILD_ENV__ !== 'prod';
+
+/**
+ * Accounts (src/account/): a guest's tour kept in the tab, a signed-in one on the
+ * server. Every build has them but prod, which keeps the tour in localStorage as it
+ * always has, and does not carry the code (designer, 2026-10-16: dev only first).
+ */
+const ACCOUNTS = __BUILD_ENV__ !== 'prod';
 
 /**
  * The tour this build plays. Prod's, which main deploys, leaves out the levels held back from
@@ -98,7 +105,17 @@ export class Game {
   private readonly progress = new Progress(
     TOUR.map((l) => l.id),
     __BUILD_ENV__ === 'prod',
+    ACCOUNTS ? new GuestStore() : new LocalStore(),
   );
+  /** Who is signed in, and the link and dialog that sign him in. Null in prod. */
+  private readonly account: Account | null = ACCOUNTS ? new Account(this.progress) : null;
+  /**
+   * Resolves once the game has opened, on the map or the level a deep link names.
+   * Where there are accounts that waits for the account to boot (at most 4 s), since
+   * which levels are open is a question about whose tour it is. Null in prod, which
+   * opens in the constructor, as it always has.
+   */
+  readonly opened: Promise<void> | null;
   private readonly map = new MapScreen(this.progress, MAP_CHAPTERS);
   private screen: Screen = 'map';
   /** Escape was pressed mid-level: after the death plays, go back to the map. */
@@ -139,7 +156,7 @@ export class Game {
   private deathAt: { x: number; y: number } | null = null;
   private titleTimer = 0;
 
-  private stats: Stats = { total: 0, byCause: new Map(), lifetime: readLifetime() };
+  private stats: Stats = { total: 0, byCause: new Map() };
 
   /** The ruler, the pointer readout and the teleport. Null in prod. */
   private readonly dev: DevTools | null;
@@ -193,9 +210,21 @@ export class Game {
       this.audio.unlock();
       this.pointer(e, true);
     });
-    // A deep link opens any level where there are dev tools, which is what the tests and
-    // the designer want. In prod it opens only a level the tour has reached, so a link
-    // cannot skip a player past the levels that set up this one.
+    if (this.account) {
+      this.opened = this.account.boot().then(() => this.open());
+    } else {
+      this.opened = null;
+      this.open();
+    }
+  }
+
+  /**
+   * The map, or the level the URL names. A deep link opens any level where there are
+   * dev tools, which is what the tests and the designer want. In prod it opens only a
+   * level the tour has reached, so a link cannot skip a player past the levels that
+   * set up this one.
+   */
+  private open(): void {
     const hash = location.hash.replace(/^#/, '').trim();
     const linked = hash && hash !== 'map' ? levelIndexFromHash(location.hash, PLAYABLE) : -1;
     if (linked >= 0 && (DEV_TOOLS || this.progress.isOpen(PLAYABLE[linked]!.id))) this.enterLevel(linked, false);
@@ -258,6 +287,11 @@ export class Game {
     return this.map;
   }
 
+  /** What this visitor has cleared and met, and his deaths in every visit. For tests. */
+  get tour(): Progress {
+    return this.progress;
+  }
+
   /** The world pixel under the pointer, as the dev ruler names it. For tests. */
   get devPoint(): { x: number; y: number } | null {
     return this.dev?.point(this.rulerView()) ?? null;
@@ -308,6 +342,7 @@ export class Game {
   private goToMap(): void {
     this.screen = 'map';
     this.showLampKey();
+    this.account?.setScreen('map');
     this.leaveAfterDeath = false;
     this.audio.stopLoops();
     if (this.level) this.map.showLevel(this.level.data.id);
@@ -327,6 +362,7 @@ export class Game {
    */
   private enterLevel(index: number, arrive: boolean): void {
     this.screen = 'level';
+    this.account?.setScreen('level');
     this.leaveAfterDeath = false;
     this.loadLevel(index);
     if (arrive && (this.level.data.arrival ?? 'walk') === 'walk') {
@@ -452,8 +488,7 @@ export class Game {
     if (sound) this.audio.play(sound);
     this.stats.total += 1;
     this.stats.byCause.set(cause, (this.stats.byCause.get(cause) ?? 0) + 1);
-    this.stats.lifetime += 1;
-    writeLifetime(this.stats.lifetime);
+    this.progress.addDeath();
   }
 
   // ---------------------------------------------------------------------
@@ -710,7 +745,7 @@ export class Game {
     if (this.screen === 'map') {
       this.map.draw(this.wctx);
       this.ctx.drawImage(this.world, 0, 0, this.canvas.width, this.canvas.height);
-      this.map.drawText(this.ctx, this.scale, this.stats.lifetime);
+      this.map.drawText(this.ctx, this.scale, this.progress.lifetime);
       this.dev?.draw(this.ctx, this.scale, null);
       return;
     }
@@ -738,6 +773,7 @@ export class Game {
     this.ctx.imageSmoothingEnabled = smooth;
     renderHud(this.ctx, this.scale, {
       stats: this.stats,
+      lifetime: this.progress.lifetime,
       texts: this.texts,
       camX: this.camera.ix,
       camY: this.camera.iy,
@@ -749,21 +785,5 @@ export class Game {
       title: this.titleTimer > 0 ? Math.min(1, this.titleTimer / 0.4, (TITLE_TIME - this.titleTimer) / 0.4) : 0,
     });
     this.dev?.draw(this.ctx, this.scale, this.rulerView());
-  }
-}
-
-function readLifetime(): number {
-  try {
-    return Number(localStorage.getItem(LIFETIME_KEY) ?? '0') || 0;
-  } catch {
-    return 0;
-  }
-}
-
-function writeLifetime(n: number): void {
-  try {
-    localStorage.setItem(LIFETIME_KEY, String(n));
-  } catch {
-    /* private mode; the number lives on in memory only */
   }
 }

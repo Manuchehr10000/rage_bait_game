@@ -5,13 +5,14 @@ import type { WorldText } from './scene';
 export interface Stats {
   total: number;
   byCause: Map<DeathCause, number>;
-  lifetime: number;
 }
 
 const LABEL_FONT = 'Georgia, "Times New Roman", serif';
 
 export interface HudState {
   stats: Stats;
+  /** Deaths in every visit (Progress.lifetime). */
+  lifetime: number;
   texts: WorldText[];
   camX: number;
   camY: number;
@@ -28,7 +29,7 @@ export interface HudState {
 
 /** Everything textual is drawn on the scaled canvas so it stays legible. */
 export function renderHud(ctx: CanvasRenderingContext2D, scale: number, h: HudState): void {
-  const { stats, texts: worldTexts, camX, camY, complete, hasNext, levelName, title, tricks, exitCard } = h;
+  const { stats, lifetime, texts: worldTexts, camX, camY, complete, hasNext, levelName, title, tricks, exitCard } = h;
   const W = VIEW_W * scale;
   const H = VIEW_H * scale;
 
@@ -57,7 +58,7 @@ export function renderHud(ctx: CanvasRenderingContext2D, scale: number, h: HudSt
   ctx.fillText(String(stats.total), 6 * scale, 11 * scale);
 
   if (title > 0 && !complete) drawTitle(ctx, scale, levelName, W, title);
-  if (complete) drawExitLabel(ctx, scale, stats, W, H, levelName, hasNext, tricks, exitCard);
+  if (complete) drawExitLabel(ctx, scale, stats, lifetime, W, H, levelName, hasNext, tricks, exitCard);
 }
 
 /** A museum label, briefly, when you arrive. Not on retries. */
@@ -85,6 +86,7 @@ function drawExitLabel(
   ctx: CanvasRenderingContext2D,
   scale: number,
   stats: Stats,
+  lifetime: number,
   W: number,
   H: number,
   levelName: string,
@@ -141,7 +143,7 @@ function drawExitLabel(
   ctx.fillStyle = '#6b5a3e';
   ctx.fillText('All visits', x + 8 * scale, ty);
   ctx.textAlign = 'right';
-  ctx.fillText(String(stats.lifetime), x + boxW - 8 * scale, ty);
+  ctx.fillText(String(lifetime), x + boxW - 8 * scale, ty);
   if (tricks) {
     // Pillar 8: how many of this site's tricks have ever had him, in every visit.
     ty += lineH;

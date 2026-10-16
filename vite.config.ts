@@ -54,15 +54,17 @@ function indexingRules(): Plugin {
 
 /**
  * The tools for building the game live in src/dev/ and never reach a player, and
- * nor do the levels held back from prod. dev and main are one history, promoted
- * by fast-forward, so their source goes to main with everything else; what must
- * not go is their code in the prod bundle. The game only reads them outside prod
- * and the bundler drops them from it. This is the check that it did: a prod
- * bundle with any of src/dev/, or any held level's file (src/levels/held-files.ts),
- * in it is not a build.
+ * nor do the levels held back from prod, nor accounts (src/account/: dev only
+ * first, designer, 2026-10-16). dev and main are one history, promoted by
+ * fast-forward, so their source goes to main with everything else; what must not
+ * go is their code in the prod bundle. The game only reads them outside prod and
+ * the bundler drops them from it. This is the check that it did: a prod bundle
+ * with any of src/dev/ or src/account/, or any held level's file
+ * (src/levels/held-files.ts), in it is not a build.
  */
 function nothingHeldInProd(): Plugin {
   let devDir = '';
+  let accountDir = '';
   let held: string[] = [];
   return {
     name: 'lost-tourist-nothing-held-in-prod',
@@ -71,6 +73,7 @@ function nothingHeldInProd(): Plugin {
     configResolved(config) {
       const root = normalizePath(config.root);
       devDir = `${root}/src/dev/`;
+      accountDir = `${root}/src/account/`;
       held = HELD_FILES.map((f) => `${root}/${f}`);
     },
 
@@ -84,6 +87,7 @@ function nothingHeldInProd(): Plugin {
     generateBundle(_, bundle) {
       if (!isProd) return;
       const tools: string[] = [];
+      const accounts: string[] = [];
       const levels: string[] = [];
       for (const chunk of Object.values(bundle)) {
         if (chunk.type !== 'chunk') continue;
@@ -92,11 +96,13 @@ function nothingHeldInProd(): Plugin {
         for (const id of Object.keys(chunk.modules)) {
           const path = normalizePath(id);
           if (path.startsWith(devDir)) tools.push(id);
+          if (path.startsWith(accountDir)) accounts.push(id);
           if (held.includes(path)) levels.push(id);
         }
       }
       const leaks = [
         ...(tools.length ? [`dev tools in the prod bundle:\n  ${tools.join('\n  ')}`] : []),
+        ...(accounts.length ? [`account code in the prod bundle (ACCOUNTS, src/game.ts):\n  ${accounts.join('\n  ')}`] : []),
         ...(levels.length ? [`levels held back from prod in its bundle (HELD, src/levels/index.ts):\n  ${levels.join('\n  ')}`] : []),
       ];
       if (leaks.length) this.error(leaks.join('\n'));

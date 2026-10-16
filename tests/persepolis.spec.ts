@@ -642,16 +642,20 @@ test('the knowing route: no deaths, about seventeen seconds, under a second and 
   expect(r.still / 60).toBeLessThan(1.5);
 });
 
-test('pillar 8: the exit label counts the audience once it has killed him, of the level\'s two tricks, and the browser remembers', async ({ page }) => {
+test('pillar 8: the exit label counts the audience once it has killed him, of the level\'s two tricks, and the tab remembers', async ({ page }) => {
   type Count = { met: number; of: number } | null;
   const count = (): Promise<Count> => page.evaluate(() => (window as unknown as { __game: { tricksCount(): Count } }).__game.tricksCount());
-  const stored = (): Promise<unknown> => page.evaluate(() => JSON.parse(localStorage.getItem('lostTourist.tricks') ?? 'null'));
+  // The tricks written down. Outside prod a guest's tour is kept in this tab's record
+  // (src/account/), not in localStorage as prod keeps it; the tests' build has accounts
+  // and no API, so the visitor is a guest. No record yet is none written down.
+  const stored = (): Promise<unknown> =>
+    page.evaluate(() => (JSON.parse(sessionStorage.getItem('lostTourist.guest') ?? 'null') as { tricks?: unknown } | null)?.tricks ?? {});
   const runThrough = `const step = () => { if (!routeUntil('court')) return; key('ArrowRight', true); };`;
 
   // Never killed by it: the label says none of the one.
   expect((await play(page, `const step = () => { routeUntil('done'); };`, 60 * 45)).state).toBe('complete');
   expect(await count()).toEqual({ met: 0, of: 2 });
-  expect(await stored()).toBeNull();
+  expect(await stored()).toEqual({});
 
   // Killed by it: written down, once, however often it happens.
   expect((await play(page, runThrough)).cause).toBe('The audience');
@@ -665,7 +669,7 @@ test('pillar 8: the exit label counts the audience once it has killed him, of th
   expect(await stored()).toEqual({ persepolis: ['The audience', 'The column'] });
   expect(await count()).toEqual({ met: 2, of: 2 });
 
-  // Another visit, the same browser.
+  // Another visit, the same tab.
   await page.reload();
   await page.waitForFunction(() => (window as unknown as { __game?: { levelData: { id: string } } }).__game?.levelData.id === 'persepolis');
   expect(await count()).toEqual({ met: 2, of: 2 });

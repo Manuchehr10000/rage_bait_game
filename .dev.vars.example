@@ -1,0 +1,30 @@
+# The accounts API's variables, for running it on this machine (`npm run api`).
+# Copy this file to .dev.vars, which is never committed, and fill in what you have:
+# wrangler reads .dev.vars from the folder it runs in. Every line may be left out.
+# Without GOOGLE_CLIENT_ID there is no Google button; without RESEND_API_KEY and
+# EMAIL_FROM there are no codes by email. The database needs no line: it is a local
+# D1, kept in .wrangler/state.
+
+# Google: the id of the OAuth web client. Its authorised JavaScript origins must
+# include http://localhost and http://localhost:8788.
+GOOGLE_CLIENT_ID=
+
+# Resend: an API key, and a sender on a domain verified with Resend.
+RESEND_API_KEY=
+EMAIL_FROM="Lost Tourist <tickets@losttourist.online>"
+
+# Codes sent per rolling 24 hours, all addresses together (default 90), and per IP
+# per rolling hour (default 20).
+# EMAIL_DAILY_CAP=90
+# EMAIL_IP_HOURLY=20
+
+# To sign in by email without sending mail: run the tests' stand-in
+# (node tests/support/providers.mjs), point the API at it, and give RESEND_API_KEY any
+# value, since codes by email are off without one. The code then is at
+# http://localhost:8790/outbox?to=<address>.
+# EMAIL_API_URL=http://localhost:8790/emails
+# RESEND_API_KEY=stand-in
+#
+# There is no stand-in for Google here: the page always loads Google's real button,
+# whose tokens only Google's own keys verify. (The tests swap in a fake button and
+# point GOOGLE_JWKS_URL at the stand-in; for a real Google client id leave it unset.)
