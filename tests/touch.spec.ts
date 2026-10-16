@@ -150,10 +150,11 @@ for (const size of [
   });
 }
 
-test('the dev tools and the keys line stay off a phone', async ({ page }) => {
-  await open(page, '#cap-blanc');
+test('the dev tools stay off a phone, and so do the keys on the keys line', async ({ page }) => {
+  await open(page, '');
   await expect(page.locator('.dev-bar')).toHaveCount(0);
-  await expect(page.locator('.controls')).toBeHidden();
+  // The line is there for the account and the build; the words for keys are not drawn.
+  expect(await page.locator('.controls').evaluate((e) => getComputedStyle(e).fontSize)).toBe('0px');
 });
 
 test('a thumb on the right arrow walks him right, and the other thumb jumps while it holds', async ({ page }) => {
@@ -283,6 +284,30 @@ test('the sound button is M', async ({ page }) => {
   await page.getByRole('button', { name: 'Sound' }).tap();
   expect(await page.evaluate(() => (window as unknown as W).__game.audio.isMuted as boolean)).toBe(!before);
   await page.getByRole('button', { name: 'Sound' }).tap();
+});
+
+// The account is only there where the API answers (playwright.config.ts, 'api').
+test.describe('with accounts', () => {
+  test.use({ baseURL: 'http://localhost:8788' });
+
+  test('on the map the account is at the foot of the left column, off the game, and opens; in a level the arrows are there', async ({ page }) => {
+    await open(page, '');
+    const link = page.locator('#account-link');
+    await expect(link).toBeVisible();
+    const r = await box(page, '#account-link');
+    const screen = await box(page, 'canvas#game');
+    expect(overlaps(r, screen)).toBe(false);
+    expect(r.x + r.width).toBeLessThanOrEqual(screen.x);
+    // The first tap: a page that went full screen at it would cover the dialog it opened.
+    await link.tap();
+    await expect(page.locator('dialog#account')).toBeVisible();
+    await page.waitForTimeout(300);
+    expect(await page.evaluate(() => document.fullscreenElement === null)).toBe(true);
+    await page.locator('#account-close').tap();
+
+    await open(page, '#cap-blanc');
+    await expect(page.locator('.controls')).toBeHidden();
+  });
 });
 
 test('the page can be kept on a home screen, full screen and sideways', async ({ page, request }) => {

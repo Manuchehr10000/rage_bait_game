@@ -11,7 +11,9 @@ import { VIEW_H, VIEW_W } from '../engine/types';
  * the arrow it pressed is still pressing it, and one that slides from one arrow to
  * the other is pressing the other. A thumb is only let go of where it is lifted.
  * Above them, the keys a keyboard has for the rest: the map (Escape), give up (R),
- * the lamp where it runs down (L), the sound (M), and full screen.
+ * the lamp where it runs down (L), the sound (M), and full screen. The keys line under
+ * the screen is not read on a phone; what it holds besides keys, the account and the
+ * build, is kept at the foot of the left column, where the arrows are in a level.
  *
  * Held upright, the phone is asked to turn and the game waits. Android goes full
  * screen and turns itself at the first tap. Safari on an iPhone lets no page do
@@ -74,7 +76,11 @@ html.touch { overflow: hidden; overscroll-behavior: none; }
 html.touch body { position: fixed; inset: 0; display: block; overflow: hidden; overscroll-behavior: none;
   touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
   -webkit-tap-highlight-color: transparent; }
-html.touch .controls { display: none; }
+html.touch .controls { position: fixed; box-sizing: border-box; margin: 0; font-size: 0; line-height: 1.5;
+  display: flex; flex-direction: column; justify-content: flex-end; align-items: flex-start; overflow-wrap: anywhere; }
+html.touch .controls > .account-slot:not([hidden]), html.touch .controls > #stamp { font-size: 11px; }
+html.touch #account-link { text-align: left; }
+html.touch dialog, html.touch dialog * { touch-action: auto; user-select: text; -webkit-user-select: text; -webkit-touch-callout: default; }
 html.touch canvas#game { position: fixed; }
 .touch-zone { position: fixed; touch-action: none; }
 .touch-btn { position: absolute; box-sizing: border-box; display: flex; align-items: center; justify-content: center;
@@ -151,6 +157,8 @@ export class TouchControls {
   private readonly hint: HTMLElement;
   /** Measures the phone's notch and rounded corners: the safe area, as padding. */
   private readonly probe: HTMLElement;
+  /** The keys line under the screen (index.html): on a phone, only the account and the build on it are shown. */
+  private readonly line: HTMLElement | null = document.querySelector('.controls');
 
   /** Each thumb on a column, by pointer, and the pad it is pressing. */
   private readonly thumbs = new Map<number, Pad>();
@@ -230,15 +238,20 @@ export class TouchControls {
       if (document.hidden) this.letGo();
     });
     // A long press is not a menu, and two fingers are not a zoom.
-    window.addEventListener('contextmenu', (e) => e.preventDefault());
+    // A field in a dialog (the account's) keeps its menu: an emailed code is pasted.
+    window.addEventListener('contextmenu', (e) => {
+      if (!(e.target instanceof Element && e.target.closest('dialog'))) e.preventDefault();
+    });
     document.addEventListener('gesturestart', (e) => e.preventDefault());
     // The browser lets sound start, and full screen be asked for, only at the end of a tap.
-    const gesture = () => {
+    // Not at a tap that opens a dialog, or is in one: full screen arriving after it would
+    // cover the dialog, which still takes every tap, and the page would look stuck.
+    const gesture = (e: Event) => {
       host.gesture();
-      if (!this.askedFull) {
-        this.askedFull = true;
-        this.fullscreen(false);
-      }
+      if (this.askedFull) return;
+      if (e.target instanceof Element && e.target.closest('dialog, .controls')) return;
+      this.askedFull = true;
+      this.fullscreen(false);
     };
     window.addEventListener('pointerup', gesture, true);
     window.addEventListener('touchend', gesture, true);
@@ -317,6 +330,8 @@ export class TouchControls {
     fix(this.sound, vw - EDGE - 2 * SMALL - GAP, sy);
     // The lamp just above the jump, where the right thumb already is.
     fix(this.lamp, vw - EDGE - SMALL, vh - bottom - jump - GAP - SMALL);
+    // The account and the build, at the foot of the left column, where nothing else is on the map.
+    if (this.line) place(this.line, EDGE, vh - bottom - thumb, Math.max(0, col - 2 * EDGE), thumb);
     return { scale };
   }
 
@@ -336,6 +351,8 @@ export class TouchControls {
     this.sound.innerHTML = svg(v.muted ? ICON.muted : ICON.sound);
     this.sound.hidden = false;
     this.full.hidden = !full;
+    // In a level the arrows are there instead.
+    if (this.line) this.line.style.visibility = v.pads ? 'hidden' : '';
   }
 
   /** A thumb comes down on a column. */

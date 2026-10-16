@@ -101,8 +101,10 @@ on it (`src/touch/controls.ts`): left and right under the left thumb, jump under
 right. Each side's whole column takes its thumb, so a thumb that slides off its arrow is
 still pressing it, and one that slides onto the other arrow presses that one. Above them
 are the map (Escape), give up (R), the sound (M) and full screen, and above jump the lamp,
-in a level where it runs down (L). A tap on the exit label goes on, as Enter does. Held
-upright, the phone is asked to turn and the game waits.
+in a level where it runs down (L). A tap on the exit label goes on, as Enter does. The
+keys line under the screen is not shown; the account link and the build stamp on it are,
+at the foot of the left column on the map. Held upright, the phone is asked to turn and
+the game waits.
 
 Android goes full screen and turns sideways at the first tap. Safari on an iPhone lets no
 page do either: there the full-screen button says how to add the game to the home screen,
