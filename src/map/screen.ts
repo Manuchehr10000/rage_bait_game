@@ -110,6 +110,8 @@ function chapterStamped(c: Chapter, progress: Progress): boolean {
 
 export class MapScreen {
   view: MapView = 'world';
+  /** Played on a phone's screen (src/touch/): the hints name taps and buttons, not keys. */
+  touch = false;
   chapter = 0;
   site = 0;
   private t = 0;
@@ -555,18 +557,19 @@ export class MapScreen {
     ctx.fillStyle = INK_SOFT;
     ctx.fillText(monument.name, px, (v.y + v.h + 6) * s);
 
-    // What pressing Enter does, and the lifetime counter.
+    // What pressing Enter does, or tapping on a phone, and the lifetime counter.
+    const enter = this.touch ? 'Tap it' : 'Enter';
     if (this.view === 'world') {
       const open = chapterOpen(c);
       ctx.font = `${5 * s}px ${FONT}`;
       ctx.fillStyle = open ? ROUTE : INK_SOFT;
-      ctx.fillText(open ? 'Enter to visit' : 'Closed', px, 127 * s);
+      ctx.fillText(open ? `${enter} to visit` : 'Closed', px, 127 * s);
     } else {
       const sel = c.sites[this.site];
       // Built but not reached yet is 'Not yet' (only in the prod build, engine/progress.ts); never
       // built, or held back from this build (atlas.ts, chaptersFor), is 'Closed'.
       const reached = !!sel?.level && this.progress.isOpen(sel.level);
-      const hint = !sel?.level ? 'Closed' : this.progress.isCleared(sel.level) ? 'Enter to visit again' : reached ? 'Enter to visit' : 'Not yet';
+      const hint = !sel?.level ? 'Closed' : this.progress.isCleared(sel.level) ? `${enter} to visit again` : reached ? `${enter} to visit` : 'Not yet';
       ctx.fillStyle = LAND_LINE;
       ctx.fillRect(px, 100 * s, pw, 0.6 * s);
       ctx.font = `bold ${5.5 * s}px ${FONT}`;
@@ -577,7 +580,7 @@ export class MapScreen {
       ctx.fillText(hint, px, 118 * s);
       ctx.font = `italic ${4.5 * s}px ${FONT}`;
       ctx.fillStyle = INK_SOFT;
-      ctx.fillText('Esc for the world', px, 127 * s);
+      ctx.fillText(this.touch ? 'Top left for the world' : 'Esc for the world', px, 127 * s);
     }
     ctx.font = `${4.5 * s}px ${FONT}`;
     ctx.fillStyle = INK_SOFT;

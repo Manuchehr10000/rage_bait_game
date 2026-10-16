@@ -14,6 +14,7 @@ import { MapScreen } from './map/screen';
 import { renderWorld, type Scene, type WorldText } from './render/scene';
 import { DevTools } from './dev/tools';
 import { Account, GuestStore } from './account';
+import { TouchControls, touchWanted } from './touch/controls';
 import type { RulerView } from './dev/ruler';
 import { ART_SCALE, DEATH_SOUND, DT, overlaps, TILE, VIEW_H, VIEW_W, type DeathCause, type Rect } from './engine/types';
 
@@ -37,6 +38,12 @@ const DEV_TOOLS = __BUILD_ENV__ !== 'prod';
  * always has, and does not carry the code (designer, 2026-10-16: dev only first).
  */
 const ACCOUNTS = __BUILD_ENV__ !== 'prod';
+
+/**
+ * The buttons on a phone's screen (src/touch/). In every build but prod until the designer
+ * has played them on a phone (2026-10-16): `__TOUCH__`, vite.config.ts, says which.
+ */
+const TOUCH = __TOUCH__;
 
 /**
  * The tour this build plays. Prod's, which main deploys, leaves out the levels held back from
@@ -158,8 +165,10 @@ export class Game {
 
   private stats: Stats = { total: 0, byCause: new Map() };
 
-  /** The ruler, the pointer readout and the teleport. Null in prod. */
+  /** The ruler, the pointer readout and the teleport. Null in prod, and on a phone. */
   private readonly dev: DevTools | null;
+  /** The buttons on a phone's screen. Null everywhere else. */
+  private readonly touch: TouchControls | null;
   /** Where the dev tools start this level from instead of its spawn. Always null in prod. */
   private devStart: { x: number; y: number } | null = null;
 
@@ -182,7 +191,29 @@ export class Game {
     this.wctx = wctx;
 
     this.input = new Input(window);
-    this.dev = DEV_TOOLS
+    const input = this.input;
+    this.touch =
+      TOUCH && touchWanted()
+        ? new TouchControls(canvas, {
+            press: (code) => input.press(code),
+            release: (code) => input.release(code),
+            // The exit label is read and then tapped through, as Enter does.
+            tapScreen: () => {
+              if (this.screen !== 'level' || this.state !== 'complete') return;
+              input.press('Enter');
+              input.release('Enter');
+            },
+            toggleMute: () => {
+              this.audio.unlock();
+              this.audio.toggleMute();
+            },
+            gesture: () => this.audio.unlock(),
+            resized: () => this.resize(),
+          })
+        : null;
+    this.map.touch = this.touch !== null;
+    // The dev tools are read with a mouse and a keyboard. A phone gets the game as a player has it.
+    this.dev = DEV_TOOLS && !this.touch
       ? new DevTools(canvas, {
           camera: () => (this.screen === 'level' ? this.camera : null),
           startAt: (x, feetY) => this.startAt(x, feetY),
@@ -388,6 +419,14 @@ export class Game {
   // ---------------------------------------------------------------------
 
   private resize(): void {
+    if (this.touch) {
+      const s = this.touch.layout().scale;
+      this.scale = s;
+      this.canvas.width = VIEW_W * s;
+      this.canvas.height = VIEW_H * s;
+      this.ctx.imageSmoothingEnabled = s !== ART_SCALE;
+      return;
+    }
     // Room under the screen for the controls line, and for the dev tools' buttons where there are any.
     const below = 40 + (this.dev?.reserve ?? 0);
     const s = Math.max(1, Math.floor(Math.min(window.innerWidth / VIEW_W, (window.innerHeight - below) / VIEW_H)));
@@ -498,11 +537,20 @@ export class Game {
     this.last = now;
     // Slowed by the dev tools' T; always 1 in prod.
     this.acc += elapsed * (this.dev?.timeScale ?? 1);
+    // A phone held upright is asked to turn, and nothing moves until it has.
+    if (this.touch?.blocked) this.acc = 0;
     while (this.acc >= DT) {
       this.tick();
       this.acc -= DT;
     }
     this.draw();
+    this.touch?.show({
+      pads: this.screen === 'level',
+      back: this.screen === 'level' || this.map.view === 'chapter',
+      retry: this.screen === 'level',
+      lamp: this.screen === 'level' && this.lampLife !== undefined ? this.lamp : null,
+      muted: this.audio.isMuted,
+    });
     requestAnimationFrame((t) => this.frame(t));
   }
 
@@ -783,6 +831,7 @@ export class Game {
       tricks: this.tricksCount(),
       exitCard: this.level.data.exitCard ?? 'centre',
       title: this.titleTimer > 0 ? Math.min(1, this.titleTimer / 0.4, (TITLE_TIME - this.titleTimer) / 0.4) : 0,
+      touch: this.touch !== null,
     });
     this.dev?.draw(this.ctx, this.scale, this.rulerView());
   }

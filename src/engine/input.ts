@@ -1,6 +1,8 @@
 /**
- * Keyboard input. Jump is edge-triggered here and buffered in the player,
- * so a press a few frames before landing still counts. Controls never lie.
+ * Keyboard input, and the buttons on a phone's screen (src/touch/), which press
+ * keys of their own here and nothing else. Jump is edge-triggered here and
+ * buffered in the player, so a press a few frames before landing still counts.
+ * Controls never lie.
  */
 export class Input {
   private down = new Set<string>();
@@ -18,24 +20,31 @@ export class Input {
         return;
       }
       if (GAME_KEYS.has(e.code)) e.preventDefault();
-      this.down.add(e.code);
-      this.pressed.add(e.code);
-      if (JUMP_KEYS.has(e.code)) this.jumpQueued = true;
-      if (e.code === 'KeyR') this.restartQueued = true;
-      if (e.code === 'Enter') this.nextQueued = true;
+      this.press(e.code);
     });
-    target.addEventListener('keyup', (e) => {
-      this.down.delete(e.code);
-    });
+    target.addEventListener('keyup', (e) => this.release(e.code));
     target.addEventListener('blur', () => this.down.clear());
   }
 
+  /** A key goes down: from the keyboard, or from a button on the screen, by the code it stands for. */
+  press(code: string): void {
+    this.down.add(code);
+    this.pressed.add(code);
+    if (JUMP_KEYS.has(code)) this.jumpQueued = true;
+    if (code === 'KeyR') this.restartQueued = true;
+    if (code === 'Enter') this.nextQueued = true;
+  }
+
+  release(code: string): void {
+    this.down.delete(code);
+  }
+
   get left(): boolean {
-    return this.down.has('ArrowLeft') || this.down.has('KeyA');
+    return this.down.has('ArrowLeft') || this.down.has('KeyA') || this.down.has('TouchLeft');
   }
 
   get right(): boolean {
-    return this.down.has('ArrowRight') || this.down.has('KeyD');
+    return this.down.has('ArrowRight') || this.down.has('KeyD') || this.down.has('TouchRight');
   }
 
   get jumpHeld(): boolean {
@@ -73,7 +82,11 @@ export class Input {
   }
 }
 
-const JUMP_KEYS = new Set(['Space', 'ArrowUp', 'KeyW', 'KeyZ', 'KeyK']);
+/**
+ * The screen's own codes are not keys a keyboard has, so a thumb and a key never
+ * let go of each other's press. The map reads arrows only: it is tapped on a phone.
+ */
+const JUMP_KEYS = new Set(['Space', 'ArrowUp', 'KeyW', 'KeyZ', 'KeyK', 'TouchJump']);
 const GAME_KEYS = new Set([
   ...JUMP_KEYS,
   'ArrowLeft',

@@ -25,11 +25,13 @@ export interface HudState {
   exitCard: 'centre' | 'right';
   /** 0 hidden, 1 fully shown. */
   title: number;
+  /** Played on a phone's screen (src/touch/): the label names a tap and the buttons, not keys. */
+  touch: boolean;
 }
 
 /** Everything textual is drawn on the scaled canvas so it stays legible. */
 export function renderHud(ctx: CanvasRenderingContext2D, scale: number, h: HudState): void {
-  const { stats, lifetime, texts: worldTexts, camX, camY, complete, hasNext, levelName, title, tricks, exitCard } = h;
+  const { stats, lifetime, texts: worldTexts, camX, camY, complete, hasNext, levelName, title, tricks, exitCard, touch } = h;
   const W = VIEW_W * scale;
   const H = VIEW_H * scale;
 
@@ -58,7 +60,7 @@ export function renderHud(ctx: CanvasRenderingContext2D, scale: number, h: HudSt
   ctx.fillText(String(stats.total), 6 * scale, 11 * scale);
 
   if (title > 0 && !complete) drawTitle(ctx, scale, levelName, W, title);
-  if (complete) drawExitLabel(ctx, scale, stats, lifetime, W, H, levelName, hasNext, tricks, exitCard);
+  if (complete) drawExitLabel(ctx, scale, stats, lifetime, W, H, levelName, hasNext, tricks, exitCard, touch);
 }
 
 /** A museum label, briefly, when you arrive. Not on retries. */
@@ -93,6 +95,7 @@ function drawExitLabel(
   hasNext: boolean,
   tricks: { met: number; of: number } | null,
   anchor: 'centre' | 'right',
+  touch: boolean,
 ): void {
   const rows: [string, string][] = [];
   for (const [cause, n] of [...stats.byCause.entries()].sort((a, b) => b[1] - a[1])) {
@@ -155,5 +158,11 @@ function drawExitLabel(
   ty += lineH * 1.4;
   ctx.textAlign = 'center';
   ctx.font = `italic ${5.5 * scale}px ${LABEL_FONT}`;
-  ctx.fillText(hasNext ? 'Enter for the next site. R to visit again. Esc for the map.' : 'Enter for the map. R to visit again.', x + boxW / 2, ty);
+  ctx.fillText(nextLine(hasNext, touch), x + boxW / 2, ty);
+}
+
+/** What the last line of the exit label says the keys, or on a phone the screen and its buttons, do. */
+function nextLine(hasNext: boolean, touch: boolean): string {
+  if (touch) return hasNext ? 'Tap for the next site. Top left to visit again, or for the map.' : 'Tap for the map. Top left to visit again.';
+  return hasNext ? 'Enter for the next site. R to visit again. Esc for the map.' : 'Enter for the map. R to visit again.';
 }

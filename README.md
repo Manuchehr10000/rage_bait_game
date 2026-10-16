@@ -94,6 +94,25 @@ source goes to main when dev is promoted; the code does not go to prod. The prod
 refuses to finish if anything from `src/dev/`, or a level held back from prod, is in its
 bundle, and CI builds prod on every push to prove it.
 
+## On a phone
+
+Held sideways, the game is as big as the phone allows with the buttons beside it, never
+on it (`src/touch/controls.ts`): left and right under the left thumb, jump under the
+right. Each side's whole column takes its thumb, so a thumb that slides off its arrow is
+still pressing it, and one that slides onto the other arrow presses that one. Above them
+are the map (Escape), give up (R), the sound (M) and full screen, and above jump the lamp,
+in a level where it runs down (L). A tap on the exit label goes on, as Enter does. Held
+upright, the phone is asked to turn and the game waits.
+
+Android goes full screen and turns sideways at the first tap. Safari on an iPhone lets no
+page do either: there the full-screen button says how to add the game to the home screen,
+which opens it with no browser around it (the manifest, `vite.config.ts`).
+
+It turns on wherever the screen is touched rather than pointed at; `?touch` turns it on
+for a mouse, `?touch=0` off. The dev tools stay off a phone. Every build but prod has it
+until the designer has played it on a phone (2026-10-16): `touch` in `vite.config.ts`
+releases it, and until then the prod build refuses a bundle with any of `src/touch/` in it.
+
 `npm test` runs scripted playthroughs in headless Chromium. Each one checks a design
 contract: the trap fires for the naive player and can be avoided by the one who remembers.
 It builds the game first, every time, so it always tests the source as it is; so does

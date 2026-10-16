@@ -79,6 +79,12 @@ notes describe the levels as they were built.
   only first: prod keeps the tour in localStorage, carries no account code (checked by
   vite.config.ts), and has no database bound, so its `/api` answers 404. How to run it and
   what to configure: README, "Accounts".
+- **On a phone** (designer, 2026-10-16): held sideways, buttons in the side borders and
+  never over the game (the game is drawn smaller for them); left and right under the left
+  thumb, jump under the right; map, give up, lamp, sound and full screen as small buttons;
+  iPhone is played from the home screen, and a phone held upright is asked to turn. In
+  every build but prod until the designer has played it on a phone: released by `touch`
+  in vite.config.ts (README, "On a phone").
 - **Open:** Apep or Sekhmet for chapter 2's legend; whether Karnak's exit has already spent
   the false completion (pillar 10, `content/tricks.md`).
 
