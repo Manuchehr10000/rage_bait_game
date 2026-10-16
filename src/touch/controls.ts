@@ -29,8 +29,8 @@ export interface TouchHost {
   /** A key down or up, by its code, as src/engine/input.ts knows it. */
   press(code: string): void;
   release(code: string): void;
-  /** The screen itself was tapped. */
-  tapScreen(): void;
+  /** The screen itself was tapped, at this page point. */
+  tapScreen(x: number, y: number): void;
   /** Turn the sound off or on. */
   toggleMute(): void;
   /** A tap the browser counts as the player's own: sound may start on it. */
@@ -62,6 +62,16 @@ type Pad = 'TouchLeft' | 'TouchRight' | 'TouchJump';
 /** Gaps, in CSS px. */
 const EDGE = 12;
 const GAP = 8;
+/**
+ * How far the thumbs' buttons keep in from the side of the phone. A swipe inward from
+ * the outermost strip is the system's back, on Android and in Safari, and a thumb
+ * rocking from one arrow to the other is a swipe inward.
+ */
+const OUTER = 24;
+/** How far a finger may move on the screen and still be a tap. */
+const TAP_SLOP = 12;
+/** A click this soon after a finger or mouse on a button is that press's own, in ms. */
+const CLICK_AFTER = 1000;
 /** A thumb's button, as a share of the phone's short side, and the most and least it may be. */
 const THUMB = 0.14;
 const THUMB_MIN = 48;
@@ -166,8 +176,10 @@ export class TouchControls {
   private held = new Set<Pad>();
   /** Where the left column parts its arrows: left of this x is left. Page px. */
   private split = 0;
-  /** Asked for full screen once, at the first tap. After that, only the button asks. */
+  /** Asked for full screen once, at the first tap. After that, only the button asks, and a tap on the turn screen. */
   private askedFull = false;
+  /** The finger that came down on the game last, and where: a tap if it comes up near there. */
+  private tap: { id: number; x: number; y: number } | null = null;
   private hintTimer = 0;
   private shown = '';
   private upright = false;
@@ -245,17 +257,34 @@ export class TouchControls {
     document.addEventListener('gesturestart', (e) => e.preventDefault());
     // The browser lets sound start, and full screen be asked for, only at the end of a tap.
     // Not at a tap that opens a dialog, or is in one: full screen arriving after it would
-    // cover the dialog, which still takes every tap, and the page would look stuck.
+    // cover the dialog, which still takes every tap, and the page would look stuck. Asked
+    // again at any tap on the turn screen: a phone that will not turn itself (Android with
+    // rotation locked) is turned by full screen, and nothing else there can be tapped.
     const gesture = (e: Event) => {
       host.gesture();
-      if (this.askedFull) return;
+      // Both arrive for one tap; full screen is asked for once, at the pointer's.
+      if (e.type !== 'pointerup') return;
+      if (this.askedFull && !this.upright) return;
       if (e.target instanceof Element && e.target.closest('dialog, .controls')) return;
       this.askedFull = true;
       this.fullscreen(false);
     };
     window.addEventListener('pointerup', gesture, true);
     window.addEventListener('touchend', gesture, true);
-    canvas.addEventListener('click', () => host.tapScreen());
+    // A tap on the game is a finger down and up on it, not the browser's click, which it
+    // never sends while another finger is down: the thumb that walked him to the exit is.
+    canvas.addEventListener('pointerdown', (e) => {
+      this.tap = { id: e.pointerId, x: e.clientX, y: e.clientY };
+    });
+    canvas.addEventListener('pointerup', (e) => {
+      const t = this.tap;
+      if (!t || t.id !== e.pointerId) return;
+      this.tap = null;
+      if (Math.hypot(e.clientX - t.x, e.clientY - t.y) <= TAP_SLOP) host.tapScreen(e.clientX, e.clientY);
+    });
+    canvas.addEventListener('pointercancel', (e) => {
+      if (this.tap?.id === e.pointerId) this.tap = null;
+    });
 
     // A phone that turns says so late, and a browser bar that comes and goes says so only here.
     const again = () => host.resized();
@@ -272,8 +301,12 @@ export class TouchControls {
     return this.upright;
   }
 
-  /** Where everything goes on this screen, and the scale the game should draw at. */
-  layout(): TouchLayout {
+  /**
+   * Where everything goes on this screen, and the scale the game should draw at. A crisp
+   * level (LevelData.crisp) is drawn a whole number of device px to the world px, smaller
+   * if need be, so every world px is the same square.
+   */
+  layout(crisp: boolean): TouchLayout {
     const vw = window.innerWidth;
     const vh = window.innerHeight;
     const css = getComputedStyle(this.probe);
@@ -289,16 +322,20 @@ export class TouchControls {
 
     // A column wide enough for two arrows side by side, or for what the notch takes, whichever is more.
     const thumb = Math.round(Math.min(THUMB_MAX, Math.max(THUMB_MIN, Math.min(vw, vh) * THUMB)));
-    const side = Math.max(inset.left, inset.right, EDGE + thumb + GAP + thumb + GAP);
+    const side = Math.max(inset.left, inset.right, OUTER + thumb + GAP + thumb + GAP);
     // Device px per world px. The canvas is a whole number of device px wide and high, so a
-    // world px is the same size everywhere on it.
-    const dpr = Math.min(3, Math.max(1, window.devicePixelRatio || 1));
-    const fit = Math.max(1 / 16, Math.min((vw - 2 * side) / VIEW_W, vh / VIEW_H));
-    const scale = Math.max(1, Math.floor((VIEW_W * fit * dpr) / 16)) * (16 / VIEW_W);
+    // world px is the same size everywhere on it; and it sits on whole device px, so the
+    // phone shows it as drawn. Clear of the home bar.
+    const dpr = Math.max(1, window.devicePixelRatio || 1);
+    const room = vh - inset.top - inset.bottom;
+    const fit = Math.max(1 / 16, Math.min((vw - 2 * side) / VIEW_W, room / VIEW_H));
+    const scale = crisp
+      ? Math.max(1, Math.floor(fit * dpr))
+      : Math.max(1, Math.floor((VIEW_W * fit * dpr) / 16)) * (16 / VIEW_W);
     const w = (VIEW_W * scale) / dpr;
     const h = (VIEW_H * scale) / dpr;
-    const x = (vw - w) / 2;
-    const y = (vh - h) / 2;
+    const x = Math.round(((vw - w) / 2) * dpr) / dpr;
+    const y = Math.round((inset.top + (room - h) / 2) * dpr) / dpr;
     const c = this.canvas.style;
     c.width = `${w}px`;
     c.height = `${h}px`;
@@ -311,27 +348,30 @@ export class TouchControls {
     place(this.left, 0, top, col, vh - top);
     place(this.right, vw - col, top, col, vh - top);
 
-    // The thumbs' buttons sit low, clear of the home bar; the arrows from the outer edge.
+    // The thumbs' buttons sit low, clear of the home bar, and in from the side.
     const bottom = Math.max(EDGE, inset.bottom);
     const by = vh - top - bottom - thumb;
-    const lx = EDGE;
+    const lx = OUTER;
     // In px from the column's corner; the left column's is the page's.
     place(this.buttons.TouchLeft, lx, by, thumb, thumb);
     place(this.buttons.TouchRight, lx + thumb + GAP, by, thumb, thumb);
     this.split = lx + thumb + GAP / 2;
     const jump = Math.round(thumb * 1.15);
-    place(this.buttons.TouchJump, col - EDGE - jump, vh - top - bottom - jump, jump, jump);
+    place(this.buttons.TouchJump, col - OUTER - jump, vh - top - bottom - jump, jump, jump);
 
-    // The small buttons: the way out at the top of the left column, the rest at the top of the right.
+    // The small buttons: the way out at the top of the left column, the rest at the top of the
+    // right; inside the rounded corners and the notch.
     const sy = Math.max(EDGE, inset.top);
-    fix(this.back, EDGE, sy);
-    fix(this.retry, EDGE + SMALL + GAP, sy);
-    fix(this.full, vw - EDGE - SMALL, sy);
-    fix(this.sound, vw - EDGE - 2 * SMALL - GAP, sy);
+    const sl = Math.max(EDGE, inset.left);
+    const sr = vw - Math.max(EDGE, inset.right);
+    fix(this.back, sl, sy);
+    fix(this.retry, sl + SMALL + GAP, sy);
+    fix(this.full, sr - SMALL, sy);
+    fix(this.sound, sr - 2 * SMALL - GAP, sy);
     // The lamp just above the jump, where the right thumb already is.
-    fix(this.lamp, vw - EDGE - SMALL, vh - bottom - jump - GAP - SMALL);
+    fix(this.lamp, vw - OUTER - SMALL, vh - bottom - jump - GAP - SMALL);
     // The account and the build, at the foot of the left column, where nothing else is on the map.
-    if (this.line) place(this.line, EDGE, vh - bottom - thumb, Math.max(0, col - 2 * EDGE), thumb);
+    if (this.line) place(this.line, OUTER, vh - bottom - thumb, Math.max(0, col - OUTER - EDGE), thumb);
     return { scale };
   }
 
@@ -350,7 +390,8 @@ export class TouchControls {
     this.lamp.classList.toggle('lit', v.lamp === true);
     this.sound.innerHTML = svg(v.muted ? ICON.muted : ICON.sound);
     this.sound.hidden = false;
-    this.full.hidden = !full;
+    // On an iPhone the button only says how the home screen does it: not over a level running.
+    this.full.hidden = !full || (v.pads && !fullscreenEnabled());
     // In a level the arrows are there instead.
     if (this.line) this.line.style.visibility = v.pads ? 'hidden' : '';
   }
@@ -461,8 +502,27 @@ function small(icon: string, label: string, act: () => void): HTMLButtonElement 
   b.hidden = true;
   // Never focused: a focused button would take the next Space, which is a jump.
   b.tabIndex = -1;
-  b.addEventListener('pointerdown', (e) => e.preventDefault());
-  b.addEventListener('click', act);
+  // Pressed when the finger lifts on it, not at the browser's click, which it never sends
+  // while another finger is down: a thumb on an arrow is. The lift is when full screen may
+  // be asked for. A click with no finger or mouse behind it (a screen reader's) still counts;
+  // the click that follows a finger's lift is that press, and does not count again.
+  const down = new Set<number>();
+  let pointed = -Infinity;
+  b.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    down.add(e.pointerId);
+    pointed = performance.now();
+  });
+  b.addEventListener('pointerup', (e) => {
+    pointed = performance.now();
+    if (!down.delete(e.pointerId)) return;
+    const r = b.getBoundingClientRect();
+    if (e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom) act();
+  });
+  b.addEventListener('pointercancel', (e) => down.delete(e.pointerId));
+  b.addEventListener('click', () => {
+    if (performance.now() - pointed > CLICK_AFTER) act();
+  });
   return b;
 }
 

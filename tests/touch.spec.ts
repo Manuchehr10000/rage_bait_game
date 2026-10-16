@@ -84,6 +84,22 @@ async function held(page: Page): Promise<{ left: boolean; right: boolean; jump: 
   });
 }
 
+/** A tap of one finger, down and up where it went down. */
+async function tapWith(t: Thumbs, id: number, p: { x: number; y: number }): Promise<void> {
+  await t.down(id, p);
+  await t.up(id);
+}
+
+async function game<T>(page: Page, f: string): Promise<T> {
+  return page.evaluate(`(() => { const g = window.__game; return ${f}; })()`) as Promise<T>;
+}
+
+/** A world point of the canvas as a page point. */
+async function worldToPage(page: Page, p: { x: number; y: number }): Promise<{ x: number; y: number }> {
+  const r = await box(page, 'canvas#game');
+  return { x: Math.round(r.x + (p.x / 320) * r.width), y: Math.round(r.y + (p.y / 180) * r.height) };
+}
+
 test('a phone gets the touch screen without being asked, and a desktop never does', async ({ page }) => {
   await page.goto('/#cap-blanc');
   await page.waitForFunction(() => (window as unknown as Partial<W>).__game !== undefined);
@@ -149,6 +165,20 @@ for (const size of [
     expect(px.w).toBeCloseTo(px.css * px.dpr, 0);
   });
 }
+
+test.describe('a phone with more than three device px to the CSS px', () => {
+  test.use({ deviceScaleFactor: 3.5 });
+
+  test('is drawn at its own pixels, not stretched', async ({ page }) => {
+    await open(page, '#cap-blanc');
+    const px = await page.evaluate(() => {
+      const c = document.getElementById('game') as HTMLCanvasElement;
+      return { w: c.width, css: c.getBoundingClientRect().width, dpr: devicePixelRatio };
+    });
+    expect(px.dpr).toBe(3.5);
+    expect(px.w).toBeCloseTo(px.css * px.dpr, 0);
+  });
+});
 
 test('the dev tools stay off a phone, and so do the keys on the keys line', async ({ page }) => {
   await open(page, '');
@@ -284,6 +314,170 @@ test('the sound button is M', async ({ page }) => {
   await page.getByRole('button', { name: 'Sound' }).tap();
   expect(await page.evaluate(() => (window as unknown as W).__game.audio.isMuted as boolean)).toBe(!before);
   await page.getByRole('button', { name: 'Sound' }).tap();
+});
+
+test('with a thumb on an arrow, the other thumb still works every small button', async ({ page }) => {
+  await open(page, '#gargas');
+  const t = await thumbs(page);
+  const right = centre(await box(page, '.touch-btn >> nth=1'));
+  await page.evaluate(() => {
+    (window as unknown as W).__game.lampOn = true;
+  });
+  await t.down(1, right);
+
+  await tapWith(t, 2, centre(await box(page, '.touch-small[aria-label="Lamp"]')));
+  await game(page, 'g.tick()');
+  expect(await game(page, 'g.lamp')).toBe(false);
+  // Still walking, and the lamp's tap was not a jump.
+  expect(await held(page)).toEqual({ left: false, right: true, jump: false });
+
+  const muted = await game<boolean>(page, 'g.audio.isMuted');
+  await tapWith(t, 3, centre(await box(page, '.touch-small[aria-label="Sound"]')));
+  expect(await game(page, 'g.audio.isMuted')).toBe(!muted);
+  await tapWith(t, 3, centre(await box(page, '.touch-small[aria-label="Sound"]')));
+
+  await tapWith(t, 4, centre(await box(page, '.touch-small[aria-label="Give up"]')));
+  await game(page, 'g.tick()');
+  expect(await game(page, "g.stats.byCause.get('Gave up')")).toBe(1);
+  await t.up(1);
+});
+
+test('with a thumb still on the arrow, a tap on the exit label goes on', async ({ page }) => {
+  await open(page, '#cap-blanc');
+  const t = await thumbs(page);
+  await t.down(1, centre(await box(page, '.touch-btn >> nth=1')));
+  await page.evaluate(() => {
+    (window as unknown as W).__game.state = 'complete';
+  });
+  const screen = await box(page, 'canvas#game');
+  await tapWith(t, 2, centre(screen));
+  await page.waitForFunction(() => (window as unknown as W).__game.levelData.id !== 'cap-blanc');
+  await t.up(1);
+});
+
+test('a tap on the map enters what it is on, once', async ({ page }) => {
+  await open(page, '');
+  const t = await thumbs(page);
+  const badge = await game<{ x: number; y: number }>(page, 'g.mapScreen.worldBadge(0)');
+  await tapWith(t, 1, await worldToPage(page, badge));
+  await page.waitForTimeout(200);
+  expect(await game(page, 'g.mapScreen.view')).toBe('chapter');
+  // The same tap did not go on into a site.
+  expect(await game(page, 'g.currentScreen')).toBe('map');
+});
+
+test('a jump tapped on the exit label is not spent on the map: the map button stays on the map', async ({ page }) => {
+  await open(page, '#cap-blanc');
+  const t = await thumbs(page);
+  await page.evaluate(() => {
+    (window as unknown as W).__game.state = 'complete';
+  });
+  await tapWith(t, 1, centre(await box(page, '.touch-zone >> nth=1 >> .touch-btn')));
+  await tapWith(t, 2, centre(await box(page, '.touch-small[aria-label="Map"]')));
+  await page.waitForFunction(() => (window as unknown as W).__game.currentScreen === 'map');
+  await page.waitForTimeout(300);
+  expect(await game(page, 'g.currentScreen')).toBe('map');
+});
+
+test('a jump tapped while he dies is not owed to the next attempt', async ({ page }) => {
+  await open(page, '#cap-blanc');
+  const t = await thumbs(page);
+  await tapWith(t, 4, centre(await box(page, '.touch-small[aria-label="Give up"]')));
+  await game(page, 'g.tick()');
+  expect(await game(page, 'g.state')).toBe('dead');
+  await tapWith(t, 1, centre(await box(page, '.touch-zone >> nth=1 >> .touch-btn')));
+  const after = await page.evaluate(() => {
+    const g = (window as unknown as W).__game;
+    for (let i = 0; i < 120 && g.state !== 'playing'; i++) g.tick();
+    const y0 = g.player.y;
+    for (let i = 0; i < 6; i++) g.tick();
+    return { state: g.state, rose: y0 - g.player.y };
+  });
+  expect(after.state).toBe('playing');
+  expect(after.rose).toBeLessThanOrEqual(0);
+});
+
+test('held upright, a tap on the turn screen asks for full screen again', async ({ page }) => {
+  await page.addInitScript(() => {
+    (window as unknown as { asked: number }).asked = 0;
+    Element.prototype.requestFullscreen = function () {
+      (window as unknown as { asked: number }).asked++;
+      return Promise.reject(new Error('not in a test'));
+    };
+  });
+  await open(page, '#cap-blanc');
+  const t = await thumbs(page);
+  // The first tap asks, once.
+  await tapWith(t, 1, centre(await box(page, 'canvas#game')));
+  await tapWith(t, 1, centre(await box(page, 'canvas#game')));
+  expect(await page.evaluate(() => (window as unknown as { asked: number }).asked)).toBe(1);
+  await page.setViewportSize({ width: PHONE.height, height: PHONE.width });
+  await expect(page.locator('.touch-turn')).toBeVisible();
+  await tapWith(t, 2, { x: 195, y: 422 });
+  expect(await page.evaluate(() => (window as unknown as { asked: number }).asked)).toBe(2);
+});
+
+test('the crisp Minotaur is drawn a whole number of device px to the world px, on whole device px', async ({ page }) => {
+  await open(page, '#minotaur');
+  const c = await page.evaluate(() => {
+    const el = document.getElementById('game') as HTMLCanvasElement;
+    const r = el.getBoundingClientRect();
+    return { w: el.width, h: el.height, x: r.x * devicePixelRatio, y: r.y * devicePixelRatio, css: r.width * devicePixelRatio };
+  });
+  expect(c.w % 320).toBe(0);
+  expect(c.h).toBe((c.w / 320) * 180);
+  // On whole device px, to within the browser's layout grid of 1/64 CSS px.
+  expect(Math.abs(c.x - Math.round(c.x))).toBeLessThan(0.05);
+  expect(Math.abs(c.y - Math.round(c.y))).toBeLessThan(0.05);
+  // Back on the map, as big as it fits again.
+  await page.getByRole('button', { name: 'Map' }).tap();
+  await page.waitForFunction(() => (window as unknown as W).__game.currentScreen === 'map');
+  expect(await page.evaluate(() => (document.getElementById('game') as HTMLCanvasElement).width)).toBeGreaterThanOrEqual(c.w);
+});
+
+test('the buttons keep in from the sides, where a swipe inward is the way back', async ({ page }) => {
+  await open(page, '#cap-blanc');
+  const left = await box(page, '.touch-btn >> nth=0');
+  const jump = await box(page, '.touch-zone >> nth=1 >> .touch-btn');
+  expect(left.x).toBeGreaterThanOrEqual(24);
+  expect(PHONE.width - (jump.x + jump.width)).toBeGreaterThanOrEqual(24);
+});
+
+test("a notched phone's corners and home bar are kept clear", async ({ page }) => {
+  const cdp = await page.context().newCDPSession(page);
+  try {
+    await cdp.send('Emulation.setSafeAreaInsetsOverride' as 'Emulation.setDeviceMetricsOverride', { insets: { top: 0, left: 47, right: 47, bottom: 21 } } as never);
+  } catch {
+    test.skip(true, 'this Chromium cannot pretend to have a notch');
+  }
+  await page.goto('/?touch#cap-blanc');
+  await page.waitForFunction(() => (window as unknown as Partial<W>).__game !== undefined);
+  await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+  const map = await box(page, '.touch-small[aria-label="Map"]');
+  const sound = await box(page, '.touch-small[aria-label="Sound"]');
+  const screen = await box(page, 'canvas#game');
+  expect(map.x).toBeGreaterThanOrEqual(47);
+  expect(PHONE.width - (sound.x + sound.width)).toBeGreaterThanOrEqual(47);
+  expect(screen.y + screen.height).toBeLessThanOrEqual(PHONE.height - 21 + 0.5);
+});
+
+test.describe('an iPhone, whose Safari has no full screen for a page', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => {
+      Object.defineProperty(Document.prototype, 'fullscreenEnabled', { get: () => false });
+      Object.defineProperty(Navigator.prototype, 'userAgent', { get: () => 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X)' });
+    });
+  });
+
+  test('says how the home screen does it, from the map, and never over a level', async ({ page }) => {
+    await open(page, '');
+    const full = page.getByRole('button', { name: 'Full screen' });
+    await expect(full).toBeVisible();
+    await full.tap();
+    await expect(page.locator('.touch-hint')).toBeVisible();
+    await open(page, '#cap-blanc');
+    await expect(full).toBeHidden();
+  });
 });
 
 // The account is only there where the API answers (playwright.config.ts, 'api').

@@ -84,7 +84,8 @@ export class Input {
 
 /**
  * The screen's own codes are not keys a keyboard has, so a thumb and a key never
- * let go of each other's press. The map reads arrows only: it is tapped on a phone.
+ * let go of each other's press. On a phone the map is tapped: the arrows and jump are
+ * not on it, and a jump pressed in a level before it is dropped there (game.ts).
  */
 const JUMP_KEYS = new Set(['Space', 'ArrowUp', 'KeyW', 'KeyZ', 'KeyK', 'TouchJump']);
 const GAME_KEYS = new Set([

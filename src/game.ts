@@ -197,11 +197,14 @@ export class Game {
         ? new TouchControls(canvas, {
             press: (code) => input.press(code),
             release: (code) => input.release(code),
-            // The exit label is read and then tapped through, as Enter does.
-            tapScreen: () => {
-              if (this.screen !== 'level' || this.state !== 'complete') return;
-              input.press('Enter');
-              input.release('Enter');
+            // The map is tapped where a mouse would click it; the exit label is read and then
+            // tapped through, as Enter does.
+            tapScreen: (x, y) => {
+              if (this.screen === 'map') this.pointer(x, y, true);
+              else if (this.state === 'complete') {
+                input.press('Enter');
+                input.release('Enter');
+              }
             },
             toggleMute: () => {
               this.audio.unlock();
@@ -236,10 +239,13 @@ export class Game {
     });
     this.resize();
     window.addEventListener('resize', () => this.resize());
-    canvas.addEventListener('mousemove', (e) => this.pointer(e, false));
+    // On a phone a tap is the touch controls' (tapScreen), and there is nothing to hover.
+    canvas.addEventListener('mousemove', (e) => {
+      if (!this.touch) this.pointer(e.clientX, e.clientY, false);
+    });
     canvas.addEventListener('click', (e) => {
       this.audio.unlock();
-      this.pointer(e, true);
+      if (!this.touch) this.pointer(e.clientX, e.clientY, true);
     });
     if (this.account) {
       this.opened = this.account.boot().then(() => this.open());
@@ -340,11 +346,12 @@ export class Game {
     };
   }
 
-  private pointer(e: MouseEvent, click: boolean): void {
+  /** A mouse over the map, or a tap on it, at a page point. */
+  private pointer(clientX: number, clientY: number, click: boolean): void {
     if (this.screen !== 'map') return;
     const r = this.canvas.getBoundingClientRect();
-    const x = ((e.clientX - r.left) / r.width) * VIEW_W;
-    const y = ((e.clientY - r.top) / r.height) * VIEW_H;
+    const x = ((clientX - r.left) / r.width) * VIEW_W;
+    const y = ((clientY - r.top) / r.height) * VIEW_H;
     this.act(this.map.pointer(x, y, click));
   }
 
@@ -379,6 +386,8 @@ export class Game {
     if (this.level) this.map.showLevel(this.level.data.id);
     else this.map.openWorld();
     this.audio.setMusic(this.mapMusic());
+    // A crisp level on a phone may have been drawn smaller; the map is drawn as big as it fits.
+    if (this.touch) this.resize();
     try {
       history.replaceState(null, '', location.pathname + location.search);
     } catch {
@@ -420,7 +429,7 @@ export class Game {
 
   private resize(): void {
     if (this.touch) {
-      const s = this.touch.layout().scale;
+      const s = this.touch.layout(this.screen === 'level' && this.level?.data.crisp === true).scale;
       this.scale = s;
       this.canvas.width = VIEW_W * s;
       this.canvas.height = VIEW_H * s;
@@ -451,6 +460,8 @@ export class Game {
     this.devStart = null;
     this.titleTimer = TITLE_TIME;
     this.showLampKey();
+    // On a phone a crisp level is drawn a whole number of device px to the world px.
+    if (this.touch) this.resize();
     try {
       history.replaceState(null, '', `#${data.id}`);
     } catch {
@@ -537,8 +548,13 @@ export class Game {
     this.last = now;
     // Slowed by the dev tools' T; always 1 in prod.
     this.acc += elapsed * (this.dev?.timeScale ?? 1);
-    // A phone held upright is asked to turn, and nothing moves until it has.
-    if (this.touch?.blocked) this.acc = 0;
+    // A phone held upright is asked to turn, and nothing moves until it has. The music keeps
+    // its time, as it does everywhere; what the world was making is quiet until he is back.
+    if (this.touch?.blocked) {
+      this.acc = 0;
+      this.audio.update();
+      this.audio.stopLoops();
+    }
     while (this.acc >= DT) {
       this.tick();
       this.acc -= DT;
@@ -578,6 +594,8 @@ export class Game {
     const lampSwitch = this.input.takePressed('KeyL');
     this.input.flush();
     if (this.state === 'complete') {
+      // A jump pressed at the label is not owed to the next level, nor to the map.
+      this.input.takeJumpPressed();
       // A dawn does not stop because he got there. It comes up on him where he stands,
       // which is the end of Dendera. Nothing else in the world is asked to carry on.
       for (const e of this.entities) if (e.def.kind === 'sweep' && e.def.skin === 'dawn') e.update(this.worldView());
@@ -598,6 +616,8 @@ export class Game {
     const world = this.worldView();
 
     if (this.state === 'dead') {
+      // A jump pressed while he dies is not owed to the next attempt, nor to the map.
+      this.input.takeJumpPressed();
       // The tourist is done. The head still lands, the water still rises, the sun still sweeps.
       for (const e of this.entities) e.update(world);
       this.driveLoops();
