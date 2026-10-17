@@ -71,7 +71,7 @@ test("the labyrinth is LEVEL.md's map, cell for cell: 320 by 752 px, 20 by 47 ti
   expect(new Set(MINOTAUR.rows.join(''))).toEqual(new Set(['#', ' ', '=']));
 });
 
-test('a level on the map of the dev and local builds: chapter 3\'s legend, in the tour after Knossos and before Persepolis, entered by its pin or its deep link; held back from prod', () => {
+test('a level on the map of every build: chapter 3\'s legend, in the tour after Knossos and before Persepolis, entered by its pin or its deep link', () => {
   // A dev stage until the designer's word, 2026-10-12: "put it on the map".
   expect(STAGES).not.toContain(MINOTAUR);
   const ids = LEVELS.map((l) => l.id);
@@ -86,9 +86,11 @@ test('a level on the map of the dev and local builds: chapter 3\'s legend, in th
   expect(CHAPTERS.flatMap((c) => c.sites).filter((s) => s.level === 'minotaur')).toHaveLength(1);
   // Its deep link names it in LEVELS, the tour of every build but prod.
   expect(levelIndexFromHash('#minotaur', LEVELS)).toBe(i);
-  // Held back from prod (designer, 2026-10-15): not in its tour, and no pin on its map.
-  expect(PROD_LEVELS).not.toContain(MINOTAUR);
-  expect(chaptersFor(PROD_LEVELS.map((l) => l.id)).flatMap((c) => c.sites).filter((s) => s.level === 'minotaur')).toEqual([]);
+  // Held back from prod on 2026-10-15 and released to it on 2026-10-16 (designer: "Make all
+  // levels available on main"): in its tour in the same place, and its pin on its map.
+  expect(PROD_LEVELS.map((l) => l.id)).toEqual(ids);
+  expect(levelIndexFromHash('#minotaur', PROD_LEVELS)).toBe(i);
+  expect(chaptersFor(PROD_LEVELS.map((l) => l.id)).flatMap((c) => c.sites).filter((s) => s.level === 'minotaur')).toHaveLength(1);
 });
 
 test("the level's data: the bull-leaper, the walk in, the camera on the spawn, the four tricks, the gated exit on the left", () => {

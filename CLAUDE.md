@@ -67,11 +67,11 @@ notes describe the levels as they were built.
   black-figure (three passes, 2026-10-10 and 11; a fourth after the designer's rulings of
   2026-10-11). On the map since the designer's word of 2026-10-12, no longer a stage: in the
   tour after Knossos and before Persepolis (`LEVELS`). Held back from prod by the designer's
-  word of 2026-10-15 ("push to main everything except Minotaur level"): on the map in the dev
-  and local builds only; prod's tour and map leave it out, and its bundle does not carry its
-  level file (`HELD` in `src/levels/index.ts`, its file in `src/levels/held-files.ts`, checked
-  by vite.config.ts). Released by writing it into `PROD_LEVELS` after Knossos and taking it out
-  of `HELD` and `held-files.ts`.
+  word of 2026-10-15 ("push to main everything except Minotaur level"), and released to it by
+  the designer's word of 2026-10-16 ("push to main. Make all levels available on main"): in
+  prod's tour after Knossos (`PROD_LEVELS`), so every built level is on prod's map. A level can
+  still be held back the same way (`HELD` in `src/levels/index.ts`, its file in
+  `src/levels/held-files.ts`, checked by vite.config.ts); none is.
 - **Accounts** (designer, 2026-10-16): a visitor keeps his tour by signing in, with Google
   or with a code sent by email; there is no sign-up, only Continue. A guest's tour lasts
   until the tab closes, and signing in carries it into the account. Cloudflare Pages

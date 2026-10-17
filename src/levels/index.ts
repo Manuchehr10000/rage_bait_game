@@ -16,7 +16,7 @@ import { PERSEPOLIS } from './ch04-persia/l01-persepolis';
  * The tour prod plays, which main deploys: every level in tour order but the ones HELD back
  * from it. Chapter 1, then chapter 2 south to north along the Nile, then the Aegean, then Persia.
  */
-export const PROD_LEVELS: LevelData[] = [CAP_BLANC, ROC_AUX_SORCIERS, PECH_MERLE, ROUFFIGNAC, GARGAS, ABU_SIMBEL, PHILAE, KARNAK, DENDERA, KNOSSOS, PERSEPOLIS];
+export const PROD_LEVELS: LevelData[] = [CAP_BLANC, ROC_AUX_SORCIERS, PECH_MERLE, ROUFFIGNAC, GARGAS, ABU_SIMBEL, PHILAE, KARNAK, DENDERA, KNOSSOS, MINOTAUR, PERSEPOLIS];
 
 /**
  * Built, on the map in the dev and local builds, and held back from prod: each with the level
@@ -26,10 +26,11 @@ export const PROD_LEVELS: LevelData[] = [CAP_BLANC, ROC_AUX_SORCIERS, PECH_MERLE
  * one back, put it here and its file in held-files.ts; to release one, write it into
  * PROD_LEVELS in its place and take it out of both.
  *
- * The Minotaur, chapter 3's legend: on the map after Knossos since 2026-10-12, held back from
- * prod by the designer, 2026-10-15.
+ * None is held back now. The Minotaur, chapter 3's legend, was held back from prod by the
+ * designer on 2026-10-15 and released to it on 2026-10-16 ("Make all levels available on
+ * main"): it is in PROD_LEVELS, after Knossos.
  */
-export const HELD: readonly { level: LevelData; after: string }[] = [{ level: MINOTAUR, after: 'knossos' }];
+export const HELD: readonly { level: LevelData; after: string }[] = [];
 
 /** `levels` with each of `held` put in after the level it follows. */
 export function withHeld(levels: readonly LevelData[], held: readonly { level: LevelData; after: string }[]): LevelData[] {
