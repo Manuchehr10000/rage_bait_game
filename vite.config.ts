@@ -16,11 +16,11 @@ const isProd = buildEnv === 'prod';
 /**
  * The buttons on a phone's screen (src/touch/), and what a phone needs from the page to
  * play it sideways and full screen: a manifest, and a page that may draw under the notch.
- * Every build but prod carries them until the designer has played them on a phone
- * (2026-10-16). Released by making this true; the prod build fails while it is false and
- * any of src/touch/ is in its bundle (nothingHeldInProd).
+ * Every build carries them: released to prod by the designer's word of 2026-10-17. Made
+ * false again, they are held back from prod as before: the prod build fails while it is
+ * false and any of src/touch/ is in its bundle (nothingHeldInProd).
  */
-const touch = !isProd;
+const touch = true;
 
 /**
  * Two hostnames serve the same game, so exactly one of them may be indexed.

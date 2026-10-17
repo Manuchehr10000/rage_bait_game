@@ -40,8 +40,8 @@ const DEV_TOOLS = __BUILD_ENV__ !== 'prod';
 const ACCOUNTS = __BUILD_ENV__ !== 'prod';
 
 /**
- * The buttons on a phone's screen (src/touch/). In every build but prod until the designer
- * has played them on a phone (2026-10-16): `__TOUCH__`, vite.config.ts, says which.
+ * The buttons on a phone's screen (src/touch/). In every build since the designer's word of
+ * 2026-10-17: `__TOUCH__`, vite.config.ts, says which.
  */
 const TOUCH = __TOUCH__;
 

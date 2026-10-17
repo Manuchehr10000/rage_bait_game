@@ -110,9 +110,9 @@ page do either: there the full-screen button says how to add the game to the hom
 which opens it with no browser around it (the manifest, `vite.config.ts`).
 
 It turns on wherever the screen is touched rather than pointed at; `?touch` turns it on
-for a mouse, `?touch=0` off. The dev tools stay off a phone. Every build but prod has it
-until the designer has played it on a phone (2026-10-16): `touch` in `vite.config.ts`
-releases it, and until then the prod build refuses a bundle with any of `src/touch/` in it.
+for a mouse, `?touch=0` off. The dev tools stay off a phone. Every build has it, prod
+since the designer's word of 2026-10-17. `touch` in `vite.config.ts` can hold it back from
+prod again; while it is false, the prod build refuses a bundle with any of `src/touch/` in it.
 
 `npm test` runs scripted playthroughs in headless Chromium. Each one checks a design
 contract: the trap fires for the naive player and can be avoided by the one who remembers.

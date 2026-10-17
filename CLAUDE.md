@@ -82,9 +82,10 @@ notes describe the levels as they were built.
 - **On a phone** (designer, 2026-10-16): held sideways, buttons in the side borders and
   never over the game (the game is drawn smaller for them); left and right under the left
   thumb, jump under the right; map, give up, lamp, sound and full screen as small buttons;
-  iPhone is played from the home screen, and a phone held upright is asked to turn. In
-  every build but prod until the designer has played it on a phone: released by `touch`
-  in vite.config.ts (README, "On a phone").
+  iPhone is played from the home screen, and a phone held upright is asked to turn.
+  Released to prod by the designer's word of 2026-10-17 ("push to main", then "Yes, do
+  it"), before it was played on a phone; `touch` in vite.config.ts holds it back again
+  (README, "On a phone").
 - **Open:** Apep or Sekhmet for chapter 2's legend; whether Karnak's exit has already spent
   the false completion (pillar 10, `content/tricks.md`).
 
