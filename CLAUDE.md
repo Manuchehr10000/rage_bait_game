@@ -55,7 +55,10 @@ notes describe the levels as they were built.
   the order is Persepolis, Naqsh-e Rustam, Pasargadae, Susa, Behistun, with 3 and 4
   provisional; the legend is Farhad, and it never stages his death; the signature is the
   way up. Persepolis is built, rough, with two tricks: the Gate's columns (the cracked one
-  holds, its twin falls; designer, 2026-10-06), and the audience. Susa may be built beside the Tomb of Daniel (designer,
+  holds, its twin falls; designer, 2026-10-06), and the audience. Naqsh-e Rustam, level 2, is
+  where height first kills: its tricks put him off a height and claim the fall; the winged
+  figure, the fire altar and Ohrmazd are never a mechanism (both 2026-10-21, on
+  recommendations; `CHAPTER.md` rulings 10 and 11). Susa may be built beside the Tomb of Daniel (designer,
   2026-10-06); the shrine is never part of the level, and whether it is seen is decided
   when Susa is designed (`arc.md` section 4).
 - **Chapter 3's legend, the Minotaur,** was designed 2026-10-06 to 2026-10-08: four tricks,

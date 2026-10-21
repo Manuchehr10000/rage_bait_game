@@ -113,6 +113,9 @@ conversation starts from what Persepolis leaves it:
   the delegations walk toward the king's place; on the tomb they hold up the king.
 - **The way up is gone.** The tombs are cut high in the cliff. Persepolis taught that the stair
   is the way up; the tomb has none.
+- **Height first kills here** (ruling 10). Persepolis taught that no fall can kill; Naqsh-e
+  Rustam's tricks put him off a height, and each claims its fall. The winged figure, the fire
+  altar and Ohrmazd are never a mechanism (ruling 11).
 - **The graves rule** (below): the carved front may carry a trap; the burial chambers and their
   cists never.
 - **Spent.** A column that comes down behind him once he has passed it, beaten by stepping
@@ -124,10 +127,11 @@ conversation starts from what Persepolis leaves it:
 
 ## Rulings
 
-Made in conversation with the designer between 2026-09-26 and 2026-10-03. The designer
-delegated several of the calls ("use your best judgement", then "go on, build level 1"); those
-are recorded as rulings made on that delegation and dated 2026-10-03. Rulings 1 to 8 are
-recorded in `arc.md` as well; the sound is recorded here only, as chapter 3's was.
+Made in conversation with the designer between 2026-09-26 and 2026-10-03, and from 2026-10-06
+on. The designer delegated several of the calls ("use your best judgement", then "go on, build
+level 1"); those are recorded as rulings made on that delegation and dated 2026-10-03. Rulings 1
+to 8, 10 and 11 are recorded in `arc.md` as well; the sound is recorded here only, as chapter
+3's was.
 
 1. **The order.** 1 Persepolis, 2 Naqsh-e Rustam, 3 Pasargadae, 4 Susa, 5 Behistun, 6 the
    legend: the three Fars sites first, then west to Susa on the Khuzestan plain, then up the
@@ -167,6 +171,15 @@ recorded in `arc.md` as well; the sound is recorded here only, as chapter 3's wa
    chapter 4 production. The designer asked for chapter 4's level 1 on 2026-10-03, and it was
    built then.
 9. **The music: not scored yet.** See The sound.
+10. **Naqsh-e Rustam is the level where height first kills** (2026-10-21, on a recommendation).
+    Persepolis taught that no fall can kill; level 2 turns that. Its tricks put him off a
+    height, and each claims the fall it sets up, whatever finishes him: pillar 8's claim comes
+    back from 8e42c99 with the first such trap. Pillar 1's fatal fall is unchanged. No trick yet
+    does this from something true about the site.
+11. **Ruling 6, extended** (2026-10-21, on a recommendation). The winged figure over the king on
+    the royal tomb fronts, the fire altar he stands before, and Ohrmazd on the Sasanian reliefs
+    are never a mechanism, anywhere in the chapter: never a trap or any part of one, never a
+    floor or a hold, and, like the winged disc, never a gag. They stay carved where they are.
 
 ## The tone
 
