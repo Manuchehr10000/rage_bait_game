@@ -50,10 +50,7 @@ export type DeathCause =
   | 'The wabet'
   | 'The New Year'
   | 'Fall'
-  | 'The upper storey'
   | 'The throne'
-  | 'The timber'
-  | 'The door'
   | 'The kouloura'
   | 'The column'
   | 'The audience'
@@ -101,15 +98,9 @@ export const DEATH_ANIM: Record<DeathCause, DeathAnim> = {
   'The wabet': 'flat',
   'The New Year': 'burn',
   Fall: 'gone',
-  // Knossos. The burnt storey of the west wing, down on him in the storeroom.
-  'The upper storey': 'crush',
-  // Landed in front of the throne, and he is sitting in it. His own frame, at rest,
+  // Knossos. Landed in front of the throne, and he is sitting in it. His own frame, at rest,
   // facing out: never the slump of giving up, and never triumphant.
   'The throne': 'enthroned',
-  // Fyfe's timber of 1901, and the span it carried, on the far side of the light well.
-  'The timber': 'crush',
-  // The leaf of a pier-and-door partition, opening into him. Over like a plank.
-  'The door': 'plank',
   // The court between the first two pits, and him on it, down a pit with no bottom.
   'The kouloura': 'gone',
   // Persepolis. The Gate's west column, come down on him.
@@ -143,7 +134,7 @@ export const DEATH_ANIM: Record<DeathCause, DeathAnim> = {
  */
 export const DEATH_SOUND: Record<
   DeathCause,
-  'squish' | 'bonk' | 'drown' | 'burn' | 'snap' | 'whoosh' | 'fallAway' | 'sigh' | 'thud' | 'click' | 'blast' | 'sitStone' | 'knock' | 'onHisBack' | 'snort' | 'toss' | null
+  'squish' | 'bonk' | 'drown' | 'burn' | 'snap' | 'whoosh' | 'fallAway' | 'sigh' | 'thud' | 'click' | 'blast' | 'sitStone' | 'onHisBack' | 'snort' | 'toss' | null
 > = {
   'The Beune': 'drown',
   'The cast': 'thud',
@@ -177,12 +168,8 @@ export const DEATH_SOUND: Record<
   'The wabet': 'thud',
   'The New Year': 'burn',
   Fall: 'fallAway',
-  'The upper storey': 'squish',
   // A body sitting down on stone, dry, once. Not the sigh: that one is chosen.
   'The throne': 'sitStone',
-  'The timber': 'squish',
-  // Wood, not the Rouffignac board's bonk.
-  'The door': 'knock',
   'The kouloura': 'fallAway',
   // Under a shaft of stone, as under a colossus's head.
   'The column': 'squish',

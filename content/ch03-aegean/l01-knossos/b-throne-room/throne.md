@@ -5,7 +5,7 @@
 | Id | `throne` |
 | File | `throne.png` (not painted yet: the game draws its own until this file exists) |
 | Size | 14 × 14 world px, painted 56 × 56 |
-| Beat | `c-throne-room` |
+| Beat | `b-throne-room` |
 
 ## What it is
 
@@ -17,7 +17,7 @@ arched supports. Evans put a wooden copy of it in the anteroom. **This painting 
 
 The original against the Throne Room's wall, where a full jump out of the basin comes down; the
 copy in the anteroom, where a full jump over the barrier comes down. The seat's footprint on the
-floor is the whole width of the seat. Landing in front of the original seats him and his visit
+floor is the whole width of the seat and five px either side. Landing in front of the original seats him and his visit
 is over; the copy does nothing. Bottom edge on the floor.
 
 ## Must be right

@@ -33,61 +33,69 @@ In the final fire the upper floors fell into the rooms below. Column bases, ston
 paving and fire-baked Linear B tablets were found where they landed, and Evans built his
 upper floors back from what had fallen. Where he rebuilt them, they have held.
 
+> **Rebuilt on 2026-10-21** under the pillars of 2026-09-26, the calls made on the designer's
+> delegation ("Use your best judgement on rulings"; `content/research/arc.md`, section 4). As
+> built before, from 2026-09-25 and with the West Court of 2026-10-07, it ran 27.3 s clean in
+> seven beats and spent five tricks. Three of them are cut (the burnt column, the timber and
+> the doors; `content/tricks.md`), and with them the West Magazines, the Hall of the Double
+> Axes and the East Bastion's stair; the Grand Staircase, where the timber was, stays, honest. That build is in git,
+> in the commit before the rebuild.
+
 ## What this level is for
 
-It opens the chapter, so it teaches the chapter's words. The research gives three:
-columns taper downward; light means safe; the palace is partly Evans's idea, cast in 1920s
-concrete. In play they become:
+It opens the chapter, so it plants the chapter's words, honestly, and spends two tricks (a
+level 1 spends one or two; `arc.md` section 1). The research gives three words: columns taper
+downward; light means safe; the palace is partly Evans's idea, cast in 1920s concrete. In play:
 
-- **Columns hold floors up.** They are never floors (standing on column tops is Egypt's:
-  the Kiosk at Philae, the Hypostyle at Karnak). A column goes and its span goes.
-- **Light comes from directly above.** A light well is a shaft open to the sky through
-  every storey, so a lit patch is the one place nothing is overhead, and **nothing ever
-  comes down on a lit patch.** Every earlier light in the game came from the side: a lamp,
-  a low sun, a sweeping beam, a spotlight. This is the first light that says something about
-  the building. Because of pillar 5 the light is where a jump may land, never where you
-  shelter and wait. At Knossos every landing in the light is safe: the light always catches
-  you.
-- **Dark means something is over you.** A storey is five tiles, 80 px floor to floor, with
-  a slab a tile thick, so under any roof there are 64 px clear and a full jump is cut to
-  about 48 px of rise and 46 of reach. The ceiling on his head is how the dark says there
-  is a floor above. The light well is the one place a jump is full.
-- **Wood gives way; stone and concrete hold.** This is the mechanic under the chapter's
-  line for this level, *the fake parts hold*. Every column that lies here is timber — once
-  the burnt Minoan original, once Fyfe's first attempt — and every one of Evans's later
-  columns holds. What fails is fire and weather, never Minoan building.
-- **The column that lies stands right beside the light.** Land in the light; never stop
-  next to it. A pattern level 1 is allowed to teach so that a later level can break it.
+- **Columns hold floors up, and every column at Knossos holds.** Four of them, a storey high,
+  the same to the pixel, under Evans's slabs. Nothing in the level comes down, anywhere.
+- **Light comes from directly above.** A light well is a shaft open to the sky through every
+  storey, so a lit patch is the one place nothing is over him. Every earlier light in the game
+  came from the side. Two here, both honest: the Throne Room's basin and the Grand Staircase's.
+- **Dark means something is over you.** A storey is five tiles, 80 px floor to floor, with a
+  slab a tile thick, so under any roof there are 64 px clear and a full jump is cut to about
+  48 px of rise. The light well is the one place a jump is full.
+- **One storey is nothing, and the light catches every landing.** He walks off the edge of the
+  upper hall into the well, falls a storey and lands in the sun. The lethal count is not taught
+  here; it is Phaistos's.
+- **The pit is the safe ground.** In the West Court the floor beside the pit is the hole, and
+  a pit's floor can be a lid.
+- **A hop, not a full jump, out of a sunken place.** The throne.
 
 > Knossos: the fake parts hold.
 
-The lethal storey count — walk off two storeys and live, jump off two and die, walk off
-three and die — is **not** taught here. At Knossos one storey is nothing. The count is
-Phaistos's, where the light no longer cares how far you fall.
+Everything of Evans's holds and does nothing: his concrete, his columns, his copy of the
+throne. What gets him is where he lands: on the court the dig never emptied, or in front of the
+throne it found. The two tricks are an inversion of each other: at the first pit a hop kills and
+the committed jump lives; in the basin the committed jump kills and the hop lives.
 
-About **25 seconds clean**. It was drafted at about 34 and cut, because the hardest trap
-is the last one and a death there replays the level: five columns in the storerooms rather
-than seven, two flights at the East Bastion rather than three, a shorter court. Built, the
-knowing run is 27.3 s from the spawn, 1.85 s of it standing at the doors.
+**Length.** The knowing run is **13.35 s** from the spawn, 0.08 s of it standing, scripted
+(`tests/knossos.spec.ts` pins it under 14 s, standing under 0.2 s); a player is about a tenth slower. Every death is in
+the first five seconds, so a retry is cheap: a death in the court comes about 1.3 s from the
+spawn. If playtests ask for more, the lever is the Central Court, a breather, never a trick.
+
+**Pillar 8.** The level declares its tricks, `['The kouloura', 'The throne']`, and the exit
+label reads "n of 2". The kouloura's two halves each claim the fall down the hole they open
+(`CrumbleDef.claims`, `World.claim`): whatever finishes him in it, riding the floor down, a jump
+inside the hole, or walking back into it later, the label is the kouloura's and it counts. The
+level names no fall of its own: every way off its bottom is through a floor that opened under
+him. The throne kills under its own name.
 
 ## The beats
 
 | Beat | Folder | What the player meets | The history it comes from |
 |---|---|---|---|
-| a | `a-west-court` | Evans's bronze bust by the way in. The paved court, the raised walkways crossing it, three open round pits to hop. Between the first two, the court opens under him and takes him down a pit the dig never emptied. The way past is down into the first pit and across into the second; the third pit's floor opens the same way, so it is hopped | The West Court, its causeways and its three *kouloures*: Old Palace pits the Minoans filled and paved over when they enlarged the court, emptied again by the dig |
-| b | `b-magazines` | A long storeroom with a row of storage jars: open sky, then dark under a roof on five identical red columns, then open sky. Four columns are Evans's and hold. The fifth, standing against the light, is the last Minoan column, burnt through: set foot under its span and it folds, and the burnt storey comes down. Cross the last span in the air and land in the light | The West Magazines: long, narrow, dead-end storerooms. Evans roofed only VIII–XII, in concrete, in 1929; the rest are open. In the final fire the upper storey fell into them, and Evans rebuilt his upper floor from what fell |
-| c | `c-throne-room` | A dark room, Evans's all the way up, where nothing comes down. The only light falls into a sunken basin in his path. A full jump out of the basin lands him in front of the gypsum throne, and he is sitting in it. His visit is over. Walked past, it does nothing. Over the barrier, in the anteroom, Evans's copy of the throne, the same chair, where a full jump lands, and it does nothing | The Throne Room, found April 1900: the gypsum throne where it was found, the benches, the lustral basin and its light well; Evans's 1930 roof and upper storey; the wooden seat he put in the anteroom; the barrier visitors stand behind |
-| d | `d-central-court` | Full sun, nothing above and nothing below. The eastern half steps down. Nothing happens | The Central Court, crossed across its width; its east part found eroded at least 2 m below the original floor |
-| e | `e-grand-staircase` | Under Evans's storey, one storey down the stair. At the edge of the upper hall, the light well, and across it the same hall under two columns exactly like the one beside him. Jump across and the first of them, timber, lets its span down on the far hall. Walk off into the light instead, land in the sun one storey down, walk on under the far hall, and watch the span land on the floor above you and stay there | The Grand Staircase, found 1901, held up by the fill packed round it; Fyfe's timber, 1901–04, beaten by the weather; Doll's stone and iron from 1904–05; the light well beside it, open to the sky, its floor drained |
-| f | `f-double-axes` | The west light well with the double axes cut in its wall. Then the dark hall and two identical doorways of folding doors on one clock, one open at a time. The first folds away from him, the second — the one beside the light — folds toward him. Wait in the middle of the hall, never at a door, then walk through into the sun | The Hall of the Double Axes: light well, inner hall, pier-and-door partitions (*polythyra*), outer hall, portico over the Kairatos valley; the masons' marks that give it its name |
-| g | `g-east-bastion` | Out onto the terrace and down Evans's stair in two flights, the stepped water channel beside it and a catch-pit at each landing. Three giant storage jars at the head of the stair. The turnstile at the foot is honest | Evans's "East Bastion" and its reconstructed stair to the east entrance; the runnel of parabolic step chutes that slows the rain and drops its silt in basins; the Magazines of the Giant Pithoi beside it |
+| a | `a-west-court` | Evans's bronze bust by the way in. The paved court, the raised walkway crossing it, three open round pits. Between the first two, the court opens under him and takes him down a pit the dig never emptied. The way past is down into the first pit and across into the second; the third pit's floor opens the same way, so it is hopped. Then up onto the stump of the west façade | The West Court, its causeways and its three *kouloures*: Old Palace pits the Minoans filled and paved over when they enlarged the court, emptied again by the dig. The West Façade |
+| b | `b-throne-room` | Down three steps through the small rooms behind the throne to the west door. The basin starts at the door: under its lintel he cannot jump, so he goes down into the light. A full jump out lands him in front of the gypsum throne, and he is sitting in it. His visit is over. A hop out lands short; walked past, the throne does nothing. Over the barrier, Evans's copy, the same chair, where a full jump lands, and it does nothing | The Throne Room, found April 1900: the gypsum throne where it was found, the benches, the lustral basin and its light well; Evans's 1930 roof and upper storey; the wooden seat he put in the anteroom; the barrier visitors stand behind |
+| c | `c-central-court` | Full sun, nothing above and nothing below. The eastern half steps down. Nothing happens | The Central Court, crossed across its width; its east part found eroded at least 2 m below the original floor |
+| d | `d-grand-staircase` | Under Evans's storey, one storey down the stair, under a ceiling that cuts a jump short. At the edge of the upper hall, the light well, and across it the far hall on two columns like the one beside him. He walks off into the light, a storey down, and lands in the sun. Every column holds | The Grand Staircase, found 1901, held up by the fill packed round it, rebuilt by Evans in timber, then stone and iron, then concrete; the light well beside it, open to the sky, its floor drained |
+| e | `e-east-bastion` | East along the corridor under the far hall, in the dark, and out onto the terrace in full sun: three giant jars, the turnstile, and the bastion's parapet at the end | The Lower East–West Corridor; Evans's "East Bastion" over the Kairatos valley; the Magazines of the Giant Pithoi beside it |
 
 ### a · West Court
 
 The beat is there to hand the player the chapter's scale and the first thing the chapter
-wants seen: before any Minoan stone, the bronze bust of the man who
-rebuilt it. The three pits are shallow in game terms, hopped or fallen into and jumped out
-of: a hole that is only a hole.
+wants seen: before any Minoan stone, the bronze bust of the man who rebuilt it. The three pits
+are shallow in game terms, hopped or fallen into and jumped out of: a hole that is only a hole.
 
 **The court between the first two pits** (designer's calls, 2026-10-06, at `knossos (127, 2)`).
 Between the first and second pits stand two tiles of court, paving on fill, drawn like the rest
@@ -98,9 +106,14 @@ it opens under him, dropping a tile a frame with him on it, and he goes down wit
 
 - **First attempt.** He hops the first pit, as the court has taught him, and comes down on the
   court beyond it.
-- **The way past.** Down into the first pit, and straight across into the second: any jump
-  held 10 frames or more, from anywhere in the first pit. Most come down on the far end of the
-  block; it opens, and he drops into the second pit with nothing under him but its floor.
+- **The way past.** Down into the first pit, and straight across into the second, at any
+  moment after landing in it: a full jump (held 14 frames or more), or one held 10 or 11. Most
+  come down on the far end of the block; it opens, and he drops into the second pit with nothing
+  under him but its floor. Held 12 or 13 the jump meets the court's edge and drops him back into
+  the first pit, and held 1 to 5 it never leaves it: both cost nothing. Held 6 to 8 it comes down
+  on the court, which opens. **It wants a run-up:** backed against the pit's west wall, a full
+  jump pressed together with Right comes down wholly on the court, which opens; six frames of
+  run first, and it reaches the second pit. Nothing tells the two spots apart but the hands.
 - **Not everyone dies on it.** A long jump from the court that comes down on the block's last
   few pixels, with part of him already over the second pit, drops him into the second pit as
   well. A hop dies.
@@ -110,198 +123,123 @@ it opens under him, dropping a tile a frame with him on it, and he goes down wit
   second pit comes down at the third's lip, so the way through is a rhythm: down, across, out,
   and straight over the third. Walls stand either side of its floor, so nobody steps off it
   while it goes.
+- **The bounce.** A full jump pressed in the last frames before he lands on the third pit's
+  floor, as he lands, or on the frame it goes, is a jump (the jump buffer and coyote time, pillar
+  1), and gets him out before the floor has gone. An honest second answer, and a precise one; pressed once the floor has gone a
+  few tiles, it is a jump inside the hole, and the hole has him.
+- **One trick, counted once.** The court and the third pit are one trick in two halves, under
+  the one label the designer gave them: one mechanism, one body, one noun. Counted separately
+  they would make three tricks in a level 1. The third pit has the touchstone cows' shape
+  (two hold, the third drops, and the lesson of the first is what kills at it); the cows are
+  kept for Cap Blanc's rebuild, which is told so in the register.
+- Over the third, the court ends at the stump of the west façade, two tiles high: a jump up,
+  and over it into the rooms behind the throne.
 
-### b · The West Magazines
+### b · Throne Room
 
-Five identical red columns, 32 px apart, carry the roof over the dark stretch. The first
-four spans are Evans's concrete. The last span is the one the fifth column carries, and the
-fifth column is the burnt original. The first time any part of his feet is on the floor
-under that span, the fifth column folds — the plaster splits and a black charred core shows —
-and after about a quarter of a second the span comes down: beams, fill, plaster and a stone
-column base. It lands as a step, daylight falls through the hole onto it, and the cut end of
-Evans's roof shows grey: the one place in the beat where his painted "timber" is seen to be
-concrete. The same fold fires harmlessly once he has passed the fifth column, so everyone sees
-it and the level after it is the same for all.
+The one room in the game where the death has no physical cause. Evans's all the way up, and
+nothing comes down.
 
-- **First attempt.** He runs into the dark as the honest court taught him, four spans hold,
-  and the fifth comes down on him a stride short of the light. Label: **The upper storey.**
-- **Second attempt.** He jumps from under the fourth span, the roof cuts the jump flat, and
-  he comes down in the light with the span falling behind him. He never stops.
-- The trigger is a footfall under the span, not a line crossed, because nothing triggered by
-  a line can be outrun at full speed and pillar 5 forbids asking him to slow down. **As built:**
-  the footfall is his centre over the floor under the span, and the span lets go 0.2 s after
-  it, the column folding in that fifth of a second. Because the trigger is his centre on the
-  ground, the jump is not frame-tight at 0.2 s: a full jump from anywhere under the fourth span
-  (32 px of take-off, about a third of a second) gets him out, the late ones straight into the
-  light, the early ones late in the fifth bay and running out. Running in, the span arrives with
-  him about 6 px short of the light. `tests/knossos.spec.ts` pins both.
-- The storage jars stand against the back wall and do nothing. They are never solid: a jar
-  plus a full jump would reach Evans's floor in the open stretches.
-
-### c · Throne Room
-
-The one room in the level where nothing comes down, because it is Evans's all the way up.
-The chapter's second verb: not what falls on you, but where you land.
-
-- He comes in by the west door from the small rooms behind the throne. The sunken basin,
-  two tiles deep, lies in his path with the room's only light falling into it; he drops into
-  the light, safely, and has to jump out of it.
-- A full jump out comes down on the throne's footprint, which is the **full width of the
-  seat**, so an ordinary committed jump seats him and nobody dies of a pixel. Walking in
-  front of the throne never seats him; only a landing does.
-- **The seat.** He is drawn at rest in the throne, facing out, never triumphant; a dry sound
-  of a body sitting down on stone; nothing reacts. Label: **The throne.** It has its own
-  frame and sound and is never the pose or the sigh of giving up (R), or players will think
-  they pressed R. It is not a false completion: no exit sound, no label, the ordinary reset.
-- **Once per game.** This is the one death in the game with no physical cause, and it is
-  spent here (`PILLARS.md`, pillar 8). No later level seats him in anything.
+- He drops off the stump into the open, then down three steps under Evans's roof through the
+  small rooms behind the throne, to the west door: a wall from the ceiling to two tiles over
+  the floor. **The basin starts at the last step, under the door**: three tiles wide and two
+  deep, the room's only light falling into the two past the door from their own light well. A
+  jump off the step meets the door, and one taken as he goes over the edge is under the lintel,
+  cut to nothing: nothing gets past the basin without going down into it. He lands half under
+  the door and walks on into the light, and out of it with a jump.
+- **The seat.** A full jump out, from anywhere in the light, standing or running, or pressed as
+  he drops in or as he lands (under the door a jump is cut, as under any roof, and lands short), comes down on the throne's footprint, **the whole seat and a little
+  either side**, and he is sitting in it. He is drawn at rest in the throne, facing out, never
+  triumphant; a dry sound of a body sitting down on stone; nothing reacts. Label: **The
+  throne.** It has its own frame and sound and is never the pose or the sigh of giving up (R).
+  It is not a false completion: no exit sound, no label, the ordinary reset.
+- **Its setup.** The court has just taught him that the way out of a pit is a committed jump.
+  The basin is the next pit, lit from above, where the chapter says nothing is over him.
+- **Once known.** A hop out, held 6 to 8 frames, lands short of the footprint wherever he
+  takes off, and he walks past it; walking in front of the throne never seats him. Held 1 to 5
+  frames he stays in the basin and tries again, at no cost. Held 9 to 13 it depends where he
+  jumps from; a full jump always seats him, Right pressed with it or a frame or two late. A
+  window of a few frames of hold: precision, never only memory (pillar 4).
+- **Once per game.** The one death in the game with no physical cause, spent here (`PILLARS.md`,
+  pillar 8). No later level seats him in anything.
 - **The copy.** He hops the barrier into the anteroom, and a full jump over it comes down in
-  front of Evans's wooden copy of the throne, pixel-identical to the original. It does
-  nothing. The flinch costs him nothing, and the original and the copy side by side are the
-  chapter's line for this level in one picture.
-- The room's ceiling is declared higher than a storey, so full jumps in it are not cut and
-  the landing on the throne is a clean arc. **As built:** six tiles clear. Every full jump out
-  of the basin, from a run or from against its wall, comes down with his centre within 20 px
-  under the throne (the seat's 14 and three either side), which is the footprint; a hop out
-  lands short of it. A full jump over the barrier, from a run or from against it, comes down on
-  the copy's footprint, the same 20 px. `tests/knossos.spec.ts` checks all of it.
-- Four steps up and out through the pier-and-door openings of the anteroom into the court.
+  front of Evans's wooden copy of the throne, pixel-identical to the original. It does nothing.
+  The flinch costs him nothing, and the original and the copy side by side are the level's line
+  in one picture.
+- The room's ceiling is declared higher than a storey, so a full jump in it is not cut and the
+  landing on the throne is a clean arc. **As built:** six tiles clear; the throne's footprint
+  and the copy's are 24 px, the seat and five either side, starting 19 and 129 px past the
+  basin's east rim, the chairs drawn where they always were; the barrier stands at 96. The
+  footprint's west edge (x 435) lies between the longest hop out of the basin (x 433.9) and the
+  shortest full jump, one pressed as he drops in under the door (x 435.4). `tests/knossos.spec.ts`
+  checks every jump above.
+- Four steps up and out through the anteroom into the court.
 
-### d · Central Court
+### c · Central Court
 
 The one honest breather: nothing above and nothing below, full sun. The eastern half is one
-step lower, because it is. The court teaches by contrast that the open sky is safe, which
-is the thing Phaistos will take away.
+step lower, because it is. The court teaches by contrast that the open sky is safe, which is
+the thing Phaistos will take away.
 
-### e · Grand Staircase
+### d · Grand Staircase
 
-The chapter's signature: the first time the game shows a building as storeys stacked on each
-other, and a collapse happening one storey above the tourist and stopping there.
+The chapter's signature, shown honestly: the first time the game shows a building as storeys
+stacked on each other, on columns, with a light well through them all.
 
-- From the court into shade under Evans's upper storey, which is only ever a ceiling, then
-  one storey down the stair. The steps are walked and never the trap (stairs are Egypt's).
-  One column stands at the head of the stair and holds. (Built with one, not a balustrade of
-  them: every column in the level is a storey high and the same to the pixel, and a column on
-  each step would have been taller than a storey.)
-- At the edge of the upper hall stands column A, and past it the light well: three tiles of
-  daylight from the sky to sunlit gypsum paving one storey down, with a drain in it.
-- Across the shaft the hall carries on under columns B and C, pixel-identical to A. They carry
-  the floor of the storey above, set back a tile from the edge.
-- When his centre crosses the edge, a fixed timeline starts. About 0.7 s later B's foot gives
-  way, the shaft folds into its base, and its span drops onto the far hall floor, where it
-  stays as a step. A and C hold. Label: **The timber.**
-- **First attempt.** He jumps the gap onto the far hall, a stride short of B, and the span
-  arrives on him.
-- **Second attempt.** He walks off the edge into the light. From here every way into the
-  well is survivable (a walk-off falls about 75 px, the longest jump about 142), so there is
-  nothing to aim at. He lands in the sun still moving and walks east under the far hall; a
-  moment later the span lands on the floor over his head and Evans's floor holds it.
-- **One route only.** A gallery at court level round the well was drafted and cut: from
-  there a full jump into the light fell two storeys from the top of the arc and killed, and
-  the chapter's first light well may not kill a player who jumped into the light.
-- **Two behaviours, not three.** Only the timber ever failed. Fyfe's timber, Doll's stone and
-  iron and the 1920s concrete never stood side by side in the staircase — Doll replaced all
-  the timber — and the level puts them there on purpose, with the timber the one that lies.
+- From the court into shade under Evans's upper storey, which is only ever a ceiling, then one
+  storey down the stair, five treads. One column stands at the head of the stair. The steps
+  are walked and never the trap (stairs are Egypt's).
+- The upper hall, under a ceiling that cuts a jump to about 48 px. At its edge stands column A,
+  and past it the light well: three tiles of daylight from the sky to sunlit gypsum paving one
+  storey down, with a drain in it.
+- Across the shaft the far hall carries on under columns B and C, pixel-identical to A, which
+  carry the floor of the storey above, set back a tile from the edge.
+- **Nothing happens.** He walks off the edge into the light and falls a storey, about 75 px,
+  into the sun. A jump across lands him on the far hall, safely, and its end drops him onto the
+  terrace, about 91 px. A jump into the well, the longest about 142 px, lives. After a floor has
+  opened under him in the court, the walk off an edge into the light is a flinch that holds.
+- **One route in effect.** Both ways come out on the terrace; the knowing run walks off into
+  the light and along the corridor under the far hall.
 
-### f · Hall of the Double Axes
+### e · East Bastion
 
-The level's last trap, and the first trap in the game to run on a cycle, which pillar 5 has
-always allowed for a last trap and nobody had used.
-
-- He comes out of the corridor into the west light well: open to the sky, the one full jump in
-  the beat, the double axe cut at three heights on the blocks of its back wall, in the light.
-  A drain in its floor. Nothing here moves.
-- The clock starts when his centre crosses the dark east edge of the well, so time spent in
-  the light never shifts it.
-- The inner hall, dark, then the first partition; the outer hall, dark, then the second
-  partition; then one tile of portico and the terrace in full sun, a tile down.
-- **The doors.** Each doorway is a pier-and-door opening with one wooden leaf that turns on
-  pivots and folds back into a recess in its pier. Shut, it is a solid bar the full height of
-  the doorway, so no jump clears it; open, it lies flat against its pier. The two partitions
-  are one code path and pixel-identical when shut. The first folds away from him, the second
-  folds toward him, and the second is the one that stands beside the light.
-- **The clock.** Before the trigger the first is shut and the second open. They turn together
-  about every 1.6 s, each swing taking 0.2 s, so exactly one doorway is open at a time. Each
-  turn is one dry wooden clack, heard only while the hall is on screen. Anyone in the area a
-  leaf has still to sweep, floor to lintel, while it swings, dies. The shut bar is solid only
-  once the leaf is fully shut. **As built:** the doorways are three tiles high under a lintel;
-  a leaf reaches 14 px; the first turn is 1.55 s after the clock starts, then every 1.6 s,
-  each taking 0.2 s. The one clack is the first door's. The knowing run stands 1.85 s in all.
-- **First attempt.** He reaches the first door shut and stands against it. It folds away from
-  him, safely, and the same turn shuts the second ahead of him. He walks on and stands against
-  the second, exactly as the first has just taught him, and it opens into his face. He goes
-  over like a plank with a wooden knock. The leaf folds into its pier and swings shut again.
-  Nothing reacts. Label: **The door.**
-- **Second attempt.** He waits at the first door, which is safe, follows it through, and stops
-  in the middle of the outer hall. The second door swings to a stride short of him and he
-  walks through into the sun. About a second and a half of standing in all, all of it in the
-  dark, under Evans's roof, which holds.
-- **Designer ruling.** The two doors on one clock are one trap under pillar 5: one mechanism,
-  one clock.
-- The tell was on screen all along: while he stood at the first door, the second door's open
-  leaf lay on the near face of its doorway.
-
-### g · East Bastion
-
-The exit, and honest. Out onto the terrace in full sun, where the full jump comes back and
-there is no roof anywhere, and down Evans's reconstructed stair in two flights. Beside it,
-lighter and behind, the stone runnel in which every step is a curved chute dropping to the
-next, and a square catch-pit with silt in it at each landing and at the foot: three identical
-honest things, answering the three pits of the West Court. At the head of the stair, three
-identical giant storage jars with rope bands and discs in relief, about his height. At the
-foot, bare ground and the turnstile. Anyone who has played Karnak, where the turnstile stands
-on a trapdoor, will flinch at it; this one is only a turnstile. Behind it, the Kairatos valley.
-No jump in the beat can kill.
+The exit, and honest. East along the Lower East–West Corridor under the far hall, in the dark,
+then out onto Evans's East Bastion terrace, a tile down, in full sun, with no roof anywhere and
+the Kairatos valley behind. Three identical giant storage jars, about his height. The turnstile,
+the game's own exit. At the end of the level the bastion's parapet, higher than any jump: a full
+jump over the turnstile comes down on the terrace, and he walks back to it. No jump in the beat
+can kill.
 
 ## Deliberate lies
 
-- **A fourth pit, paved over, between the first two, with no bottom.** The West Court has three
-  *kouloures*, round and broad and a few metres deep at most. The Minoans did fill and pave them
-  when they enlarged the court; the dig emptied all three. This one it left, and the court over
-  it holds nobody.
-- **He walks the storeroom floor, and he gets into it over the west façade.** The storerooms
-  open only eastward onto the Long Corridor; visitors look down into them from Evans's upper
-  floor and nobody walks their floors.
-- **Open, roofed, open along one storeroom.** A storeroom is roofed or open along its whole
-  length. The real pattern is across the row: III–VII open, VIII–XII under Evans's 1929 roof,
-  XIII–XVIII open. The level lays it along one room.
-- **Columns in a storeroom.** None ever stood there: Evans's 1929 roof rests on the storeroom
-  walls. His red columns in the west wing are in the South Propylaeum, the Stepped Portico and
-  the Throne Room.
-- **A Minoan column still standing, and a Minoan span still up to fall.** No Minoan shaft
-  survives at Knossos, and the upper storey fell in the fire that ended the palace. It waits
-  for him.
-- **The basin lies in his path.** It is across the room from the throne, behind a bench and a
-  balustrade with three columns. He gets out of it by jumping its wall; the six steps are the
-  only way in and out.
+- **A fourth pit, paved over, between the first two, with no bottom; and a third whose floor
+  is a lid.** The West Court has three *kouloures*, round and broad and a few metres deep at
+  most. The Minoans did fill and pave them when they enlarged the court; the dig emptied all
+  three, and none has a hole under it.
+- **From the West Court straight over the west façade into the rooms behind the throne.** The
+  West Magazines and the Long Corridor lie between, and the Throne Room is entered from the
+  Central Court, by its anteroom.
+- **The basin lies in his path, under the west door.** It is across the room from the throne,
+  behind a bench and a balustrade with three columns. He gets out of it by jumping its wall; the
+  six steps are the only way in and out.
 - **Landing in front of the throne seats him and ends his visit.** It is a chair and has never
   done anything to anybody.
 - **Evans's copy is the colour of the gypsum.** If the anteroom copy is wood-coloured, it is
   painted to match so the two thrones are pixel-identical (pillar 4).
 - **The Throne Room is taller than a storey**, and he enters by its west door and leaves over
   the barrier. Visitors see it only from the anteroom.
-- **The Central Court's western half is levelled** into a flat run.
-- **Three campaigns side by side in the Grand Staircase, one of them still timber.** Doll
-  replaced all of Fyfe's timber from 1904–05, and no 1920s concrete column stands in the
-  staircase itself. A span of it comes down on the far hall.
+- **The Central Court's western half is levelled** into a flat run, and short.
+- **One column at the head of the staircase, and three by the light well.** The level's
+  placing, not the staircase's colonnade. Every column the same to the pixel.
 - **The staircase is open to walk.** It has been closed to the public since the 1990s;
-  visitors look down into it from the court.
-- **Working wooden door leaves in a present-day visit.** Minoan leaves existed (pivot sockets,
-  charred wood), but none survives and none is restored. They are drawn from the pivot sockets
-  and Evans's publication, never traced from de Jong's watercolours.
-- **One opening per partition.** The hall had at least eleven doorways (secondary sources).
-- **The doors fold the ways they do.** Which way each leaf folded was not verified.
-- **They swing by themselves on one clock.**
-- **No daylight through the open doors.** The polythyron existed to let light and air into
-  the hall from the portico; the level keeps the light to the well and the terrace so the
-  chapter's rule stays clean. The light through the doors is held in reserve for a later level.
-- **A portico one tile deep, with no portico columns**, and the corridor coming in through the
-  light well.
-- **The route from the hall to the East Bastion is straightened.** It runs by the Lower
-  East–West Corridor, past the Lapidary's Workshop and the Court of the Stone Spout.
-- **Visitors do not leave by the East Bastion.** The stair is Evans's reconstruction, and its
-  flights, turns and catch-pits are counted and placed by the level. The giant jars are moved
-  to its head.
+  visitors look down into it from the court. One flight of it, and a drop of a storey into its
+  light well; its lower flights are left out.
+- **The route from the staircase's light well to the East Bastion is straightened.** It runs
+  by the Lower East–West Corridor, past the Lapidary's Workshop and the Court of the Stone
+  Spout; here it is a straight corridor under the far hall.
+- **Visitors do not leave by the East Bastion,** and its parapet is no higher than a parapet:
+  here it is higher than any jump, the end of the level. Evans's stair down from the terrace is
+  left out. The giant jars are moved onto the terrace from their magazine beside it.
 - **Scale.** A storey drawn at 80 px is about 8.5 m at the tourist's size, roughly double or
   more a Minoan storey of about 3–3.5 m. Spacing, sequence and jump distances are level design
   (`arc.md`, invariants).
@@ -310,21 +248,16 @@ No jump in the beat can kill.
 
 - Evans's bust stands by the way in, and the palace behind it is partly his.
 - The kouloures were filled and paved by the Minoans and emptied by the dig.
-- The upper storey of the west wing fell into the storerooms in the fire, and what fell is what
-  Evans rebuilt from. His concrete roof over VIII–XII has held.
 - Every column a visitor sees is Evans's, tapering downward on the evidence of pictures, very
-  often standing on a Minoan base.
+  often standing on a Minoan base. His concrete has held.
 - The throne is the original, one block of gypsum, where it was found in April 1900. Evans put
   a wooden copy in the anteroom. Visitors stand behind a barrier and do not go in.
 - The only light in the Throne Room falls into the sunken basin.
-- The Grand Staircase stood in 1901 because the fill held it, and Fyfe's timber, put in to
-  hold it once the fill came out, was beaten by the weather.
+- The Grand Staircase stood in 1901 because the fill held it; the east wing is cut into the
+  slope, storeys below the court as well as above it.
 - Light wells are shafts open to the sky; their floors are paved and drained.
-- The Hall of the Double Axes is light well, inner hall, partition, outer hall, portico, west
-  to east; its doors turned on pivots and folded into their piers; it is named for the double
-  axes cut in its light well.
-- The East Bastion stair has a stepped runnel beside it that slows the rain and settles its
-  silt.
+- The East Bastion looks over the Kairatos valley, and the Magazines of the Giant Pithoi are
+  beside it.
 
 ## Not in the level
 
@@ -333,15 +266,23 @@ No jump in the beat can kill.
   not the Bull-Leaper copy in the replica room over the Throne Room, not the oxhide
   figure-of-eight shields of the staircase loggia and the upper hall. The upper storeys are
   drawn as slab, never opened.
-- **The Minotaur and the labyrinth.** Myth. The derivation of "labyrinth" from *labrys*, the
-  double axe, is Evans's and doubted by linguists; the double axes in the light well are
-  masons' marks and are drawn as marks.
+- **The Minotaur and the labyrinth.** Myth, and level 6's. The derivation of "labyrinth" from
+  *labrys*, the double axe, is Evans's and doubted by linguists. With the Hall of the Double
+  Axes cut, no double axe is drawn in the level, so nothing in it points at the labyrinth.
 - **Whose seat the throne was.** Evans's "Throne of Minos", a king's seat; a priestess or an
   enthroned goddess has been argued (Reusch 1958; Niemeier 1986), because griffins flank
   goddesses in Minoan art. The level takes no side: only the tourist ever sits there.
 - **The griffins.** The pair flanking the throne is the Gilliérons' symmetry. Galanakis, Tsitsa
   and Günkel-Maschek (BSA 2017) found no evidence for a griffin west of the throne; the scheme
   "as it currently stands, never existed". Drawn as it stands today, with the note.
+- **The West Magazines, the Hall of the Double Axes and the East Bastion's stair**, cut on
+  2026-10-21, the first two with their tricks, the burnt column and the doors; the timber, cut
+  from the Grand Staircase, which stays (`content/tricks.md`). Their history stays true and stays in the
+  chapter: the upper storey of the west wing fell into the storerooms in the fire, and Evans
+  roofed storerooms VIII–XII in concrete in 1929 and left the rest open; Fyfe's timber in the
+  Grand Staircase, 1901–04, rotted and was replaced by Doll's stone and iron; the hall's light
+  well, its masons' marks, its pier-and-door partitions and portico; the stair's stepped runnel
+  and its catch-pits. The pier-and-door partitions are free for a later level (`tricks.md`).
 - **The throne-and-canopy cast** in the Hall of the Double Axes, and Evans's wooden throne on
   it: left out, because the seat is spent and a third throne would be a tell the level cannot
   pay off.
@@ -357,19 +298,30 @@ No jump in the beat can kill.
 
 ## New in the engine
 
-Nothing here is exotic. All of it is built (2026-09-25), rough and drawn by code; the anteroom's
-pier-and-door openings onto the court are not drawn yet.
+All of it built, rough and drawn by code.
 
 - Darkness in more than one stretch of a level, bounded in height, and a `lightWell` shaft of
-  daylight cut out of it with no fixture. Never the `spotlight` decor: at Karnak, spotlit
-  meant it falls.
-- A span that is solid and drawn while it holds, falls on a footfall (b) or a timeline (e), and
-  lands as a step; a Minoan column bound to it that folds. The existing roof block always draws
-  at 24 × 18; fix that.
-- A seat: a landing on its footprint kills with its own cause, frame and sound; an inert copy.
-- A pier-and-door partition on a cycle, solid only when fully shut, killing in the area the
-  leaf has still to sweep.
-- Theme `knossos`, the bull-leaper costume with its seated and enthroned frames, the new causes.
+  daylight cut out of it with no fixture (2026-09-25). Never the `spotlight` decor: at Karnak,
+  spotlit meant it falls.
+- A seat: a landing on its footprint kills with its own cause, frame and sound; an inert copy
+  (2026-09-25).
+- A trapdoor (`CrumbleDef.opens`): the frame he is on it, it is dropping away a tile a frame
+  with him on it; drawn as the level's own tiles (`asTiles`), with the rock under it until it
+  goes (`solidBelow`) (2026-10-07).
+- **A trap claims the death it sets up** (`CrumbleDef.claims`, `World.claim`; 2026-10-21): once
+  a trapdoor has opened under him, a plain death down its hole (the fall out of the level, the
+  drop, a drowning) is named for the trap and counts for pillar 8, while he is in the hole. The
+  claim lapses when he stands on something or jumps and no trap claims him again that frame; a
+  trap's own death and giving up are never renamed. Brought back from the reverted Cap Blanc
+  rebuild (8e42c99) as CLAUDE.md asked, for the first trap that only moves him. Phaistos's and
+  Akrotiri's floors that move him need the same.
+- Knossos now starts its camera on him (`cameraOnSpawn`, built for the Minotaur), so he is seen
+  walking in on the court, high in the level (pillar 13).
+- Theme `knossos`, the bull-leaper costume with its seated and enthroned frames.
+- Removed with the cut tricks: the span on a column that folds (`Span`), the pier-and-door
+  partition on a clock (`Door`), their causes, sounds and drawing, and the double axes, the
+  runnel and its catch-pits. They can be brought back from commit 651fdbe; the doors are a free
+  trick, the span a family the register says not to claim again as new.
 - Walk-throughs in `tests/` for every first and second attempt above.
 
 ## Sources
@@ -418,10 +370,9 @@ pier-and-door openings onto the court are not drawn yet.
 
 **How this was checked.** The research for this level was done through web search, and the
 network blocked most page fetches, so most claims were taken from search extracts of the pages
-cited rather than from the pages or the books. The one the whole of beat b rests on — that
-Evans roofed storerooms VIII–XII in concrete in 1929 and left the rest open — was confirmed
-against Knossos Documenta's own summary. Everything below marked "ask before painting" must be
-read in the books before its asset note is signed off.
+cited rather than from the pages or the books. Everything below marked "ask before painting"
+must be read in the books before its asset note is signed off. The rebuild of 2026-10-21 added
+no new history: it cut beats and moved the Throne Room's basin, and its new lies are listed.
 
 **Solid.** Kalokairinos first; Evans from 23 March 1900; the three campaigns (timber, then
 stone, iron and brick arches, then reinforced concrete) and Fyfe, Doll and de Jong; storerooms
@@ -439,15 +390,14 @@ Doll's first use in 1905–10). The number of storeys in the east wing (four, fi
 storerooms (18, which is Documenta's and the site's; guides say 19 or 22).
 
 **Not verified, so ask before painting:**
-- whether the 1929 roof over the storerooms has beams or posts inside them;
 - the colour of the columns in each area (red shaft and black capital, or the reverse);
 - the Throne Room barrier's real form, and who made the anteroom copy and when; whether
   visitors once sat in the copy for photographs;
 - whether the light well over the lustral basin is Minoan evidence or Evans's 1930 inference;
-- the depth and size of the kouloures, the basin, the magazines and the Long Corridor (Hood &
-  Taylor 1981);
-- which way each door leaf folded in the Hall of the Double Axes, and whether its piers above the
-  gypsum bases are restored in wood, plaster or concrete (the ground-floor piers were wood on
-  gypsum bases; the double axes are cut in limestone, not gypsum);
-- the number and placing of the East Bastion catch-pits, and how much of the runnel is Minoan;
+- the depth and size of the kouloures and the basin (Hood & Taylor 1981);
+- whether the Grand Staircase's floors over the light well are Doll's iron girders and brick or
+  1920s concrete, as the slab is drawn;
+- where the Lower East–West Corridor and the Hall of the Colonnades lie at the foot of the
+  staircase, and how they lead to the East Bastion;
+- the East Bastion's parapet: its height and stone;
 - the date and sculptor of Evans's bust (1935 is often said).

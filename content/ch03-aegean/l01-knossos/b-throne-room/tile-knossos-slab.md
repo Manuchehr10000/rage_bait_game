@@ -5,7 +5,7 @@
 | Id | `tile-knossos-slab` |
 | File | `tile-knossos-slab.png` (not painted yet: the game draws its own until this file exists) |
 | Size | 16 × 16 world px, painted 64 × 64 |
-| Beat | `b-magazines` |
+| Beat | `b-throne-room` |
 
 ## What it is
 
@@ -16,11 +16,9 @@ round beam ends.
 
 ## Where it stands in the game
 
-The roof over the middle of the storeroom, the Throne Room's ceiling, the floors of the upper
-storeys either side of the Grand Staircase's light well, and the ceiling of the Hall of the
-Double Axes. **The two spans that fall are drawn as this tile until they go** (pillar 4): the
-burnt storey in the storeroom and the stretch of floor on Fyfe's timber across the light well.
-Nothing on the tile may ever differ from one slab to the next.
+The Throne Room's ceiling, and the floors of the upper storeys either side of the Grand
+Staircase's light well. None of it ever falls: at Knossos everything of Evans's holds. Nothing
+on the tile may ever differ from one slab to the next (pillar 4).
 
 ## Must be right
 
@@ -30,8 +28,6 @@ Nothing on the tile may ever differ from one slab to the next.
 ## Deliberately wrong
 
 - The beam and beam ends are the same on every tile, spaced by the tile, not by any real bay.
-- Where a span has fallen the game draws the cut ends of the slab in grey: the concrete under
-  the paint. That is the one place in the level where the painted timber is seen to be concrete.
 
 ## Sources
 

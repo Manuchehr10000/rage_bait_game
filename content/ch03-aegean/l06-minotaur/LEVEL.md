@@ -927,7 +927,7 @@ Catullus 64.112–115; Ovid, *Met.* 8.172–173, line numbers unverified). Reser
 - **Icarus and Daedalus**, shut in the labyrinth in Apollodorus (*Epitome* 1.12, unverified) and
   the only men to leave it by air. Icarus springing up the side of a shaft the tourist steered to
   needed them there during Theseus's visit, and its answer, a swerve in a fall, had Knossos's
-  doors' shape. Their other verbs, the wings, the wax, the feathers, the fall, are spent families.
+  doors' shape (the doors were cut from Knossos on 2026-10-21 and are free). Their other verbs, the wings, the wax, the feathers, the fall, are spent families.
 - **Minos's ring and Amphitrite's wreath** (Bacchylides 17, unverified), at sea, and **Aegeus and
   the black sail**, on the voyage home: never in the labyrinth.
 - **Pasiphae** and Daedalus's hollow wooden cow (Apollodorus 3.1.4): it would spend the bull before

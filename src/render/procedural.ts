@@ -2259,28 +2259,6 @@ export const THRONE_SPRITE = compile(
   KNOSSOS,
 );
 
-/** A storage jar of the west storerooms, plain, as tall as a man's shoulder. 9 x 15. */
-export const PITHOS_SPRITE = compile(
-  [
-    '..OOOOO..',
-    '..OCCCO..',
-    '.OCLCCCO.',
-    'OCLCCCCCO',
-    'OCLCCCCDO',
-    'OCLCCCCDO',
-    'OOOOOOOOO',
-    'OCLCCCCDO',
-    'OCLCCCCDO',
-    'OCLCCCCDO',
-    '.OCCCCDO.',
-    '.OCCCCDO.',
-    '..OCCDO..',
-    '..OCCDO..',
-    '..OOOOO..',
-  ],
-  KNOSSOS,
-);
-
 /** A giant jar of the Old Palace by the East Bastion: rope bands and discs in relief, as tall as he is. 11 x 16. */
 export const GIANT_PITHOS_SPRITE = compile(
   [

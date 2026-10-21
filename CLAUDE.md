@@ -30,12 +30,15 @@ notes describe the levels as they were built.
 - **Pillar 8.** The exit label shows how many of the level's tricks this visitor has ever
   been killed by, as "7 of 9"; plain falls and drownings do not count. Built for a level
   that declares its tricks (`LevelData.tricks`, the nouns its traps kill under; the
-  browser remembers them, `Progress.markTrick`); Persepolis is the first. Still missing:
-  a trap that only moves him, where water or a pit gets the noun, must claim the death it
-  set up. The reverted Cap Blanc rebuild (8e42c99) had a `World.claim` for that; bring it
-  back with the first such trap. Declare a level's tricks as that level is rebuilt.
+  browser remembers them, `Progress.markTrick`); Persepolis, the Minotaur and
+  Knossos declare theirs. A trap that only moves him, where water or a pit gets the noun, claims the death it
+  set up: `World.claim`, with `CrumbleDef.claims` for a floor that opens under him (built with
+  Knossos's kouloura, 2026-10-21). Declare a level's tricks as that level is rebuilt.
 - **Every level built or designed before 2026-09-26 is to be rebuilt**, one at a time, and
-  until then is not a model. Suggested first: Cap Blanc, the first two minutes.
+  until then is not a model. Suggested first: Cap Blanc, the first two minutes. **Knossos was
+  rebuilt on 2026-10-21** (on the designer's delegation, `arc.md` section 4): five beats,
+  13.35 s clean, two tricks (the kouloura, the throne; "n of 2"); the burnt column, the timber
+  and the doors cut, the doors free for a later level; Phaistos to be redesigned from it.
 - **The chapter** (`arc.md` section 1): six levels, played in order. Plant, harvest,
   contradict, change the job (a clock alone is not a change), everything and the grand
   feature, then the legend. What grows is how deep the setups go and how much the hands
