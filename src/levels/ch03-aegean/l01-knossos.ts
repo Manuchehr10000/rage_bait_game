@@ -311,6 +311,7 @@ export const KNOSSOS: LevelData = {
       fake: true,
       delay: 0,
       opens: 960,
+      claims: 'The kouloura',
       solidBelow: true,
     },
 
@@ -323,6 +324,7 @@ export const KNOSSOS: LevelData = {
       fake: true,
       delay: 0,
       opens: 960,
+      claims: 'The kouloura',
       solidBelow: true,
       asTiles: ['##'],
     },

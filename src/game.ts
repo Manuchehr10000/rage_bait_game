@@ -161,6 +161,11 @@ export class Game {
   private deathCause: DeathCause = 'Fall';
   /** Where the death in progress leaves him, if it carries him off: the top-left of his box there. */
   private deathAt: { x: number; y: number } | null = null;
+  /**
+   * The trap that has taken the credit for the plain death he is on his way to (pillar 8),
+   * until he stands on something or jumps and it does not claim him again.
+   */
+  private claimed: DeathCause | null = null;
   private titleTimer = 0;
 
   private stats: Stats = { total: 0, byCause: new Map() };
@@ -492,6 +497,7 @@ export class Game {
     // A new attempt has not died of anything yet.
     this.deathCause = 'Fall';
     this.deathAt = null;
+    this.claimed = null;
     this.state = 'playing';
   }
 
@@ -529,6 +535,8 @@ export class Game {
 
   private kill(cause: DeathCause, at?: { x: number; y: number }): void {
     if (this.state !== 'playing') return;
+    // A plain death a trap set up is the trap's. Giving up is his, and a trap's own death its own.
+    if (this.claimed && this.plain(cause)) cause = this.claimed;
     if (this.level.data.tricks?.includes(cause)) this.progress.markTrick(this.level.data.id, cause);
     this.state = 'dead';
     this.deathTimer = DEATH_TIME;
@@ -647,6 +655,9 @@ export class Game {
       return;
     }
 
+    // Stood on something, or jumped: what happens next is not the last trap's doing,
+    // unless it claims him again now.
+    if (this.player.onGround || this.player.justJumped) this.claimed = null;
     // Traps first, so a platform's displacement is known before the player moves.
     for (const e of this.entities) {
       e.update(world);
@@ -734,6 +745,13 @@ export class Game {
     return keep;
   }
 
+  /** A fall, a drop or a drowning: the deaths that are nobody's trick unless a trap claims them. */
+  private plain(cause: DeathCause): boolean {
+    const d = this.level.data;
+    if (cause === (d.fallCause ?? 'Fall') || cause === (d.dropCause ?? 'The drop')) return true;
+    return d.entities.some((e) => e.kind === 'water' && e.cause === cause);
+  }
+
   /** Pillar 8's count for the exit label: how many of the level's tricks have ever killed this visitor. */
   private tricksCount(): { met: number; of: number } | null {
     const t = this.level.data.tricks;
@@ -750,6 +768,9 @@ export class Game {
       events: this.events,
       alive: this.state === 'playing',
       kill: (c, at) => this.kill(c, at),
+      claim: (c) => {
+        if (this.state === 'playing') this.claimed = c;
+      },
       sound: (n) => this.audio.play(n),
     };
   }

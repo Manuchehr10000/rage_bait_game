@@ -183,6 +183,12 @@ export interface CrumbleDef {
    */
   opens?: number;
   /**
+   * The trick it is (pillar 8). Once it has opened under him, a plain death down the hole it
+   * leaves (the fall out of the level, the drop, the water) is this one's, while he is in
+   * the hole: the pit gets him, the label names the trap.
+   */
+  claims?: DeathCause;
+  /**
    * The level's own tiles it stands in for, a row of characters to a row of tiles, drawn by
    * the code that draws the level's tiles. Where a skin draws the ground it is part of, this
    * says which ground: paving on fill, or the stone floor of a pit.

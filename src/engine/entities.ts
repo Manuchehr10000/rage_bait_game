@@ -45,6 +45,12 @@ export interface World {
    * top-left of his box there. Only a death that carries him off says.
    */
   kill(cause: DeathCause, at?: { x: number; y: number }): void;
+  /**
+   * A trap that only moves him takes the plain death it sets up (pillar 8): if he dies a
+   * fall, a drop or a drowning before the claim lapses, it is this one. It lapses once he
+   * stands on something or jumps, unless the trap claims him again that frame.
+   */
+  claim(cause: DeathCause): void;
   sound(name: Sfx): void;
 }
 
@@ -436,6 +442,8 @@ export class Crumble implements Entity {
   private readonly roofY: number;
   /** Whether the player was off the ground last frame, for the ones that mind being landed on. */
   private wasAirborne = false;
+  /** Whether a trapdoor opened under him: the hole it leaves is then its own. */
+  private took = false;
 
   constructor(readonly def: CrumbleDef, level?: Level) {
     this.rect = { ...def.rect };
@@ -451,8 +459,12 @@ export class Crumble implements Entity {
   }
 
   update(w: World): void {
-    if (!this.def.fake || this.state === 'gone') return;
+    if (!this.def.fake) return;
     const p = w.player;
+    // Down the hole it opened under him, whatever finishes him is this trap (pillar 8).
+    const d0 = this.def.rect;
+    if (this.took && this.def.claims && p.x + p.w > d0.x && p.x < d0.x + d0.w && p.y + p.h > d0.y) w.claim(this.def.claims);
+    if (this.state === 'gone') return;
     this.solid.dx = 0;
     this.solid.dy = 0;
     const r = this.rect;
@@ -498,6 +510,8 @@ export class Crumble implements Entity {
       }
       // A trapdoor: gone this frame, under whoever is on it.
       this.state = 'falling';
+      this.took = standing;
+      if (standing && this.def.claims) w.claim(this.def.claims);
       w.sound('crumble');
     }
     if (this.state === 'armed') {
