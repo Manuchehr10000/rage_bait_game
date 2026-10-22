@@ -153,14 +153,19 @@ What it needs, outside the repo:
 
 - **Cloudflare**, in the `lost-tourist` Pages project's settings, for the Preview
   environment only, which is where dev deploys: a D1 database bound as `DB`;
-  `GOOGLE_CLIENT_ID`; `EMAIL_FROM` (e.g. `Lost Tourist <tickets@losttourist.online>`); and
+  `GOOGLE_CLIENT_ID`; `EMAIL_FROM` (e.g. `Lost Tourist <tickets@mail.losttourist.online>`); and
   `RESEND_API_KEY`, as a secret. `EMAIL_DAILY_CAP` (default 90 codes a day, all addresses
   together) and `EMAIL_IP_HOURLY` (default 20 an hour per IP) are optional. The API makes
   its own tables the first time it is asked. Production gets none of these, so prod stays
   without accounts. Pages gives bindings and variables only to deployments made after
   they were added: once they are in, redeploy dev (push to `dev`, or run the CI workflow on
   `dev` again), or dev's `/api` keeps answering 404.
-- **Resend**: the domain `EMAIL_FROM` sends from, verified, and the API key.
+- **Resend**: the domain `EMAIL_FROM` sends from, `mail.losttourist.online` (a subdomain
+  keeps the main domain's mail reputation apart), verified; its DNS is at Cloudflare, so
+  Resend's Auto configure adds the records. The game's key is a sending-only key
+  restricted to that domain, put straight into Cloudflare as `RESEND_API_KEY`. Each code
+  goes with an idempotency key, so a send tried again (the server tries up to three times
+  when Resend is out of reach or briefly overloaded) never delivers two codes.
 - **Google Cloud**: an OAuth client of the Web application type. Its authorised JavaScript
   origins: `https://dev.losttourist.online`, `https://losttourist.online` (for when
   accounts reach prod), `http://localhost` and `http://localhost:8788`. Its client id is

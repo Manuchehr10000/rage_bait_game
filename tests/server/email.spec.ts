@@ -134,7 +134,10 @@ test('a code is sent through the email API, deadpan, and nothing about it is in 
     html: expect.stringContaining(code) as unknown as string,
     authorization: 'Bearer re_test_key',
     userAgent: 'lost-tourist/1',
+    // This start's row in the send log: a try made again cannot send a second code.
+    idempotencyKey: expect.stringMatching(/^lost-tourist\/code\/[A-Za-z0-9_-]{22}$/) as unknown as string,
   });
+  expect(world.db.rows('SELECT id FROM email_sends')).toEqual([{ id: mail.idempotencyKey!.slice('lost-tourist/code/'.length) }]);
   // Stored as a hash only, never as the code.
   const stored = world.db.rows('SELECT * FROM email_codes');
   expect(stored.length).toBe(1);
@@ -312,13 +315,15 @@ test('EMAIL_DAILY_CAP codes in any 24 hours, all addresses together; the log for
 });
 
 test('a code the API failed to send is not kept, so the address can try again at once', async () => {
-  for (const status of [500, 422, 'throw'] as const) {
+  // A server error or no answer is tried three times in all; a refusal, once.
+  for (const [status, tries] of [[500, 3], [422, 1], ['throw', 3]] as const) {
     const world = new World();
     const client = world.client();
     world.net.mailStatus = status;
     const { result: res, logged } = await quietly(() => client.post(START, { email: 'tourist@example.com' }));
     expect(res.status, String(status)).toBe(502);
     expect(res.body).toEqual({ error: 'send_failed' });
+    expect(world.net.mailKeys.length, String(status)).toBe(tries);
     expect(world.db.count('email_codes')).toBe(0);
     expect(logged).toContain('email send failed');
     expect(logged).not.toContain('tourist@example.com');
@@ -327,6 +332,71 @@ test('a code the API failed to send is not kept, so the address can try again at
     // The failure still counted against the limits.
     expect(world.db.count('email_sends')).toBe(2);
   }
+});
+
+test('a try that failed is made again with the same idempotency key, so one code goes out', async () => {
+  const world = new World();
+  // No answer, then a server error, then sent: three tries, one key, one mail.
+  world.net.mailAnswers.push('throw', 503);
+  const { result: res } = await quietly(() => world.client().post(START, { email: 'tourist@example.com' }));
+  expect(res.status).toBe(200);
+  expect(world.net.mailKeys.length).toBe(3);
+  expect(new Set(world.net.mailKeys).size).toBe(1);
+  expect(world.net.outbox.length).toBe(1);
+  expect(world.net.slept).toEqual([300, 1000]);
+  // The code he receives is the one stored.
+  world.advance(MINUTE);
+  const verify = await world.client().post<SignedIn>('/api/auth/email/verify', { email: 'tourist@example.com', code: world.code('tourist@example.com') });
+  expect(verify.status).toBe(200);
+  // Another start is another key.
+  world.advance(MINUTE);
+  expect((await world.client().post(START, { email: 'tourist@example.com' })).status).toBe(200);
+  expect(new Set(world.net.mailKeys).size).toBe(2);
+});
+
+test('Resend\'s rate limit is waited out as it asks, up to two seconds; its quotas are not', async () => {
+  const limited = (retryAfter?: string): { status: number; name: string; retryAfter?: string } => ({ status: 429, name: 'rate_limit_exceeded', ...(retryAfter === undefined ? {} : { retryAfter }) });
+
+  // It names a wait it can be given.
+  let world = new World();
+  world.net.mailAnswers.push(limited('1'));
+  let { result: res } = await quietly(() => world.client().post(START, { email: 'tourist@example.com' }));
+  expect(res.status).toBe(200);
+  expect(world.net.slept).toEqual([1000]);
+  expect(world.net.outbox.length).toBe(1);
+
+  // It names none: the usual wait.
+  world = new World();
+  world.net.mailAnswers.push(limited());
+  ({ result: res } = await quietly(() => world.client().post(START, { email: 'tourist@example.com' })));
+  expect(res.status).toBe(200);
+  expect(world.net.slept).toEqual([300]);
+
+  // Longer than he should be kept waiting: not waited out, and the code is not kept.
+  world = new World();
+  world.net.mailAnswers.push(limited('30'));
+  ({ result: res } = await quietly(() => world.client().post(START, { email: 'tourist@example.com' })));
+  expect(res.status).toBe(502);
+  expect(world.net.slept).toEqual([]);
+  expect(world.net.mailKeys.length).toBe(1);
+  expect(world.db.count('email_codes')).toBe(0);
+
+  // A quota is spent for the day or the month: asking again in a second changes nothing.
+  for (const name of ['daily_quota_exceeded', 'monthly_quota_exceeded']) {
+    world = new World();
+    world.net.mailAnswers.push({ status: 429, name, retryAfter: '1' });
+    ({ result: res } = await quietly(() => world.client().post(START, { email: 'tourist@example.com' })));
+    expect(res.status, name).toBe(502);
+    expect(world.net.mailKeys.length, name).toBe(1);
+    expect(world.net.slept, name).toEqual([]);
+  }
+
+  // The same key still being sent by a try that timed out here: try again.
+  world = new World();
+  world.net.mailAnswers.push({ status: 409, name: 'concurrent_idempotent_requests' });
+  ({ result: res } = await quietly(() => world.client().post(START, { email: 'tourist@example.com' })));
+  expect(res.status).toBe(200);
+  expect(world.net.mailKeys.length).toBe(2);
 });
 
 test('the right code signs him in with a session cookie, and makes his account once', async () => {

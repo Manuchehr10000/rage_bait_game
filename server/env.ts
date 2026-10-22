@@ -6,7 +6,7 @@ export interface Env {
   DB?: D1Like;
   GOOGLE_CLIENT_ID?: string;
   RESEND_API_KEY?: string;
-  /** e.g. 'Lost Tourist <tickets@losttourist.online>'. */
+  /** e.g. 'Lost Tourist <tickets@mail.losttourist.online>'. */
   EMAIL_FROM?: string;
   /** Default 'https://api.resend.com/emails'; tests point it at a mock. */
   EMAIL_API_URL?: string;
@@ -23,6 +23,8 @@ export interface Deps {
   /** Milliseconds since the epoch. */
   now(): number;
   fetch: typeof fetch;
+  /** Waits `ms`; the tests wait no time at all. */
+  sleep(ms: number): Promise<void>;
 }
 
 /** One request, as the handlers see it. */

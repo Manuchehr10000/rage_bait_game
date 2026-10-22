@@ -39,6 +39,7 @@ const DEFAULT_DEPS: Deps = {
   now: () => Date.now(),
   // Called through a closure: Workers refuse a fetch detached from the global.
   fetch: (input, init) => fetch(input, init),
+  sleep: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
 };
 
 export async function handle(request: Request, env: Env, deps: Partial<Deps> = {}): Promise<Response> {
