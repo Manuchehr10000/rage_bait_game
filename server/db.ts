@@ -19,9 +19,10 @@ export interface D1Like {
 
 /**
  * Each entry is one version of the schema, applied in order and never edited
- * once deployed: a change is a new entry at the end.
+ * once deployed: a change is a new entry at the end. Exported for the test that
+ * brings a database made at an older version up to date.
  */
-const MIGRATIONS: readonly (readonly string[])[] = [
+export const MIGRATIONS: readonly (readonly string[])[] = [
   [
     `CREATE TABLE IF NOT EXISTS users (id TEXT PRIMARY KEY, email TEXT NOT NULL UNIQUE, google_sub TEXT UNIQUE,
       lifetime INTEGER NOT NULL DEFAULT 0, created_at INTEGER NOT NULL)`,
@@ -42,6 +43,15 @@ const MIGRATIONS: readonly (readonly string[])[] = [
     // Each push forgets its account's old ids; without this it would read every id he has to find them.
     'CREATE INDEX IF NOT EXISTS pushes_at ON pushes (user_id, at)',
     'CREATE TABLE IF NOT EXISTS schema_version (version INTEGER PRIMARY KEY)',
+  ],
+  [
+    // What happened in play (contract.ts, PlayEvent), for the admin's tracker: one row an
+    // event, kept once per account by the page's id for it. `at` is the page's clock, which
+    // orders his events; `received_at` the server's, which says when he was last seen.
+    `CREATE TABLE IF NOT EXISTS events (user_id TEXT NOT NULL, id TEXT NOT NULL, at INTEGER NOT NULL,
+      received_at INTEGER NOT NULL, kind TEXT NOT NULL, level_id TEXT NOT NULL, cause TEXT, x INTEGER, y INTEGER,
+      ms INTEGER, deaths INTEGER, PRIMARY KEY (user_id, id))`,
+    'CREATE INDEX IF NOT EXISTS events_user_at ON events (user_id, at)',
   ],
 ];
 

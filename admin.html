@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- The admin's, never the public's: no crawler on any build. -->
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Lost Tourist · Visitors</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png" />
+    <style>
+      :root { --page: #0b0a08; --bright: #cfc6b0; --muted: #7d7462; --line: #2c2820; --mark: #d0644f; --dot: #cfc6b0; }
+      html { background: var(--page); }
+      body { margin: 0; background: var(--page); color: var(--bright); font: 14px/1.45 Georgia, serif; }
+      main { box-sizing: border-box; max-width: 1180px; margin: 0 auto; padding: 24px 16px 64px; }
+      h1 { margin: 0; font-size: 22px; font-weight: normal; letter-spacing: 0.02em; }
+      h2 { margin: 36px 0 10px; font-size: 16px; font-weight: normal; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+      h3 { margin: 22px 0 6px; font-size: 15px; font-weight: normal; }
+      a { color: var(--bright); }
+      p { margin: 0 0 10px; }
+      .muted { color: var(--muted); }
+      .stamp { font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+      header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 24px; }
+      .tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1px; margin-top: 18px; background: var(--line); border: 1px solid var(--line); }
+      .tile { padding: 10px 12px; background: var(--page); }
+      .tile b { display: block; font-size: 22px; font-weight: normal; font-variant-numeric: tabular-nums; }
+      .tile span { font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+      .scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+      table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+      th, td { padding: 6px 10px 6px 0; text-align: left; border-bottom: 1px solid var(--line); white-space: nowrap; vertical-align: top; }
+      th { font-weight: normal; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+      th button { padding: 0; border: 0; background: none; color: inherit; font: inherit; letter-spacing: inherit; text-transform: inherit; cursor: pointer; }
+      th button:hover, th button.on { color: var(--bright); }
+      td.n, th.n { text-align: right; padding-right: 14px; }
+      tr.row { cursor: pointer; }
+      tr.row:hover td, tr.row.on td { background: #16140f; }
+      td.wrap { white-space: normal; min-width: 180px; }
+      input[type='search'] { box-sizing: border-box; width: min(320px, 100%); margin: 0 0 10px; padding: 7px 8px; font: inherit; color: var(--bright); background: var(--page); border: 1px solid var(--muted); border-radius: 0; }
+      input[type='search']:focus { outline: 1px solid var(--bright); outline-offset: -1px; }
+      .bar { display: inline-block; height: 8px; background: var(--muted); vertical-align: middle; }
+      .bar.lost { background: var(--mark); }
+      svg.deaths { display: block; width: 100%; max-width: 640px; height: auto; margin: 6px 0 4px; background: #13110d; border: 1px solid var(--line); }
+      .legend { font-size: 12px; color: var(--muted); }
+      .legend i { display: inline-block; width: 8px; height: 8px; margin: 0 4px 0 10px; border-radius: 50%; background: var(--dot); vertical-align: middle; }
+      .legend i.lost { background: var(--mark); }
+      .spots { margin: 4px 0 0; padding: 0; list-style: none; font-size: 13px; }
+      .spots code { font: 13px ui-monospace, Menlo, Consolas, monospace; color: var(--bright); }
+      .level { padding: 2px 0 14px; border-bottom: 1px solid var(--line); }
+      .error { margin-top: 24px; font-style: italic; }
+    </style>
+  </head>
+  <body>
+    <main id="admin"><p class="muted">Loading the visitors…</p></main>
+    <script type="module" src="/src/admin/main.ts"></script>
+  </body>
+</html>

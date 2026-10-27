@@ -9,6 +9,9 @@
 # include http://localhost and http://localhost:8788.
 GOOGLE_CLIENT_ID=
 
+# The addresses whose accounts may read the admin's tracker (/admin), commas between.
+ADMIN_EMAILS=
+
 # Resend: an API key, and a sender on a domain verified with Resend.
 RESEND_API_KEY=
 EMAIL_FROM="Lost Tourist <tickets@mail.losttourist.online>"

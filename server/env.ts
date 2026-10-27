@@ -2,9 +2,11 @@ import type { D1Like } from './db';
 
 /** The Cloudflare bindings. All optional: without DB the API does not exist. */
 export interface Env {
-  /** Bound only where accounts are on: dev's Preview environment. */
+  /** Bound only where accounts are on: dev's Preview environment, and prod's Production once it is given one. */
   DB?: D1Like;
   GOOGLE_CLIENT_ID?: string;
+  /** The addresses whose accounts may read the admin's tracker (server/admin.ts), commas between. None by default. */
+  ADMIN_EMAILS?: string;
   RESEND_API_KEY?: string;
   /** e.g. 'Lost Tourist <tickets@mail.losttourist.online>'. */
   EMAIL_FROM?: string;

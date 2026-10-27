@@ -144,7 +144,7 @@ export class AccountUi {
     this.guest = make(
       'section',
       {},
-      make('p', { className: 'muted', textContent: 'Without an account the tour is forgotten when this tab closes.' }),
+      make('p', { className: 'muted', textContent: 'Without an account the tour is kept in this browser only.' }),
       this.google,
       this.or,
       this.emailForm,

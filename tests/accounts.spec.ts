@@ -1,6 +1,6 @@
 import { request as httpRequest } from 'node:http';
 import { expect, test, type APIRequestContext, type Page } from '@playwright/test';
-import type { Me, ProgressPush, Snapshot } from '../server/contract';
+import type { AdminUserDetail, Me, PlayEvent, ProgressPush, Snapshot } from '../server/contract';
 
 /**
  * Accounts, end to end (designer, 2026-10-16): the game as a visitor has it, in the
@@ -9,8 +9,8 @@ import type { Me, ProgressPush, Snapshot } from '../server/contract';
  * a code is read from the outbox the API sent it to, and Google's script is
  * replaced by one whose button asks the stand-in for a signed ID token.
  *
- * A guest's tour lasts until the tab closes; signing in carries it into the account;
- * signing out leaves an empty guest. Signed in, each tab queues and sends its own, and
+ * A guest's tour is kept in this browser (designer, 2026-10-27); signing in carries it,
+ * and what he did in play, into the account; signing out leaves an empty guest. Signed in, each tab queues and sends its own, and
  * what a closed tab left goes to the next tab signed in to the same account. A push whose
  * answer the page never heard goes again under its id, which the server counts once; an
  * account is named by its id, so one deleted and made again under the same address is
@@ -24,7 +24,8 @@ const PROVIDERS = 'http://localhost:8790';
 /** The game's own server, which has no API: there, accounts are unavailable. */
 const NO_API = 'http://localhost:4173';
 const CLIENT_ID = 'test-client.apps.googleusercontent.com';
-const GUEST_KEY = 'lostTourist.guest';
+/** The one address the API under test takes as the admin's (playwright.config.ts, ADMIN_EMAILS). */
+const ADMIN = 'admin@example.test';
 const EMPTY: Snapshot = { cleared: [], tricks: {}, lifetime: 0 };
 /** An account's id as the server makes it: 16 random bytes, base64url. */
 const ACCOUNT_ID = /^[A-Za-z0-9_-]{22}$/;
@@ -72,13 +73,40 @@ function me(page: Page): Promise<Me> {
   return page.evaluate(() => fetch('/api/me', { cache: 'no-store' }).then((r) => r.json() as Promise<Me>));
 }
 
-function guestRecord(page: Page): Promise<unknown> {
-  return page.evaluate((key) => JSON.parse(sessionStorage.getItem(key) ?? 'null') as unknown, GUEST_KEY);
+/** A guest's tour as this browser keeps it, under the keys prod always kept it under: null where a key is not there. */
+function browserTour(page: Page): Promise<{ cleared: unknown; tricks: unknown; lifetime: unknown }> {
+  return page.evaluate(() => {
+    const read = (key: string): unknown => JSON.parse(localStorage.getItem(key) ?? 'null') as unknown;
+    return { cleared: read('lostTourist.cleared'), tricks: read('lostTourist.tricks'), lifetime: read('lostTourist.lifetimeDeaths') };
+  });
 }
 
-/** A guest's record in the tab: its tour, and the id it was given with its first fact. */
-function guestOf(s: Snapshot): Snapshot & { id: unknown } {
-  return { id: expect.any(String) as unknown, ...s };
+/** No guest's tour in the browser at all. */
+const NO_TOUR = { cleared: null, tricks: null, lifetime: null };
+
+/** What a guest did in play, as this browser keeps it until he signs in. */
+function guestPlays(page: Page): Promise<PlayEvent[] | null> {
+  return page.evaluate(() => JSON.parse(localStorage.getItem('lostTourist.plays') ?? 'null') as PlayEvent[] | null);
+}
+
+/** The events in `pushes`, each once, in the order first sent, without their ids and times. */
+function eventsIn(pushes: ProgressPush[]): Omit<PlayEvent, 'id' | 'at'>[] {
+  const seen = new Set<string>();
+  const out: Omit<PlayEvent, 'id' | 'at'>[] = [];
+  for (const p of pushes) {
+    for (const e of p.events ?? []) {
+      if (seen.has(e.id)) continue;
+      seen.add(e.id);
+      const { id: _id, at: _at, ...rest } = e;
+      out.push(rest);
+    }
+  }
+  return out;
+}
+
+/** A death in Cap Blanc, wherever it was, as the tracker hears of it. */
+function deathIn(level: string, cause: string): Record<string, unknown> {
+  return { kind: 'death', level, cause, x: expect.any(Number) as unknown, y: expect.any(Number) as unknown, ms: expect.any(Number) as unknown };
 }
 
 /**
@@ -230,30 +258,32 @@ test.afterEach(({ page }) => {
   errors.delete(page);
 });
 
-test('a guest\'s tour lasts until the tab closes: a reload keeps it, a new tab has none', async ({ page, context }) => {
+test('a guest\'s tour is kept in this browser: a reload keeps it, and so does another tab', async ({ page, context }) => {
   await open(page);
   await expect(page.locator('#account-link')).toHaveText('Keep your tour: sign in');
   // Muted until he has something to lose.
   await expect(page.locator('#account-link')).not.toHaveClass(/lit/);
   await page.evaluate(() => (window as unknown as W).__game.tour.markCleared('cap-blanc'));
-  // In the tab, never in the browser.
-  expect(await guestRecord(page)).toEqual(guestOf({ cleared: ['cap-blanc'], tricks: {}, lifetime: 0 }));
-  expect(await page.evaluate(() => localStorage.getItem('lostTourist.cleared'))).toBeNull();
+  // In the browser, under the keys prod has always kept it under (designer, 2026-10-27).
+  expect(await browserTour(page)).toEqual({ cleared: ['cap-blanc'], tricks: null, lifetime: null });
 
   await page.reload();
   await page.waitForFunction(() => (window as unknown as Partial<W>).__game?.currentScreen === 'map');
   expect(await tour(page)).toEqual({ cleared: ['cap-blanc'], tricks: {}, lifetime: 0 });
-  // Something to lose now: the link is lit.
+  // Something to lose now: the link is lit, and the dialog says where it is kept.
   await expect(page.locator('#account-link')).toHaveClass(/lit/);
+  await page.locator('#account-link').click();
+  await expect(page.locator('#account')).toContainText('Without an account the tour is kept in this browser only.');
+  await page.locator('#account-close').click();
 
-  // Another tab of the same browser: the tab that had it is all that had it.
+  // Another tab of the same browser has it too.
   const other = await context.newPage();
   await open(other);
-  expect(await tour(other)).toEqual(EMPTY);
+  expect(await tour(other)).toEqual({ cleared: ['cap-blanc'], tricks: {}, lifetime: 0 });
   await other.close();
 });
 
-test('what this browser kept before accounts is a guest\'s tour, read and never written', async ({ page }) => {
+test('what this browser kept before accounts is the guest\'s tour, and goes on being kept there', async ({ page }) => {
   await open(page);
   await page.evaluate(() => {
     localStorage.setItem('lostTourist.cleared', JSON.stringify(['cap-blanc', 'roc-aux-sorciers']));
@@ -265,11 +295,10 @@ test('what this browser kept before accounts is a guest\'s tour, read and never 
   expect(await tour(page)).toEqual({ cleared: ['cap-blanc', 'roc-aux-sorciers'], tricks: { persepolis: ['The audience'] }, lifetime: 5 });
   await expect(page.locator('#account-link')).toHaveClass(/lit/);
 
-  // A death as a guest counts in the tour, and goes to the tab.
+  // A death as a guest counts in the tour, and is kept with the rest.
   await page.evaluate(() => (window as unknown as W).__game.tour.addDeath());
   expect((await tour(page)).lifetime).toBe(6);
-  expect(await page.evaluate(() => localStorage.getItem('lostTourist.lifetimeDeaths'))).toBe('5');
-  expect(await guestRecord(page)).toEqual(guestOf({ cleared: [], tricks: {}, lifetime: 1 }));
+  expect(await browserTour(page)).toEqual({ cleared: ['cap-blanc', 'roc-aux-sorciers'], tricks: { persepolis: ['The audience'] }, lifetime: 6 });
 });
 
 test('email: Continue makes the account, the guest\'s tour goes into it, and the next page opens signed in', async ({ page, context, request }) => {
@@ -292,7 +321,7 @@ test('email: Continue makes the account, the guest\'s tour goes into it, and the
     .poll(() => me(page))
     .toEqual({ user: { email, id: expect.stringMatching(ACCOUNT_ID) as unknown }, progress: kept, methods: { google: CLIENT_ID, email: true } });
   // Forgotten as a guest's: it is the account's now, and sent, so nothing is left queued.
-  expect(await guestRecord(page)).toBeNull();
+  expect(await browserTour(page)).toEqual(NO_TOUR);
   await expect.poll(() => queuedFor(page, email)).toEqual([]);
   // The code came from the API under workerd, whose fetch names no User-Agent of its
   // own; Resend refuses mail without one, and so does its stand-in.
@@ -875,53 +904,44 @@ test('a tab whose browser has since been signed in as someone else deletes no on
   await other.close();
 });
 
-test('a duplicated guest tab carries its copy of the tour in once: only what it earned since counts again', async ({ page, context, request }) => {
+test('two guest tabs keep one tour, and signing in carries it in once: only what one earned since counts again', async ({ page, context, request }) => {
   await open(page);
   await page.evaluate(() => {
     const t = (window as unknown as W).__game.tour;
     t.markCleared('cap-blanc');
     for (let i = 0; i < 50; i++) t.addDeath();
   });
-  // Duplicating a tab copies its sessionStorage: the copy opens with the same record, and the same tab id.
-  const copied = await page.evaluate(() => {
-    const all: Record<string, string> = {};
-    for (let i = 0; i < sessionStorage.length; i++) {
-      const key = sessionStorage.key(i) ?? '';
-      all[key] = sessionStorage.getItem(key) ?? '';
-    }
-    return all;
-  });
-  const copy = await context.newPage();
-  await copy.addInitScript((all) => {
-    // Once, as the browser does it: a reload of the copy keeps what the copy has made of it.
-    if (sessionStorage.getItem('test.duplicated')) return;
-    for (const [key, value] of Object.entries(all)) sessionStorage.setItem(key, value);
-    sessionStorage.setItem('test.duplicated', '1');
-  }, copied);
-  await open(copy);
-  expect(await tour(copy)).toEqual({ cleared: ['cap-blanc'], tricks: {}, lifetime: 50 });
-  // The first tab holds that id, so the copy takes another.
-  await expect.poll(() => copy.evaluate(() => sessionStorage.getItem('lostTourist.tab'))).not.toBe(copied['lostTourist.tab']);
-  // From here the copy is a tab of its own: a level and a death of its own.
-  await copy.evaluate(() => {
+  const other = await context.newPage();
+  await open(other);
+  expect(await tour(other)).toEqual({ cleared: ['cap-blanc'], tricks: {}, lifetime: 50 });
+  // A level and a death in the other tab go into the same tour.
+  await other.evaluate(() => {
     const t = (window as unknown as W).__game.tour;
     t.markCleared('philae');
     t.addDeath();
   });
+  expect(await browserTour(page)).toEqual({ cleared: ['cap-blanc', 'philae'], tricks: null, lifetime: 51 });
 
-  const email = address('duplicate');
+  const email = address('two-guests');
   await signInByEmail(page, request, email);
-  await expect.poll(() => me(page).then((m) => m.progress)).toEqual({ cleared: ['cap-blanc'], tricks: {}, lifetime: 50 });
-
-  // The copy, loaded again, is signed in by the cookie and carries in its own: 51, not 101.
-  await copy.reload();
-  await copy.waitForFunction(() => (window as unknown as Partial<W>).__game?.currentScreen === 'map');
-  await expect(copy.locator('#account-link')).toHaveText(`Tour kept · ${email}`);
   const all: Snapshot = { cleared: ['cap-blanc', 'philae'], tricks: {}, lifetime: 51 };
-  await expect.poll(() => held(copy)).toEqual(all);
-  await copy.waitForTimeout(1_000);
-  expect(await held(copy)).toEqual(all);
-  await copy.close();
+  await expect.poll(() => held(page)).toEqual(all);
+  expect(await browserTour(page)).toEqual(NO_TOUR);
+
+  // The other tab still shows the guest's tour it loaded. A death there now is kept over
+  // what the browser holds, which is nothing, not over what it loaded: the 51 are not
+  // kept again to be carried in twice.
+  await other.evaluate(() => (window as unknown as W).__game.tour.addDeath());
+  expect(await browserTour(other)).toEqual({ cleared: null, tricks: null, lifetime: 1 });
+  // Loaded again, it is signed in by the cookie and carries in its own: 52, not 103.
+  await other.reload();
+  await other.waitForFunction(() => (window as unknown as Partial<W>).__game?.currentScreen === 'map');
+  await expect(other.locator('#account-link')).toHaveText(`Tour kept · ${email}`);
+  const now: Snapshot = { ...all, lifetime: 52 };
+  await expect.poll(() => held(other)).toEqual(now);
+  await other.waitForTimeout(1_000);
+  expect(await held(other)).toEqual(now);
+  await other.close();
 });
 
 test('a queue a closed tab left goes to the next tab signed in to its account, and never to another', async ({ page, context, request }) => {
@@ -947,7 +967,7 @@ test('a queue a closed tab left goes to the next tab signed in to its account, a
     t.addDeath();
   });
   const lost = (await failed).postDataJSON() as ProgressPush;
-  expect(lost).toEqual({ id: expect.stringMatching(PUSH_ID) as unknown, account: xId, cleared: ['knossos'], tricks: {}, deaths: 3 });
+  expect(lost).toEqual({ id: expect.stringMatching(PUSH_ID) as unknown, account: xId, cleared: ['knossos'], tricks: {}, deaths: 3, events: [] });
   // Its deaths stay with the push that failed, under its id, never back among those
   // not sent: whoever sends them again sends that push.
   await expect.poll(() => queuedFor(page, x)).toEqual([{ account: xId, cleared: ['knossos'], deaths: 0, outbox: [3] }]);
@@ -1109,7 +1129,7 @@ test('the link is never inside a level: only on the map', async ({ page }) => {
   await expect(page.locator('#account-link')).toBeVisible();
 });
 
-test('with no API, there are no accounts: no link, no dialog, and he plays as a guest', async ({ page }) => {
+test('with no API, there are no accounts: no link, no dialog, and he plays as a guest, his tour kept in the browser', async ({ page }) => {
   const asked: number[] = [];
   page.on('response', (r) => {
     if (new URL(r.url()).pathname === '/api/me') asked.push(r.status());
@@ -1120,9 +1140,136 @@ test('with no API, there are no accounts: no link, no dialog, and he plays as a 
   await expect(page.locator('#account')).toHaveCount(0);
 
   await page.evaluate(() => (window as unknown as W).__game.tour.markCleared('cap-blanc'));
-  expect(await guestRecord(page)).toEqual(guestOf({ cleared: ['cap-blanc'], tricks: {}, lifetime: 0 }));
-  expect(await page.evaluate(() => localStorage.getItem('lostTourist.cleared'))).toBeNull();
+  // As prod has always kept it: a tab closed, or a deploy without a database, loses nothing.
+  expect(await browserTour(page)).toEqual({ cleared: ['cap-blanc'], tricks: null, lifetime: null });
   await page.reload();
   await page.waitForFunction(() => (window as unknown as Partial<W>).__game?.currentScreen === 'map');
   expect(await tour(page)).toEqual({ cleared: ['cap-blanc'], tricks: {}, lifetime: 0 });
+});
+
+/** Deaths in this visit, and whether he is playing again after the last one. */
+function deathsNow(page: Page): Promise<{ total: number; state: string }> {
+  return page.evaluate(() => {
+    const g = (window as unknown as W).__game;
+    return { total: g.stats.total, state: g.state };
+  });
+}
+
+/** Into Cap Blanc by its link, R there, then Esc: he gives up twice, and leaves for the map. */
+async function giveUpTwiceInCapBlanc(page: Page): Promise<void> {
+  await page.goto('about:blank');
+  await open(page, '/#cap-blanc', 'level');
+  await page.keyboard.press('KeyR');
+  await expect.poll(() => deathsNow(page)).toEqual({ total: 1, state: 'playing' });
+  await page.keyboard.press('Escape');
+  await page.waitForFunction(() => (window as unknown as W).__game.currentScreen === 'map');
+}
+
+test('what happens in play goes with the pushes: going in, each death and where, leaving for the map, clearing', async ({ page, request }) => {
+  await open(page);
+  const email = address('plays');
+  await signInByEmail(page, request, email);
+  const pushes = pushesOf(page);
+  await giveUpTwiceInCapBlanc(page);
+  // Coming back to the map sends them, with the deaths.
+  await expect
+    .poll(() => eventsIn(pushes), { timeout: 5_000 })
+    .toEqual([{ kind: 'enter', level: 'cap-blanc' }, deathIn('cap-blanc', 'Gave up'), deathIn('cap-blanc', 'Gave up'), { kind: 'leave', level: 'cap-blanc', deaths: 2 }]);
+  // The first was where a link puts him, on his spawn: the dev ruler's point there is (middle of him, 0).
+  const spawn = await page.evaluate(() => {
+    const g = (window as unknown as { __game: { levelData: { spawn: { x: number } }; player: { w: number } } }).__game;
+    return Math.round(g.levelData.spawn.x + g.player.w / 2);
+  });
+  const first = pushes.flatMap((p) => p.events ?? []).find((e) => e.kind === 'death');
+  expect(first).toMatchObject({ x: spawn, y: 0 });
+  expect(first?.kind === 'death' && first.ms).toBeGreaterThan(0);
+  await expect.poll(() => queuedFor(page, email)).toEqual([]);
+
+  // In again, and put at the exit: a clear, after no deaths, and Esc at the label is no leave.
+  await page.goto('about:blank');
+  await open(page, '/#cap-blanc', 'level');
+  await page.evaluate(() => {
+    type G = { __game: { levelData: { exit: { x: number; y: number; w: number; h: number } }; player: { x: number; y: number; w: number; h: number } } };
+    const g = (window as unknown as G).__game;
+    const { exit } = g.levelData;
+    g.player.x = exit.x + exit.w / 2 - g.player.w / 2;
+    g.player.y = exit.y + exit.h - g.player.h;
+  });
+  await page.waitForFunction(() => (window as unknown as W).__game.state === 'complete');
+  await page.keyboard.press('Escape');
+  await page.waitForFunction(() => (window as unknown as W).__game.currentScreen === 'map');
+  await expect
+    .poll(() => eventsIn(pushes).slice(4), { timeout: 5_000 })
+    .toEqual([{ kind: 'enter', level: 'cap-blanc' }, { kind: 'clear', level: 'cap-blanc', ms: expect.any(Number) as unknown, deaths: 0 }]);
+  await expect.poll(() => held(page).then((h) => h?.cleared)).toEqual(['cap-blanc']);
+});
+
+test('what a guest did in play is kept in the browser, and goes into the account he signs in to', async ({ page, request }) => {
+  await open(page);
+  await giveUpTwiceInCapBlanc(page);
+  expect((await guestPlays(page))?.map((e) => e.kind)).toEqual(['enter', 'death', 'death', 'leave']);
+  // Kept after a reload, as his tour is.
+  await page.reload();
+  await page.waitForFunction(() => (window as unknown as Partial<W>).__game?.currentScreen === 'map');
+  expect(await guestPlays(page)).toHaveLength(4);
+
+  const pushes = pushesOf(page);
+  const email = address('guest-plays');
+  await signInByEmail(page, request, email);
+  await expect
+    .poll(() => eventsIn(pushes))
+    .toEqual([{ kind: 'enter', level: 'cap-blanc' }, deathIn('cap-blanc', 'Gave up'), deathIn('cap-blanc', 'Gave up'), { kind: 'leave', level: 'cap-blanc', deaths: 2 }]);
+  // Forgotten as a guest's, and the server has them.
+  expect(await guestPlays(page)).toBeNull();
+  await expect.poll(() => queuedFor(page, email)).toEqual([]);
+  await expect.poll(() => held(page).then((h) => h?.lifetime)).toBe(2);
+});
+
+test('the admin\'s tracker: only the admin reads it, and it shows what each visitor did', async ({ page, request, browser }) => {
+  // A visitor, who plays a little.
+  await open(page);
+  const email = address('tracked');
+  await signInByEmail(page, request, email);
+  const id = await accountId(page);
+  await giveUpTwiceInCapBlanc(page);
+  await expect.poll(() => queuedFor(page, email)).toEqual([]);
+
+  // His own page of it says he is not the admin.
+  await page.goto('/admin.html');
+  await expect(page.locator('.error')).toContainText('This account is not an admin\u2019s.');
+
+  // Signed out, it says to sign in first.
+  const stranger = await browser.newContext({ baseURL: 'http://localhost:8788' });
+  const nobody = await stranger.newPage();
+  await nobody.goto('/admin.html');
+  await expect(nobody.locator('.error')).toContainText('Sign in on the game\u2019s map first');
+  await stranger.close();
+
+  // The admin, in a browser of his own.
+  const theirs = await browser.newContext({ baseURL: 'http://localhost:8788' });
+  await theirs.route('https://accounts.google.com/**', (route) => route.abort());
+  const admin = await theirs.newPage();
+  await open(admin);
+  await signInByEmail(admin, request, ADMIN);
+  const detail = (await admin.evaluate(
+    (who) => fetch(`/api/admin/user?id=${encodeURIComponent(who)}`, { cache: 'no-store' }).then((r) => r.json()),
+    id,
+  )) as AdminUserDetail;
+  expect(detail.user).toMatchObject({ id, email, visits: 1, deaths: 2, gaveUp: 2, left: 1, lifetime: 2 });
+  expect(detail.levels).toEqual([expect.objectContaining({ level: 'cap-blanc', visits: 1, deaths: 2, gaveUp: 2, left: 1, clears: 0 })]);
+
+  await admin.goto('/admin.html');
+  const row = admin.locator('tr.row', { hasText: email });
+  await expect(row).toBeVisible();
+  await expect(row).toContainText('Left Cap Blanc');
+  await row.click();
+  const visitor = admin.locator('#visitor');
+  await expect(visitor).toContainText(email);
+  await expect(visitor.locator('table').first()).toContainText('Cap Blanc');
+  await expect(visitor.locator('.spots')).toContainText('cap-blanc (');
+  await expect(visitor).toContainText('Left for the map, after 2 deaths');
+  // Its address names the visitor, so the page opens on him again.
+  await admin.reload();
+  await expect(admin.locator('#visitor')).toContainText(email);
+  await theirs.close();
 });

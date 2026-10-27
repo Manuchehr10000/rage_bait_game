@@ -53,7 +53,7 @@ notes describe the levels as they were built.
   and a level he has cleared stays open (designer, 2026-10-15). Deep links still open any
   level in dev and local builds.
 - **Chapters 1 to 4 are the game for now.** 5 to 12 are hidden (`SHOWN_CHAPTERS` in
-  `src/map/atlas.ts`) and are thought about later.
+  `src/map/atlas.ts`) and are thought about later. Main plays only 1 and 2 (below).
 - **Chapter 4** (ruled 2026-10-03, on the designer's delegation, `arc.md` sections 3 and 4):
   the order is Persepolis, Naqsh-e Rustam, Pasargadae, Susa, Behistun, with 3 and 4
   provisional; the legend is Farhad, and it never stages his death; the signature is the
@@ -71,17 +71,36 @@ notes describe the levels as they were built.
   2026-10-11). On the map since the designer's word of 2026-10-12, no longer a stage: in the
   tour after Knossos and before Persepolis (`LEVELS`). Held back from prod by the designer's
   word of 2026-10-15 ("push to main everything except Minotaur level"), and released to it by
-  the designer's word of 2026-10-16 ("push to main. Make all levels available on main"): in
-  prod's tour after Knossos (`PROD_LEVELS`), so every built level is on prod's map. A level can
-  still be held back the same way (`HELD` in `src/levels/index.ts`, its file in
-  `src/levels/held-files.ts`, checked by vite.config.ts); none is.
+  the designer's word of 2026-10-16 ("push to main. Make all levels available on main").
+  Held back again with all of chapters 3 and 4 on 2026-10-27 (below). A level is held back by
+  `HELD` in `src/levels/index.ts`, its file in `src/levels/held-files.ts`, checked by
+  vite.config.ts.
+- **Main plays chapters 1 and 2** (designer, 2026-10-27: "Make only chapter 1 and 2 playable
+  in main. Other chapters are visible but locked for now. Locked in the sense that are under
+  developments"): Knossos, the Minotaur and Persepolis are `HELD`, so prod's tour ends at
+  Dendera and its bundle carries none of their files. Prod's map still shows chapters 3 and
+  4, closed for restoration (`chapterRestoring`, `src/map/atlas.ts`): a badge, not a dot, and
+  no way in. Dev and local builds play everything, as before. To release a chapter, put its
+  levels back in `PROD_LEVELS` and take them out of `HELD` and `held-files.ts`.
 - **Accounts** (designer, 2026-10-16): a visitor keeps his tour by signing in, with Google
-  or with a code sent by email; there is no sign-up, only Continue. A guest's tour lasts
-  until the tab closes, and signing in carries it into the account. Cloudflare Pages
-  Functions and D1 (`functions/api/`, `server/`; the page's side in `src/account/`). Dev
-  only first: prod keeps the tour in localStorage, carries no account code (checked by
-  vite.config.ts), and has no database bound, so its `/api` answers 404. How to run it and
-  what to configure: README, "Accounts".
+  or with a code sent by email; there is no sign-up, only Continue. Signing in carries a
+  guest's tour into the account. Cloudflare Pages Functions and D1 (`functions/api/`,
+  `server/`; the page's side in `src/account/`). Dev only at first; released to prod by the
+  designer's word of 2026-10-27 ("add google auth to main"), Google alone there, which is
+  prod's configuration (no Resend key), not its code. `accounts` in vite.config.ts can hold
+  them back again. Until prod's Production environment has a database bound, its `/api`
+  answers 404 and everyone is a guest. A guest's tour is kept in the browser in every build
+  (designer, 2026-10-27, on a recommendation), no longer only until the tab closes: on prod
+  a guest who never signs in must not lose the tour. How to run it and what to
+  configure: README, "Accounts".
+- **The admin's tracker** (designer, 2026-10-27): `/admin` shows every account, when it was
+  made, which levels it played and cleared, its deaths by cause and by place, where it gave
+  up and where it is now; only for the addresses `ADMIN_EMAILS` names. Built on events
+  (`PlayEvent`, `server/contract.ts`; one row each in D1's `events`) that the page sends
+  with its pushes: going into a level, each death (cause, the dev ruler's (X, Y), how far
+  into the attempt), leaving a level from the middle of it, each clear. Full analytics are
+  to be built on top of it. Only accounts are seen: a guest's events wait in the browser
+  until the guest signs in. README, "The admin's tracker".
 - **On a phone** (designer, 2026-10-16): held sideways, buttons in the side borders and
   never over the game (the game is drawn smaller for them); left and right under the left
   thumb, jump under the right; map, give up, lamp, sound and full screen as small buttons;

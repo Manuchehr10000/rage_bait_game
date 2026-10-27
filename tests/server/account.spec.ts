@@ -438,9 +438,11 @@ test('deleting the account forgets everything about him, and nothing about anyon
   world.advance(2 * MINUTE);
   await second.signInByEmail('tourist@example.com');
   const progress = { cleared: ['cap-blanc'], tricks: { 'cap-blanc': ['The cow'] }, deaths: 4 };
-  expect((await client.post('/api/progress', push(id, progress))).status).toBe(200);
-  expect((await other.post('/api/progress', push(otherId, progress))).status).toBe(200);
+  const events = [{ id: 'event-0000000000000001', at: world.now, kind: 'enter' as const, level: 'cap-blanc' }];
+  expect((await client.post('/api/progress', push(id, { ...progress, events }))).status).toBe(200);
+  expect((await other.post('/api/progress', push(otherId, { ...progress, events }))).status).toBe(200);
   expect(world.db.count('pushes')).toBe(2);
+  expect(world.db.count('events')).toBe(2);
   world.advance(2 * MINUTE);
   await client.post('/api/auth/email/start', { email: 'tourist@example.com' });
   expect(world.db.count('email_codes', 'email = ?1', 'tourist@example.com')).toBe(1);
@@ -455,10 +457,11 @@ test('deleting the account forgets everything about him, and nothing about anyon
   expect(world.db.count('tricks')).toBe(1);
   expect(world.db.count('email_codes')).toBe(0);
   expect(world.db.rows('SELECT user_id FROM pushes')).toEqual([{ user_id: otherId }]);
+  expect(world.db.rows('SELECT user_id FROM events')).toEqual([{ user_id: otherId }]);
   // The send log keeps its rows for the limits, but not his address.
   expect(world.db.count('email_sends', "email = 'tourist@example.com'")).toBe(0);
   expect(world.db.count('email_sends', "email = ''")).toBe(3);
-  for (const table of ['users', 'sessions', 'cleared', 'tricks', 'pushes', 'email_codes', 'email_sends']) {
+  for (const table of ['users', 'sessions', 'cleared', 'tricks', 'pushes', 'events', 'email_codes', 'email_sends']) {
     const rows = JSON.stringify(world.db.rows(`SELECT * FROM ${table}`));
     expect(rows, table).not.toContain('tourist@');
     expect(rows, table).not.toContain(id);

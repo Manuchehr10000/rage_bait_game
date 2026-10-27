@@ -14,6 +14,11 @@ export interface Site {
   lon: number;
   /** Level id in src/levels, once the level exists. */
   level?: string;
+  /**
+   * Built, and held back from this build (src/levels/index.ts, HELD): its level is taken
+   * off it, and it is closed for restoration (chaptersFor). Never set in the atlas itself.
+   */
+  held?: true;
   /** Nudge for the pin on the chapter map when sites crowd; a leader line points at the true spot. */
   pin?: { dx: number; dy: number };
   /** Which side the name goes. Default alternates. */
@@ -268,9 +273,9 @@ export const CHAPTERS: Chapter[] = TOUR.slice(0, SHOWN_CHAPTERS);
 
 /**
  * The chapters as a build shows them, given the levels in its tour: a site whose level the
- * build does not carry has no level there, and is drawn and treated as closed. That is a
- * level held back from prod (src/levels/index.ts) on prod's map; in every other build the
- * tour has every level the atlas names, and these are CHAPTERS.
+ * build does not carry has no level there, and is drawn and treated as closed, for
+ * restoration (`held`). That is a level held back from prod (src/levels/index.ts) on prod's
+ * map; in every other build the tour has every level the atlas names, and these are CHAPTERS.
  */
 export function chaptersFor(tour: readonly string[]): Chapter[] {
   return CHAPTERS.map((c) => ({
@@ -278,7 +283,7 @@ export function chaptersFor(tour: readonly string[]): Chapter[] {
     sites: c.sites.map((s) => {
       if (!s.level || tour.includes(s.level)) return s;
       const { level: _held, ...closed } = s;
-      return closed;
+      return { ...closed, held: true as const };
     }),
   }));
 }
@@ -286,6 +291,15 @@ export function chaptersFor(tour: readonly string[]): Chapter[] {
 /** True if any level of the chapter exists in the game. */
 export function chapterOpen(c: Chapter): boolean {
   return c.sites.some((s) => s.level);
+}
+
+/**
+ * A chapter with levels built that this build holds back, and none it plays: on the map,
+ * closed for restoration, its badge drawn where a chapter never built is only a dot.
+ * Chapters 3 and 4 on prod's (designer, 2026-10-27).
+ */
+export function chapterRestoring(c: Chapter): boolean {
+  return !chapterOpen(c) && c.sites.some((s) => s.held);
 }
 
 /** The site whose monument stands for the chapter on the tour map. */

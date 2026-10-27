@@ -14,27 +14,35 @@ import { PERSEPOLIS } from './ch04-persia/l01-persepolis';
 
 /**
  * The tour prod plays, which main deploys: every level in tour order but the ones HELD back
- * from it. Chapter 1, then chapter 2 south to north along the Nile, then the Aegean, then Persia.
+ * from it. Chapter 1, then chapter 2 south to north along the Nile. The Aegean and Persia are
+ * held back, and closed for restoration on prod's map (designer, 2026-10-27).
  */
-export const PROD_LEVELS: LevelData[] = [CAP_BLANC, ROC_AUX_SORCIERS, PECH_MERLE, ROUFFIGNAC, GARGAS, ABU_SIMBEL, PHILAE, KARNAK, DENDERA, KNOSSOS, MINOTAUR, PERSEPOLIS];
+export const PROD_LEVELS: LevelData[] = [CAP_BLANC, ROC_AUX_SORCIERS, PECH_MERLE, ROUFFIGNAC, GARGAS, ABU_SIMBEL, PHILAE, KARNAK, DENDERA];
 
 /**
  * Built, on the map in the dev and local builds, and held back from prod: each with the level
- * it follows in the tour. Prod has no place in its tour for one, no pin, no deep link, and not
- * its level file: game.ts reads LEVELS only outside prod, and vite.config.ts fails a prod build
- * that carries the file (its art notes and the engine code that draws it still ship). To hold
- * one back, put it here and its file in held-files.ts; to release one, write it into
- * PROD_LEVELS in its place and take it out of both.
+ * it follows in the tour, which may be another held one. Prod has no place in its tour for
+ * one, no pin, no deep link, and not its level file: game.ts reads LEVELS only outside prod,
+ * and vite.config.ts fails a prod build that carries the file (its art notes and the engine
+ * code that draws it still ship). To hold one back, put it here and its file in
+ * held-files.ts; to release one, write it into PROD_LEVELS in its place and take it out of both.
  *
- * None is held back now. The Minotaur, chapter 3's legend, was held back from prod by the
- * designer on 2026-10-15 and released to it on 2026-10-16 ("Make all levels available on
- * main"): it is in PROD_LEVELS, after Knossos.
+ * Chapters 3 and 4 are held back: main plays chapters 1 and 2, and shows the other two on its
+ * map, closed for restoration, while they are being made (designer, 2026-10-27: "Make only
+ * chapter 1 and 2 playable in main"). A chapter all of whose levels are held is drawn that
+ * way (src/map/atlas.ts, chaptersFor). The Minotaur was held back once before, from
+ * 2026-10-15 to 2026-10-16.
  */
-export const HELD: readonly { level: LevelData; after: string }[] = [];
+export const HELD: readonly { level: LevelData; after: string }[] = [
+  { level: KNOSSOS, after: 'dendera' },
+  { level: MINOTAUR, after: 'knossos' },
+  { level: PERSEPOLIS, after: 'minotaur' },
+];
 
-/** `levels` with each of `held` put in after the level it follows. */
+/** `levels` with each of `held` put in after the level it follows, and any held after that after it. */
 export function withHeld(levels: readonly LevelData[], held: readonly { level: LevelData; after: string }[]): LevelData[] {
-  return levels.flatMap((l) => [l, ...held.filter((h) => h.after === l.id).map((h) => h.level)]);
+  const after = (id: string): LevelData[] => held.filter((h) => h.after === id).flatMap((h) => [h.level, ...after(h.level.id)]);
+  return levels.flatMap((l) => [l, ...after(l.id)]);
 }
 
 /**

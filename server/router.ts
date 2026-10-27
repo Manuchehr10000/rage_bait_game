@@ -4,6 +4,7 @@
  * on Workers and on Node alike.
  */
 
+import { adminUser, adminUsers } from './admin';
 import type { Me, Methods, Ok, ProgressReply } from './contract';
 import { sha256hex } from './crypto';
 import { ensureSchema } from './db';
@@ -33,6 +34,8 @@ const ROUTES = new Map<string, Route>([
   ['/api/auth/google', { method: 'POST', handler: googleSignIn }],
   ['/api/auth/logout', { method: 'POST', handler: logout }],
   ['/api/account', { method: 'DELETE', handler: deleteAccount }],
+  ['/api/admin/users', { method: 'GET', handler: adminUsers }],
+  ['/api/admin/user', { method: 'GET', handler: adminUser }],
 ]);
 
 const DEFAULT_DEPS: Deps = {
