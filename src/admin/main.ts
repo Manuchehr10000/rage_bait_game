@@ -27,7 +27,7 @@ const NAME = new Map(ATLAS.map((l) => [l.id, l.name]));
 /** The cause a give-up dies of (src/engine/types.ts, DeathCause). */
 const GAVE_UP = 'Gave up';
 const WEEK = 7 * 86_400_000;
-/** Deaths within this many world px of each other are one spot. */
+/** Deaths are counted by the nearest point of a grid this many world px apart, which names the spot. */
 const SPOT = 8;
 
 type Reply<T> = { ok: true; body: T } | { ok: false; status: number; error: string | null };
@@ -131,7 +131,16 @@ const COLUMNS: Column[] = [
     value: (u) => TOUR.filter((l) => u.cleared.includes(l.id)).length,
     show: (u) => `${TOUR.filter((l) => u.cleared.includes(l.id)).length} of ${TOUR.length}`,
   },
-  { key: 'at', label: 'Now at', value: (u) => TOUR.findIndex((l) => l.id === nowAt(u)), show: (u) => (nowAt(u) ? levelName(nowAt(u)!) : 'Finished') },
+  {
+    key: 'at',
+    label: 'Now at',
+    // Finished is past the last level, not before the first.
+    value: (u) => {
+      const at = nowAt(u);
+      return at === null ? TOUR.length : TOUR.findIndex((l) => l.id === at);
+    },
+    show: (u) => (nowAt(u) ? levelName(nowAt(u)!) : 'Finished'),
+  },
   { key: 'lifetime', label: 'Deaths', numeric: true, value: (u) => u.lifetime, show: (u) => u.lifetime },
   { key: 'gaveUp', label: 'Gave up', numeric: true, value: (u) => u.gaveUp, show: (u) => u.gaveUp },
   { key: 'left', label: 'Left', numeric: true, value: (u) => u.left, show: (u) => u.left },
@@ -310,7 +319,9 @@ async function open(id: string): Promise<void> {
   const r = await get<AdminUserDetail>(`/api/admin/user?id=${encodeURIComponent(id)}`);
   if (selected !== id) return;
   if (!r.ok) {
-    detail.replaceChildren(h('h2', {}, 'Visitor'), h('p', { className: 'error' }, refusal(r.status, r.error)));
+    // The list came, so there is an API: a 404 here is an account deleted since.
+    const why = r.status === 404 ? 'This account is not there any more: deleted since the list was loaded. Reload for the list as it is.' : refusal(r.status, r.error);
+    detail.replaceChildren(h('h2', {}, 'Visitor'), h('p', { className: 'error' }, why));
     return;
   }
   detail.replaceChildren(...kids(visitor(r.body)));
@@ -332,7 +343,7 @@ function visitor(d: AdminUserDetail): Child[] {
     ),
     h('p', { className: 'muted' }, `Account ${u.id}. Visits, deaths, give-ups and clears below are counted from the tracker\u2019s events, since it began; deaths in all go back further.`),
     levels.length ? levelTable(levels) : h('p', { className: 'muted' }, 'Nothing played since the tracker began.'),
-    ...levels.filter((l) => l.points.length).map(deathsIn),
+    ...levels.filter((l) => l.deaths > 0).map(deathsIn),
     h('h3', {}, 'Latest events'),
     d.events.length ? timeline(d.events) : h('p', { className: 'muted' }, 'No events yet.'),
     d.more ? h('p', { className: 'muted' }, `The newest ${d.events.length} events.`) : null,
@@ -380,9 +391,10 @@ function deathsIn(l: AdminLevel): HTMLElement {
     { className: 'level' },
     h('h3', {}, `${levelName(l.level)} `, h('span', { className: 'muted' }, `· ${l.deaths} deaths`)),
     h('p', { className: 'muted' }, causes),
-    scatter(l),
-    h('div', { className: 'legend' }, 'X along the level, Y up from the floor the tourist spawns on.', h('i'), 'a death', h('i', { className: 'lost' }), 'gave up'),
-    spots(l),
+    l.points.length ? scatter(l) : null,
+    l.points.length ? h('div', { className: 'legend' }, 'X along the level, Y up from the floor the tourist spawns on.', h('i'), 'a death', h('i', { className: 'lost' }), 'gave up') : null,
+    l.points.length < l.deaths ? h('p', { className: 'muted' }, `Drawn and counted below: the newest ${l.points.length} of the ${l.deaths}.`) : null,
+    l.points.length ? spots(l) : null,
   );
 }
 

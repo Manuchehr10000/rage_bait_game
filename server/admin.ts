@@ -17,9 +17,9 @@ import { isAccountId } from './users';
 const GAVE_UP = 'Gave up';
 /** Accounts in one answer. */
 const USERS_MAX = 1000;
-/** One account's newest events in one answer, and its newest deaths counted as points. */
+/** One account's newest events in one answer, and in each level its newest deaths given as points. */
 const EVENTS_MAX = 500;
-const POINTS_MAX = 5000;
+const POINTS_PER_LEVEL = 1000;
 
 /** The addresses ADMIN_EMAILS names, as accounts keep them: commas or spaces between, any case. */
 function admins(env: Env): Set<string> {
@@ -142,8 +142,14 @@ export async function adminUser(ctx: Ctx): Promise<Response> {
       )
       .bind(id),
     db
-      .prepare(`SELECT level_id, cause, x, y FROM events WHERE user_id = ?1 AND kind = 'death' ORDER BY at DESC, rowid DESC LIMIT ?2`)
-      .bind(id, POINTS_MAX),
+      .prepare(
+        `SELECT level_id, cause, x, y FROM (
+           SELECT level_id, cause, x, y, at, rowid AS r,
+             row_number() OVER (PARTITION BY level_id ORDER BY at DESC, rowid DESC) AS n
+           FROM events WHERE user_id = ?1 AND kind = 'death')
+         WHERE n <= ?2 ORDER BY level_id, at DESC, r DESC`,
+      )
+      .bind(id, POINTS_PER_LEVEL),
     db
       .prepare(`SELECT id, at, kind, level_id, cause, x, y, ms, deaths FROM events WHERE user_id = ?1 ORDER BY at DESC, rowid DESC LIMIT ?2`)
       .bind(id, EVENTS_MAX + 1),

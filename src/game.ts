@@ -117,13 +117,13 @@ export class Game {
     __BUILD_ENV__ === 'prod',
     ACCOUNTS ? new GuestStore() : new LocalStore(),
   );
-  /** Who is signed in, and the link and dialog that sign him in. Null in prod. */
+  /** Who is signed in, and the link and dialog that sign him in. Null in a build without accounts (vite.config.ts). */
   private readonly account: Account | null = ACCOUNTS ? new Account(this.progress) : null;
   /**
    * Resolves once the game has opened, on the map or the level a deep link names.
    * Where there are accounts that waits for the account to boot (at most 4 s), since
-   * which levels are open is a question about whose tour it is. Null in prod, which
-   * opens in the constructor, as it always has.
+   * which levels are open is a question about whose tour it is. Null in a build without
+   * accounts, which opens in the constructor, as prod did before it had them.
    */
   readonly opened: Promise<void> | null;
   private readonly map = new MapScreen(this.progress, MAP_CHAPTERS);

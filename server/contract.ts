@@ -166,7 +166,7 @@ export interface AdminLevel {
   tricks: string[];
   /** Deaths by cause, most first. */
   causes: { cause: string; n: number }[];
-  /** Where he died, each death once, newest first. */
+  /** Where the deaths were, newest first: each once, the newest 1000 of the level's (`deaths` counts them all). */
   points: { cause: string; x: number; y: number }[];
   firstAt: number | null;
   lastAt: number | null;

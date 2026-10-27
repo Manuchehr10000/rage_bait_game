@@ -1,7 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 import { Progress } from '../src/engine/progress';
 import { existsSync } from 'node:fs';
-import { HELD, LEVELS, PROD_LEVELS } from '../src/levels';
+import { HELD, LEVELS, PROD_LEVELS, levelIndexFromHash } from '../src/levels';
 import { HELD_FILES } from '../src/levels/held-files';
 import { CHAPTERS, chapterOpen, chapterRestoring, chaptersFor, locate } from '../src/map/atlas';
 
@@ -352,6 +352,14 @@ test('in order, a level not cleared stays locked behind the first one not cleare
   for (const id of ids.slice(0, ids.indexOf('knossos') + 1)) progress.markCleared(id);
   expect(progress.isOpen('minotaur')).toBe(true);
   expect(progress.isOpen('persepolis')).toBe(false);
+});
+
+test('a deep link names a level of the build\'s tour or none: a held one opens prod on its map, not on Cap Blanc', () => {
+  expect(levelIndexFromHash('#karnak', PROD_LEVELS)).toBe(PROD_LEVELS.findIndex((l) => l.id === 'karnak'));
+  expect(levelIndexFromHash('#3', PROD_LEVELS)).toBe(2);
+  // Knossos is in every build's tour but prod's (game.ts sends -1 to the map).
+  expect(levelIndexFromHash('#knossos', LEVELS)).toBe(LEVELS.findIndex((l) => l.id === 'knossos'));
+  for (const hash of ['#knossos', '#minotaur', '#persepolis', '#10', '#nowhere', '#', '']) expect(levelIndexFromHash(hash, PROD_LEVELS), hash).toBe(-1);
 });
 
 test('in prod, a level cleared before it was held back is no level of the tour: nothing opens past Dendera', () => {

@@ -152,8 +152,14 @@ test('a push with an event in any other shape is refused whole', async () => {
     expect(res.status, JSON.stringify(e)).toBe(400);
     expect(res.body).toEqual({ error: 'bad_progress' });
   }
-  const many = Array.from({ length: 201 }, () => enter('karnak'));
-  expect((await client.post('/api/progress', push(id, { events: many }))).status).toBe(400);
+  // 201 are refused by count, not only by the body's size: these would fit in 16 KiB.
+  const many = Array.from({ length: 201 }, (_, i) => ({ id: `e${String(i).padStart(15, '0')}`, at: 0, kind: 'enter' as const, level: 'k' }));
+  expect(JSON.stringify(push(id, { events: many })).length).toBeLessThan(16 * 1024);
+  expect(validatePush(push(id, { events: many }))).toBeNull();
+  const refused = await client.post<ApiError>('/api/progress', push(id, { events: many }));
+  expect(refused.status).toBe(400);
+  expect(refused.body).toEqual({ error: 'bad_progress' });
+  expect(validatePush(push(id, { events: many.slice(1) }))?.events).toHaveLength(200);
   expect((await client.post('/api/progress', push(id, { events: null as unknown as PlayEvent[] }))).status).toBe(400);
   expect((await client.post('/api/progress', push(id, { events: {} as unknown as PlayEvent[] }))).status).toBe(400);
   expect(world.db.count('events')).toBe(0);
@@ -337,4 +343,23 @@ test('an account\'s newest 500 events are listed, and the answer says there are 
   // Counted whole all the same.
   expect(res.body.levels.find((l) => l.level === 'gargas')?.deaths).toBe(600);
   expect(res.body.levels.find((l) => l.level === 'gargas')?.points).toHaveLength(600);
+});
+
+test('each level gives its newest 1000 deaths as points, whatever the others have', async () => {
+  const { world, admin } = await withAdmin();
+  const client = world.client();
+  const { id } = (await client.signInByEmail('tourist@example.com')).body.user;
+  // Five in Cap Blanc first, then 1100 in Gargas.
+  await client.post('/api/progress', push(id, { events: Array.from({ length: 5 }, (_, i) => death('cap-blanc', 'The cow', i, 0, T0 + i)) }));
+  for (let p = 0; p < 11; p++) {
+    const events = Array.from({ length: 100 }, (_, i) => death('gargas', 'The dark', i, 0, T0 + MINUTE + (p * 100 + i) * SECOND));
+    expect((await client.post('/api/progress', push(id, { events }))).status).toBe(200);
+  }
+  const res = await admin.get<AdminUserDetail>(`/api/admin/user?id=${id}`);
+  const gargas = res.body.levels.find((l) => l.level === 'gargas')!;
+  expect(gargas.deaths).toBe(1100);
+  expect(gargas.points).toHaveLength(1000);
+  // Newest first: the last push's last death, and nothing of the first hundred.
+  expect(gargas.points[0]).toEqual({ cause: 'The dark', x: 99, y: 0 });
+  expect(res.body.levels.find((l) => l.level === 'cap-blanc')?.points).toHaveLength(5);
 });

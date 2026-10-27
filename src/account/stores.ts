@@ -5,6 +5,8 @@ import { exclusively, newId, tabId } from './tab';
 
 /** What a guest did in play, kept in this browser until he signs in and it goes to his account. */
 const PLAYS_KEY = 'lostTourist.plays';
+/** How many of the deaths under LOCAL_KEYS.lifetime have gone into an account already. */
+const CARRIED_KEY = 'lostTourist.carriedDeaths';
 /** At most this many of a guest's: the newest, so one who signs in late brings what he did lately. */
 const GUEST_PLAYS = 1000;
 /** A signed-in tab's queue is kept under this and the tab's id. */
@@ -23,8 +25,12 @@ const MAX_PLAYS = 100;
 const MAX_BYTES = 15 * 1024;
 const LEVEL_ID = /^[a-z0-9][a-z0-9-]{0,47}$/;
 const NOUN = /^[^\u0000-\u001f\u007f-\u009f]{1,64}$/;
-/** Half a surrogate pair, which is no text, and which the server refuses (server/progress.ts). */
-const HALF_PAIR = /[\ud800-\udbff](?![\udc00-\udfff])|(?<![\ud800-\udbff])[\udc00-\udfff]/;
+/**
+ * Text with no half of a surrogate pair, which is no text, and which the server refuses
+ * (server/progress.ts). Without a lookbehind, which Safari before 16.4 cannot read: this
+ * is in the bundle every page loads, and a regex it cannot read stops the whole game.
+ */
+const WHOLE_PAIRS = /^(?:[^\ud800-\udfff]|[\ud800-\udbff][\udc00-\udfff])*$/;
 const PUSH_ID = /^[A-Za-z0-9_-]{16,64}$/;
 /** The limits on an event the server holds it to (server/progress.ts). */
 const MAX_MS = 86_400_000;
@@ -47,10 +53,16 @@ export interface Carried {
  * signs in and it goes to his account. Each change is written over what the browser
  * holds now, never over what this page loaded: another tab may have carried the tour
  * into an account since, and what it carried must not come back to be carried again.
+ *
+ * The deaths are a count, which a tab still running the game from before accounts
+ * (LocalStore, which writes the count it loaded and its own since) can write back after
+ * they were carried. So they are never taken away: the count stays, and the deaths
+ * carried so far are kept beside it (CARRIED_KEY). A guest's are those over it.
  */
 export class GuestStore implements ProgressStore {
   load(): Snapshot {
-    return new LocalStore().load();
+    const tour = new LocalStore().load();
+    return { ...tour, lifetime: Math.max(0, tour.lifetime - readCarried()) };
   }
 
   record(change: Change): void {
@@ -71,15 +83,36 @@ export class GuestStore implements ProgressStore {
 
   /** Carried into an account: everything the guest holds, and nothing held here after. */
   handOver(): Carried {
-    const carried = { tour: new LocalStore().load(), plays: readPlays() };
-    for (const key of [...Object.values(LOCAL_KEYS), PLAYS_KEY]) {
+    const all = new LocalStore().load();
+    const before = readCarried();
+    const carried = { tour: { ...all, lifetime: Math.max(0, all.lifetime - before) }, plays: readPlays() };
+    for (const key of [LOCAL_KEYS.cleared, LOCAL_KEYS.tricks, PLAYS_KEY]) {
       try {
         localStorage.removeItem(key);
       } catch {
         /* nothing to forget */
       }
     }
+    try {
+      localStorage.setItem(CARRIED_KEY, String(Math.max(before, all.lifetime)));
+    } catch {
+      // Full: the count goes instead, as it went before there was a mark, so it is not carried twice.
+      try {
+        localStorage.removeItem(LOCAL_KEYS.lifetime);
+      } catch {
+        /* private mode: nothing is kept to carry twice */
+      }
+    }
     return carried;
+  }
+}
+
+function readCarried(): number {
+  try {
+    const n = Number(localStorage.getItem(CARRIED_KEY) ?? '0');
+    return Number.isFinite(n) && n > 0 ? Math.floor(n) : 0;
+  } catch {
+    return 0;
   }
 }
 
@@ -122,7 +155,7 @@ function isPlayEvent(x: unknown): x is PlayEvent {
   if (typeof e.level !== 'string' || !LEVEL_ID.test(e.level)) return false;
   if (e.kind === 'death') {
     const cause = e.cause;
-    if (typeof cause !== 'string' || !NOUN.test(cause) || HALF_PAIR.test(cause)) return false;
+    if (typeof cause !== 'string' || !NOUN.test(cause) || !WHOLE_PAIRS.test(cause)) return false;
     if (!isCoord(e.x) || !isCoord(e.y) || !isWhole(e.ms, MAX_MS)) return false;
   }
   if (e.kind === 'clear' && !isWhole(e.ms, MAX_MS)) return false;

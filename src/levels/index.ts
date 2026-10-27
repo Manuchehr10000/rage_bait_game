@@ -61,12 +61,15 @@ export const LEVELS: LevelData[] = /* @__PURE__ */ withHeld(PROD_LEVELS, HELD);
  */
 export const STAGES: LevelData[] = [];
 
-/** `list` is what the game can enter: the build's tour, and the stages too where there are dev tools. */
+/**
+ * `list` is what the game can enter: the build's tour, and the stages too where there are dev
+ * tools. -1 when the hash names none of it, and the game opens on the map: a level held back
+ * from this build, as #knossos is on prod's since 2026-10-27, is closed there, not Cap Blanc.
+ */
 export function levelIndexFromHash(hash: string, list: readonly LevelData[]): number {
   const key = hash.replace(/^#/, '').trim();
-  if (!key) return 0;
+  if (!key) return -1;
   const n = Number(key);
   if (Number.isInteger(n) && n >= 1 && n <= list.length) return n - 1;
-  const i = list.findIndex((l) => l.id === key);
-  return i >= 0 ? i : 0;
+  return list.findIndex((l) => l.id === key);
 }

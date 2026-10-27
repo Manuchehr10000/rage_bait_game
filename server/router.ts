@@ -47,7 +47,7 @@ const DEFAULT_DEPS: Deps = {
 
 export async function handle(request: Request, env: Env, deps: Partial<Deps> = {}): Promise<Response> {
   try {
-    // Where no database is bound (prod), there are no accounts and so no API.
+    // Where no database is bound (prod, until its Production environment is given one), there are no accounts and so no API.
     const db = env.DB;
     if (!db) return fail(404, 'not_found');
     const url = new URL(request.url);
