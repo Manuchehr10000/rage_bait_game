@@ -110,8 +110,10 @@ const DAY_FROM = px(117);
  * middle one is a step up, and it tips: a sixth of a second after he lands on it,
  * it is off its bearer and not under him, so it is jumped from as it is landed on,
  * or not at all. The last one's foot takes his boot, and lets go of a boot that is
- * left alone for three tenths of a second; six tenths after it took the boot the
- * slab goes. Pull, and it keeps the boot. Stand still, then jump.
+ * left alone for three tenths of a second; a second after it took the boot the
+ * slab goes. Pull, and it keeps the boot. Stand still, then jump. It went at six
+ * tenths until the designer found the jump impossible (2026-10-28): that left a
+ * man who let go a fifth of a second late a tenth to answer the step.
  */
 const SLABS = [
   { x: px(111) + 8, y: LOWER, does: 'holds' },
@@ -300,13 +302,13 @@ export const GARGAS: LevelData = {
       letsGoStill: 0.3,
     },
     // The fitted path across the well. The middle slab is not bearing on anything;
-    // the last goes six tenths of a second after its foot takes a boot.
+    // the last goes a second after its foot takes a boot.
     ...SLABS.map((s) => ({
       kind: 'crumble' as const,
       skin: 'walkway' as const,
       rect: { x: s.x, y: s.y, w: 32, h: 8 },
       fake: s.does !== 'holds',
-      delay: s.does === 'tips' ? 0.15 : s.does === 'boot' ? 0.6 : 0,
+      delay: s.does === 'tips' ? 0.15 : s.does === 'boot' ? 1 : 0,
       onEvent: s.does === 'boot' ? 'lastBoot' : undefined,
       tips: s.does !== 'holds' || undefined,
       post: true,
