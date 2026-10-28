@@ -11,13 +11,17 @@ further apart than a running jump carries, so the middle one has to be touched a
 the same breath: a jump off it within about a quarter of a second of landing, or none.
 
 **The last slab keeps a boot that is pulled at.** Its foot takes his boot wherever on the
-slab he comes down, and six tenths of a second later the slab goes, as the middle one did.
+slab he comes down, and a second later the slab goes, as the middle one did.
 Pressing to go either way is pulling at the boot, and so is holding a jump: either keeps
 the boot, and he is drawn pulling. Anything else, the lamp included, is leaving it alone.
 Left alone for three tenths of a second, with the slab still under him, the boot comes free
-with the sound of a step and he stands up straight, and there are three tenths of a second left to
+with the sound of a step and he stands up straight, and there are seven tenths of a second left to
 jump for the far rim. So the answer is to let go of everything the moment he lands, and
-then go. It comes straight after the slab that punished him for not leaving at once, and a
+then go. The slab went at six tenths until the designer found the jump impossible
+(2026-10-28): a man who let go a fifth of a second after landing, about as soon as anybody
+knows he is caught, was freed with a tenth of a second left, too little to hear the step and
+jump. At a second, one who lets go as late as half a second after landing still has a fifth
+of a second to go in, and one who never lets go, or never goes, is still taken. It comes straight after the slab that punished him for not leaving at once, and a
 man who does nothing at all goes down with it as well, having seen his boot come free:
 which is how the answer is found. It is the only trap in the level that makes him wait,
 and it is the last one (pillar 5). The first slab is the one honest slab, and the only place

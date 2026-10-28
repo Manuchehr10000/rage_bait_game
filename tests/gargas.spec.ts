@@ -756,7 +756,7 @@ test('the last slab takes his boot, and lets go of it only when he stops pulling
     const out = {};
     for (const pol of ['pull', 'jump only', 'mash jump', 'left only', 'nothing']) out[pol] = attempt(pol);
     out.letGo = [];
-    for (let J = 0; J <= 44; J += 2) out.letGo.push(J + ':' + attempt('let go', J));
+    for (let J = 0; J <= 70; J += 2) out.letGo.push(J + ':' + attempt('let go', J));
     return out;
   })()`)) as Record<string, unknown>;
   // Pulling either way, or holding or mashing a jump, keeps the boot to the end.
@@ -766,12 +766,12 @@ test('the last slab takes his boot, and lets go of it only when he stops pulling
   expect(r['left only']).toBe('The oubliettes, held');
   // Doing nothing gets the boot back, and the slab anyway.
   expect(r.nothing).toBe('The oubliettes, freed');
-  // Let go at once, and then jump: after three tenths, before six tenths.
+  // Let go at once, and then jump: after three tenths, before a second.
   const over = (r.letGo as string[]).filter((t) => t.includes(':over')).map((t) => Number(t.split(':')[0] ?? NaN));
-  expect(over).toEqual([18, 20, 22, 24, 26, 28, 30, 32, 34, 36]);
+  expect(over).toEqual([18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60]);
 
   // The ruled times, to the tick: the boot comes free three tenths after the catch with the
-  // sound of a step, on that tick; the slab goes six tenths after it.
+  // sound of a step, on that tick; the slab goes a second after it.
   const timing = (await page.evaluate(`(() => { ${DRIVER}
     g.resetRun(); p.spawnAt(1900, 290); g.camera.x = 1790;
     const lb = g.entities.find((e) => e.def.kind === 'snare' && e.def.letsGoStill !== undefined);
@@ -779,21 +779,22 @@ test('the last slab takes his boot, and lets go of it only when he stops pulling
     const heard = []; let t = 0;
     const play = g.audio.play.bind(g.audio); g.audio.play = (n) => { heard.push(t + ':' + n); return play(n); };
     let caught = -1, freed = -1, went = -1;
-    for (t = 0; t < 80; t++) { g.tick(); if (caught < 0 && lb.caught) caught = t; if (freed < 0 && lb.freed) freed = t; if (went < 0 && slab.state === 'falling') went = t; }
+    for (t = 0; t < 100; t++) { g.tick(); if (caught < 0 && lb.caught) caught = t; if (freed < 0 && lb.freed) freed = t; if (went < 0 && slab.state === 'falling') went = t; }
     g.audio.play = play;
     return { freedAfter: freed - caught, wentAfter: went - caught, stepOnTheTick: heard.includes(freed + ':step') };
   })()`)) as Record<string, unknown>;
-  expect(timing).toEqual({ freedAfter: 18, wentAfter: 36, stepOnTheTick: true });
+  expect(timing).toEqual({ freedAfter: 18, wentAfter: 60, stepOnTheTick: true });
 
   // Pulled at until the slab has gone, the boot stays in on the way down: no step, no
   // coming free in mid-air.
   const down = (await page.evaluate(`(() => { ${DRIVER}
     g.resetRun(); p.spawnAt(1900, 290); g.camera.x = 1790;
     const lb = g.entities.find((e) => e.def.kind === 'snare' && e.def.letsGoStill !== undefined);
+    const slab = g.entities.filter((e) => e.def.kind === 'crumble' && e.def.skin === 'walkway').sort((a, b) => a.def.rect.x - b.def.rect.x)[2];
     const heard = []; const play = g.audio.play.bind(g.audio); g.audio.play = (n) => { heard.push(n); return play(n); };
     key('ArrowRight', true);
     let t = 0;
-    for (; t < 200 && g.state === 'playing'; t++) { if (t === 45) key('ArrowRight', false); g.tick(); }
+    for (; t < 200 && g.state === 'playing'; t++) { if (slab.state === 'falling') key('ArrowRight', false); g.tick(); }
     g.audio.play = play;
     return { cause: g.deathCause, freed: lb.freed, stepped: heard.includes('step') };
   })()`)) as Record<string, unknown>;

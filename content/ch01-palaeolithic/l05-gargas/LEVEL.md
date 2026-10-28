@@ -111,11 +111,13 @@ step up, and it tips: it is not bearing on anything, and a sixth of a second aft
 on it it goes off its bearer, the far end first, and is not under him any more. Whoever is
 still on it goes into the oubliettes with it. The first and third are too far apart to jump
 between, so the middle one has to be touched and left in the same breath. And the last one's
-foot takes his boot, wherever on it he comes down, and six tenths of a second later the
-slab goes. Pressing to go either way is pulling at the boot, and it keeps it in; so does
-holding a jump. Anything else is leaving it alone. Left alone for three tenths of a second
-while he stands on the slab, the boot comes free with the sound of a step, and there is
-three tenths of a second left to jump. It is the level's one trap whose answer is to do
+foot takes his boot, wherever on it he comes down, and a second later the slab goes.
+Pressing to go either way is pulling at the boot, and it keeps it in; so does holding a
+jump. Anything else is leaving it alone. Left alone for three tenths of a second while he
+stands on the slab, the boot comes free with the sound of a step, and there are seven
+tenths of a second left to jump. (It was six tenths and three until the designer found the
+jump impossible, 2026-10-28: only a man who let go within a tenth of a second of landing had
+time to hear the step and answer it.) It is the level's one trap whose answer is to do
 nothing, and it comes straight after the one that punished him for
 not leaving at once; and a man who does nothing at all goes down with the slab too, having
 seen his boot come free. Slab 1 is the one honest slab, and the only place over the well to
