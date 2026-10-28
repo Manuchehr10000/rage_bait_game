@@ -8,7 +8,7 @@ import { Level, type LevelData, type Theme } from './engine/level';
 import { LEVELS, PROD_LEVELS, STAGES, levelIndexFromHash } from './levels/index';
 import { PHYS, Player, type MovingSolid } from './engine/player';
 import { slopeTop } from './engine/physics';
-import { LocalStore, Progress } from './engine/progress';
+import { LocalStore, Progress, type Play } from './engine/progress';
 import { chaptersFor, locate } from './map/atlas';
 import { MapScreen } from './map/screen';
 import { renderWorld, type Scene, type WorldText } from './render/scene';
@@ -20,6 +20,8 @@ import { ART_SCALE, DEATH_SOUND, DT, overlaps, TILE, VIEW_H, VIEW_W, type DeathC
 
 /** How long a death plays before the reset. The world keeps moving through it. */
 const DEATH_TIME = 0.75;
+/** The latest in an attempt the tracker is told anything happened: a day (server/progress.ts). */
+const TRACKED_MS = 86_400_000;
 const TITLE_TIME = 2.2;
 
 type State = 'playing' | 'dead' | 'complete';
@@ -33,11 +35,12 @@ type Screen = 'map' | 'level';
 const DEV_TOOLS = __BUILD_ENV__ !== 'prod';
 
 /**
- * Accounts (src/account/): a guest's tour kept in the tab, a signed-in one on the
- * server. Every build has them but prod, which keeps the tour in localStorage as it
- * always has, and does not carry the code (designer, 2026-10-16: dev only first).
+ * Accounts (src/account/): a guest's tour kept in this browser, a signed-in one on the
+ * server, with what happens in play for the admin's tracker. In every build, prod since
+ * the designer's word of 2026-10-27: `__ACCOUNTS__`, vite.config.ts, says which. A build
+ * without them keeps the tour in this browser and does not carry the code.
  */
-const ACCOUNTS = __BUILD_ENV__ !== 'prod';
+const ACCOUNTS = __ACCOUNTS__;
 
 /**
  * The buttons on a phone's screen (src/touch/). In every build since the designer's word of
@@ -114,13 +117,13 @@ export class Game {
     __BUILD_ENV__ === 'prod',
     ACCOUNTS ? new GuestStore() : new LocalStore(),
   );
-  /** Who is signed in, and the link and dialog that sign him in. Null in prod. */
+  /** Who is signed in, and the link and dialog that sign him in. Null in a build without accounts (vite.config.ts). */
   private readonly account: Account | null = ACCOUNTS ? new Account(this.progress) : null;
   /**
    * Resolves once the game has opened, on the map or the level a deep link names.
    * Where there are accounts that waits for the account to boot (at most 4 s), since
-   * which levels are open is a question about whose tour it is. Null in prod, which
-   * opens in the constructor, as it always has.
+   * which levels are open is a question about whose tour it is. Null in a build without
+   * accounts, which opens in the constructor, as prod did before it had them.
    */
   readonly opened: Promise<void> | null;
   private readonly map = new MapScreen(this.progress, MAP_CHAPTERS);
@@ -161,6 +164,11 @@ export class Game {
   private deathCause: DeathCause = 'Fall';
   /** Where the death in progress leaves him, if it carries him off: the top-left of his box there. */
   private deathAt: { x: number; y: number } | null = null;
+  /**
+   * The trap that has taken the credit for the plain death he is on his way to (pillar 8),
+   * until he stands on something or jumps and it does not claim him again.
+   */
+  private claimed: DeathCause | null = null;
   private titleTimer = 0;
 
   private stats: Stats = { total: 0, byCause: new Map() };
@@ -405,10 +413,25 @@ export class Game {
     this.account?.setScreen('level');
     this.leaveAfterDeath = false;
     this.loadLevel(index);
+    this.played({ kind: 'enter', level: this.level.data.id });
     if (arrive && (this.level.data.arrival ?? 'walk') === 'walk') {
       this.arriving = true;
       this.player.x = -this.player.w - ARRIVE_FROM;
     }
+  }
+
+  /**
+   * Something happened in play, for the admin's tracker (engine/progress.ts, Play). Not
+   * in a run the dev tools started from somewhere else: that is not a visit, it is
+   * the designer replaying a trap.
+   */
+  private played(play: Play): void {
+    if (!this.devStart) this.progress.track(play);
+  }
+
+  /** How far into this attempt, in ms, as the tracker counts it. */
+  private get attemptMs(): number {
+    return Math.min(TRACKED_MS, Math.max(0, Math.round(this.time * 1000)));
   }
 
   /** The next site of this chapter that has a level, or null at the end of the chapter. */
@@ -492,6 +515,7 @@ export class Game {
     // A new attempt has not died of anything yet.
     this.deathCause = 'Fall';
     this.deathAt = null;
+    this.claimed = null;
     this.state = 'playing';
   }
 
@@ -529,6 +553,8 @@ export class Game {
 
   private kill(cause: DeathCause, at?: { x: number; y: number }): void {
     if (this.state !== 'playing') return;
+    // A plain death a trap set up is the trap's. Giving up is his, and a trap's own death its own.
+    if (this.claimed && this.plain(cause)) cause = this.claimed;
     if (this.level.data.tricks?.includes(cause)) this.progress.markTrick(this.level.data.id, cause);
     this.state = 'dead';
     this.deathTimer = DEATH_TIME;
@@ -539,6 +565,18 @@ export class Game {
     this.stats.total += 1;
     this.stats.byCause.set(cause, (this.stats.byCause.get(cause) ?? 0) + 1);
     this.progress.addDeath();
+    // Where it got him, as the dev ruler names a point: X along the level from its start
+    // to the middle of him, Y from the floor he spawns on up to his feet.
+    const p = this.player;
+    const floorY = this.level.data.spawn.y + p.h;
+    this.played({
+      kind: 'death',
+      level: this.level.data.id,
+      cause,
+      x: Math.round(p.x + p.w / 2),
+      y: Math.round(floorY - (p.y + p.h)),
+      ms: this.attemptMs,
+    });
   }
 
   // ---------------------------------------------------------------------
@@ -623,8 +661,12 @@ export class Game {
       this.driveLoops();
       this.deathTimer -= DT;
       if (this.deathTimer <= 0) {
-        if (this.leaveAfterDeath) this.goToMap();
-        else this.resetLevel();
+        if (this.leaveAfterDeath) {
+          this.played({ kind: 'leave', level: this.level.data.id, deaths: this.stats.total });
+          this.goToMap();
+        } else {
+          this.resetLevel();
+        }
       }
       return;
     }
@@ -647,6 +689,9 @@ export class Game {
       return;
     }
 
+    // Stood on something, or jumped: what happens next is not the last trap's doing,
+    // unless it claims him again now.
+    if (this.player.onGround || this.player.justJumped) this.claimed = null;
     // Traps first, so a platform's displacement is known before the player moves.
     for (const e of this.entities) {
       e.update(world);
@@ -719,6 +764,7 @@ export class Game {
     if (reached) {
       this.state = 'complete';
       this.progress.markCleared(this.level.data.id);
+      this.played({ kind: 'clear', level: this.level.data.id, ms: this.attemptMs, deaths: this.stats.total });
       this.audio.stopLoops();
       this.audio.play('turnstile');
     }
@@ -732,6 +778,13 @@ export class Game {
       if (y !== null) keep = Math.max(keep ?? y, y);
     }
     return keep;
+  }
+
+  /** A fall, a drop or a drowning: the deaths that are nobody's trick unless a trap claims them. */
+  private plain(cause: DeathCause): boolean {
+    const d = this.level.data;
+    if (cause === (d.fallCause ?? 'Fall') || cause === (d.dropCause ?? 'The drop')) return true;
+    return d.entities.some((e) => e.kind === 'water' && e.cause === cause);
   }
 
   /** Pillar 8's count for the exit label: how many of the level's tricks have ever killed this visitor. */
@@ -750,6 +803,9 @@ export class Game {
       events: this.events,
       alive: this.state === 'playing',
       kill: (c, at) => this.kill(c, at),
+      claim: (c) => {
+        if (this.state === 'playing') this.claimed = c;
+      },
       sound: (n) => this.audio.play(n),
     };
   }

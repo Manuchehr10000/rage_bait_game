@@ -7,13 +7,15 @@ import { tabId } from './tab';
 import { AccountUi, type UiHost, type UiState } from './ui';
 
 /**
- * Accounts, from the page (the designer's decisions of 2026-10-16). Every build has
- * them but prod, which does not carry this code: only game.ts imports it, behind
- * ACCOUNTS, and vite.config.ts fails a prod build with any of it in.
+ * Accounts, from the page (the designer's decisions of 2026-10-16). In every build, prod
+ * since the designer's word of 2026-10-27 ("add google auth to main"): only game.ts
+ * imports it, behind ACCOUNTS, which vite.config.ts decides, and while that holds them
+ * back the prod build fails with any of it in.
  *
- * A guest's tour lasts until the tab closes. Signed in, it is the account's: each new
- * fact is queued (AccountStore, one queue per tab) and sent soon after, and what the
- * server answers is merged in, so a level cleared on another device shows here too.
+ * A guest's tour is kept in this browser (designer, 2026-10-27). Signed in, it is the
+ * account's: each new fact is queued (AccountStore, one queue per tab) and sent soon
+ * after, with what happened in play for the admin's tracker, and what the server
+ * answers is merged in, so a level cleared on another device shows here too.
  * The account is named by its id, not its address: one deleted and made again with
  * the same address is another account, and nothing queued for the old one goes to it.
  * Signing in carries the guest's tour into the account; signing out leaves an empty
@@ -129,10 +131,10 @@ export class Account {
   }
 
   /**
-   * Signed in, at boot or just now. The guest's tour goes into this tab's queue for
-   * this account and is forgotten as a guest's, and so do the queues other tabs left
-   * for it; the tour is the account's and the queue's together, and the queue is sent
-   * at once. One sign-in at a time: two would share this tab's queue.
+   * Signed in, at boot or just now. The guest's tour, and what he did in play, go into
+   * this tab's queue for this account and are forgotten as a guest's, and so do the
+   * queues other tabs left for it; the tour is the account's and the queue's together,
+   * and the queue is sent at once. One sign-in at a time: two would share this tab's queue.
    */
   private enter(user: User, server: Snapshot): Promise<void> {
     const entered = this.entering.then(() => this.enterNow(user, server));

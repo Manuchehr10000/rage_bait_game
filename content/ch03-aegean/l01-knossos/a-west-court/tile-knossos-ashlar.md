@@ -11,7 +11,7 @@
 
 Limestone ashlar laid in courses, and under the floors the fill and terrace walls the palace
 stands on. The stump of the west façade, the walls either side of the rooms, the masonry over
-the Hall of the Double Axes, and everything under a floor.
+the Throne Room, the bastion's parapet, and everything under a floor.
 
 ## Where it stands in the game
 
@@ -26,8 +26,8 @@ Behind and under everything. Two courses to a tile; the joints stagger from row 
 ## Deliberately wrong
 
 - The fill under the floors is drawn as ashlar, which it is not; a tile repeats.
-- Evans's upper storeys, where the game shows them as a mass (over the Throne Room, over the Hall
-  of the Double Axes), are drawn in this tile. They are his reinforced concrete, plastered and
+- Evans's upper storey, where the game shows it as a mass (over the Throne Room), is drawn in
+  this tile. They are his reinforced concrete, plastered and
   painted; the level shows them as slab and never opens them.
 
 ## Sources

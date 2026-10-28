@@ -1,6 +1,8 @@
 /**
  * Which levels this visitor has cleared, which of each level's tricks have killed
- * him (pillar 8), and how many times he has died in all. Nothing else is remembered.
+ * him (pillar 8), and how many times he has died in all. Nothing else is remembered
+ * for the game; what happens in play (track) is told to the store for the admin's
+ * tracker, and the game never reads it back.
  *
  * In order, the tour is played in order: a level opens once every level before it
  * in `order` is cleared, which locks the chapters in order and the levels inside
@@ -10,10 +12,10 @@
  * build, dev included, opens every built level from the start, so the designer can
  * play any of them (designer ruling, 2026-10-03). game.ts decides which.
  *
- * Where it is kept is a store's business. Prod keeps it in this browser (LocalStore),
- * as it always has. Every other build has accounts (src/account/): a guest's tour is
- * kept in the tab, a signed-in one on the server, and the store is swapped when he
- * signs in or out.
+ * Where it is kept is a store's business. Every build has accounts (src/account/): a
+ * guest's tour is kept in this browser, as prod always kept it, a signed-in one on the
+ * server, and the store is swapped when he signs in or out. A build that holds accounts
+ * back (vite.config.ts) keeps it in this browser only (LocalStore).
  */
 
 /** Everything remembered, as plain data. */
@@ -26,8 +28,22 @@ export interface Snapshot {
   lifetime: number;
 }
 
+/**
+ * Something that happened in play, for the admin's tracker (server/contract.ts, Play,
+ * which says what each field is). A give-up is a death, its cause 'Gave up'.
+ */
+export type Play =
+  | { kind: 'enter'; level: string }
+  | { kind: 'death'; level: string; cause: string; x: number; y: number; ms: number }
+  | { kind: 'leave'; level: string; deaths: number }
+  | { kind: 'clear'; level: string; ms: number; deaths: number };
+
 /** One new fact. A store is told each one once, as it happens. */
-export type Change = { kind: 'cleared'; level: string } | { kind: 'trick'; level: string; trick: string } | { kind: 'death' };
+export type Change =
+  | { kind: 'cleared'; level: string }
+  | { kind: 'trick'; level: string; trick: string }
+  | { kind: 'death' }
+  | { kind: 'play'; play: Play };
 
 /** Where progress is kept. */
 export interface ProgressStore {
@@ -45,7 +61,7 @@ export const LOCAL_KEYS = {
 /**
  * Progress in this browser's localStorage, under the keys it has always used. Each
  * write is the whole of what it holds, as it always was. Private mode keeps it in
- * memory only.
+ * memory only. What happens in play is not kept: there is no one to send it to.
  */
 export class LocalStore implements ProgressStore {
   private cleared = new Set<string>();
@@ -94,7 +110,7 @@ export class LocalStore implements ProgressStore {
         met.add(change.trick);
         this.tricks.set(change.level, met);
         localStorage.setItem(LOCAL_KEYS.tricks, JSON.stringify(Object.fromEntries([...this.tricks].map(([id, t]) => [id, [...t]]))));
-      } else {
+      } else if (change.kind === 'death') {
         this.lifetime += 1;
         localStorage.setItem(LOCAL_KEYS.lifetime, String(this.lifetime));
       }
@@ -161,6 +177,11 @@ export class Progress {
   addDeath(): void {
     this.deaths += 1;
     this.store.record({ kind: 'death' });
+  }
+
+  /** Something happened in play. Told to the store, and nothing else: the tour does not change. */
+  track(play: Play): void {
+    this.store.record({ kind: 'play', play });
   }
 
   snapshot(): Snapshot {

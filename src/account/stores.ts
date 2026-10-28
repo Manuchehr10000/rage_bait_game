@@ -1,133 +1,175 @@
-import type { ProgressPush, User } from '../../server/contract';
-import { LOCAL_KEYS, LocalStore, type Change, type ProgressStore, type Snapshot } from '../engine/progress';
-import { combine, empty, toSnapshot } from './snapshot';
+import type { PlayEvent, ProgressPush, User } from '../../server/contract';
+import { LOCAL_KEYS, LocalStore, type Change, type Play, type ProgressStore, type Snapshot } from '../engine/progress';
+import { toSnapshot } from './snapshot';
 import { exclusively, newId, tabId } from './tab';
 
-/** A guest's tour in this tab: a reload keeps it, closing the tab forgets it. */
-const GUEST_KEY = 'lostTourist.guest';
-/** The last guest records carried into an account, so that a copy of one is not carried in again. */
-const ABSORBED_KEY = 'lostTourist.absorbed';
-const ABSORBED_KEPT = 20;
+/** What a guest did in play, kept in this browser until he signs in and it goes to his account. */
+const PLAYS_KEY = 'lostTourist.plays';
+/** How many of the deaths under LOCAL_KEYS.lifetime have gone into an account already. */
+const CARRIED_KEY = 'lostTourist.carriedDeaths';
+/** At most this many of a guest's: the newest, so one who signs in late brings what he did lately. */
+const GUEST_PLAYS = 1000;
 /** A signed-in tab's queue is kept under this and the tab's id. */
 const QUEUE_KEY = 'lostTourist.pending.';
+/** At most this many in a queue, the newest: a page that cannot reach the server for long does not fill the browser. */
+const QUEUE_PLAYS = 2000;
 
 /** What one push may carry (server/: anything more is refused whole). */
 const MAX_CLEARED = 200;
 const MAX_LEVELS = 200;
 const MAX_NOUNS = 500;
 const MAX_DEATHS = 100_000;
+/** Fewer than the server takes (200): a hundred deaths are about 12 KiB, and the bytes are counted too. */
+const MAX_PLAYS = 100;
 /** A body is at most 16 KiB; a little under, to be sure. */
 const MAX_BYTES = 15 * 1024;
 const LEVEL_ID = /^[a-z0-9][a-z0-9-]{0,47}$/;
 const NOUN = /^[^\u0000-\u001f\u007f-\u009f]{1,64}$/;
+/**
+ * Text with no half of a surrogate pair, which is no text, and which the server refuses
+ * (server/progress.ts). Without a lookbehind, which Safari before 16.4 cannot read: this
+ * is in the bundle every page loads, and a regex it cannot read stops the whole game.
+ */
+const WHOLE_PAIRS = /^(?:[^\ud800-\udfff]|[\ud800-\udbff][\udc00-\udfff])*$/;
 const PUSH_ID = /^[A-Za-z0-9_-]{16,64}$/;
+/** The limits on an event the server holds it to (server/progress.ts). */
+const MAX_MS = 86_400_000;
+const MAX_COORD = 1_000_000;
+const MAX_AT = 8_640_000_000_000_000;
 
 /** How long a new fact waits before it is sent: a level or a trick soon, a death with the next few. */
 const SOON = 500;
 const LATER = 15_000;
 
-/** A guest's record in this tab. Its id is made with its first fact. */
-interface GuestRecord extends Snapshot {
-  id: string | null;
+/** What a guest hands over as he signs in: his tour, and what he did in play. */
+export interface Carried {
+  tour: Snapshot;
+  plays: PlayEvent[];
 }
 
 /**
- * A guest: what he has earned in this tab, and what this browser kept before there
- * were accounts, which he keeps, read-only, until he signs in and it goes to his account.
+ * A guest: his tour in this browser's localStorage, under the keys prod has always kept
+ * it under, so a guest keeps it when the tab closes (designer, 2026-10-27), until he
+ * signs in and it goes to his account. Each change is written over what the browser
+ * holds now, never over what this page loaded: another tab may have carried the tour
+ * into an account since, and what it carried must not come back to be carried again.
+ *
+ * The deaths are a count, which a tab still running the game from before accounts
+ * (LocalStore, which writes the count it loaded and its own since) can write back after
+ * they were carried. So they are never taken away: the count stays, and the deaths
+ * carried so far are kept beside it (CARRIED_KEY). A guest's are those over it.
  */
 export class GuestStore implements ProgressStore {
   load(): Snapshot {
-    return combine(readGuest(), new LocalStore().load());
+    const tour = new LocalStore().load();
+    return { ...tour, lifetime: Math.max(0, tour.lifetime - readCarried()) };
   }
 
   record(change: Change): void {
-    const own = readGuest();
-    own.id ??= newId();
-    if (change.kind === 'cleared') {
-      if (!own.cleared.includes(change.level)) own.cleared.push(change.level);
-    } else if (change.kind === 'trick') {
-      const met = own.tricks[change.level] ?? [];
-      if (!met.includes(change.trick)) met.push(change.trick);
-      own.tricks[change.level] = met;
-    } else {
-      own.lifetime += 1;
+    if (change.kind === 'play') {
+      const play = toPlayEvent(change.play);
+      if (!play) return;
+      try {
+        localStorage.setItem(PLAYS_KEY, JSON.stringify([...readPlays(), play].slice(-GUEST_PLAYS)));
+      } catch {
+        /* private mode, or full: the tracker does without it */
+      }
+      return;
     }
-    try {
-      sessionStorage.setItem(GUEST_KEY, JSON.stringify(own));
-    } catch {
-      /* private mode; it lives on in memory only */
-    }
+    const now = new LocalStore();
+    now.load();
+    now.record(change);
   }
 
-  /**
-   * Carried into an account: everything the guest holds, this tab's and the old, and
-   * nothing held here after. The tab's record is written off, by its id and its deaths,
-   * so a copy of it in a duplicated tab does not carry them in a second time.
-   */
-  handOver(): Snapshot {
-    const own = readGuest();
-    const all = combine(own, new LocalStore().load());
-    if (own.id) writeOff({ id: own.id, deaths: own.lifetime });
-    try {
-      sessionStorage.removeItem(GUEST_KEY);
-    } catch {
-      /* nothing to forget */
-    }
-    for (const key of Object.values(LOCAL_KEYS)) {
+  /** Carried into an account: everything the guest holds, and nothing held here after. */
+  handOver(): Carried {
+    const all = new LocalStore().load();
+    const before = readCarried();
+    const carried = { tour: { ...all, lifetime: Math.max(0, all.lifetime - before) }, plays: readPlays() };
+    for (const key of [LOCAL_KEYS.cleared, LOCAL_KEYS.tricks, PLAYS_KEY]) {
       try {
         localStorage.removeItem(key);
       } catch {
         /* nothing to forget */
       }
     }
-    return all;
+    try {
+      localStorage.setItem(CARRIED_KEY, String(Math.max(before, all.lifetime)));
+    } catch {
+      // Full: the count goes instead, as it went before there was a mark, so it is not carried twice.
+      try {
+        localStorage.removeItem(LOCAL_KEYS.lifetime);
+      } catch {
+        /* private mode: nothing is kept to carry twice */
+      }
+    }
+    return carried;
   }
 }
 
-/**
- * This tab's guest record. A record with the id of one already carried into an
- * account is a copy of it, made when a tab was duplicated: the deaths it held then
- * have been counted, and only those since are its own. Its levels and tricks stay,
- * since a fact carried in twice is still one. It goes on under a new id.
- */
-function readGuest(): GuestRecord {
+function readCarried(): number {
   try {
-    const raw = sessionStorage.getItem(GUEST_KEY);
-    const o = raw ? (JSON.parse(raw) as unknown) : null;
-    const id = o && typeof o === 'object' && typeof (o as { id?: unknown }).id === 'string' ? (o as { id: string }).id : null;
-    const record: GuestRecord = { id, ...toSnapshot(o) };
-    const carried = id ? writtenOff().find((c) => c.id === id) : undefined;
-    if (!carried) return record;
-    const own: GuestRecord = { ...record, id: newId(), lifetime: Math.max(0, record.lifetime - carried.deaths) };
-    sessionStorage.setItem(GUEST_KEY, JSON.stringify(own));
-    return own;
+    const n = Number(localStorage.getItem(CARRIED_KEY) ?? '0');
+    return Number.isFinite(n) && n > 0 ? Math.floor(n) : 0;
   } catch {
-    return { id: null, ...empty() };
+    return 0;
   }
 }
 
-/** A guest record carried into an account: its id, and the deaths it held. */
-interface Carried {
-  id: string;
-  deaths: number;
-}
-
-function writtenOff(): Carried[] {
+function readPlays(): PlayEvent[] {
   try {
-    const list = JSON.parse(localStorage.getItem(ABSORBED_KEY) ?? '[]') as unknown;
-    if (!Array.isArray(list)) return [];
-    return list.filter((c): c is Carried => !!c && typeof c === 'object' && typeof (c as Carried).id === 'string' && Number.isInteger((c as Carried).deaths));
+    const list = JSON.parse(localStorage.getItem(PLAYS_KEY) ?? '[]') as unknown;
+    return Array.isArray(list) ? list.filter(isPlayEvent) : [];
   } catch {
     return [];
   }
 }
 
-function writeOff(c: Carried): void {
-  try {
-    localStorage.setItem(ABSORBED_KEY, JSON.stringify([...writtenOff(), c].slice(-ABSORBED_KEPT)));
-  } catch {
-    /* private mode: a duplicate's copy could come in again */
+/** What happened, as an event with an id and the time, if it is one the server takes; otherwise null, and it is not kept. */
+function toPlayEvent(play: Play): PlayEvent | null {
+  const event = { id: newId(), at: Date.now(), ...play };
+  return isPlayEvent(event) ? event : null;
+}
+
+/** Every key an event of each kind has, and no other, as the server holds it (server/progress.ts). */
+const EVENT_KEYS: Record<PlayEvent['kind'], readonly string[]> = {
+  enter: ['id', 'at', 'kind', 'level'],
+  death: ['id', 'at', 'kind', 'level', 'cause', 'x', 'y', 'ms'],
+  leave: ['id', 'at', 'kind', 'level', 'deaths'],
+  clear: ['id', 'at', 'kind', 'level', 'ms', 'deaths'],
+};
+const KINDS: ReadonlySet<unknown> = new Set(Object.keys(EVENT_KEYS));
+
+/**
+ * An event the server takes. One it would refuse would take the whole push with it,
+ * levels and tricks too, so one that is not is never queued.
+ */
+function isPlayEvent(x: unknown): x is PlayEvent {
+  if (!x || typeof x !== 'object' || Array.isArray(x)) return false;
+  const e = x as Record<string, unknown>;
+  if (!KINDS.has(e.kind)) return false;
+  const want = EVENT_KEYS[e.kind as PlayEvent['kind']];
+  const keys = Object.keys(e);
+  if (keys.length !== want.length || !want.every((k) => keys.includes(k))) return false;
+  if (typeof e.id !== 'string' || !PUSH_ID.test(e.id) || !isWhole(e.at, MAX_AT)) return false;
+  if (typeof e.level !== 'string' || !LEVEL_ID.test(e.level)) return false;
+  if (e.kind === 'death') {
+    const cause = e.cause;
+    if (typeof cause !== 'string' || !NOUN.test(cause) || !WHOLE_PAIRS.test(cause)) return false;
+    if (!isCoord(e.x) || !isCoord(e.y) || !isWhole(e.ms, MAX_MS)) return false;
   }
+  if (e.kind === 'clear' && !isWhole(e.ms, MAX_MS)) return false;
+  if ((e.kind === 'leave' || e.kind === 'clear') && !isWhole(e.deaths, MAX_DEATHS)) return false;
+  return true;
+}
+
+/** A whole number from 0 to `max`. */
+function isWhole(n: unknown, max: number): n is number {
+  return typeof n === 'number' && Number.isInteger(n) && n >= 0 && n <= max;
+}
+
+function isCoord(n: unknown): n is number {
+  return typeof n === 'number' && Number.isInteger(n) && Math.abs(n) <= MAX_COORD;
 }
 
 /** Deaths sent in one push, under its id, and not yet known to be counted. */
@@ -148,6 +190,8 @@ interface Queue {
   deaths: number;
   /** Deaths sent, each push's under its id, until the server is known to have them. */
   outbox: Sent[];
+  /** What happened in play, oldest first, until the server has it. */
+  plays: PlayEvent[];
   /** He has signed out of it: whichever tab signs in to the account next takes it over. */
   released: boolean;
 }
@@ -180,20 +224,21 @@ export class AccountStore implements ProgressStore {
     user: User,
     private readonly schedule: (ms: number) => void,
   ) {
-    this.q = { tab, account: user.id, email: user.email, cleared: [], tricks: {}, deaths: 0, outbox: [], released: false };
+    this.q = { tab, account: user.id, email: user.email, cleared: [], tricks: {}, deaths: 0, outbox: [], plays: [], released: false };
   }
 
   /**
    * The queue for `user` in this tab, as he signs in here: with what `carry` hands
-   * over (the guest's tour) and every queue for his account whose tab has gone.
+   * over (the guest's tour, and what he did in play) and every queue for his account
+   * whose tab has gone.
    */
-  static async open(user: User, schedule: (ms: number) => void, carry: () => Snapshot): Promise<AccountStore> {
+  static async open(user: User, schedule: (ms: number) => void, carry: () => Carried): Promise<AccountStore> {
     const tab = await tabId();
     const store = new AccountStore(tab, user, schedule);
     const claim = (): void => {
       setAside(tab);
-      const guest = carry();
-      store.add({ cleared: guest.cleared, tricks: guest.tricks, deaths: guest.lifetime, outbox: [] });
+      const { tour, plays } = carry();
+      store.add({ cleared: tour.cleared, tricks: tour.tricks, deaths: tour.lifetime, outbox: [], plays });
       store.write();
     };
     // With the other tabs' takeovers kept out, as they may be looking at this tab's
@@ -218,6 +263,14 @@ export class AccountStore implements ProgressStore {
 
   record(change: Change): void {
     this.sync();
+    if (change.kind === 'play') {
+      const play = toPlayEvent(change.play);
+      if (!play) return;
+      this.addPlays([play]);
+      this.write();
+      this.schedule(LATER);
+      return;
+    }
     if (change.kind === 'death') {
       this.q.deaths += 1;
       this.write();
@@ -236,7 +289,8 @@ export class AccountStore implements ProgressStore {
     const out = this.carried();
     const facts = q.cleared.some((id) => !out.has(id)) || Object.entries(q.tricks).some(([id, list]) => list.some((t) => !out.has(`${id}\n${t}`)));
     if (facts || q.outbox.some((s) => !this.out.has(s.id))) return SOON;
-    return q.deaths ? LATER : null;
+    const playsOut = this.playsOut();
+    return q.deaths || q.plays.some((p) => !playsOut.has(p.id)) ? LATER : null;
   }
 
   /**
@@ -278,7 +332,8 @@ export class AccountStore implements ProgressStore {
    * The next push, or null when everything queued is out already. Its deaths are one
    * entry of the outbox: one sent before and not answered goes again first, as it was;
    * failing that, the deaths queued move to the outbox under a new id. With them go the
-   * levels and tricks that no push out carries, as many as one push may hold.
+   * levels and tricks that no push out carries, as many as one push may hold, and in
+   * what room is left, the oldest of what happened in play that no push out carries.
    */
   take(): ProgressPush | null {
     this.sync();
@@ -315,6 +370,16 @@ export class AccountStore implements ProgressStore {
       levels += 1;
       bytes += b;
     }
+    const playsOut = this.playsOut();
+    const events: PlayEvent[] = [];
+    // Its frame, `,"events":[]`, is within the 400 counted at the start.
+    for (const p of q.plays) {
+      if (playsOut.has(p.id)) continue;
+      const b = utf8.encode(JSON.stringify(p)).length + 1;
+      if (events.length >= MAX_PLAYS || bytes + b > MAX_BYTES) break;
+      events.push(p);
+      bytes += b;
+    }
     let sent = q.outbox.find((s) => !this.out.has(s.id));
     if (!sent && q.deaths > 0) {
       sent = { id: newId(), deaths: Math.min(q.deaths, MAX_DEATHS) };
@@ -322,8 +387,8 @@ export class AccountStore implements ProgressStore {
       q.outbox.push(sent);
       this.write();
     }
-    if (!sent && !cleared.length && !levels) return null;
-    const push: ProgressPush = { id: sent?.id ?? newId(), account: q.account, cleared, tricks, deaths: sent?.deaths ?? 0 };
+    if (!sent && !cleared.length && !levels && !events.length) return null;
+    const push: ProgressPush = { id: sent?.id ?? newId(), account: q.account, cleared, tricks, deaths: sent?.deaths ?? 0, events };
     this.out.set(push.id, push);
     return push;
   }
@@ -344,6 +409,8 @@ export class AccountStore implements ProgressStore {
     const q = this.q;
     q.outbox = q.outbox.filter((s) => s.id !== push.id);
     q.cleared = q.cleared.filter((id) => !push.cleared.includes(id));
+    const had = new Set((push.events ?? []).map((p) => p.id));
+    q.plays = q.plays.filter((p) => !had.has(p.id));
     for (const [id, list] of Object.entries(push.tricks)) {
       const left = (q.tricks[id] ?? []).filter((t) => !list.includes(t));
       if (left.length) q.tricks[id] = left;
@@ -386,12 +453,35 @@ export class AccountStore implements ProgressStore {
     return out;
   }
 
+  /** The ids of what happened in play that the pushes out carry. */
+  private playsOut(): Set<string> {
+    const out = new Set<string>();
+    for (const p of this.out.values()) for (const e of p.events ?? []) out.add(e.id);
+    return out;
+  }
+
   /** Everything in `s` that a push can carry (anything else could never be sent), its outbox with it. */
-  private add(s: Pick<Queue, 'cleared' | 'tricks' | 'deaths' | 'outbox'>): void {
+  private add(s: Pick<Queue, 'cleared' | 'tricks' | 'deaths' | 'outbox' | 'plays'>): void {
     for (const id of s.cleared) this.addCleared(id);
     for (const [id, list] of Object.entries(s.tricks)) for (const t of list) this.addTrick(id, t);
     this.q.deaths += Math.max(0, Math.floor(s.deaths));
     for (const sent of s.outbox) if (!this.q.outbox.some((o) => o.id === sent.id)) this.q.outbox.push(sent);
+    this.addPlays(s.plays);
+  }
+
+  /** Each event the server takes and the queue has not got, in order of when it happened; the newest QUEUE_PLAYS are kept. */
+  private addPlays(plays: readonly PlayEvent[]): void {
+    const have = new Set(this.q.plays.map((p) => p.id));
+    const fresh: PlayEvent[] = [];
+    for (const p of plays) {
+      if (!isPlayEvent(p) || have.has(p.id)) continue;
+      have.add(p.id);
+      fresh.push(p);
+    }
+    if (!fresh.length) return;
+    const all = [...this.q.plays, ...fresh];
+    all.sort((a, b) => a.at - b.at);
+    this.q.plays = all.slice(-QUEUE_PLAYS);
   }
 
   private addCleared(id: string): boolean {
@@ -423,6 +513,7 @@ export class AccountStore implements ProgressStore {
     this.q.tricks = {};
     this.q.deaths = 0;
     this.q.outbox = [];
+    this.q.plays = [];
   }
 
   /** The key, made to hold just what the queue holds: an empty queue has none. A deleted account's has none. */
@@ -430,7 +521,7 @@ export class AccountStore implements ProgressStore {
     if (this.state === 'dropped') return;
     const key = QUEUE_KEY + this.q.tab;
     const q = this.q;
-    if (!q.cleared.length && !Object.keys(q.tricks).length && !q.deaths && !q.outbox.length) {
+    if (!q.cleared.length && !Object.keys(q.tricks).length && !q.deaths && !q.outbox.length && !q.plays.length) {
       remove(key);
       this.kept = false;
       return;
@@ -485,7 +576,7 @@ function readQueue(key: string, tab: string): Queue | null {
     const raw = localStorage.getItem(key);
     const o = raw ? (JSON.parse(raw) as unknown) : null;
     if (!o || typeof o !== 'object') return null;
-    const { account, email, deaths, outbox, released } = o as Record<string, unknown>;
+    const { account, email, deaths, outbox, plays, released } = o as Record<string, unknown>;
     if (typeof account !== 'string' || typeof email !== 'string') return null;
     const s = toSnapshot(o);
     return {
@@ -496,6 +587,7 @@ function readQueue(key: string, tab: string): Queue | null {
       tricks: s.tricks,
       deaths: isCount(deaths) ? deaths : 0,
       outbox: Array.isArray(outbox) ? outbox.filter(isSent) : [],
+      plays: Array.isArray(plays) ? plays.filter(isPlayEvent) : [],
       released: released === true,
     };
   } catch {

@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'node:url';
 import { defineConfig, normalizePath, type Plugin } from 'vite';
 // @ts-expect-error -- plain JS, and the config is the only thing that loads it.
 import { png, svg, check } from './tools/favicon.mjs';
@@ -23,6 +24,17 @@ const isProd = buildEnv === 'prod';
 const touch = true;
 
 /**
+ * Accounts (src/account/): Google, or a code sent by email, keeps a visitor's tour, and
+ * what he does in play goes to the admin's tracker (admin.html). Every build carries them:
+ * dev from 2026-10-16, prod since the designer's word of 2026-10-27 ("add google auth to
+ * main"). Which ways to sign in a deployment offers is its configuration (README,
+ * "Accounts"): prod's offers Google alone. Made false again, they are held back from prod
+ * as before: the prod build fails while it is false and any of src/account/ is in its
+ * bundle (nothingHeldInProd).
+ */
+const accounts = true;
+
+/**
  * Two hostnames serve the same game, so exactly one of them may be indexed.
  * prod claims the canonical URL; every other build tells crawlers to keep out,
  * twice over: a meta tag in the head, and an `X-Robots-Tag` header, which
@@ -37,10 +49,13 @@ function indexingRules(): Plugin {
     name: 'lost-tourist-indexing',
     apply: 'build',
 
-    transformIndexHtml: () =>
-      isProd
-        ? [{ tag: 'link', attrs: { rel: 'canonical', href: CANONICAL }, injectTo: 'head' as const }]
-        : [{ tag: 'meta', attrs: { name: 'robots', content: 'noindex, nofollow' }, injectTo: 'head' as const }],
+    // The game's page only: the admin's (admin.html) keeps every crawler out in every build itself.
+    transformIndexHtml: (_, ctx) =>
+      !isGamePage(ctx.path)
+        ? []
+        : isProd
+          ? [{ tag: 'link', attrs: { rel: 'canonical', href: CANONICAL }, injectTo: 'head' as const }]
+          : [{ tag: 'meta', attrs: { name: 'robots', content: 'noindex, nofollow' }, injectTo: 'head' as const }],
 
     generateBundle() {
       this.emitFile({
@@ -63,13 +78,13 @@ function indexingRules(): Plugin {
 
 /**
  * The tools for building the game live in src/dev/ and never reach a player, and
- * nor do the levels held back from prod, nor accounts (src/account/: dev only
- * first, designer, 2026-10-16). dev and main are one history, promoted by
- * fast-forward, so their source goes to main with everything else; what must not
- * go is their code in the prod bundle. The game only reads them outside prod and
- * the bundler drops them from it. This is the check that it did: a prod bundle
- * with any of src/dev/ or src/account/, or any held level's file
- * (src/levels/held-files.ts), in it is not a build.
+ * nor do the levels held back from prod, nor accounts or the touch controls while
+ * they are held back (`accounts`, `touch`, above). dev and main are one history,
+ * promoted by fast-forward, so their source goes to main with everything else; what
+ * must not go is their code in the prod bundle. The game only reads them outside
+ * prod and the bundler drops them from it. This is the check that it did: a prod
+ * bundle with any of src/dev/, or any held level's file (src/levels/held-files.ts),
+ * or anything held back, in it is not a build.
  */
 function nothingHeldInProd(): Plugin {
   let devDir = '';
@@ -98,7 +113,7 @@ function nothingHeldInProd(): Plugin {
     generateBundle(_, bundle) {
       if (!isProd) return;
       const tools: string[] = [];
-      const accounts: string[] = [];
+      const accountCode: string[] = [];
       const levels: string[] = [];
       const buttons: string[] = [];
       for (const chunk of Object.values(bundle)) {
@@ -108,14 +123,14 @@ function nothingHeldInProd(): Plugin {
         for (const id of Object.keys(chunk.modules)) {
           const path = normalizePath(id);
           if (path.startsWith(devDir)) tools.push(id);
-          if (path.startsWith(accountDir)) accounts.push(id);
+          if (!accounts && path.startsWith(accountDir)) accountCode.push(id);
           if (held.includes(path)) levels.push(id);
           if (!touch && path.startsWith(touchDir)) buttons.push(id);
         }
       }
       const leaks = [
         ...(tools.length ? [`dev tools in the prod bundle:\n  ${tools.join('\n  ')}`] : []),
-        ...(accounts.length ? [`account code in the prod bundle (ACCOUNTS, src/game.ts):\n  ${accounts.join('\n  ')}`] : []),
+        ...(accountCode.length ? [`account code held back from prod in its bundle (accounts, vite.config.ts):\n  ${accountCode.join('\n  ')}`] : []),
         ...(levels.length ? [`levels held back from prod in its bundle (HELD, src/levels/index.ts):\n  ${levels.join('\n  ')}`] : []),
         ...(buttons.length ? [`touch controls held back from prod in its bundle (touch, vite.config.ts):\n  ${buttons.join('\n  ')}`] : []),
       ];
@@ -199,8 +214,8 @@ function phone(): Plugin {
   return {
     name: 'lost-tourist-phone',
 
-    transformIndexHtml(html) {
-      if (!touch) return html;
+    transformIndexHtml(html, ctx) {
+      if (!touch || !isGamePage(ctx.path)) return html;
       if (!html.includes(VIEWPORT)) throw new Error('index.html: the viewport meta is not the one the phone plugin replaces');
       return {
         html: html.replace(
@@ -237,11 +252,26 @@ function phone(): Plugin {
   };
 }
 
+/** Whether a page is the game's (index.html), not the admin's (admin.html). */
+function isGamePage(path: string): boolean {
+  return path === '/' || path === '/index.html';
+}
+
 export default defineConfig({
   plugins: [favicon(), indexingRules(), nothingHeldInProd(), phone()],
   define: {
     __BUILD_ENV__: JSON.stringify(buildEnv),
     __COMMIT__: JSON.stringify(commit),
     __TOUCH__: JSON.stringify(touch),
+    __ACCOUNTS__: JSON.stringify(accounts),
+  },
+  build: {
+    // Two pages: the game, and the admin's tracker of its visitors (src/admin/).
+    rollupOptions: {
+      input: {
+        main: fileURLToPath(new URL('./index.html', import.meta.url)),
+        admin: fileURLToPath(new URL('./admin.html', import.meta.url)),
+      },
+    },
   },
 });

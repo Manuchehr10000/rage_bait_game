@@ -1,5 +1,16 @@
 # Chapter 3 · Level 2 · Phaistos
 
+> **Read first (2026-10-21).** This design predates the pillars of 2026-09-26 and Knossos's
+> rebuild of 2026-10-21, and it is not built as it stands: it is redesigned from what the
+> rebuilt Knossos plants (`../CHAPTER.md`, Level 1; `content/research/arc.md`, section 4).
+> These setups are void, because Knossos no longer has them: Knossos killing from above and
+> "look up"; the column that lies beside the light; "never stand at a door", taught by
+> Knossos's doors; and the turn of Knossos's storerooms. Two collisions to avoid: Phaistos's
+> own kouloures may not be another floor that opens beside or under a pit (the kouloura is
+> spent at Knossos); and an edge survived by a hop repeats the throne's lesson, a hop out of a
+> sunken place, so the redesign turns it rather than repeats it. Every level built or designed
+> before 2026-09-26 is to be rebuilt; this note says where to start.
+
 A ridge at the western end of the Messara plain in south Crete, with Mount Ida (Psiloritis)
 to the north and, high on its flank, the dark mouth of the Kamares cave. The second palace
 of Minoan Crete, built twice. The **Old Palace** of about 1900 BC stood on terraces cut into

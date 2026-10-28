@@ -5,7 +5,7 @@
 | Id | `giant-pithos` |
 | File | `giant-pithos.png` (not painted yet: the game draws its own until this file exists) |
 | Size | 11 × 16 world px, painted 44 × 64 |
-| Beat | `g-east-bastion` |
+| Beat | `e-east-bastion` |
 
 ## What it is
 
@@ -15,7 +15,7 @@ East Bastion.
 
 ## Where it stands in the game
 
-Three of them at the head of Evans's stair on the terrace, bottom edge on the terrace. Not solid.
+Three of them on the terrace before the turnstile, bottom edge on the terrace. Not solid.
 Identical and honest.
 
 ## Must be right
@@ -25,7 +25,7 @@ Identical and honest.
 
 ## Deliberately wrong
 
-- **They are moved to the head of the stair.** They stand in their own magazine beside it.
+- **They are moved onto the bastion's terrace.** They stand in their own magazine beside it.
 - Drawn about his height, shorter than they are.
 
 ## Sources

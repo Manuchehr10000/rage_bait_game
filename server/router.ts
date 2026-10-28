@@ -4,6 +4,7 @@
  * on Workers and on Node alike.
  */
 
+import { adminUser, adminUsers } from './admin';
 import type { Me, Methods, Ok, ProgressReply } from './contract';
 import { sha256hex } from './crypto';
 import { ensureSchema } from './db';
@@ -33,17 +34,20 @@ const ROUTES = new Map<string, Route>([
   ['/api/auth/google', { method: 'POST', handler: googleSignIn }],
   ['/api/auth/logout', { method: 'POST', handler: logout }],
   ['/api/account', { method: 'DELETE', handler: deleteAccount }],
+  ['/api/admin/users', { method: 'GET', handler: adminUsers }],
+  ['/api/admin/user', { method: 'GET', handler: adminUser }],
 ]);
 
 const DEFAULT_DEPS: Deps = {
   now: () => Date.now(),
   // Called through a closure: Workers refuse a fetch detached from the global.
   fetch: (input, init) => fetch(input, init),
+  sleep: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
 };
 
 export async function handle(request: Request, env: Env, deps: Partial<Deps> = {}): Promise<Response> {
   try {
-    // Where no database is bound (prod), there are no accounts and so no API.
+    // Where no database is bound (prod, until its Production environment is given one), there are no accounts and so no API.
     const db = env.DB;
     if (!db) return fail(404, 'not_found');
     const url = new URL(request.url);

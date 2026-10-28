@@ -16,7 +16,7 @@ designed; levels 1 and 6 are built, rough, drawn by code.
 | Level | Site | Place | Period | Designed | Built |
 |---|---|---|---|---|---|
 | 1 | Knossos | Kephala hill, Heraklion, Crete | Palaces c. 1900–1350 BC | yes | rough |
-| 2 | Phaistos | Messara plain, south Crete | Old Palace c. 1900 BC; New c. 1700–1450 BC | yes | not yet |
+| 2 | Phaistos | Messara plain, south Crete | Old Palace c. 1900 BC; New c. 1700–1450 BC | before the pillars; to be redesigned | not yet |
 | 3 | Akrotiri | Thera (Santorini) | Buried by eruption, late 17th c. BC | not yet | not yet |
 | 4 | Mycenae | Argolid | Peak c. 1350–1200 BC | not yet | not yet |
 | 5 | Tiryns | Argolid | Circuit and palace c. 1400–1200 BC | not yet | not yet |
@@ -74,20 +74,36 @@ collapse** (`arc.md`, section 5).
 
 ## Level 1 · Knossos
 
-Designed; see `l01-knossos/LEVEL.md`. The mechanic under its line is **wood gives way; stone
-and concrete hold**: every column that lies is timber — once the burnt Minoan original, once
-Fyfe's first attempt of 1901 — and every one of Evans's later columns holds. What fails is fire
-and weather, never Minoan building. Its pattern, taught on purpose so a later level can break
-it: **the column that lies stands right beside the light.** Land in the light; never stop next
-to it. It has two crushes (a burnt span in the storerooms, a timber span in the Grand
-Staircase), the game's one death with no physical cause (the tourist lands in front of the
-throne and is sitting in it), and the game's first trap on a cycle (the folding doors of the
-Hall of the Double Axes). About 25 seconds clean; built rough, the knowing run is 27.3 s, 1.85
-s of it standing at the doors (`tests/knossos.spec.ts`).
+Rebuilt 2026-10-21 under the pillars of 2026-09-26, on the designer's delegation; see
+`l01-knossos/LEVEL.md`. Five beats: the West Court, the Throne Room, the Central Court, the
+Grand Staircase, out by the corridor onto the East Bastion's terrace. Under its line,
+**everything of Evans's holds and does nothing**: his concrete, his four columns, his copy of
+the throne. Nothing in the level comes down. What gets him is where he lands, in two tricks:
+the kouloura (the court between the first two pits opens under him, and the third pit's floor
+is a lid; the way past is down into the pit) and the throne (a full jump out of the lit basin
+seats him in it, the game's one death with no physical cause; a hop lives). The two are an
+inversion: at the pit the committed jump lives, at the basin it kills. The knowing run is
+13.35 s, 0.08 s of it standing (`tests/knossos.spec.ts`).
+
+What it plants for the levels after it, honestly: a storey is five tiles, and under a roof the
+jump is cut; one storey is nothing and the light catches every landing (a walk off into the
+Grand Staircase's light well); light from directly above means nothing is overhead, twice;
+every column holds, and tapers downward; the pit is the safe ground and the floor beside it
+the hole; a hop, not a full jump, out of a sunken place. It no longer has a crush, a column
+that lies, a door or a trap on a cycle: as built from 2026-09-25 it had all four, and they
+were cut (`content/tricks.md`).
 
 ## Level 2 · Phaistos
 
-Designed; see `l02-phaistos/LEVEL.md`.
+Designed 2026-09-24, before the pillars of 2026-09-26; see `l02-phaistos/LEVEL.md`. **To be
+redesigned from the rebuilt Knossos** (ruled 2026-10-21, on the designer's delegation): three
+of the setups below are void, because Knossos no longer has them. Knossos no longer kills from
+above; its doors are cut, so it never taught him not to stand at a door; and the column that
+lies beside the light is gone. Two more cautions for the redesign: the throne now teaches a
+hop out of a sunken place, so an edge survived by a hop repeats it and must turn it instead;
+and Phaistos's own kouloures may not be another trapdoor beside or under a pit (the kouloura is
+spent at Knossos, and the Minotaur's snort is its neighbour). What it can build on is
+Knossos's plants, above. The notes below describe the design as it was.
 
 > Phaistos: nothing falls on you. You fall.
 
@@ -120,11 +136,13 @@ two levels leave it:
 
 - **Two readable tells, both honest so far.** Knossos's light from above (nothing overhead),
   Phaistos's section (the old walls below hold). Akrotiri may make either lie.
-- **The pattern still unbroken:** at Knossos the column that lies stands beside the light.
+- **The pattern still unbroken:** every column at Knossos holds. (Until 2026-10-21 it was
+  "the column that lies stands beside the light"; that column was cut with Knossos's rebuild.)
 - **"If you cannot see the bottom, walk"** has never failed a player. Akrotiri may make it.
 - **Its verb cannot be the crush** (ruling), and the seat is spent. Floors that carry him down
   are the obvious verb for a town held up by ash, so the open pillar-1 ruling on floors that
-  drop with him (`arc.md`, section 4) has to be settled before it is built.
+  drop with him (`arc.md`, section 4) has to be settled before it is built. A floor that only
+  moves him can claim the death it sets up (`World.claim`, built for Knossos's kouloura).
 - **The ash did it.** The houses stood two and three storeys high because the ash filled them;
   the excavation took the ash away. The casts of beds and tables poured into the voids the
   wood left in the ash are the real objects.
@@ -320,7 +338,7 @@ its room is ruled again then.
 
 | Level | Room | Why |
 |---|---|---|
-| Knossos | `open` | **Ruled 2026-09-25: `open`, for the whole level.** The room is the place as a visitor stands in it today, and at Knossos that is outdoors: on the courts and the walkways, looking into Evans's rooms from outside them. The rooms the level takes the tourist into (the storeroom floor, the Throne Room past the barrier, the Grand Staircase, closed since the 1990s, the Hall of the Double Axes) are rooms visitors are kept out of, so a roofed sound there would be the sound of a visit nobody makes; and every one of them is open to the sky through a light well. The first roof the lyre is heard under is Akrotiri's, the one site visited wholly under a roof: a room at Knossos would spend that before it arrives. A small room called Evans's was considered and not made: it would be a new estimate with nothing to measure it against. |
+| Knossos | `open` | **Ruled 2026-09-25: `open`, for the whole level.** The room is the place as a visitor stands in it today, and at Knossos that is outdoors: on the courts and the walkways, looking into Evans's rooms from outside them. The rooms the level takes the tourist into (the storeroom floor, the Throne Room past the barrier, the Grand Staircase, closed since the 1990s, the Hall of the Double Axes) are rooms visitors are kept out of, so a roofed sound there would be the sound of a visit nobody makes; and every one of them is open to the sky through a light well. The first roof the lyre is heard under is Akrotiri's, the one site visited wholly under a roof: a room at Knossos would spend that before it arrives. A small room called Evans's was considered and not made: it would be a new estimate with nothing to measure it against. Rebuilt 2026-10-21, the level keeps two of those rooms, the Throne Room and the Grand Staircase, both open to the sky through a light well; `open` stands. |
 | Phaistos | `open` | Excavated and conserved, never reconstructed. The most exposed of the five. Level 2, designed 2026-09-24, is in the open air throughout except its finale, the hall of the Royal Apartments under a 1960s shelter, and its last few seconds under the New Palace floor: `open` stands. |
 | Akrotiri | `hall` | The only site visited wholly under a roof: the modern shelter over the excavated town. Estimated at 1.2 to 2 s; `hall` is 1.6 s and, if anything, dry. Nothing in the sound refers to the shelter's history. Waits on the ruling for Akrotiri in `content/research/arc.md`, section 4. |
 | Mycenae | `open` | An open citadel inside its walls. If level 4 is built inside the Treasury of Atreus, use the existing `deep`. The tholos is a tomb, its name a modern identification drawing on Pausanias 2.16.6, and no published measurement of its famous echo was found: nothing may suggest it was built for sound. |

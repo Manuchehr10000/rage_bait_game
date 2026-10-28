@@ -113,7 +113,7 @@ const DAY_FROM = px(117);
  * left alone for three tenths of a second; a second after it took the boot the
  * slab goes. Pull, and it keeps the boot. Stand still, then jump. It went at six
  * tenths until the designer found the jump impossible (2026-10-28): that left a
- * man who let go a tenth late no time to answer the step.
+ * man who let go a fifth of a second late a tenth to answer the step.
  */
 const SLABS = [
   { x: px(111) + 8, y: LOWER, does: 'holds' },

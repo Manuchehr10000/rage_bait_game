@@ -9,9 +9,12 @@
 # include http://localhost and http://localhost:8788.
 GOOGLE_CLIENT_ID=
 
+# The addresses whose accounts may read the admin's tracker (/admin), commas between.
+ADMIN_EMAILS=
+
 # Resend: an API key, and a sender on a domain verified with Resend.
 RESEND_API_KEY=
-EMAIL_FROM="Lost Tourist <tickets@losttourist.online>"
+EMAIL_FROM="Lost Tourist <tickets@mail.losttourist.online>"
 
 # Codes sent per rolling 24 hours, all addresses together (default 90), and per IP
 # per rolling hour (default 20).

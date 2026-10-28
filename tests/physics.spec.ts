@@ -341,6 +341,7 @@ test('every solid that rises in a built level lifts a man going up on it, and ne
           kill: (c) => {
             dead = c;
           },
+          claim: () => {},
           sound: () => {},
         };
         const { k, input } = keys();

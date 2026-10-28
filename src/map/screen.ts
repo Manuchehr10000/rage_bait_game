@@ -29,7 +29,10 @@ import type { Progress } from '../engine/progress';
 import { VIEW_H, VIEW_W } from '../engine/types';
 import { blitFacing } from '../render/frame';
 import { tourist } from '../render/scene';
-import { chapterMonumentSite, chapterOpen, monumentArtId, type Chapter } from './atlas';
+import { chapterMonumentSite, chapterOpen, chapterRestoring, monumentArtId, type Chapter } from './atlas';
+
+/** What the panel says of a chapter, or a site, built and held back from this build. */
+const RESTORING = 'Closed for restoration';
 
 /** The title card counts the chapters the game shows, in words. */
 const COUNT: Record<number, string> = { 1: 'one', 2: 'two', 3: 'three', 4: 'four', 5: 'five', 6: 'six', 7: 'seven', 8: 'eight', 9: 'nine', 10: 'ten', 11: 'eleven', 12: 'twelve' };
@@ -300,8 +303,9 @@ export class MapScreen {
     this.chapters.forEach((c, i) => {
       const p = this.worldBadge(i);
       const selected = i === this.chapter;
-      if (!chapterOpen(c) && !selected) {
-        // A chapter you cannot enter is a dot. The ribbon still lists it.
+      if (!chapterOpen(c) && !selected && !chapterRestoring(c)) {
+        // A chapter never built is a dot. The ribbon still lists it. One closed for
+        // restoration keeps its badge, drawn as a chapter not yet open.
         dot(ctx, p.x, p.y, 1.4, LAND_LINE);
         return;
       }
@@ -563,13 +567,14 @@ export class MapScreen {
       const open = chapterOpen(c);
       ctx.font = `${5 * s}px ${FONT}`;
       ctx.fillStyle = open ? ROUTE : INK_SOFT;
-      ctx.fillText(open ? `${enter} to visit` : 'Closed', px, 127 * s);
+      ctx.fillText(open ? `${enter} to visit` : chapterRestoring(c) ? RESTORING : 'Closed', px, 127 * s);
     } else {
       const sel = c.sites[this.site];
       // Built but not reached yet is 'Not yet' (only in the prod build, engine/progress.ts); never
-      // built, or held back from this build (atlas.ts, chaptersFor), is 'Closed'.
+      // built is 'Closed', and held back from this build (atlas.ts, chaptersFor) closed for restoration.
       const reached = !!sel?.level && this.progress.isOpen(sel.level);
-      const hint = !sel?.level ? 'Closed' : this.progress.isCleared(sel.level) ? `${enter} to visit again` : reached ? `${enter} to visit` : 'Not yet';
+      const closed = sel?.held ? RESTORING : 'Closed';
+      const hint = !sel?.level ? closed : this.progress.isCleared(sel.level) ? `${enter} to visit again` : reached ? `${enter} to visit` : 'Not yet';
       ctx.fillStyle = LAND_LINE;
       ctx.fillRect(px, 100 * s, pw, 0.6 * s);
       ctx.font = `bold ${5.5 * s}px ${FONT}`;

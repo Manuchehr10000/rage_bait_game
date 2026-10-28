@@ -28,7 +28,11 @@ export interface Mail {
   html: string;
   authorization: string | null;
   userAgent: string | null;
+  idempotencyKey: string | null;
 }
+
+/** One answer of the fake email API: a status (with Resend's error name and retry-after), or a network failure. */
+export type MailAnswer = number | 'throw' | { status: number; name?: string; retryAfter?: string };
 
 /** An account id as the server makes them (newId): 16 random bytes, base64url. */
 export const ACCOUNT_ID = /^[A-Za-z0-9_-]{22}$/;
@@ -45,6 +49,15 @@ export class FakeNet {
   readonly outbox: Mail[] = [];
   /** What the email API answers: a status, or 'throw' for a network failure. */
   mailStatus: number | 'throw' = 200;
+  /** Answers given before mailStatus, one per try, first first. */
+  readonly mailAnswers: MailAnswer[] = [];
+  /** The Idempotency-Key of every try at the email API, sent or not. */
+  readonly mailKeys: (string | null)[] = [];
+  /** Every wait the server asked for, in ms; none is waited out. */
+  readonly slept: number[] = [];
+  readonly sleep = async (ms: number): Promise<void> => {
+    this.slept.push(ms);
+  };
   /** Every URL fetched, in order. */
   readonly calls: string[] = [];
   readonly routes = new Map<string, () => Response | Promise<Response>>();
@@ -53,15 +66,25 @@ export class FakeNet {
     const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url;
     this.calls.push(url);
     if (url === EMAIL_API) {
-      if (this.mailStatus === 'throw') throw new TypeError('fetch failed');
       const headers = new Headers(init?.headers);
+      this.mailKeys.push(headers.get('Idempotency-Key'));
+      const answer = this.mailAnswers.shift() ?? this.mailStatus;
+      if (answer === 'throw') throw new TypeError('fetch failed');
+      const { status, name, retryAfter } = typeof answer === 'number' ? { status: answer, name: undefined, retryAfter: undefined } : answer;
       // As Resend does. Node's fetch would add a User-Agent of its own, a Worker's adds none.
       if (!headers.get('User-Agent')) return new Response(JSON.stringify({ name: 'missing_user_agent' }), { status: 403 });
-      const body = JSON.parse(String(init?.body)) as Omit<Mail, 'authorization' | 'userAgent'>;
-      if (this.mailStatus >= 200 && this.mailStatus < 300) {
-        this.outbox.push({ ...body, authorization: headers.get('Authorization'), userAgent: headers.get('User-Agent') });
+      const body = JSON.parse(String(init?.body)) as Omit<Mail, 'authorization' | 'userAgent' | 'idempotencyKey'>;
+      if (status >= 200 && status < 300) {
+        this.outbox.push({
+          ...body,
+          authorization: headers.get('Authorization'),
+          userAgent: headers.get('User-Agent'),
+          idempotencyKey: headers.get('Idempotency-Key'),
+        });
+        return new Response(JSON.stringify({ id: 'mail' }), { status });
       }
-      return new Response(JSON.stringify({ id: 'mail' }), { status: this.mailStatus });
+      const extra: Record<string, string> = retryAfter === undefined ? {} : { 'retry-after': retryAfter };
+      return new Response(JSON.stringify({ statusCode: status, name: name ?? 'application_error' }), { status, headers: extra });
     }
     const route = this.routes.get(url);
     if (!route) throw new TypeError(`fetch failed: nothing at ${url}`);
@@ -111,7 +134,7 @@ export class World {
 
   async send(request: Request): Promise<Response> {
     const { result: res, queries } = await this.db.metered(() =>
-      handle(request, this.env, { now: () => this.now, fetch: this.net.fetch }),
+      handle(request, this.env, { now: () => this.now, fetch: this.net.fetch, sleep: this.net.sleep }),
     );
     expect(queries, `${request.method} ${new URL(request.url).pathname} stays inside D1's 50 queries`).toBeLessThanOrEqual(50);
     return res;

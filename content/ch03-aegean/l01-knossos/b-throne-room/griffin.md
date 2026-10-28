@@ -5,7 +5,7 @@
 | Id | `griffin` |
 | File | `griffin.png` (not painted yet: the game draws its own until this file exists) |
 | Size | 24 × 14 world px, painted 96 × 56 |
-| Beat | `c-throne-room` |
+| Beat | `b-throne-room` |
 
 ## What it is
 

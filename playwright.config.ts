@@ -10,6 +10,8 @@ import { defineConfig } from '@playwright/test';
 const PROVIDERS = 'http://localhost:8790';
 const API_VARS: Record<string, string> = {
   GOOGLE_CLIENT_ID: 'test-client.apps.googleusercontent.com',
+  // The admin's tracker reads only for this address (tests/accounts.spec.ts, ADMIN).
+  ADMIN_EMAILS: 'admin@example.test',
   RESEND_API_KEY: 'test',
   EMAIL_FROM: 'Lost Tourist <tickets@example.test>',
   EMAIL_API_URL: `${PROVIDERS}/emails`,

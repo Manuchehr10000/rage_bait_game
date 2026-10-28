@@ -6,7 +6,7 @@ if (!(canvas instanceof HTMLCanvasElement)) throw new Error('canvas#game missing
 
 const game = new Game(canvas);
 // Where there are accounts, the game opens once the account has booted (game.ts), and
-// starts, and is handed to the tests, only then. In prod it opened in its constructor.
+// starts, and is handed to the tests, only then. Without accounts it opens in its constructor.
 const opened = game.opened;
 if (opened) void Promise.all([loadArt(), opened]).then(() => game.start());
 else loadArt().then(() => game.start());

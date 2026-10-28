@@ -2,11 +2,13 @@ import type { D1Like } from './db';
 
 /** The Cloudflare bindings. All optional: without DB the API does not exist. */
 export interface Env {
-  /** Bound only where accounts are on: dev's Preview environment. */
+  /** Bound only where accounts are on: dev's Preview environment, and prod's Production once it is given one. */
   DB?: D1Like;
   GOOGLE_CLIENT_ID?: string;
+  /** The addresses whose accounts may read the admin's tracker (server/admin.ts), commas between. None by default. */
+  ADMIN_EMAILS?: string;
   RESEND_API_KEY?: string;
-  /** e.g. 'Lost Tourist <tickets@losttourist.online>'. */
+  /** e.g. 'Lost Tourist <tickets@mail.losttourist.online>'. */
   EMAIL_FROM?: string;
   /** Default 'https://api.resend.com/emails'; tests point it at a mock. */
   EMAIL_API_URL?: string;
@@ -23,6 +25,8 @@ export interface Deps {
   /** Milliseconds since the epoch. */
   now(): number;
   fetch: typeof fetch;
+  /** Waits `ms`; the tests wait no time at all. */
+  sleep(ms: number): Promise<void>;
 }
 
 /** One request, as the handlers see it. */

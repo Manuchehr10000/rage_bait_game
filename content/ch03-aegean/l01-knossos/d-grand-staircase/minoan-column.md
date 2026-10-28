@@ -5,7 +5,7 @@
 | Id | `minoan-column` |
 | File | `minoan-column.png` (not painted yet: the game draws its own until this file exists) |
 | Size | 12 × 64 world px, painted 48 × 256 |
-| Beat | `b-magazines` |
+| Beat | `d-grand-staircase` |
 
 ## What it is
 
@@ -16,12 +16,10 @@ colours come from frescoes, seals, the stone bases and the Mycenaean stone versi
 
 ## Where it stands in the game
 
-Every column in the level is this painting, at the same size: four of Evans's in the storeroom,
-the one at the head of the Grand Staircase, A and C beside its light well; and the two that
-fail — the fifth in the storeroom (the last burnt Minoan one) and B (Fyfe's timber of 1901).
-**They must be identical to the pixel** (pillar 4). The game draws the failing ones folding —
-the plaster splitting, a charred or rotten core, the shaft going down into its base — itself.
-The top of the painting is the underside of the slab it carries; the bottom row is the floor.
+Every column in the level is this painting, at the same size: the one at the head of the Grand
+Staircase, A at the edge of the upper hall, and B and C across the light well under the far
+hall's storey. **They are identical to the pixel** (pillar 4), and every one of them holds. The
+top of the painting is the underside of the slab it carries; the bottom row is the floor.
 
 ## Must be right
 
@@ -30,9 +28,9 @@ The top of the painting is the underside of the slab it carries; the bottom row 
 
 ## Deliberately wrong
 
-- Columns in a storeroom: none ever stood there; Evans's 1929 roof rests on the storeroom walls.
-- A Minoan column still standing: none survives.
 - One colour scheme for every column in the level.
+- Where they stand: one at the stair head and three by the light well is the level's placing,
+  not the staircase's real colonnade (see the level's deliberate lies).
 
 ## Sources
 

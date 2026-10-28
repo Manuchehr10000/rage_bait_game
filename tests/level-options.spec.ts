@@ -25,7 +25,8 @@ const PLAYER_H = 16;
 
 /**
  * The camera's height on the first frame of every attempt at each level built
- * before the Minotaur: the bottom of what it shows, cameraBottom − VIEW_H.
+ * before the Minotaur, and not rebuilt since: the bottom of what it shows,
+ * cameraBottom − VIEW_H. Knossos, rebuilt on 2026-10-21, starts on him instead.
  */
 const BUILT_START_Y: Record<string, number> = {
   'cap-blanc': 76,
@@ -37,11 +38,13 @@ const BUILT_START_Y: Record<string, number> = {
   philae: 76,
   karnak: 76,
   dendera: 188,
-  knossos: 252,
   persepolis: 76,
 };
 
 const built = () => LEVELS.map((data, index) => ({ data, index })).filter(({ data }) => data.id in BUILT_START_Y);
+/** Levels built before the Minotaur and rebuilt since: their camera starts on him. */
+const REBUILT = ['knossos'];
+const builtOrRebuilt = () => LEVELS.map((data, index) => ({ data, index })).filter(({ data }) => data.id in BUILT_START_Y || REBUILT.includes(data.id));
 
 /** Where the camera settles over a man standing on the level's spawn. */
 const settled = (id: string): number => {
@@ -74,6 +77,7 @@ async function open(page: Page): Promise<void> {
 
 test('every built level is pinned, and its camera starts at the bottom of what it shows and keeps no line of its own in view', () => {
   expect(built().length).toBe(Object.keys(BUILT_START_Y).length);
+  for (const id of REBUILT) expect(LEVELS.find((l) => l.id === id)?.cameraOnSpawn, id).toBe(true);
   for (const { data } of built()) {
     expect(data.cameraOnSpawn, data.id).toBeUndefined();
     expect(data.cameraKeeps, data.id).toBeUndefined();
@@ -84,14 +88,14 @@ test('every built level is pinned, and its camera starts at the bottom of what i
   }
 });
 
-test('started on the spawn for every level, four built levels would start somewhere else: so it is an option', () => {
-  // Pech-Merle, Gargas and Knossos spawn him high in a tall level, above the view for
-  // its first frames; Rouffignac's camera starts 23 px under where it settles. Their
-  // first frames stay as they were built.
+test('started on the spawn for every level, three built levels would start somewhere else: so it is an option', () => {
+  // Pech-Merle and Gargas spawn him high in a tall level, above the view for its first
+  // frames; Rouffignac's camera starts 23 px under where it settles. Their first frames
+  // stay as they were built.
   const moved = built()
     .filter(({ data }) => settled(data.id) !== BUILT_START_Y[data.id])
     .map(({ data }) => data.id);
-  expect(moved).toEqual(['pech-merle', 'rouffignac', 'gargas', 'knossos']);
+  expect(moved).toEqual(['pech-merle', 'rouffignac', 'gargas']);
 });
 
 test('a camera started on a man is where it would have settled over him, and stays there', () => {
@@ -165,7 +169,7 @@ test('in the game: every built level starts its camera where it always did, and 
 
 test('in the game: a built exit lets him out at once; told to wait, it waits for its event, in every attempt', async ({ page }) => {
   await open(page);
-  const fixed = built().filter(({ data }) => data.exit);
+  const fixed = builtOrRebuilt().filter(({ data }) => data.exit);
   expect(fixed.length).toBe(10); // Philae leaves by boat.
   for (const { data, index } of fixed) {
     expect(data.exitAfter, data.id).toBeUndefined();
@@ -222,7 +226,7 @@ test('in the game: a built exit lets him out at once; told to wait, it waits for
 
 test('in the game: every built level centres its exit card; anchored right, it stands at view x 136 to 316', async ({ page }) => {
   await open(page);
-  for (const { data, index } of built()) {
+  for (const { data, index } of builtOrRebuilt()) {
     expect(data.exitCard, data.id).toBeUndefined();
     const r = await page.evaluate(
       (index) => {

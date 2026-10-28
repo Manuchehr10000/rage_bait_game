@@ -232,7 +232,7 @@ known: step past it and straight back behind its foot, and let it fall.
   he is past it and he cannot outrun it, so he must cross its line and be back behind its foot
   inside that: 6 frames to spare from a run, 17 from a creep.
 - **Only here: weakly.** A column that falls fits any columned site, and Knossos's burnt column
-  and Karnak's obelisk are already falling shafts. What ties it to Persepolis is the Gate's own
+  (cut from Knossos in its rebuild of 2026-10-21) and Karnak's obelisk are already falling shafts. What ties it to Persepolis is the Gate's own
   hall: four columns once, two or three standing now. The designer accepted this.
 - **The closest tricks.** The designer's touchstone obelisk (`content/tricks.md`) cracks, holds,
   and comes down behind him once he is past it; it is answered by outrunning its length. It is
@@ -241,7 +241,7 @@ known: step past it and straight back behind its foot, and let it fall.
   down, and the answer is the opposite, to go back, not on. Until Karnak is rebuilt, the setup is
   the crack in this level alone. "Something comes down where a runner is going" (spent four
   times before 2026-09-26) comes down ahead of him; this comes down behind. Knossos's burnt column
-  lets a span down on whoever is under it; here nothing is overhead.
+  let a span down on whoever was under it (cut 2026-10-21); here nothing is overhead.
 
 **'The audience'** (beat d). Its shape is nearer the obelisk's than the cows': the setup is honest
 and the punchline is *where*. At the moment it fires he is standing in the one safe place, and he
@@ -277,12 +277,13 @@ that steps out and shoves him back, and Karnak's rams, which turn and butt him b
 he crossed, are the same fuse: a carving that moves. Both shove, and their answer is to time the
 pass. The guards never push and never move sideways; he dies only by being where a guard stands.
 Neither answer is new. The first, stopping in the gap between the two halves while both are out
-and then walking on, overlaps Knossos's doors: there both leaves sweep the outer hall on one
-clock, and the answer is to wait in its middle. The second, crossing both files in one window
+and then walking on, overlaps Knossos's doors (cut from Knossos on 2026-10-21 and free, so no
+built level holds them now): there both leaves swept the outer hall on one clock, and the answer
+was to wait in its middle. The second, crossing both files in one window
 while they are in the wall, is the ordinary pass on a clock. What is new is the punchline and the
 precision. The punchline: he is unhurt in the king's place at the moment the trap fires, and is
-killed by running out of it into the right-hand file. At Knossos the second door kills by folding
-the other way from the first, the cows' shape; here the two files are the same and step out
+killed by running out of it into the right-hand file. At Knossos the second door killed by folding
+the other way from the first, the cows' shape (cut 2026-10-21); here the two files are the same and step out
 together. The precision: a 16 px gap and a release window of about four frames, against
 Knossos's 68 px of hall. Whether that is enough to make the trick new is for the designer to
 confirm (Confidence).

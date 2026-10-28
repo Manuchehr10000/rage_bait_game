@@ -3,7 +3,6 @@ import type {
   ChaserDef,
   ConveyorDef,
   CrumbleDef,
-  DoorDef,
   EarDef,
   EntityDef,
   FallingDef,
@@ -19,7 +18,6 @@ import type {
   RoofDef,
   SeatDef,
   SnareDef,
-  SpanDef,
   SweepDef,
   TableauDef,
   ThrowerDef,
@@ -45,6 +43,12 @@ export interface World {
    * top-left of his box there. Only a death that carries him off says.
    */
   kill(cause: DeathCause, at?: { x: number; y: number }): void;
+  /**
+   * A trap that only moves him takes the plain death it sets up (pillar 8): if he dies a
+   * fall, a drop or a drowning before the claim lapses, it is this one. It lapses once he
+   * stands on something or jumps, unless the trap claims him again that frame.
+   */
+  claim(cause: DeathCause): void;
   sound(name: Sfx): void;
 }
 
@@ -95,12 +99,8 @@ export function createEntity(def: EntityDef, level: Level): Entity {
       return new Roof(def);
     case 'train':
       return new Train(def);
-    case 'span':
-      return new Span(def);
     case 'seat':
       return new Seat(def);
-    case 'door':
-      return new Door(def);
     case 'guards':
       return new Guards(def);
     case 'hero':
@@ -436,6 +436,8 @@ export class Crumble implements Entity {
   private readonly roofY: number;
   /** Whether the player was off the ground last frame, for the ones that mind being landed on. */
   private wasAirborne = false;
+  /** Whether a trapdoor opened under him: the hole it leaves is then its own. */
+  private took = false;
 
   constructor(readonly def: CrumbleDef, level?: Level) {
     this.rect = { ...def.rect };
@@ -451,8 +453,12 @@ export class Crumble implements Entity {
   }
 
   update(w: World): void {
-    if (!this.def.fake || this.state === 'gone') return;
+    if (!this.def.fake) return;
     const p = w.player;
+    // Down the hole it opened under him, whatever finishes him is this trap (pillar 8).
+    const d0 = this.def.rect;
+    if (this.took && this.def.claims && p.x + p.w > d0.x && p.x < d0.x + d0.w && p.y + p.h > d0.y) w.claim(this.def.claims);
+    if (this.state === 'gone') return;
     this.solid.dx = 0;
     this.solid.dy = 0;
     const r = this.rect;
@@ -498,6 +504,8 @@ export class Crumble implements Entity {
       }
       // A trapdoor: gone this frame, under whoever is on it.
       this.state = 'falling';
+      this.took = standing;
+      if (standing && this.def.claims) w.claim(this.def.claims);
       w.sound('crumble');
     }
     if (this.state === 'armed') {
@@ -768,11 +776,11 @@ export class Horse implements Entity {
 // ---------------------------------------------------------------------------
 
 /**
- * Something heavy coming down, and him under it: a block of a shelter's roof, a span
- * of a burnt storey. From the first touch he is pinned: nothing he presses gets him
- * out from under it. Caught in the air, he goes down under it to the floor. It crushes
- * him when it lands, on the floor, and not before: never in the air, and never while it
- * is still coming down on a man standing under it. Returns whether it has him.
+ * Something heavy coming down, and him under it: a block of a shelter's roof. From the
+ * first touch he is pinned: nothing he presses gets him out from under it. Caught in the
+ * air, he goes down under it to the floor. It crushes him when it lands, on the floor, and
+ * not before: never in the air, and never while it is still coming down on a man standing
+ * under it. Returns whether it has him.
  */
 function crushUnder(w: World, rect: Rect, vy: number, landed: boolean, floorY: number, cause: DeathCause, pinning: boolean): boolean {
   const p = w.player;
@@ -1121,77 +1129,6 @@ export class Train implements Entity {
 // Knossos.
 // ---------------------------------------------------------------------------
 
-/** How long a column takes to fold under its span once it has decided to go. */
-export const COLUMN_FOLD = 0.2;
-
-/**
- * A stretch of the floor over his head, on one column. Solid and drawn as ceiling
- * until the column goes; then it comes down as hard as the roof at Cap Blanc, and
- * whoever is under it is under it. Down, it is a step.
- */
-export class Span implements Entity {
-  readonly rect: Rect;
-  state: 'idle' | 'armed' | 'falling' | 'landed' = 'idle';
-  /** Seconds since it was set off. */
-  t = 0;
-  private vy = 0;
-  /** It has touched him, and he is going down under it. */
-  private pinning = false;
-  private readonly solid: MovingSolid;
-
-  constructor(readonly def: SpanDef) {
-    this.rect = { ...def.rect };
-    this.solid = { rect: this.rect, dx: 0, dy: 0 };
-  }
-
-  /** How far its column has folded: 0 standing, 1 down. */
-  get fold(): number {
-    if (this.state === 'idle') return 0;
-    if (this.state !== 'armed') return 1;
-    return Math.max(0, Math.min(1, (this.t - (this.def.delay - COLUMN_FOLD)) / COLUMN_FOLD));
-  }
-
-  update(w: World): void {
-    const d = this.def;
-    const p = w.player;
-    if (this.state === 'idle') {
-      const cx = centerX(p);
-      const f = d.footfall;
-      // His feet on the floor under it: on the ground, his centre over the strip.
-      const onIt = f !== undefined && w.alive && p.onGround && cx >= f.x && cx < f.x + f.w && Math.abs(p.y + p.h - f.y) <= 2;
-      const past = d.atX !== undefined && cx >= d.atX;
-      if (onIt || past) this.state = 'armed';
-      return;
-    }
-    if (this.state === 'armed') {
-      const before = this.t;
-      this.t += DT;
-      // The column goes first, with a crack, and then what it was carrying.
-      const foldAt = d.delay - COLUMN_FOLD;
-      if (before < foldAt && this.t >= foldAt) w.sound('headCrack');
-      if (this.t < d.delay) return;
-      this.state = 'falling';
-      this.vy = ROOF.push;
-      w.sound('crumble');
-      return;
-    }
-    if (this.state === 'landed') return;
-    this.vy += ROOF.gravity * DT;
-    this.rect.y += this.vy * DT;
-    if (this.rect.y + this.rect.h >= d.floorY) {
-      this.rect.y = d.floorY - this.rect.h;
-      this.state = 'landed';
-      w.sound('thud');
-    }
-    this.pinning = crushUnder(w, this.rect, this.vy, this.state === 'landed', d.floorY, d.cause, this.pinning);
-  }
-
-  /** Ceiling while it hangs, nothing while it falls, a step once it is down. */
-  solids(): MovingSolid[] {
-    return this.state === 'falling' ? [] : [this.solid];
-  }
-}
-
 /**
  * A seat. The throne of Knossos: land in front of it and he is sitting in it, and that
  * is the end of his visit. Walking past it does nothing; only a landing does. An
@@ -1218,75 +1155,6 @@ export class Seat implements Entity {
       this.sat = true;
       w.kill(d.cause);
     }
-  }
-}
-
-/**
- * One leaf of a pier-and-door partition. Shut, a bar across the doorway, floor to
- * lintel; open, folded flat against its pier on one side. It turns on the hall's
- * clock, and while it swings, the ground it has still to cover is its own.
- */
-export class Door implements Entity {
-  /** 0 shut, 1 open. */
-  k: number;
-  /** Seconds since the hall's clock started, or -1 before it has. */
-  t = -1;
-  /** Turns begun, so each one clacks once. */
-  private turns = 0;
-  private readonly solid: MovingSolid;
-
-  constructor(readonly def: DoorDef) {
-    this.k = def.startShut ? 0 : 1;
-    this.solid = { rect: { x: def.planeX - 2, y: def.floorY - def.height, w: 4, h: def.height }, dx: 0, dy: 0 };
-  }
-
-  /** How far from its pivot the leaf reaches now, signed by the side it folds to. */
-  get reach(): number {
-    return this.def.fold * this.def.leafW * this.k;
-  }
-
-  /** True while it is turning. */
-  get swinging(): boolean {
-    return this.k > 0 && this.k < 1;
-  }
-
-  update(w: World): void {
-    const d = this.def;
-    const c = d.clock;
-    const p = w.player;
-    if (this.t < 0) {
-      if (centerX(p) < c.triggerX) return;
-      this.t = 0;
-    }
-    this.t += DT;
-    const since = this.t - c.first;
-    if (since < 0) return;
-    const n = Math.floor(since / c.period);
-    const into = since - n * c.period;
-    const s0 = d.startShut ? 0 : 1;
-    const from = n % 2 === 0 ? s0 : 1 - s0;
-    const to = 1 - from;
-    if (into >= c.swing) {
-      this.k = to;
-      return;
-    }
-    if (this.turns <= n) {
-      this.turns = n + 1;
-      if (!d.quiet && d.planeX > w.cameraX - 16 && d.planeX < w.cameraX + VIEW_W + 16) w.sound('clack');
-    }
-    this.k = from + (to - from) * (into / c.swing);
-    if (!w.alive) return;
-    // What it has still to cover, floor to lintel; shutting, that includes the bar.
-    const a = d.planeX + d.fold * d.leafW * this.k;
-    const b = d.planeX + d.fold * d.leafW * to;
-    const x0 = Math.min(a, b) - (to === 0 ? 2 : 0);
-    const x1 = Math.max(a, b) + (to === 0 ? 2 : 0);
-    if (overlaps({ x: x0, y: d.floorY - d.height, w: x1 - x0, h: d.height }, p)) w.kill(d.cause);
-  }
-
-  /** A shut leaf is a wall; a moving or open one is not something to stand against. */
-  solids(): MovingSolid[] {
-    return this.k === 0 ? [this.solid] : [];
   }
 }
 

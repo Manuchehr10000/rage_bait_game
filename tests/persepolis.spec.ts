@@ -642,14 +642,13 @@ test('the knowing route: no deaths, about seventeen seconds, under a second and 
   expect(r.still / 60).toBeLessThan(1.5);
 });
 
-test('pillar 8: the exit label counts the audience once it has killed him, of the level\'s two tricks, and the tab remembers', async ({ page }) => {
+test('pillar 8: the exit label counts the audience once it has killed him, of the level\'s two tricks, and the browser remembers', async ({ page }) => {
   type Count = { met: number; of: number } | null;
   const count = (): Promise<Count> => page.evaluate(() => (window as unknown as { __game: { tricksCount(): Count } }).__game.tricksCount());
-  // The tricks written down. Outside prod a guest's tour is kept in this tab's record
-  // (src/account/), not in localStorage as prod keeps it; the tests' build has accounts
-  // and no API, so the visitor is a guest. No record yet is none written down.
-  const stored = (): Promise<unknown> =>
-    page.evaluate(() => (JSON.parse(sessionStorage.getItem('lostTourist.guest') ?? 'null') as { tricks?: unknown } | null)?.tricks ?? {});
+  // The tricks written down. The tests' build has accounts and no API, so the visitor is a
+  // guest, whose tour is kept in this browser under the keys prod always kept it under
+  // (src/account/; designer, 2026-10-27). None kept yet is none written down.
+  const stored = (): Promise<unknown> => page.evaluate(() => JSON.parse(localStorage.getItem('lostTourist.tricks') ?? '{}') as unknown);
   const runThrough = `const step = () => { if (!routeUntil('court')) return; key('ArrowRight', true); };`;
 
   // Never killed by it: the label says none of the one.
@@ -669,7 +668,7 @@ test('pillar 8: the exit label counts the audience once it has killed him, of th
   expect(await stored()).toEqual({ persepolis: ['The audience', 'The column'] });
   expect(await count()).toEqual({ met: 2, of: 2 });
 
-  // Another visit, the same tab.
+  // Another visit, the same browser.
   await page.reload();
   await page.waitForFunction(() => (window as unknown as { __game?: { levelData: { id: string } } }).__game?.levelData.id === 'persepolis');
   expect(await count()).toEqual({ met: 2, of: 2 });

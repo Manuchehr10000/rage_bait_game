@@ -1,5 +1,5 @@
 {
-  "$comment": "Sizes are world pixels (320 x 180 view). Painted files are 4x. See content/README.md. Drawn by the game and not listed: the sky, Juktas and the hills; the back walls of the rooms and the far walls of the light wells; the kouloures' linings, the causeway, the basin's lining, the benches, the barrier post; the burnt storey and Evans's floor once they have fallen, and the columns folding under them; the door leaves; the double axes, the runnel and its catch-pits; the dark and the daylight. The turnstile is the game's own exit, the same as Karnak's.",
+  "$comment": "Sizes are world pixels (320 x 180 view). Painted files are 4x. See content/README.md. Drawn by the game and not listed: the sky, Juktas and the hills; the back walls of the rooms and the far walls of the light wells; the kouloures' linings, the causeway, the basin's lining, the benches, the barrier post; the dark and the daylight. The turnstile is the game's own exit, the same in every level.",
   "level": "l01-knossos",
   "assets": [
     {
@@ -41,50 +41,43 @@
       "id": "tile-knossos-slab",
       "w": 16,
       "h": 16,
-      "beat": "b-magazines",
-      "what": "Evans's reinforced-concrete slab, seen on edge: a plastered face with a timber beam and round beam ends painted on it. Every roof and upper floor in the level, and the two spans that fall, which are drawn as this tile until they go."
+      "beat": "b-throne-room",
+      "what": "Evans's reinforced-concrete slab, seen on edge: a plastered face with a timber beam and round beam ends painted on it. Every roof and upper floor in the level; none of it falls."
     },
     {
       "id": "tile-knossos-slab-top",
       "w": 16,
       "h": 16,
-      "beat": "b-magazines",
+      "beat": "b-throne-room",
       "what": "The same slab with sky on it: the bare concrete roof on top."
-    },
-    {
-      "id": "pithos",
-      "w": 9,
-      "h": 15,
-      "beat": "b-magazines",
-      "what": "A storage jar of the west storerooms, against the wall. Never solid."
-    },
-    {
-      "id": "minoan-column",
-      "w": 12,
-      "h": 64,
-      "beat": "b-magazines",
-      "what": "A Minoan column as Evans rebuilt it, a storey high: stone base, red shaft tapering downward, black cushion capital and abacus. Every column in the level, the ones that hold and the two that do not."
     },
     {
       "id": "throne",
       "w": 14,
       "h": 14,
-      "beat": "c-throne-room",
+      "beat": "b-throne-room",
       "what": "The gypsum throne, from the room, against its wall. Evans's copy in the anteroom is this same painting."
     },
     {
       "id": "griffin",
       "w": 24,
       "h": 14,
-      "beat": "c-throne-room",
+      "beat": "b-throne-room",
       "what": "One griffin of the Throne Room wall as restored, couchant among reeds on red and off-white bands. Faces right; the game flips it for the other side of the throne."
+    },
+    {
+      "id": "minoan-column",
+      "w": 12,
+      "h": 64,
+      "beat": "d-grand-staircase",
+      "what": "A Minoan column as Evans rebuilt it, a storey high: stone base, red shaft tapering downward, black cushion capital and abacus. Every column in the level, and every one holds."
     },
     {
       "id": "giant-pithos",
       "w": 11,
       "h": 16,
-      "beat": "g-east-bastion",
-      "what": "A giant jar of the Old Palace, rope bands and discs in relief, about his height. Three stand at the head of the stair."
+      "beat": "e-east-bastion",
+      "what": "A giant jar of the Old Palace, rope bands and discs in relief, about his height. Three stand on the terrace before the turnstile."
     }
   ]
 }

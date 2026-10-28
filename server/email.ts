@@ -14,6 +14,14 @@ const RESEND_GAP = MINUTE;
 const PER_ADDRESS_HOURLY = 5;
 const ATTEMPTS = 5;
 const DEFAULT_API = 'https://api.resend.com/emails';
+/** A send is tried this many times at most, when Resend is out of reach or briefly overloaded. */
+const SEND_TRIES = 3;
+/** The waits between tries when Resend names none. */
+const RETRY_WAITS = [300, 1000];
+/** A longer wait than this is not waited out: he is looking at the dialog, waiting for the code. */
+const MAX_RETRY_WAIT = 2000;
+/** Each try's own limit: Resend answers in well under a second when it answers at all. */
+const TRY_TIMEOUT = 5000;
 
 export function emailOn(env: Env): boolean {
   return Boolean(env.RESEND_API_KEY && env.EMAIL_FROM);
@@ -102,7 +110,7 @@ export async function emailStart(ctx: Ctx, body: unknown): Promise<Response> {
     return fail(429, 'too_many', { retryAfter: await retryAfter(ctx, limits) });
   }
 
-  if (!(await send(ctx, email, code))) {
+  if (!(await send(ctx, email, code, id))) {
     // Nobody received it, so it should not hold the address for a minute. The
     // send stays in the log: a failure still counts against the limits.
     await db.prepare('DELETE FROM email_codes WHERE email = ?1 AND code_hash = ?2').bind(email, hash).run();
@@ -147,34 +155,74 @@ async function retryAfter(ctx: Ctx, limits: Limits): Promise<number> {
   return wait > 0 ? Math.ceil(wait / 1000) : RESEND_GAP / 1000;
 }
 
-/** Sends the code through the email API. False on any failure; the reason is logged, the address and code never. */
-async function send(ctx: Ctx, email: string, code: string): Promise<boolean> {
-  const { env } = ctx;
-  const text = `Your code is ${code}. It is good for ten minutes. If you did not ask for it, do nothing.`;
+/**
+ * Sends the code through the email API. False on any failure; the reason is
+ * logged, the address and code never. `sendId` is this start's row in the send
+ * log: as the idempotency key, it lets a try that may have got through be made
+ * again without a second code going out (Resend keeps keys for 24 hours).
+ */
+async function send(ctx: Ctx, email: string, code: string, sendId: string): Promise<boolean> {
+  const body = JSON.stringify({
+    from: ctx.env.EMAIL_FROM,
+    to: [email],
+    subject: `Your Lost Tourist code: ${code}`,
+    text: `Your code is ${code}. It is good for ten minutes. If you did not ask for it, do nothing.`,
+    html: `<p>Your code is <strong>${code}</strong>. It is good for ten minutes. If you did not ask for it, do nothing.</p>`,
+  });
+  for (let tries = 1; ; tries++) {
+    const outcome = await sendOnce(ctx, body, `lost-tourist/code/${sendId}`);
+    if (outcome === 'sent') return true;
+    if (outcome === 'failed' || tries >= SEND_TRIES) return false;
+    const wait = outcome.wait ?? RETRY_WAITS[tries - 1] ?? MAX_RETRY_WAIT;
+    if (wait > MAX_RETRY_WAIT) return false;
+    await ctx.deps.sleep(wait);
+  }
+}
+
+/**
+ * One try. Worth another: no answer, a server error, Resend's per-second rate
+ * limit (after the wait it names), or the same key still in progress from a try
+ * that timed out here. Not worth one: anything else, the daily and monthly
+ * quotas among it, which do not clear in seconds.
+ */
+async function sendOnce(ctx: Ctx, body: string, key: string): Promise<'sent' | 'failed' | { wait: number | null }> {
+  let res: Response;
   try {
-    const res = await ctx.deps.fetch(env.EMAIL_API_URL || DEFAULT_API, {
+    res = await ctx.deps.fetch(ctx.env.EMAIL_API_URL || DEFAULT_API, {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${env.RESEND_API_KEY ?? ''}`,
+        Authorization: `Bearer ${ctx.env.RESEND_API_KEY ?? ''}`,
         'Content-Type': 'application/json',
         // Resend refuses a request without one (403), and a Worker's fetch sends none of its own.
         'User-Agent': 'lost-tourist/1',
+        'Idempotency-Key': key,
       },
-      body: JSON.stringify({
-        from: env.EMAIL_FROM,
-        to: [email],
-        subject: `Your Lost Tourist code: ${code}`,
-        text,
-        html: `<p>Your code is <strong>${code}</strong>. It is good for ten minutes. If you did not ask for it, do nothing.</p>`,
-      }),
-      signal: AbortSignal.timeout(10_000),
+      body,
+      signal: AbortSignal.timeout(TRY_TIMEOUT),
     });
-    if (res.ok) return true;
-    console.error(`email send failed: HTTP ${res.status}`);
-    return false;
   } catch (err) {
     console.error(`email send failed: ${err instanceof Error ? err.name : 'unknown error'}`);
-    return false;
+    return { wait: null };
+  }
+  if (res.ok) return 'sent';
+  const name = await errorName(res);
+  console.error(`email send failed: HTTP ${res.status}${name ? ` ${name}` : ''}`);
+  if (res.status >= 500 || (res.status === 409 && name === 'concurrent_idempotent_requests')) return { wait: null };
+  if (res.status === 429 && name !== 'daily_quota_exceeded' && name !== 'monthly_quota_exceeded') {
+    const header = res.headers.get('retry-after');
+    const seconds = header === null || header.trim() === '' ? NaN : Number(header);
+    return { wait: Number.isFinite(seconds) && seconds >= 0 ? seconds * 1000 : null };
+  }
+  return 'failed';
+}
+
+/** The error's type, as Resend names it (`rate_limit_exceeded`), or null. */
+async function errorName(res: Response): Promise<string | null> {
+  try {
+    const body = (await res.json()) as unknown;
+    return isRecord(body) && typeof body.name === 'string' ? body.name.slice(0, 64) : null;
+  } catch {
+    return null;
   }
 }
 

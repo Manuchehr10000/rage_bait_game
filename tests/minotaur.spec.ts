@@ -1,7 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import { MINOTAUR } from '../src/levels/ch03-aegean/l06-minotaur';
-import { LEVELS, PROD_LEVELS, STAGES, levelIndexFromHash } from '../src/levels';
+import { HELD, LEVELS, PROD_LEVELS, STAGES, levelIndexFromHash } from '../src/levels';
 import { CHAPTERS, chaptersFor } from '../src/map/atlas';
 import { Level, type HeroDef } from '../src/engine/level';
 import { PHYS, Player } from '../src/engine/player';
@@ -71,7 +71,7 @@ test("the labyrinth is LEVEL.md's map, cell for cell: 320 by 752 px, 20 by 47 ti
   expect(new Set(MINOTAUR.rows.join(''))).toEqual(new Set(['#', ' ', '=']));
 });
 
-test('a level on the map of every build: chapter 3\'s legend, in the tour after Knossos and before Persepolis, entered by its pin or its deep link', () => {
+test('a level on the map of every build but prod: chapter 3\'s legend, in the tour after Knossos and before Persepolis, entered by its pin or its deep link', () => {
   // A dev stage until the designer's word, 2026-10-12: "put it on the map".
   expect(STAGES).not.toContain(MINOTAUR);
   const ids = LEVELS.map((l) => l.id);
@@ -86,11 +86,14 @@ test('a level on the map of every build: chapter 3\'s legend, in the tour after 
   expect(CHAPTERS.flatMap((c) => c.sites).filter((s) => s.level === 'minotaur')).toHaveLength(1);
   // Its deep link names it in LEVELS, the tour of every build but prod.
   expect(levelIndexFromHash('#minotaur', LEVELS)).toBe(i);
-  // Held back from prod on 2026-10-15 and released to it on 2026-10-16 (designer: "Make all
-  // levels available on main"): in its tour in the same place, and its pin on its map.
-  expect(PROD_LEVELS.map((l) => l.id)).toEqual(ids);
-  expect(levelIndexFromHash('#minotaur', PROD_LEVELS)).toBe(i);
-  expect(chaptersFor(PROD_LEVELS.map((l) => l.id)).flatMap((c) => c.sites).filter((s) => s.level === 'minotaur')).toHaveLength(1);
+  // Held back from prod on 2026-10-15, released to it on 2026-10-16, and held back again
+  // with all of chapters 3 and 4 on 2026-10-27 (designer: "Make only chapter 1 and 2
+  // playable in main"): not in prod's tour, and on prod's map its site is closed for restoration.
+  expect(PROD_LEVELS.map((l) => l.id)).not.toContain('minotaur');
+  expect(HELD.find((h) => h.level === MINOTAUR)?.after).toBe('knossos');
+  const onProd = chaptersFor(PROD_LEVELS.map((l) => l.id)).flatMap((c) => c.sites).filter((s) => s.name === 'The Minotaur');
+  expect(onProd).toEqual([expect.objectContaining({ held: true, legend: true })]);
+  expect(onProd[0]?.level).toBeUndefined();
 });
 
 test("the level's data: the bull-leaper, the walk in, the camera on the spawn, the four tricks, the gated exit on the left", () => {

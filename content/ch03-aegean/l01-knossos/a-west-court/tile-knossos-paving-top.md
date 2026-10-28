@@ -10,9 +10,9 @@
 ## What it is
 
 The walking surface of the palace: big fitted slabs of limestone, and of gypsum in the state
-rooms and the light wells, worn smooth. The West Court, the storeroom floor, the Throne Room,
-the Central Court, the treads of both stairs, the floors of the light wells and the terrace are
-all this tile.
+rooms and the light wells, worn smooth. The West Court, the Throne Room and its steps, the
+Central Court, the treads of the Grand Staircase, the floors of the light well and the corridor,
+and the terrace are all this tile.
 
 ## Where it stands in the game
 
@@ -23,7 +23,8 @@ Everywhere he walks. Wraps sideways with itself and sits on `tile-knossos-ashlar
 - Large flat slabs with fine joints, pale, the colour of limestone and gypsum in the sun.
 - Nothing on it that could be placed on one slab and not the next: no crack, no stain, no mark.
   A floor that holds and a floor that does not must never be told apart by the paving
-  (pillar 4), even though at Knossos nothing in the floor gives way.
+  (pillar 4): at Knossos the court between the first two pits gives way, drawn as this tile on
+  ashlar, and so does the third pit's floor.
 
 ## Deliberately wrong
 
