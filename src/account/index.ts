@@ -1,8 +1,8 @@
-import type { Methods, ProgressPush, ProgressReply, SignedIn, User } from '../../server/contract';
+import type { GuestPush, Methods, Ok, ProgressPush, ProgressReply, SignedIn, User } from '../../server/contract';
 import type { Progress, Snapshot } from '../engine/progress';
 import * as api from './api';
 import { combine, empty } from './snapshot';
-import { AccountStore, GuestStore } from './stores';
+import { AccountStore, GuestStore, forgetGuestPlays, guestPlaysWaiting, takeGuestPush } from './stores';
 import { tabId } from './tab';
 import { AccountUi, type UiHost, type UiState } from './ui';
 
@@ -20,6 +20,12 @@ import { AccountUi, type UiHost, type UiState } from './ui';
  * the same address is another account, and nothing queued for the old one goes to it.
  * Signing in carries the guest's tour into the account; signing out leaves an empty
  * guest, so nothing is ever counted twice.
+ *
+ * A guest is seen by the tracker too (designer, 2026-11-03): wherever there are accounts,
+ * his tour and what he does in play go to the server as a guest's (server/visitors.ts),
+ * once as the page opens, so a visitor is counted whether or not he plays, and then as
+ * a signed-in tab sends its own, a little less often. As he signs in, the server makes
+ * what it has of him the account's, and what was not sent yet goes with his tour.
  */
 
 export { GuestStore } from './stores';
@@ -33,6 +39,12 @@ const RETRY_FIRST = 2000;
 const RETRY_MAX = 60_000;
 /** Pushes out at once, at most: each may outlive the page, and those may hold 64 KiB in all. */
 const MAX_OUT = 2;
+/** How long a guest's play waits before it is sent: with whatever else happens in the meantime. Coming back to the map sends it at once. */
+const GUEST_LATER = 30_000;
+/** A guest with more to send than one push carries sends the next this soon after. */
+const GUEST_SOON = 500;
+/** The longest a guest's push refused for its network's hour (429) waits to go again. */
+const GUEST_WAIT_MAX = 3_600_000;
 
 export type Screen = 'map' | 'level';
 
@@ -63,6 +75,10 @@ export class Account {
   private entering: Promise<void> = Promise.resolve();
   /** Asked to flush while one was out: flush again when it is answered. */
   private again = false;
+  /** The server answered as the page opened: there are accounts, and a guest is tracked. */
+  private live = false;
+  /** A guest's push out; one at a time. */
+  private guestOut: Promise<void> | null = null;
 
   constructor(private readonly progress: Progress) {}
 
@@ -79,7 +95,14 @@ export class Account {
       void tabId();
       const { user, progress, methods } = r.body;
       this.methods = methods;
+      this.live = true;
       if (user && progress) await this.enter(user, progress);
+      else {
+        // The same tour, kept as it was, by a guest store that says when there is something to send.
+        this.progress.replace(this.progress.snapshot(), this.guestStore());
+        // Sent even with nothing in it: he came.
+        void this.sendGuest(true);
+      }
       // With no way to sign in, a guest has nothing to be offered.
       if (user || methods.google || methods.email) this.ui = new AccountUi(this.host(), this.uiState());
       document.addEventListener('visibilitychange', () => {
@@ -170,8 +193,13 @@ export class Account {
     this.cancelTimer();
     this.retry = 0;
     this.again = false;
-    this.progress.replace(empty(), new GuestStore());
+    this.progress.replace(empty(), this.guestStore());
     this.ui?.update(this.uiState(), why);
+  }
+
+  /** A guest's store, which asks for what he did in play to be sent. */
+  private guestStore(): GuestStore {
+    return new GuestStore(() => this.schedule(GUEST_LATER));
   }
 
   private async signOut(): Promise<api.Failure | null> {
@@ -212,7 +240,7 @@ export class Account {
 
   /** Flush when `ms` from now, unless one is due sooner. */
   private schedule(ms: number): void {
-    if (!this.store) return;
+    if (!this.store && !this.live) return;
     const at = Date.now() + ms;
     if (this.timer !== null && this.timerAt <= at) return;
     this.cancelTimer();
@@ -238,7 +266,7 @@ export class Account {
    */
   private flush(leaving = false): Promise<void> {
     const store = this.store;
-    if (!store) return Promise.resolve();
+    if (!store) return this.sendGuest(false);
     if (leaving) return this.send(store);
     if (this.flushing) {
       this.again = true;
@@ -271,6 +299,48 @@ export class Account {
     });
     this.out.add(sent);
     return sent;
+  }
+
+  /**
+   * A guest's push of what this browser holds, unless one is out already, or (except as
+   * the page opens, `always`) nothing has happened in play to send.
+   */
+  private sendGuest(always: boolean): Promise<void> {
+    if (!this.live || this.store) return Promise.resolve();
+    if (this.guestOut) return this.guestOut;
+    const push = takeGuestPush();
+    if (!always && !push.events.length) return Promise.resolve();
+    this.cancelTimer();
+    const era = this.era;
+    const sent: Promise<void> = api.pushVisit(push).then((r) => {
+      if (this.guestOut === sent) this.guestOut = null;
+      this.settleGuest(push, r, era);
+    });
+    this.guestOut = sent;
+    return sent;
+  }
+
+  /**
+   * A guest's push answered. Had (200) or refused whole (400, as it would be every time),
+   * its events are not kept to send again; anything else, and they go again later, which
+   * the server counts once each. A guest who has signed in since sends nothing more as one.
+   */
+  private settleGuest(push: GuestPush, r: api.Reply<Ok>, era: number): void {
+    const refused = !r.ok && r.status === 400;
+    if (r.ok || refused) forgetGuestPlays(new Set(push.events.map((e) => e.id)));
+    if (refused) console.warn('accounts: guest push refused', r.error?.error);
+    if (era !== this.era || this.store) return;
+    if (r.ok || refused) {
+      this.retry = 0;
+      if (guestPlaysWaiting()) this.schedule(push.events.length ? GUEST_SOON : GUEST_LATER);
+      return;
+    }
+    if (r.status === 429 && r.error?.retryAfter) {
+      this.schedule(Math.min(GUEST_WAIT_MAX, r.error.retryAfter * 1000));
+      return;
+    }
+    this.retry = Math.min(RETRY_MAX, this.retry ? this.retry * 2 : RETRY_FIRST);
+    this.schedule(this.retry);
   }
 
   /** A push answered. What becomes of its deaths is the store's to say (AccountStore.settle). */

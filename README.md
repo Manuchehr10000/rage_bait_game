@@ -167,7 +167,8 @@ What it needs, outside the repo:
   `GOOGLE_CLIENT_ID`; `ADMIN_EMAILS`, the addresses that may read the tracker, commas
   between; `EMAIL_FROM` (e.g. `Lost Tourist <tickets@mail.losttourist.online>`); and
   `RESEND_API_KEY`, as a secret. `EMAIL_DAILY_CAP` (default 90 codes a day, all addresses
-  together) and `EMAIL_IP_HOURLY` (default 20 an hour per IP) are optional. For the
+  together), `EMAIL_IP_HOURLY` (default 20 an hour per IP) and `VISIT_IP_HOURLY` (what one
+  network may send as guests to the tracker in an hour, default 5000) are optional. For the
   Production environment, which is where main deploys: a D1 database of its own (not dev's,
   so the designer's test accounts and deaths stay out of the players'), bound as `DB`;
   `GOOGLE_CLIENT_ID`; and `ADMIN_EMAILS`. No `RESEND_API_KEY` or `EMAIL_FROM` there: that is
@@ -190,26 +191,51 @@ What it needs, outside the repo:
 
 ## The admin's tracker
 
-`/admin` (`admin.html`, `src/admin/`) shows the visitors with accounts (designer,
-2026-10-27): when each account was made and how it signs in, when it was last seen, which
-levels it has cleared and where in the tour it is now, how many have cleared each level and
-how many each level holds, and for one account, level by level: visits, deaths by cause,
-give-ups, the times a level was left for the map, clears and the best time, where on the
-level the deaths were (a scatter, and the spots with the most, as the dev ruler names them:
-`karnak (96, 64)`), and the latest events. It reads `GET /api/admin/users` and
-`GET /api/admin/user?id=` (`server/admin.ts`), which answer only an account whose address
-`ADMIN_EMAILS` names: sign in on the game's map with it first. The game never links to it.
+`/admin` (`admin.html`, `src/admin/`) shows the game's visitors (designer, 2026-10-27), the
+guests among them since the designer's word of 2026-11-03 ("Add tracking of any users who
+came to game and played even without logging and then how many logged in"): how many
+browsers opened the game, how many of them played a level and how many went on to sign in;
+when each account was made and how it signs in, and when each guest was first seen; when
+each was last seen, which levels each has cleared and where in the tour it is now, how many
+have cleared each level and how many each level holds, and for one account or guest, level
+by level: visits, deaths by cause, give-ups, the times a level was left for the map, clears
+and the best time, where on the level the deaths were (a scatter, and the spots with the
+most, as the dev ruler names them: `karnak (96, 64)`), and the latest events. It reads
+`GET /api/admin/users`, `GET /api/admin/user?id=` and `GET /api/admin/guest?id=`
+(`server/admin.ts`), which answer only an account whose address `ADMIN_EMAILS` names: sign
+in on the game's map with it first. The game never links to it. The tiles and the funnel
+count everyone on the server; the table lists the newest thousand accounts and the newest
+thousand guests.
 
 What it counts are events (`PlayEvent`, `server/contract.ts`), one row each in D1's `events`
 table: going into a level, each death with its cause, where (X, Y on the dev ruler) and how
 far into the attempt, leaving a level for the map from the middle of it (Escape, which gives
 up first), and each clear with its time and the deaths before it. A give-up is a death, its
 cause `Gave up`. The page queues them with the tour and sends them with its pushes, each
-kept once by its id; a run the dev tools started from somewhere else is not counted. A
-guest's events wait in the browser, the newest thousand, and go into the account signed in
-to there; a guest who never signs in is never seen. Counts begin when the tracker did; the
-deaths in all of an account's visits go back further. Deleting an account deletes its
-events. This is the ground the game's analytics are to be built on.
+kept once by its id; a run the dev tools started from somewhere else is not counted.
+
+A guest is a visitor (`server/visitors.ts`): his browser, named by a random id in a cookie
+of its own, `__Host-lt_visitor`, made the first time the page pushes as a guest and kept for
+thirteen months from then, never longer. Nothing else is kept of him: no address, no IP,
+nothing of the device. The page sends `POST /api/visit` once as it opens, so a visitor is
+counted whether or not he plays, and then what he does in play and his tour as the browser
+holds it: on the map, as the page is hidden, and half a minute after anything happens in a
+level. What it cannot send yet waits in the browser, the newest thousand. Signing in makes
+the visitor the account's, in the same transaction as the session: what it did as a guest
+goes into the account's events, and so does anything a tab that has not heard yet sends as
+a guest. Signing out and deleting the account forget the cookie, so the browser that goes on
+as a guest is a new visitor, as its tour is a new guest's. A visitor is a browser, not a
+person: one on two devices, or who clears the browser, is two, and a guest's tour is as his
+browser last said. One network may send `VISIT_IP_HOURLY` an hour (a push one, and each event
+one more; default 5000), so a script on one network cannot fill the database (many networks
+can: Cloudflare's own rate limiting is the answer to that); the count is kept two hours,
+by the network's key as the email limits keep it. A search engine that runs the page is not
+counted. Accounts made before visitors were counted have none.
+
+Counts begin when the tracker did, and guests' when visitors were first counted; the deaths
+in all of an account's visits, and of a guest's as his browser counts them, go back further.
+Deleting an account deletes its events and the visitors that signed in as it. This is the
+ground the game's analytics are to be built on.
 
 ## Layout
 

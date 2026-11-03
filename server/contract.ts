@@ -95,6 +95,21 @@ export interface ProgressReply {
 }
 
 /**
+ * POST /api/visit: a guest's push, for the admin's tracker (designer, 2026-11-03). The
+ * browser is the visitor, named by its own cookie, which the server makes the first time
+ * it hears from it. `tour` is the guest's tour as this browser holds it now, and stands
+ * for the whole of it: the server keeps every level it has ever named, the newest list of
+ * tricks for each level, and the highest count of deaths, so a push that arrives late, or
+ * leaves part of the tour out, takes nothing away. `events` are what happened in play
+ * since, each kept once per visitor however often it is sent, by its id. Once the browser
+ * has signed in, what it sends as a guest goes to that account.
+ */
+export interface GuestPush {
+  tour: Snapshot;
+  events: PlayEvent[];
+}
+
+/**
  * DELETE /api/account: the account to delete, which must be the one the
  * cookie is signed in as (409 other_account otherwise, and nothing deleted).
  */
@@ -111,10 +126,84 @@ export interface Ok {
   ok: true;
 }
 
-/** GET /api/admin/users: every account, newest first, with what the tracker knows of each. */
+/**
+ * GET /api/admin/users: every account and every guest, newest first, with what the
+ * tracker knows of each, and the totals, which count everyone however many are listed.
+ */
 export interface AdminUsers {
   users: AdminUser[];
   /** True when there were more accounts than one answer lists. */
+  more: boolean;
+  /** The visitors who have never signed in, newest first (designer, 2026-11-03). */
+  guests: AdminGuest[];
+  /** True when there were more guests than one answer lists. */
+  moreGuests: boolean;
+  totals: AdminTotals;
+}
+
+/**
+ * Everyone, counted on the server. Everyone is the accounts and the guests: a visitor that
+ * signed in is its account from then on, so no one is counted twice. A visitor is one
+ * browser, counted from the first time it opened the game where the tracker runs.
+ */
+export interface AdminTotals {
+  accounts: number;
+  /** Made in the last seven days. */
+  accountsNew: number;
+  /** With anything of their play heard of in the last seven days. */
+  accountsSeen: number;
+  /** That sign in with Google. */
+  google: number;
+  /** Visitors that have never signed in. */
+  guests: number;
+  /** First heard of in the last seven days. */
+  guestsNew: number;
+  /** Last heard of in the last seven days. */
+  guestsSeen: number;
+  /** Every visitor counted: the guests, and those that went on to sign in. */
+  visitors: number;
+  /** Of them, those that went into a level, as a guest or once signed in. */
+  played: number;
+  /** Of them, those that signed in. */
+  signedIn: number;
+  /** When the first visitor was counted, or null when none has been. */
+  since: number | null;
+  /** Deaths in every visit, the accounts' and the guests', give-ups among them. */
+  deaths: number;
+  /** Counted from the events, so only since the tracker began. */
+  gaveUp: number;
+  left: number;
+  /**
+   * Every set of cleared levels anyone holds, and how many hold it: an account its own, a
+   * guest the one its browser last told of. The page reads the tour's funnel from it.
+   */
+  tours: { cleared: string[]; accounts: number; guests: number }[];
+}
+
+/** A visitor that has never signed in, as GET /api/admin/users lists it. */
+export interface AdminGuest {
+  /** The visitor's id: its browser's, not a person's. */
+  id: string;
+  /** When the server first heard of it, and last did, ms since the epoch. */
+  firstSeen: number;
+  lastSeen: number;
+  /** Deaths in every visit, as its browser counts them. */
+  lifetime: number;
+  /** Level ids, as its browser last told of them. */
+  cleared: string[];
+  /** Counted from the events. */
+  visits: number;
+  deaths: number;
+  gaveUp: number;
+  left: number;
+  last: { kind: Play['kind']; level: string; at: number } | null;
+}
+
+/** GET /api/admin/guest?id=: one guest, level by level, as GET /api/admin/user has an account. */
+export interface AdminGuestDetail {
+  guest: AdminGuest;
+  levels: AdminLevel[];
+  events: PlayEvent[];
   more: boolean;
 }
 
@@ -125,6 +214,8 @@ export interface AdminUser {
   google: boolean;
   /** When the account was made, ms since the epoch. */
   createdAt: number;
+  /** When a browser he signed in on first opened the game as a guest, or null if none was counted. */
+  firstVisit: number | null;
   /** When the server last heard anything of his play, or null if never. */
   lastSeen: number | null;
   /** Deaths in every visit, give-ups among them, counted since before there were events. */
@@ -160,7 +251,7 @@ export interface AdminLevel {
   clears: number;
   /** The fastest clear, ms into its attempt. */
   bestMs: number | null;
-  /** When he first cleared it (the account's record), or null. */
+  /** When he first cleared it: the account's record, or a guest's first clear the tracker heard of; or null. */
   clearedAt: number | null;
   /** The tricks that have killed him here (pillar 8). */
   tricks: string[];

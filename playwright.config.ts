@@ -18,6 +18,8 @@ const API_VARS: Record<string, string> = {
   GOOGLE_JWKS_URL: `${PROVIDERS}/jwks`,
   EMAIL_DAILY_CAP: '100000',
   EMAIL_IP_HOURLY: '100000',
+  // Every test's guests come from this machine: one network.
+  VISIT_IP_HOURLY: '1000000',
 };
 
 export default defineConfig({

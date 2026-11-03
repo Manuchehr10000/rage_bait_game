@@ -18,6 +18,8 @@ export interface Env {
   EMAIL_DAILY_CAP?: string;
   /** Codes sent per IP per rolling hour. Default 20. */
   EMAIL_IP_HOURLY?: string;
+  /** What one network may send as guests in an hour, a push one and each event in it one more (server/visitors.ts). Default 5000. */
+  VISIT_IP_HOURLY?: string;
 }
 
 /** What the server reaches outside itself, so tests can stand in for time and the network. */

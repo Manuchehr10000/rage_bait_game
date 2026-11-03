@@ -9,6 +9,7 @@ import { ORIGIN, World, quietly } from './harness';
 const ROUTES: [string, string][] = [
   ['GET', '/api/me'],
   ['POST', '/api/progress'],
+  ['POST', '/api/visit'],
   ['POST', '/api/auth/email/start'],
   ['POST', '/api/auth/email/verify'],
   ['GET', '/api/auth/google/nonce'],
@@ -17,6 +18,7 @@ const ROUTES: [string, string][] = [
   ['DELETE', '/api/account'],
   ['GET', '/api/admin/users'],
   ['GET', '/api/admin/user'],
+  ['GET', '/api/admin/guest'],
 ];
 
 test('without a database there is no API: 404 everywhere, before anything else is looked at', async () => {
@@ -135,9 +137,22 @@ test('the schema is made once, by the server itself, and then costs one query an
   const world = new World();
   const client = world.client();
   await client.get('/api/me');
-  expect(world.db.rows('SELECT version FROM schema_version ORDER BY version')).toEqual([{ version: 1 }, { version: 2 }]);
+  expect(world.db.rows('SELECT version FROM schema_version ORDER BY version')).toEqual([{ version: 1 }, { version: 2 }, { version: 3 }]);
   const tables = world.db.rows("SELECT name FROM sqlite_master WHERE type = 'table' ORDER BY name").map((r) => r.name);
-  expect(tables).toEqual(['cleared', 'email_codes', 'email_sends', 'events', 'pushes', 'schema_version', 'sessions', 'tricks', 'users']);
+  expect(tables).toEqual([
+    'cleared',
+    'email_codes',
+    'email_sends',
+    'events',
+    'guest_events',
+    'pushes',
+    'schema_version',
+    'sessions',
+    'tricks',
+    'users',
+    'visit_limits',
+    'visitors',
+  ]);
   world.db.log.length = 0;
   await client.get('/api/me');
   expect(world.db.log.filter((sql) => /CREATE|schema_version/.test(sql))).toEqual([]);
@@ -145,7 +160,7 @@ test('the schema is made once, by the server itself, and then costs one query an
   // A second database in the same isolate is brought up to date on its own.
   const other = new World();
   await other.client().get('/api/me');
-  expect(other.db.count('schema_version')).toBe(2);
+  expect(other.db.count('schema_version')).toBe(3);
 });
 
 test('an exception is a 500 that tells the client nothing, and logs nothing he sent', async () => {

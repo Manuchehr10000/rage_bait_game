@@ -1,13 +1,16 @@
-import type { PlayEvent, ProgressPush, User } from '../../server/contract';
+import type { GuestPush, PlayEvent, ProgressPush, User } from '../../server/contract';
 import { LOCAL_KEYS, LocalStore, type Change, type Play, type ProgressStore, type Snapshot } from '../engine/progress';
 import { toSnapshot } from './snapshot';
 import { exclusively, newId, tabId } from './tab';
 
-/** What a guest did in play, kept in this browser until he signs in and it goes to his account. */
+/**
+ * What a guest did in play, kept in this browser until the server has it: as a guest's
+ * (takeGuestPush), or in the account he signs in to (handOver), whichever comes first.
+ */
 const PLAYS_KEY = 'lostTourist.plays';
 /** How many of the deaths under LOCAL_KEYS.lifetime have gone into an account already. */
 const CARRIED_KEY = 'lostTourist.carriedDeaths';
-/** At most this many of a guest's: the newest, so one who signs in late brings what he did lately. */
+/** At most this many of a guest's: the newest, so one who cannot reach the server for long sends what he did lately. */
 const GUEST_PLAYS = 1000;
 /** A signed-in tab's queue is kept under this and the tab's id. */
 const QUEUE_KEY = 'lostTourist.pending.';
@@ -36,6 +39,10 @@ const PUSH_ID = /^[A-Za-z0-9_-]{16,64}$/;
 const MAX_MS = 86_400_000;
 const MAX_COORD = 1_000_000;
 const MAX_AT = 8_640_000_000_000_000;
+/** A guest's deaths in every visit, at most, as the server takes them (server/visitors.ts). */
+const MAX_LIFETIME = 1_000_000_000;
+/** A guest's tour bigger than this goes without its levels and tricks, which the server keeps from before. */
+const MAX_TOUR_BYTES = 6 * 1024;
 
 /** How long a new fact waits before it is sent: a level or a trick soon, a death with the next few. */
 const SOON = 500;
@@ -60,6 +67,9 @@ export interface Carried {
  * carried so far are kept beside it (CARRIED_KEY). A guest's are those over it.
  */
 export class GuestStore implements ProgressStore {
+  /** `played` is told each time something happens in play, so it can be sent (src/account/index.ts). */
+  constructor(private readonly played: () => void = () => {}) {}
+
   load(): Snapshot {
     const tour = new LocalStore().load();
     return { ...tour, lifetime: Math.max(0, tour.lifetime - readCarried()) };
@@ -74,6 +84,7 @@ export class GuestStore implements ProgressStore {
       } catch {
         /* private mode, or full: the tracker does without it */
       }
+      this.played();
       return;
     }
     const now = new LocalStore();
@@ -105,6 +116,61 @@ export class GuestStore implements ProgressStore {
     }
     return carried;
   }
+}
+
+/**
+ * A guest's push (server/visitors.ts): his tour as this browser holds it now, and the
+ * oldest of what he did in play, as many as one push may carry.
+ * The tour stands for the whole of it, and the server takes nothing away for what one
+ * leaves out, so a tour too big to go (it never is) goes as its count of deaths alone.
+ */
+export function takeGuestPush(): GuestPush {
+  const all = new GuestStore().load();
+  const cleared = all.cleared.filter((id) => LEVEL_ID.test(id)).slice(0, MAX_CLEARED);
+  const tricks: Record<string, string[]> = {};
+  let nouns = 0;
+  for (const [id, list] of Object.entries(all.tricks)) {
+    if (!LEVEL_ID.test(id) || Object.keys(tricks).length >= MAX_LEVELS) continue;
+    const fit = list.filter((t) => NOUN.test(t) && WHOLE_PAIRS.test(t)).slice(0, MAX_NOUNS - nouns);
+    if (!fit.length) continue;
+    tricks[id] = fit;
+    nouns += fit.length;
+  }
+  const lifetime = Math.min(MAX_LIFETIME, all.lifetime);
+  const utf8 = new TextEncoder();
+  let tour: Snapshot = { cleared, tricks, lifetime };
+  let bytes = utf8.encode(JSON.stringify(tour)).length;
+  if (bytes > MAX_TOUR_BYTES) {
+    tour = { cleared: [], tricks: {}, lifetime };
+    bytes = utf8.encode(JSON.stringify(tour)).length;
+  }
+  // The frame, `{"tour":,"events":[]}`, is well within 400.
+  bytes += 400;
+  const events: PlayEvent[] = [];
+  for (const p of readPlays()) {
+    const b = utf8.encode(JSON.stringify(p)).length + 1;
+    if (events.length >= MAX_PLAYS || bytes + b > MAX_BYTES) break;
+    events.push(p);
+    bytes += b;
+  }
+  return { tour, events };
+}
+
+/** The server has these of a guest's (or refused them whole, as it would every time): they are not kept to send again. */
+export function forgetGuestPlays(ids: ReadonlySet<string>): void {
+  if (!ids.size) return;
+  const left = readPlays().filter((p) => !ids.has(p.id));
+  try {
+    if (left.length) localStorage.setItem(PLAYS_KEY, JSON.stringify(left));
+    else localStorage.removeItem(PLAYS_KEY);
+  } catch {
+    /* sent again, and kept once */
+  }
+}
+
+/** Whether this browser holds anything a guest did in play that the server may not have. */
+export function guestPlaysWaiting(): boolean {
+  return readPlays().length > 0;
 }
 
 function readCarried(): number {

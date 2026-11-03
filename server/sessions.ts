@@ -2,8 +2,11 @@ import type { SignedIn } from './contract';
 import { randomToken, sha256hex } from './crypto';
 import type { D1Statement } from './db';
 import type { Ctx } from './env';
-import { json } from './http';
+import { clearCookie, json, readCookie, setCookie } from './http';
 import { snapshotStatements, toSnapshot } from './progress';
+import { linkStatements } from './visitors';
+
+export { clearCookie, readCookie, setCookie } from './http';
 
 export const SESSION_COOKIE = '__Host-lt_session';
 export const NONCE_COOKIE = '__Host-lt_gnonce';
@@ -14,29 +17,6 @@ const SESSION_MS = 180 * DAY;
 const RENEW_BELOW = 150 * DAY;
 /** 32 bytes, base64url. Anything else is not one of ours and costs no query. */
 const TOKEN = /^[A-Za-z0-9_-]{43}$/;
-
-/**
- * `__Host-`: Secure, Path=/ and no Domain, so no other site under the same
- * parent domain can set or read it. Lax: sent on the page's own requests,
- * never on another site's POST.
- */
-export function setCookie(name: string, value: string, maxAge: number): string {
-  return `${name}=${value}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${maxAge}`;
-}
-
-export function clearCookie(name: string): string {
-  return setCookie(name, '', 0);
-}
-
-export function readCookie(request: Request, name: string): string | null {
-  const header = request.headers.get('Cookie');
-  if (!header) return null;
-  for (const part of header.split(';')) {
-    const eq = part.indexOf('=');
-    if (eq >= 0 && part.slice(0, eq).trim() === name) return part.slice(eq + 1).trim();
-  }
-  return null;
-}
 
 export interface Session {
   token: string;
@@ -85,7 +65,9 @@ export function renewal(ctx: Ctx, session: Session): { statement: D1Statement; c
 /**
  * Starts a session for `user` and answers with it and his progress. A session
  * the request already carried is ended: one browser, one session. His expired
- * sessions are swept while we are here.
+ * sessions are swept while we are here. The visitor the browser has been as a
+ * guest, if any, is his from now on, and what it did in play goes into his account
+ * (server/visitors.ts), in the same transaction.
  */
 export async function signIn(ctx: Ctx, user: { id: string; email: string }, cookies: readonly string[] = []): Promise<Response> {
   const { db, now } = ctx;
@@ -100,7 +82,7 @@ export async function signIn(ctx: Ctx, user: { id: string; email: string }, cook
   if (old !== null && TOKEN.test(old)) {
     statements.push(db.prepare('DELETE FROM sessions WHERE token_hash = ?1').bind(await sha256hex(old)));
   }
-  const results = await db.batch([...statements, ...snapshotStatements(db, user.id)]);
+  const results = await db.batch([...statements, ...linkStatements(ctx, user.id), ...snapshotStatements(db, user.id)]);
   const body: SignedIn = { user: { email: user.email, id: user.id }, progress: toSnapshot(results) };
   return json(200, body, [setCookie(SESSION_COOKIE, token, SESSION_MS / 1000), ...cookies]);
 }

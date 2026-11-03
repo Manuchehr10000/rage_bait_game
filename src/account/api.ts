@@ -1,4 +1,4 @@
-import type { AccountDeletion, ApiError, Me, Nonce, Ok, ProgressPush, ProgressReply, SignedIn, User } from '../../server/contract';
+import type { AccountDeletion, ApiError, GuestPush, Me, Nonce, Ok, ProgressPush, ProgressReply, SignedIn, User } from '../../server/contract';
 import { toSnapshot } from './snapshot';
 
 /**
@@ -91,6 +91,15 @@ export async function me(timeout: number): Promise<Reply<Me>> {
 export async function pushProgress(push: ProgressPush): Promise<Reply<ProgressReply>> {
   const r = await call<ProgressReply>('POST', 'progress', { body: push, keepalive: true });
   return r.ok ? { ok: true, body: { progress: toSnapshot(r.body.progress) } } : r;
+}
+
+/**
+ * A guest's push, for the admin's tracker (server/visitors.ts). It may outlive the page
+ * too: a body is under 15 KiB, and one is out at a time, beside at most two of an
+ * account's while he signs in.
+ */
+export function pushVisit(push: GuestPush): Promise<Reply<Ok>> {
+  return call<Ok>('POST', 'visit', { body: push, keepalive: true });
 }
 
 export function emailStart(email: string): Promise<Reply<Ok>> {

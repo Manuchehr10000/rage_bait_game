@@ -1,13 +1,15 @@
-import type { AdminLevel, AdminUser, AdminUserDetail, AdminUsers, ApiError, PlayEvent } from '../../server/contract';
+import type { AdminGuest, AdminGuestDetail, AdminLevel, AdminUser, AdminUserDetail, AdminUsers, ApiError, PlayEvent } from '../../server/contract';
 import { HELD_FILES } from '../levels/held-files';
 import { CHAPTERS } from '../map/atlas';
 
 /**
  * The admin's tracker of the game's visitors (designer, 2026-10-27): when each account
  * was made, which levels he has played and cleared, how often he died, where and of
- * what, and where he gave up. Read from the accounts API (server/admin.ts), which only
- * answers an account ADMIN_EMAILS names. What it counts from events begins when the
- * tracker did; the deaths in all of a visitor's visits go back further.
+ * what, and where he gave up; and since the designer's word of 2026-11-03, the guests as
+ * well, and how many of the visitors went on to sign in. Read from the accounts API
+ * (server/admin.ts), which only answers an account ADMIN_EMAILS names. What it counts
+ * from events begins when the tracker did; the deaths in all of a visitor's visits go
+ * back further.
  *
  * Its own page, admin.html, never linked from the game. It reads the tour from the
  * atlas, which names every level's site, and never from the levels themselves, so it
@@ -26,7 +28,6 @@ const TOUR = __BUILD_ENV__ === 'prod' ? ATLAS.filter((l) => !HELD.has(l.id)) : A
 const NAME = new Map(ATLAS.map((l) => [l.id, l.name]));
 /** The cause a give-up dies of (src/engine/types.ts, DeathCause). */
 const GAVE_UP = 'Gave up';
-const WEEK = 7 * 86_400_000;
 /** Deaths are counted by the nearest point of a grid this many world px apart, which names the spot. */
 const SPOT = 8;
 
@@ -94,16 +95,60 @@ function levelName(id: string): string {
   return NAME.get(id) ?? id;
 }
 
-/** The first level of the tour he has not cleared, or null when he has cleared it all. */
-function nowAt(u: AdminUser): string | null {
-  const done = new Set(u.cleared);
+/** Someone in the table: an account, or a guest, as one row. */
+interface Visitor {
+  kind: 'account' | 'guest';
+  id: string;
+  /** The address, or the guest's id in short. */
+  name: string;
+  /** The account made, or the guest first heard of. */
+  since: number;
+  via: 'Google' | 'Email' | 'Guest';
+  lastSeen: number | null;
+  last: AdminUser['last'];
+  cleared: string[];
+  lifetime: number;
+  gaveUp: number;
+  left: number;
+}
+
+/** A guest, as the page names him: by the start of his visitor's id, which is only his browser's. */
+function guestName(id: string): string {
+  return `Guest ${id.slice(0, 6)}`;
+}
+
+function ofAccount(u: AdminUser): Visitor {
+  const via = u.google ? 'Google' : 'Email';
+  return { kind: 'account', id: u.id, name: u.email, since: u.createdAt, via, lastSeen: u.lastSeen, last: u.last, cleared: u.cleared, lifetime: u.lifetime, gaveUp: u.gaveUp, left: u.left };
+}
+
+function ofGuest(g: AdminGuest): Visitor {
+  return { kind: 'guest', id: g.id, name: guestName(g.id), since: g.firstSeen, via: 'Guest', lastSeen: g.lastSeen, last: g.last, cleared: g.cleared, lifetime: g.lifetime, gaveUp: g.gaveUp, left: g.left };
+}
+
+/** What the address names him by: a guest's is marked, as an account's id never holds a colon. */
+function keyOf(v: Pick<Visitor, 'kind' | 'id'>): string {
+  return v.kind === 'guest' ? `guest:${v.id}` : v.id;
+}
+
+/** The first level of the tour not in `cleared`, or null when it holds the whole tour. */
+function firstUncleared(cleared: readonly string[]): string | null {
+  const done = new Set(cleared);
   return TOUR.find((l) => !done.has(l.id))?.id ?? null;
 }
 
-function lastDid(u: AdminUser): string {
-  if (!u.last) return '—';
-  const name = levelName(u.last.level);
-  return { enter: `Went into ${name}`, death: `Died in ${name}`, leave: `Left ${name}`, clear: `Cleared ${name}` }[u.last.kind];
+function nowAt(v: Pick<Visitor, 'cleared'>): string | null {
+  return firstUncleared(v.cleared);
+}
+
+function lastDid(v: Visitor): string {
+  if (!v.last) return '—';
+  const name = levelName(v.last.level);
+  return { enter: `Went into ${name}`, death: `Died in ${name}`, leave: `Left ${name}`, clear: `Cleared ${name}` }[v.last.kind];
+}
+
+function share(n: number, of: number): string {
+  return of > 0 ? `${Math.round((n / of) * 100)}%` : '—';
 }
 
 // ---------------------------------------------------------------------------
@@ -114,43 +159,47 @@ interface Column {
   key: string;
   label: string;
   numeric?: boolean;
-  value(u: AdminUser): string | number;
-  show(u: AdminUser): Child;
+  value(v: Visitor): string | number;
+  show(v: Visitor): Child;
 }
 
 const COLUMNS: Column[] = [
-  { key: 'email', label: 'Visitor', value: (u) => u.email, show: (u) => u.email },
-  { key: 'created', label: 'Signed up', value: (u) => u.createdAt, show: (u) => DAY_ONLY.format(u.createdAt) },
-  { key: 'via', label: 'Via', value: (u) => (u.google ? 'Google' : 'Email'), show: (u) => (u.google ? 'Google' : 'Email') },
-  { key: 'seen', label: 'Last seen', value: (u) => u.lastSeen ?? 0, show: (u) => ago(u.lastSeen) },
-  { key: 'last', label: 'Last did', value: (u) => u.last?.at ?? 0, show: (u) => lastDid(u) },
+  { key: 'name', label: 'Visitor', value: (v) => v.name, show: (v) => (v.kind === 'guest' ? h('span', { className: 'muted' }, v.name) : v.name) },
+  { key: 'since', label: 'Since', value: (v) => v.since, show: (v) => DAY_ONLY.format(v.since) },
+  { key: 'via', label: 'Via', value: (v) => v.via, show: (v) => v.via },
+  { key: 'seen', label: 'Last seen', value: (v) => v.lastSeen ?? 0, show: (v) => ago(v.lastSeen) },
+  { key: 'last', label: 'Last did', value: (v) => v.last?.at ?? 0, show: (v) => lastDid(v) },
   {
     key: 'cleared',
     label: 'Cleared',
     numeric: true,
-    value: (u) => TOUR.filter((l) => u.cleared.includes(l.id)).length,
-    show: (u) => `${TOUR.filter((l) => u.cleared.includes(l.id)).length} of ${TOUR.length}`,
+    value: (v) => TOUR.filter((l) => v.cleared.includes(l.id)).length,
+    show: (v) => `${TOUR.filter((l) => v.cleared.includes(l.id)).length} of ${TOUR.length}`,
   },
   {
     key: 'at',
     label: 'Now at',
     // Finished is past the last level, not before the first.
-    value: (u) => {
-      const at = nowAt(u);
+    value: (v) => {
+      const at = nowAt(v);
       return at === null ? TOUR.length : TOUR.findIndex((l) => l.id === at);
     },
-    show: (u) => (nowAt(u) ? levelName(nowAt(u)!) : 'Finished'),
+    show: (v) => (nowAt(v) ? levelName(nowAt(v)!) : 'Finished'),
   },
-  { key: 'lifetime', label: 'Deaths', numeric: true, value: (u) => u.lifetime, show: (u) => u.lifetime },
-  { key: 'gaveUp', label: 'Gave up', numeric: true, value: (u) => u.gaveUp, show: (u) => u.gaveUp },
-  { key: 'left', label: 'Left', numeric: true, value: (u) => u.left, show: (u) => u.left },
+  { key: 'lifetime', label: 'Deaths', numeric: true, value: (v) => v.lifetime, show: (v) => v.lifetime },
+  { key: 'gaveUp', label: 'Gave up', numeric: true, value: (v) => v.gaveUp, show: (v) => v.gaveUp },
+  { key: 'left', label: 'Left', numeric: true, value: (v) => v.left, show: (v) => v.left },
 ];
 
-let users: AdminUser[] = [];
-let more = false;
-let sortKey = 'created';
+/** Which of them the table shows. */
+type Who = 'everyone' | 'accounts' | 'guests';
+
+let data: AdminUsers | null = null;
+let visitors: Visitor[] = [];
+let sortKey = 'since';
 let sortDown = true;
 let filter = '';
+let who: Who = 'everyone';
 let selected: string | null = null;
 const table = h('tbody');
 const detail = h('section', { id: 'visitor' });
@@ -161,14 +210,15 @@ async function boot(): Promise<void> {
     root.replaceChildren(header(), h('p', { className: 'error' }, refusal(r.status, r.error)), back());
     return;
   }
-  users = r.body.users;
-  more = r.body.more;
+  data = r.body;
+  visitors = [...data.users.map(ofAccount), ...(data.guests ?? []).map(ofGuest)];
   render();
-  const linked = decodeURIComponent(location.hash.replace(/^#/, ''));
-  if (linked && users.some((u) => u.id === linked)) void open(linked);
+  const linked = (): string => decodeURIComponent(location.hash.replace(/^#/, ''));
+  const listed = (key: string): boolean => visitors.some((v) => keyOf(v) === key);
+  if (linked() && listed(linked())) void open(linked());
   window.addEventListener('hashchange', () => {
-    const id = decodeURIComponent(location.hash.replace(/^#/, ''));
-    if (id && id !== selected && users.some((u) => u.id === id)) void open(id);
+    const key = linked();
+    if (key && key !== selected && listed(key)) void open(key);
   });
 }
 
@@ -194,21 +244,40 @@ function back(): HTMLElement {
 }
 
 function render(): void {
-  const search = h('input', { type: 'search', placeholder: 'Find a visitor by address', value: filter });
+  const d = data!;
+  const search = h('input', { type: 'search', placeholder: 'Find a visitor by address, or a guest by id', value: filter });
   search.addEventListener('input', () => {
     filter = search.value.trim().toLowerCase();
     fillTable();
   });
+  const choose = h(
+    'select',
+    { className: 'who', ariaLabel: 'Who the table shows' },
+    ...(['everyone', 'accounts', 'guests'] as const).map((w) => h('option', { value: w, selected: w === who }, { everyone: 'Everyone', accounts: 'Accounts', guests: 'Guests' }[w])),
+  );
+  choose.addEventListener('change', () => {
+    who = choose.value as Who;
+    fillTable();
+  });
+  const t = d.totals;
   root.replaceChildren(
     ...kids([
       header(),
       tiles(),
+      h(
+        'p',
+        { className: 'muted note' },
+        t.since === null
+          ? 'No visitor has been counted yet. A visitor is a browser that opened the game: counted as a guest until it signs in, and as its account from then on.'
+          : `Visitors are browsers that opened the game, counted since ${DAY_ONLY.format(t.since)}: each counts as a guest until it signs in, and as its account from then on, so no one is counted twice. A guest is not a person: one on two devices, or who clears the browser, is two.`,
+      ),
       h('h2', {}, 'Where they are'),
-      h('p', { className: 'muted' }, 'Each level of the tour: how many have cleared it, and how many it holds now, as the first they have not.'),
+      h('p', { className: 'muted' }, 'Each level of the tour: how many have cleared it, and how many it holds now, as the first they have not. Accounts and guests together.'),
       funnel(),
       h('h2', {}, 'Visitors'),
-      more ? h('p', { className: 'muted' }, `The newest ${users.length} accounts.`) : null,
-      search,
+      d.more ? h('p', { className: 'muted' }, `The newest ${d.users.length} accounts.`) : null,
+      d.moreGuests ? h('p', { className: 'muted' }, `The newest ${d.guests.length} guests.`) : null,
+      h('div', { className: 'find' }, search, choose),
       h('div', { className: 'scroll' }, h('table', {}, h('thead', {}, headRow()), table)),
       detail,
       back(),
@@ -218,46 +287,58 @@ function render(): void {
 }
 
 function tiles(): HTMLElement {
-  const now = Date.now();
-  const tile = (n: number, label: string) => h('div', { className: 'tile' }, h('b', {}, n.toLocaleString()), h('span', {}, label));
-  const sum = (f: (u: AdminUser) => number) => users.reduce((n, u) => n + f(u), 0);
+  const t = data!.totals;
+  const tile = (n: number | string, label: string, title = '') =>
+    h('div', { className: 'tile', title }, h('b', {}, typeof n === 'number' ? n.toLocaleString() : n), h('span', {}, label));
+  const finished = t.tours.filter((x) => firstUncleared(x.cleared) === null).reduce((n, x) => n + x.accounts + x.guests, 0);
   return h(
     'div',
     { className: 'tiles' },
-    tile(users.length, 'Accounts'),
-    tile(users.filter((u) => now - u.createdAt < WEEK).length, 'New this week'),
-    tile(users.filter((u) => u.lastSeen !== null && now - u.lastSeen < WEEK).length, 'Played this week'),
-    tile(users.filter((u) => u.google).length, 'Via Google'),
-    tile(users.filter((u) => nowAt(u) === null).length, 'Finished the tour'),
-    tile(sum((u) => u.lifetime), 'Deaths in all'),
-    tile(sum((u) => u.gaveUp), 'Gave up'),
-    tile(sum((u) => u.left), 'Left a level'),
+    tile(t.visitors, 'Visitors', 'Browsers that opened the game since the tracker began counting them'),
+    tile(t.played, 'Played a level', 'Visitors that went into a level, as a guest or once signed in'),
+    tile(t.signedIn, 'Signed in', 'Visitors that went on to sign in'),
+    tile(share(t.signedIn, t.visitors), 'Of visitors signed in'),
+    tile(t.guests, 'Guests', 'Visitors that have not signed in'),
+    tile(t.accounts, 'Accounts'),
+    tile(t.accountsNew + t.guestsNew, 'New this week', 'Accounts made, and guests first seen, in the last seven days'),
+    tile(t.accountsSeen + t.guestsSeen, 'Seen this week', 'Accounts and guests heard from in the last seven days'),
+    tile(t.google, 'Via Google'),
+    tile(finished, 'Finished the tour'),
+    tile(t.deaths, 'Deaths in all'),
+    tile(t.gaveUp, 'Gave up'),
+    tile(t.left, 'Left a level'),
   );
 }
 
 function funnel(): HTMLElement {
-  const most = Math.max(1, users.length);
+  const { tours } = data!.totals;
+  const everyone = (x: { accounts: number; guests: number }) => x.accounts + x.guests;
+  const most = Math.max(1, tours.reduce((n, x) => n + everyone(x), 0));
   const bar = (n: number, lost = false) => {
     const b = h('span', { className: lost ? 'bar lost' : 'bar' });
     b.style.width = `${Math.round((n / most) * 160)}px`;
     return b;
   };
+  const count = (n: number, guests: number) => h('td', { className: 'n' }, n, guests ? h('span', { className: 'muted' }, ` · ${guests} guests`) : null);
+  const at = tours.map((x) => ({ ...x, at: firstUncleared(x.cleared) }));
   const rows = TOUR.map((l, i) => {
-    const cleared = users.filter((u) => u.cleared.includes(l.id)).length;
-    const here = users.filter((u) => nowAt(u) === l.id).length;
+    const holding = at.filter((x) => x.cleared.includes(l.id));
+    const here = at.filter((x) => x.at === l.id);
+    const sum = (list: typeof at, f: (x: (typeof at)[number]) => number) => list.reduce((n, x) => n + f(x), 0);
     return h(
       'tr',
       {},
       h('td', { className: 'n' }, i + 1),
       h('td', {}, l.name, h('span', { className: 'muted' }, ` · ch. ${l.chapter}`)),
-      h('td', { className: 'n' }, cleared),
-      h('td', {}, bar(cleared)),
-      h('td', { className: 'n' }, here),
-      h('td', {}, bar(here, true)),
+      count(sum(holding, everyone), sum(holding, (x) => x.guests)),
+      h('td', {}, bar(sum(holding, everyone))),
+      count(sum(here, everyone), sum(here, (x) => x.guests)),
+      h('td', {}, bar(sum(here, everyone), true)),
     );
   });
-  const done = users.filter((u) => nowAt(u) === null).length;
-  rows.push(h('tr', {}, h('td'), h('td', { className: 'muted' }, 'Finished'), h('td'), h('td'), h('td', { className: 'n' }, done), h('td', {}, bar(done, true))));
+  const done = at.filter((x) => x.at === null);
+  const doneAll = done.reduce((n, x) => n + everyone(x), 0);
+  rows.push(h('tr', {}, h('td'), h('td', { className: 'muted' }, 'Finished'), h('td'), h('td'), count(doneAll, done.reduce((n, x) => n + x.guests, 0)), h('td', {}, bar(doneAll, true))));
   return h(
     'div',
     { className: 'scroll' },
@@ -277,7 +358,7 @@ function headRow(): HTMLTableRowElement {
     ...COLUMNS.map((c) => {
       const b = h('button', { type: 'button', className: c.key === sortKey ? 'on' : '' }, c.label, c.key === sortKey ? (sortDown ? ' ↓' : ' ↑') : '');
       b.addEventListener('click', () => {
-        sortDown = c.key === sortKey ? !sortDown : c.numeric === true || c.key === 'created' || c.key === 'seen' || c.key === 'last';
+        sortDown = c.key === sortKey ? !sortDown : c.numeric === true || c.key === 'since' || c.key === 'seen' || c.key === 'last';
         sortKey = c.key;
         render();
       });
@@ -288,7 +369,11 @@ function headRow(): HTMLTableRowElement {
 
 function fillTable(): void {
   const col = COLUMNS.find((c) => c.key === sortKey) ?? COLUMNS[1]!;
-  const list = users.filter((u) => !filter || u.email.includes(filter));
+  const list = visitors.filter(
+    (v) =>
+      (who === 'everyone' || (who === 'accounts') === (v.kind === 'account')) &&
+      (!filter || v.name.toLowerCase().includes(filter) || (v.kind === 'guest' && v.id.toLowerCase().includes(filter))),
+  );
   list.sort((a, b) => {
     const x = col.value(a);
     const y = col.value(b);
@@ -296,41 +381,48 @@ function fillTable(): void {
     return sortDown ? -d : d;
   });
   table.replaceChildren(
-    ...list.map((u) => {
-      const tr = h('tr', { className: u.id === selected ? 'row on' : 'row' }, ...COLUMNS.map((c) => h('td', { className: c.numeric ? 'n' : '' }, c.show(u))));
-      tr.addEventListener('click', () => void open(u.id));
+    ...list.map((v) => {
+      const tr = h('tr', { className: keyOf(v) === selected ? 'row on' : 'row' }, ...COLUMNS.map((c) => h('td', { className: c.numeric ? 'n' : '' }, c.show(v))));
+      tr.addEventListener('click', () => void open(keyOf(v)));
       return tr;
     }),
   );
-  if (!list.length) table.append(h('tr', {}, h('td', { colSpan: COLUMNS.length, className: 'muted' }, users.length ? 'No one by that address.' : 'No accounts yet.')));
+  if (!list.length) {
+    const none = visitors.length ? 'No one by that.' : 'No visitors yet.';
+    table.append(h('tr', {}, h('td', { colSpan: COLUMNS.length, className: 'muted' }, none)));
+  }
 }
 
-/** One visitor, level by level, under the table. */
-async function open(id: string): Promise<void> {
-  selected = id;
+/** One visitor, level by level, under the table: an account by its id, a guest by `guest:` and his. */
+async function open(key: string): Promise<void> {
+  selected = key;
   fillTable();
   try {
-    history.replaceState(null, '', `#${encodeURIComponent(id)}`);
+    history.replaceState(null, '', `#${encodeURIComponent(key)}`);
   } catch {
     /* fine */
   }
   detail.replaceChildren(h('h2', {}, 'Visitor'), h('p', { className: 'muted' }, 'Loading…'));
   detail.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  const r = await get<AdminUserDetail>(`/api/admin/user?id=${encodeURIComponent(id)}`);
-  if (selected !== id) return;
+  const guest = key.startsWith('guest:');
+  const id = guest ? key.slice('guest:'.length) : key;
+  const r = guest
+    ? await get<AdminGuestDetail>(`/api/admin/guest?id=${encodeURIComponent(id)}`)
+    : await get<AdminUserDetail>(`/api/admin/user?id=${encodeURIComponent(id)}`);
+  if (selected !== key) return;
   if (!r.ok) {
-    // The list came, so there is an API: a 404 here is an account deleted since.
-    const why = r.status === 404 ? 'This account is not there any more: deleted since the list was loaded. Reload for the list as it is.' : refusal(r.status, r.error);
-    detail.replaceChildren(h('h2', {}, 'Visitor'), h('p', { className: 'error' }, why));
+    // The list came, so there is an API: a 404 here is an account deleted since, or a guest who has signed in since.
+    const gone = guest
+      ? 'This guest is not one any more: he has signed in since the list was loaded, and is his account now. Reload for the list as it is.'
+      : 'This account is not there any more: deleted since the list was loaded. Reload for the list as it is.';
+    detail.replaceChildren(h('h2', {}, 'Visitor'), h('p', { className: 'error' }, r.status === 404 ? gone : refusal(r.status, r.error)));
     return;
   }
-  detail.replaceChildren(...kids(visitor(r.body)));
+  detail.replaceChildren(...kids('guest' in r.body ? guestDetail(r.body) : accountDetail(r.body)));
 }
 
-function visitor(d: AdminUserDetail): Child[] {
+function accountDetail(d: AdminUserDetail): Child[] {
   const u = d.user;
-  const order = new Map(ATLAS.map((l, i) => [l.id, i]));
-  const levels = [...d.levels].sort((a, b) => (order.get(a.level) ?? 999) - (order.get(b.level) ?? 999) || a.level.localeCompare(b.level));
   const at = nowAt(u);
   return [
     h('h2', {}, 'Visitor'),
@@ -338,10 +430,38 @@ function visitor(d: AdminUserDetail): Child[] {
     h(
       'p',
       { className: 'muted' },
-      `Signed up ${when(u.createdAt)} with ${u.google ? 'Google' : 'a code by email'} · last seen ${ago(u.lastSeen)} · ${u.lifetime} deaths in all · `,
+      `Signed up ${when(u.createdAt)} with ${u.google ? 'Google' : 'a code by email'}`,
+      u.firstVisit !== null && u.firstVisit < u.createdAt ? `, after coming as a guest from ${when(u.firstVisit)}` : '',
+      ` · last seen ${ago(u.lastSeen)} · ${u.lifetime} deaths in all · `,
       at ? `now at ${levelName(at)}` : 'has cleared the whole tour',
     ),
-    h('p', { className: 'muted' }, `Account ${u.id}. Visits, deaths, give-ups and clears below are counted from the tracker\u2019s events, since it began; deaths in all go back further.`),
+    h('p', { className: 'muted' }, `Account ${u.id}. Visits, deaths, give-ups and clears below are counted from the tracker’s events, since it began, what he did as a guest before he signed in among them; deaths in all go back further.`),
+    ...played(d),
+  ];
+}
+
+function guestDetail(d: AdminGuestDetail): Child[] {
+  const g = d.guest;
+  const at = nowAt(g);
+  return [
+    h('h2', {}, 'Visitor'),
+    h('h3', {}, guestName(g.id), h('span', { className: 'muted' }, ' · a guest')),
+    h(
+      'p',
+      { className: 'muted' },
+      `First seen ${when(g.firstSeen)} · last seen ${ago(g.lastSeen)} · ${g.lifetime} deaths in all · `,
+      at ? `now at ${levelName(at)}` : 'has cleared the whole tour',
+    ),
+    h('p', { className: 'muted' }, `Visitor ${g.id}: a browser, not a person, that has not signed in. Its tour is as the browser last told of it; visits, deaths, give-ups and clears below are counted from the events, since it was first seen.`),
+    ...played(d),
+  ];
+}
+
+/** What the events say, level by level, and the newest of them. */
+function played(d: AdminUserDetail | AdminGuestDetail): Child[] {
+  const order = new Map(ATLAS.map((l, i) => [l.id, i]));
+  const levels = [...d.levels].sort((a, b) => (order.get(a.level) ?? 999) - (order.get(b.level) ?? 999) || a.level.localeCompare(b.level));
+  return [
     levels.length ? levelTable(levels) : h('p', { className: 'muted' }, 'Nothing played since the tracker began.'),
     ...levels.filter((l) => l.deaths > 0).map(deathsIn),
     h('h3', {}, 'Latest events'),

@@ -50,17 +50,31 @@ export function validatePush(body: unknown): ProgressPush | null {
   const keys = Object.keys(body);
   const expected = 'events' in body ? [...PUSH_KEYS, 'events'] : PUSH_KEYS;
   if (keys.length !== expected.length || !expected.every((key) => keys.includes(key))) return null;
-  const { id, account, cleared, tricks, deaths, events = [] } = body;
+  const { id, account, deaths } = body;
   if (typeof id !== 'string' || !PUSH_ID.test(id)) return null;
   if (!isAccountId(account)) return null;
+  const cleared = readCleared(body.cleared);
+  const tricks = readTricks(body.tricks);
+  if (!cleared || !tricks || !isCount(deaths, MAX_DEATHS)) return null;
+  // Left out is none; anything else, null among it, is held to the shape.
+  const events = readEvents('events' in body ? body.events : []);
+  if (!events) return null;
+  return { id, account, cleared, tricks, deaths, events };
+}
 
+/** Level ids, each once, if every one is one and there are not too many; otherwise null. */
+export function readCleared(cleared: unknown): string[] | null {
   if (!Array.isArray(cleared) || cleared.length > MAX_CLEARED) return null;
   const ids = new Set<string>();
   for (const level of cleared) {
     if (typeof level !== 'string' || !LEVEL_ID.test(level)) return null;
     ids.add(level);
   }
+  return [...ids];
+}
 
+/** Tricks by level, each noun once in its level, if all are well formed and within the limits; otherwise null. */
+export function readTricks(tricks: unknown): Record<string, string[]> | null {
   if (!isRecord(tricks)) return null;
   const entries = Object.entries(tricks);
   if (entries.length > MAX_LEVELS) return null;
@@ -77,9 +91,11 @@ export function validatePush(body: unknown): ProgressPush | null {
     }
     met.set(level, [...seen]);
   }
+  return Object.fromEntries(met);
+}
 
-  if (!isCount(deaths, MAX_DEATHS)) return null;
-
+/** The events, each once by its id, if every one has the shape of its kind and there are not too many; otherwise null. */
+export function readEvents(events: unknown): PlayEvent[] | null {
   if (!Array.isArray(events) || events.length > MAX_EVENTS) return null;
   const happened = new Map<string, PlayEvent>();
   for (const e of events) {
@@ -87,8 +103,17 @@ export function validatePush(body: unknown): ProgressPush | null {
     if (!event) return null;
     if (!happened.has(event.id)) happened.set(event.id, event);
   }
-  return { id, account, cleared: [...ids], tricks: Object.fromEntries(met), deaths, events: [...happened.values()] };
+  return [...happened.values()];
 }
+
+/**
+ * The columns of an event row, read out of json_each's `value`, after its owner and the
+ * time it was received: each field a kind does not have is NULL.
+ */
+export const EVENT_COLUMNS = 'id, at, received_at, kind, level_id, cause, x, y, ms, deaths';
+export const EVENT_VALUES = `json_extract(value, '$.id'), json_extract(value, '$.at'), ?2, json_extract(value, '$.kind'),
+             json_extract(value, '$.level'), json_extract(value, '$.cause'), json_extract(value, '$.x'),
+             json_extract(value, '$.y'), json_extract(value, '$.ms'), json_extract(value, '$.deaths')`;
 
 /** The event, if it has exactly the shape of its kind and stays inside the limits. */
 function toEvent(e: unknown): PlayEvent | null {
@@ -115,7 +140,7 @@ function toEvent(e: unknown): PlayEvent | null {
 }
 
 /** A whole number from 0 to `max`. */
-function isCount(value: unknown, max: number): value is number {
+export function isCount(value: unknown, max: number): value is number {
   return typeof value === 'number' && Number.isInteger(value) && value >= 0 && value <= max;
 }
 
@@ -177,10 +202,8 @@ export function pushStatements(db: D1Like, userId: string, push: ProgressPush, n
     writes.push(
       db
         .prepare(
-          `INSERT OR IGNORE INTO events (user_id, id, at, received_at, kind, level_id, cause, x, y, ms, deaths)
-           SELECT ?1, json_extract(value, '$.id'), json_extract(value, '$.at'), ?2, json_extract(value, '$.kind'),
-             json_extract(value, '$.level'), json_extract(value, '$.cause'), json_extract(value, '$.x'),
-             json_extract(value, '$.y'), json_extract(value, '$.ms'), json_extract(value, '$.deaths')
+          `INSERT OR IGNORE INTO events (user_id, ${EVENT_COLUMNS})
+           SELECT ?1, ${EVENT_VALUES}
            FROM json_each(?3) WHERE EXISTS (SELECT 1 FROM users WHERE id = ?1)`,
         )
         .bind(userId, now, JSON.stringify(push.events)),

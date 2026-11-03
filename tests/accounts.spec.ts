@@ -1,6 +1,6 @@
 import { request as httpRequest } from 'node:http';
-import { expect, test, type APIRequestContext, type Page } from '@playwright/test';
-import type { AdminUserDetail, Me, PlayEvent, ProgressPush, Snapshot } from '../server/contract';
+import { expect, test, type APIRequestContext, type Browser, type Page } from '@playwright/test';
+import type { AdminGuestDetail, AdminUserDetail, AdminUsers, GuestPush, Me, PlayEvent, ProgressPush, Snapshot } from '../server/contract';
 
 /**
  * Accounts, end to end (designer, 2026-10-16): the game as a visitor has it, in the
@@ -16,6 +16,10 @@ import type { AdminUserDetail, Me, PlayEvent, ProgressPush, Snapshot } from '../
  * account is named by its id, so one deleted and made again under the same address is
  * another, and a tab that still shows the old one can neither add to the new one nor
  * delete it. Every test signs in with an address of its own.
+ *
+ * A guest is seen by the tracker too (designer, 2026-11-03): his browser is a visitor,
+ * named by a cookie, and what he does in play goes to the server as a guest's; signing in
+ * makes the visitor, and what it did, the account's.
  */
 
 test.use({ baseURL: 'http://localhost:8788' });
@@ -31,6 +35,8 @@ const EMPTY: Snapshot = { cleared: [], tricks: {}, lifetime: 0 };
 const ACCOUNT_ID = /^[A-Za-z0-9_-]{22}$/;
 /** A push's id (server/contract.ts). */
 const PUSH_ID = /^[A-Za-z0-9_-]{16,64}$/;
+/** A visitor's id, as the server makes it (server/visitors.ts). */
+const VISITOR_ID = /^[A-Za-z0-9_-]{22}$/;
 
 interface Tour {
   readonly lifetime: number;
@@ -97,8 +103,8 @@ function guestPlays(page: Page): Promise<PlayEvent[] | null> {
   return page.evaluate(() => JSON.parse(localStorage.getItem('lostTourist.plays') ?? 'null') as PlayEvent[] | null);
 }
 
-/** The events in `pushes`, each once, in the order first sent, without their ids and times. */
-function eventsIn(pushes: ProgressPush[]): Omit<PlayEvent, 'id' | 'at'>[] {
+/** The events in `pushes`, an account's or a guest's, each once, in the order first sent, without their ids and times. */
+function eventsIn(pushes: readonly { events?: PlayEvent[] }[]): Omit<PlayEvent, 'id' | 'at'>[] {
   const seen = new Set<string>();
   const out: Omit<PlayEvent, 'id' | 'at'>[] = [];
   for (const p of pushes) {
@@ -165,6 +171,38 @@ function pushesOf(page: Page): ProgressPush[] {
     if (new URL(r.url()).pathname === '/api/progress') sent.push(r.postDataJSON() as ProgressPush);
   });
   return sent;
+}
+
+/** A guest's pushes a page sends (server/visitors.ts), as their bodies, in the order sent: across its reloads too. */
+function visitsOf(page: Page): GuestPush[] {
+  const sent: GuestPush[] = [];
+  page.on('request', (r) => {
+    if (new URL(r.url()).pathname === '/api/visit') sent.push(r.postDataJSON() as GuestPush);
+  });
+  return sent;
+}
+
+/** The visitor this page's browser is, by its cookie, or null. */
+async function visitorOf(page: Page): Promise<string | null> {
+  return (await page.context().cookies()).find((c) => c.name === '__Host-lt_visitor')?.value ?? null;
+}
+
+/** The admin, signed in in a browser of his own, and what the tracker answers him. */
+async function asAdmin(browser: Browser, request: APIRequestContext): Promise<{ admin: Page; ask<T>(path: string): Promise<{ status: number; body: T }>; close(): Promise<void> }> {
+  const theirs = await browser.newContext({ baseURL: 'http://localhost:8788' });
+  await theirs.route('https://accounts.google.com/**', (route) => route.abort());
+  const admin = await theirs.newPage();
+  await open(admin);
+  await signInByEmail(admin, request, ADMIN);
+  return {
+    admin,
+    ask: <T>(path: string) =>
+      admin.evaluate(
+        (p) => fetch(p, { cache: 'no-store' }).then(async (r) => ({ status: r.status, body: (await r.json()) as unknown })),
+        path,
+      ) as Promise<{ status: number; body: T }>,
+    close: () => theirs.close(),
+  };
 }
 
 /**
@@ -1239,7 +1277,9 @@ test('what happens in play goes with the pushes: going in, each death and where,
   await expect.poll(() => held(page).then((h) => h?.cleared)).toEqual(['cap-blanc']);
 });
 
-test('what a guest did in play is kept in the browser, and goes into the account he signs in to', async ({ page, request }) => {
+test('what a guest did in play waits in the browser while it cannot be sent, and goes into the account he signs in to', async ({ page, request }) => {
+  // The server out of reach for a guest's pushes, and only for them.
+  await page.route('**/api/visit', (route) => route.abort());
   await open(page);
   await giveUpTwiceInCapBlanc(page);
   expect((await guestPlays(page))?.map((e) => e.kind)).toEqual(['enter', 'death', 'death', 'leave']);
@@ -1258,6 +1298,54 @@ test('what a guest did in play is kept in the browser, and goes into the account
   expect(await guestPlays(page)).toBeNull();
   await expect.poll(() => queuedFor(page, email)).toEqual([]);
   await expect.poll(() => held(page).then((h) => h?.lifetime)).toBe(2);
+});
+
+test('a guest is seen as he plays, under his browser\'s visitor; signing in makes it, and what it did, his account\'s', async ({ page, request, browser }) => {
+  const visits = visitsOf(page);
+  await open(page);
+  // As the page opens, he came: a push with nothing in it, and his browser is a visitor.
+  await expect.poll(() => visits.length).toBeGreaterThanOrEqual(1);
+  expect(visits[0]).toEqual({ tour: EMPTY, events: [] });
+  await expect.poll(() => visitorOf(page)).toMatch(VISITOR_ID);
+  const visitor = (await visitorOf(page))!;
+
+  await giveUpTwiceInCapBlanc(page);
+  // Back on the map, what he did goes at once, and the browser keeps none of it.
+  await expect.poll(() => guestPlays(page), { timeout: 5_000 }).toBeNull();
+  expect(eventsIn(visits)).toEqual([{ kind: 'enter', level: 'cap-blanc' }, deathIn('cap-blanc', 'Gave up'), deathIn('cap-blanc', 'Gave up'), { kind: 'leave', level: 'cap-blanc', deaths: 2 }]);
+  expect(visits.at(-1)?.tour.lifetime).toBe(2);
+  // A reload is the same visitor.
+  expect(await visitorOf(page)).toBe(visitor);
+
+  const { admin, ask, close } = await asAdmin(browser, request);
+  const guest = await ask<AdminGuestDetail>(`/api/admin/guest?id=${visitor}`);
+  expect(guest.status).toBe(200);
+  expect(guest.body.guest).toMatchObject({ id: visitor, visits: 1, deaths: 2, gaveUp: 2, left: 1, lifetime: 2 });
+  await admin.goto('/admin.html');
+  const row = admin.locator('tr.row', { hasText: `Guest ${visitor.slice(0, 6)}` });
+  await expect(row).toBeVisible();
+  await expect(row).toContainText('Left Cap Blanc');
+  await row.click();
+  await expect(admin.locator('#visitor')).toContainText('a guest');
+  await expect(admin.locator('#visitor')).toContainText('Left for the map, after 2 deaths');
+  await expect(admin).toHaveURL(new RegExp(`#guest%3A${visitor}$`));
+
+  // He signs in: no longer a guest, and his account has what he did, and when he came.
+  const email = address('seen');
+  const sent = visits.length;
+  await signInByEmail(page, request, email);
+  const id = await accountId(page);
+  expect((await ask(`/api/admin/guest?id=${visitor}`)).status).toBe(404);
+  const user = await ask<AdminUserDetail>(`/api/admin/user?id=${encodeURIComponent(id)}`);
+  expect(user.body.user).toMatchObject({ email, visits: 1, deaths: 2, gaveUp: 2, left: 1, lifetime: 2, firstVisit: expect.any(Number) as unknown });
+  const list = await ask<AdminUsers>('/api/admin/users');
+  expect(list.body.guests.some((g) => g.id === visitor)).toBe(false);
+  expect(list.body.totals.signedIn).toBeGreaterThanOrEqual(1);
+  // Signed in, the page sends nothing more as a guest.
+  await giveUpTwiceInCapBlanc(page);
+  await expect.poll(() => held(page).then((h) => h?.lifetime)).toBe(4);
+  expect(visits.length).toBe(sent);
+  await close();
 });
 
 test('the admin\'s tracker: only the admin reads it, and it shows what each visitor did', async ({ page, request, browser }) => {

@@ -4,7 +4,7 @@
  * on Workers and on Node alike.
  */
 
-import { adminUser, adminUsers } from './admin';
+import { adminGuest, adminUser, adminUsers } from './admin';
 import type { Me, Methods, Ok, ProgressReply } from './contract';
 import { sha256hex } from './crypto';
 import { ensureSchema } from './db';
@@ -15,6 +15,7 @@ import { fail, isRecord, json, readJson } from './http';
 import { hasUser, pushStatements, snapshotStatements, toSnapshot, validatePush } from './progress';
 import { SESSION_COOKIE, clearCookie, readCookie, readSession, renewal } from './sessions';
 import { deleteUser, isAccountId } from './users';
+import { forgetVisitor, visit } from './visitors';
 
 export type { Deps, Env } from './env';
 
@@ -28,6 +29,7 @@ interface Route {
 const ROUTES = new Map<string, Route>([
   ['/api/me', { method: 'GET', handler: me }],
   ['/api/progress', { method: 'POST', handler: progress }],
+  ['/api/visit', { method: 'POST', handler: visit }],
   ['/api/auth/email/start', { method: 'POST', handler: emailStart }],
   ['/api/auth/email/verify', { method: 'POST', handler: emailVerify }],
   ['/api/auth/google/nonce', { method: 'GET', handler: googleNonce }],
@@ -36,6 +38,7 @@ const ROUTES = new Map<string, Route>([
   ['/api/account', { method: 'DELETE', handler: deleteAccount }],
   ['/api/admin/users', { method: 'GET', handler: adminUsers }],
   ['/api/admin/user', { method: 'GET', handler: adminUser }],
+  ['/api/admin/guest', { method: 'GET', handler: adminGuest }],
 ]);
 
 const DEFAULT_DEPS: Deps = {
@@ -121,20 +124,24 @@ async function progress(ctx: Ctx, body: unknown): Promise<Response> {
   return json(200, reply);
 }
 
-/** POST /api/auth/logout: ends this browser's session, if it has one. Always succeeds. */
+/**
+ * POST /api/auth/logout: ends this browser's session, if it has one. Always succeeds. The
+ * visitor goes with it: what the browser does as a guest from here is a new visitor's, as
+ * its tour is a new guest's (server/visitors.ts).
+ */
 async function logout(ctx: Ctx): Promise<Response> {
   const token = readCookie(ctx.request, SESSION_COOKIE);
   if (token) {
     await ctx.db.prepare('DELETE FROM sessions WHERE token_hash = ?1').bind(await sha256hex(token)).run();
   }
   const ok: Ok = { ok: true };
-  return json(200, ok, [clearCookie(SESSION_COOKIE)]);
+  return json(200, ok, [clearCookie(SESSION_COOKIE), ...forgetVisitor(ctx.request)]);
 }
 
 /**
- * DELETE /api/account: forgets him entirely. The body names the account, as a
- * push does: a tab still showing an account the cookie no longer holds must not
- * delete the one it does.
+ * DELETE /api/account: forgets him entirely, and the browser's visitor with him. The body
+ * names the account, as a push does: a tab still showing an account the cookie no longer
+ * holds must not delete the one it does.
  */
 async function deleteAccount(ctx: Ctx, body: unknown): Promise<Response> {
   const { session } = await readSession(ctx);
@@ -143,5 +150,5 @@ async function deleteAccount(ctx: Ctx, body: unknown): Promise<Response> {
   if (body.account !== session.userId) return fail(409, 'other_account');
   await deleteUser(ctx.db, { id: session.userId, email: session.email });
   const ok: Ok = { ok: true };
-  return json(200, ok, [clearCookie(SESSION_COOKIE)]);
+  return json(200, ok, [clearCookie(SESSION_COOKIE), ...forgetVisitor(ctx.request)]);
 }

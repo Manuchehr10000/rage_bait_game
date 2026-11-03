@@ -70,10 +70,15 @@ export async function userByGoogle(db: D1Like, sub: string, email: string, now: 
   return 'email_taken';
 }
 
-/** Forgets the user: his progress, what he did in play, his sessions, any code waiting for him. */
+/**
+ * Forgets the user: his progress, what he did in play, his sessions, any code waiting for
+ * him, and the visitors that signed in as him, with anything one of them still held.
+ */
 export async function deleteUser(db: D1Like, user: UserRow): Promise<void> {
   await db.batch([
     db.prepare('DELETE FROM events WHERE user_id = ?1').bind(user.id),
+    db.prepare('DELETE FROM guest_events WHERE visitor_id IN (SELECT id FROM visitors WHERE user_id = ?1)').bind(user.id),
+    db.prepare('DELETE FROM visitors WHERE user_id = ?1').bind(user.id),
     db.prepare('DELETE FROM tricks WHERE user_id = ?1').bind(user.id),
     db.prepare('DELETE FROM cleared WHERE user_id = ?1').bind(user.id),
     db.prepare('DELETE FROM pushes WHERE user_id = ?1').bind(user.id),

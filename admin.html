@@ -35,8 +35,11 @@
       tr.row { cursor: pointer; }
       tr.row:hover td, tr.row.on td { background: #16140f; }
       td.wrap { white-space: normal; min-width: 180px; }
-      input[type='search'] { box-sizing: border-box; width: min(320px, 100%); margin: 0 0 10px; padding: 7px 8px; font: inherit; color: var(--bright); background: var(--page); border: 1px solid var(--muted); border-radius: 0; }
-      input[type='search']:focus { outline: 1px solid var(--bright); outline-offset: -1px; }
+      .find { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 10px; }
+      input[type='search'], select.who { box-sizing: border-box; padding: 7px 8px; font: inherit; color: var(--bright); background: var(--page); border: 1px solid var(--muted); border-radius: 0; }
+      input[type='search'] { width: min(320px, 100%); }
+      input[type='search']:focus, select.who:focus { outline: 1px solid var(--bright); outline-offset: -1px; }
+      .note { margin-top: 10px; font-size: 13px; }
       .bar { display: inline-block; height: 8px; background: var(--muted); vertical-align: middle; }
       .bar.lost { background: var(--mark); }
       svg.deaths { display: block; width: 100%; max-width: 640px; height: auto; margin: 6px 0 4px; background: #13110d; border: 1px solid var(--line); }

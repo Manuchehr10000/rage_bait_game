@@ -71,3 +71,26 @@ async function readLimited(request: Request, limit: number): Promise<Uint8Array 
   }
   return bytes;
 }
+
+/**
+ * `__Host-`: Secure, Path=/ and no Domain, so no other site under the same
+ * parent domain can set or read it. Lax: sent on the page's own requests,
+ * never on another site's POST.
+ */
+export function setCookie(name: string, value: string, maxAge: number): string {
+  return `${name}=${value}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${maxAge}`;
+}
+
+export function clearCookie(name: string): string {
+  return setCookie(name, '', 0);
+}
+
+export function readCookie(request: Request, name: string): string | null {
+  const header = request.headers.get('Cookie');
+  if (!header) return null;
+  for (const part of header.split(';')) {
+    const eq = part.indexOf('=');
+    if (eq >= 0 && part.slice(0, eq).trim() === name) return part.slice(eq + 1).trim();
+  }
+  return null;
+}

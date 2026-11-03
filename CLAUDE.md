@@ -99,8 +99,13 @@ notes describe the levels as they were built.
   (`PlayEvent`, `server/contract.ts`; one row each in D1's `events`) that the page sends
   with its pushes: going into a level, each death (cause, the dev ruler's (X, Y), how far
   into the attempt), leaving a level from the middle of it, each clear. Full analytics are
-  to be built on top of it. Only accounts are seen: a guest's events wait in the browser
-  until the guest signs in. README, "The admin's tracker".
+  to be built on top of it. Guests are seen too (designer, 2026-11-03: "Add tracking of any
+  users who came to game and played even without logging and then how many logged in"): a
+  browser is a visitor, by a random id in a cookie of its own (`server/visitors.ts`), and
+  nothing else is kept of it; it pushes its tour and events as a guest (`POST /api/visit`),
+  once as the page opens whether or not it plays; signing in makes the visitor and what it
+  did the account's, signing out starts a new one. `/admin` shows how many visitors came,
+  played and signed in, and every guest beside the accounts. README, "The admin's tracker".
 - **On a phone** (designer, 2026-10-16): held sideways, buttons in the side borders and
   never over the game (the game is drawn smaller for them); left and right under the left
   thumb, jump under the right; map, give up, lamp, sound and full screen as small buttons;

@@ -191,7 +191,7 @@ test('a database made before there were events is brought up to date, and keeps 
   const me = await client.get<Me>('/api/me');
   expect(me.body.user).toEqual({ email: 'old@example.com', id: 'old-account-id' });
   expect(me.body.progress).toEqual({ cleared: ['cap-blanc'], tricks: {}, lifetime: 40 });
-  expect(world.db.rows('SELECT version FROM schema_version ORDER BY version')).toEqual([{ version: 1 }, { version: 2 }]);
+  expect(world.db.rows('SELECT version FROM schema_version ORDER BY version')).toEqual([{ version: 1 }, { version: 2 }, { version: 3 }]);
   expect((await client.post('/api/progress', push('old-account-id', { events: [enter('cap-blanc')] }))).status).toBe(200);
   expect(world.db.count('events')).toBe(1);
 });
@@ -202,7 +202,7 @@ test('the tracker is the admin\'s: the signed out are told to sign in, anyone el
   expect((await world.client('198.51.100.21').get('/api/admin/users')).status).toBe(401);
   const stranger = world.client('198.51.100.22');
   await stranger.signInByEmail('tourist@example.com');
-  for (const path of ['/api/admin/users', '/api/admin/user?id=x']) {
+  for (const path of ['/api/admin/users', '/api/admin/user?id=x', `/api/admin/guest?id=${'A'.repeat(22)}`]) {
     const res = await stranger.get<ApiError>(path);
     expect(res.status, path).toBe(403);
     expect(res.body).toEqual({ error: 'not_admin' });
@@ -260,6 +260,7 @@ test('the tracker lists every account, newest first, with what its events say of
     email: 'a@example.com',
     google: false,
     createdAt: madeA,
+    firstVisit: null,
     lastSeen: seenA,
     lifetime: 5,
     cleared: ['cap-blanc'],
