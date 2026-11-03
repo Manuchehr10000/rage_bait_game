@@ -22,6 +22,8 @@ const GUESTS_MAX = 1000;
 /** One account's newest events in one answer, and in each level its newest deaths given as points. */
 const EVENTS_MAX = 500;
 const POINTS_PER_LEVEL = 1000;
+/** The guests' sets of cleared levels the funnel is read from, the most held first. */
+const TOURS_MAX = 500;
 const WEEK = 7 * 86_400_000;
 /** A visitor's id, as the server makes it (server/visitors.ts). */
 const VISITOR_ID = /^[A-Za-z0-9_-]{22}$/;
@@ -168,29 +170,22 @@ function toGuests(rows: Row[], tallyRows: Row[], lasts: Row[]): AdminGuest[] {
   });
 }
 
-/** Every count the tiles show, over everyone, however many the lists hold. */
+/** Every count the tiles show, over everyone, however many the lists hold: one pass over each table. */
 function totalsStatement(db: D1Like, now: number): D1Statement {
   return db
     .prepare(
-      `SELECT
-         (SELECT count(*) FROM users) AS accounts,
-         (SELECT count(*) FROM users WHERE created_at > ?1) AS accounts_new,
-         (SELECT count(DISTINCT user_id) FROM events WHERE received_at > ?1) AS accounts_seen,
-         (SELECT count(*) FROM users WHERE google_sub IS NOT NULL) AS google,
-         (SELECT count(*) FROM visitors WHERE user_id IS NULL) AS guests,
-         (SELECT count(*) FROM visitors WHERE user_id IS NULL AND first_at > ?1) AS guests_new,
-         (SELECT count(*) FROM visitors WHERE user_id IS NULL AND last_at > ?1) AS guests_seen,
-         (SELECT count(*) FROM visitors) AS visitors,
-         (SELECT count(*) FROM visitors v WHERE CASE WHEN v.user_id IS NULL
-            THEN EXISTS (SELECT 1 FROM guest_events g WHERE g.visitor_id = v.id AND g.kind = 'enter')
-            ELSE EXISTS (SELECT 1 FROM events e WHERE e.user_id = v.user_id AND e.kind = 'enter') END) AS played,
-         (SELECT count(*) FROM visitors WHERE user_id IS NOT NULL) AS signed_in,
-         (SELECT min(first_at) FROM visitors) AS since,
-         (SELECT coalesce(sum(lifetime), 0) FROM users)
-           + (SELECT coalesce(sum(lifetime), 0) FROM visitors WHERE user_id IS NULL) AS deaths,
-         (SELECT count(*) FROM events WHERE kind = 'death' AND cause = ?2)
-           + (SELECT count(*) FROM guest_events WHERE kind = 'death' AND cause = ?2) AS gave_up,
-         (SELECT count(*) FROM events WHERE kind = 'leave') + (SELECT count(*) FROM guest_events WHERE kind = 'leave') AS left_`,
+      `SELECT u.accounts, u.accounts_new, u.google, u.deaths AS account_deaths,
+         e.seen AS accounts_seen, e.gave_up AS account_gave_up, e.left_ AS account_left,
+         g.gave_up AS guest_gave_up, g.left_ AS guest_left, v.*
+       FROM (SELECT count(*) AS accounts, sum(created_at > ?1) AS accounts_new, sum(google_sub IS NOT NULL) AS google,
+               sum(lifetime) AS deaths FROM users) u,
+         (SELECT count(DISTINCT CASE WHEN received_at > ?1 THEN user_id END) AS seen,
+               sum(kind = 'death' AND cause = ?2) AS gave_up, sum(kind = 'leave') AS left_ FROM events) e,
+         (SELECT sum(kind = 'death' AND cause = ?2) AS gave_up, sum(kind = 'leave') AS left_ FROM guest_events) g,
+         (SELECT count(*) AS visitors, sum(user_id IS NULL) AS guests, sum(user_id IS NULL AND first_at > ?1) AS guests_new,
+               sum(user_id IS NULL AND last_at > ?1) AS guests_seen, sum(played_at IS NOT NULL) AS played,
+               sum(user_id IS NOT NULL) AS signed_in, sum(played_at IS NOT NULL AND user_id IS NOT NULL) AS played_signed_in,
+               min(first_at) AS since, sum(CASE WHEN user_id IS NULL THEN lifetime END) AS guest_deaths FROM visitors) v`,
     )
     .bind(now - WEEK, GAVE_UP);
 }
@@ -203,7 +198,8 @@ function tourStatements(db: D1Like): D1Statement[] {
          SELECT (SELECT json_group_array(level_id) FROM cleared c WHERE c.user_id = u.id) AS k FROM users u)
        GROUP BY k`,
     ),
-    db.prepare(`SELECT cleared AS k, count(*) AS n FROM visitors WHERE user_id IS NULL GROUP BY cleared`),
+    // The most held first, and no more than these: a guest's tour is what his browser says, and a script could say anything.
+    db.prepare(`SELECT cleared AS k, count(*) AS n FROM visitors WHERE user_id IS NULL GROUP BY cleared ORDER BY n DESC LIMIT ?1`).bind(TOURS_MAX),
   ];
 }
 
@@ -232,10 +228,11 @@ function toTotals(t: Row | undefined, accountTours: Row[], guestTours: Row[]): A
     visitors: num(t?.visitors),
     played: num(t?.played),
     signedIn: num(t?.signed_in),
+    playedSignedIn: num(t?.played_signed_in),
     since: numOrNull(t?.since),
-    deaths: num(t?.deaths),
-    gaveUp: num(t?.gave_up),
-    left: num(t?.left_),
+    deaths: num(t?.account_deaths) + num(t?.guest_deaths),
+    gaveUp: num(t?.account_gave_up) + num(t?.guest_gave_up),
+    left: num(t?.account_left) + num(t?.guest_left),
     tours: [...tours.values()],
   };
 }

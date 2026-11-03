@@ -2,9 +2,10 @@ import { ipKey } from './address';
 import type { GuestPush, Ok } from './contract';
 import { newId } from './crypto';
 import type { D1Statement } from './db';
-import type { Ctx, Env } from './env';
+import type { Ctx } from './env';
 import { clearCookie, fail, isRecord, json, readCookie, setCookie } from './http';
 import { EVENT_COLUMNS, EVENT_VALUES, isCount, readCleared, readEvents, readTricks } from './progress';
+import { readSession } from './sessions';
 
 /**
  * The visitors (designer, 2026-11-03: "Add tracking of any users who came to game and
@@ -12,13 +13,16 @@ import { EVENT_COLUMNS, EVENT_VALUES, isCount, readCleared, readEvents, readTric
  * that opened the game where the tracker runs, named by a random id in a cookie of its
  * own, which the server makes the first time the page pushes as a guest. Nothing else is
  * kept of it: no address, no IP, nothing of the device. What it does in play as a guest
- * is kept under it (guest_events), with its tour as the browser last told of it.
+ * is kept under it (guest_events), with its tour as the browser has told of it.
  *
  * Signing in makes the visitor the account's (sessions.ts, signIn): what it did as a
  * guest goes into the account's events, in the same transaction, and whatever it sends
- * as a guest after that, from a tab that has not heard yet, goes there too. Signing out
- * and deleting the account forget the cookie, so the browser that goes on as a guest is
- * a new visitor, as its tour is a new guest's.
+ * as a guest after that, from a tab that has not heard yet, goes there too, while the
+ * browser is signed in to that account. Once it is not (signed out, the session run
+ * out, or signed in as someone else), what it sends as a guest is a new visitor's: the
+ * server gives the browser another, as it gives one to a browser signing in to another
+ * account. A visitor is so a browser's stretch as one person; deleting the account
+ * deletes its visitors and forgets the cookie.
  *
  * The cookie is made once and never made to last longer: thirteen months from the first
  * visit, as the usual rule for a measuring cookie has it.
@@ -31,19 +35,34 @@ const VISITOR_AGE = 390 * 86_400;
 const VISITOR_ID = /^[A-Za-z0-9_-]{22}$/;
 
 const HOUR = 3_600_000;
+const DAY = 86_400_000;
 /**
- * What one network may send as guests in an hour: a push costs one, and one more for each
- * event in it. Far past what anyone playing sends (a death every two seconds for an hour is
- * under 2000), and enough for a few dozen playing behind one address. Over it, a push is
- * refused until the hour is out, and its page keeps it until then.
+ * What guests may send, in units: a push is one, each event in it one more, and each KiB
+ * of its tour one more, so the units bound the rows and the bytes stored. A unit is about
+ * two rows written. One network an hour: a guest dying every two seconds for an hour
+ * sends under 2000, so this is a few playing hard behind one address, or many playing
+ * lightly. All networks a day: on D1's free plan, 100,000 rows written a day are the
+ * accounts' too, and this keeps the guests to under half of them. Over either, a push is
+ * refused until the hour or the day is out, nothing written, and its page keeps it.
  */
-const DEFAULT_IP_HOURLY = 5000;
+const DEFAULT_IP_HOURLY = 20_000;
+const DEFAULT_DAILY = 20_000;
+/** The day's row in visit_limits, all networks together. No network's key is it. */
+const ALL = '*';
 
 /** Deaths in every visit, as a browser counts them: far past anyone's. */
 const MAX_LIFETIME = 1_000_000_000;
+/** What a guest's tour may hold in all, whatever its pushes have named: as much as one push may carry. */
+const MAX_CLEARED = 200;
+const MAX_TRICKS = 500;
 
-/** A crawler that runs the page, as a search engine's does: not a visitor. */
-const CRAWLER = /(?:bot|crawler|spider)(?:[/\s;)_-]|$)|crawling|slurp/i;
+/**
+ * A crawler that runs the page, as a search engine's does: not a visitor. By name, as
+ * crawlers give it: a word with "bot" in it would take phones too (a Cubot's model is
+ * in its browser's).
+ */
+const CRAWLER =
+  /Googlebot|Google-InspectionTool|bingbot|Applebot|DuckDuckBot|YandexBot|Baiduspider|AhrefsBot|SemrushBot|Bytespider|GPTBot|PetalBot|facebookexternalhit|crawler|spider|Slurp/i;
 
 /** The visitor the request's cookie names, if it is one of ours. */
 export function readVisitor(request: Request): string | null {
@@ -51,14 +70,19 @@ export function readVisitor(request: Request): string | null {
   return id !== null && VISITOR_ID.test(id) ? id : null;
 }
 
-/** The cookie that forgets the visitor, when the request carried one: signing out, and deleting the account. */
+/** The cookie that forgets the visitor, when the request carried one: deleting the account. */
 export function forgetVisitor(request: Request): string[] {
   return readCookie(request, VISITOR_COOKIE) === null ? [] : [clearCookie(VISITOR_COOKIE)];
 }
 
-function hourlyCap(env: Env): number {
-  const n = Number(env.VISIT_IP_HOURLY);
-  return Number.isInteger(n) && n > 0 ? n : DEFAULT_IP_HOURLY;
+function newVisitor(): { id: string; cookie: string } {
+  const id = newId();
+  return { id, cookie: setCookie(VISITOR_COOKIE, id, VISITOR_AGE) };
+}
+
+function limit(raw: string | undefined, fallback: number): number {
+  const n = Number(raw);
+  return Number.isInteger(n) && n > 0 ? n : fallback;
 }
 
 /**
@@ -85,11 +109,12 @@ function hasKeys(x: unknown, want: readonly string[]): x is Record<string, unkno
 }
 
 /**
- * POST /api/visit: a guest's push. The browser's visitor, made now if it has none; its
- * tour merged into what is kept (every level ever named, every trick, the highest count
- * of deaths), and its events kept once each: under the visitor while it is a guest, in
- * its account once it has signed in. All in one transaction, after the network's hour
- * is counted, and nothing written once that is past the limit (429).
+ * POST /api/visit: a guest's push. The browser's visitor, made now if it has none, or if
+ * the one it has is an account's that the browser is no longer signed in to; its tour
+ * merged into what is kept (every level it has named, every trick, the highest count of
+ * deaths), and its events kept once each: under the visitor while it is a guest's, in the
+ * account while it is that account's. Refused (429), with nothing written, once the
+ * network's hour or everyone's day has had what it may.
  */
 export async function visit(ctx: Ctx, body: unknown): Promise<Response> {
   const push = validateGuestPush(body);
@@ -98,96 +123,144 @@ export async function visit(ctx: Ctx, body: unknown): Promise<Response> {
   // A search engine running the page plays nothing, and is no visitor: it is told yes, and nothing is kept.
   if (CRAWLER.test(ctx.request.headers.get('User-Agent') ?? '')) return json(200, ok);
 
-  const { db, now } = ctx;
-  const known = readVisitor(ctx.request);
-  const id = known ?? newId();
-  const cookies = known ? [] : [setCookie(VISITOR_COOKIE, id, VISITOR_AGE)];
+  const { db, now, env } = ctx;
   const ip = ipKey(ctx.request.headers.get('CF-Connecting-IP'));
   const hour = Math.floor(now / HOUR);
-  const cap = hourlyCap(ctx.env);
-  const under = 'SELECT n FROM visit_limits WHERE ip = ?4 AND hour = ?5';
-  // A level kept once however often it is named; a level's tricks only in a list that has one.
+  const day = Math.floor(now / DAY) * 24;
+  // A level's tricks only in a list that has one: an empty list says nothing.
   const tricks = Object.fromEntries(Object.entries(push.tour.tricks).filter(([, list]) => list.length > 0));
-  const events = JSON.stringify(push.events);
+  const tour = JSON.stringify({ cleared: push.tour.cleared, tricks });
+  const cost = 1 + push.events.length + Math.ceil(new TextEncoder().encode(tour).length / 1024);
 
+  let id = readVisitor(ctx.request);
+  // Read first, so a push refused writes nothing at all. Pushes at the same moment may go a
+  // little past a limit between them; it stays a limit.
+  const seen = await db
+    .prepare(
+      `SELECT (SELECT user_id FROM visitors WHERE id = ?1) AS owner,
+         (SELECT n FROM visit_limits WHERE ip = ?2 AND hour = ?3) AS network,
+         (SELECT n FROM visit_limits WHERE ip = ?4 AND hour = ?5) AS everyone`,
+    )
+    .bind(id ?? '', ip, hour, ALL, day)
+    .first<{ owner: string | null; network: number | null; everyone: number | null }>();
+  const cookies: string[] = [];
+  let account: string | null = null;
+  if (id && seen?.owner) {
+    // An account's visitor: still his while the browser is signed in as him; otherwise
+    // the browser is a guest again, and a new visitor.
+    const { session } = await readSession(ctx);
+    if (session?.userId === seen.owner) account = seen.owner;
+    else id = null;
+  }
+  if (!id) {
+    const fresh = newVisitor();
+    id = fresh.id;
+    cookies.push(fresh.cookie);
+  }
+  const overNetwork = Number(seen?.network ?? 0) + cost > limit(env.VISIT_IP_HOURLY, DEFAULT_IP_HOURLY);
+  const overDay = Number(seen?.everyone ?? 0) + cost > limit(env.VISIT_DAILY_CAP, DEFAULT_DAILY);
+  if (overNetwork || overDay) {
+    const wait = Math.max(overNetwork ? (hour + 1) * HOUR - now : 0, overDay ? (day + 24) * HOUR - now : 0);
+    return fail(429, 'too_many', { retryAfter: Math.max(1, Math.ceil(wait / 1000)) }, cookies);
+  }
+
+  const events = JSON.stringify(push.events);
   const statements: D1Statement[] = [
-    // The hour before stays, so the limit is never reset by a sweep in its own hour.
-    db.prepare('DELETE FROM visit_limits WHERE hour < ?1').bind(hour - 1),
-    db
-      .prepare('INSERT INTO visit_limits (ip, hour, n) VALUES (?1, ?2, ?3) ON CONFLICT (ip, hour) DO UPDATE SET n = n + excluded.n')
-      .bind(ip, hour, 1 + push.events.length),
-    // SQLite needs the WHERE here, before ON CONFLICT, to read an INSERT ... SELECT with an upsert.
+    // A network's count is kept for its hour and the next; everyone's for its day.
+    db.prepare('DELETE FROM visit_limits WHERE hour < ?1 AND ip <> ?2').bind(hour - 1, ALL),
+    db.prepare('DELETE FROM visit_limits WHERE hour < ?1 AND ip = ?2').bind(day, ALL),
     db
       .prepare(
-        `INSERT INTO visitors (id, first_at, last_at, cleared, tricks, lifetime)
-         SELECT ?1, ?2, ?2, ?3, ?6, ?7 WHERE (${under}) <= ?8
-         ON CONFLICT (id) DO UPDATE SET last_at = excluded.last_at,
-           cleared = (SELECT json_group_array(value) FROM (
-             SELECT value FROM json_each(visitors.cleared) UNION SELECT value FROM json_each(excluded.cleared))),
-           tricks = (SELECT json_group_object(level, json(list)) FROM (
-             SELECT level, json_group_array(trick) AS list FROM (
-               SELECT o.key AS level, t.value AS trick FROM json_each(visitors.tricks) o, json_each(o.value) t
-               UNION SELECT o.key, t.value FROM json_each(excluded.tricks) o, json_each(o.value) t)
-             GROUP BY level)),
-           lifetime = max(visitors.lifetime, excluded.lifetime)`,
+        `INSERT INTO visit_limits (ip, hour, n) VALUES (?1, ?2, ?5), (?3, ?4, ?5)
+         ON CONFLICT (ip, hour) DO UPDATE SET n = n + excluded.n`,
       )
-      .bind(id, now, JSON.stringify(push.tour.cleared), ip, hour, JSON.stringify(tricks), push.tour.lifetime, cap),
+      .bind(ip, hour, ALL, day, cost),
   ];
-  if (push.events.length > 0) {
+  if (account) {
+    // His account's visitor, from a tab that has not heard he signed in: his events, as the page would have sent them.
+    statements.push(db.prepare('UPDATE visitors SET last_at = ?2 WHERE id = ?1').bind(id, now));
+    if (push.events.length) {
+      statements.push(
+        db
+          .prepare(
+            `INSERT OR IGNORE INTO events (user_id, ${EVENT_COLUMNS})
+             SELECT ?1, ${EVENT_VALUES} FROM json_each(?3) WHERE EXISTS (SELECT 1 FROM users WHERE id = ?1)`,
+          )
+          .bind(account, now, events),
+      );
+    }
+  } else {
+    const played = push.events.some((e) => e.kind === 'enter') ? now : null;
     statements.push(
-      // A guest's: kept under the visitor.
+      // Everything any push of this visitor's has named, up to what one push may carry;
+      // the guest's whole tour, as each push sends it, gets no bigger than that.
       db
         .prepare(
-          `INSERT OR IGNORE INTO guest_events (visitor_id, ${EVENT_COLUMNS})
-           SELECT ?1, ${EVENT_VALUES}
-           FROM json_each(?3) WHERE EXISTS (SELECT 1 FROM visitors WHERE id = ?1 AND user_id IS NULL) AND (${under}) <= ?6`,
+          `INSERT INTO visitors (id, first_at, last_at, played_at, cleared, tricks, lifetime)
+           VALUES (?1, ?2, ?2, ?3, json_extract(?4, '$.cleared'), json_extract(?4, '$.tricks'), ?5)
+           ON CONFLICT (id) DO UPDATE SET last_at = excluded.last_at,
+             played_at = coalesce(visitors.played_at, excluded.played_at),
+             cleared = (SELECT json_group_array(value) FROM (SELECT value FROM (
+               SELECT value FROM json_each(visitors.cleared) UNION SELECT value FROM json_each(excluded.cleared)) LIMIT ?6)),
+             tricks = (SELECT json_group_object(level, json(list)) FROM (
+               SELECT level, json_group_array(trick) AS list FROM (SELECT level, trick FROM (
+                 SELECT o.key AS level, t.value AS trick FROM json_each(visitors.tricks) o, json_each(o.value) t
+                 UNION SELECT o.key, t.value FROM json_each(excluded.tricks) o, json_each(o.value) t) LIMIT ?7)
+               GROUP BY level)),
+             lifetime = max(visitors.lifetime, excluded.lifetime)`,
         )
-        .bind(id, now, events, ip, hour, cap),
-      // Signed in since, in another tab: his account's, as the page would have sent them had it known.
-      db
-        .prepare(
-          `INSERT OR IGNORE INTO events (user_id, ${EVENT_COLUMNS})
-           SELECT v.user_id, ${EVENT_VALUES}
-           FROM visitors v, json_each(?3) WHERE v.id = ?1 AND v.user_id IS NOT NULL
-             AND EXISTS (SELECT 1 FROM users WHERE id = v.user_id) AND (${under}) <= ?6`,
-        )
-        .bind(id, now, events, ip, hour, cap),
+        .bind(id, now, played, tour, push.tour.lifetime, MAX_CLEARED, MAX_TRICKS),
     );
+    if (push.events.length) {
+      statements.push(
+        db
+          .prepare(`INSERT OR IGNORE INTO guest_events (visitor_id, ${EVENT_COLUMNS}) SELECT ?1, ${EVENT_VALUES} FROM json_each(?3)`)
+          .bind(id, now, events),
+      );
+    }
   }
-  statements.push(db.prepare('SELECT n FROM visit_limits WHERE ip = ?1 AND hour = ?2').bind(ip, hour));
-  const results = await db.batch<{ n: number }>(statements);
-  const spent = Number(results[results.length - 1]?.results[0]?.n ?? 0);
-  if (spent > cap) return fail(429, 'too_many', { retryAfter: Math.max(1, Math.ceil(((hour + 1) * HOUR - now) / 1000)) }, cookies);
+  await db.batch(statements);
   return json(200, ok, cookies);
 }
 
 /**
- * The statements that make the browser's visitor `userId`'s as he signs in, for signIn's
- * batch: the visitor his, unless it is someone else's already (another tab signed this
- * browser in as someone else, without signing out), and what it did as a guest moved into
- * his events. None when the browser has no visitor.
+ * How the browser's visitor becomes `userId`'s as he signs in, for signIn: the statements
+ * for its batch, and the cookie to set. A guest's visitor, or one this browser has not got
+ * a row for, is his, and what it did as a guest goes into his events. One that is already
+ * someone else's (this browser was signed in as them) stays theirs, and the browser is
+ * given a new visitor, his from the start. None when the browser has no visitor.
  */
-export function linkStatements(ctx: Ctx, userId: string): D1Statement[] {
-  const id = readVisitor(ctx.request);
-  if (!id) return [];
+export async function linkVisitor(ctx: Ctx, userId: string): Promise<{ statements: D1Statement[]; cookies: string[] }> {
+  let id = readVisitor(ctx.request);
+  if (!id) return { statements: [], cookies: [] };
   const { db, now } = ctx;
-  return [
-    db
-      .prepare(
-        `INSERT INTO visitors (id, first_at, last_at, user_id, signed_in_at) SELECT ?1, ?3, ?3, ?2, ?3
-         WHERE EXISTS (SELECT 1 FROM users WHERE id = ?2)
-         ON CONFLICT (id) DO UPDATE SET last_at = excluded.last_at, user_id = coalesce(visitors.user_id, excluded.user_id),
-           signed_in_at = coalesce(visitors.signed_in_at, excluded.signed_in_at)`,
-      )
-      .bind(id, userId, now),
-    db
-      .prepare(
-        `INSERT OR IGNORE INTO events (user_id, ${EVENT_COLUMNS}) SELECT ?2, ${EVENT_COLUMNS} FROM guest_events
-         WHERE visitor_id = ?1 AND EXISTS (SELECT 1 FROM visitors WHERE id = ?1 AND user_id = ?2)`,
-      )
-      .bind(id, userId),
-    db
-      .prepare('DELETE FROM guest_events WHERE visitor_id = ?1 AND EXISTS (SELECT 1 FROM visitors WHERE id = ?1 AND user_id = ?2)')
-      .bind(id, userId),
-  ];
+  const cookies: string[] = [];
+  const row = await db.prepare('SELECT user_id FROM visitors WHERE id = ?1').bind(id).first<{ user_id: string | null }>();
+  if (row?.user_id && row.user_id !== userId) {
+    const fresh = newVisitor();
+    id = fresh.id;
+    cookies.push(fresh.cookie);
+  }
+  return {
+    cookies,
+    statements: [
+      db
+        .prepare(
+          `INSERT INTO visitors (id, first_at, last_at, user_id, signed_in_at) SELECT ?1, ?3, ?3, ?2, ?3
+           WHERE EXISTS (SELECT 1 FROM users WHERE id = ?2)
+           ON CONFLICT (id) DO UPDATE SET last_at = excluded.last_at, user_id = coalesce(visitors.user_id, excluded.user_id),
+             signed_in_at = coalesce(visitors.signed_in_at, excluded.signed_in_at)`,
+        )
+        .bind(id, userId, now),
+      db
+        .prepare(
+          `INSERT OR IGNORE INTO events (user_id, ${EVENT_COLUMNS}) SELECT ?2, ${EVENT_COLUMNS} FROM guest_events
+           WHERE visitor_id = ?1 AND EXISTS (SELECT 1 FROM visitors WHERE id = ?1 AND user_id = ?2)`,
+        )
+        .bind(id, userId),
+      db
+        .prepare('DELETE FROM guest_events WHERE visitor_id = ?1 AND EXISTS (SELECT 1 FROM visitors WHERE id = ?1 AND user_id = ?2)')
+        .bind(id, userId),
+    ],
+  };
 }

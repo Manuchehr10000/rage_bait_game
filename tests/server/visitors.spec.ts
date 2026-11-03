@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import type { AdminGuestDetail, AdminUsers, ApiError, GuestPush, PlayEvent, Snapshot } from '../../server/contract';
 import { validateGuestPush } from '../../server/visitors';
-import { HOUR, MINUTE, SECOND, T0, World, type Client } from './harness';
+import { DAY, HOUR, MINUTE, SECOND, T0, World, type Client } from './harness';
 
 /**
  * The visitors (designer, 2026-11-03): a guest's play reaches the tracker under his
@@ -61,6 +61,8 @@ test('a guest\'s first push makes his visitor: a cookie of its own, and a row wi
     last_at: world.now,
     user_id: null,
     signed_in_at: null,
+    // It went into a level.
+    played_at: world.now,
     cleared: '["cap-blanc"]',
     tricks: '{"cap-blanc":["The cow"]}',
     lifetime: 7,
@@ -102,6 +104,21 @@ test('the tour is kept whole: every level ever named, every trick, the highest c
   // Nothing of it at all: still all of it.
   await client.post('/api/visit', guestPush());
   expect(visitorRow(world, id)).toMatchObject({ cleared: row.cleared, lifetime: 9 });
+  // A push that never went into a level is not one that played.
+  expect(visitorRow(world, id)?.played_at).toBeNull();
+});
+
+test('what a guest\'s tour may hold is what one push may carry, however many push it, and its size is paid for', async () => {
+  const world = new World();
+  const client = world.client();
+  const ids = (from: number) => Array.from({ length: 200 }, (_, i) => `level-${from + i}`);
+  await client.post('/api/visit', guestPush([], { cleared: ids(0) }));
+  await client.post('/api/visit', guestPush([], { cleared: ids(200), tricks: { 'cap-blanc': Array.from({ length: 50 }, (_, i) => `Trick ${i}`) } }));
+  const row = visitorRow(world, visitorOf(client)!)!;
+  expect((JSON.parse(String(row.cleared)) as string[]).length).toBe(200);
+  // Each KiB of the tour is a unit, beside the push's one: 200 ids are 3 KiB and some.
+  const spent = world.db.rows("SELECT n FROM visit_limits WHERE ip <> '*'")[0]?.n as number;
+  expect(spent).toBeGreaterThanOrEqual(2 * (1 + 3));
 });
 
 test('a guest\'s push in any other shape is refused whole, and makes no visitor', async () => {
@@ -157,7 +174,7 @@ test('a cookie that is not one of ours is a new visitor\'s', async () => {
   expect(world.db.count('visitors')).toBe(4);
 });
 
-test('signing in makes the visitor the account\'s: what it did as a guest goes into his events, and so does what it sends as a guest after', async () => {
+test('signing in makes the visitor the account\'s: what it did as a guest goes into his events, and so does what it sends as a guest while signed in', async () => {
   const world = new World();
   const client = world.client();
   const before = [enter('cap-blanc', T0 + SECOND), death('cap-blanc', 'Gave up', 40, 0, T0 + 2 * SECOND)];
@@ -170,24 +187,50 @@ test('signing in makes the visitor the account\'s: what it did as a guest goes i
   const account = signedIn.body.user.id;
   // Signing in sets the session's cookie, and leaves the visitor's as it is.
   expect(signedIn.cookies.some((c) => c.startsWith(`${VISITOR}=`))).toBe(false);
-  expect(visitorRow(world, visitor)).toMatchObject({ user_id: account, signed_in_at: world.now, first_at: came, last_at: world.now });
+  expect(visitorRow(world, visitor)).toMatchObject({ user_id: account, signed_in_at: world.now, first_at: came, last_at: world.now, played_at: came });
   expect(world.db.count('guest_events')).toBe(0);
   expect(world.db.rows('SELECT user_id, id, received_at FROM events ORDER BY at')).toEqual([
     { user_id: account, id: before[0]!.id, received_at: came },
     { user_id: account, id: before[1]!.id, received_at: came },
   ]);
 
-  // A tab that has not heard yet goes on as a guest: what it sends is his.
+  // A tab that has not heard yet goes on as a guest: while the browser is signed in as him, what it sends is his.
   world.advance(MINUTE);
   const later = leave('cap-blanc', 1, T0 + 3 * SECOND);
-  expect((await client.post('/api/visit', guestPush([before[1]!, later]))).status).toBe(200);
+  const res = await client.post('/api/visit', guestPush([before[1]!, later]));
+  expect(res.status).toBe(200);
+  expect(res.cookies).toEqual([]);
   expect(world.db.count('guest_events')).toBe(0);
   expect(world.db.rows('SELECT id FROM events WHERE user_id = ? ORDER BY at', account).map((r) => r.id)).toEqual([before[0]!.id, before[1]!.id, later.id]);
+  // Signed in again as him, it is his still.
+  await client.signInByEmail('tourist@example.com');
+  expect(visitorOf(client)).toBe(visitor);
 
-  // Signed in as someone else in the same browser, without signing out: the visitor stays the first's.
+  // Signed in as someone else in the same browser, without signing out: the visitor stays
+  // the first's, and the browser is given another, the new account's from the start.
   const other = (await client.signInByEmail('other@example.com')).body.user.id;
   expect(other).not.toBe(account);
   expect(visitorRow(world, visitor)).toMatchObject({ user_id: account });
+  const second = visitorOf(client)!;
+  expect(second).not.toBe(visitor);
+  expect(visitorRow(world, second)).toMatchObject({ user_id: other, first_at: world.now, signed_in_at: world.now, played_at: null });
+});
+
+test('a browser whose session has run out, or that signed in as someone else, is a guest again: a new visitor, not the account\'s', async () => {
+  const world = new World();
+  const client = world.client();
+  await client.post('/api/visit', guestPush());
+  const visitor = visitorOf(client)!;
+  const account = (await client.signInByEmail('tourist@example.com')).body.user.id;
+  world.advance(181 * DAY);
+  const res = await client.post('/api/visit', guestPush([enter('gargas')]));
+  expect(res.status).toBe(200);
+  const fresh = VISITOR_SET.exec(res.cookies[0] ?? '')?.[1];
+  expect(fresh).toBeTruthy();
+  expect(fresh).not.toBe(visitor);
+  expect(visitorRow(world, fresh!)).toMatchObject({ user_id: null, played_at: world.now });
+  expect(world.db.rows('SELECT visitor_id FROM guest_events')).toEqual([{ visitor_id: fresh }]);
+  expect(world.db.count('events', 'user_id = ?', account)).toBe(0);
 });
 
 test('signing in with no visitor (cookies from before there were visitors) links nothing, and signs in as ever', async () => {
@@ -198,26 +241,30 @@ test('signing in with no visitor (cookies from before there were visitors) links
   expect(world.db.count('visitors')).toBe(0);
 });
 
-test('signing out forgets the visitor: what the browser does next as a guest is a new visitor\'s', async () => {
+test('signing out keeps the visitor: signed in again it is his still, and what the browser does as a guest meanwhile is a new visitor\'s', async () => {
   const world = new World();
   const client = world.client();
   await client.post('/api/visit', guestPush());
   const first = visitorOf(client)!;
-  await client.signInByEmail('tourist@example.com');
+  const account = (await client.signInByEmail('tourist@example.com')).body.user.id;
   const out = await client.post('/api/auth/logout', {});
-  expect(out.cookies).toEqual([SESSION_CLEARED, VISITOR_CLEARED]);
-  expect(visitorOf(client)).toBeUndefined();
+  expect(out.cookies).toEqual([SESSION_CLEARED]);
+  expect(visitorOf(client)).toBe(first);
+  // Straight back in: the same visitor, counted once.
+  await client.signInByEmail('tourist@example.com');
+  expect(visitorOf(client)).toBe(first);
+  expect(world.db.count('visitors')).toBe(1);
+
+  // Out, and playing as a guest: a new visitor, not his.
+  await client.post('/api/auth/logout', {});
   const next = await client.post('/api/visit', guestPush([enter('cap-blanc')]));
   const second = VISITOR_SET.exec(next.cookies[0] ?? '')?.[1];
   expect(second).toBeTruthy();
   expect(second).not.toBe(first);
   expect(visitorRow(world, second!)).toMatchObject({ user_id: null });
+  expect(visitorRow(world, first)).toMatchObject({ user_id: account });
   expect(world.db.rows('SELECT visitor_id FROM guest_events')).toEqual([{ visitor_id: second }]);
-
-  // A browser with no visitor signs out as it always did.
-  const bare = world.client('198.51.100.3');
-  await bare.signInByEmail('bare@example.com');
-  expect((await bare.post('/api/auth/logout', {})).cookies).toEqual([SESSION_CLEARED]);
+  expect(world.db.count('events')).toBe(0);
 });
 
 test('deleting the account deletes the visitors that signed in as it, and forgets the cookie', async () => {
@@ -250,40 +297,72 @@ test('a search engine running the page is told yes, and nothing is kept', async 
     expect(res.cookies, ua).toEqual([]);
   }
   expect(world.db.count('visitors')).toBe(0);
-  // A browser is not one.
-  const chrome = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36';
-  expect((await world.client().post('/api/visit', guestPush(), { headers: { 'User-Agent': chrome } })).cookies).toHaveLength(1);
-  expect(world.db.count('visitors')).toBe(1);
+  // A browser is not one, a phone whose model has "bot" in it among them.
+  for (const ua of [
+    'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+    'Mozilla/5.0 (Linux; Android 12; CUBOT KINGKONG 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0 Mobile Safari/537.36',
+    'Mozilla/5.0 (Linux; Android 11; CUBOT_X30) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0 Mobile Safari/537.36',
+  ]) {
+    expect((await world.client().post('/api/visit', guestPush(), { headers: { 'User-Agent': ua } })).cookies, ua).toHaveLength(1);
+  }
+  expect(world.db.count('visitors')).toBe(3);
 });
 
-test('a network past its hour\'s limit is refused, keeps nothing it sent, and is let through the next hour', async () => {
+test('a network past its hour\'s limit is refused, nothing it sent written, and is let through the next hour', async () => {
   const world = new World({ VISIT_IP_HOURLY: '10' });
   world.now = Math.floor(T0 / HOUR) * HOUR + 15 * MINUTE;
   const client = world.client('192.0.2.10');
-  // A push is one, and each event one more: six.
+  // A push is one, its tour (under a KiB) one, and each event one more: seven.
   expect((await client.post('/api/visit', guestPush(Array.from({ length: 5 }, () => enter('cap-blanc'))))).status).toBe(200);
   const visitor = visitorOf(client)!;
-  // Five more is eleven.
+  const counted = () => world.db.rows("SELECT n FROM visit_limits WHERE ip = '192.0.2.10'")[0]?.n;
+  expect(counted()).toBe(7);
+  // Six more would be thirteen.
   const over = await client.post<ApiError>('/api/visit', guestPush(Array.from({ length: 4 }, () => enter('gargas')), { lifetime: 50 }));
   expect(over.status).toBe(429);
   expect(over.body).toEqual({ error: 'too_many', retryAfter: 45 * 60 });
+  // Nothing written: not the events, not the tour, not even the count.
   expect(world.db.count('guest_events')).toBe(5);
-  expect(visitorRow(world, visitor)).toMatchObject({ lifetime: 0, last_at: world.now });
-  // Another network is not this one, and a new visitor behind this one is refused too.
+  expect(visitorRow(world, visitor)).toMatchObject({ lifetime: 0 });
+  expect(counted()).toBe(7);
+  // Another network is not this one; behind this one, what still fits goes, and then nothing.
   expect((await world.client('192.0.2.11').post('/api/visit', guestPush([enter('cap-blanc')]))).status).toBe(200);
-  const newcomer = await world.client('192.0.2.10').post('/api/visit', guestPush());
+  expect((await world.client('192.0.2.10').post('/api/visit', guestPush())).status).toBe(200);
+  const newcomer = await world.client('192.0.2.10').post('/api/visit', guestPush(Array.from({ length: 2 }, () => enter('gargas'))));
   expect(newcomer.status).toBe(429);
   // Told who it is all the same, for the next hour.
   expect(newcomer.cookies[0]).toMatch(VISITOR_SET);
-  expect(world.db.count('visitors')).toBe(2);
+  expect(world.db.count('visitors')).toBe(3);
 
   world.advance(45 * MINUTE);
   expect((await client.post('/api/visit', guestPush(Array.from({ length: 4 }, () => enter('gargas')), { lifetime: 50 }))).status).toBe(200);
   expect(world.db.count('guest_events')).toBe(10);
-  // Counts from two hours ago are swept.
+  expect(visitorRow(world, visitor)).toMatchObject({ lifetime: 50 });
+  // A network's counts from two hours ago are swept; the day's stays.
   world.advance(2 * HOUR);
   await client.post('/api/visit', guestPush());
-  expect(world.db.rows('SELECT hour FROM visit_limits').map((r) => r.hour)).toEqual([Math.floor(world.now / HOUR)]);
+  expect(world.db.rows("SELECT ip, hour FROM visit_limits ORDER BY ip")).toEqual([
+    { ip: '*', hour: Math.floor(world.now / DAY) * 24 },
+    { ip: '192.0.2.10', hour: Math.floor(world.now / HOUR) },
+  ]);
+});
+
+test('all networks together have a day\'s limit, so guests cannot take the accounts\' share of the database\'s day', async () => {
+  const world = new World({ VISIT_DAILY_CAP: '12' });
+  world.now = Math.floor(T0 / DAY) * DAY + 20 * HOUR;
+  expect((await world.client('192.0.2.20').post('/api/visit', guestPush(Array.from({ length: 4 }, () => enter('k'))))).status).toBe(200);
+  expect((await world.client('192.0.2.21').post('/api/visit', guestPush(Array.from({ length: 4 }, () => enter('k'))))).status).toBe(200);
+  const over = await world.client('192.0.2.22').post<ApiError>('/api/visit', guestPush());
+  expect(over.status).toBe(429);
+  // Until midnight, UTC.
+  expect(over.body).toEqual({ error: 'too_many', retryAfter: 4 * 3600 });
+  expect(world.db.count('visitors')).toBe(2);
+  // Accounts are not held to it.
+  const tourist = world.client('192.0.2.23');
+  const { id } = (await tourist.signInByEmail('tourist@example.com')).body.user;
+  expect((await tourist.post('/api/progress', { id: 'daily-cap-push-000001', account: id, cleared: ['k'], tricks: {}, deaths: 1, events: [enter('k')] })).status).toBe(200);
+  world.advance(4 * HOUR);
+  expect((await world.client('192.0.2.22').post('/api/visit', guestPush())).status).toBe(200);
 });
 
 test('the tracker counts every visitor, how many played and how many signed in, and lists the guests', async () => {
@@ -329,6 +408,7 @@ test('the tracker counts every visitor, how many played and how many signed in, 
     visitors: 3,
     played: 2,
     signedIn: 1,
+    playedSignedIn: 1,
     since: T0 + MINUTE * 1,
     deaths: 33,
     gaveUp: 1,

@@ -120,11 +120,12 @@ export class GuestStore implements ProgressStore {
 
 /**
  * A guest's push (server/visitors.ts): his tour as this browser holds it now, and the
- * oldest of what he did in play, as many as one push may carry.
+ * oldest of what he did in play that `out` (pushes out already) does not carry, as many as
+ * one push may carry.
  * The tour stands for the whole of it, and the server takes nothing away for what one
  * leaves out, so a tour too big to go (it never is) goes as its count of deaths alone.
  */
-export function takeGuestPush(): GuestPush {
+export function takeGuestPush(out: ReadonlySet<string>): GuestPush {
   const all = new GuestStore().load();
   const cleared = all.cleared.filter((id) => LEVEL_ID.test(id)).slice(0, MAX_CLEARED);
   const tricks: Record<string, string[]> = {};
@@ -148,6 +149,7 @@ export function takeGuestPush(): GuestPush {
   bytes += 400;
   const events: PlayEvent[] = [];
   for (const p of readPlays()) {
+    if (out.has(p.id)) continue;
     const b = utf8.encode(JSON.stringify(p)).length + 1;
     if (events.length >= MAX_PLAYS || bytes + b > MAX_BYTES) break;
     events.push(p);

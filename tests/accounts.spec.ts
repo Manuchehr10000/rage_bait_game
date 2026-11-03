@@ -1335,17 +1335,33 @@ test('a guest is seen as he plays, under his browser\'s visitor; signing in make
   const sent = visits.length;
   await signInByEmail(page, request, email);
   const id = await accountId(page);
+  // The deaths he had as a guest go with his tour, in the account's first push.
+  await expect.poll(() => held(page).then((h) => h?.lifetime)).toBe(2);
   expect((await ask(`/api/admin/guest?id=${visitor}`)).status).toBe(404);
   const user = await ask<AdminUserDetail>(`/api/admin/user?id=${encodeURIComponent(id)}`);
   expect(user.body.user).toMatchObject({ email, visits: 1, deaths: 2, gaveUp: 2, left: 1, lifetime: 2, firstVisit: expect.any(Number) as unknown });
   const list = await ask<AdminUsers>('/api/admin/users');
   expect(list.body.guests.some((g) => g.id === visitor)).toBe(false);
   expect(list.body.totals.signedIn).toBeGreaterThanOrEqual(1);
+  expect(list.body.totals.playedSignedIn).toBeGreaterThanOrEqual(1);
+  // Signed in, it is the same visitor, now his.
+  expect(await visitorOf(page)).toBe(visitor);
   // Signed in, the page sends nothing more as a guest.
   await giveUpTwiceInCapBlanc(page);
   await expect.poll(() => held(page).then((h) => h?.lifetime)).toBe(4);
   expect(visits.length).toBe(sent);
   await close();
+});
+
+test('the push that says a guest came goes again until the server has it, though he never plays', async ({ page }) => {
+  let refused = 0;
+  // The first two do not arrive.
+  await page.route('**/api/visit', (route) => (refused++ < 2 ? route.abort() : route.continue()));
+  const visits = visitsOf(page);
+  await open(page);
+  await expect.poll(() => visitorOf(page), { timeout: 15_000 }).toMatch(VISITOR_ID);
+  expect(visits.length).toBe(3);
+  expect(visits.every((v) => v.events.length === 0)).toBe(true);
 });
 
 test('the admin\'s tracker: only the admin reads it, and it shows what each visitor did', async ({ page, request, browser }) => {

@@ -21,9 +21,11 @@ EMAIL_FROM="Lost Tourist <tickets@mail.losttourist.online>"
 # EMAIL_DAILY_CAP=90
 # EMAIL_IP_HOURLY=20
 
-# What one network may send as guests to the admin's tracker in an hour: a push one,
-# and each event in it one more (default 5000).
-# VISIT_IP_HOURLY=5000
+# What guests may send to the admin's tracker, in units (a push one, each event in it one
+# more, each KiB of its tour one more): one network an hour (default 20000), and all of
+# them a day (default 20000, about half of D1's free 100,000 rows written a day).
+# VISIT_IP_HOURLY=20000
+# VISIT_DAILY_CAP=20000
 
 # To sign in by email without sending mail: run the tests' stand-in
 # (node tests/support/providers.mjs), point the API at it, and give RESEND_API_KEY any

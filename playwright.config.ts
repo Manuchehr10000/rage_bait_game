@@ -20,6 +20,7 @@ const API_VARS: Record<string, string> = {
   EMAIL_IP_HOURLY: '100000',
   // Every test's guests come from this machine: one network.
   VISIT_IP_HOURLY: '1000000',
+  VISIT_DAILY_CAP: '1000000',
 };
 
 export default defineConfig({

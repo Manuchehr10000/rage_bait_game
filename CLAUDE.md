@@ -104,8 +104,10 @@ notes describe the levels as they were built.
   browser is a visitor, by a random id in a cookie of its own (`server/visitors.ts`), and
   nothing else is kept of it; it pushes its tour and events as a guest (`POST /api/visit`),
   once as the page opens whether or not it plays; signing in makes the visitor and what it
-  did the account's, signing out starts a new one. `/admin` shows how many visitors came,
-  played and signed in, and every guest beside the accounts. README, "The admin's tracker".
+  did the account's, and a browser that plays as a guest after signing out is a new one.
+  `/admin` shows how many visitors came, played as guests and signed in, and every guest
+  beside the accounts. Guests' writes are capped (`VISIT_IP_HOURLY`, `VISIT_DAILY_CAP`) so
+  they cannot use up D1's free day. README, "The admin's tracker".
 - **On a phone** (designer, 2026-10-16): held sideways, buttons in the side borders and
   never over the game (the game is drawn smaller for them); left and right under the left
   thumb, jump under the right; map, give up, lamp, sound and full screen as small buttons;

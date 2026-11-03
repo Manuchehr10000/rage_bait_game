@@ -167,8 +167,8 @@ What it needs, outside the repo:
   `GOOGLE_CLIENT_ID`; `ADMIN_EMAILS`, the addresses that may read the tracker, commas
   between; `EMAIL_FROM` (e.g. `Lost Tourist <tickets@mail.losttourist.online>`); and
   `RESEND_API_KEY`, as a secret. `EMAIL_DAILY_CAP` (default 90 codes a day, all addresses
-  together), `EMAIL_IP_HOURLY` (default 20 an hour per IP) and `VISIT_IP_HOURLY` (what one
-  network may send as guests to the tracker in an hour, default 5000) are optional. For the
+  together), `EMAIL_IP_HOURLY` (default 20 an hour per IP), `VISIT_IP_HOURLY` and
+  `VISIT_DAILY_CAP` (what guests may send to the tracker, below) are optional. For the
   Production environment, which is where main deploys: a D1 database of its own (not dev's,
   so the designer's test accounts and deaths stay out of the players'), bound as `DB`;
   `GOOGLE_CLIENT_ID`; and `ADMIN_EMAILS`. No `RESEND_API_KEY` or `EMAIL_FROM` there: that is
@@ -217,20 +217,34 @@ kept once by its id; a run the dev tools started from somewhere else is not coun
 A guest is a visitor (`server/visitors.ts`): his browser, named by a random id in a cookie
 of its own, `__Host-lt_visitor`, made the first time the page pushes as a guest and kept for
 thirteen months from then, never longer. Nothing else is kept of him: no address, no IP,
-nothing of the device. The page sends `POST /api/visit` once as it opens, so a visitor is
-counted whether or not he plays, and then what he does in play and his tour as the browser
-holds it: on the map, as the page is hidden, and half a minute after anything happens in a
-level. What it cannot send yet waits in the browser, the newest thousand. Signing in makes
-the visitor the account's, in the same transaction as the session: what it did as a guest
-goes into the account's events, and so does anything a tab that has not heard yet sends as
-a guest. Signing out and deleting the account forget the cookie, so the browser that goes on
-as a guest is a new visitor, as its tour is a new guest's. A visitor is a browser, not a
-person: one on two devices, or who clears the browser, is two, and a guest's tour is as his
-browser last said. One network may send `VISIT_IP_HOURLY` an hour (a push one, and each event
-one more; default 5000), so a script on one network cannot fill the database (many networks
-can: Cloudflare's own rate limiting is the answer to that); the count is kept two hours,
-by the network's key as the email limits keep it. A search engine that runs the page is not
-counted. Accounts made before visitors were counted have none.
+nothing of the device. The page sends `POST /api/visit` as it opens, until the server has
+it, so a visitor is counted whether or not he plays; and then what he does in play and his
+tour as the browser holds it: on the map, as the page is hidden, and half a minute after
+anything happens in a level, one push at a time across the browser's tabs. What it cannot
+send yet waits in the browser, the newest thousand. Signing in makes the visitor the
+account's, in the same transaction as the session: what it did as a guest goes into the
+account's events, and so does anything a tab that has not heard yet sends as a guest while
+the browser is signed in to that account. Signed out, run out, or signed in as someone else,
+the browser that plays as a guest is a new visitor, as its tour is a new guest's; signed in
+again as the same account with no guest play between, it is the same visitor. Deleting the
+account deletes its visitors and forgets the cookie.
+
+So a visitor is a browser's stretch as one person, not a person: one account on two devices
+is two visitors, one who clears the browser is a new guest, and a guest's tour and deaths
+are what his browser says. "Played as a guest" is a visitor that went into a level before it
+signed in, or without ever signing in; "Played, then signed in" is one of those that signed
+in after. A search engine that runs the page is not counted. Accounts made before visitors
+were counted have none.
+
+What guests send is limited in units, a push one, each event in it one more and each KiB of
+its tour one more; a unit is about two rows written. One network may send `VISIT_IP_HOURLY` an
+hour (default 20000), by the network's key as the email limits count it, kept for its hour
+and the next; all networks together `VISIT_DAILY_CAP` a day (default 20000), so that on D1's
+free plan, whose 100,000 rows written a day are the accounts' too, the guests take under
+half. Past either, a push is refused until the hour or the day (UTC) is out, nothing of it
+written, and the page keeps it: on a busy day, guests are counted until the cap and then not
+until midnight. On a paid plan, raise it. A script on many networks can still use the day's
+share; Cloudflare's own rate limiting is the answer to that.
 
 Counts begin when the tracker did, and guests' when visitors were first counted; the deaths
 in all of an account's visits, and of a guest's as his browser counts them, go back further.

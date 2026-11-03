@@ -126,8 +126,8 @@ async function progress(ctx: Ctx, body: unknown): Promise<Response> {
 
 /**
  * POST /api/auth/logout: ends this browser's session, if it has one. Always succeeds. The
- * visitor goes with it: what the browser does as a guest from here is a new visitor's, as
- * its tour is a new guest's (server/visitors.ts).
+ * visitor cookie stays: signed in again here it is his still, and what the browser does
+ * as a guest meanwhile is a new visitor's (server/visitors.ts).
  */
 async function logout(ctx: Ctx): Promise<Response> {
   const token = readCookie(ctx.request, SESSION_COOKIE);
@@ -135,7 +135,7 @@ async function logout(ctx: Ctx): Promise<Response> {
     await ctx.db.prepare('DELETE FROM sessions WHERE token_hash = ?1').bind(await sha256hex(token)).run();
   }
   const ok: Ok = { ok: true };
-  return json(200, ok, [clearCookie(SESSION_COOKIE), ...forgetVisitor(ctx.request)]);
+  return json(200, ok, [clearCookie(SESSION_COOKIE)]);
 }
 
 /**

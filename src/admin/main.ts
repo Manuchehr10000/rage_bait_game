@@ -213,12 +213,18 @@ async function boot(): Promise<void> {
   data = r.body;
   visitors = [...data.users.map(ofAccount), ...(data.guests ?? []).map(ofGuest)];
   render();
-  const linked = (): string => decodeURIComponent(location.hash.replace(/^#/, ''));
-  const listed = (key: string): boolean => visitors.some((v) => keyOf(v) === key);
-  if (linked() && listed(linked())) void open(linked());
+  // Whoever the address names, listed or not: an older guest is past the newest thousand, and still there.
+  const linked = (): string => {
+    try {
+      return decodeURIComponent(location.hash.replace(/^#/, ''));
+    } catch {
+      return '';
+    }
+  };
+  if (linked()) void open(linked());
   window.addEventListener('hashchange', () => {
     const key = linked();
-    if (key && key !== selected && listed(key)) void open(key);
+    if (key && key !== selected) void open(key);
   });
 }
 
@@ -269,7 +275,7 @@ function render(): void {
         { className: 'muted note' },
         t.since === null
           ? 'No visitor has been counted yet. A visitor is a browser that opened the game: counted as a guest until it signs in, and as its account from then on.'
-          : `Visitors are browsers that opened the game, counted since ${DAY_ONLY.format(t.since)}: each counts as a guest until it signs in, and as its account from then on, so no one is counted twice. A guest is not a person: one on two devices, or who clears the browser, is two.`,
+          : `Visitors are browsers that opened the game, counted since ${DAY_ONLY.format(t.since)}: each is a guest until it signs in, and its account from then on, so accounts and guests together count each account once and each guest once. A visitor is a browser, not a person: one account on two devices is two visitors, and so is a browser that played as a guest between two sign-ins; one who clears the browser is a new guest. A guest's tour and deaths are as his browser says.`,
       ),
       h('h2', {}, 'Where they are'),
       h('p', { className: 'muted' }, 'Each level of the tour: how many have cleared it, and how many it holds now, as the first they have not. Accounts and guests together.'),
@@ -295,9 +301,11 @@ function tiles(): HTMLElement {
     'div',
     { className: 'tiles' },
     tile(t.visitors, 'Visitors', 'Browsers that opened the game since the tracker began counting them'),
-    tile(t.played, 'Played a level', 'Visitors that went into a level, as a guest or once signed in'),
+    tile(t.played, 'Played as a guest', 'Visitors that went into a level before signing in, or without ever signing in'),
     tile(t.signedIn, 'Signed in', 'Visitors that went on to sign in'),
+    tile(t.playedSignedIn, 'Played, then signed in', 'Visitors that played as a guest and then signed in'),
     tile(share(t.signedIn, t.visitors), 'Of visitors signed in'),
+    tile(share(t.playedSignedIn, t.played), 'Of players signed in', 'Of the visitors that played as a guest, those that went on to sign in'),
     tile(t.guests, 'Guests', 'Visitors that have not signed in'),
     tile(t.accounts, 'Accounts'),
     tile(t.accountsNew + t.guestsNew, 'New this week', 'Accounts made, and guests first seen, in the last seven days'),
@@ -411,10 +419,10 @@ async function open(key: string): Promise<void> {
     : await get<AdminUserDetail>(`/api/admin/user?id=${encodeURIComponent(id)}`);
   if (selected !== key) return;
   if (!r.ok) {
-    // The list came, so there is an API: a 404 here is an account deleted since, or a guest who has signed in since.
+    // The list came, so there is an API: a 404 here is a guest who has signed in, or an account deleted, or an address that names no one.
     const gone = guest
-      ? 'This guest is not one any more: he has signed in since the list was loaded, and is his account now. Reload for the list as it is.'
-      : 'This account is not there any more: deleted since the list was loaded. Reload for the list as it is.';
+      ? 'This guest is not one: he has signed in since, and is his account now, or the address names no guest. Reload for the list as it is.'
+      : 'This account is not there: deleted since, or the address names no account. Reload for the list as it is.';
     detail.replaceChildren(h('h2', {}, 'Visitor'), h('p', { className: 'error' }, r.status === 404 ? gone : refusal(r.status, r.error)));
     return;
   }

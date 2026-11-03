@@ -18,8 +18,13 @@ export interface Env {
   EMAIL_DAILY_CAP?: string;
   /** Codes sent per IP per rolling hour. Default 20. */
   EMAIL_IP_HOURLY?: string;
-  /** What one network may send as guests in an hour, a push one and each event in it one more (server/visitors.ts). Default 5000. */
+  /**
+   * What guests may send (server/visitors.ts), in units: a push one, each event in it one
+   * more, each KiB of its tour one more. One network an hour, default 20000, and all of
+   * them a day, default 20000: about half of D1's free 100,000 rows written a day.
+   */
   VISIT_IP_HOURLY?: string;
+  VISIT_DAILY_CAP?: string;
 }
 
 /** What the server reaches outside itself, so tests can stand in for time and the network. */

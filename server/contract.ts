@@ -98,11 +98,12 @@ export interface ProgressReply {
  * POST /api/visit: a guest's push, for the admin's tracker (designer, 2026-11-03). The
  * browser is the visitor, named by its own cookie, which the server makes the first time
  * it hears from it. `tour` is the guest's tour as this browser holds it now, and stands
- * for the whole of it: the server keeps every level it has ever named, the newest list of
- * tricks for each level, and the highest count of deaths, so a push that arrives late, or
- * leaves part of the tour out, takes nothing away. `events` are what happened in play
- * since, each kept once per visitor however often it is sent, by its id. Once the browser
- * has signed in, what it sends as a guest goes to that account.
+ * for the whole of it: the server keeps every level and every trick any of the visitor's
+ * pushes has named (up to what one push may carry), and the highest count of deaths, so a
+ * push that arrives late, or leaves part of the tour out, takes nothing away. `events` are
+ * what happened in play since, each kept once per visitor however often it is sent, by
+ * its id. Once the browser has signed in, what it sends as a guest goes to that account
+ * while the browser is signed in to it; after that, it is a new visitor's.
  */
 export interface GuestPush {
   tour: Snapshot;
@@ -143,8 +144,12 @@ export interface AdminUsers {
 
 /**
  * Everyone, counted on the server. Everyone is the accounts and the guests: a visitor that
- * signed in is its account from then on, so no one is counted twice. A visitor is one
- * browser, counted from the first time it opened the game where the tracker runs.
+ * signed in is its account from then on, so the two together count each account once and
+ * each guest once. A visitor is a browser's stretch as one person (server/visitors.ts),
+ * counted from the first time it opened the game where the tracker runs: one account on
+ * two browsers is two visitors, and so is a browser that played as a guest between two
+ * sign-ins. A guest is a browser, not a person, and what a guest's browser says of it is
+ * taken as said.
  */
 export interface AdminTotals {
   accounts: number;
@@ -162,10 +167,12 @@ export interface AdminTotals {
   guestsSeen: number;
   /** Every visitor counted: the guests, and those that went on to sign in. */
   visitors: number;
-  /** Of them, those that went into a level, as a guest or once signed in. */
+  /** Of them, those that went into a level as a guest. */
   played: number;
   /** Of them, those that signed in. */
   signedIn: number;
+  /** Those that played as a guest and then signed in. */
+  playedSignedIn: number;
   /** When the first visitor was counted, or null when none has been. */
   since: number | null;
   /** Deaths in every visit, the accounts' and the guests', give-ups among them. */
@@ -189,7 +196,7 @@ export interface AdminGuest {
   lastSeen: number;
   /** Deaths in every visit, as its browser counts them. */
   lifetime: number;
-  /** Level ids, as its browser last told of them. */
+  /** Level ids: every one its browser has told of. */
   cleared: string[];
   /** Counted from the events. */
   visits: number;

@@ -111,6 +111,33 @@ export async function exclusively(fn: (live: Set<string> | null) => void): Promi
   return ran;
 }
 
+/** How long a tab waits for another's oneAtATime before it goes on without it. */
+const ONE_WAIT = 5000;
+
+/**
+ * `fn`, while no other tab of this browser runs one under `name`. Where the browser has no
+ * locks, or the lock cannot be had soon (a tab holding it has been frozen), it runs
+ * anyway: the lock only keeps tabs from doing at once what would be better done in turn.
+ */
+export async function oneAtATime<T>(name: string, fn: () => Promise<T>): Promise<T> {
+  const l = locks();
+  if (!l) return fn();
+  const abort = new AbortController();
+  const timer = setTimeout(() => abort.abort(), ONE_WAIT);
+  let ran: Promise<T> | null = null;
+  try {
+    return await l.request(name, { signal: abort.signal }, () => {
+      clearTimeout(timer);
+      ran = fn();
+      return ran;
+    });
+  } catch {
+    return ran ?? fn();
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 /** A random id: 16 bytes, base64url. */
 export function newId(): string {
   const b = crypto.getRandomValues(new Uint8Array(16));

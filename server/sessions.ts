@@ -4,7 +4,7 @@ import type { D1Statement } from './db';
 import type { Ctx } from './env';
 import { clearCookie, json, readCookie, setCookie } from './http';
 import { snapshotStatements, toSnapshot } from './progress';
-import { linkStatements } from './visitors';
+import { linkVisitor } from './visitors';
 
 export { clearCookie, readCookie, setCookie } from './http';
 
@@ -67,7 +67,7 @@ export function renewal(ctx: Ctx, session: Session): { statement: D1Statement; c
  * the request already carried is ended: one browser, one session. His expired
  * sessions are swept while we are here. The visitor the browser has been as a
  * guest, if any, is his from now on, and what it did in play goes into his account
- * (server/visitors.ts), in the same transaction.
+ * (server/visitors.ts, linkVisitor), in the same transaction.
  */
 export async function signIn(ctx: Ctx, user: { id: string; email: string }, cookies: readonly string[] = []): Promise<Response> {
   const { db, now } = ctx;
@@ -82,7 +82,8 @@ export async function signIn(ctx: Ctx, user: { id: string; email: string }, cook
   if (old !== null && TOKEN.test(old)) {
     statements.push(db.prepare('DELETE FROM sessions WHERE token_hash = ?1').bind(await sha256hex(old)));
   }
-  const results = await db.batch([...statements, ...linkStatements(ctx, user.id), ...snapshotStatements(db, user.id)]);
+  const visitor = await linkVisitor(ctx, user.id);
+  const results = await db.batch([...statements, ...visitor.statements, ...snapshotStatements(db, user.id)]);
   const body: SignedIn = { user: { email: user.email, id: user.id }, progress: toSnapshot(results) };
-  return json(200, body, [setCookie(SESSION_COOKIE, token, SESSION_MS / 1000), ...cookies]);
+  return json(200, body, [setCookie(SESSION_COOKIE, token, SESSION_MS / 1000), ...cookies, ...visitor.cookies]);
 }

@@ -56,18 +56,21 @@ export const MIGRATIONS: readonly (readonly string[])[] = [
   [
     // The visitors (designer, 2026-11-03): one row a browser that opened the game, named
     // by its cookie (server/visitors.ts), guest or not. user_id is the account it signed
-    // in to, once it has. The tour is a guest's as its browser last told of it.
+    // in to, once it has; played_at when it first went into a level as a guest. The tour
+    // is everything a guest's browser has told of.
     `CREATE TABLE IF NOT EXISTS visitors (id TEXT PRIMARY KEY, first_at INTEGER NOT NULL, last_at INTEGER NOT NULL,
-      user_id TEXT, signed_in_at INTEGER, cleared TEXT NOT NULL DEFAULT '[]', tricks TEXT NOT NULL DEFAULT '{}',
-      lifetime INTEGER NOT NULL DEFAULT 0)`,
+      user_id TEXT, signed_in_at INTEGER, played_at INTEGER, cleared TEXT NOT NULL DEFAULT '[]',
+      tricks TEXT NOT NULL DEFAULT '{}', lifetime INTEGER NOT NULL DEFAULT 0)`,
     'CREATE INDEX IF NOT EXISTS visitors_first ON visitors (first_at)',
     'CREATE INDEX IF NOT EXISTS visitors_user ON visitors (user_id)',
-    // A guest's events, as events has an account's; they move there when he signs in.
+    // A guest's events, as events has an account's; they move there when he signs in. No
+    // index but the key, which every read starts from: each is a row written per event.
     `CREATE TABLE IF NOT EXISTS guest_events (visitor_id TEXT NOT NULL, id TEXT NOT NULL, at INTEGER NOT NULL,
       received_at INTEGER NOT NULL, kind TEXT NOT NULL, level_id TEXT NOT NULL, cause TEXT, x INTEGER, y INTEGER,
       ms INTEGER, deaths INTEGER, PRIMARY KEY (visitor_id, id))`,
-    'CREATE INDEX IF NOT EXISTS guest_events_at ON guest_events (visitor_id, at)',
-    // What each network has sent as a guest this hour and the last, for the limit on it. ip is server/address.ts's key.
+    // What each network has sent as guests this hour and the last, and (ip '*') what all of
+    // them have this day, for the limits on it. ip is server/address.ts's key; hour is hours
+    // since the epoch, the day's row the hour it began.
     'CREATE TABLE IF NOT EXISTS visit_limits (ip TEXT NOT NULL, hour INTEGER NOT NULL, n INTEGER NOT NULL, PRIMARY KEY (ip, hour))',
     'CREATE INDEX IF NOT EXISTS visit_limits_hour ON visit_limits (hour)',
   ],
