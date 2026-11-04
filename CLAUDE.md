@@ -112,7 +112,8 @@ notes describe the levels as they were built.
   cookie (`POST /api/count`), and a no after a yes forgets the visitor. With it, the days a
   visitor comes are kept too, for the return rate ("add return rate"). The tracker's writes
   are capped (`VISIT_IP_HOURLY`, `VISIT_DAILY_CAP`), sized for the Workers Paid plan the
-  game is on (designer, 2026-11-04). README, "The admin's tracker".
+  game is on (designer, 2026-11-04). On dev and main by the designer's word of 2026-11-04
+  ("put it on dev and main"). README, "The admin's tracker".
 - **On a phone** (designer, 2026-10-16): held sideways, buttons in the side borders and
   never over the game (the game is drawn smaller for them); left and right under the left
   thumb, jump under the right; map, give up, lamp, sound and full screen as small buttons;
