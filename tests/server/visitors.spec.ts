@@ -315,7 +315,8 @@ test('a network past its hour\'s limit is refused, nothing it sent written, and 
   // A push is one, its tour (under a KiB) one, and each event one more: seven.
   expect((await client.post('/api/visit', guestPush(Array.from({ length: 5 }, () => enter('cap-blanc'))))).status).toBe(200);
   const visitor = visitorOf(client)!;
-  const counted = () => world.db.rows("SELECT n FROM visit_limits WHERE ip = '192.0.2.10'")[0]?.n;
+  // The only network so far: its key is not its address, but the address scrambled with the day's salt.
+  const counted = () => world.db.rows("SELECT n FROM visit_limits WHERE ip <> '*'")[0]?.n;
   expect(counted()).toBe(7);
   // Six more would be thirteen.
   const over = await client.post<ApiError>('/api/visit', guestPush(Array.from({ length: 4 }, () => enter('gargas')), { lifetime: 50 }));
@@ -341,10 +342,13 @@ test('a network past its hour\'s limit is refused, nothing it sent written, and 
   // A network's counts from two hours ago are swept; the day's stays.
   world.advance(2 * HOUR);
   await client.post('/api/visit', guestPush());
-  expect(world.db.rows("SELECT ip, hour FROM visit_limits ORDER BY ip")).toEqual([
+  const rows = world.db.rows('SELECT ip, hour FROM visit_limits ORDER BY ip');
+  expect(rows).toEqual([
     { ip: '*', hour: Math.floor(world.now / DAY) * 24 },
-    { ip: '192.0.2.10', hour: Math.floor(world.now / HOUR) },
+    { ip: expect.stringMatching(/^[0-9a-f]{32}$/), hour: Math.floor(world.now / HOUR) },
   ]);
+  // No address kept as it is, not even for the limits.
+  expect(JSON.stringify(world.db.rows('SELECT * FROM visit_limits'))).not.toContain('192.0.2');
 });
 
 test('all networks together have a day\'s limit, so guests cannot take the accounts\' share of the database\'s day', async () => {
@@ -491,14 +495,14 @@ test('a signed-in browser with its yes is a visitor that is his from the start: 
   const { world, admin } = await withAdmin();
   const client = world.client('198.51.100.50');
   const { id: account } = (await client.signInByEmail('tourist@example.com')).body.user;
-  const res = await client.post('/api/visit', guestPush());
+  const res = await client.post('/api/visit', { ...guestPush(), open: true });
   expect(res.status).toBe(200);
   const visitor = VISITOR_SET.exec(res.cookies[0] ?? '')?.[1];
   expect(visitor).toBeTruthy();
   expect(visitorRow(world, visitor!)).toMatchObject({ user_id: account, first_at: world.now, signed_in_at: world.now, played_at: null });
   expect(world.db.rows('SELECT day FROM visitor_days WHERE visitor_id = ?', visitor!)).toEqual([{ day: Math.floor(world.now / DAY) }]);
   // The next page, the same visitor, the same day once.
-  expect((await client.post('/api/visit', guestPush())).cookies).toEqual([]);
+  expect((await client.post('/api/visit', { ...guestPush(), open: true })).cookies).toEqual([]);
   expect(world.db.count('visitor_days')).toBe(1);
   const { totals } = (await admin.get<AdminUsers>('/api/admin/users')).body;
   // A visitor, but one that never came as a guest, so not one that signed in after.
@@ -554,7 +558,8 @@ test('how many come back: by the days each visitor came, of those who could have
   const { world, admin } = await withAdmin();
   const day0 = Math.floor(world.now / DAY) * DAY + 10 * HOUR;
   world.now = day0;
-  const come = (c: Client) => c.post('/api/visit', guestPush());
+  // Each a page opening, as the page's first push says.
+  const come = (c: Client) => c.post('/api/visit', { ...guestPush(), open: true });
   const once = world.client('198.51.100.70');
   const nextDay = world.client('198.51.100.71');
   const later = world.client('198.51.100.72');
@@ -565,15 +570,34 @@ test('how many come back: by the days each visitor came, of those who could have
   await come(nextDay);
   world.now = day0 + 5 * DAY;
   await come(later);
-  // Ten days on: four first seen before today, all of them a week ago or more; and one new today, who could not have come back yet.
+  // A push that is not a page opening (a long game going on past midnight) is no day he came.
+  world.now = day0 + 2 * DAY;
+  await once.post('/api/visit', guestPush([enter('cap-blanc')]));
+  // Ten days on: four first seen before today, all of them with their next day and their week over; and one new today, who could not have come back yet.
   world.now = day0 + 10 * DAY;
   await come(world.client('198.51.100.74'));
   const { returns } = (await admin.get<AdminUsers>('/api/admin/users')).body.totals;
-  expect(returns).toEqual({ cohort: 4, cameBack: 2, nextDay: 1, cohortWeek: 4, week: 2 });
+  expect(returns).toEqual({ cohort: 4, cameBack: 2, cohortDay: 4, nextDay: 1, cohortWeek: 4, week: 2 });
   // Coming back after the week is coming back, but not within it.
   await come(once);
   const after = (await admin.get<AdminUsers>('/api/admin/users')).body.totals.returns;
-  expect(after).toEqual({ cohort: 4, cameBack: 3, nextDay: 1, cohortWeek: 4, week: 2 });
+  expect(after).toEqual({ cohort: 4, cameBack: 3, cohortDay: 4, nextDay: 1, cohortWeek: 4, week: 2 });
+});
+
+test('a day, or a week, is asked of a visitor only once it is over', async () => {
+  const { world, admin } = await withAdmin();
+  const day0 = Math.floor(world.now / DAY) * DAY + 10 * HOUR;
+  const come = (c: Client) => c.post('/api/visit', { ...guestPush(), open: true });
+  const yesterday = world.client('198.51.100.75');
+  const weekAgo = world.client('198.51.100.76');
+  world.now = day0;
+  await come(weekAgo);
+  world.now = day0 + 6 * DAY;
+  await come(yesterday);
+  // Today: yesterday's first may still come back today, and a week ago's week ends today.
+  world.now = day0 + 7 * DAY;
+  const { returns } = (await admin.get<AdminUsers>('/api/admin/users')).body.totals;
+  expect(returns).toEqual({ cohort: 2, cameBack: 0, cohortDay: 1, nextDay: 0, cohortWeek: 0, week: 0 });
 });
 
 test('everyone\'s counts are anonymous: no cookie read or set, nothing kept that tells one visitor from another', async () => {
@@ -633,7 +657,7 @@ test('everyone\'s counts are anonymous: no cookie read or set, nothing kept that
   expect((await admin.get('/api/admin/spots')).status).toBe(400);
 });
 
-test('counts in any other shape are refused whole, and they are held to the tracker\'s limits', async () => {
+test('counts in any other shape are refused whole, and they are held to the tracker\'s limits, each thing counted a unit', async () => {
   const world = new World({ VISIT_IP_HOURLY: '10' });
   world.now = Math.floor(T0 / HOUR) * HOUR;
   const client = world.client('192.0.2.30');
@@ -672,6 +696,8 @@ test('counts in any other shape are refused whole, and they are held to the trac
   expect(over.status).toBe(429);
   expect(over.body.retryAfter).toBe(3600);
   expect(world.db.rows('SELECT n FROM counts')).toEqual([{ n: 5 }]);
+  // Nor is one count of five a unit: it is five.
+  expect((await world.client('192.0.2.32').post('/api/count', { counts: [{ ...good, n: 10 }] })).status).toBe(429);
   // A crawler is told yes, and nothing is counted.
   const bot = await world.client('192.0.2.31').post('/api/count', { counts: [good] }, { headers: { 'User-Agent': 'Googlebot/2.1' } });
   expect(bot.status).toBe(200);

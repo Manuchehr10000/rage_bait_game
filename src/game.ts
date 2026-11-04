@@ -459,8 +459,9 @@ export class Game {
       this.ctx.imageSmoothingEnabled = s !== ART_SCALE;
       return;
     }
-    // Room under the screen for the controls line, and for the dev tools' buttons where there are any.
-    const below = 40 + (this.dev?.reserve ?? 0);
+    // Room under the screen for the controls line, for the question of recording while it is
+    // asked (src/account/consent-ui.ts), and for the dev tools' buttons where there are any.
+    const below = 40 + (this.account?.reserve ?? 0) + (this.dev?.reserve ?? 0);
     const s = Math.max(1, Math.floor(Math.min(window.innerWidth / VIEW_W, (window.innerHeight - below) / VIEW_H)));
     this.scale = s;
     this.canvas.width = VIEW_W * s;

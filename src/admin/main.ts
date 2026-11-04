@@ -70,6 +70,8 @@ function s<K extends keyof SVGElementTagNameMap>(tag: K, attrs: Record<string, s
 }
 
 const DATE = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' });
+/** A day the counts keep, which begins at midnight UTC. */
+const UTC_DAY = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeZone: 'UTC' });
 const DAY_ONLY = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' });
 
 function when(at: number | null): string {
@@ -276,14 +278,14 @@ function render(): void {
         { className: 'muted' },
         e.since === null
           ? 'Nothing counted yet. Everyone who opens the game is counted here, whatever they answer to recording: anonymously, with no id and no cookie.'
-          : `Everyone who opened the game since ${DAY_ONLY.format(e.since)}, whatever they answered to recording: anonymous counts, with no id and no cookie, so a page opened twice is two.`,
+          : `Everyone who opened the game since ${UTC_DAY.format(e.since)} (UTC), whatever they answered to recording: anonymous counts, with no id and no cookie, so a page opened twice is two.`,
       ),
       tileRow([
         [e.opens, 'Page opens'],
         [e.opensWeek, 'Opens this week'],
         [e.levels.reduce((n, l) => n + l.enters, 0), 'Level entries'],
         [e.levels.reduce((n, l) => n + l.deaths, 0), 'Deaths'],
-        [share(e.yes, e.yes + e.no), 'Said yes to recording', `${e.yes} yes, ${e.no} no; the rest have not answered`],
+        [share(e.yes, e.yes + e.no), 'Of answers, yes', `${e.yes} yes, ${e.no} no: answers given, so one who changes his mind counts again, and one who never answers is not counted`],
       ]),
       everyoneTable(e),
       h('h2', {}, 'Visitors who said yes'),
@@ -301,10 +303,15 @@ function render(): void {
         [share(t.signedIn, t.cameAsGuests), 'Of guests signed in'],
         [share(t.playedSignedIn, t.played), 'Of players signed in', `${t.playedSignedIn} of the ${t.played} that played as a guest went on to sign in`],
         [share(t.returns.cameBack, t.returns.cohort), 'Came back', `${t.returns.cameBack} of the ${t.returns.cohort} first seen before today came again on another day`],
-        [share(t.returns.nextDay, t.returns.cohort), 'Back the next day', `${t.returns.nextDay} of the ${t.returns.cohort} first seen before today came again the day after`],
-        [share(t.returns.week, t.returns.cohortWeek), 'Back within a week', `${t.returns.week} of the ${t.returns.cohortWeek} first seen a week ago or more came again within seven days`],
+        [share(t.returns.nextDay, t.returns.cohortDay), 'Back the next day', `${t.returns.nextDay} of the ${t.returns.cohortDay} first seen before yesterday came again the day after`],
+        [share(t.returns.week, t.returns.cohortWeek), 'Back within a week', `${t.returns.week} of the ${t.returns.cohortWeek} whose first week is over came again within it`],
       ]),
       h('h2', {}, 'Accounts and guests'),
+      h(
+        'p',
+        { className: 'muted' },
+        'Every account, and every guest who said yes. Deaths in all come from each tour, kept for every account; give-ups, leaves, and each one\u2019s play below, only from what was recorded with a yes.',
+      ),
       tiles(),
       h('h2', {}, 'Where they are'),
       h('p', { className: 'muted' }, 'Each level of the tour: how many have cleared it, and how many it holds now, as the first they have not. Accounts, and guests who said yes.'),
@@ -365,7 +372,7 @@ function everyoneTable(e: AdminEveryone): HTMLElement {
       h('td', { className: 'n' }, share(l.clears, l.enters)),
       h('td', { className: 'wrap' }, l.causes.slice(0, 3).map((c) => `${c.cause} ${c.n}`).join(' · ') || '—'),
     );
-    tr.addEventListener('click', () => void openSpots(l.level, spots));
+    tr.addEventListener('click', () => void openSpots(l.level, l.deaths, spots));
     return tr;
   });
   return h(
@@ -386,7 +393,7 @@ function everyoneTable(e: AdminEveryone): HTMLElement {
 }
 
 /** Where everyone died in a level, from the anonymous counts: a scatter sized by how many, and the spots with the most. */
-async function openSpots(level: string, into: HTMLElement): Promise<void> {
+async function openSpots(level: string, deaths: number, into: HTMLElement): Promise<void> {
   into.replaceChildren(h('p', { className: 'muted' }, 'Loading…'));
   const r = await get<AdminSpots>(`/api/admin/spots?level=${encodeURIComponent(level)}`);
   if (!r.ok) {
@@ -394,10 +401,9 @@ async function openSpots(level: string, into: HTMLElement): Promise<void> {
     return;
   }
   const { spots, more } = r.body;
-  const total = spots.reduce((n, p) => n + p.n, 0);
   into.replaceChildren(
     ...kids([
-      h('h3', {}, `${levelName(level)} `, h('span', { className: 'muted' }, `· where everyone died, ${total} deaths`)),
+      h('h3', {}, `${levelName(level)} `, h('span', { className: 'muted' }, `· where everyone died, ${deaths} deaths`)),
       spots.length ? spotsScatter(level, spots) : h('p', { className: 'muted' }, 'No deaths counted here.'),
       spots.length ? h('div', { className: 'legend' }, 'X along the level, Y up from the floor the tourist spawns on; the bigger, the more.', h('i'), 'a death', h('i', { className: 'lost' }), 'gave up') : null,
       more ? h('p', { className: 'muted' }, `The ${spots.length} spots with the most.`) : null,

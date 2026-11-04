@@ -219,8 +219,10 @@ it first. The game never links to it. It has three parts:
 Every visitor is asked, on the map, never in a level (`src/account/consent-ui.ts`): a line
 under the screen (on a phone, at the foot of the left column) until it is answered, then a
 link beside the account's that says which it is and asks again, with what is kept and why.
-Play goes on meanwhile. The answer is kept in the browser (`lostTourist.consent`) and every
-tab hears of it (`src/account/consent.ts`).
+Play goes on meanwhile, and the game leaves room under the screen for the line while it
+shows. The answer is the browser's, kept in it (`lostTourist.consent`), and every tab hears
+of it (`src/account/consent.ts`); a yes lasts thirteen months, the visitor cookie's life,
+and then the question is asked again.
 
 - **Without a yes** (no answer, or no), nothing is kept that tells one visitor from another.
   The page counts what happens (the page opening, going into a level, each death by cause and
@@ -232,8 +234,14 @@ tab hears of it (`src/account/consent.ts`).
   guest's, and the days he opens the game are kept (`visitor_days`), for how many come back.
   A no after a yes forgets the browser's visitor (`DELETE /api/visitor`): its cookie, its
   days, and what it did as a guest. What went with an account goes when the account does.
-  Plays held in the browser to be sent are dropped. His tour is kept either way: keeping it
-  is what signing in is for.
+  The no is owed until the server has it (`lostTourist.forgetVisitor`): sent behind any push
+  of the visitor's out in any tab, tried again until it arrives, and by the next page if
+  this one closes first; and no push of the visitor's goes after it. A push already taken
+  is checked for the yes again as it goes.
+- **Never without a yes**, nothing he does in play is kept in the browser to be sent: the
+  stores themselves refuse it, and a page that opens without a yes drops what an older page
+  kept, a guest's plays and any account queue's, so a later yes never sends what came
+  before it. His tour is kept either way: keeping it is what signing in is for.
 
 ### Events and visitors
 
@@ -249,11 +257,13 @@ A visitor (`server/visitors.ts`) is a browser that said yes, named by a random i
 of its own, `__Host-lt_visitor`, made the first time the page pushes with the yes and kept for
 thirteen months from then, never longer. Nothing else is kept of it: no address, no IP,
 nothing of the device. A guest's page sends `POST /api/visit` as it opens (or as he says
-yes), until the server has it; and then what he does in play and his tour as the browser
-holds it: on the map, as the page is hidden, and half a minute after anything happens in a
-level, one push at a time across the browser's tabs. What it cannot send yet waits in the
-browser, the newest thousand. A signed-in page sends one as it opens, with nothing in it: the
-day he came. Signing in makes the visitor the account's, in the same transaction as the
+yes), marked `open`, until the server has it; and then what he does in play and his tour as
+the browser holds it: on the map, as the page is hidden, and half a minute after anything
+happens in a level, one push at a time across the browser's tabs. What it cannot send yet
+waits in the browser, the newest thousand. A signed-in page sends one as it opens, with
+nothing in it but `open`: the day he came, tried again with the account's pushes until it
+arrives. Only a push marked `open` is a day he came: a long game going on past midnight is
+not. Signing in makes the visitor the account's, in the same transaction as the
 session: what it did as a guest goes into the account's events, and so does anything a tab
 that has not heard yet sends while the browser is signed in to that account. Signed out, run
 out, or signed in as someone else, the browser that plays as a guest is a new visitor, as its
@@ -265,17 +275,21 @@ So a visitor is a browser's stretch as one person, not a person: one account on 
 is two visitors, one who clears the browser is a new guest, and a guest's tour and deaths are
 what his browser says. "Played as a guest" is a visitor that went into a level before it
 signed in, or without ever signing in; "came as guests, signed in" is one that was a guest
-first and then signed in. How many come back is counted by UTC day: of the visitors first
-seen before today, those seen on another day, and on the day after their first; of those
-first seen a week ago or more, those seen again within seven days. A search engine that runs
+first and then signed in. How many come back is counted by the UTC days the page opened, and
+each asked only of those whose days in question are over: of the visitors first seen before
+today, those seen on another day; of those first seen before yesterday, those seen the day
+after their first; of those whose seven days after their first are over, those seen again
+within them. A search engine that runs
 the page is not counted. Accounts made before visitors were counted have none.
 
 ### Limits
 
 What the tracker is sent, events and counts both, is limited in units: a push one, each event
-or count in it one more, and each KiB of a guest's tour one more; a unit is about two rows
-written. One network may send `VISIT_IP_HOURLY` an hour (default 20000), by the network's key
-as the email limits count it, kept for its hour and the next; all networks together
+or thing counted in it one more (a count of five is five), and each KiB of a guest's tour one
+more; a unit is about two rows written. One network may send `VISIT_IP_HOURLY` an hour
+(default 20000), counted by its address (as the email limits key it) scrambled with a random
+salt of the day's (`salts`), deleted as the day ends, so no key leads back to an address,
+kept for its hour and the next; all networks together
 `VISIT_DAILY_CAP` a day (default 500000), so that on the Workers Paid plan (designer,
 2026-11-04), whose D1 includes 50 million rows written a month, the tracker writes about 30
 million at most and the accounts keep the rest. Past either, a push is refused until the hour

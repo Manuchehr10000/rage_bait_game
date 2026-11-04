@@ -1,6 +1,6 @@
 import { ipKey } from './address';
 import type { CountPush, GuestPush, Ok } from './contract';
-import { newId } from './crypto';
+import { newId, randomToken, sha256hex } from './crypto';
 import type { D1Statement } from './db';
 import type { Ctx } from './env';
 import { clearCookie, fail, isRecord, json, readCookie, setCookie } from './http';
@@ -27,7 +27,9 @@ import { readSession } from './sessions';
  * deleting the account deletes its visitors.
  *
  * Without the yes, the page sends only counts (POST /api/count): anonymous, by day, with
- * no cookie and nothing that tells one visitor from another.
+ * no cookie and nothing that tells one visitor from another. The limits on both count a
+ * network by its address scrambled with a salt of the day's (networkKey), never by the
+ * address as it is.
  *
  * The cookie is made once and never made to last longer: thirteen months from the yes,
  * as the usual rule for a measuring cookie has it.
@@ -103,6 +105,24 @@ function isCrawler(ctx: Ctx): boolean {
 }
 
 /**
+ * The key one network is counted by today: its address (address.ts, ipKey) scrambled with
+ * the day's salt, made the first time it is asked for. The days before are deleted as it
+ * is, so no key kept leads back to an address once its day is out, and a visitor's
+ * address is never kept as it is, not even for the limits.
+ */
+async function networkKey(ctx: Ctx): Promise<string> {
+  const { db, now } = ctx;
+  const today = Math.floor(now / DAY);
+  const [, , row] = await db.batch<{ salt: string }>([
+    db.prepare('DELETE FROM salts WHERE day < ?1').bind(today),
+    db.prepare('INSERT OR IGNORE INTO salts (day, salt) VALUES (?1, ?2)').bind(today, randomToken()),
+    db.prepare('SELECT salt FROM salts WHERE day = ?1').bind(today),
+  ]);
+  const salt = row?.results[0]?.salt ?? '';
+  return (await sha256hex(`${salt}\n${ipKey(ctx.request.headers.get('CF-Connecting-IP'))}`)).slice(0, 32);
+}
+
+/**
  * The limits on what the tracker is sent: `cost` units from this request's network, read
  * before anything is written, so a push refused writes nothing at all. Pushes at the same
  * moment may go a little past a limit between them; it stays a limit. `refused` is the
@@ -110,7 +130,7 @@ function isCrawler(ctx: Ctx): boolean {
  */
 async function budget(ctx: Ctx, cost: number, cookies: string[] = []): Promise<{ refused: Response | null; statements: D1Statement[] }> {
   const { db, now, env } = ctx;
-  const ip = ipKey(ctx.request.headers.get('CF-Connecting-IP'));
+  const ip = await networkKey(ctx);
   const hour = Math.floor(now / HOUR);
   const day = Math.floor(now / DAY) * 24;
   const spent = await db
@@ -145,7 +165,9 @@ async function budget(ctx: Ctx, cost: number, cookies: string[] = []): Promise<{
  * account's push, and its events too.
  */
 export function validateGuestPush(body: unknown): GuestPush | null {
-  if (!hasKeys(body, ['tour', 'events'])) return null;
+  const open = isRecord(body) && 'open' in body;
+  if (!hasKeys(body, open ? ['tour', 'events', 'open'] : ['tour', 'events'])) return null;
+  if (open && body.open !== true) return null;
   const { tour } = body;
   if (!hasKeys(tour, ['cleared', 'tricks', 'lifetime'])) return null;
   const cleared = readCleared(tour.cleared);
@@ -153,7 +175,7 @@ export function validateGuestPush(body: unknown): GuestPush | null {
   if (!cleared || !tricks || !isCount(tour.lifetime, MAX_LIFETIME)) return null;
   const events = readEvents(body.events);
   if (!events) return null;
-  return { tour: { cleared, tricks, lifetime: tour.lifetime }, events };
+  return { tour: { cleared, tricks, lifetime: tour.lifetime }, events, ...(open ? { open: true as const } : {}) };
 }
 
 function hasKeys(x: unknown, want: readonly string[]): x is Record<string, unknown> {
@@ -205,7 +227,8 @@ export async function visit(ctx: Ctx, body: unknown): Promise<Response> {
   if (refused) return refused;
 
   const events = JSON.stringify(push.events);
-  statements.push(db.prepare('INSERT OR IGNORE INTO visitor_days (visitor_id, day) VALUES (?1, ?2)').bind(id, today));
+  // A day he came is a day the page opened, not one a long game went on into.
+  if (push.open) statements.push(db.prepare('INSERT OR IGNORE INTO visitor_days (visitor_id, day) VALUES (?1, ?2)').bind(id, today));
   if (account) {
     statements.push(...linkStatements(ctx, id, account));
     if (push.events.length) {
@@ -366,7 +389,8 @@ export async function count(ctx: Ctx, body: unknown): Promise<Response> {
   if (!push) return fail(400, 'bad_progress');
   const ok: Ok = { ok: true };
   if (isCrawler(ctx) || !push.counts.length) return json(200, ok);
-  const { refused, statements } = await budget(ctx, 1 + push.counts.length);
+  // Each thing counted is a unit, however it is sent: n at a time, or one by one.
+  const { refused, statements } = await budget(ctx, 1 + push.counts.reduce((n, c) => n + c.n, 0));
   if (refused) return refused;
   const spot = (v: number) => Math.round(v / SPOT) * SPOT;
   const rows = JSON.stringify(push.counts.map((c) => ({ ...c, x: spot(c.x), y: spot(c.y) })));

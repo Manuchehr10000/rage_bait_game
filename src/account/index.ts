@@ -1,10 +1,10 @@
 import type { CountPush, GuestPush, Methods, Ok, ProgressPush, ProgressReply, SignedIn, User } from '../../server/contract';
 import type { Change, Play, Progress, ProgressStore, Snapshot } from '../engine/progress';
 import * as api from './api';
-import { type Answer, answer, consent, onAnswer, recording } from './consent';
+import { type Answer, answer, consent, forgetOwed, forgotten, onAnswer, recording } from './consent';
 import { ConsentUi } from './consent-ui';
 import { combine, empty } from './snapshot';
-import { AccountStore, GuestStore, dropGuestPlays, forgetGuestPlays, guestPlaysWaiting, takeGuestPush } from './stores';
+import { AccountStore, GuestStore, dropAllPlays, forgetGuestPlays, guestPlaysWaiting, takeGuestPush } from './stores';
 import { oneAtATime, tabId } from './tab';
 import { AccountUi, type UiHost, type UiState } from './ui';
 
@@ -108,7 +108,22 @@ export class Account {
   /** What happened since the counts were last sent, by what it was. */
   private readonly counts = new Map<string, Count>();
 
-  constructor(private readonly progress: Progress) {}
+  /** The server's forgetting of the visitor, while it is asked for, and when it is to be asked again. */
+  private forgetting: Promise<void> | null = null;
+  private forgetRetry = 0;
+  /** A signed-in page's push saying he came, while it is out. */
+  private saying: Promise<void> | null = null;
+
+  constructor(private readonly progress: Progress) {
+    // Without his yes, nothing he did in play is kept to send, whether or not the server
+    // answers: what an older page kept before there was a question, among it.
+    if (!recording()) dropAllPlays();
+  }
+
+  /** What the question of recording takes up under the screen, for the game to leave room for. */
+  get reserve(): number {
+    return this.consentUi?.reserve ?? 0;
+  }
 
   /**
    * Who is signed in. No answer in time, or a server with no accounts, and the page
@@ -141,6 +156,8 @@ export class Account {
       this.consentUi = new ConsentUi({ answer: (a) => answer(a) }, consent());
       this.consentUi.update(consent(), this.screen === 'map');
       onAnswer((a, here) => this.answered(a, here));
+      // A no an earlier page could not deliver.
+      void this.forget();
       document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'hidden') this.leaving();
       });
@@ -236,27 +253,72 @@ export class Account {
       void this.sendCounts();
     }
     this.consentUi?.update(a, this.screen === 'map');
+    this.came = false;
     if (a === 'yes') {
       if (this.store) {
         void this.sayCame();
         const delay = this.store.delay();
         if (delay !== null) this.schedule(delay);
       } else {
-        this.came = false;
         void this.sendGuest(false);
       }
       return;
     }
-    this.came = false;
-    dropGuestPlays();
+    dropAllPlays();
     this.store?.dropPlays();
-    if (here) void api.forgetVisitor();
+    void this.forget();
   }
 
-  /** Signed in with his yes: the server hears the day he came (server/visitors.ts), for how many come back. Once a page. */
+  /**
+   * The server forgets the browser's visitor, after a no (consent.ts keeps that it is owed,
+   * so the next page asks if this one cannot). Behind any push of the visitor's that is out
+   * in any tab (VISIT_LOCK), so none arrives after it to make the visitor again; and tried
+   * again until the server has it.
+   */
+  private forget(): Promise<void> {
+    if (!this.live || !forgetOwed()) return Promise.resolve();
+    this.forgetting ??= oneAtATime(VISIT_LOCK, () => (forgetOwed() ? api.forgetVisitor() : Promise.resolve(null))).then((r) => {
+      this.forgetting = null;
+      if (!r || r.ok) {
+        if (r) forgotten();
+        this.forgetRetry = 0;
+        return;
+      }
+      this.forgetRetry = Math.min(RETRY_MAX, this.forgetRetry ? this.forgetRetry * 2 : RETRY_FIRST);
+      setTimeout(() => void this.forget(), this.forgetRetry);
+    });
+    return this.forgetting;
+  }
+
+  /**
+   * A push of the visitor's, as it goes: only if he still says yes, and after the server has
+   * forgotten any visitor a no before it owed (a yes again soon after a no, offline). Status 0
+   * and no error when it does not go; the caller asks again later, or drops what it held.
+   */
+  private async visitNow(push: GuestPush): Promise<api.Reply<Ok>> {
+    const unsent: api.Reply<Ok> = { ok: false, status: 0, error: null };
+    if (!recording()) return unsent;
+    if (forgetOwed()) {
+      const r = await api.forgetVisitor();
+      if (!r.ok) return unsent;
+      forgotten();
+      if (!recording()) return unsent;
+    }
+    return api.pushVisit(push);
+  }
+
+  /**
+   * Signed in with his yes: the server hears the day he came (server/visitors.ts), for how
+   * many come back. As the page opens, or he says yes; tried again with the account's next
+   * push until it is had.
+   */
   private sayCame(): Promise<void> {
-    if (!this.live || !recording()) return Promise.resolve();
-    return oneAtATime(VISIT_LOCK, () => api.pushVisit({ tour: empty(), events: [] })).then(() => undefined);
+    if (!this.live || !recording() || this.came) return Promise.resolve();
+    this.saying ??= oneAtATime(VISIT_LOCK, () => this.visitNow({ tour: empty(), events: [], open: true })).then((r) => {
+      this.saying = null;
+      if (r.ok) this.came = true;
+    });
+    return this.saying;
   }
 
   private host(): UiHost {
@@ -406,6 +468,7 @@ export class Account {
   private flush(leaving = false): Promise<void> {
     const store = this.store;
     if (!store) return this.sendGuest(leaving);
+    if (!leaving && !this.came) void this.sayCame();
     if (leaving) return this.send(store);
     if (this.flushing) {
       this.again = true;
@@ -461,12 +524,13 @@ export class Account {
       return [...this.guestOut.keys()][0] ?? Promise.resolve();
     }
     const out = new Set([...this.guestOut.values()].flatMap((ids) => [...ids]));
-    const push = takeGuestPush(out);
+    // The page's first that the server has: the day he came.
+    const push: GuestPush = this.came ? takeGuestPush(out) : { ...takeGuestPush(out), open: true };
     if (!push.events.length && (this.came || this.guestOut.size > 0)) return Promise.resolve();
     this.cancelTimer();
     const era = this.era;
     const ids = new Set(push.events.map((e) => e.id));
-    const go = () => api.pushVisit(push);
+    const go = () => this.visitNow(push);
     const sent: Promise<void> = (leaving ? go() : oneAtATime(VISIT_LOCK, go)).then((r) => {
       this.guestOut.delete(sent);
       this.settleGuest(push, ids, r, era);
@@ -482,6 +546,11 @@ export class Account {
    * signed in since sends nothing more as one.
    */
   private settleGuest(push: GuestPush, ids: Set<string>, r: api.Reply<Ok>, era: number): void {
+    // Not sent: he said no meanwhile, and what it held is not his to send.
+    if (!recording()) {
+      forgetGuestPlays(ids);
+      return;
+    }
     const refused = !r.ok && r.status === 400;
     if (r.ok || refused) forgetGuestPlays(ids);
     if (r.ok) this.came = true;

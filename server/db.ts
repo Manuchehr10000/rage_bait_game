@@ -73,6 +73,10 @@ export const MIGRATIONS: readonly (readonly string[])[] = [
     // since the epoch, the day's row the hour it began.
     'CREATE TABLE IF NOT EXISTS visit_limits (ip TEXT NOT NULL, hour INTEGER NOT NULL, n INTEGER NOT NULL, PRIMARY KEY (ip, hour))',
     'CREATE INDEX IF NOT EXISTS visit_limits_hour ON visit_limits (hour)',
+    // A random salt a day, for the key the limits count a network by (server/visitors.ts,
+    // budget): its address scrambled with it, so the day after, with the salt gone, no key
+    // leads back to an address.
+    'CREATE TABLE IF NOT EXISTS salts (day INTEGER PRIMARY KEY, salt TEXT NOT NULL)',
     // The days (since the epoch, UTC) each visitor opened the game, for how many come back.
     'CREATE TABLE IF NOT EXISTS visitor_days (visitor_id TEXT NOT NULL, day INTEGER NOT NULL, PRIMARY KEY (visitor_id, day)) WITHOUT ROWID',
     // Everyone's play, anonymous (designer, 2026-11-04), with nothing that tells one visitor

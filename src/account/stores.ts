@@ -78,6 +78,9 @@ export class GuestStore implements ProgressStore {
 
   record(change: Change): void {
     if (change.kind === 'play') {
+      // Only with his yes (consent.ts), whoever hands it here: a page whose account never
+      // booted keeps the store game.ts made, and Account's watch never sees it.
+      if (!recording()) return;
       const play = toPlayEvent(change.play);
       if (!play) return;
       try {
@@ -175,6 +178,24 @@ export function forgetGuestPlays(ids: ReadonlySet<string>): void {
 /** He has said no to recording: nothing a guest did in play is kept in this browser to send. */
 export function dropGuestPlays(): void {
   remove(PLAYS_KEY);
+}
+
+/**
+ * Without his yes, nothing he did in play is kept in this browser to send: a guest's, and
+ * what any queue holds, whichever tab or account it is (a tab still open drops its own as
+ * it hears of the answer). Done as a page opens without a yes, so what an older page kept
+ * before there was a question is never sent on a later yes, and on a no.
+ */
+export function dropAllPlays(): void {
+  dropGuestPlays();
+  for (const [key, q] of queues()) {
+    if (!q.plays.length) continue;
+    try {
+      localStorage.setItem(key, JSON.stringify({ ...q, plays: [] }));
+    } catch {
+      /* left as it is: it is never sent without a yes */
+    }
+  }
 }
 
 /** Whether this browser holds anything a guest did in play that the server may not have. */
@@ -339,6 +360,7 @@ export class AccountStore implements ProgressStore {
   record(change: Change): void {
     this.sync();
     if (change.kind === 'play') {
+      if (!recording()) return;
       const play = toPlayEvent(change.play);
       if (!play) return;
       this.addPlays([play]);
@@ -512,26 +534,13 @@ export class AccountStore implements ProgressStore {
     remove(QUEUE_KEY + own);
   }
 
-  /**
-   * He has said no to recording: what happened in play is not kept to send, here or in a
-   * queue no tab holds (released). Other tabs hear of the no and drop their own. A push
-   * out with some still goes: it went before the no.
-   */
+  /** He has said no to recording: what happened in play is not kept to send, by this tab (dropAllPlays does the rest). */
   dropPlays(): void {
     if (this.state === 'dropped') return;
     this.sync();
-    if (this.q.plays.length) {
-      this.q.plays = [];
-      this.write();
-    }
-    for (const [key, q] of queues()) {
-      if (!q.released || !q.plays.length) continue;
-      try {
-        localStorage.setItem(key, JSON.stringify({ ...q, plays: [] }));
-      } catch {
-        /* left as it is: it is never sent without a yes */
-      }
-    }
+    if (!this.q.plays.length) return;
+    this.q.plays = [];
+    this.write();
   }
 
   /** The account is gone, and so is everything queued for it, by any tab. */

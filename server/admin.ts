@@ -199,17 +199,19 @@ function totalsStatement(db: D1Like, now: number): D1Statement {
 }
 
 /**
- * How many come back, from the days each visitor came: of those first seen before today,
- * those seen on another day and on the day after the first; of those first seen a week
- * ago or more, those seen again within seven days.
+ * How many come back, from the days each visitor came, each asked only of those whose days
+ * in question are over: of those first seen before today, those seen on another day; of
+ * those first seen before yesterday, those seen the day after the first; of those whose
+ * seven days after are over, those seen again within them.
  */
 function returnsStatement(db: D1Like, now: number): D1Statement {
   return db
     .prepare(
       `SELECT count(*) AS cohort, sum(days > 1) AS came_back,
-         sum(EXISTS (SELECT 1 FROM visitor_days x WHERE x.visitor_id = f.visitor_id AND x.day = f.d0 + 1)) AS next_day,
-         sum(d0 <= ?1 - 7) AS cohort_week,
-         sum(d0 <= ?1 - 7 AND EXISTS (SELECT 1 FROM visitor_days x WHERE x.visitor_id = f.visitor_id AND x.day > f.d0 AND x.day <= f.d0 + 7)) AS week
+         sum(d0 <= ?1 - 2) AS cohort_day,
+         sum(d0 <= ?1 - 2 AND EXISTS (SELECT 1 FROM visitor_days x WHERE x.visitor_id = f.visitor_id AND x.day = f.d0 + 1)) AS next_day,
+         sum(d0 <= ?1 - 8) AS cohort_week,
+         sum(d0 <= ?1 - 8 AND EXISTS (SELECT 1 FROM visitor_days x WHERE x.visitor_id = f.visitor_id AND x.day > f.d0 AND x.day <= f.d0 + 7)) AS week
        FROM (SELECT visitor_id, min(day) AS d0, count(*) AS days FROM visitor_days GROUP BY visitor_id) f
        WHERE d0 < ?1`,
     )
@@ -314,6 +316,7 @@ function toTotals(t: Row | undefined, accountTours: Row[], guestTours: Row[], re
     returns: {
       cohort: num(returns?.cohort),
       cameBack: num(returns?.came_back),
+      cohortDay: num(returns?.cohort_day),
       nextDay: num(returns?.next_day),
       cohortWeek: num(returns?.cohort_week),
       week: num(returns?.week),

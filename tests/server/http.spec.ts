@@ -150,6 +150,7 @@ test('the schema is made once, by the server itself, and then costs one query an
     'events',
     'guest_events',
     'pushes',
+    'salts',
     'schema_version',
     'sessions',
     'spots',

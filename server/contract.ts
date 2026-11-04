@@ -109,6 +109,8 @@ export interface ProgressReply {
 export interface GuestPush {
   tour: Snapshot;
   events: PlayEvent[];
+  /** The page's first push as it opens (or as he says yes): the day he came, for how many come back. */
+  open?: true;
 }
 
 /**
@@ -191,12 +193,14 @@ export interface AdminTotals {
   /** When the first visitor was counted, or null when none has been. */
   since: number | null;
   /**
-   * How many come back, from the days each visitor opened the game (UTC). `cohort`: the
-   * visitors first seen before today, who could have; of them, those seen on another day
-   * since (`cameBack`), and on the day after their first (`nextDay`). `cohortWeek`: those
-   * first seen a week ago or more; of them, those seen again within seven days (`week`).
+   * How many come back, from the days each visitor opened the game (UTC), each counted only
+   * once the days it asks about are over. `cohort`: the visitors first seen before today;
+   * of them, those seen on another day since (`cameBack`). `cohortDay`: those first seen
+   * before yesterday; of them, those seen the day after their first (`nextDay`).
+   * `cohortWeek`: those whose first seven days after are over; of them, those seen again
+   * within the seven (`week`).
    */
-  returns: { cohort: number; cameBack: number; nextDay: number; cohortWeek: number; week: number };
+  returns: { cohort: number; cameBack: number; cohortDay: number; nextDay: number; cohortWeek: number; week: number };
   /** Everyone's play, anonymous, whatever they answered (POST /api/count). */
   everyone: AdminEveryone;
   /** Deaths in every visit, the accounts' and the guests', give-ups among them. */

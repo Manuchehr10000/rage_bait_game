@@ -302,7 +302,7 @@ test.beforeEach(async ({ context, page }, info) => {
   if (!info.tags.includes(UNASKED)) {
     await context.addInitScript(() => {
       try {
-        if (localStorage.getItem('lostTourist.consent') === null) localStorage.setItem('lostTourist.consent', 'yes');
+        if (localStorage.getItem('lostTourist.consent') === null) localStorage.setItem('lostTourist.consent', `yes:${Date.now()}`);
       } catch {
         /* about:blank has no storage */
       }
@@ -1319,7 +1319,7 @@ test('a guest is seen as he plays, under his browser\'s visitor; signing in make
   await open(page);
   // As the page opens, he came: a push with nothing in it, and his browser is a visitor.
   await expect.poll(() => visits.length).toBeGreaterThanOrEqual(1);
-  expect(visits[0]).toEqual({ tour: EMPTY, events: [] });
+  expect(visits[0]).toEqual({ tour: EMPTY, events: [], open: true });
   await expect.poll(() => visitorOf(page)).toMatch(VISITOR_ID);
   const visitor = (await visitorOf(page))!;
 
@@ -1363,7 +1363,7 @@ test('a guest is seen as he plays, under his browser\'s visitor; signing in make
   // Signed in, the page sends nothing more as a guest: only, as each page opens, the day he came.
   await giveUpTwiceInCapBlanc(page);
   await expect.poll(() => held(page).then((h) => h?.lifetime)).toBe(4);
-  expect(visits.slice(sent)).toEqual([{ tour: EMPTY, events: [] }]);
+  expect(visits.slice(sent)).toEqual([{ tour: EMPTY, events: [], open: true }]);
   await close();
 });
 
@@ -1430,7 +1430,7 @@ test('Allow on the map: the browser is a visitor and what he does goes to the tr
   await expect(page.locator('#consent-notice')).toBeHidden();
   await expect(page.locator('#consent-link')).toHaveText('Recording how you play');
   await expect.poll(() => visitorOf(page)).toMatch(VISITOR_ID);
-  expect(visits[0]).toEqual({ tour: EMPTY, events: [] });
+  expect(visits[0]).toEqual({ tour: EMPTY, events: [], open: true });
   await expect.poll(() => counts.flatMap((c) => c.body.counts).find((c) => c.kind === 'consent')?.cause).toBe('yes');
   // Kept: the next page asks nothing.
   await giveUpTwiceInCapBlanc(page);
@@ -1454,6 +1454,49 @@ test('Allow on the map: the browser is a visitor and what he does goes to the tr
   expect(await guestPlays(page)).toBeNull();
 });
 
+test('a no given offline is still owed: the next page delivers it, and nothing goes before it', { tag: UNASKED }, async ({ page }) => {
+  await open(page);
+  await page.locator('#consent-allow').click();
+  await expect.poll(() => visitorOf(page)).toMatch(VISITOR_ID);
+  // The server out of reach for the no.
+  await page.route('**/api/visitor', (route) => route.abort());
+  await page.locator('#consent-link').click();
+  await page.locator('#consent-no').click();
+  await expect(page.locator('#consent-link')).toHaveText('Not recording');
+  expect(await page.evaluate(() => localStorage.getItem('lostTourist.forgetVisitor'))).toBe('1');
+  expect(await visitorOf(page)).toMatch(VISITOR_ID);
+  // The next page, with the server back: delivered, and forgotten there.
+  await page.unroute('**/api/visitor');
+  const forgot = page.waitForRequest((r) => new URL(r.url()).pathname === '/api/visitor' && r.method() === 'DELETE');
+  await page.reload();
+  await forgot;
+  await expect.poll(() => visitorOf(page)).toBeNull();
+  await expect.poll(() => page.evaluate(() => localStorage.getItem('lostTourist.forgetVisitor'))).toBeNull();
+});
+
+test('what an older page kept of a guest\'s play before there was a question is never sent: not on the way, not on a later yes', { tag: UNASKED }, async ({ page }) => {
+  // As the build before consent left it: a guest's plays, waiting in the browser.
+  await page.goto('/robots.txt');
+  await page.evaluate(() => localStorage.setItem('lostTourist.plays', JSON.stringify([{ id: 'old-play-0000000001', at: 1, kind: 'enter', level: 'cap-blanc' }])));
+  const visits = visitsOf(page);
+  await open(page);
+  expect(await guestPlays(page)).toBeNull();
+  await page.locator('#consent-allow').click();
+  await expect.poll(() => visits.length).toBe(1);
+  expect(eventsIn(visits)).toEqual([]);
+});
+
+test('the notice takes room under the screen while it is asked, and the game leaves it: nothing is pushed off the window', { tag: UNASKED }, async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 640 });
+  await open(page);
+  await expect(page.locator('#consent-notice')).toBeVisible();
+  const fits = () => page.evaluate(() => document.documentElement.scrollHeight <= window.innerHeight && document.querySelector('canvas#game')!.getBoundingClientRect().top >= 0);
+  expect(await fits()).toBe(true);
+  await page.locator('#consent-deny').click();
+  await expect(page.locator('#consent-notice')).toBeHidden();
+  expect(await fits()).toBe(true);
+});
+
 test('signed in with his yes, the page tells the server the day he came, as his account\'s visitor', async ({ page, request, browser }) => {
   await open(page);
   const email = address('came');
@@ -1462,7 +1505,7 @@ test('signed in with his yes, the page tells the server the day he came, as his 
   await page.reload();
   await page.waitForFunction(() => (window as unknown as Partial<W>).__game?.currentScreen === 'map');
   await expect.poll(() => visits.length).toBe(1);
-  expect(visits[0]).toEqual({ tour: EMPTY, events: [] });
+  expect(visits[0]).toEqual({ tour: EMPTY, events: [], open: true });
   const visitor = await visitorOf(page);
   expect(visitor).toMatch(VISITOR_ID);
   // His account's, not a guest's.

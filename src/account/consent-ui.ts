@@ -37,7 +37,7 @@ html.touch #consent-notice button { margin-left: 6px; }
 #consent h2 { margin: 0 0 8px; font-size: 18px; font-weight: normal; }
 #consent p { margin: 0 0 10px; }
 #consent .muted { color: ${MUTED}; }
-#consent .row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+#consent .row { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 14px; }
 #consent .row button { padding: 7px 14px; font: inherit; color: ${BRIGHT}; background: transparent;
   border: 1px solid ${MUTED}; border-radius: 0; cursor: pointer; }
 #consent .row button:hover, #consent .row button.on { border-color: ${BRIGHT}; }
@@ -117,28 +117,29 @@ export class ConsentUi {
       { id: 'consent', tabIndex: -1 },
       close,
       heading,
-      make(
-        'p',
-        {},
-        'With your yes, this browser is given a random id, kept in a cookie for thirteen months, and the game sends what you do in it: each level you go into, each death and where in the level it happened, each time you give up or leave a level for the map, and each level you get through, with how long it took. The days you come are kept too, to see whether players come back. If you sign in, it goes with your account.',
-      ),
-      make(
-        'p',
-        {},
-        'Nothing else is kept: not your IP address, not your device, not who you are. The game’s designer reads it, to see where the game is unfair, or too easy.',
-      ),
-      make(
-        'p',
-        {},
-        'With a no, or no answer, nothing is kept that could tell you apart: the game only adds one to totals, such as how many opened it today, or how many died at each spot of a level.',
-      ),
-      make(
-        'p',
-        {},
-        'You can change your mind here at any time. A no forgets the id, and what was kept under it while you played without signing in; what went with an account goes when the account is deleted.',
-      ),
+      // The answer first, so changing it is a tap, on a phone too, and the reasons after.
       this.now,
       make('div', { className: 'row' }, this.yes, this.no),
+      make(
+        'p',
+        {},
+        'With your yes, this browser is given a random id, kept in a cookie for thirteen months, and the game sends what you do in it, with the time of each: each level you go into, each death and where in the level it happened, each time you give up or leave a level for the map, and each level you get through, with how long it took. While you play without signing in, it sends the levels you have got through, the tricks that have killed you, and how many times you have died, as this browser counts them. The days you come are kept too, to see whether players come back. If you sign in, it all goes with your account, and the designer sees it beside your email address.',
+      ),
+      make(
+        'p',
+        {},
+        'Nothing else is kept: not your IP address (to stop one network flooding the game, a scrambled form of it is kept for the day, then thrown away), not your device. The game’s designer reads it, to see where the game is unfair, or too easy.',
+      ),
+      make(
+        'p',
+        {},
+        'With a no, or no answer, nothing is kept that could tell you apart: the game only adds one to totals, such as how many opened it today, or how many died at each spot of a level. Signed in, your tour is kept with your account either way: that is what signing in is for.',
+      ),
+      make(
+        'p',
+        {},
+        'The answer is this browser’s, and lasts thirteen months, when you are asked again. You can change it here at any time. A no forgets the id, and what was kept under it while you played without signing in; what went with an account goes when the account is deleted.',
+      ),
     );
     this.dialog.setAttribute('aria-labelledby', 'consent-title');
     document.body.append(this.dialog);
@@ -155,6 +156,11 @@ export class ConsentUi {
     }
     this.dialog.addEventListener('close', releaseKeys);
     this.render();
+  }
+
+  /** The height the notice takes under the screen while it shows, with its margin, for the game to leave room for (src/game.ts, resize). */
+  get reserve(): number {
+    return this.notice.hidden ? 0 : this.notice.offsetHeight + 6;
   }
 
   /** The answer as it is now, and whether the map is showing. */
@@ -174,7 +180,10 @@ export class ConsentUi {
   }
 
   private render(): void {
+    const was = this.notice.hidden;
     this.notice.hidden = !this.onMap || this.answer !== null;
+    // The game leaves room under the screen for it while it shows (src/game.ts, resize).
+    if (was !== this.notice.hidden) window.dispatchEvent(new Event('resize'));
     this.slot.hidden = !this.onMap || this.answer === null;
     this.link.textContent = this.answer === 'yes' ? 'Recording how you play' : 'Not recording';
     this.now.textContent =
