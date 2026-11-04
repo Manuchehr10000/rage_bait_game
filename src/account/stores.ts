@@ -1,6 +1,7 @@
 import type { GuestPush, PlayEvent, ProgressPush, User } from '../../server/contract';
 import { LOCAL_KEYS, LocalStore, type Change, type Play, type ProgressStore, type Snapshot } from '../engine/progress';
 import { toSnapshot } from './snapshot';
+import { recording } from './consent';
 import { exclusively, newId, tabId } from './tab';
 
 /**
@@ -96,7 +97,8 @@ export class GuestStore implements ProgressStore {
   handOver(): Carried {
     const all = new LocalStore().load();
     const before = readCarried();
-    const carried = { tour: { ...all, lifetime: Math.max(0, all.lifetime - before) }, plays: readPlays() };
+    // What he did in play goes too only with his yes (consent.ts); without it, it is forgotten here.
+    const carried = { tour: { ...all, lifetime: Math.max(0, all.lifetime - before) }, plays: recording() ? readPlays() : [] };
     for (const key of [LOCAL_KEYS.cleared, LOCAL_KEYS.tricks, PLAYS_KEY]) {
       try {
         localStorage.removeItem(key);
@@ -168,6 +170,11 @@ export function forgetGuestPlays(ids: ReadonlySet<string>): void {
   } catch {
     /* sent again, and kept once */
   }
+}
+
+/** He has said no to recording: nothing a guest did in play is kept in this browser to send. */
+export function dropGuestPlays(): void {
+  remove(PLAYS_KEY);
 }
 
 /** Whether this browser holds anything a guest did in play that the server may not have. */
@@ -401,9 +408,10 @@ export class AccountStore implements ProgressStore {
    * entry of the outbox: one sent before and not answered goes again first, as it was;
    * failing that, the deaths queued move to the outbox under a new id. With them go the
    * levels and tricks that no push out carries, as many as one push may hold, and in
-   * what room is left, the oldest of what happened in play that no push out carries.
+   * what room is left, the oldest of what happened in play that no push out carries:
+   * only with his yes to recording (`plays`); without it, what is queued waits.
    */
-  take(): ProgressPush | null {
+  take(plays = true): ProgressPush | null {
     this.sync();
     const q = this.q;
     const out = this.carried();
@@ -441,7 +449,7 @@ export class AccountStore implements ProgressStore {
     const playsOut = this.playsOut();
     const events: PlayEvent[] = [];
     // Its frame, `,"events":[]`, is within the 400 counted at the start.
-    for (const p of q.plays) {
+    for (const p of plays ? q.plays : []) {
       if (playsOut.has(p.id)) continue;
       const b = utf8.encode(JSON.stringify(p)).length + 1;
       if (events.length >= MAX_PLAYS || bytes + b > MAX_BYTES) break;
@@ -502,6 +510,28 @@ export class AccountStore implements ProgressStore {
     this.q.tab = newId();
     this.write();
     remove(QUEUE_KEY + own);
+  }
+
+  /**
+   * He has said no to recording: what happened in play is not kept to send, here or in a
+   * queue no tab holds (released). Other tabs hear of the no and drop their own. A push
+   * out with some still goes: it went before the no.
+   */
+  dropPlays(): void {
+    if (this.state === 'dropped') return;
+    this.sync();
+    if (this.q.plays.length) {
+      this.q.plays = [];
+      this.write();
+    }
+    for (const [key, q] of queues()) {
+      if (!q.released || !q.plays.length) continue;
+      try {
+        localStorage.setItem(key, JSON.stringify({ ...q, plays: [] }));
+      } catch {
+        /* left as it is: it is never sent without a yes */
+      }
+    }
   }
 
   /** The account is gone, and so is everything queued for it, by any tab. */

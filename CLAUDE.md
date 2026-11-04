@@ -106,8 +106,13 @@ notes describe the levels as they were built.
   once as the page opens whether or not it plays; signing in makes the visitor and what it
   did the account's, and a browser that plays as a guest after signing out is a new one.
   `/admin` shows how many visitors came, played as guests and signed in, and every guest
-  beside the accounts. Guests' writes are capped (`VISIT_IP_HOURLY`, `VISIT_DAILY_CAP`) so
-  they cannot use up D1's free day. README, "The admin's tracker".
+  beside the accounts. Only with the visitor's yes (designer, 2026-11-04: "add consent",
+  asked of everyone, accounts too; `src/account/consent.ts`): asked on the map, never in a
+  level, play going on meanwhile; without it the page sends only anonymous counts with no
+  cookie (`POST /api/count`), and a no after a yes forgets the visitor. With it, the days a
+  visitor comes are kept too, for the return rate ("add return rate"). The tracker's writes
+  are capped (`VISIT_IP_HOURLY`, `VISIT_DAILY_CAP`), sized for the Workers Paid plan the
+  game is on (designer, 2026-11-04). README, "The admin's tracker".
 - **On a phone** (designer, 2026-10-16): held sideways, buttons in the side borders and
   never over the game (the game is drawn smaller for them); left and right under the left
   thumb, jump under the right; map, give up, lamp, sound and full screen as small buttons;

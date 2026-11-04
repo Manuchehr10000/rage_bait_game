@@ -10,6 +10,8 @@ const ROUTES: [string, string][] = [
   ['GET', '/api/me'],
   ['POST', '/api/progress'],
   ['POST', '/api/visit'],
+  ['DELETE', '/api/visitor'],
+  ['POST', '/api/count'],
   ['POST', '/api/auth/email/start'],
   ['POST', '/api/auth/email/verify'],
   ['GET', '/api/auth/google/nonce'],
@@ -19,6 +21,7 @@ const ROUTES: [string, string][] = [
   ['GET', '/api/admin/users'],
   ['GET', '/api/admin/user'],
   ['GET', '/api/admin/guest'],
+  ['GET', '/api/admin/spots'],
 ];
 
 test('without a database there is no API: 404 everywhere, before anything else is looked at', async () => {
@@ -141,6 +144,7 @@ test('the schema is made once, by the server itself, and then costs one query an
   const tables = world.db.rows("SELECT name FROM sqlite_master WHERE type = 'table' ORDER BY name").map((r) => r.name);
   expect(tables).toEqual([
     'cleared',
+    'counts',
     'email_codes',
     'email_sends',
     'events',
@@ -148,9 +152,11 @@ test('the schema is made once, by the server itself, and then costs one query an
     'pushes',
     'schema_version',
     'sessions',
+    'spots',
     'tricks',
     'users',
     'visit_limits',
+    'visitor_days',
     'visitors',
   ]);
   world.db.log.length = 0;

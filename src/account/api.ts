@@ -1,4 +1,4 @@
-import type { AccountDeletion, ApiError, GuestPush, Me, Nonce, Ok, ProgressPush, ProgressReply, SignedIn, User } from '../../server/contract';
+import type { AccountDeletion, ApiError, CountPush, GuestPush, Me, Nonce, Ok, ProgressPush, ProgressReply, SignedIn, User } from '../../server/contract';
 import { toSnapshot } from './snapshot';
 
 /**
@@ -18,6 +18,8 @@ interface CallOptions {
   body?: unknown;
   timeout?: number;
   keepalive?: boolean;
+  /** Sent without the browser's cookies, so the server cannot tell who sent it. */
+  anonymous?: boolean;
 }
 
 async function call<T>(method: 'GET' | 'POST' | 'DELETE', path: string, opts: CallOptions = {}): Promise<Reply<T>> {
@@ -30,7 +32,7 @@ async function call<T>(method: 'GET' | 'POST' | 'DELETE', path: string, opts: Ca
       method,
       headers,
       body: opts.body === undefined ? undefined : JSON.stringify(opts.body),
-      credentials: 'same-origin',
+      credentials: opts.anonymous ? 'omit' : 'same-origin',
       cache: 'no-store',
       keepalive: opts.keepalive ?? false,
       signal: abort.signal,
@@ -100,6 +102,20 @@ export async function pushProgress(push: ProgressPush): Promise<Reply<ProgressRe
  */
 export function pushVisit(push: GuestPush): Promise<Reply<Ok>> {
   return call<Ok>('POST', 'visit', { body: push, keepalive: true });
+}
+
+/**
+ * Everyone's counts, anonymous (server/visitors.ts, count): without the browser's cookies,
+ * so nothing in it tells the server who sent it. It may outlive the page: a body is under
+ * 8 KiB, beside the pushes above.
+ */
+export function pushCounts(push: CountPush): Promise<Reply<Ok>> {
+  return call<Ok>('POST', 'count', { body: push, keepalive: true, anonymous: true });
+}
+
+/** He has said no to recording: the browser's visitor is forgotten, and its cookie. */
+export function forgetVisitor(): Promise<Reply<Ok>> {
+  return call<Ok>('DELETE', 'visitor', { keepalive: true });
 }
 
 export function emailStart(email: string): Promise<Reply<Ok>> {

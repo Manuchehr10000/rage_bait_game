@@ -4,7 +4,7 @@
  * on Workers and on Node alike.
  */
 
-import { adminGuest, adminUser, adminUsers } from './admin';
+import { adminGuest, adminSpots, adminUser, adminUsers } from './admin';
 import type { Me, Methods, Ok, ProgressReply } from './contract';
 import { sha256hex } from './crypto';
 import { ensureSchema } from './db';
@@ -15,7 +15,7 @@ import { fail, isRecord, json, readJson } from './http';
 import { hasUser, pushStatements, snapshotStatements, toSnapshot, validatePush } from './progress';
 import { SESSION_COOKIE, clearCookie, readCookie, readSession, renewal } from './sessions';
 import { deleteUser, isAccountId } from './users';
-import { forgetVisitor, visit } from './visitors';
+import { count, forget, forgetVisitor, visit } from './visitors';
 
 export type { Deps, Env } from './env';
 
@@ -30,6 +30,8 @@ const ROUTES = new Map<string, Route>([
   ['/api/me', { method: 'GET', handler: me }],
   ['/api/progress', { method: 'POST', handler: progress }],
   ['/api/visit', { method: 'POST', handler: visit }],
+  ['/api/visitor', { method: 'DELETE', handler: forget }],
+  ['/api/count', { method: 'POST', handler: count }],
   ['/api/auth/email/start', { method: 'POST', handler: emailStart }],
   ['/api/auth/email/verify', { method: 'POST', handler: emailVerify }],
   ['/api/auth/google/nonce', { method: 'GET', handler: googleNonce }],
@@ -39,6 +41,7 @@ const ROUTES = new Map<string, Route>([
   ['/api/admin/users', { method: 'GET', handler: adminUsers }],
   ['/api/admin/user', { method: 'GET', handler: adminUser }],
   ['/api/admin/guest', { method: 'GET', handler: adminGuest }],
+  ['/api/admin/spots', { method: 'GET', handler: adminSpots }],
 ]);
 
 const DEFAULT_DEPS: Deps = {

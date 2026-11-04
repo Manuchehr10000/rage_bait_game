@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
-import type { AdminGuestDetail, AdminUsers, ApiError, GuestPush, PlayEvent, Snapshot } from '../../server/contract';
-import { validateGuestPush } from '../../server/visitors';
+import type { AdminGuestDetail, AdminSpots, AdminUsers, ApiError, CountPush, GuestPush, PlayEvent, Snapshot } from '../../server/contract';
+import { validateCounts, validateGuestPush } from '../../server/visitors';
 import { DAY, HOUR, MINUTE, SECOND, T0, World, type Client } from './harness';
 
 /**
@@ -485,4 +485,195 @@ test('one guest level by level, as an account is; a visitor that has signed in i
     expect((await admin.get(`/api/admin/guest?id=${encodeURIComponent(bad)}`)).status, bad).toBe(400);
   }
   expect((await admin.get('/api/admin/guest')).status).toBe(400);
+});
+
+test('a signed-in browser with its yes is a visitor that is his from the start: the day it came, and never a guest', async () => {
+  const { world, admin } = await withAdmin();
+  const client = world.client('198.51.100.50');
+  const { id: account } = (await client.signInByEmail('tourist@example.com')).body.user;
+  const res = await client.post('/api/visit', guestPush());
+  expect(res.status).toBe(200);
+  const visitor = VISITOR_SET.exec(res.cookies[0] ?? '')?.[1];
+  expect(visitor).toBeTruthy();
+  expect(visitorRow(world, visitor!)).toMatchObject({ user_id: account, first_at: world.now, signed_in_at: world.now, played_at: null });
+  expect(world.db.rows('SELECT day FROM visitor_days WHERE visitor_id = ?', visitor!)).toEqual([{ day: Math.floor(world.now / DAY) }]);
+  // The next page, the same visitor, the same day once.
+  expect((await client.post('/api/visit', guestPush())).cookies).toEqual([]);
+  expect(world.db.count('visitor_days')).toBe(1);
+  const { totals } = (await admin.get<AdminUsers>('/api/admin/users')).body;
+  // A visitor, but one that never came as a guest, so not one that signed in after.
+  expect(totals).toMatchObject({ visitors: 1, cameAsGuests: 0, signedIn: 0, guests: 0 });
+});
+
+test('a guest\'s visitor in a browser signed in since is his at its next push, with what it did as a guest', async () => {
+  const world = new World();
+  const client = world.client();
+  const before = enter('gargas');
+  await client.post('/api/visit', guestPush([before]));
+  const visitor = visitorOf(client)!;
+  // Signed in without the visitor's cookie (it said yes only after, in a tab still a guest's).
+  client.jar.delete(VISITOR);
+  const { id: account } = (await client.signInByEmail('tourist@example.com')).body.user;
+  expect(world.db.count('visitors', 'user_id IS NOT NULL')).toBe(0);
+  client.jar.set(VISITOR, visitor);
+  const res = await client.post('/api/visit', guestPush([leave('gargas', 0)]));
+  expect(res.cookies).toEqual([]);
+  expect(visitorRow(world, visitor)).toMatchObject({ user_id: account });
+  expect(world.db.count('guest_events')).toBe(0);
+  expect(world.db.rows('SELECT id FROM events WHERE user_id = ? ORDER BY rowid', account).map((r) => r.id)).toContain(before.id);
+  expect(world.db.count('events', 'user_id = ?', account)).toBe(2);
+});
+
+test('saying no forgets the visitor: its row, its days, what it did as a guest, and its cookie; what went with an account stays the account\'s', async () => {
+  const world = new World();
+  const guest = world.client('198.51.100.60');
+  await guest.post('/api/visit', guestPush([enter('cap-blanc')], { lifetime: 3 }));
+  const visitor = visitorOf(guest)!;
+  const res = await guest.delete('/api/visitor');
+  expect(res.status).toBe(200);
+  expect(res.cookies).toEqual([VISITOR_CLEARED]);
+  expect(visitorRow(world, visitor)).toBeUndefined();
+  expect(world.db.count('guest_events')).toBe(0);
+  expect(world.db.count('visitor_days')).toBe(0);
+  // With no visitor, it is said and done all the same.
+  const again = await guest.delete('/api/visitor');
+  expect(again.status).toBe(200);
+  expect(again.cookies).toEqual([]);
+
+  const player = world.client('198.51.100.61');
+  await player.post('/api/visit', guestPush([enter('gargas')]));
+  const { id: account } = (await player.signInByEmail('tourist@example.com')).body.user;
+  await player.delete('/api/visitor');
+  expect(world.db.count('visitors')).toBe(0);
+  expect(world.db.count('events', 'user_id = ?', account)).toBe(1);
+  // And it may not be asked from another site.
+  expect((await player.delete('/api/visitor', { origin: 'https://evil.test' })).status).toBe(403);
+});
+
+test('how many come back: by the days each visitor came, of those who could have', async () => {
+  const { world, admin } = await withAdmin();
+  const day0 = Math.floor(world.now / DAY) * DAY + 10 * HOUR;
+  world.now = day0;
+  const come = (c: Client) => c.post('/api/visit', guestPush());
+  const once = world.client('198.51.100.70');
+  const nextDay = world.client('198.51.100.71');
+  const later = world.client('198.51.100.72');
+  const twiceToday = world.client('198.51.100.73');
+  for (const c of [once, nextDay, later, twiceToday]) await come(c);
+  await come(twiceToday);
+  world.now = day0 + DAY;
+  await come(nextDay);
+  world.now = day0 + 5 * DAY;
+  await come(later);
+  // Ten days on: four first seen before today, all of them a week ago or more; and one new today, who could not have come back yet.
+  world.now = day0 + 10 * DAY;
+  await come(world.client('198.51.100.74'));
+  const { returns } = (await admin.get<AdminUsers>('/api/admin/users')).body.totals;
+  expect(returns).toEqual({ cohort: 4, cameBack: 2, nextDay: 1, cohortWeek: 4, week: 2 });
+  // Coming back after the week is coming back, but not within it.
+  await come(once);
+  const after = (await admin.get<AdminUsers>('/api/admin/users')).body.totals.returns;
+  expect(after).toEqual({ cohort: 4, cameBack: 3, nextDay: 1, cohortWeek: 4, week: 2 });
+});
+
+test('everyone\'s counts are anonymous: no cookie read or set, nothing kept that tells one visitor from another', async () => {
+  const { world, admin } = await withAdmin();
+  const signedIn = world.client('198.51.100.80');
+  await signedIn.signInByEmail('tourist@example.com');
+  const before = { users: world.db.count('users'), sessions: world.db.count('sessions'), visitors: world.db.count('visitors') };
+  const counts: CountPush['counts'] = [
+    { kind: 'open', level: '', cause: '', x: 0, y: 0, n: 1 },
+    { kind: 'enter', level: 'karnak', cause: '', x: 0, y: 0, n: 2 },
+    { kind: 'death', level: 'karnak', cause: 'The column', x: 97, y: 61, n: 3 },
+    { kind: 'death', level: 'karnak', cause: 'The column', x: 95, y: 66, n: 1 },
+    { kind: 'death', level: 'karnak', cause: 'Gave up', x: 12, y: 0, n: 1 },
+    { kind: 'leave', level: 'karnak', cause: '', x: 0, y: 0, n: 1 },
+    { kind: 'clear', level: 'karnak', cause: '', x: 0, y: 0, n: 1 },
+    { kind: 'consent', level: '', cause: 'yes', x: 0, y: 0, n: 1 },
+    { kind: 'consent', level: '', cause: 'no', x: 0, y: 0, n: 2 },
+  ];
+  // Even sent with a session's cookie, which the page never does: it is not read.
+  const res = await signedIn.post('/api/count', { counts });
+  expect(res.status).toBe(200);
+  expect(res.cookies).toEqual([]);
+  expect({ users: world.db.count('users'), sessions: world.db.count('sessions'), visitors: world.db.count('visitors') }).toEqual(before);
+  // Twice, from a browser with nothing.
+  expect((await world.client('198.51.100.81').post('/api/count', { counts })).status).toBe(200);
+  // What is kept: the day, what, where, how many; the spots on the grid of eight.
+  expect(world.db.rows('SELECT * FROM spots ORDER BY x')).toEqual([
+    { level_id: 'karnak', x: 16, y: 0, cause: 'Gave up', day: Math.floor(world.now / DAY), n: 2 },
+    { level_id: 'karnak', x: 96, y: 64, cause: 'The column', day: Math.floor(world.now / DAY), n: 8 },
+  ]);
+  const { everyone } = (await admin.get<AdminUsers>('/api/admin/users')).body.totals;
+  expect(everyone).toMatchObject({ opens: 2, opensWeek: 2, yes: 2, no: 4, since: Math.floor(world.now / DAY) * DAY });
+  expect(everyone.levels).toEqual([
+    {
+      level: 'karnak',
+      enters: 4,
+      deaths: 10,
+      gaveUp: 2,
+      left: 2,
+      clears: 2,
+      causes: [
+        { cause: 'The column', n: 8 },
+        { cause: 'Gave up', n: 2 },
+      ],
+    },
+  ]);
+  const spots = await admin.get<AdminSpots>('/api/admin/spots?level=karnak');
+  expect(spots.body).toEqual({
+    level: 'karnak',
+    spots: [
+      { cause: 'The column', x: 96, y: 64, n: 8 },
+      { cause: 'Gave up', x: 16, y: 0, n: 2 },
+    ],
+    more: false,
+  });
+  expect((await admin.get('/api/admin/spots?level=Karnak')).status).toBe(400);
+  expect((await admin.get('/api/admin/spots')).status).toBe(400);
+});
+
+test('counts in any other shape are refused whole, and they are held to the tracker\'s limits', async () => {
+  const world = new World({ VISIT_IP_HOURLY: '10' });
+  world.now = Math.floor(T0 / HOUR) * HOUR;
+  const client = world.client('192.0.2.30');
+  const good = { kind: 'enter', level: 'karnak', cause: '', x: 0, y: 0, n: 1 };
+  const bad: unknown[] = [
+    null,
+    {},
+    { counts: null },
+    { counts: [good], extra: 1 },
+    { counts: Array.from({ length: 201 }, () => good) },
+    { counts: [{ ...good, kind: 'jump' }] },
+    { counts: [{ ...good, n: 0 }] },
+    { counts: [{ ...good, n: 1001 }] },
+    { counts: [{ ...good, n: 1.5 }] },
+    { counts: [{ ...good, level: 'Karnak' }] },
+    { counts: [{ ...good, level: '' }] },
+    { counts: [{ ...good, cause: 'x' }] },
+    { counts: [{ ...good, x: 4 }] },
+    { counts: [{ kind: 'open', level: 'karnak', cause: '', x: 0, y: 0, n: 1 }] },
+    { counts: [{ kind: 'consent', level: '', cause: 'maybe', x: 0, y: 0, n: 1 }] },
+    { counts: [{ kind: 'death', level: 'karnak', cause: '', x: 0, y: 0, n: 1 }] },
+    { counts: [{ kind: 'death', level: 'karnak', cause: 'The\ncolumn', x: 0, y: 0, n: 1 }] },
+    { counts: [{ kind: 'death', level: 'karnak', cause: 'Fall', x: 1.5, y: 0, n: 1 }] },
+    { counts: [{ kind: 'death', level: 'karnak', cause: 'Fall', x: 0, y: 1_000_001, n: 1 }] },
+    { counts: [{ kind: 'enter', level: 'karnak', cause: '', x: 0, y: 0 }] },
+  ];
+  for (const body of bad) {
+    const res = await client.post<ApiError>('/api/count', body);
+    expect(res.status, JSON.stringify(body)).toBe(400);
+  }
+  expect(validateCounts({ counts: [good] })).toEqual({ counts: [good] });
+  expect(world.db.count('counts')).toBe(0);
+  // Five counts are six units; five more would be twelve.
+  expect((await client.post('/api/count', { counts: Array.from({ length: 5 }, () => good) })).status).toBe(200);
+  const over = await client.post<ApiError>('/api/count', { counts: Array.from({ length: 5 }, () => good) });
+  expect(over.status).toBe(429);
+  expect(over.body.retryAfter).toBe(3600);
+  expect(world.db.rows('SELECT n FROM counts')).toEqual([{ n: 5 }]);
+  // A crawler is told yes, and nothing is counted.
+  const bot = await world.client('192.0.2.31').post('/api/count', { counts: [good] }, { headers: { 'User-Agent': 'Googlebot/2.1' } });
+  expect(bot.status).toBe(200);
+  expect(world.db.rows('SELECT n FROM counts')).toEqual([{ n: 5 }]);
 });

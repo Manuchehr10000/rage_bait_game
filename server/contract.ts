@@ -95,9 +95,10 @@ export interface ProgressReply {
 }
 
 /**
- * POST /api/visit: a guest's push, for the admin's tracker (designer, 2026-11-03). The
- * browser is the visitor, named by its own cookie, which the server makes the first time
- * it hears from it. `tour` is the guest's tour as this browser holds it now, and stands
+ * POST /api/visit: a push for the admin's tracker (designer, 2026-11-03), sent only with
+ * the visitor's yes (designer, 2026-11-04). The browser is the visitor, named by its own
+ * cookie, which the server makes the first time it hears from it. A signed-in page sends
+ * one as it opens, with nothing in it: the day he came. `tour` is the guest's tour as this browser holds it now, and stands
  * for the whole of it: the server keeps every level and every trick any of the visitor's
  * pushes has named (up to what one push may carry), and the highest count of deaths, so a
  * push that arrives late, or leaves part of the tour out, takes nothing away. `events` are
@@ -108,6 +109,18 @@ export interface ProgressReply {
 export interface GuestPush {
   tour: Snapshot;
   events: PlayEvent[];
+}
+
+/**
+ * POST /api/count: everyone's play, anonymous (designer, 2026-11-04), sent whatever the
+ * visitor's answer, with no cookie. Each count is how many times something happened
+ * since the last push: the page opened (`open`), he went into a level, died in it (with
+ * the cause, and the spot as the dev ruler names it), left it for the map, cleared it, or
+ * answered the question of recording (`consent`, cause 'yes' or 'no'). A part a kind has
+ * not is '' or 0.
+ */
+export interface CountPush {
+  counts: { kind: 'open' | 'enter' | 'death' | 'leave' | 'clear' | 'consent'; level: string; cause: string; x: number; y: number; n: number }[];
 }
 
 /**
@@ -165,16 +178,27 @@ export interface AdminTotals {
   guestsNew: number;
   /** Last heard of in the last seven days. */
   guestsSeen: number;
-  /** Every visitor counted: the guests, and those that went on to sign in. */
+  /** Every visitor counted (every browser that said yes): the guests, and those signed in. */
   visitors: number;
+  /** Of them, those that came first as guests (not signed in already when they said yes). */
+  cameAsGuests: number;
   /** Of them, those that went into a level as a guest. */
   played: number;
-  /** Of them, those that signed in. */
+  /** Of those that came as guests, those that went on to sign in. */
   signedIn: number;
   /** Those that played as a guest and then signed in. */
   playedSignedIn: number;
   /** When the first visitor was counted, or null when none has been. */
   since: number | null;
+  /**
+   * How many come back, from the days each visitor opened the game (UTC). `cohort`: the
+   * visitors first seen before today, who could have; of them, those seen on another day
+   * since (`cameBack`), and on the day after their first (`nextDay`). `cohortWeek`: those
+   * first seen a week ago or more; of them, those seen again within seven days (`week`).
+   */
+  returns: { cohort: number; cameBack: number; nextDay: number; cohortWeek: number; week: number };
+  /** Everyone's play, anonymous, whatever they answered (POST /api/count). */
+  everyone: AdminEveryone;
   /** Deaths in every visit, the accounts' and the guests', give-ups among them. */
   deaths: number;
   /** Counted from the events, so only since the tracker began. */
@@ -185,6 +209,28 @@ export interface AdminTotals {
    * guest the one its browser last told of. The page reads the tour's funnel from it.
    */
   tours: { cleared: string[]; accounts: number; guests: number }[];
+}
+
+/** Everyone's play, from the anonymous counts: all of it, since they began. */
+export interface AdminEveryone {
+  /** The page opened, ever and in the last seven days. */
+  opens: number;
+  opensWeek: number;
+  /** How the question of recording was answered. */
+  yes: number;
+  no: number;
+  /** Each level anyone went into or died in. */
+  levels: { level: string; enters: number; deaths: number; gaveUp: number; left: number; clears: number; causes: { cause: string; n: number }[] }[];
+  /** When the counts began (the first day with any, ms), or null. */
+  since: number | null;
+}
+
+/** GET /api/admin/spots?level=: where everyone died in a level, the spots with the most first. */
+export interface AdminSpots {
+  level: string;
+  spots: { cause: string; x: number; y: number; n: number }[];
+  /** True when there were more spots than one answer gives. */
+  more: boolean;
 }
 
 /** A visitor that has never signed in, as GET /api/admin/users lists it. */

@@ -168,7 +168,7 @@ What it needs, outside the repo:
   between; `EMAIL_FROM` (e.g. `Lost Tourist <tickets@mail.losttourist.online>`); and
   `RESEND_API_KEY`, as a secret. `EMAIL_DAILY_CAP` (default 90 codes a day, all addresses
   together), `EMAIL_IP_HOURLY` (default 20 an hour per IP), `VISIT_IP_HOURLY` and
-  `VISIT_DAILY_CAP` (what guests may send to the tracker, below) are optional. For the
+  `VISIT_DAILY_CAP` (what the tracker may be sent, below) are optional. For the
   Production environment, which is where main deploys: a D1 database of its own (not dev's,
   so the designer's test accounts and deaths stay out of the players'), bound as `DB`;
   `GOOGLE_CLIENT_ID`; and `ADMIN_EMAILS`. No `RESEND_API_KEY` or `EMAIL_FROM` there: that is
@@ -193,63 +193,99 @@ What it needs, outside the repo:
 
 `/admin` (`admin.html`, `src/admin/`) shows the game's visitors (designer, 2026-10-27), the
 guests among them since the designer's word of 2026-11-03 ("Add tracking of any users who
-came to game and played even without logging and then how many logged in"): how many
-browsers opened the game, how many of them played a level and how many went on to sign in;
-when each account was made and how it signs in, and when each guest was first seen; when
-each was last seen, which levels each has cleared and where in the tour it is now, how many
-have cleared each level and how many each level holds, and for one account or guest, level
-by level: visits, deaths by cause, give-ups, the times a level was left for the map, clears
-and the best time, where on the level the deaths were (a scatter, and the spots with the
-most, as the dev ruler names them: `karnak (96, 64)`), and the latest events. It reads
-`GET /api/admin/users`, `GET /api/admin/user?id=` and `GET /api/admin/guest?id=`
-(`server/admin.ts`), which answer only an account whose address `ADMIN_EMAILS` names: sign
-in on the game's map with it first. The game never links to it. The tiles and the funnel
-count everyone on the server; the table lists the newest thousand accounts and the newest
-thousand guests.
+came to game and played even without logging and then how many logged in"), and only with
+their yes since the designer's word of 2026-11-04 ("add consent", asked of everyone, accounts
+too; "add return rate"). It reads `GET /api/admin/users`, `GET /api/admin/user?id=`,
+`GET /api/admin/guest?id=` and `GET /api/admin/spots?level=` (`server/admin.ts`), which
+answer only an account whose address `ADMIN_EMAILS` names: sign in on the game's map with
+it first. The game never links to it. It has three parts:
 
-What it counts are events (`PlayEvent`, `server/contract.ts`), one row each in D1's `events`
-table: going into a level, each death with its cause, where (X, Y on the dev ruler) and how
-far into the attempt, leaving a level for the map from the middle of it (Escape, which gives
-up first), and each clear with its time and the deaths before it. A give-up is a death, its
-cause `Gave up`. The page queues them with the tour and sends them with its pushes, each
-kept once by its id; a run the dev tools started from somewhere else is not counted.
+- **Everyone**, from anonymous counts that every page sends whatever its visitor answered:
+  how often the page opened, ever and this week, and, level by level, the entries, deaths,
+  give-ups, leaves for the map and clears, the commonest causes, and where on the level
+  everyone died (click a level: a scatter sized by how many, and the spots with the most);
+  and how the question of recording was answered.
+- **Visitors who said yes**: how many, how many played as a guest, how many of those who came
+  as guests signed in, how many of those who played did, and how many come back: on another
+  day at all, the next day, and within a week.
+- **Accounts and guests**: the totals, the tour's funnel (how many have cleared each level and
+  how many each level holds), and the table of accounts and guests, newest thousand of each,
+  with for one, level by level: visits, deaths by cause, give-ups, leaves, clears and the best
+  time, where on the level the deaths were (as the dev ruler names spots: `karnak (96, 64)`),
+  and the latest events.
 
-A guest is a visitor (`server/visitors.ts`): his browser, named by a random id in a cookie
-of its own, `__Host-lt_visitor`, made the first time the page pushes as a guest and kept for
-thirteen months from then, never longer. Nothing else is kept of him: no address, no IP,
-nothing of the device. The page sends `POST /api/visit` as it opens, until the server has
-it, so a visitor is counted whether or not he plays; and then what he does in play and his
-tour as the browser holds it: on the map, as the page is hidden, and half a minute after
-anything happens in a level, one push at a time across the browser's tabs. What it cannot
-send yet waits in the browser, the newest thousand. Signing in makes the visitor the
-account's, in the same transaction as the session: what it did as a guest goes into the
-account's events, and so does anything a tab that has not heard yet sends as a guest while
-the browser is signed in to that account. Signed out, run out, or signed in as someone else,
-the browser that plays as a guest is a new visitor, as its tour is a new guest's; signed in
-again as the same account with no guest play between, it is the same visitor. Deleting the
-account deletes its visitors and forgets the cookie.
+### The question of recording
+
+Every visitor is asked, on the map, never in a level (`src/account/consent-ui.ts`): a line
+under the screen (on a phone, at the foot of the left column) until it is answered, then a
+link beside the account's that says which it is and asks again, with what is kept and why.
+Play goes on meanwhile. The answer is kept in the browser (`lostTourist.consent`) and every
+tab hears of it (`src/account/consent.ts`).
+
+- **Without a yes** (no answer, or no), nothing is kept that tells one visitor from another.
+  The page counts what happens (the page opening, going into a level, each death by cause and
+  by spot on a grid of eight world px, leaving a level, clearing one, the answer itself) and
+  sends the counts on the map and as the page is hidden, to `POST /api/count`, without the
+  browser's cookies; the server adds them to the day's in `counts` and `spots`, and reads no
+  cookie and sets none. A page opened twice is two.
+- **With a yes**, what he does in play goes to the tracker as events (below), his own or a
+  guest's, and the days he opens the game are kept (`visitor_days`), for how many come back.
+  A no after a yes forgets the browser's visitor (`DELETE /api/visitor`): its cookie, its
+  days, and what it did as a guest. What went with an account goes when the account does.
+  Plays held in the browser to be sent are dropped. His tour is kept either way: keeping it
+  is what signing in is for.
+
+### Events and visitors
+
+What it counts per visitor are events (`PlayEvent`, `server/contract.ts`), one row each in
+D1's `events` table: going into a level, each death with its cause, where (X, Y on the dev
+ruler) and how far into the attempt, leaving a level for the map from the middle of it
+(Escape, which gives up first), and each clear with its time and the deaths before it. A
+give-up is a death, its cause `Gave up`. A signed-in page queues them with the tour and
+sends them with its pushes, each kept once by its id; a run the dev tools started from
+somewhere else is not counted.
+
+A visitor (`server/visitors.ts`) is a browser that said yes, named by a random id in a cookie
+of its own, `__Host-lt_visitor`, made the first time the page pushes with the yes and kept for
+thirteen months from then, never longer. Nothing else is kept of it: no address, no IP,
+nothing of the device. A guest's page sends `POST /api/visit` as it opens (or as he says
+yes), until the server has it; and then what he does in play and his tour as the browser
+holds it: on the map, as the page is hidden, and half a minute after anything happens in a
+level, one push at a time across the browser's tabs. What it cannot send yet waits in the
+browser, the newest thousand. A signed-in page sends one as it opens, with nothing in it: the
+day he came. Signing in makes the visitor the account's, in the same transaction as the
+session: what it did as a guest goes into the account's events, and so does anything a tab
+that has not heard yet sends while the browser is signed in to that account. Signed out, run
+out, or signed in as someone else, the browser that plays as a guest is a new visitor, as its
+tour is a new guest's; signed in again as the same account with no guest play between, it is
+the same visitor. A browser signed in already when it says yes is a visitor that is his from
+the start, and never counted as a guest. Deleting the account deletes its visitors.
 
 So a visitor is a browser's stretch as one person, not a person: one account on two devices
-is two visitors, one who clears the browser is a new guest, and a guest's tour and deaths
-are what his browser says. "Played as a guest" is a visitor that went into a level before it
-signed in, or without ever signing in; "Played, then signed in" is one of those that signed
-in after. A search engine that runs the page is not counted. Accounts made before visitors
-were counted have none.
+is two visitors, one who clears the browser is a new guest, and a guest's tour and deaths are
+what his browser says. "Played as a guest" is a visitor that went into a level before it
+signed in, or without ever signing in; "came as guests, signed in" is one that was a guest
+first and then signed in. How many come back is counted by UTC day: of the visitors first
+seen before today, those seen on another day, and on the day after their first; of those
+first seen a week ago or more, those seen again within seven days. A search engine that runs
+the page is not counted. Accounts made before visitors were counted have none.
 
-What guests send is limited in units, a push one, each event in it one more and each KiB of
-its tour one more; a unit is about two rows written. One network may send `VISIT_IP_HOURLY` an
-hour (default 20000), by the network's key as the email limits count it, kept for its hour
-and the next; all networks together `VISIT_DAILY_CAP` a day (default 20000), so that on D1's
-free plan, whose 100,000 rows written a day are the accounts' too, the guests take under
-half. Past either, a push is refused until the hour or the day (UTC) is out, nothing of it
-written, and the page keeps it: on a busy day, guests are counted until the cap and then not
-until midnight. On a paid plan, raise it. A script on many networks can still use the day's
-share; Cloudflare's own rate limiting is the answer to that.
+### Limits
 
-Counts begin when the tracker did, and guests' when visitors were first counted; the deaths
-in all of an account's visits, and of a guest's as his browser counts them, go back further.
-Deleting an account deletes its events and the visitors that signed in as it. This is the
-ground the game's analytics are to be built on.
+What the tracker is sent, events and counts both, is limited in units: a push one, each event
+or count in it one more, and each KiB of a guest's tour one more; a unit is about two rows
+written. One network may send `VISIT_IP_HOURLY` an hour (default 20000), by the network's key
+as the email limits count it, kept for its hour and the next; all networks together
+`VISIT_DAILY_CAP` a day (default 500000), so that on the Workers Paid plan (designer,
+2026-11-04), whose D1 includes 50 million rows written a month, the tracker writes about 30
+million at most and the accounts keep the rest. Past either, a push is refused until the hour
+or the day (UTC) is out, nothing of it written, and the page keeps it. A script on many
+networks can still use the day's share; Cloudflare's own rate limiting is the answer to that.
+
+Counts begin when the tracker did, guests' when visitors were first counted, and everyone's
+when the counts were; the deaths in all of an account's visits, and of a guest's as his
+browser counts them, go back further. This is the ground the game's analytics are to be
+built on.
 
 ## Layout
 

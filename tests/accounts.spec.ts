@@ -1,6 +1,6 @@
 import { request as httpRequest } from 'node:http';
 import { expect, test, type APIRequestContext, type Browser, type Page } from '@playwright/test';
-import type { AdminGuestDetail, AdminUserDetail, AdminUsers, GuestPush, Me, PlayEvent, ProgressPush, Snapshot } from '../server/contract';
+import type { AdminGuestDetail, AdminUserDetail, AdminUsers, CountPush, GuestPush, Me, PlayEvent, ProgressPush, Snapshot } from '../server/contract';
 
 /**
  * Accounts, end to end (designer, 2026-10-16): the game as a visitor has it, in the
@@ -291,9 +291,23 @@ async function fakeGoogle(page: Page, who: { email: string; sub: string; nonce?:
 
 const errors = new Map<Page, string[]>();
 
-test.beforeEach(async ({ context, page }) => {
+/** A test of the question of recording itself, which starts with it unanswered. */
+const UNASKED = '@unasked';
+
+test.beforeEach(async ({ context, page }, info) => {
   // Google, unless a test stands in for it: never the real one.
   await context.route('https://accounts.google.com/**', (route) => route.abort());
+  // Every other test plays as one who has said yes to recording (src/account/consent.ts),
+  // unless it answers otherwise itself.
+  if (!info.tags.includes(UNASKED)) {
+    await context.addInitScript(() => {
+      try {
+        if (localStorage.getItem('lostTourist.consent') === null) localStorage.setItem('lostTourist.consent', 'yes');
+      } catch {
+        /* about:blank has no storage */
+      }
+    });
+  }
   const seen: string[] = [];
   errors.set(page, seen);
   page.on('pageerror', (e) => seen.push(String(e)));
@@ -1346,10 +1360,10 @@ test('a guest is seen as he plays, under his browser\'s visitor; signing in make
   expect(list.body.totals.playedSignedIn).toBeGreaterThanOrEqual(1);
   // Signed in, it is the same visitor, now his.
   expect(await visitorOf(page)).toBe(visitor);
-  // Signed in, the page sends nothing more as a guest.
+  // Signed in, the page sends nothing more as a guest: only, as each page opens, the day he came.
   await giveUpTwiceInCapBlanc(page);
   await expect.poll(() => held(page).then((h) => h?.lifetime)).toBe(4);
-  expect(visits.length).toBe(sent);
+  expect(visits.slice(sent)).toEqual([{ tour: EMPTY, events: [] }]);
   await close();
 });
 
@@ -1362,6 +1376,102 @@ test('the push that says a guest came goes again until the server has it, though
   await expect.poll(() => visitorOf(page), { timeout: 15_000 }).toMatch(VISITOR_ID);
   expect(visits.length).toBe(3);
   expect(visits.every((v) => v.events.length === 0)).toBe(true);
+});
+
+/** The anonymous counts a page sends, as their bodies, and whether each went with any cookie. */
+function countsOf(page: Page): { body: CountPush; cookie: boolean }[] {
+  const sent: { body: CountPush; cookie: boolean }[] = [];
+  page.on('request', (r) => {
+    if (new URL(r.url()).pathname !== '/api/count') return;
+    void r.allHeaders().then((h) => sent.push({ body: r.postDataJSON() as CountPush, cookie: 'cookie' in h }));
+  });
+  return sent;
+}
+
+/** Every count of `kind` in `sent`, added up. */
+function counted(sent: { body: CountPush }[], kind: CountPush['counts'][number]['kind']): number {
+  return sent.flatMap((s) => s.body.counts).filter((c) => c.kind === kind).reduce((n, c) => n + c.n, 0);
+}
+
+test('until he answers, nothing of his play goes to the tracker: only anonymous counts, sent with no cookie', { tag: UNASKED }, async ({ page, request }) => {
+  const visits = visitsOf(page);
+  const counts = countsOf(page);
+  await open(page);
+  await expect(page.locator('#consent-notice')).toBeVisible();
+  await expect(page.locator('#consent-notice')).toContainText('May the game record how you play');
+  // The page opening is counted.
+  await expect.poll(() => counted(counts, 'open')).toBe(1);
+  // Signed in, so the browser has a cookie the counts must not carry.
+  const email = address('unasked');
+  await signInByEmail(page, request, email);
+  const pushes = pushesOf(page);
+  await giveUpTwiceInCapBlanc(page);
+  await expect.poll(() => counted(counts, 'death')).toBe(2);
+  expect(counted(counts, 'enter')).toBe(1);
+  expect(counted(counts, 'leave')).toBe(1);
+  expect(counts.every((c) => !c.cookie)).toBe(true);
+  // His tour is the account's all the same; what he did in play goes nowhere else.
+  await expect.poll(() => held(page).then((h) => h?.lifetime)).toBe(2);
+  expect(eventsIn(pushes)).toEqual([]);
+  expect(visits).toEqual([]);
+  expect(await visitorOf(page)).toBeNull();
+  expect(await guestPlays(page)).toBeNull();
+  // Never in a level.
+  await page.goto('about:blank');
+  await open(page, '/#cap-blanc', 'level');
+  await expect(page.locator('#consent-notice')).toBeHidden();
+});
+
+test('Allow on the map: the browser is a visitor and what he does goes to the tracker; a no later forgets it', { tag: UNASKED }, async ({ page }) => {
+  const visits = visitsOf(page);
+  const counts = countsOf(page);
+  await open(page);
+  await page.locator('#consent-allow').click();
+  await expect(page.locator('#consent-notice')).toBeHidden();
+  await expect(page.locator('#consent-link')).toHaveText('Recording how you play');
+  await expect.poll(() => visitorOf(page)).toMatch(VISITOR_ID);
+  expect(visits[0]).toEqual({ tour: EMPTY, events: [] });
+  await expect.poll(() => counts.flatMap((c) => c.body.counts).find((c) => c.kind === 'consent')?.cause).toBe('yes');
+  // Kept: the next page asks nothing.
+  await giveUpTwiceInCapBlanc(page);
+  await expect(page.locator('#consent-notice')).toBeHidden();
+  await expect.poll(() => eventsIn(visits).map((e) => e.kind)).toEqual(['enter', 'death', 'death', 'leave']);
+
+  // He changes his mind, from the link beside the account's.
+  const forgot = page.waitForRequest((r) => new URL(r.url()).pathname === '/api/visitor' && r.method() === 'DELETE');
+  await page.locator('#consent-link').click();
+  await expect(page.locator('dialog#consent')).toBeVisible();
+  await expect(page.locator('#consent-now')).toHaveText('Now: recording how you play.');
+  await page.locator('#consent-no').click();
+  await forgot;
+  await expect(page.locator('dialog#consent')).toBeHidden();
+  await expect(page.locator('#consent-link')).toHaveText('Not recording');
+  await expect.poll(() => visitorOf(page)).toBeNull();
+  const sent = visits.length;
+  await giveUpTwiceInCapBlanc(page);
+  await expect.poll(() => counted(counts, 'death')).toBe(4);
+  expect(visits.length).toBe(sent);
+  expect(await guestPlays(page)).toBeNull();
+});
+
+test('signed in with his yes, the page tells the server the day he came, as his account\'s visitor', async ({ page, request, browser }) => {
+  await open(page);
+  const email = address('came');
+  await signInByEmail(page, request, email);
+  const visits = visitsOf(page);
+  await page.reload();
+  await page.waitForFunction(() => (window as unknown as Partial<W>).__game?.currentScreen === 'map');
+  await expect.poll(() => visits.length).toBe(1);
+  expect(visits[0]).toEqual({ tour: EMPTY, events: [] });
+  const visitor = await visitorOf(page);
+  expect(visitor).toMatch(VISITOR_ID);
+  // His account's, not a guest's.
+  const { ask, close } = await asAdmin(browser, request);
+  expect((await ask(`/api/admin/guest?id=${visitor}`)).status).toBe(404);
+  const list = await ask<AdminUsers>('/api/admin/users');
+  expect(list.body.guests.some((g) => g.id === visitor)).toBe(false);
+  expect(list.body.totals.visitors).toBeGreaterThanOrEqual(1);
+  await close();
 });
 
 test('the admin\'s tracker: only the admin reads it, and it shows what each visitor did', async ({ page, request, browser }) => {

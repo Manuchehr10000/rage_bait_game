@@ -1,8 +1,10 @@
-import type { GuestPush, Methods, Ok, ProgressPush, ProgressReply, SignedIn, User } from '../../server/contract';
-import type { Progress, Snapshot } from '../engine/progress';
+import type { CountPush, GuestPush, Methods, Ok, ProgressPush, ProgressReply, SignedIn, User } from '../../server/contract';
+import type { Change, Play, Progress, ProgressStore, Snapshot } from '../engine/progress';
 import * as api from './api';
+import { type Answer, answer, consent, onAnswer, recording } from './consent';
+import { ConsentUi } from './consent-ui';
 import { combine, empty } from './snapshot';
-import { AccountStore, GuestStore, forgetGuestPlays, guestPlaysWaiting, takeGuestPush } from './stores';
+import { AccountStore, GuestStore, dropGuestPlays, forgetGuestPlays, guestPlaysWaiting, takeGuestPush } from './stores';
 import { oneAtATime, tabId } from './tab';
 import { AccountUi, type UiHost, type UiState } from './ui';
 
@@ -26,6 +28,14 @@ import { AccountUi, type UiHost, type UiState } from './ui';
  * once as the page opens, so a visitor is counted whether or not he plays, and then as
  * a signed-in tab sends its own, a little less often. As he signs in, the server makes
  * what it has of him the account's, and what was not sent yet goes with his tour.
+ *
+ * Only with his yes (designer, 2026-11-04: "add consent", asked of everyone, accounts
+ * too; consent.ts). Until he answers, or with a no, nothing he does in play is kept for
+ * the tracker, his or a guest's: the page adds what happens to anonymous counts instead
+ * (POST /api/count), sent without cookies, for everyone whatever the answer. A no after a
+ * yes forgets the browser's visitor. Signed in with a yes, the page tells the server the
+ * day he came, for how many come back. His tour is the account's either way: keeping it
+ * is what signing in is for.
  */
 
 export { GuestStore } from './stores';
@@ -47,6 +57,13 @@ const GUEST_SOON = 500;
 const GUEST_WAIT_MAX = 3_600_000;
 /** Held by the tab sending a guest's push (tab.ts, oneAtATime). */
 const VISIT_LOCK = 'lostTourist.visit';
+/** Counts in one push: a hundred are under 8 KiB, and none is more than the server takes. */
+const COUNTS_MAX = 100;
+const COUNT_MAX = 1000;
+/** A death is counted by the nearest point of a grid this many world px apart, as the server keeps spots. */
+const SPOT = 8;
+
+type Count = CountPush['counts'][number];
 
 export type Screen = 'map' | 'level';
 
@@ -87,6 +104,9 @@ export class Account {
   private guestAgain = false;
   /** Refused for its network's hour or everyone's day (429): no guest's push until then. */
   private holdUntil = 0;
+  private consentUi: ConsentUi | null = null;
+  /** What happened since the counts were last sent, by what it was. */
+  private readonly counts = new Map<string, Count>();
 
   constructor(private readonly progress: Progress) {}
 
@@ -104,19 +124,27 @@ export class Account {
       const { user, progress, methods } = r.body;
       this.methods = methods;
       this.live = true;
-      if (user && progress) await this.enter(user, progress);
-      else {
+      this.count({ kind: 'open', level: '', cause: '', x: 0, y: 0 });
+      void this.sendCounts();
+      if (user && progress) {
+        await this.enter(user, progress);
+        if (recording()) void this.sayCame();
+      } else {
         // The same tour, kept as it was, by a guest store that says when there is something to send.
-        this.progress.replace(this.progress.snapshot(), this.guestStore());
-        // Sent even with nothing in it, until it is had: he came.
+        this.progress.replace(this.progress.snapshot(), this.watch(this.guestStore()));
+        // With his yes, sent even with nothing in it, until it is had: he came.
         void this.sendGuest(false);
       }
       // With no way to sign in, a guest has nothing to be offered.
       if (user || methods.google || methods.email) this.ui = new AccountUi(this.host(), this.uiState());
+      // The question of recording, after the account's link, so it goes beside it.
+      this.consentUi = new ConsentUi({ answer: (a) => answer(a) }, consent());
+      this.consentUi.update(consent(), this.screen === 'map');
+      onAnswer((a, here) => this.answered(a, here));
       document.addEventListener('visibilitychange', () => {
-        if (document.visibilityState === 'hidden') void this.flush(true);
+        if (document.visibilityState === 'hidden') this.leaving();
       });
-      window.addEventListener('pagehide', () => void this.flush(true));
+      window.addEventListener('pagehide', () => this.leaving());
     } catch (e) {
       console.error('accounts: boot failed', e);
     }
@@ -125,8 +153,110 @@ export class Account {
   /** The game is on the map or in a level. The link is only on the map, and coming back to it sends what is queued. */
   setScreen(screen: Screen): void {
     this.screen = screen;
-    if (screen === 'map') void this.flush();
+    if (screen === 'map') {
+      void this.flush();
+      void this.sendCounts();
+    }
     this.refresh();
+  }
+
+  /** The page is hidden, and may be going: what is new goes at once. */
+  private leaving(): void {
+    void this.flush(true);
+    void this.sendCounts();
+  }
+
+  /**
+   * The store the tour is kept in, as Progress is given it: what happens in play is
+   * counted, anonymously, whatever his answer, and goes on to the store to be kept for
+   * the tracker only with his yes.
+   */
+  private watch(store: ProgressStore): ProgressStore {
+    return {
+      load: () => store.load(),
+      record: (change: Change) => {
+        if (change.kind === 'play') {
+          this.countPlay(change.play);
+          if (!recording()) return;
+        }
+        store.record(change);
+      },
+    };
+  }
+
+  private countPlay(play: Play): void {
+    const at = (v: number) => Math.round(v / SPOT) * SPOT;
+    if (play.kind === 'death') this.count({ kind: 'death', level: play.level, cause: play.cause, x: at(play.x), y: at(play.y) });
+    else this.count({ kind: play.kind, level: play.level, cause: '', x: 0, y: 0 });
+  }
+
+  private count(c: Omit<Count, 'n'>): void {
+    if (!this.live) return;
+    const key = [c.kind, c.level, c.cause, c.x, c.y].join('\n');
+    const had = this.counts.get(key);
+    if (had) had.n += 1;
+    else this.counts.set(key, { ...c, n: 1 });
+  }
+
+  /**
+   * The counts since the last push, anonymous: on the map, on hide, and as the page opens.
+   * One that does not arrive is added back to go with the next, unless it was refused
+   * whole (400), as it would be every time.
+   */
+  private sendCounts(): Promise<void> {
+    if (!this.live || !this.counts.size) return Promise.resolve();
+    const counts: Count[] = [];
+    for (const [key, c] of this.counts) {
+      if (counts.length >= COUNTS_MAX) break;
+      const n = Math.min(c.n, COUNT_MAX);
+      counts.push({ ...c, n });
+      if (n === c.n) this.counts.delete(key);
+      else c.n -= n;
+    }
+    return api.pushCounts({ counts }).then((r) => {
+      if (r.ok || r.status === 400) return;
+      for (const c of counts) {
+        const key = [c.kind, c.level, c.cause, c.x, c.y].join('\n');
+        const had = this.counts.get(key);
+        if (had) had.n += c.n;
+        else this.counts.set(key, c);
+      }
+    });
+  }
+
+  /**
+   * He has answered the question of recording, here or in another tab. Yes: what he does
+   * from now goes to the tracker, and the server hears he came. No: nothing more goes,
+   * nothing is kept to go, and the browser's visitor is forgotten (by the tab he said it
+   * in; the server forgets it once).
+   */
+  private answered(a: Answer, here: boolean): void {
+    if (here) {
+      this.count({ kind: 'consent', level: '', cause: a, x: 0, y: 0 });
+      void this.sendCounts();
+    }
+    this.consentUi?.update(a, this.screen === 'map');
+    if (a === 'yes') {
+      if (this.store) {
+        void this.sayCame();
+        const delay = this.store.delay();
+        if (delay !== null) this.schedule(delay);
+      } else {
+        this.came = false;
+        void this.sendGuest(false);
+      }
+      return;
+    }
+    this.came = false;
+    dropGuestPlays();
+    this.store?.dropPlays();
+    if (here) void api.forgetVisitor();
+  }
+
+  /** Signed in with his yes: the server hears the day he came (server/visitors.ts), for how many come back. Once a page. */
+  private sayCame(): Promise<void> {
+    if (!this.live || !recording()) return Promise.resolve();
+    return oneAtATime(VISIT_LOCK, () => api.pushVisit({ tour: empty(), events: [] })).then(() => undefined);
   }
 
   private host(): UiHost {
@@ -159,6 +289,7 @@ export class Account {
 
   private refresh(): void {
     this.ui?.update(this.uiState());
+    this.consentUi?.update(consent(), this.screen === 'map');
   }
 
   /**
@@ -183,7 +314,7 @@ export class Account {
     this.retry = 0;
     this.seen = server.lifetime;
     // Its lifetime is the server's and every death of ours it may not have yet (store.load).
-    this.progress.replace(combine(server, store.load()), store);
+    this.progress.replace(combine(server, store.load()), this.watch(store));
     this.refresh();
     void this.flush();
   }
@@ -201,7 +332,7 @@ export class Account {
     this.cancelTimer();
     this.retry = 0;
     this.again = false;
-    this.progress.replace(empty(), this.guestStore());
+    this.progress.replace(empty(), this.watch(this.guestStore()));
     this.ui?.update(this.uiState(), why);
   }
 
@@ -297,7 +428,7 @@ export class Account {
   /** One push of what is queued, unless as many are out as may be, or everything queued is out already. */
   private send(store: AccountStore): Promise<void> {
     if (this.out.size >= MAX_OUT) return Promise.resolve();
-    const push = store.take();
+    const push = store.take(recording());
     if (!push) return Promise.resolve();
     this.cancelTimer();
     const era = this.era;
@@ -317,7 +448,7 @@ export class Account {
    * the other tabs. With nothing new it goes only until the server has heard that he came.
    */
   private sendGuest(leaving: boolean): Promise<void> {
-    if (!this.live || this.store) return Promise.resolve();
+    if (!this.live || this.store || !recording()) return Promise.resolve();
     const now = Date.now();
     // Refused for the network's hour or everyone's day (429): it would be again.
     if (now < this.holdUntil) {
@@ -400,7 +531,7 @@ export class Account {
       const merged = combine(this.progress.snapshot(), r.body.progress);
       this.seen = Math.max(this.seen, r.body.progress.lifetime);
       merged.lifetime = this.seen + store.load().lifetime;
-      this.progress.replace(merged, store);
+      this.progress.replace(merged, this.watch(store));
       this.refresh();
     }
     const delay = store.delay();

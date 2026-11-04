@@ -202,7 +202,7 @@ test('the tracker is the admin\'s: the signed out are told to sign in, anyone el
   expect((await world.client('198.51.100.21').get('/api/admin/users')).status).toBe(401);
   const stranger = world.client('198.51.100.22');
   await stranger.signInByEmail('tourist@example.com');
-  for (const path of ['/api/admin/users', '/api/admin/user?id=x', `/api/admin/guest?id=${'A'.repeat(22)}`]) {
+  for (const path of ['/api/admin/users', '/api/admin/user?id=x', `/api/admin/guest?id=${'A'.repeat(22)}`, '/api/admin/spots?level=karnak']) {
     const res = await stranger.get<ApiError>(path);
     expect(res.status, path).toBe(403);
     expect(res.body).toEqual({ error: 'not_admin' });

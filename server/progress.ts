@@ -139,6 +139,11 @@ function toEvent(e: unknown): PlayEvent | null {
   }
 }
 
+/** A level id as the game writes it. */
+export function isLevelId(value: unknown): value is string {
+  return typeof value === 'string' && LEVEL_ID.test(value);
+}
+
 /** A whole number from 0 to `max`. */
 export function isCount(value: unknown, max: number): value is number {
   return typeof value === 'number' && Number.isInteger(value) && value >= 0 && value <= max;
@@ -148,7 +153,7 @@ function isCoord(value: unknown): value is number {
   return typeof value === 'number' && Number.isInteger(value) && Math.abs(value) <= MAX_COORD;
 }
 
-function isNoun(value: unknown): value is string {
+export function isNoun(value: unknown): value is string {
   if (typeof value !== 'string' || NOT_TEXT.test(value)) return false;
   const length = [...value].length;
   return length >= 1 && length <= MAX_NOUN;

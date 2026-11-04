@@ -78,6 +78,7 @@ export async function deleteUser(db: D1Like, user: UserRow): Promise<void> {
   await db.batch([
     db.prepare('DELETE FROM events WHERE user_id = ?1').bind(user.id),
     db.prepare('DELETE FROM guest_events WHERE visitor_id IN (SELECT id FROM visitors WHERE user_id = ?1)').bind(user.id),
+    db.prepare('DELETE FROM visitor_days WHERE visitor_id IN (SELECT id FROM visitors WHERE user_id = ?1)').bind(user.id),
     db.prepare('DELETE FROM visitors WHERE user_id = ?1').bind(user.id),
     db.prepare('DELETE FROM tricks WHERE user_id = ?1').bind(user.id),
     db.prepare('DELETE FROM cleared WHERE user_id = ?1').bind(user.id),

@@ -1,4 +1,4 @@
-import type { AdminGuest, AdminGuestDetail, AdminLevel, AdminUser, AdminUserDetail, AdminUsers, ApiError, PlayEvent } from '../../server/contract';
+import type { AdminEveryone, AdminGuest, AdminGuestDetail, AdminLevel, AdminSpots, AdminUser, AdminUserDetail, AdminUsers, ApiError, PlayEvent } from '../../server/contract';
 import { HELD_FILES } from '../levels/held-files';
 import { CHAPTERS } from '../map/atlas';
 
@@ -266,19 +266,48 @@ function render(): void {
     fillTable();
   });
   const t = d.totals;
+  const e = t.everyone;
   root.replaceChildren(
     ...kids([
       header(),
-      tiles(),
+      h('h2', {}, 'Everyone'),
       h(
         'p',
-        { className: 'muted note' },
-        t.since === null
-          ? 'No visitor has been counted yet. A visitor is a browser that opened the game: counted as a guest until it signs in, and as its account from then on.'
-          : `Visitors are browsers that opened the game, counted since ${DAY_ONLY.format(t.since)}: each is a guest until it signs in, and its account from then on, so accounts and guests together count each account once and each guest once. A visitor is a browser, not a person: one account on two devices is two visitors, and so is a browser that played as a guest between two sign-ins; one who clears the browser is a new guest. A guest's tour and deaths are as his browser says.`,
+        { className: 'muted' },
+        e.since === null
+          ? 'Nothing counted yet. Everyone who opens the game is counted here, whatever they answer to recording: anonymously, with no id and no cookie.'
+          : `Everyone who opened the game since ${DAY_ONLY.format(e.since)}, whatever they answered to recording: anonymous counts, with no id and no cookie, so a page opened twice is two.`,
       ),
+      tileRow([
+        [e.opens, 'Page opens'],
+        [e.opensWeek, 'Opens this week'],
+        [e.levels.reduce((n, l) => n + l.enters, 0), 'Level entries'],
+        [e.levels.reduce((n, l) => n + l.deaths, 0), 'Deaths'],
+        [share(e.yes, e.yes + e.no), 'Said yes to recording', `${e.yes} yes, ${e.no} no; the rest have not answered`],
+      ]),
+      everyoneTable(e),
+      h('h2', {}, 'Visitors who said yes'),
+      h(
+        'p',
+        { className: 'muted' },
+        t.since === null
+          ? 'No visitor yet. A visitor is a browser that said yes to recording: a guest until it signs in, and its account from then on.'
+          : `Browsers that said yes to recording, since ${DAY_ONLY.format(t.since)}: each a guest until it signs in, and its account from then on. A visitor is a browser, not a person: one account on two devices is two visitors, and so is a browser that played as a guest between two sign-ins; one who clears the browser is a new one. How many come back is by the days (UTC) each opened the game.`,
+      ),
+      tileRow([
+        [t.visitors, 'Visitors'],
+        [t.played, 'Played as a guest', 'Went into a level before signing in, or without ever signing in'],
+        [t.signedIn, 'Came as guests, signed in', `Of the ${t.cameAsGuests} that came as guests`],
+        [share(t.signedIn, t.cameAsGuests), 'Of guests signed in'],
+        [share(t.playedSignedIn, t.played), 'Of players signed in', `${t.playedSignedIn} of the ${t.played} that played as a guest went on to sign in`],
+        [share(t.returns.cameBack, t.returns.cohort), 'Came back', `${t.returns.cameBack} of the ${t.returns.cohort} first seen before today came again on another day`],
+        [share(t.returns.nextDay, t.returns.cohort), 'Back the next day', `${t.returns.nextDay} of the ${t.returns.cohort} first seen before today came again the day after`],
+        [share(t.returns.week, t.returns.cohortWeek), 'Back within a week', `${t.returns.week} of the ${t.returns.cohortWeek} first seen a week ago or more came again within seven days`],
+      ]),
+      h('h2', {}, 'Accounts and guests'),
+      tiles(),
       h('h2', {}, 'Where they are'),
-      h('p', { className: 'muted' }, 'Each level of the tour: how many have cleared it, and how many it holds now, as the first they have not. Accounts and guests together.'),
+      h('p', { className: 'muted' }, 'Each level of the tour: how many have cleared it, and how many it holds now, as the first they have not. Accounts, and guests who said yes.'),
       funnel(),
       h('h2', {}, 'Visitors'),
       d.more ? h('p', { className: 'muted' }, `The newest ${d.users.length} accounts.`) : null,
@@ -292,29 +321,122 @@ function render(): void {
   fillTable();
 }
 
-function tiles(): HTMLElement {
-  const t = data!.totals;
-  const tile = (n: number | string, label: string, title = '') =>
-    h('div', { className: 'tile', title }, h('b', {}, typeof n === 'number' ? n.toLocaleString() : n), h('span', {}, label));
-  const finished = t.tours.filter((x) => firstUncleared(x.cleared) === null).reduce((n, x) => n + x.accounts + x.guests, 0);
+function tileRow(items: [number | string, string, string?][]): HTMLElement {
   return h(
     'div',
     { className: 'tiles' },
-    tile(t.visitors, 'Visitors', 'Browsers that opened the game since the tracker began counting them'),
-    tile(t.played, 'Played as a guest', 'Visitors that went into a level before signing in, or without ever signing in'),
-    tile(t.signedIn, 'Signed in', 'Visitors that went on to sign in'),
-    tile(t.playedSignedIn, 'Played, then signed in', 'Visitors that played as a guest and then signed in'),
-    tile(share(t.signedIn, t.visitors), 'Of visitors signed in'),
-    tile(share(t.playedSignedIn, t.played), 'Of players signed in', 'Of the visitors that played as a guest, those that went on to sign in'),
-    tile(t.guests, 'Guests', 'Visitors that have not signed in'),
-    tile(t.accounts, 'Accounts'),
-    tile(t.accountsNew + t.guestsNew, 'New this week', 'Accounts made, and guests first seen, in the last seven days'),
-    tile(t.accountsSeen + t.guestsSeen, 'Seen this week', 'Accounts and guests heard from in the last seven days'),
-    tile(t.google, 'Via Google'),
-    tile(finished, 'Finished the tour'),
-    tile(t.deaths, 'Deaths in all'),
-    tile(t.gaveUp, 'Gave up'),
-    tile(t.left, 'Left a level'),
+    ...items.map(([n, label, title = '']) => h('div', { className: 'tile', title }, h('b', {}, typeof n === 'number' ? n.toLocaleString() : n), h('span', {}, label))),
+  );
+}
+
+function tiles(): HTMLElement {
+  const t = data!.totals;
+  const finished = t.tours.filter((x) => firstUncleared(x.cleared) === null).reduce((n, x) => n + x.accounts + x.guests, 0);
+  return tileRow([
+    [t.accounts, 'Accounts'],
+    [t.guests, 'Guests', 'Visitors that said yes and have not signed in'],
+    [t.accountsNew + t.guestsNew, 'New this week', 'Accounts made, and guests first seen, in the last seven days'],
+    [t.accountsSeen + t.guestsSeen, 'Seen this week', 'Accounts and guests heard from in the last seven days'],
+    [t.google, 'Via Google'],
+    [finished, 'Finished the tour'],
+    [t.deaths, 'Deaths in all'],
+    [t.gaveUp, 'Gave up'],
+    [t.left, 'Left a level'],
+  ]);
+}
+
+/** Everyone's play level by level, from the anonymous counts; a level opens where everyone died in it. */
+function everyoneTable(e: AdminEveryone): HTMLElement {
+  const order = new Map(ATLAS.map((l, i) => [l.id, i]));
+  const levels = [...e.levels].sort((a, b) => (order.get(a.level) ?? 999) - (order.get(b.level) ?? 999) || a.level.localeCompare(b.level));
+  const head = ['Level', 'Entries', 'Deaths', 'Gave up', 'Left', 'Cleared', 'Cleared, of entries', 'Most deaths'];
+  const numeric = new Set(head.slice(1, 7));
+  const spots = h('div', { id: 'everyone-spots' });
+  const rows = levels.map((l) => {
+    const tr = h(
+      'tr',
+      { className: 'row' },
+      h('td', {}, levelName(l.level)),
+      h('td', { className: 'n' }, l.enters),
+      h('td', { className: 'n' }, l.deaths),
+      h('td', { className: 'n' }, l.gaveUp),
+      h('td', { className: 'n' }, l.left),
+      h('td', { className: 'n' }, l.clears),
+      h('td', { className: 'n' }, share(l.clears, l.enters)),
+      h('td', { className: 'wrap' }, l.causes.slice(0, 3).map((c) => `${c.cause} ${c.n}`).join(' · ') || '—'),
+    );
+    tr.addEventListener('click', () => void openSpots(l.level, spots));
+    return tr;
+  });
+  return h(
+    'div',
+    {},
+    h(
+      'div',
+      { className: 'scroll' },
+      h(
+        'table',
+        {},
+        h('thead', {}, h('tr', {}, ...head.map((t) => h('th', { className: numeric.has(t) ? 'n' : '' }, t)))),
+        h('tbody', {}, ...rows, ...(rows.length ? [] : [h('tr', {}, h('td', { colSpan: head.length, className: 'muted' }, 'Nothing played yet.'))])),
+      ),
+    ),
+    spots,
+  );
+}
+
+/** Where everyone died in a level, from the anonymous counts: a scatter sized by how many, and the spots with the most. */
+async function openSpots(level: string, into: HTMLElement): Promise<void> {
+  into.replaceChildren(h('p', { className: 'muted' }, 'Loading…'));
+  const r = await get<AdminSpots>(`/api/admin/spots?level=${encodeURIComponent(level)}`);
+  if (!r.ok) {
+    into.replaceChildren(h('p', { className: 'error' }, refusal(r.status, r.error)));
+    return;
+  }
+  const { spots, more } = r.body;
+  const total = spots.reduce((n, p) => n + p.n, 0);
+  into.replaceChildren(
+    ...kids([
+      h('h3', {}, `${levelName(level)} `, h('span', { className: 'muted' }, `· where everyone died, ${total} deaths`)),
+      spots.length ? spotsScatter(level, spots) : h('p', { className: 'muted' }, 'No deaths counted here.'),
+      spots.length ? h('div', { className: 'legend' }, 'X along the level, Y up from the floor the tourist spawns on; the bigger, the more.', h('i'), 'a death', h('i', { className: 'lost' }), 'gave up') : null,
+      more ? h('p', { className: 'muted' }, `The ${spots.length} spots with the most.`) : null,
+      spots.length
+        ? h(
+            'ul',
+            { className: 'spots' },
+            ...spots.slice(0, 8).map((p) => h('li', {}, h('code', {}, `${level} (${p.x}, ${p.y})`), ` × ${p.n} · ${p.cause}`)),
+          )
+        : null,
+    ]),
+  );
+}
+
+function spotsScatter(level: string, spots: AdminSpots['spots']): SVGSVGElement {
+  const xs = spots.map((p) => p.x);
+  const ys = spots.map((p) => p.y);
+  const x0 = Math.min(0, ...xs) - SPOT;
+  const x1 = Math.max(...xs) + SPOT;
+  const y0 = Math.min(0, ...ys) - SPOT;
+  const y1 = Math.max(0, ...ys) + SPOT;
+  const W = 640;
+  const scale = W / Math.max(1, x1 - x0);
+  const H = Math.round(Math.min(240, Math.max(60, (y1 - y0) * scale)));
+  const sy = H / Math.max(1, y1 - y0);
+  const most = Math.max(...spots.map((p) => p.n));
+  const px = (x: number) => ((x - x0) * scale).toFixed(1);
+  const py = (y: number) => ((y1 - y) * sy).toFixed(1);
+  return s(
+    'svg',
+    { class: 'deaths', viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': `Where everyone died in ${levelName(level)}` },
+    s('line', { x1: 0, x2: W, y1: py(0), y2: py(0), stroke: '#3a352b', 'stroke-dasharray': '3 3' }),
+    ...spots.map((p) =>
+      s(
+        'circle',
+        { cx: px(p.x), cy: py(p.y), r: (2.5 + 7 * Math.sqrt(p.n / most)).toFixed(1), fill: p.cause === GAVE_UP ? '#d0644f' : '#cfc6b0', 'fill-opacity': 0.45 },
+        s('title', {}, `${level} (${p.x}, ${p.y}) ${p.cause} × ${p.n}`),
+      ),
+    ),
   );
 }
 

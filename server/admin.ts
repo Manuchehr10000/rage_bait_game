@@ -1,5 +1,5 @@
 import { normalizeEmail } from './address';
-import type { AdminGuest, AdminGuestDetail, AdminLevel, AdminTotals, AdminUser, AdminUserDetail, AdminUsers, PlayEvent } from './contract';
+import type { AdminEveryone, AdminGuest, AdminGuestDetail, AdminLevel, AdminSpots, AdminTotals, AdminUser, AdminUserDetail, AdminUsers, PlayEvent } from './contract';
 import type { D1Like, D1Statement } from './db';
 import type { Ctx, Env } from './env';
 import { fail, json } from './http';
@@ -24,7 +24,12 @@ const EVENTS_MAX = 500;
 const POINTS_PER_LEVEL = 1000;
 /** The guests' sets of cleared levels the funnel is read from, the most held first. */
 const TOURS_MAX = 500;
-const WEEK = 7 * 86_400_000;
+const DAY = 86_400_000;
+const WEEK = 7 * DAY;
+/** A level's spots in one answer, the most first. */
+const SPOTS_MAX = 2000;
+/** A level id as the game writes it. */
+const LEVEL_ID = /^[a-z0-9][a-z0-9-]{0,47}$/;
 /** A visitor's id, as the server makes it (server/visitors.ts). */
 const VISITOR_ID = /^[A-Za-z0-9_-]{22}$/;
 
@@ -184,10 +189,86 @@ function totalsStatement(db: D1Like, now: number): D1Statement {
          (SELECT sum(kind = 'death' AND cause = ?2) AS gave_up, sum(kind = 'leave') AS left_ FROM guest_events) g,
          (SELECT count(*) AS visitors, sum(user_id IS NULL) AS guests, sum(user_id IS NULL AND first_at > ?1) AS guests_new,
                sum(user_id IS NULL AND last_at > ?1) AS guests_seen, sum(played_at IS NOT NULL) AS played,
-               sum(user_id IS NOT NULL) AS signed_in, sum(played_at IS NOT NULL AND user_id IS NOT NULL) AS played_signed_in,
+               -- One made signed in (signed_in_at its first_at) never came as a guest.
+               sum(user_id IS NULL OR signed_in_at > first_at) AS came_as_guests,
+               sum(user_id IS NOT NULL AND signed_in_at > first_at) AS signed_in,
+               sum(played_at IS NOT NULL AND user_id IS NOT NULL) AS played_signed_in,
                min(first_at) AS since, sum(CASE WHEN user_id IS NULL THEN lifetime END) AS guest_deaths FROM visitors) v`,
     )
     .bind(now - WEEK, GAVE_UP);
+}
+
+/**
+ * How many come back, from the days each visitor came: of those first seen before today,
+ * those seen on another day and on the day after the first; of those first seen a week
+ * ago or more, those seen again within seven days.
+ */
+function returnsStatement(db: D1Like, now: number): D1Statement {
+  return db
+    .prepare(
+      `SELECT count(*) AS cohort, sum(days > 1) AS came_back,
+         sum(EXISTS (SELECT 1 FROM visitor_days x WHERE x.visitor_id = f.visitor_id AND x.day = f.d0 + 1)) AS next_day,
+         sum(d0 <= ?1 - 7) AS cohort_week,
+         sum(d0 <= ?1 - 7 AND EXISTS (SELECT 1 FROM visitor_days x WHERE x.visitor_id = f.visitor_id AND x.day > f.d0 AND x.day <= f.d0 + 7)) AS week
+       FROM (SELECT visitor_id, min(day) AS d0, count(*) AS days FROM visitor_days GROUP BY visitor_id) f
+       WHERE d0 < ?1`,
+    )
+    .bind(Math.floor(now / DAY));
+}
+
+/** Everyone's play, from the anonymous counts: every kind in every level by cause, and the week's opens. */
+function everyoneStatements(db: D1Like, now: number): D1Statement[] {
+  return [
+    db.prepare('SELECT kind, level_id, cause, sum(n) AS n FROM counts GROUP BY kind, level_id, cause'),
+    db
+      .prepare("SELECT (SELECT sum(n) FROM counts WHERE day > ?1 AND kind = 'open') AS opens_week, (SELECT min(day) FROM counts) AS first_day")
+      .bind(Math.floor(now / DAY) - 7),
+  ];
+}
+
+function toEveryone(rows: Row[], extra: Row | undefined): AdminEveryone {
+  const out: AdminEveryone = { opens: 0, opensWeek: num(extra?.opens_week), yes: 0, no: 0, levels: [], since: extra?.first_day == null ? null : num(extra.first_day) * DAY };
+  const levels = new Map<string, AdminEveryone['levels'][number]>();
+  const level = (id: string) => {
+    let l = levels.get(id);
+    if (!l) {
+      l = { level: id, enters: 0, deaths: 0, gaveUp: 0, left: 0, clears: 0, causes: [] };
+      levels.set(id, l);
+    }
+    return l;
+  };
+  for (const r of rows) {
+    const n = num(r.n);
+    const id = String(r.level_id);
+    switch (r.kind) {
+      case 'open':
+        out.opens += n;
+        break;
+      case 'consent':
+        if (r.cause === 'yes') out.yes += n;
+        else if (r.cause === 'no') out.no += n;
+        break;
+      case 'enter':
+        level(id).enters += n;
+        break;
+      case 'leave':
+        level(id).left += n;
+        break;
+      case 'clear':
+        level(id).clears += n;
+        break;
+      case 'death': {
+        const l = level(id);
+        l.deaths += n;
+        if (r.cause === GAVE_UP) l.gaveUp += n;
+        l.causes.push({ cause: String(r.cause), n });
+        break;
+      }
+    }
+  }
+  for (const l of levels.values()) l.causes.sort((a, b) => b.n - a.n || a.cause.localeCompare(b.cause));
+  out.levels = [...levels.values()];
+  return out;
 }
 
 /** Every set of cleared levels and how many hold it: the accounts', then the guests'. */
@@ -203,7 +284,7 @@ function tourStatements(db: D1Like): D1Statement[] {
   ];
 }
 
-function toTotals(t: Row | undefined, accountTours: Row[], guestTours: Row[]): AdminTotals {
+function toTotals(t: Row | undefined, accountTours: Row[], guestTours: Row[], returns: Row | undefined, everyone: AdminEveryone): AdminTotals {
   // One entry a set, whatever order its levels were kept in.
   const tours = new Map<string, AdminTotals['tours'][number]>();
   const add = (rows: Row[], who: 'accounts' | 'guests') => {
@@ -227,8 +308,17 @@ function toTotals(t: Row | undefined, accountTours: Row[], guestTours: Row[]): A
     guestsSeen: num(t?.guests_seen),
     visitors: num(t?.visitors),
     played: num(t?.played),
+    cameAsGuests: num(t?.came_as_guests),
     signedIn: num(t?.signed_in),
     playedSignedIn: num(t?.played_signed_in),
+    returns: {
+      cohort: num(returns?.cohort),
+      cameBack: num(returns?.came_back),
+      nextDay: num(returns?.next_day),
+      cohortWeek: num(returns?.cohort_week),
+      week: num(returns?.week),
+    },
+    everyone,
     since: numOrNull(t?.since),
     deaths: num(t?.account_deaths) + num(t?.guest_deaths),
     gaveUp: num(t?.account_gave_up) + num(t?.guest_gave_up),
@@ -246,7 +336,7 @@ export async function adminUsers(ctx: Ctx): Promise<Response> {
   const newest = 'SELECT id FROM users ORDER BY created_at DESC, id LIMIT ?1';
   const listed = `user_id IN (${newest})`;
   const newestGuests = 'SELECT id FROM visitors WHERE user_id IS NULL ORDER BY first_at DESC, id LIMIT ?1';
-  const [users, cleared, tally, lasts, visits, guests, guestTally, guestLasts, totals, accountTours, guestTours] = await db.batch<Row>([
+  const [users, cleared, tally, lasts, visits, guests, guestTally, guestLasts, totals, accountTours, guestTours, returns, counted, opened] = await db.batch<Row>([
     db
       .prepare('SELECT id, email, google_sub IS NOT NULL AS google, created_at, lifetime FROM users ORDER BY created_at DESC, id LIMIT ?1')
       .bind(USERS_MAX + 1),
@@ -259,6 +349,8 @@ export async function adminUsers(ctx: Ctx): Promise<Response> {
     ...tallyStatements(db, GUEST, `visitor_id IN (${newestGuests})`, [GUESTS_MAX]),
     totalsStatement(db, ctx.now),
     ...tourStatements(db),
+    returnsStatement(db, ctx.now),
+    ...everyoneStatements(db, ctx.now),
   ]);
   const rows = users?.results ?? [];
   const guestRows = guests?.results ?? [];
@@ -267,7 +359,13 @@ export async function adminUsers(ctx: Ctx): Promise<Response> {
     more: rows.length > USERS_MAX,
     guests: toGuests(guestRows.slice(0, GUESTS_MAX), guestTally?.results ?? [], guestLasts?.results ?? []),
     moreGuests: guestRows.length > GUESTS_MAX,
-    totals: toTotals(totals?.results[0], accountTours?.results ?? [], guestTours?.results ?? []),
+    totals: toTotals(
+      totals?.results[0],
+      accountTours?.results ?? [],
+      guestTours?.results ?? [],
+      returns?.results[0],
+      toEveryone(counted?.results ?? [], opened?.results[0]),
+    ),
   };
   return json(200, body);
 }
@@ -393,6 +491,24 @@ export async function adminGuest(ctx: Ctx): Promise<Response> {
   for (const lid of guest!.cleared) l.level(lid).clearedAt = l.firstClear.get(lid) ?? null;
   for (const [lid, list] of Object.entries(parsed(row.tricks, isTricks, {}))) l.level(lid).tricks.push(...list);
   const body: AdminGuestDetail = { guest: guest!, levels: [...l.byLevel.values()], events: l.events, more: l.more };
+  return json(200, body);
+}
+
+/** GET /api/admin/spots?level=: where everyone died in a level, from the anonymous counts, the spots with the most first. */
+export async function adminSpots(ctx: Ctx): Promise<Response> {
+  const no = await refuse(ctx);
+  if (no) return no;
+  const level = new URL(ctx.request.url).searchParams.get('level');
+  if (level === null || !LEVEL_ID.test(level)) return fail(400, 'bad_request');
+  const { results } = await ctx.db
+    .prepare('SELECT cause, x, y, sum(n) AS n FROM spots WHERE level_id = ?1 GROUP BY cause, x, y ORDER BY n DESC, x, y, cause LIMIT ?2')
+    .bind(level, SPOTS_MAX + 1)
+    .all<Row>();
+  const body: AdminSpots = {
+    level,
+    spots: results.slice(0, SPOTS_MAX).map((r) => ({ cause: String(r.cause), x: num(r.x), y: num(r.y), n: num(r.n) })),
+    more: results.length > SPOTS_MAX,
+  };
   return json(200, body);
 }
 

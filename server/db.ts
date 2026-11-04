@@ -73,6 +73,15 @@ export const MIGRATIONS: readonly (readonly string[])[] = [
     // since the epoch, the day's row the hour it began.
     'CREATE TABLE IF NOT EXISTS visit_limits (ip TEXT NOT NULL, hour INTEGER NOT NULL, n INTEGER NOT NULL, PRIMARY KEY (ip, hour))',
     'CREATE INDEX IF NOT EXISTS visit_limits_hour ON visit_limits (hour)',
+    // The days (since the epoch, UTC) each visitor opened the game, for how many come back.
+    'CREATE TABLE IF NOT EXISTS visitor_days (visitor_id TEXT NOT NULL, day INTEGER NOT NULL, PRIMARY KEY (visitor_id, day)) WITHOUT ROWID',
+    // Everyone's play, anonymous (designer, 2026-11-04), with nothing that tells one visitor
+    // from another: counts by day, of a kind, in a level, of a cause ('' for a kind with
+    // none); and each death again by the spot it happened at, read a level at a time.
+    `CREATE TABLE IF NOT EXISTS counts (day INTEGER NOT NULL, kind TEXT NOT NULL, level_id TEXT NOT NULL, cause TEXT NOT NULL,
+      n INTEGER NOT NULL, PRIMARY KEY (day, kind, level_id, cause)) WITHOUT ROWID`,
+    `CREATE TABLE IF NOT EXISTS spots (level_id TEXT NOT NULL, x INTEGER NOT NULL, y INTEGER NOT NULL, cause TEXT NOT NULL,
+      day INTEGER NOT NULL, n INTEGER NOT NULL, PRIMARY KEY (level_id, x, y, cause, day)) WITHOUT ROWID`,
   ],
 ];
 

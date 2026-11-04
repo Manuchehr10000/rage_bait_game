@@ -19,9 +19,10 @@ export interface Env {
   /** Codes sent per IP per rolling hour. Default 20. */
   EMAIL_IP_HOURLY?: string;
   /**
-   * What guests may send (server/visitors.ts), in units: a push one, each event in it one
-   * more, each KiB of its tour one more. One network an hour, default 20000, and all of
-   * them a day, default 20000: about half of D1's free 100,000 rows written a day.
+   * What the tracker may be sent (server/visitors.ts), in units: a push one, each event or
+   * count in it one more, each KiB of a guest's tour one more. One network an hour, default
+   * 20000, and all of them a day, default 500000: about 30 million of the Workers Paid
+   * plan's 50 million rows written a month at most.
    */
   VISIT_IP_HOURLY?: string;
   VISIT_DAILY_CAP?: string;
