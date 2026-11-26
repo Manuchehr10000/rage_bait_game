@@ -73,7 +73,7 @@ const TOUR: Chapter[] = [
       { name: 'Rouffignac', lat: 45.01, lon: 0.99, level: 'rouffignac', pin: { dx: -14, dy: -6 }, label: 'left' },
       { name: 'Gargas', lat: 43.05, lon: 0.52, level: 'gargas', label: 'left' },
       // The hunt with spears, as the twentieth century's "hunting magic" told it. Designer's choice, 2026-09-26.
-      { name: 'Hunting Magic', lat: 43.05, lon: 0.52, pin: { dx: 17, dy: 3 }, legend: true },
+      { name: 'Hunting Magic', lat: 43.05, lon: 0.52, level: 'hunting-magic', pin: { dx: 17, dy: 3 }, legend: true },
     ],
   },
   {

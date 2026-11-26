@@ -4,6 +4,7 @@
  * tests/map.spec.ts holds this list to HELD. No imports: the build config reads it.
  */
 export const HELD_FILES: readonly string[] = [
+  'src/levels/ch01-palaeolithic/l06-hunting-magic.ts',
   'src/levels/ch03-aegean/l01-knossos.ts',
   'src/levels/ch03-aegean/l06-minotaur.ts',
   'src/levels/ch04-persia/l01-persepolis.ts',

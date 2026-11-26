@@ -50,6 +50,8 @@ const SHOWN = 4;
 
 /** Chapter 1's levels, for tests that need a chapter cleared. */
 const CHAPTER_1 = ['cap-blanc', 'roc-aux-sorciers', 'pech-merle', 'rouffignac', 'gargas'];
+/** Chapter 1 as every build but prod plays it: its five sites and its legend, held from prod (2026-11-26). */
+const CHAPTER_1_ALL = [...CHAPTER_1, 'hunting-magic'];
 /** Chapter 2's. */
 const CHAPTER_2 = ['abu-simbel', 'philae', 'karnak', 'dendera'];
 
@@ -142,7 +144,7 @@ test('a chapter with nothing built in it is closed; one level opens it', async (
 });
 
 test('arrow keys walk the chapters; Enter walks into Egypt from the left edge; Escape comes back', async ({ page }) => {
-  await seed(page, CHAPTER_1);
+  await seed(page, CHAPTER_1_ALL);
   await press(page, 'ArrowRight');
   let s = await snap(page);
   expect(s.chapter).toBe(1);
@@ -200,7 +202,7 @@ test('a closed site stays closed; the chapter wraps around', async ({ page }) =>
 });
 
 test('the mouse picks a chapter and a site', async ({ page }) => {
-  await seed(page, [...CHAPTER_1, 'abu-simbel', 'philae']);
+  await seed(page, [...CHAPTER_1_ALL, 'abu-simbel', 'philae']);
   const box = await page.locator('#game').boundingBox();
   if (!box) throw new Error('no canvas');
   const at = async (p: { x: number; y: number }) => ({ x: box.x + (p.x / 320) * box.width, y: box.y + (p.y / 180) * box.height });
@@ -277,15 +279,16 @@ test('in prod the tour is played in order: a level opens once every level before
 });
 
 test('prod\'s tour is chapters 1 and 2; the others\' puts back every level held from it, each after the one it follows', () => {
-  // Chapters 3 and 4 are held back from prod, closed for restoration (designer, 2026-10-27).
+  // Chapters 3 and 4 are held back from prod, closed for restoration (designer, 2026-10-27), and
+  // so is chapter 1's legend, on the dev map since 2026-11-26.
   const held = HELD.map((h) => h.level.id);
-  expect(held).toEqual(['knossos', 'minotaur', 'persepolis']);
+  expect(held).toEqual(['hunting-magic', 'knossos', 'minotaur', 'persepolis']);
   const prod = PROD_LEVELS.map((l) => l.id);
   expect(prod).toEqual([...CHAPTER_1, ...CHAPTER_2]);
   for (const id of held) expect(prod).not.toContain(id);
   // Every held level goes back in, after the one it follows, held or not: none is lost to an
   // `after` that prod's tour does not have.
-  expect(LEVELS.map((l) => l.id)).toEqual([...prod, 'knossos', 'minotaur', 'persepolis']);
+  expect(LEVELS.map((l) => l.id)).toEqual([...CHAPTER_1_ALL, ...CHAPTER_2, 'knossos', 'minotaur', 'persepolis']);
   expect(LEVELS).toHaveLength(PROD_LEVELS.length + HELD.length);
   for (const h of HELD) expect(LEVELS.map((l) => l.id).indexOf(h.level.id)).toBe(LEVELS.map((l) => l.id).indexOf(h.after) + 1);
   // The atlas is the others' tour, in its order.
@@ -302,7 +305,9 @@ test('the prod build keeps out the file of every held level, and of nothing else
 test('on prod\'s map chapters 3 and 4 are closed for restoration, and chapters 1 and 2 are the atlas', () => {
   const prod = chaptersFor(PROD_LEVELS.map((l) => l.id));
   expect(prod.map((c) => c.number)).toEqual([1, 2, 3, 4]);
-  expect(prod.slice(0, 2)).toEqual(CHAPTERS.slice(0, 2));
+  // Chapter 2 is the atlas's; chapter 1 is too, but for its legend's pin, held: closed, no level.
+  expect(prod[1]).toEqual(CHAPTERS[1]);
+  expect(prod[0]!.sites).toEqual(CHAPTERS[0]!.sites.map((s) => (s.level === 'hunting-magic' ? { ...s, level: undefined, held: true } : s)));
   for (const c of prod.slice(2)) {
     expect(chapterOpen(c), `chapter ${c.number}`).toBe(false);
     expect(chapterRestoring(c), `chapter ${c.number}`).toBe(true);
@@ -385,7 +390,7 @@ test('a deep link still opens a level directly, and the exit leads to the next s
 });
 
 test('chapter 3 opens on the Minotaur once Knossos is cleared, and its pin walks him in under its title card', async ({ page }) => {
-  await seed(page, [...CHAPTER_1, ...CHAPTER_2, 'knossos']);
+  await seed(page, [...CHAPTER_1_ALL, ...CHAPTER_2, 'knossos']);
   await press(page, 'ArrowRight');
   await press(page, 'ArrowRight');
   await press(page, 'Enter');
@@ -409,7 +414,7 @@ test('chapter 3 opens on the Minotaur once Knossos is cleared, and its pin walks
   expect(s.deaths).toBe(0);
 
   // And the mouse, on the legend's own pin.
-  await seed(page, [...CHAPTER_1, ...CHAPTER_2, 'knossos']);
+  await seed(page, [...CHAPTER_1_ALL, ...CHAPTER_2, 'knossos']);
   const box = await page.locator('#game').boundingBox();
   if (!box) throw new Error('no canvas');
   await press(page, 'ArrowRight');
@@ -426,12 +431,12 @@ test('chapter 3 opens on the Minotaur once Knossos is cleared, and its pin walks
 
 test('chapter 3 is stamped on the world once Knossos and the Minotaur are both cleared, and not for either alone', async ({ page }) => {
   const walked = () => page.evaluate(() => (window as unknown as { __game: { mapScreen: { view: string; walked(): number } } }).__game.mapScreen.walked());
-  await seed(page, [...CHAPTER_1, ...CHAPTER_2, 'knossos']);
+  await seed(page, [...CHAPTER_1_ALL, ...CHAPTER_2, 'knossos']);
   expect((await snap(page)).view).toBe('world');
   expect(await walked()).toBe(2);
-  await seed(page, [...CHAPTER_1, ...CHAPTER_2, 'minotaur']);
+  await seed(page, [...CHAPTER_1_ALL, ...CHAPTER_2, 'minotaur']);
   expect(await walked()).toBe(2);
-  await seed(page, [...CHAPTER_1, ...CHAPTER_2, 'knossos', 'minotaur']);
+  await seed(page, [...CHAPTER_1_ALL, ...CHAPTER_2, 'knossos', 'minotaur']);
   expect(await walked()).toBe(3);
 });
 
@@ -482,7 +487,7 @@ test('the itinerary ribbon is one straight rule, left to right, with every stop 
 });
 
 test('the ribbon picks a chapter and then a site, the same as the map does', async ({ page }) => {
-  await seed(page, [...CHAPTER_1, 'abu-simbel', 'philae']);
+  await seed(page, [...CHAPTER_1_ALL, 'abu-simbel', 'philae']);
   const box = await page.locator('#game').boundingBox();
   if (!box) throw new Error('no canvas');
   const at = async (p: { x: number; y: number }) => ({ x: box.x + (p.x / 320) * box.width, y: box.y + (p.y / 180) * box.height });
@@ -513,9 +518,9 @@ test('the ribbon measures progress, not where the cursor is', async ({ page }) =
   await press(page, 'ArrowRight');
   expect(await walked()).toBe(0);
 
-  // Chapter 1's five levels cleared, chapter 2's three not.
+  // Chapter 1's levels cleared, its legend with them, and chapter 2's not.
   await page.evaluate(() =>
-    localStorage.setItem('lostTourist.cleared', JSON.stringify(['cap-blanc', 'roc-aux-sorciers', 'pech-merle', 'rouffignac', 'gargas'])),
+    localStorage.setItem('lostTourist.cleared', JSON.stringify(['cap-blanc', 'roc-aux-sorciers', 'pech-merle', 'rouffignac', 'gargas', 'hunting-magic'])),
   );
   await page.reload();
   await page.waitForFunction(() => (window as unknown as { __game?: { currentScreen: string } }).__game?.currentScreen === 'map');
@@ -537,7 +542,7 @@ test('the ribbon measures progress, not where the cursor is', async ({ page }) =
 
 test('a chapter whose every built level is cleared opens on its first site', async ({ page }) => {
   await page.evaluate(() =>
-    localStorage.setItem('lostTourist.cleared', JSON.stringify(['cap-blanc', 'roc-aux-sorciers', 'pech-merle', 'rouffignac', 'gargas'])),
+    localStorage.setItem('lostTourist.cleared', JSON.stringify(['cap-blanc', 'roc-aux-sorciers', 'pech-merle', 'rouffignac', 'gargas', 'hunting-magic'])),
   );
   await page.reload();
   await page.waitForFunction(() => (window as unknown as { __game?: { currentScreen: string } }).__game?.currentScreen === 'map');

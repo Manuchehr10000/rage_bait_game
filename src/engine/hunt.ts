@@ -141,7 +141,7 @@ export class Hunt implements Entity {
         w.sound('crumble');
         const onCover = p.onGround && Math.abs(p.y + p.h - d.floorY) <= 1 && p.x + p.w > d.pit.x0 && p.x < d.pit.x1;
         if (onCover) {
-          w.kill('The pitfall');
+          w.kill(d.causes.pitfall);
           return;
         }
       }
@@ -222,7 +222,7 @@ export class Hunt implements Entity {
       // The trap's double: the trap lets go, and the beast comes up out of the pit at him,
       // on the lip floor and in the air over it (the tectiform).
       this.state = 'sprung';
-      w.kill('The tectiform');
+      w.kill(this.def.causes.tectiform);
     }
   }
 

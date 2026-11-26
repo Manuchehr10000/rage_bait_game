@@ -4,8 +4,8 @@ import { TILE } from '../../engine/types';
 /**
  * Chapter 1, Level 6 — Hunting Magic, the chapter's legend: a mammoth hunt as the twentieth
  * century's "hunting magic" told it. Design: content/ch01-palaeolithic/l06-hunting-magic/LEVEL.md,
- * ruled in content/research/arc.md, section 4. Built rough as a dev stage, by its deep link
- * #hunting-magic, not on the map (src/levels/index.ts, STAGES).
+ * ruled in content/research/arc.md, section 4. Built rough; on the dev map after Gargas since
+ * the designer's word of 2026-11-26, and held back from prod (src/levels/index.ts, HELD).
  *
  * One screen wide and 40 tiles deep. The spawn floor is y 160, so a designer's point (X, Y)
  * is world x X, y 160 − Y.
@@ -77,6 +77,7 @@ const HUNT: HuntDef = {
   backSpeed: 40,
   sinkTime: 0.4,
   felled: FELLED,
+  causes: { pitfall: 'The pitfall', tectiform: 'The tectiform' },
 };
 
 const g = new Grid(W, H);

@@ -35,6 +35,8 @@ export const PROD_LEVELS: LevelData[] = [CAP_BLANC, ROC_AUX_SORCIERS, PECH_MERLE
  * 2026-10-15 to 2026-10-16.
  */
 export const HELD: readonly { level: LevelData; after: string }[] = [
+  // Chapter 1's legend, built rough: on the dev map after Gargas, not yet in prod (designer, 2026-11-26).
+  { level: HUNTING_MAGIC, after: 'gargas' },
   { level: KNOSSOS, after: 'dendera' },
   { level: MINOTAUR, after: 'knossos' },
   { level: PERSEPOLIS, after: 'minotaur' },
@@ -60,7 +62,7 @@ export const LEVELS: LevelData[] = /* @__PURE__ */ withHeld(PROD_LEVELS, HELD);
  * `#<id>`. When its traps are in, it takes its level's place in the tour: in PROD_LEVELS, or
  * in HELD, with its file in held-files.ts, while it is held back from prod.
  */
-export const STAGES: LevelData[] = /* @__PURE__ */ (() => [HUNTING_MAGIC])();
+export const STAGES: LevelData[] = [];
 
 /**
  * `list` is what the game can enter: the build's tour, and the stages too where there are dev

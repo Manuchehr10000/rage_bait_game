@@ -716,6 +716,8 @@ export interface HuntDef {
   sinkTime: number;
   /** The event the heart, in a trapped beast, fires. */
   felled: string;
+  /** Its two deaths: down the pit under the beast, and the trap let go. */
+  causes: { pitfall: DeathCause; tectiform: DeathCause };
 }
 
 /** The animals of the plate (Hunting Magic): Altamira's horse, hind and bison. */

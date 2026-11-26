@@ -75,6 +75,11 @@ notes describe the levels as they were built.
   Held back again with all of chapters 3 and 4 on 2026-10-27 (below). A level is held back by
   `HELD` in `src/levels/index.ts`, its file in `src/levels/held-files.ts`, checked by
   vite.config.ts.
+- **Hunting Magic, chapter 1's legend,** was designed 2026-11-25 and 26 and built rough on 2026-11-26
+  (`content/ch01-palaeolithic/l06-hunting-magic/LEVEL.md`; `src/engine/hunt.ts`): three tricks, the
+  relief, the pitfall and the tectiform ("n of 3"); the throw is X or J. On the dev map after Gargas
+  by the designer's word of 2026-11-26 ("put it on the dev map"), held back from prod (`HELD`). A
+  clean run is 7.2 s against the ruled "about 22": open, for the designer.
 - **Main plays chapters 1 and 2** (designer, 2026-10-27: "Make only chapter 1 and 2 playable
   in main. Other chapters are visible but locked for now. Locked in the sense that are under
   developments"): Knossos, the Minotaur and Persepolis are `HELD`, so prod's tour ends at
