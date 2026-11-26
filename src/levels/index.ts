@@ -3,6 +3,7 @@ import { CAP_BLANC } from './ch01-palaeolithic/l01-cap-blanc';
 import { PECH_MERLE } from './ch01-palaeolithic/l03-pech-merle';
 import { ROUFFIGNAC } from './ch01-palaeolithic/l04-rouffignac';
 import { GARGAS } from './ch01-palaeolithic/l05-gargas';
+import { HUNTING_MAGIC } from './ch01-palaeolithic/l06-hunting-magic';
 import { ROC_AUX_SORCIERS } from './ch01-palaeolithic/l02-roc-aux-sorciers';
 import { ABU_SIMBEL } from './ch02-egypt/l01-abu-simbel';
 import { KARNAK } from './ch02-egypt/l03-karnak';
@@ -59,7 +60,7 @@ export const LEVELS: LevelData[] = /* @__PURE__ */ withHeld(PROD_LEVELS, HELD);
  * `#<id>`. When its traps are in, it takes its level's place in the tour: in PROD_LEVELS, or
  * in HELD, with its file in held-files.ts, while it is held back from prod.
  */
-export const STAGES: LevelData[] = [];
+export const STAGES: LevelData[] = /* @__PURE__ */ (() => [HUNTING_MAGIC])();
 
 /**
  * `list` is what the game can enter: the build's tour, and the stages too where there are dev

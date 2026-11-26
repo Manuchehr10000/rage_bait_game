@@ -1,3 +1,4 @@
+import { drawGargasAbove, drawPlateFigure, drawPlatePaper, drawPlateTile } from './plate';
 import type { Camera } from '../engine/camera';
 import type { Chaser, Crumble, Ear, Entity, Falling, Fight, Guards, Hero, HeroFrame, Horse, Platform, Pusher, Roof, Seat, Sweep, Tableau, Thrower, Tipper, TrapColumn, Water } from '../engine/entities';
 import type { DecorDef, Level } from '../engine/level';
@@ -271,6 +272,7 @@ export function renderWorld(ctx: CanvasRenderingContext2D, s: Scene): void {
   else if (theme === 'knossos') drawKnossosSky(ctx, cy);
   else if (theme === 'persepolis') drawPersepolisSky(ctx, cy);
   else if (theme === 'minotaur') drawMinotaurClay(ctx);
+  else if (theme === 'huntingMagic') drawPlatePaper(ctx);
   else drawSky(ctx, cy, theme);
   if (theme === 'capBlanc') drawFarBeune(ctx, cx, cy);
   else if (theme === 'rocAuxSorciers') drawFarAnglin(ctx, cx, cy);
@@ -280,7 +282,7 @@ export function renderWorld(ctx: CanvasRenderingContext2D, s: Scene): void {
   else if (theme === 'dendera') drawFarDendera(ctx, cx, cy);
   else if (theme === 'knossos') drawFarKnossos(ctx, cx, cy);
   else if (theme === 'persepolis') drawFarPersepolis(ctx, cx, cy);
-  else if (theme !== 'minotaur') drawFarKarnak(ctx, cx, cy);
+  else if (theme !== 'minotaur' && theme !== 'huntingMagic') drawFarKarnak(ctx, cx, cy);
 
   ctx.save();
   ctx.translate(-cx, -cy);
@@ -288,7 +290,7 @@ export function renderWorld(ctx: CanvasRenderingContext2D, s: Scene): void {
   if (theme === 'abuSimbel') drawRock(ctx, s, cx, cy);
   else if (theme === 'philae') drawRiverbed(ctx, s, cx, cy);
   else if (theme === 'minotaur') drawVestibule(ctx);
-  else if (theme !== 'dendera' && theme !== 'knossos' && theme !== 'persepolis') drawKarnakGround(ctx, s, cx, cy);
+  else if (theme !== 'dendera' && theme !== 'knossos' && theme !== 'persepolis' && theme !== 'huntingMagic') drawKarnakGround(ctx, s, cx, cy);
   for (const d of level.data.decor) drawDecor(ctx, s, d);
   drawTiles(ctx, level, cx, cy);
   for (const e of s.entities) drawEntityBack(ctx, s, e);
@@ -842,6 +844,12 @@ function drawRiverbed(ctx: CanvasRenderingContext2D, s: Scene, cx: number, cy: n
 function drawDecor(ctx: CanvasRenderingContext2D, s: Scene, d: DecorDef): void {
   const groundY = 15 * TILE;
   switch (d.kind) {
+    case 'plateFigure':
+      drawPlateFigure(ctx, d.figure, d.rect, d.face);
+      break;
+    case 'gargasAbove':
+      drawGargasAbove(ctx, d.y, d.x);
+      break;
     case 'facade': {
       // The Great Temple's face: a pylon shape cut into the cliff, battered on
       // its free edge, with a torus moulding and a cavetto cornice. The colossi
@@ -1631,6 +1639,10 @@ function drawTileAt(
     if (!paint(ctx, persepolisTileId(stone, open && !under), x, y)) drawPersepolisTile(ctx, stone, tx, ty, x, y, open && !under);
     return;
   }
+  if (theme === 'huntingMagic') {
+    drawPlateTile(ctx, level, tx, ty, x, y);
+    return;
+  }
   if (paint(ctx, tileArtId(theme, c, open), x, y)) return;
   if (theme === 'knossos' && (c === '=' || c === '#' || c === '%')) {
     drawKnossosTile(ctx, c, tx, ty, x, y, open);
@@ -1924,6 +1936,10 @@ function drawCliff(ctx: CanvasRenderingContext2D, tx: number, ty: number, x: num
 function drawEntityBack(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): void {
   const d = e.def;
   switch (d.kind) {
+    case 'relief':
+      // Drawn exactly as the flat ones are: the plate does not show the boss.
+      drawPlateFigure(ctx, d.figure, d.rect, d.face);
+      break;
     case 'snare': {
       // Drawn by the same code as the harmless ones, because it is the same track.
       // One that is part of something already drawn is not drawn again.

@@ -95,6 +95,9 @@ const SOUND_OF: Record<Theme, { track: MusicId | null; room: Room }> = {
   // The chapter's lyre. Which room it is heard in here is not designed yet (its LEVEL.md);
   // until it is, the chapter's open air, which claims no roof.
   minotaur: { track: 'ch03', room: 'open' },
+  // The chapter's pipe, in a cave: a shaft and a room under it. Not designed further in its
+  // LEVEL.md; 'deep', as at Gargas, which it is entered from.
+  huntingMagic: { track: 'ch01', room: 'deep' },
 };
 
 /** The pages of the brochure that have been arranged, by chapter number. */

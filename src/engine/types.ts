@@ -59,6 +59,8 @@ export type DeathCause =
   | 'The hands'
   | 'The horns'
   | 'The labyrinth'
+  | 'The relief'
+  | 'The shaft'
   | 'Gave up';
 
 /** How each death is drawn. */
@@ -125,6 +127,11 @@ export const DEATH_ANIM: Record<DeathCause, DeathAnim> = {
   'The horns': 'horns',
   // A fall that kills, or a fall off the bottom: neither can happen in the labyrinth.
   'The labyrinth': 'flat',
+  // Hunting Magic. Stopped dead against a bison on a boss the plate does not show, and down
+  // the open shaft: a fall's body on the hunt room's floor.
+  'The relief': 'flat',
+  // A plain fall that kills on the way down.
+  'The shaft': 'flat',
   'Gave up': 'sit',
 };
 
@@ -185,6 +192,8 @@ export const DEATH_SOUND: Record<
   // bull reaches him.
   'The horns': null,
   'The labyrinth': 'thud',
+  'The relief': 'thud',
+  'The shaft': 'thud',
   'Gave up': 'sigh',
 };
 

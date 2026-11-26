@@ -15,6 +15,7 @@ import type {
   Level,
   PlatformDef,
   PusherDef,
+  ReliefDef,
   RoofDef,
   SeatDef,
   SnareDef,
@@ -111,6 +112,8 @@ export function createEntity(def: EntityDef, level: Level): Entity {
       return new Fight(def);
     case 'tableau':
       return new Tableau(def);
+    case 'relief':
+      return new Relief(def);
   }
 }
 
@@ -419,6 +422,36 @@ export class Sweep implements Entity {
       const safe = d.safe.some((s) => cx >= s.x && cx <= s.x + s.w && centerY(p) >= s.y && centerY(p) <= s.y + s.h);
       if (!safe) w.kill(d.cause);
     }
+  }
+}
+
+/**
+ * The relief (ReliefDef): a solid that looks like a flat picture. Met side on in the air,
+ * it stops him dead, and the fall that follows is its death. Its back is a floor.
+ */
+export class Relief implements Entity {
+  private readonly solid: MovingSolid;
+
+  constructor(readonly def: ReliefDef) {
+    this.solid = { rect: { ...def.rect }, dx: 0, dy: 0 };
+  }
+
+  update(w: World): void {
+    if (!w.alive) return;
+    const p = w.player;
+    const r = this.def.rect;
+    if (p.onGround) return;
+    // Entities run before he moves: last frame's contacts say whether he was stopped against
+    // one of its sides, beside it and not over or under it.
+    const c = p.lastContacts;
+    const beside = p.y + p.h > r.y && p.y < r.y + r.h;
+    const atLeft = c.right && Math.abs(p.x + p.w - r.x) < 0.5;
+    const atRight = c.left && Math.abs(p.x - (r.x + r.w)) < 0.5;
+    if (beside && (atLeft || atRight)) w.claim(this.def.claims);
+  }
+
+  solids(): MovingSolid[] {
+    return [this.solid];
   }
 }
 

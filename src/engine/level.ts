@@ -23,7 +23,8 @@ export type Theme =
   | 'dendera'
   | 'knossos'
   | 'persepolis'
-  | 'minotaur';
+  | 'minotaur'
+  | 'huntingMagic';
 
 /**
  * A floor that is a straight line from (x0, y0) to (x1, y1), x0 < x1: a stair of risers
@@ -672,7 +673,28 @@ export interface TableauDef {
   body: { head: number; w: number };
 }
 
+/**
+ * A picture on the wall that is painted on a bulge of the rock, a boss, which the plate it
+ * is drawn in does not show (Hunting Magic, the relief). Drawn flat as every other picture
+ * on the wall, and solid all round: its outline is the boss's edge, so its back is a
+ * floor. A man who meets its side in the air is stopped dead, and whatever plain death
+ * the fall after it brings is `claims` (pillar 8; World.claim).
+ */
+export interface ReliefDef {
+  kind: 'relief';
+  /** The figure painted on it, drawn as the plate draws the flat ones. */
+  figure: PlateFigure;
+  rect: Rect;
+  /** Which way it faces. */
+  face: 1 | -1;
+  claims: DeathCause;
+}
+
+/** The animals of the plate (Hunting Magic): Altamira's horse, hind and bison. */
+export type PlateFigure = 'horse' | 'hind' | 'bison';
+
 export type EntityDef =
+  | ReliefDef
   | TableauDef
   | FightDef
   | EarDef
@@ -916,7 +938,12 @@ export type DecorDef =
    */
   | { kind: 'queue'; front: number; step: number; maidens: number; youths: number; floorY: number }
   /** Ariadne, apart from the file, over x `x0` to `x1`: facing the door, her hands empty. */
-  | { kind: 'ariadne'; x0: number; x1: number; floorY: number };
+  | { kind: 'ariadne'; x0: number; x1: number; floorY: number }
+  // Hunting Magic.
+  /** A flat figure of the plate, drawn on the wall behind him. */
+  | { kind: 'plateFigure'; figure: PlateFigure; rect: Rect; face: 1 | -1 }
+  /** Gargas, in the cave's own drawing, over x 0 to `x` and above `y`: where the plate has not begun. */
+  | { kind: 'gargasAbove'; x: number; y: number };
 
 /** The painted panels the game draws on cave rock, by site. */
 export type CavePanel =
