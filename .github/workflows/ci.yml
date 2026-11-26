@@ -22,7 +22,9 @@ permissions:
 
 jobs:
   check:
-    runs-on: ubuntu-latest
+    # Pinned: ubuntu-latest moved to 26.04, where Playwright 1.56 cannot install Chromium
+    # (2026-11-26). Move it on when the project's Playwright supports the newer image.
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -52,7 +54,7 @@ jobs:
   deploy:
     needs: check
     if: github.event_name != 'pull_request' && (github.ref_name == 'main' || github.ref_name == 'dev')
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     # Queue per branch: a second push to dev supersedes the first, and never
     # cancels a prod deploy that happens to be in flight.
     concurrency:
