@@ -100,4 +100,7 @@ const GAME_KEYS = new Set([
   'KeyL',
   'Enter',
   'Escape',
+  // The throw, beside the jump keys Z and K: only Hunting Magic listens (arc.md, section 4).
+  'KeyX',
+  'KeyJ',
 ]);

@@ -1,4 +1,4 @@
-import { Grid, type LevelData, type ReliefDef } from '../../engine/level';
+import { Grid, type HuntDef, type LevelData, type ReliefDef } from '../../engine/level';
 import { TILE } from '../../engine/types';
 
 /**
@@ -17,14 +17,15 @@ import { TILE } from '../../engine/types';
  *           the relief, the bison on its boss over the gap past A's lip, x 108..134, its back
  *           at 348; C (x 176..304, floor 528), reached off the bison's back, and out of reach of a
  *           man stopped by its flank, who drifts on under it; off C's left edge
- *           down to the hunt room's floor, 608
- *   c     the hunt room, floor 608: the fight is still to build. Rough: an exit on the far lip.
+ *           down to the hunt room's floor, 640
+ *   c     the hunt room, floor 640: the fight (HUNT). The exit is the far lip, once the
+ *           beast is felled.
  *
  * Every drop on the clean way is under PHYS.fatalFall; the only one that is not is down the
- * open shaft past A's lip, 240 px, which a man stopped by the bison falls.
+ * open shaft past A's lip, 272 px, which a man stopped by the bison falls.
  */
 const W = 20;
-const H = 41;
+const H = 43;
 const px = (t: number) => t * TILE;
 
 /** The floors, top to bottom. */
@@ -32,7 +33,7 @@ const LEDGE_1 = 160;
 const LEDGE_2 = 256;
 const A = 368;
 const C = 528;
-const FLOOR = 608;
+const FLOOR = 640;
 
 /** A's lip: the right edge of A, where the open shaft begins. */
 const LIP = 96;
@@ -51,6 +52,31 @@ const RELIEF: ReliefDef = {
   rect: { x: LIP + 12, y: A - 20, w: 26, h: 28 },
   face: 1,
   claims: 'The relief',
+};
+
+/** The event the heart fires: the trapped beast felled, and the exit open. */
+const FELLED = 'felled';
+
+/**
+ * The hunt (LEVEL.md, beat c; arc.md, section 4, 2026-11-26): the Montespan bear at 56..76, the
+ * blind beast at 144..208, 64 by 32, facing him; the 16 px strip; the pit under its cover at
+ * 224..288, 32 deep; the far lip at 288..304 under the rock that leans over it to 24 px above
+ * its floor; the closing rock from 304. The picture is over the pit, its foot on the floor's
+ * line. Rough: the strip is 16 px where it was ruled 12, to sit on the grid; the beast is
+ * 32 tall where it was about 30, so that sunk its back is the floor's line.
+ */
+const HUNT: HuntDef = {
+  kind: 'hunt',
+  floorY: FLOOR,
+  bear: { x: 56, y: FLOOR - 12, w: 20, h: 12 },
+  beast: { x: 144, w: 64, h: 32 },
+  pit: { x0: 224, x1: 288 },
+  pitDepth: 32,
+  rock: { x: 288, y: FLOOR - 40, w: 16, h: 16 },
+  opensAfter: 0.2,
+  backSpeed: 40,
+  sinkTime: 0.4,
+  felled: FELLED,
 };
 
 const g = new Grid(W, H);
@@ -79,12 +105,14 @@ export const HUNTING_MAGIC: LevelData = {
   spawn: { x: 8, y: LEDGE_1 - 16 },
   cameraBottom: px(H),
   cameraOnSpawn: true,
-  tricks: ['The relief'],
+  tricks: ['The relief', 'The pitfall', 'The tectiform'],
   // A plain fall that kills is the shaft's, and nobody's trick unless the relief claims it.
   dropCause: 'The shaft',
   fallCause: 'The shaft',
-  // Rough, until the fight is built: the far lip.
+  // Rough: the far lip, once the beast is felled. Where the legend is left is not designed.
   exit: { x: 288, y: FLOOR - 24, w: 16, h: 24 },
+  exitAfter: FELLED,
+  exitHidden: true,
   decor: [
     { kind: 'gargasAbove', x: 112, y: LEDGE_1 + 16 },
     // Stage 1: the horse, behind the fall off ledge 1.
@@ -92,5 +120,5 @@ export const HUNTING_MAGIC: LevelData = {
     // Stage 2: the hind, behind the drift off ledge 2's left edge.
     { kind: 'plateFigure', figure: 'hind', rect: { x: 76, y: 300, w: 36, h: 28 }, face: -1 },
   ],
-  entities: [RELIEF],
+  entities: [RELIEF, HUNT],
 };

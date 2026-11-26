@@ -106,9 +106,77 @@ export function drawPlateFigure(ctx: CanvasRenderingContext2D, figure: PlateFigu
   if (figure === 'mammoth') {
     // Its eye, high on the domed head; shut, a line; open, a dot.
     const ex = face === 1 ? r.x + 0.86 * r.w : r.x + 0.14 * r.w;
-    const ey = r.y + 0.28 * r.h;
+    const ey = r.y + 0.22 * r.h;
     ctx.fillStyle = PLATE.line;
     if (eyeShut) ctx.fillRect(Math.round(ex) - 1, Math.round(ey), 3, 1);
     else ctx.fillRect(Math.round(ex), Math.round(ey), 1, 1);
   }
+}
+
+/** A spear: a black shaft with a point, from (x, y), `len` px long, pointing `dir`. */
+export function drawSpear(ctx: CanvasRenderingContext2D, x: number, y: number, len: number, dir: 1 | -1): void {
+  ctx.fillStyle = PLATE.line;
+  const x0 = Math.round(dir > 0 ? x : x - len);
+  ctx.fillRect(x0, Math.round(y), len, 1);
+  const tipX = Math.round(dir > 0 ? x + len : x - len);
+  ctx.fillRect(tipX - (dir > 0 ? 1 : 0), Math.round(y) - 1, 1, 3);
+}
+
+/**
+ * The hunt, rough (src/engine/hunt.ts): the picture with what is on it, the cover, the leaning
+ * rock, the Montespan bear, and the beast in front.
+ */
+export function drawHunt(ctx: CanvasRenderingContext2D, h: import('../engine/hunt').Hunt): void {
+  const d = h.def;
+  const pic = h.picture;
+  // The picture, identical to the beast, facing him: its eye shut while the beast is blind.
+  drawPlateFigure(ctx, 'mammoth', pic, -1, h.state === 'blind');
+  // The heart, a natural hole in the rock, at 16 to 19 px.
+  ctx.fillStyle = PLATE.line;
+  ctx.fillRect(pic.x + 30, d.floorY - 19, 3, 3);
+  // The hunters' trap sign, a red roof, at 12 to 15 px, just below the heart.
+  ctx.fillStyle = PLATE.red;
+  for (let i = 0; i < 4; i++) ctx.fillRect(pic.x + 26 + i, d.floorY - 12 - i, 1, 1);
+  for (let i = 0; i < 4; i++) ctx.fillRect(pic.x + 33 - i, d.floorY - 12 - i, 1, 1);
+  ctx.fillRect(pic.x + 26, d.floorY - 12, 8, 1);
+  // The hunters' spear in the painted eye, standing out of the rock.
+  if (h.eyeSpear) {
+    const r = h.eyeSpearRect;
+    drawSpear(ctx, r.x + 2, r.y + 5, 12, -1);
+  }
+  for (const s of h.stuck) drawSpear(ctx, s.x, s.y, 10, 1);
+  // The leaning rock over the far lip.
+  ctx.fillStyle = PLATE.paperShade;
+  ctx.fillRect(d.rock.x, d.rock.y, d.rock.w, d.rock.h);
+  ctx.fillStyle = PLATE.line;
+  ctx.fillRect(d.rock.x, d.rock.y + d.rock.h - 1, d.rock.w, 1);
+  ctx.fillRect(d.rock.x, d.rock.y, 1, d.rock.h);
+  // The cover: poles and hides over the pit, until it goes.
+  if (!h.coverGone) {
+    ctx.fillStyle = '#8a7356';
+    ctx.fillRect(d.pit.x0, d.floorY, d.pit.x1 - d.pit.x0, 3);
+    ctx.fillStyle = PLATE.line;
+    for (let x = d.pit.x0; x < d.pit.x1; x += 6) ctx.fillRect(x, d.floorY, 1, 3);
+  }
+  // The Montespan bear: headless clay, lying, the skull between its forepaws, spears in it.
+  const b = d.bear;
+  ctx.fillStyle = '#9a7b55';
+  ctx.fillRect(b.x + 4, b.y + 3, b.w - 6, b.h - 3);
+  ctx.fillStyle = PLATE.line;
+  ctx.fillRect(b.x + 4, b.y + 3, b.w - 6, 1);
+  ctx.fillStyle = '#e8e0cc';
+  ctx.fillRect(b.x, b.y + b.h - 4, 4, 4);
+  for (let i = 0; i < 3; i++) drawSpear(ctx, b.x + 8 + i * 4, b.y + 1 + i, 6, 1);
+}
+
+/** The live beast, in front of everything else of the hunt. Its eye only ever shows shut or open. */
+export function drawHuntBeast(ctx: CanvasRenderingContext2D, h: import('../engine/hunt').Hunt): void {
+  if (h.state === 'sprung') return;
+  drawPlateFigure(ctx, 'mammoth', h.beast, -1, h.state === 'blind' || h.state === 'felled');
+}
+
+/** Spears in the air, and the one in his hand. */
+export function drawHuntSpears(ctx: CanvasRenderingContext2D, h: import('../engine/hunt').Hunt, p: { x: number; y: number; w: number; h: number; facing: 1 | -1 }): void {
+  for (const s of h.flying) drawSpear(ctx, s.vx > 0 ? s.x : s.x + 14, s.y, 14, s.vx > 0 ? 1 : -1);
+  if (h.carrying) drawSpear(ctx, p.facing > 0 ? p.x - 2 : p.x + p.w + 2, p.y + p.h - 10, 14, p.facing);
 }

@@ -690,11 +690,40 @@ export interface ReliefDef {
   claims: DeathCause;
 }
 
+/**
+ * Hunting Magic's fight (src/engine/hunt.ts): the blind mammoth, the hunters' covered pit, the
+ * picture on the rock over it, the far lip under the leaning rock, and the Montespan bear,
+ * where spears are taken.
+ */
+export interface HuntDef {
+  kind: 'hunt';
+  /** The room's floor: the lip's, the strip's, and the picture's foot. */
+  floorY: number;
+  /** Where touching takes a spear from the Montespan bear. */
+  bear: Rect;
+  /** The beast as it stands, blind, facing him: its left x and its size. */
+  beast: { x: number; w: number; h: number };
+  /** The hunters' pit under its cover, over x0 to x1; the picture is over it. */
+  pit: { x0: number; x1: number };
+  pitDepth: number;
+  /** The rock leaning over the far lip, under which every hop stops at one height. */
+  rock: Rect;
+  /** Seconds from the pull to the beast backing: the eye opening. */
+  opensAfter: number;
+  /** px/s it backs, rump first. Lamed, half. */
+  backSpeed: number;
+  /** Seconds it takes to go down into the pit. */
+  sinkTime: number;
+  /** The event the heart, in a trapped beast, fires. */
+  felled: string;
+}
+
 /** The animals of the plate (Hunting Magic): Altamira's horse, hind and bison. */
 export type PlateFigure = 'horse' | 'hind' | 'bison';
 
 export type EntityDef =
   | ReliefDef
+  | HuntDef
   | TableauDef
   | FightDef
   | EarDef

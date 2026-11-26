@@ -29,6 +29,7 @@ import type {
 } from './level';
 import type { MovingSolid, Player } from './player';
 import { PHYS } from './player';
+import { Hunt } from './hunt';
 import { centerX, centerY, DEATH_FRAMES, DT, overlaps, TILE, VIEW_W, type DeathCause, type Rect } from './types';
 
 export interface World {
@@ -51,6 +52,8 @@ export interface World {
    */
   claim(cause: DeathCause): void;
   sound(name: Sfx): void;
+  /** Whether he threw this tick: X or J, in the one level with a spear (Hunting Magic). */
+  thrown: boolean;
 }
 
 export interface Entity {
@@ -114,6 +117,8 @@ export function createEntity(def: EntityDef, level: Level): Entity {
       return new Tableau(def);
     case 'relief':
       return new Relief(def);
+    case 'hunt':
+      return new Hunt(def);
   }
 }
 

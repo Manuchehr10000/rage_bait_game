@@ -61,6 +61,8 @@ export type DeathCause =
   | 'The labyrinth'
   | 'The relief'
   | 'The shaft'
+  | 'The pitfall'
+  | 'The tectiform'
   | 'Gave up';
 
 /** How each death is drawn. */
@@ -132,6 +134,10 @@ export const DEATH_ANIM: Record<DeathCause, DeathAnim> = {
   'The relief': 'flat',
   // A plain fall that kills on the way down.
   'The shaft': 'flat',
+  // Down into the hunters' pit under the beast.
+  'The pitfall': 'crush',
+  // The trap let go, and the beast came up out of the pit at him.
+  'The tectiform': 'crush',
   'Gave up': 'sit',
 };
 
@@ -194,6 +200,8 @@ export const DEATH_SOUND: Record<
   'The labyrinth': 'thud',
   'The relief': 'thud',
   'The shaft': 'thud',
+  'The pitfall': 'squish',
+  'The tectiform': 'squish',
   'Gave up': 'sigh',
 };
 

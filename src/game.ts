@@ -172,6 +172,8 @@ export class Game {
    * until he stands on something or jumps and it does not claim him again.
    */
   private claimed: DeathCause | null = null;
+  /** Whether the throw was pressed this tick (Hunting Magic). */
+  private thrown = false;
   private titleTimer = 0;
 
   private stats: Stats = { total: 0, byCause: new Map() };
@@ -634,6 +636,9 @@ export class Game {
     const next = this.input.takeNextPressed();
     const escape = this.input.takePressed('Escape');
     const lampSwitch = this.input.takePressed('KeyL');
+    const threwX = this.input.takePressed('KeyX');
+    const threwJ = this.input.takePressed('KeyJ');
+    this.thrown = threwX || threwJ;
     this.input.flush();
     if (this.state === 'complete') {
       // A jump pressed at the label is not owed to the next level, nor to the map.
@@ -811,6 +816,7 @@ export class Game {
         if (this.state === 'playing') this.claimed = c;
       },
       sound: (n) => this.audio.play(n),
+      thrown: this.thrown,
     };
   }
 

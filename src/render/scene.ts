@@ -1,4 +1,5 @@
-import { drawGargasAbove, drawPlateFigure, drawPlatePaper, drawPlateTile } from './plate';
+import { drawGargasAbove, drawHunt, drawHuntBeast, drawHuntSpears, drawPlateFigure, drawPlatePaper, drawPlateTile } from './plate';
+import type { Hunt } from '../engine/hunt';
 import type { Camera } from '../engine/camera';
 import type { Chaser, Crumble, Ear, Entity, Falling, Fight, Guards, Hero, HeroFrame, Horse, Platform, Pusher, Roof, Seat, Sweep, Tableau, Thrower, Tipper, TrapColumn, Water } from '../engine/entities';
 import type { DecorDef, Level } from '../engine/level';
@@ -1940,6 +1941,10 @@ function drawEntityBack(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): voi
       // Drawn exactly as the flat ones are: the plate does not show the boss.
       drawPlateFigure(ctx, d.figure, d.rect, d.face);
       break;
+    case 'hunt':
+      drawHunt(ctx, e as Hunt);
+      drawHuntBeast(ctx, e as Hunt);
+      break;
     case 'snare': {
       // Drawn by the same code as the harmless ones, because it is the same track.
       // One that is part of something already drawn is not drawn again.
@@ -2548,7 +2553,8 @@ function drawEntityFront(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): vo
 
 function drawEntityOverlay(ctx: CanvasRenderingContext2D, s: Scene, e: Entity): void {
   const d = e.def;
-  if (d.kind === 'hero') drawHeroFront(ctx, s, e as Hero);
+  if (d.kind === 'hunt') drawHuntSpears(ctx, e as Hunt, s.player);
+  else if (d.kind === 'hero') drawHeroFront(ctx, s, e as Hero);
   else if (d.kind === 'ear') drawDust(ctx, (e as Ear).dust(s.player).front);
   else if (d.kind === 'fight') drawBullHands(ctx, s, e as Fight);
   else if (d.kind === 'water') {
